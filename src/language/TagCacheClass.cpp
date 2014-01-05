@@ -219,13 +219,46 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClassOrFile(cons
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);
 
-	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
-	// instead of the global finder, since the global finder will be outdated.
 	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
 		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactClassOrFile(tagSearch);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			matches.push_back(tag);
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactClass(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
+
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactClass(tagSearch);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			matches.push_back(tag);
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactFunction(const UnicodeString& search) {
+	std::vector<mvceditor::TagClass> matches;
+	mvceditor::TagSearchClass tagSearch(search);
+
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactFunction(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
 			mvceditor::TagClass tag = finderMatches[j];

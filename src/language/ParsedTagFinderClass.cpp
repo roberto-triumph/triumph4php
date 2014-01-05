@@ -1705,11 +1705,6 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClassOrFi
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<mvceditor::TagClass> allMatches;
-	std::vector<int> types;
-	bool error = false;
-	wxString errorMsg;
-	std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, tagSearch.GetSourceDirs(), error, errorMsg);
-	wxASSERT_MSG(!error, errorMsg);
 	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
 		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 		mvceditor::FileTagResultClass fileTagResult;
@@ -1724,6 +1719,28 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClassOrFi
 		exactResult.Prepare(*Session, true);
 		allMatches = exactResult.Matches();
 	}
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClass(const mvceditor::TagSearchClass& tagSearch) {
+	std::vector<mvceditor::TagClass> allMatches;	
+	mvceditor::ExactNonMemberTagResultClass exactResult;
+	exactResult.SetTagType(mvceditor::TagClass::CLASS);
+	exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
+	exactResult.Prepare(*Session, true);
+	allMatches = exactResult.Matches();
+	
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFunction(const mvceditor::TagSearchClass& tagSearch) {
+	std::vector<mvceditor::TagClass> allMatches;	
+	mvceditor::ExactNonMemberTagResultClass exactResult;
+	exactResult.SetTagType(mvceditor::TagClass::FUNCTION);
+	exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
+	exactResult.Prepare(*Session, true);
+	allMatches = exactResult.Matches();
+	
 	return allMatches;
 }
 

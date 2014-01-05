@@ -262,6 +262,24 @@ public:
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
 	 */
 	std::vector<mvceditor::TagClass> ExactClassOrFile(const UnicodeString& search);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches (it will call ExactClass
+	 * on each tag finder).
+	 * @param search string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be class tags only
+	 */
+	std::vector<mvceditor::TagClass> ExactClass(const UnicodeString& search);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches (it will call ExactFunction
+	 * on each tag finder).
+	 * @param search string to search for
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be function tags only
+	 */
+	std::vector<mvceditor::TagClass> ExactFunction(const UnicodeString& search);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)

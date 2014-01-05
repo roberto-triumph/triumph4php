@@ -579,8 +579,7 @@ public:
 	std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 	/**
-	 * Looks for the a class or file tag, using exact, case insensitive matching. Will collect the fully qualified tag name 
-	 * itself.
+	 * Looks for a class or file tag, using exact, case insensitive matching. 
 	 * 
 	 * @param tagSearch the resources to look for
 	 * @return std::vector<TagClass> the matched resources
@@ -589,6 +588,28 @@ public:
 	 *         the file system.
 	 */
 	std::vector<mvceditor::TagClass> ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch);
+
+	/**
+	 * Looks for a class name using exact, case insensitive matching. 
+	 * 
+	 * @param tagSearch the resources to look for
+	 * @return std::vector<TagClass> the matched resources
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
+	 */
+	std::vector<mvceditor::TagClass> ExactClass(const mvceditor::TagSearchClass& tagSearch);
+
+	/**
+	 * Looks for a function name using exact, case insensitive matching. 
+	 * 
+	 * @param tagSearch the resources to look for
+	 * @return std::vector<TagClass> the matched resources
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
+	 */
+	std::vector<mvceditor::TagClass> ExactFunction(const mvceditor::TagSearchClass& tagSearch);
 	
 	/**
 	 * Looks for the class or file tag, using a near-match logic. Logic is as follows:
