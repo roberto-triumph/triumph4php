@@ -89,6 +89,38 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithArray) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithStatic) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($b) {\n"
+		"  static $a = 1;\n"
+		"  var_dump($a);\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithGlobal) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($b) {\n"
+		"  global $a;\n"
+		"  var_dump($a);\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithList) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($b) {\n"
+		"  list($k) = $b;\n"
+		"  var_dump($k);\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
 
 TEST_FIXTURE(PhpLintTestFixtureClass, PredefinedVariables) {
 	UnicodeString code = mvceditor::CharToIcu(
@@ -248,5 +280,60 @@ TEST_FIXTURE(PhpLintTestFixtureClass, RecurseConstructorArguments) {
 	CHECK_EQUAL(7, Results[1].LineNumber);
 }
 
+TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedArrayKeys) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($c, $d) {\n"
+		"  $a = $c[$key];\n"
+		"  $c[$k] = array($f => $g); \n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(4, Results);
+	CHECK_UNISTR_EQUALS("$key", Results[0].VariableName);
+	CHECK_EQUAL(2, Results[0].LineNumber);
+	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
+	CHECK_EQUAL(3, Results[1].LineNumber);
+	CHECK_UNISTR_EQUALS("$f", Results[2].VariableName);
+	CHECK_EQUAL(3, Results[2].LineNumber);
+	CHECK_UNISTR_EQUALS("$g", Results[3].VariableName);
+	CHECK_EQUAL(3, Results[3].LineNumber);
+}
+
+TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedIncludeVariables) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"$file2  = include __DIR__ . $file;\n"
+		"include_once __DIR__ . $file;\n"
+		"require __DIR__ . $file;\n"
+		"require_once __DIR__ . $file2;\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(3, Results);
+	CHECK_UNISTR_EQUALS("$file", Results[0].VariableName);
+	CHECK_EQUAL(1, Results[0].LineNumber);
+	CHECK_UNISTR_EQUALS("$file", Results[1].VariableName);
+	CHECK_EQUAL(2, Results[1].LineNumber);
+	CHECK_UNISTR_EQUALS("$file", Results[2].VariableName);
+	CHECK_EQUAL(3, Results[2].LineNumber);
+}
+
+TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedInClosure) {
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($c, $d) {\n"
+		"  $a = $c[$d];\n"
+		"  $zz = function($i, $j) use ($d) {\n"
+		"      $a[$c] = array($i => $d, 2 => $j, 3 => $k); \n"
+		"   };\n"  
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(2, Results);
+	CHECK_UNISTR_EQUALS("$c", Results[0].VariableName);
+	CHECK_EQUAL(4, Results[0].LineNumber);
+	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
+	CHECK_EQUAL(4, Results[1].LineNumber);
+}
 
 }

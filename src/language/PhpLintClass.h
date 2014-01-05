@@ -141,6 +141,16 @@ public:
 
 	void ExpressionFunctionArgumentFound(pelet::VariableClass* variable);
 
+	void StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables);
+
+	void StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables);
+
+	void ExpressionIncludeFound(pelet::IncludeExpressionClass* expr);
+
+	void ExpressionClosureFound(pelet::ClosureExpressionClass* expr);
+
+	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
+
 private:
 
 	/**
@@ -168,7 +178,6 @@ private:
 	 */
 	pelet::ParserClass Parser;
 
-
 	/**
 	 * @param var the expression to check. A Check  will be
 	 *       done to see if any of the variables used in the 
@@ -185,6 +194,15 @@ private:
 	 *       created and appended to the Errors vector.
 	 */
 	void CheckVariable(pelet::VariableClass* var);
+
+	/**
+	 * @param expr array definition to check. check array($key => $value)
+	 *       A Check  will be
+	 *       done to see if any variable in the key-value pairs has been previously
+	 *       initialized. if not, then a new error is 
+	 *       created and appended to the Errors vector.
+	 */
+	void CheckArrayDefinition(pelet::ArrayExpressionClass* expr);
 
 };
 

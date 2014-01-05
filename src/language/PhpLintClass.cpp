@@ -140,6 +140,15 @@ void mvceditor::PhpLintClass::ExpressionVariableFound(pelet::VariableClass* expr
 }
 
 void mvceditor::PhpLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+	
+	// check any array accesses in the destination variable
+	// ie $user[$name]
+	for (size_t i = 0; i < expression->Destination.ChainList.size(); ++i) {
+		if (expression->Destination.ChainList[i].IsArrayAccess && expression->Destination.ChainList[i].ArrayAccess) {
+			CheckExpression(expression->Destination.ChainList[i].ArrayAccess);
+		}
+	}
+	
 	CheckExpression(expression->Expression);
 	
 	// for now, ignore assignments to properties ie. $obj->prop1
@@ -203,9 +212,97 @@ void mvceditor::PhpLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpre
 	}
 } 
 
+void mvceditor::PhpLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
+	
+	// global statement brings in variables, so we add them to 
+	// the defined list
+	for (size_t i = 0; i < variables->Variables.size(); ++i) {
+		if (!variables->Variables[i]->ChainList.empty()) {
+			UnicodeString varName = variables->Variables[i]->ChainList[0].Name;
+			ScopeVariables.push_back(varName);
+		}
+	}
+}
+
+void mvceditor::PhpLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
+
+	// static statement brings in variables, so we add them to 
+	// the defined list
+	for (size_t i = 0; i < variables->Variables.size(); ++i) {
+		if (!variables->Variables[i]->ChainList.empty()) {
+			UnicodeString varName = variables->Variables[i]->ChainList[0].Name;
+			ScopeVariables.push_back(varName);
+		}
+	}
+}
+
+void mvceditor::PhpLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
+	CheckExpression(expr->Expression);
+}
+
+void mvceditor::PhpLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
+	
+	// for a closure, we add the closure parameters and the lexical
+	// var ("use" variables) as into the scope.  we also define a new
+	// scope for the closure.
+	std::vector<UnicodeString> closureScopeVariables;
+	for (size_t i = 0; i < expr->Parameters.size(); ++i) {
+		pelet::VariableClass* param = expr->Parameters[i];
+		if (!param->ChainList.empty()) {
+			closureScopeVariables.push_back(param->ChainList[0].Name);
+		}
+	}
+	for (size_t i = 0; i < expr->LexicalVars.size(); ++i) {
+		pelet::VariableClass* param = expr->LexicalVars[i];
+		if (!param->ChainList.empty()) {
+			closureScopeVariables.push_back(param->ChainList[0].Name);
+		}
+	}
+
+	// copy the current scope to be replaced back after we deal with the closure
+	std::vector<UnicodeString> oldScope = ScopeVariables;
+	ScopeVariables = closureScopeVariables;
+
+	for (size_t i = 0; i < expr->Statements.Size(); ++i) {
+		if (pelet::StatementClass::EXPRESSION == expr->Statements.TypeAt(i)) {
+			CheckExpression((pelet::ExpressionClass*)expr->Statements.At(i));
+		}
+	}
+	
+	// put the old scope back
+	ScopeVariables = oldScope;
+}
+void mvceditor::PhpLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
+
+	// check any array accesses in the destination variables
+	// ie $user[$name]
+	for (size_t i = 0; i < expression->Destinations.size(); ++i) {
+		pelet::VariableClass var = expression->Destinations[i];
+		for (size_t j = 0; j < var.ChainList.size(); ++j) {
+			if (var.ChainList[j].IsArrayAccess && var.ChainList[j].ArrayAccess) {
+				CheckExpression(var.ChainList[j].ArrayAccess);
+			}
+		}
+	}
+	
+	CheckExpression(expression->Expression);
+	
+	// add the assigned variables to the scope
+	// for now, ignore assignments to properties ie. $obj->prop1
+	for (size_t i = 0; i < expression->Destinations.size(); ++i) {
+		pelet::VariableClass var = expression->Destinations[i];
+		if (var.ChainList.size() == 1 && 
+			!var.ChainList[0].IsFunction) {
+			
+			ScopeVariables.push_back(var.ChainList[0].Name);
+		}
+	}
+}
+
 void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	switch (expr->ExpressionType) {
 	case pelet::ExpressionClass::ARRAY:
+		CheckArrayDefinition((pelet::ArrayExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::ASSIGNMENT:
 		ExpressionAssignmentFound((pelet::AssignmentExpressionClass*)expr);
@@ -214,7 +311,7 @@ void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 		ExpressionAssignmentCompoundFound((pelet::AssignmentCompoundExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::ASSIGNMENT_LIST:
-		// TODO
+		ExpressionAssignmentListFound((pelet::AssignmentListExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::BINARY_OPERATION:
 		ExpressionBinaryOperationFound((pelet::BinaryOperationClass*)expr);
@@ -237,6 +334,12 @@ void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	case pelet::ExpressionClass::VARIABLE:
 		CheckVariable((pelet::VariableClass*)expr);
 		break;
+	case pelet::ExpressionClass::INCLUDE:
+		ExpressionIncludeFound((pelet::IncludeExpressionClass*)expr);
+		break;
+	case pelet::ExpressionClass::CLOSURE:
+		ExpressionClosureFound((pelet::ClosureExpressionClass*)expr);
+		break;
 	}
 }
 
@@ -253,13 +356,10 @@ void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
 	   ///  4. undefined properties of an object
 	   ///  5. undefined methods of an object
 	//  6. variable variables  "$obj->{$methodName}"
-	  ///  7. variables in array expression $users[$iIndex], array(strtolower($name) => $count)
-	  ///  8. variables inside closures 
 	  ///  9. attempt to inherit from undefined base classes
 	  /// 10. attempt to implement undefined interfaces
 	  /// 11. type hints with classes that are not defined
 	  /// 12. namespace declarations with namespaces that are not defined
-	  /// 13. variable in include/require statements
 	if (!var->ChainList[0].IsFunction) {
 		UnicodeString varName = var->ChainList[0].Name;
 		if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)
@@ -279,5 +379,23 @@ void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
 		for (it = var->ChainList[0].CallArguments.begin(); it != var->ChainList[0].CallArguments.end(); ++it) {
 			CheckExpression(*it);
 		}
+	}
+
+	// check for array accesees ie $user[$name]
+	for (size_t i = 0; i < var->ChainList.size(); ++i) {
+		if (var->ChainList[i].IsArrayAccess && var->ChainList[i].ArrayAccess) {
+			CheckExpression(var->ChainList[i].ArrayAccess);
+		}
+	}
+}
+
+void mvceditor::PhpLintClass::CheckArrayDefinition(pelet::ArrayExpressionClass* expr) {
+	std::vector<pelet::ArrayPairExpressionClass*>::const_iterator it;
+	for (it = expr->ArrayPairs.begin(); it != expr->ArrayPairs.end(); ++it) {
+		pelet::ArrayPairExpressionClass* pair = *it;
+		if (pair->Key) {
+			CheckExpression(pair->Key);
+		}
+		CheckExpression(pair->Value);
 	}
 }
