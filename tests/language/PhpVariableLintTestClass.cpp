@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <language/PhpLintClass.h>
+#include <language/PhpVariableLintClass.h>
 #include <globals/String.h>
 #include <MvcEditorChecks.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
@@ -32,15 +32,15 @@
  * fixture for the PHP lint tests. Will create a
  * linter, default it to suer PHP 5.3 syntax
  */
-class PhpLintTestFixtureClass {
+class PhpVariableLintTestFixtureClass {
 
 public:
 
-	mvceditor::PhpLintClass Lint;
-	std::vector<mvceditor::PhpLintResultClass> Results;
+	mvceditor::PhpVariableLintClass Lint;
+	std::vector<mvceditor::PhpVariableLintResultClass> Results;
 	bool HasError;
 
-	PhpLintTestFixtureClass() 
+	PhpVariableLintTestFixtureClass() 
 	: Lint() 
 	, Results()
 	, HasError(false) {
@@ -54,9 +54,9 @@ public:
 };
 
 
-SUITE(PhpLintTestClass) {
+SUITE(PhpVariableLintTestClass) {
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithObject) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = new MyClass();\n"
@@ -67,7 +67,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithObject) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithVariable) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($b) {\n"
 		"  $a = $b;\n"
@@ -78,7 +78,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithVariable) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithArray) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithArray) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($b) {\n"
 		"  $a = array(1, 2, 3);\n"
@@ -89,7 +89,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithArray) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithStatic) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithStatic) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($b) {\n"
 		"  static $a = 1;\n"
@@ -100,7 +100,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithStatic) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithGlobal) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithGlobal) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($b) {\n"
 		"  global $a;\n"
@@ -111,7 +111,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithGlobal) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithList) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithList) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($b) {\n"
 		"  list($k) = $b;\n"
@@ -122,7 +122,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, IntializedWithList) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, PredefinedVariables) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, PredefinedVariables) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = $_GET['help'];\n"
@@ -133,7 +133,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, PredefinedVariables) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, FunctionParameters) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 
 	// function parameters should be automatically declared
 	UnicodeString code = mvceditor::CharToIcu(
@@ -145,7 +145,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, FunctionParameters) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, ExceptionBlocks) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
 	
 	// no errors on exception blocks as exceptions
 	// caught are already initialized
@@ -165,7 +165,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, ExceptionBlocks) {
 	CHECK_EQUAL(false, HasError);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariable) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = $x + $y;\n"
@@ -183,7 +183,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariable) {
 	CHECK_EQUAL(3, Results[2].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariableScopes) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 
 	// test that variables are stored by scope; meaning
 	// that the same named-variable in different functions
@@ -212,7 +212,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariableScopes) {
 	CHECK_EQUAL(10, Results[2].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariableArguments) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
 	UnicodeString code = mvceditor::CharToIcu(
@@ -232,7 +232,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedVariableArguments) {
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, RecurseFunctionArguments) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 
 	// test that arguments to calling function are checked
 	// must recurse down function calls in case an argument
@@ -254,7 +254,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, RecurseFunctionArguments) {
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, RecurseConstructorArguments) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 
 	// test that arguments to a constructor are checked
 	// must recurse down constructor call and any method chaining 
@@ -280,7 +280,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, RecurseConstructorArguments) {
 	CHECK_EQUAL(7, Results[1].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedArrayKeys) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedArrayKeys) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$key];\n"
@@ -300,7 +300,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedArrayKeys) {
 	CHECK_EQUAL(3, Results[3].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedIncludeVariables) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"$file2  = include __DIR__ . $file;\n"
 		"include_once __DIR__ . $file;\n"
@@ -318,7 +318,7 @@ TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedIncludeVariables) {
 	CHECK_EQUAL(3, Results[2].LineNumber);
 }
 
-TEST_FIXTURE(PhpLintTestFixtureClass, UnitializedInClosure) {
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$d];\n"

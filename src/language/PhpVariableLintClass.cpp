@@ -22,11 +22,12 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <language/PhpLintClass.h>
+#include <language/PhpVariableLintClass.h>
 #include <globals/String.h>
+#include <wx/ffile.h>
 #include <algorithm>
 
-mvceditor::PhpLintResultClass::PhpLintResultClass()
+mvceditor::PhpVariableLintResultClass::PhpVariableLintResultClass()
 : VariableName()
 , LineNumber(0)
 , Pos(0) 
@@ -34,7 +35,7 @@ mvceditor::PhpLintResultClass::PhpLintResultClass()
 
 }
 
-mvceditor::PhpLintResultClass::PhpLintResultClass(const mvceditor::PhpLintResultClass& src)
+mvceditor::PhpVariableLintResultClass::PhpVariableLintResultClass(const mvceditor::PhpVariableLintResultClass& src)
 : VariableName()
 , LineNumber(0)
 , Pos(0) 
@@ -42,13 +43,13 @@ mvceditor::PhpLintResultClass::PhpLintResultClass(const mvceditor::PhpLintResult
 	Copy(src);
 }
 
-mvceditor::PhpLintResultClass& 
-mvceditor::PhpLintResultClass::operator=(const mvceditor::PhpLintResultClass& src) {
+mvceditor::PhpVariableLintResultClass& 
+mvceditor::PhpVariableLintResultClass::operator=(const mvceditor::PhpVariableLintResultClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::PhpLintResultClass::Copy(const mvceditor::PhpLintResultClass& src) {
+void mvceditor::PhpVariableLintResultClass::Copy(const mvceditor::PhpVariableLintResultClass& src) {
 	VariableName = src.VariableName;
 	LineNumber = src.LineNumber;
 	Pos = src.Pos;
@@ -56,7 +57,7 @@ void mvceditor::PhpLintResultClass::Copy(const mvceditor::PhpLintResultClass& sr
 }
 
 
-mvceditor::PhpLintClass::PhpLintClass()
+mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 : Errors()
 , ScopeVariables()
 , PredefinedVariables()
@@ -87,26 +88,36 @@ mvceditor::PhpLintClass::PhpLintClass()
 	}
 }
 
-void mvceditor::PhpLintClass::SetVersion(pelet::Versions version) {
+void mvceditor::PhpVariableLintClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-bool mvceditor::PhpLintClass::ParseFile(const wxFileName& fileName, 
-															std::vector<mvceditor::PhpLintResultClass>& errors) {
-	return true;																
+bool mvceditor::PhpVariableLintClass::ParseFile(const wxFileName& fileName, 
+															std::vector<mvceditor::PhpVariableLintResultClass>& errors) {
+	Errors.clear();
+	ScopeVariables.clear();
+	pelet::LintResultsClass lintResult;
+
+	wxFFile file;
+	if (file.Open(fileName.GetFullPath(), wxT("rb"))) {
+		bool good = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), lintResult);
+		errors = Errors;
+	}
+	return !errors.empty();
 }
 
-bool mvceditor::PhpLintClass::ParseString(const UnicodeString& code, 
-															  std::vector<mvceditor::PhpLintResultClass>& errors) {
+bool mvceditor::PhpVariableLintClass::ParseString(const UnicodeString& code, 
+															  std::vector<mvceditor::PhpVariableLintResultClass>& errors) {
 	
 	Errors.clear();
+	ScopeVariables.clear();
 	pelet::LintResultsClass lintResult;
 	bool good = Parser.ScanString(code, lintResult);
 	errors = Errors;
 	return !errors.empty();
 }
 
-void mvceditor::PhpLintClass::DefineDeclarationFound(const UnicodeString& namespaceName, 
+void mvceditor::PhpVariableLintClass::DefineDeclarationFound(const UnicodeString& namespaceName, 
 													 const UnicodeString& variableName, 
 													 const UnicodeString& variableValue, 
 													 const UnicodeString& comment, 
@@ -114,20 +125,20 @@ void mvceditor::PhpLintClass::DefineDeclarationFound(const UnicodeString& namesp
 
 }
 
-void mvceditor::PhpLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+void mvceditor::PhpVariableLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ScopeVariables.clear();
 }
 
-void mvceditor::PhpLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
+void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
 											const UnicodeString& comment, const int lineNumber) {
 	ScopeVariables.clear();
 }
 
-void mvceditor::PhpLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
+void mvceditor::PhpVariableLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
 	
 	// functino arguments go in the initialized list
 	if (!variable->ChainList.empty()) {
@@ -135,11 +146,11 @@ void mvceditor::PhpLintClass::ExpressionFunctionArgumentFound(pelet::VariableCla
 	}
 }
 
-void mvceditor::PhpLintClass::ExpressionVariableFound(pelet::VariableClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionVariableFound(pelet::VariableClass* expression) {
 	CheckVariable(expression);
 }
 
-void mvceditor::PhpLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
 	
 	// check any array accesses in the destination variable
 	// ie $user[$name]
@@ -159,7 +170,7 @@ void mvceditor::PhpLintClass::ExpressionAssignmentFound(pelet::AssignmentExpress
 	}
 }
 
-void mvceditor::PhpLintClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
 	CheckExpression(expression->RightOperand);
 
 	// for now, ignore assignments to properties ie. $obj->prop1
@@ -170,20 +181,20 @@ void mvceditor::PhpLintClass::ExpressionAssignmentCompoundFound(pelet::Assignmen
 	}
 }
 
-void mvceditor::PhpLintClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
 	CheckExpression(expression->LeftOperand);
 	CheckExpression(expression->RightOperand);
 }
 
-void mvceditor::PhpLintClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
 	CheckExpression(expression->Operand);
 }
 
-void mvceditor::PhpLintClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
 	CheckVariable(&expression->Variable);
 }
 
-void mvceditor::PhpLintClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
 	CheckExpression(expression->Expression1);
 	CheckExpression(expression->Expression2);
 	if (expression->Expression3) {
@@ -191,12 +202,12 @@ void mvceditor::PhpLintClass::ExpressionTernaryOperationFound(pelet::TernaryOper
 	}
 }
 
-void mvceditor::PhpLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 	
 	// nothing as scalars cannot be undefined
 }
 
-void mvceditor::PhpLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
 	std::vector<pelet::ExpressionClass*>::const_iterator constructorArg = expression->CallArguments.begin();
 	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
 		CheckExpression(*constructorArg);
@@ -212,7 +223,7 @@ void mvceditor::PhpLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpre
 	}
 } 
 
-void mvceditor::PhpLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
+void mvceditor::PhpVariableLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
 	
 	// global statement brings in variables, so we add them to 
 	// the defined list
@@ -224,7 +235,7 @@ void mvceditor::PhpLintClass::StatementGlobalVariablesFound(pelet::GlobalVariabl
 	}
 }
 
-void mvceditor::PhpLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
+void mvceditor::PhpVariableLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
 
 	// static statement brings in variables, so we add them to 
 	// the defined list
@@ -236,11 +247,11 @@ void mvceditor::PhpLintClass::StatementStaticVariablesFound(pelet::StaticVariabl
 	}
 }
 
-void mvceditor::PhpLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
+void mvceditor::PhpVariableLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
 	CheckExpression(expr->Expression);
 }
 
-void mvceditor::PhpLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
+void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
 	
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
@@ -272,7 +283,7 @@ void mvceditor::PhpLintClass::ExpressionClosureFound(pelet::ClosureExpressionCla
 	// put the old scope back
 	ScopeVariables = oldScope;
 }
-void mvceditor::PhpLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
+void mvceditor::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
 
 	// check any array accesses in the destination variables
 	// ie $user[$name]
@@ -299,7 +310,7 @@ void mvceditor::PhpLintClass::ExpressionAssignmentListFound(pelet::AssignmentLis
 	}
 }
 
-void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
+void mvceditor::PhpVariableLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	switch (expr->ExpressionType) {
 	case pelet::ExpressionClass::ARRAY:
 		CheckArrayDefinition((pelet::ArrayExpressionClass*)expr);
@@ -343,7 +354,7 @@ void mvceditor::PhpLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	}
 }
 
-void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
+void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	if (var->ChainList.empty()) {
 		return;
 	}
@@ -364,10 +375,10 @@ void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
 		UnicodeString varName = var->ChainList[0].Name;
 		if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)
 			&& PredefinedVariables.end() == std::find(PredefinedVariables.begin(), PredefinedVariables.end(), varName)) {
-			mvceditor::PhpLintResultClass lintResult;
+			mvceditor::PhpVariableLintResultClass lintResult;
 			lintResult.LineNumber = var->LineNumber;
 			lintResult.Pos = 0;
-			lintResult.Type = mvceditor::PhpLintResultClass::UNINITIALIZED_VARIABLE;
+			lintResult.Type = mvceditor::PhpVariableLintResultClass::UNINITIALIZED_VARIABLE;
 			lintResult.VariableName = varName;
 			Errors.push_back(lintResult);
 		}
@@ -389,7 +400,7 @@ void mvceditor::PhpLintClass::CheckVariable(pelet::VariableClass* var) {
 	}
 }
 
-void mvceditor::PhpLintClass::CheckArrayDefinition(pelet::ArrayExpressionClass* expr) {
+void mvceditor::PhpVariableLintClass::CheckArrayDefinition(pelet::ArrayExpressionClass* expr) {
 	std::vector<pelet::ArrayPairExpressionClass*>::const_iterator it;
 	for (it = expr->ArrayPairs.begin(); it != expr->ArrayPairs.end(); ++it) {
 		pelet::ArrayPairExpressionClass* pair = *it;

@@ -35,7 +35,7 @@ namespace mvceditor {
  * name and position of an uninitialized variable
  * found in a PHP file.
  */
-class PhpLintResultClass {
+class PhpVariableLintResultClass {
 	
 public:
 
@@ -63,22 +63,22 @@ public:
 
 	Types Type;
 
-	PhpLintResultClass();
+	PhpVariableLintResultClass();
 
-	PhpLintResultClass(const mvceditor::PhpLintResultClass& src);
+	PhpVariableLintResultClass(const mvceditor::PhpVariableLintResultClass& src);
 
-	mvceditor::PhpLintResultClass& operator=(const mvceditor::PhpLintResultClass& src);
+	mvceditor::PhpVariableLintResultClass& operator=(const mvceditor::PhpVariableLintResultClass& src);
 
-	void Copy(const mvceditor::PhpLintResultClass& src);
+	void Copy(const mvceditor::PhpVariableLintResultClass& src);
 };
 
 /**
- * The PhpLintClass is a class that is used
+ * The PhpVariableLintClass is a class that is used
  * to find any uninitialized variables in a PHP file. If a file
- * contains syntax errors, then most uninitialized variables will
+ * contains syntax errors, then uninitialized variables will
  * not be found.
  */
-class PhpLintClass :
+class PhpVariableLintClass :
 	public pelet::ClassObserverClass, 
 	public pelet::ClassMemberObserverClass, 
 	public pelet::FunctionObserverClass, 
@@ -86,7 +86,7 @@ class PhpLintClass :
 
 public:
 
-	PhpLintClass();
+	PhpVariableLintClass();
 
 	/**
 	 * Set the version that the PHP parser should use. This method should be
@@ -100,7 +100,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
-	bool ParseFile(const wxFileName& fileName, std::vector<mvceditor::PhpLintResultClass>& errors);
+	bool ParseFile(const wxFileName& fileName, std::vector<mvceditor::PhpVariableLintResultClass>& errors);
 
 	/**
 	 * @param code the string to parse and report errors on
@@ -108,7 +108,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
-	bool ParseString(const UnicodeString& code, std::vector<mvceditor::PhpLintResultClass>& errors);
+	bool ParseString(const UnicodeString& code, std::vector<mvceditor::PhpVariableLintResultClass>& errors);
 
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
@@ -156,7 +156,7 @@ private:
 	/**
 	 * errors found so far
 	 */
-	std::vector<mvceditor::PhpLintResultClass> Errors;
+	std::vector<mvceditor::PhpVariableLintResultClass> Errors;
 
 	/**
 	 * variables found in the current scope
