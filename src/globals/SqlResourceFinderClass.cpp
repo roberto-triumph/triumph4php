@@ -313,10 +313,62 @@ void mvceditor::SqlResourceTableResultClass::Next() {
 	Fetch();
 }
 
+mvceditor::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
+ : SqliteResultClass()
+ , TableName()
+ , Connection() 
+ , Lookup() 
+ , ConnectionHash() {
+	 
+ }
+ 
+void mvceditor::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
+	Lookup = mvceditor::WxToChar(lookup);
+	ConnectionHash = connectionHash;
+}
 
-/**
- * Performs a prefix lookup on column names 
- */
+bool mvceditor::ExactSqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
+	std::string sql = "SELECT table_name, connection_label ";
+	sql += "FROM db_tables ";
+	sql += "WHERE table_name = ? ";
+	if (!ConnectionHash.empty()) {
+		
+		// no connection hash = search for table on all connections
+		sql += "AND connection_label = ? ";
+	}
+	sql += "ORDER BY table_name ";
+	if (doLimit) {
+		sql += "LIMIT 100";
+	}
+	
+	soci::statement* stmt = new soci::statement(session);
+	stmt->prepare(sql);
+	stmt->exchange(soci::use(Lookup));
+	if (!ConnectionHash.empty()) {
+		stmt->exchange(soci::use(ConnectionHash));
+	}
+	return Init(stmt);
+}
+
+bool mvceditor::ExactSqlResourceTableResultClass::Init(soci::statement* stmt) {
+	wxString error;
+	bool ret = false;
+	try {
+		stmt->exchange(soci::into(TableName));
+		stmt->exchange(soci::into(Connection));
+		
+		ret = AdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = mvceditor::CharToWx(e.what());
+		wxASSERT_MSG(false, error);
+	}
+	return ret;
+}
+
+void mvceditor::ExactSqlResourceTableResultClass::Next() {
+	Fetch();
+}
+
 mvceditor::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
 : SqliteResultClass()
 , ColumnName()
