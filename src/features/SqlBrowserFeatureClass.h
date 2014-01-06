@@ -488,6 +488,14 @@ private:
 	 * needed to get the connection list
 	 */
 	SqlBrowserFeatureClass& Feature;
+
+	/**
+	 * used to execute queries in the background
+	 * use our own instance so that we can close any 
+	 * running queries if the user clicks the
+	 * close app button (closes the program)
+	 */
+	mvceditor::RunningThreadsClass RunningThreads;
 	
 	/**
 	 * to kill a running query

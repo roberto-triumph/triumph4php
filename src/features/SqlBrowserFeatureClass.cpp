@@ -1185,19 +1185,20 @@ void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::Open
 mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id, mvceditor::SqlBrowserFeatureClass& feature)
 : TableDefinitionPanelGeneratedClass(parent, id)
 , Feature(feature) 
+, RunningThreads()
 , TableConnectionIdentifier() 
 , IndexConnectionIdentifier() {
 	ColumnsGrid->ClearGrid();
 	IndicesGrid->ClearGrid();
 	Connections->Clear();
 	FillConnectionList();
-	Feature.App.RunningThreads.AddEventHandler(this);
+	RunningThreads.AddEventHandler(this);
 	RefreshButton->SetBitmap(mvceditor::IconImageAsset("outline-refresh"));
 	this->Layout();
 }
 
 mvceditor::TableDefinitionPanelClass::~TableDefinitionPanelClass() {
-	Feature.App.RunningThreads.RemoveEventHandler(this);
+	RunningThreads.RemoveEventHandler(this);
 }
 
 void mvceditor::TableDefinitionPanelClass::FillConnectionList() {
@@ -1234,9 +1235,9 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 		columnSql = mvceditor::WxToIcu("PRAGMA table_info('" + tableName + "')");
 	}
 	mvceditor::MultipleSqlExecuteClass* sqlDefExecute = 
-		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
+		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
 	if (sqlDefExecute->Init(columnSql, query)) {
-		Feature.App.RunningThreads.Queue(sqlDefExecute);
+		RunningThreads.Queue(sqlDefExecute);
 	}
 	
 	UnicodeString indexSql;
@@ -1247,9 +1248,9 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 		indexSql = mvceditor::WxToIcu("PRAGMA index_list('" + tableName + "')");
 	}
 	mvceditor::MultipleSqlExecuteClass* sqlIndexExecute = 
-		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
+		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
 	if (sqlIndexExecute->Init(indexSql, query)) {
-		Feature.App.RunningThreads.Queue(sqlIndexExecute);
+		RunningThreads.Queue(sqlIndexExecute);
 	}
 }
 
@@ -1305,9 +1306,9 @@ void mvceditor::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
 	mvceditor::SqlQueryClass query;
 	query.DatabaseTag = selectedTag;
 	mvceditor::MultipleSqlExecuteClass* sqlCreateExecute = 
-		new mvceditor::MultipleSqlExecuteClass(Feature.App.RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
+		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
 	if (sqlCreateExecute->Init(createSql, query)) {
-		Feature.App.RunningThreads.Queue(sqlCreateExecute);
+		RunningThreads.Queue(sqlCreateExecute);
 	}
 }
 
