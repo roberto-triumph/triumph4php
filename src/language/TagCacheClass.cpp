@@ -325,9 +325,7 @@ void mvceditor::TagCacheClass::Print() {
 bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 
 	// if at least one tag finder is not empty, return false
-	if (TagFinderList && TagFinderList->IsNativeTagFinderInit && !TagFinderList->NativeTagFinder.IsFileCacheEmpty()) {
-		return false;
-	}
+	// no need to check native tag cache, as that is always not empty
 	if (TagFinderList && TagFinderList->IsTagFinderInit && !TagFinderList->TagFinder.IsFileCacheEmpty()) {
 		return false;
 	}

@@ -293,12 +293,22 @@ void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSear
 			desc = tag->PhpTag.FullPath;
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
+			mvceditor::DatabaseTagClass dbTag;
+			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Data for ") + tag->TableTag.TableName;
+			desc = _("Database Table Data for ") 
+				+ tag->TableTag.TableName 
+				+ _(" in connection ") 
+				+ mvceditor::IcuToWx(dbTag.Label);
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
+			mvceditor::DatabaseTagClass dbTag;
+			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Definition for ") + tag->TableTag.TableName;
+			desc = _("Database Table Definition for ") 
+				+ tag->TableTag.TableName 
+				+ _(" in connection ") 
+				+ mvceditor::IcuToWx(dbTag.Label);
 		}
 		
 		MatchesList->Append(value + wxT(" - ") + desc);
@@ -343,7 +353,8 @@ void mvceditor::TotalSearchDialogClass::UpdateCacheStatus() {
 		IsCacheBeingBuilt = true;
 		return;
 	}
-	if (Feature.App.Globals.TagCache.IsResourceCacheEmpty()) {
+	
+	if (Feature.App.Globals.TagCache.IsFileCacheEmpty()) {
 		if (!IsCacheEmpty) {
 			wxWindowUpdateLocker locker(this);
 			CacheStatusLabel->SetLabel(wxT("Cache Status: Empty"));

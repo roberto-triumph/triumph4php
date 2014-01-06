@@ -1218,11 +1218,9 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 	for (size_t i = 0; i < dbTags.size(); ++i) {
 		if (dbTags[i].ConnectionHash() == tag.ConnectionHash()) {
 			indexToSelect = i;
+			Connections->Select(indexToSelect);
 			break;
 		}
-	}
-	if (indexToSelect) {
-		Connections->Select(indexToSelect);
 	}
 	
 	// trigger the description query
