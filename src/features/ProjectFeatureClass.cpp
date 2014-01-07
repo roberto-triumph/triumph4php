@@ -56,6 +56,7 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.PhpFileExtensionsString);
 	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.CssFileExtensionsString);
 	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.SqlFileExtensionsString);
+	config->Read(wxT("/Project/JsFileExtensions"), &App.Globals.JsFileExtensionsString);
 	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.MiscFileExtensionsString);
 	
 	App.Globals.Projects.clear();
@@ -106,6 +107,7 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
 	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.CssFileExtensionsString);
 	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.SqlFileExtensionsString);
+	config->Write(wxT("/Project/JsFileExtensions"), App.Globals.JsFileExtensionsString);
 	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.MiscFileExtensionsString);
 
 	// remove all project from the config
@@ -334,6 +336,9 @@ mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *
 	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
+	NonEmptyTextValidatorClass jsFileExtensionsValidator(&projectFeature.App.Globals.JsFileExtensionsString, JsLabel);
+	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
+
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 }

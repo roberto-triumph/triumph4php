@@ -38,6 +38,10 @@ mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvcedito
 		wxString name = wxString::FromAscii(options.PhpStyles[i].Name);
 		Styles->Append(wxGetTranslation(name), &options.PhpStyles[i]);
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(options.JsStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &options.JsStyles[i]);
+	}
 	for (size_t i = 0; i < options.SqlStyles.size(); ++i) {
 		wxString name = wxString::FromAscii(options.SqlStyles[i].Name);
 		Styles->Append(wxGetTranslation(name), &options.SqlStyles[i]);

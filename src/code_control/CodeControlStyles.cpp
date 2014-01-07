@@ -77,6 +77,24 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	options.PhpStyles.push_back(pref); options.PhpStyles[index++].Control(wxSTC_H_QUESTION,  "HTML Embedded Script Start"); // <?php start tag
 	options.PhpStyles.push_back(pref); options.PhpStyles[index++].Control(wxSTC_H_TAGEND, "HTML Embedded Script End"); // script end tag ?>	
 	
+	// javascript lexer
+	// note that scintilla the CPP lexer is also the Javascript lexer
+	index = 0;
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_DEFAULT, "Javascript Start");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_COMMENT, "Javascript Multi Line Comment");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_COMMENTLINE, "Javascript Line Comment");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_COMMENTDOC, "Javascript Doc Comment");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_NUMBER, "Javascript Number");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_WORD, "Javascript Keyword");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_IDENTIFIER, "Javascript Identifier");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_STRING, "Javascript Double Quoted String");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_CHARACTER, "Javascript Single Quoted String");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_OPERATOR, "Javascript Operators");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_STRINGEOL, "Javascript End-Of-Line");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_REGEX, "Javascript Regular Expression");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_COMMENTLINEDOC, "Javascript Singe Line Doc Comment");
+	options.JsStyles.push_back(pref); options.JsStyles[index++].Control(wxSTC_C_WORD2, "Javascript Keyword 2");
+
 	index = 0;
 	options.SqlStyles.push_back(pref); options.SqlStyles[index++].Control(wxSTC_SQL_DEFAULT, "SQL Default");
 	options.SqlStyles.push_back(pref); options.SqlStyles[index++].Control(wxSTC_SQL_COMMENT, "SQL Comment");  // starts with "/*"
@@ -141,6 +159,10 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 }
 
 
+
+
+
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
@@ -180,6 +202,13 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#D8D8D8"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#1E1E1E"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#FFC600"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FFFFFF"));
@@ -212,8 +241,24 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#D8D8D8"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#C7DD0C"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#C7DD0C"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#C7DD0C"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#7FB347"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#FFC600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#FFC600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#FFC600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#C7DD0C"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#FFFFFF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#C7DD0C"));
@@ -300,6 +345,13 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#F8E1AA"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#000000"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#D6C248"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#E79E3C"));
@@ -332,8 +384,24 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#F8E1AA"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#83786E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#83786E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#83786E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#D6C248"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#E79E3C"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#D6C248"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#D6C248"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D6C248"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#D6C248"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#83786E"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#E79E3C"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#83786E"));
@@ -420,6 +488,13 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#657A81"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FDF6E3"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#2AA198"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#B58900"));
@@ -452,8 +527,24 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#657A81"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#93A1A1"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#B58900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#586E75"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#B58900"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#93A1A1"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#586E75"));
@@ -540,6 +631,13 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#839496"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#002B36"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#2AA198"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#B58900"));
@@ -572,8 +670,24 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#839496"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#B58900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#268BD2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#B58900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#2AA198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#268BD2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#586E75"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#B58900"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#586E75"));
@@ -660,6 +774,13 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#d3d7cf"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#2e3436"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#edd400"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FFFFFF"));
@@ -692,8 +813,24 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#d3d7cf"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#ce5c00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#729fcf"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#edd400"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#edd400"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#edd400"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#729fcf"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#888a85"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#FFFFFF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#888a85"));
@@ -780,6 +917,13 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#f6f3e8"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#242424"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#95e454"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#8ac6f2"));
@@ -812,8 +956,24 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#f6f3e8"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#99968b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#99968b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#99968b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#f08080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#8ac6f2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#95e454"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#95e454"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#f3f6ee"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#95e454"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#99968b"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#8ac6f2"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#99968b"));
@@ -900,6 +1060,13 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#C0C0C0"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#000000"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#c78d9b"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#82677E"));
@@ -932,8 +1099,24 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#C0C0C0"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#82677E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#E8E2B7"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#7D8C93"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#82677E"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -1020,6 +1203,13 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#000000"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#990000"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#3333ff"));
@@ -1052,8 +1242,24 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#FFFFFF"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00cc00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#00cc00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#00cc00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#7FB347"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#3333ff"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#990000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#990000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#990000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#00cc00"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#3333ff"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#00cc00"));
@@ -1140,6 +1346,13 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#E0E2E4"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#293134"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#EC7600"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#93C763"));
@@ -1172,8 +1385,24 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#E0E2E4"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#FFCD22"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#93C763"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#EC7600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#EC7600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#E8E2B7"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#EC7600"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#7D8C93"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#93C763"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -1260,6 +1489,13 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#000000"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#A31515"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -1292,8 +1528,24 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#000000"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#A31515"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#A31515"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#A31515"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#008000"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#0000FF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#008000"));
@@ -1380,6 +1632,13 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#C0B6A8"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#2D3639"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#A38474"));
@@ -1412,8 +1671,24 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#C0B6A8"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AEAEAE"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#AEAEAE"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#AEAEAE"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#B9A185"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#A38474"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#A19A83"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#F0EFD0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#A19A83"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#AEAEAE"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#A38474"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#AEAEAE"));
@@ -1500,6 +1775,13 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#000000"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#92679a"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#688046"));
@@ -1532,8 +1814,24 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#000000"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#17608f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#17608f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#17608f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#801f91"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#688046"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#5c8198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#92679a"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#92679a"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#92679a"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#5c8198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#17608f"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#688046"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#17608f"));
@@ -1620,6 +1918,13 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#430400"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#585545"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#606060"));
@@ -1652,8 +1957,24 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#430400"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#d5d9e5"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#d7d3cc"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#d5d9e5"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#d0321f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#606060"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#2b6488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#585545"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#585545"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#5f97a9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#585545"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#2b6488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#d5d9e5"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#606060"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#d7d3cc"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#d5d9e5"));
@@ -1740,6 +2061,13 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#000000"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FEFCF5"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#808080"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -1772,8 +2100,24 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#000000"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#008000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#FF8000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#000080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#8000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#000080"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#008000"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#0000FF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#008000"));
@@ -1860,6 +2204,13 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#191919"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#477488"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#EC691E"));
@@ -1892,8 +2243,24 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#FFFFFF"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#8C3FC8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#8146A2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#8C3FC8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#477488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#EC691E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#3C758D"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#477488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#477488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#477488"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#3C758D"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#8C3FC8"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#EC691E"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#8146A2"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#8C3FC8"));
@@ -1980,6 +2347,13 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#D0D0D0"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#101020"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#DC78DC"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#00D0D0"));
@@ -2012,8 +2386,24 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#D0D0D0"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00E000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#00E000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#00E000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#00D0D0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#DC78DC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#DC78DC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#DC78DC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#00E000"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#00D0D0"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#00E000"));
@@ -2100,6 +2490,13 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#333333"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC0000"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -2132,8 +2529,24 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#333333"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FF9900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#FF9900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#FF9900"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#0066FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#CC0000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#CC0000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#CC0000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#0066FF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#FF9900"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#0000FF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#FF9900"));
@@ -2220,6 +2633,13 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#F9F9F9"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#000000"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#76BA53"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#EA9C77"));
@@ -2252,8 +2672,24 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#F9F9F9"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#A8A8A8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#A8A8A8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#A8A8A8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#EA9C77"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#4B9CE9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#76BA53"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#76BA53"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#76BA53"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#4B9CE9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#A8A8A8"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#EA9C77"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#A8A8A8"));
@@ -2340,6 +2776,13 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#CFBFAD"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#1F1F27"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#FFCD8B"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#808BED"));
@@ -2372,8 +2815,24 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#CFBFAD"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#CD8B00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#CD8B00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#CD8B00"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#FFCD8B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#808BED"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#FFCD8B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#FFCD8B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#FFCD8B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#CD8B00"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#808BED"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#CD8B00"));
@@ -2460,6 +2919,13 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#000000"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#ffffff"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#333333"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#5c8198"));
@@ -2492,8 +2958,24 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#000000"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#334466"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#334466"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#334466"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#5c8198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#5c8198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#5c8198"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#334466"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#5c8198"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#334466"));
@@ -2580,6 +3062,13 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#E2E2E2"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#1E1E1E"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#8DCBE2"));
@@ -2612,8 +3101,24 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#E2E2E2"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#73879B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#73879B"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#EAB882"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#8DCBE2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#F0EFD0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#73879B"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#8DCBE2"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#73879B"));
@@ -2700,6 +3205,13 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#F8F8F2"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#272822"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#E6DB74"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#66CCB3"));
@@ -2732,8 +3244,24 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#F8F8F2"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#75715e"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#75715E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#75715e"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#7FB347"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#66CCB3"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#E6DB74"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#E6DB74"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#E6DB74"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#79ABFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#75715e"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#66CCB3"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#75715E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#75715e"));
@@ -2820,6 +3348,13 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#CFBFAD"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#272822"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#ECE47E"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FF007F"));
@@ -2852,8 +3387,24 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#CFBFAD"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#C48CFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#FF007F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#ECE47E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#ECE47E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#FF007F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#ECE47E"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#FFFFFF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#FF007F"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#FFFFFF"));
@@ -2940,6 +3491,13 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#E0E2E4"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#1f2223"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#c78d9b"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#a57b61"));
@@ -2972,8 +3530,24 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#E0E2E4"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#a57b61"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#E8E2B7"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#c78d9b"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#7D8C93"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#a57b61"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -3060,6 +3634,13 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#DCDCCC"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#1F1F1F"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#F0DFAF"));
@@ -3092,8 +3673,24 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#DCDCCC"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7F9F7F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#7F9F7F"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#8CD0D3"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#F0DFAF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#F0EFD0"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#CC9393"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#D4C4A9"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#7F9F7F"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#F0DFAF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7F9F7F"));
@@ -3180,6 +3777,13 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#FFFFFF"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#000000"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#00a40f"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#999999"));
@@ -3212,8 +3816,24 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#FFFFFF"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#FF0000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#F7C527"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#00a40f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#00a40f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#00a40f"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#F7C527"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#666666"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#999999"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#666666"));
@@ -3300,6 +3920,13 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("#585858"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("#F5F5F5"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#317ECC"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#295F94"));
@@ -3332,8 +3959,24 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("#585858"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AD95AF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("#AD95AF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("#AD95AF"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("#AF0F91"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("#295F94"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("#55aa55"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("#317ECC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("#317ECC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("#317ECC"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("#55aa55"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("#AD95AF"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("#295F94"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#AD95AF"));

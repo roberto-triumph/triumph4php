@@ -80,6 +80,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxString oldExtensions = Globals.PhpFileExtensionsString 
 		+ Globals.SqlFileExtensionsString
 		+ Globals.CssFileExtensionsString
+		+ Globals.JsFileExtensionsString
 		+ Globals.MiscFileExtensionsString;
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		KeyboardShortcutsPanel->ApplyChanges();
@@ -92,6 +93,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxString newExtensions = Globals.PhpFileExtensionsString 
 			+ Globals.SqlFileExtensionsString
 			+ Globals.CssFileExtensionsString
+			+ Globals.JsFileExtensionsString
 			+ Globals.MiscFileExtensionsString;
 		if (oldExtensions != newExtensions) {
 			NeedsRetag = true;

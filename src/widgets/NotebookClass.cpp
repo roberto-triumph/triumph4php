@@ -167,6 +167,9 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 		case mvceditor::CodeControlClass::PHP:
 			format = _("Untitled %d.php");
 			break;
+		case mvceditor::CodeControlClass::JS:
+			format = _("Untitled %d.js");
+			break;
 	}
 	
 	// make sure to use a unique ID, other source code depends on this
@@ -256,6 +259,9 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 			}
 			else if (mvceditor::CodeControlClass::SQL == mode) {
 				docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
+			}
+			else if (mvceditor::CodeControlClass::JS == mode) {
+				docBitmap = mvceditor::IconImageAsset(wxT("document-javascript"));
 			}
 
 			// if user dragged in a file on an opened file we want still want to accept dragged files
@@ -502,23 +508,28 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	wxString phpLabel = Globals->PhpFileExtensionsString,
 		cssLabel = Globals->CssFileExtensionsString,
-		sqlLabel = Globals->SqlFileExtensionsString;
+		sqlLabel = Globals->SqlFileExtensionsString,
+		jsLabel = Globals->JsFileExtensionsString;
 	phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
+	jsLabel.Replace(wxT(";"), wxT(" "));
 	wxString php = Globals->PhpFileExtensionsString,
 		css = Globals->CssFileExtensionsString,
-		sql = Globals->SqlFileExtensionsString;
+		sql = Globals->SqlFileExtensionsString,
+		js = Globals->JsFileExtensionsString;
 	wxString allSourceCode = 
 			Globals->PhpFileExtensionsString + wxT(";") + 
 			Globals->CssFileExtensionsString + wxT(";") + 
-			Globals->SqlFileExtensionsString;
+			Globals->SqlFileExtensionsString + wxT(";") + 
+			Globals->JsFileExtensionsString;
 
 	wxString fileFilter = 
 		wxString::Format(wxT("All Source Code Files (%s)|%s|"), allSourceCode.c_str(), allSourceCode.c_str()) +
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +
 		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
 		wxString::Format(wxT("SQL Files (%s)|%s|"), sqlLabel.c_str(), sql.c_str()) +
+		wxString::Format(wxT("Javascript Files (%s)|%s|"), jsLabel.c_str(), js.c_str()) +
 		wxT("All Files (*.*)|*.*");
 	return fileFilter;
 }
@@ -533,7 +544,10 @@ int mvceditor::NotebookClass::WilcardIndex(mvceditor::CodeControlClass::Mode mod
 	else if (mvceditor::CodeControlClass::SQL == mode) {
 		return 2;
 	}
-	return 3;
+	else if (mvceditor::CodeControlClass::JS == mode) {
+		return 3;
+	}
+	return 4;
 }
 
 void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {

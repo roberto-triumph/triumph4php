@@ -363,37 +363,19 @@ void mvceditor::CodeControlClass::SetMargin() {
 
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
-	
-	bool found = false;
-	std::vector<wxString> wildcards = Globals->GetPhpFileExtensions();
-	for (size_t i = 0; i < wildcards.size(); ++i) {
-		if (wxMatchWild(wildcards[i], file)) {
-			found = true;
-			SetDocumentMode(mvceditor::CodeControlClass::PHP);
-			break;
-		}
+	if (Globals->HasAPhpExtension(file)) {
+		SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	}
-	if (!found) {
-		wildcards = Globals->GetCssFileExtensions();
-		for (size_t i = 0; i < wildcards.size(); ++i) {
-			if (wxMatchWild(wildcards[i], file)) {
-				found = true;
-				SetDocumentMode(mvceditor::CodeControlClass::CSS);
-				break;
-			}
-		}	
+	else if (Globals->HasACssExtension(file)) {
+		SetDocumentMode(mvceditor::CodeControlClass::CSS);
 	}
-	if (!found) {
-		wildcards = Globals->GetSqlFileExtensions();
-		for (size_t i = 0; i < wildcards.size(); ++i) {
-			if (wxMatchWild(wildcards[i], file)) {
-				found = true;
-				SetDocumentMode(mvceditor::CodeControlClass::SQL);
-				break;
-			}
-		}
+	else if (Globals->HasASqlExtension(file)) {
+		SetDocumentMode(mvceditor::CodeControlClass::SQL);
 	}
-	if (!found) {
+	else if (Globals->HasAJsExtension(file)) {
+		SetDocumentMode(mvceditor::CodeControlClass::JS);
+	}
+	else {
 		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
 	}
 }
@@ -431,6 +413,14 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		Document->SetControl(this);
 		SetCodeControlOptions(CodeControlOptions.CssStyles);
 		SetCssOptions();
+	}
+	else if (mvceditor::CodeControlClass::JS == DocumentMode) {
+	
+		// use the PHP styles; needed to get the caret and margin styling right
+		SetCodeControlOptions(CodeControlOptions.PhpStyles);
+		Document = new mvceditor::JsDocumentClass();
+		Document->SetControl(this);
+		SetJsOptions();
 	}
 	else {
 		
@@ -488,19 +478,14 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 			// use the PHP default settings as the catch-all for settings not yet exposed
 			// (Javascript) so the user sees a uniform style.
 			int styles[] = {
-				wxSTC_STYLE_DEFAULT, wxSTC_HJ_START, wxSTC_HJ_DEFAULT, 
-				wxSTC_HJ_COMMENT, wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, 
-				wxSTC_HJ_NUMBER, wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, 
-				wxSTC_HJ_DOUBLESTRING, wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, 
-
 				// sgml styles take care of the <!DOCTYPE declarations
-				wxSTC_HJ_STRINGEOL, wxSTC_HJ_REGEX, wxSTC_H_SGML_1ST_PARAM, 
-				wxSTC_H_SGML_1ST_PARAM_COMMENT, wxSTC_H_SGML_BLOCK_DEFAULT, wxSTC_H_SGML_COMMAND, 
+				wxSTC_STYLE_DEFAULT, wxSTC_H_SGML_1ST_PARAM, 
+				wxSTC_H_SGML_1ST_PARAM_COMMENT, wxSTC_H_SGML_BLOCK_DEFAULT, wxSTC_H_SGML_COMMAND,  // 5 
 				wxSTC_H_SGML_COMMENT, wxSTC_H_SGML_DEFAULT, wxSTC_H_SGML_DOUBLESTRING, 
-				wxSTC_H_SGML_ENTITY, wxSTC_H_SGML_ERROR, wxSTC_H_SGML_SIMPLESTRING, 
+				wxSTC_H_SGML_ENTITY, wxSTC_H_SGML_ERROR, wxSTC_H_SGML_SIMPLESTRING,  // 11
 				wxSTC_H_SGML_SPECIAL
 			};
-			for (int j = 0; j < 25; ++j) {
+			for (int j = 0; j < 12; ++j) {
 				StyleSetFont(styles[j], pref.Font);
 				StyleSetForeground(styles[j], pref.Color);
 				StyleSetBackground(styles[j], pref.BackgroundColor);
@@ -513,6 +498,34 @@ void mvceditor::CodeControlClass::SetPhpOptions() {
 		StyleSetBackground(style, pref.BackgroundColor);
 		StyleSetBold(style, pref.IsBold);
 		StyleSetItalic(style, pref.IsItalic);
+	}
+
+	// color embedded javascript using the javascript styles
+	// we need to map the external JS file styles (that are 
+	// styled with the CPP lexer) to the styles for the HTML
+	// lexer
+	int embeddedStyles[] = { 
+		wxSTC_HJ_START, wxSTC_HJ_DEFAULT,
+		wxSTC_HJ_COMMENT, wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC,  // 5
+		wxSTC_HJ_NUMBER, wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD,
+		wxSTC_HJ_DOUBLESTRING, wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, // 11
+		wxSTC_HJ_REGEX, wxSTC_HJ_STRINGEOL
+	};
+	int jsStyles[] = {
+		wxSTC_C_DEFAULT, wxSTC_C_DEFAULT, 
+		wxSTC_C_COMMENT, wxSTC_C_COMMENTLINE, wxSTC_C_COMMENTDOC,  // 5
+		wxSTC_C_NUMBER, wxSTC_C_IDENTIFIER, wxSTC_C_WORD,
+		wxSTC_C_STRING, wxSTC_C_CHARACTER, wxSTC_C_OPERATOR,  // 11
+		wxSTC_C_REGEX, wxSTC_C_STRINGEOL
+	};
+	for (int  i = 0; i < 13; ++i) {
+		mvceditor::StylePreferenceClass pref = 
+			CodeControlOptions.FindByStcStyle(CodeControlOptions.JsStyles, jsStyles[i]);
+		StyleSetFont(embeddedStyles[i], pref.Font);
+		StyleSetForeground(embeddedStyles[i], pref.Color);
+		StyleSetBackground(embeddedStyles[i], pref.BackgroundColor);
+		StyleSetBold(embeddedStyles[i], pref.IsBold);
+		StyleSetItalic(embeddedStyles[i], pref.IsItalic);	
 	}
 
 	// the annotation styles
@@ -609,6 +622,70 @@ void mvceditor::CodeControlClass::SetCssOptions() {
 			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
 			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
 			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
+		}
+		StyleSetFont(style, pref.Font);
+		StyleSetForeground(style, pref.Color);
+		StyleSetBackground(style, pref.BackgroundColor);
+		StyleSetBold(style, pref.IsBold);
+		StyleSetItalic(style, pref.IsItalic);	
+	}
+
+	// the found match indicator style
+	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
+		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
+	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
+}
+
+void mvceditor::CodeControlClass::SetJsOptions() {
+	
+	// the CPP lexer is used to handle javascript
+	SetLexer(wxSTC_LEX_CPP);
+	
+	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
+	SetStyleBits(5);
+	
+	// got this by looking at LexCPP.cxx 
+	// keywords 0 => Primary keywords and identifiers
+    // keywords 1 => Secondary keywords and identifiers
+	// keywords 2 => Documentation comment keywords
+    // keywords 3 => Global classes and typedefs
+	// keywords 4 => Preprocessor definitions
+
+	SetKeyWords(0, ((mvceditor::JsDocumentClass*)Document)->GetJsKeywords());
+	SetKeyWords(1, wxT(""));
+	SetKeyWords(2, wxT(""));
+	
+	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
+	AutoCompSetSeparator(' ');
+	AutoCompSetIgnoreCase(true);
+	AutoCompSetChooseSingle(true);
+	AutoCompSetFillUps(wxT("([:"));
+	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
+	for (size_t i = 0; i < CodeControlOptions.JsStyles.size(); ++i) {
+		mvceditor::StylePreferenceClass pref = CodeControlOptions.JsStyles[i];
+		int style = pref.StcStyle;
+		if (wxSTC_C_DEFAULT == style) {
+			
+			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not 
+			// use the default settings as the catch-all for settings not yet exposed
+			// because they are only for C++ code, but we use the C++ lexer 
+			// for javascript which will never have these styles (like preprocessors
+			// for example
+			int defaultStyles [] = {
+				wxSTC_C_UUID, wxSTC_C_PREPROCESSOR, wxSTC_C_VERBATIM,
+				wxSTC_C_COMMENTDOCKEYWORD, wxSTC_C_COMMENTDOCKEYWORDERROR, // 5
+				wxSTC_C_GLOBALCLASS, wxSTC_C_STRINGRAW, wxSTC_C_TRIPLEVERBATIM,
+				wxSTC_C_HASHQUOTEDSTRING, wxSTC_C_PREPROCESSORCOMMENT,   // 10
+				wxSTC_STYLE_DEFAULT,
+			};
+			for (int j = 0; j < 11; ++j) {
+				StyleSetFont(defaultStyles[j], pref.Font);
+				StyleSetForeground(defaultStyles[j], pref.Color);
+				StyleSetBackground(defaultStyles[j], pref.BackgroundColor);
+				StyleSetBold(defaultStyles[j], pref.IsBold);
+				StyleSetItalic(defaultStyles[j], pref.IsItalic);
+			}
 		}
 		StyleSetFont(style, pref.Font);
 		StyleSetForeground(style, pref.Color);

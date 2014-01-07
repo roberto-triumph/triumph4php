@@ -11,12 +11,12 @@
 
 ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 2, 1, 0, 0 );
-	fgSizer2->AddGrowableCol( 0 );
-	fgSizer2->AddGrowableRow( 0 );
-	fgSizer2->SetFlexibleDirection( wxBOTH );
-	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* FlexSizer;
+	FlexSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexSizer->AddGrowableCol( 0 );
+	FlexSizer->AddGrowableRow( 0 );
+	FlexSizer->SetFlexibleDirection( wxBOTH );
+	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* StaticBoxSizerFileTypes;
 	StaticBoxSizerFileTypes = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Associations") ), wxVERTICAL );
@@ -38,7 +38,7 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	AssociationsGridSizer->Add( AssociationsBoxSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* AssociationsFormSizer;
-	AssociationsFormSizer = new wxFlexGridSizer( 4, 2, 0, 0 );
+	AssociationsFormSizer = new wxFlexGridSizer( 5, 2, 0, 0 );
 	AssociationsFormSizer->AddGrowableCol( 1 );
 	AssociationsFormSizer->SetFlexibleDirection( wxBOTH );
 	AssociationsFormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -49,6 +49,13 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	
 	PhpFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	AssociationsFormSizer->Add( PhpFileExtensions, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	JsLabel = new wxStaticText( this, wxID_ANY, _("JS Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	JsLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( JsLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	JsFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( JsFileExtensions, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	CssLabel = new wxStaticText( this, wxID_ANY, _("CSS Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	CssLabel->Wrap( -1 );
@@ -75,9 +82,9 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	
 	StaticBoxSizerFileTypes->Add( AssociationsGridSizer, 1, wxEXPAND, 5 );
 	
-	fgSizer2->Add( StaticBoxSizerFileTypes, 1, wxALL|wxEXPAND, 5 );
+	FlexSizer->Add( StaticBoxSizerFileTypes, 1, wxALL|wxEXPAND, 5 );
 	
-	this->SetSizer( fgSizer2 );
+	this->SetSizer( FlexSizer );
 	this->Layout();
 }
 

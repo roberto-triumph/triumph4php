@@ -101,6 +101,10 @@ public:
 	std::vector<StylePreferenceClass> PhpStyles;
 	std::vector<StylePreferenceClass> SqlStyles;
 	std::vector<StylePreferenceClass> CssStyles;
+
+	// JsStyles apply Javascript files (*.js), not javascript
+	// embedded in HTML
+	std::vector<StylePreferenceClass> JsStyles;
 	
 	/**
 	 *  This is the entire list of styles that can have font/color attached to.

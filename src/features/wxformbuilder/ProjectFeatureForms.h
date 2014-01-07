@@ -40,6 +40,8 @@ class ProjectPreferencesGeneratedPanelClass : public wxPanel
 		wxStaticText* WildcardHelpText;
 		wxStaticText* PhpLabel;
 		wxTextCtrl* PhpFileExtensions;
+		wxStaticText* JsLabel;
+		wxTextCtrl* JsFileExtensions;
 		wxStaticText* CssLabel;
 		wxTextCtrl* CssFileExtensions;
 		wxStaticText* SqlLabel;

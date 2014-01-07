@@ -38,7 +38,8 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, PhpFileExtensionsString(wxT("*.php"))	
 	, CssFileExtensionsString(wxT("*.css"))
 	, SqlFileExtensionsString(wxT("*.sql"))
-	, MiscFileExtensionsString(wxT("*.js;*.html;*.yml;*.xml;*.txt"))
+	, JsFileExtensionsString(wxT("*.js"))
+	, MiscFileExtensionsString(wxT("*.html;*.yml;*.xml;*.txt"))
 	, TagCacheDbFileName(mvceditor::TagCacheAsset())
 	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
 	, ResourceCacheSession()
@@ -144,6 +145,16 @@ std::vector<wxString> mvceditor::GlobalsClass::GetSqlFileExtensions() const {
 	return wildcards;
 }
 
+std::vector<wxString> mvceditor::GlobalsClass::GetJsFileExtensions() const {
+	std::vector<wxString> wildcards;
+	wxStringTokenizer tokenizer(JsFileExtensionsString, wxT(";"));
+	while (tokenizer.HasMoreTokens()) {
+		wxString wildcard = tokenizer.NextToken();
+		wildcards.push_back(wildcard);
+	}
+	return wildcards;
+}
+
 std::vector<wxString> mvceditor::GlobalsClass::GetMiscFileExtensions() const {
 	std::vector<wxString> wildcards;
 	wxStringTokenizer tokenizer(MiscFileExtensionsString, wxT(";"));
@@ -158,10 +169,12 @@ std::vector<wxString> mvceditor::GlobalsClass::GetNonPhpFileExtensions() const {
 	std::vector<wxString> wildcards;
 	std::vector<wxString> css = GetCssFileExtensions();
 	std::vector<wxString> sql = GetSqlFileExtensions();
+	std::vector<wxString> js = GetJsFileExtensions();
 	std::vector<wxString> misc = GetMiscFileExtensions();
 
 	wildcards.insert(wildcards.end(), css.begin(), css.end());
 	wildcards.insert(wildcards.end(), sql.begin(), sql.end());
+	wildcards.insert(wildcards.end(), js.begin(), js.end());
 	wildcards.insert(wildcards.end(), misc.begin(), misc.end());
 	return wildcards;
 }
@@ -171,11 +184,13 @@ std::vector<wxString> mvceditor::GlobalsClass::GetAllSourceFileExtensions() cons
 	std::vector<wxString> php = GetPhpFileExtensions();
 	std::vector<wxString> css = GetCssFileExtensions();
 	std::vector<wxString> sql = GetSqlFileExtensions();
+	std::vector<wxString> js = GetJsFileExtensions();
 	std::vector<wxString> misc = GetMiscFileExtensions();
 
 	wildcards.insert(wildcards.end(), php.begin(), php.end());
 	wildcards.insert(wildcards.end(), css.begin(), css.end());
 	wildcards.insert(wildcards.end(), sql.begin(), sql.end());
+	wildcards.insert(wildcards.end(), js.begin(), js.end());
 	wildcards.insert(wildcards.end(), misc.begin(), misc.end());
 	return wildcards;
 }
@@ -203,6 +218,18 @@ bool mvceditor::GlobalsClass::HasAPhpExtension(const wxString& fullPath) const {
 
 bool mvceditor::GlobalsClass::HasASqlExtension(const wxString& fullPath) const {
 	std::vector<wxString> wildcards = GetSqlFileExtensions();
+	bool found = false;
+	for (size_t i = 0; i < wildcards.size(); ++i) {
+		if (wxMatchWild(wildcards[i], fullPath)) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+bool mvceditor::GlobalsClass::HasAJsExtension(const wxString& fullPath) const {
+	std::vector<wxString> wildcards = GetJsFileExtensions();
 	bool found = false;
 	for (size_t i = 0; i < wildcards.size(); ++i) {
 		if (wxMatchWild(wildcards[i], fullPath)) {
@@ -266,6 +293,7 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 	project.CssFileExtensions = GetCssFileExtensions();
 	project.SqlFileExtensions = GetSqlFileExtensions();
 	project.MiscFileExtensions = GetMiscFileExtensions();
+	project.JsFileExtensions = GetJsFileExtensions();
 }
 
 std::vector<mvceditor::TemplateFileTagClass> mvceditor::GlobalsClass::CurrentTemplates() const {

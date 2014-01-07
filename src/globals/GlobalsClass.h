@@ -105,6 +105,11 @@ public:
 	wxString SqlFileExtensionsString;
 
 	/**
+	 * Serialized JS file filters string from the config
+	 */
+	wxString JsFileExtensionsString;
+
+	/**
 	 * Serialized miscalleneous file filters string from the config
 	 * basically any files that we want to open in the editor, like
 	 * XML files, YML files, etc...
@@ -215,6 +220,12 @@ public:
 	std::vector<wxString> GetSqlFileExtensions() const;
 
 	/**
+	 * Returns the valid JS (javascript) file extensions 
+	 * @return std::vector<wxString> a copy of the file extensions
+	 */
+	std::vector<wxString> GetJsFileExtensions() const;
+
+	/**
 	 * Returns the valid Misc. file extensions
 	 * @return std::vector<wxString> a copy of the file extensions
 	 */
@@ -254,6 +265,13 @@ public:
 	 * for sql files that are NOT in a project.
 	 */
 	bool HasASqlExtension(const wxString& fullPath) const;
+
+	/**
+	 * @return TRUE if given full path is a JS file, as determined only by
+	 * the js file extensions wilcard. This method will return TRUE 
+	 * for js files that are NOT in a project.
+	 */
+	bool HasAJsExtension(const wxString& fullPath) const;
 
 	/**
 	 * @return TRUE if given full path is a CSS file, as determined only by

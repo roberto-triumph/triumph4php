@@ -431,6 +431,28 @@ public:
 
 };
 
+class JsDocumentClass : public TextDocumentClass {
+
+public:
+
+	JsDocumentClass();
+
+	bool CanAutoComplete();
+	
+	wxString GetJsKeywords() const;
+	
+	/**
+	 * Match any parenthesis or braces
+	 */
+	void MatchBraces(int posToCheck);
+
+	/**
+	 * check to see if the give pos is at a CSS comment or CSS string
+	 */
+	bool InCommentOrStringStyle(int posToCheck); 
+
+};
+
 }
 
 

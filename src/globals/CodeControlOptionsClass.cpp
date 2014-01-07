@@ -30,6 +30,7 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass()
 : PhpStyles() 
 , SqlStyles()
 , CssStyles()
+, JsStyles()
 , CodeStyles() 
 , SpacesPerIndent(0) 
 , TabWidth(4) 
@@ -63,6 +64,7 @@ void mvceditor::CodeControlOptionsClass::Copy(const mvceditor::CodeControlOption
 	PhpStyles = src.PhpStyles; 
 	SqlStyles = src.SqlStyles;
 	CssStyles = src.CssStyles;
+	JsStyles = src.JsStyles;
 	CodeStyles = src.CodeStyles; 
 	SpacesPerIndent = src.SpacesPerIndent;
 	TabWidth = src.TabWidth;
@@ -117,6 +119,9 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	for (size_t i = 0; i < CssStyles.size(); ++i) {
 		CssStyles[i].Read(config);
 	}
+	for (size_t i = 0; i < JsStyles.size(); ++i) {
+		JsStyles[i].Read(config);
+	}
 }
 	 
 void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
@@ -144,6 +149,9 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	}
 	for (size_t i = 0; i < CssStyles.size(); ++i) {
 		CssStyles[i].Write(config);
+	}
+	for (size_t i = 0; i < JsStyles.size(); ++i) {
+		JsStyles[i].Write(config);
 	}
 }
 

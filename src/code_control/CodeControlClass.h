@@ -83,7 +83,7 @@ public:
 		TEXT,
 
 		/**
-		 * The full functionalityL code completion, call tips, syntax highlighting, the works
+		 * The full functionality code completion, call tips, syntax highlighting, the works
 		 */
 		PHP,
 
@@ -95,7 +95,12 @@ public:
 		/**
 		 * CSS style sheets (pure CSS files only)
 		 */
-		CSS
+		CSS,
+
+		/**
+		 * Javascript (pure JS files only)
+		 */
+		JS
 	};
 
 	/**
@@ -426,6 +431,11 @@ private:
 	 * Set the CSS highlight options of the source control
 	 */
 	void SetCssOptions();
+
+	/**
+	 * Set the JS highlight options of the source control
+	 */
+	void SetJsOptions();
 
 	/**
 	 * Set the font settings for plain text documents.

@@ -179,6 +179,13 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 		options.CssStyles[i].IsBold = false;
 		options.CssStyles[i].IsItalic = false;
 	}
+	for (size_t i = 0; i < options.JsStyles.size(); ++i) {
+		options.JsStyles[i].Font = font;
+		options.JsStyles[i].Color = wxColour(wxT("{$defaultForeground}"));
+		options.JsStyles[i].BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+		options.JsStyles[i].IsBold = false;
+		options.JsStyles[i].IsItalic = false;
+	}
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("{$string}"));	
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("{$keyword}"));
@@ -211,8 +218,24 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_QUESTION).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAGEND).Color = wxColour(wxT("{$defaultForeground}"));
-
-
+	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINE).Color = wxColour(wxT("{$commentSingle}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTDOC).Color = wxColour(wxT("{$commentMultiLine}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_NUMBER).Color = wxColour(wxT("{$number}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).Color = wxColour(wxT("{$keyword}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD).IsBold = true;
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_IDENTIFIER).Color = wxColour(wxT("{$variable}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRING).Color = wxColour(wxT("{$string}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_CHARACTER).Color = wxColour(wxT("{$string}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_OPERATOR).Color = wxColour(wxT("{$operator}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_STRINGEOL).Color = wxColour(wxT("{$string}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_REGEX).Color = wxColour(wxT("{$variable}"));
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENTLINEDOC).Color = wxColour(wxT("{$commentMultiLine}"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).Color = wxColour(wxT("{$keyword}"));	
+	options.FindByStcStyle(options.JsStyles, wxSTC_C_WORD2).IsBold = true;
+	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("{$commentSingle}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("{$commentMultiLine}"));
