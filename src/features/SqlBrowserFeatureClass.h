@@ -456,6 +456,31 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * panel that shows a grid of all indices of a database table
+ */
+class DefinitionIndicesPanelClass : public DefinitionIndicesPanelGeneratedClass {
+
+public:
+
+	DefinitionIndicesPanelClass(wxWindow* parent);
+
+	void Fill(mvceditor::SqlResultClass* result);
+};
+
+/**
+ * panel that shows a grid of all columns of a database table
+ */
+class DefinitionColumnsPanelClass : public DefinitionColumnsPanelGeneratedClass {
+
+public:
+
+	DefinitionColumnsPanelClass(wxWindow* parent);
+
+	void Fill(mvceditor::SqlResultClass* result);
+
+};
+
 class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
 	
 public:
@@ -506,9 +531,14 @@ private:
 	 * to kill a running query
 	 */
 	mvceditor::ConnectionIdentifierClass IndexConnectionIdentifier;
+
+	mvceditor::DefinitionIndicesPanelClass* DefinitionIndicesPanel;
+
+	mvceditor::DefinitionColumnsPanelClass* DefinitionColumnsPanel;
 	
 	DECLARE_EVENT_TABLE()
 };
+
 
 /**
  * This is a feature to manage SQL connections and make queries to the database.

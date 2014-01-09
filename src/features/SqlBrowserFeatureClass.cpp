@@ -34,6 +34,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
 #include <wx/artprov.h>
+#include <wx/wupdlock.h>
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();
@@ -1188,12 +1189,17 @@ mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent
 , RunningThreads()
 , TableConnectionIdentifier() 
 , IndexConnectionIdentifier() {
-	ColumnsGrid->ClearGrid();
-	IndicesGrid->ClearGrid();
 	Connections->Clear();
 	FillConnectionList();
 	RunningThreads.AddEventHandler(this);
 	RefreshButton->SetBitmap(mvceditor::IconImageAsset("outline-refresh"));
+
+	DefinitionIndicesPanel = new mvceditor::DefinitionIndicesPanelClass(Notebook);
+	DefinitionColumnsPanel = new mvceditor::DefinitionColumnsPanelClass(Notebook);
+
+	Notebook->SetWindowStyle(wxAUI_NB_BOTTOM);
+	Notebook->AddPage(DefinitionColumnsPanel, _("Columns"));
+	Notebook->AddPage(DefinitionIndicesPanel, _("Indices"));
 	this->Layout();
 }
 
@@ -1255,23 +1261,23 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 }
 
 void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(wxCommandEvent& event) {
-	ColumnsGrid->ClearGrid();
+	wxWindowUpdateLocker locker(this);
 	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
-	if (!result) {
-		return;
+	if (result) {
+		DefinitionColumnsPanel->Fill(result);
+		delete result;
 	}
-	FillGridWithResults(ColumnsGrid, result);
-	delete result;
+	this->Layout();
 }
 
 void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(wxCommandEvent& event) {
-	IndicesGrid->ClearGrid();
+	wxWindowUpdateLocker locker(this);
 	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
-	if (!result) {
-		return;
+	if (result) {
+		DefinitionIndicesPanel->Fill(result);
+		delete result;
 	}
-	FillGridWithResults(IndicesGrid, result);
-	delete result;
+	this->Layout();
 }
 
 
@@ -1318,7 +1324,7 @@ void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(wxCommandEvent& e
 		return;
 	}
 	if (!result->Error.isEmpty()) {
-		FillGridWithResults(ColumnsGrid, result);
+		DefinitionColumnsPanel->Fill(result);
 	}
 	else if (!result->StringResults.empty() && result->StringResults[0].size() == 2) {
 		
@@ -1341,6 +1347,30 @@ void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(wxCommandEvent& e
 void mvceditor::TableDefinitionPanelClass::OnRefreshButton(wxCommandEvent& event) {
 	OnTableNameEnter(event);
 }
+
+mvceditor::DefinitionIndicesPanelClass::DefinitionIndicesPanelClass(wxWindow* parent)
+: DefinitionIndicesPanelGeneratedClass(parent, wxID_ANY) {
+	IndicesGrid->ClearGrid();
+
+}
+
+void mvceditor::DefinitionIndicesPanelClass::Fill(mvceditor::SqlResultClass* result) {
+	IndicesGrid->ClearGrid();
+	FillGridWithResults(IndicesGrid, result);
+}
+
+mvceditor::DefinitionColumnsPanelClass::DefinitionColumnsPanelClass(wxWindow* parent)
+: DefinitionColumnsPanelGeneratedClass(parent, wxID_ANY) {
+	ColumnsGrid->ClearGrid();
+}
+
+void mvceditor::DefinitionColumnsPanelClass::Fill(mvceditor::SqlResultClass* result) {
+	ColumnsGrid->ClearGrid();
+	FillGridWithResults(ColumnsGrid, result);
+}
+
+
+
 
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
