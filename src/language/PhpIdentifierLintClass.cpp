@@ -115,6 +115,9 @@ void mvceditor::PhpIdentifierLintClass::FunctionFound(const UnicodeString& names
 											const UnicodeString& comment, const int lineNumber) {
 }
 
+void mvceditor::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+}
+
 void mvceditor::PhpIdentifierLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
 }
 
@@ -164,14 +167,14 @@ void mvceditor::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewIns
 		CheckExpression(*constructorArg);
 	}
 
-	UnicodeString className = expression->ClassName;
-	std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(className);
+	UnicodeString fullyQualifiedClassName = expression->ClassName;
+	std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(fullyQualifiedClassName);
 	if (tags.empty()) {
 		mvceditor::PhpIdentifierLintResultClass lintResult;
 		lintResult.LineNumber = expression->LineNumber;
 		lintResult.Pos = 0;
 		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
-		lintResult.Identifier = className;
+		lintResult.Identifier = expression->ClassName;
 		Errors.push_back(lintResult);	
 	}
 
@@ -283,12 +286,11 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 
 	// TODO:
 	// checks to implement
-	//  4. undefined properties of an object
-	//  5. undefined methods of an object
-	//  9. attempt to inherit from undefined base classes
-	// 10. attempt to implement undefined interfaces
-	// 11. type hints with classes that are not defined
-	// 12. namespace declarations with namespaces that are not defined
+	// 1. attempt to inherit from undefined base classes
+	// 2. attempt to implement undefined interfaces
+	// 3. type hints with classes that are not defined
+	// 4. namespace declarations with namespaces that are not defined
+	// 5. unused namespace imports
 	if (var->ChainList[0].IsFunction) {
 		
 		// check the function name
@@ -311,11 +313,37 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 		}
 	}
 
-	// check for array accesees ie $user[$name]
-	for (size_t i = 0; i < var->ChainList.size(); ++i) {
-		if (var->ChainList[i].IsArrayAccess && var->ChainList[i].ArrayAccess) {
+	// check the rest of the variable property/method accesses
+	for (size_t i = 1; i < var->ChainList.size(); ++i) {
+		pelet::VariablePropertyClass prop = var->ChainList[i];
+		if (prop.IsFunction) {
+			std::vector<mvceditor::TagClass> tags = TagCache.ExactMethod(prop.Name, prop.IsStatic);
+			if (tags.empty()) {
+				mvceditor::PhpIdentifierLintResultClass lintResult;
+				lintResult.LineNumber = var->LineNumber;
+				lintResult.Pos = 0;
+				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
+				lintResult.Identifier = prop.Name;
+				Errors.push_back(lintResult);
+			}
+		}
+		else if (prop.IsArrayAccess && prop.ArrayAccess) {
+
+			// check for array accesees ie $user[$name]
 			CheckExpression(var->ChainList[i].ArrayAccess);
 		}
+		else if (!prop.IsArrayAccess) {
+			std::vector<mvceditor::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
+			if (tags.empty()) {
+				mvceditor::PhpIdentifierLintResultClass lintResult;
+				lintResult.LineNumber = var->LineNumber;
+				lintResult.Pos = 0;
+				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
+				lintResult.Identifier = prop.Name;
+				Errors.push_back(lintResult);
+			}
+		}
+		
 	}
 }
 

@@ -110,6 +110,9 @@ public:
 	
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
+	void SetMethodType(bool onlyStatic);
+
+	void SetPropertyType(bool onlyStatic);
 protected:
 
 	std::string Key;
@@ -117,6 +120,8 @@ protected:
 	std::vector<int> TagTypes;
 
 	std::vector<std::string> SourceDirs;
+
+	bool OnlyStatic;
 };
 
 class NearMatchMemberOnlyTagResultClass : public ExactMemberOnlyTagResultClass {
@@ -544,7 +549,8 @@ mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 	: TagResultClass()
 	, Key()
 	, TagTypes()
-	, SourceDirs() {
+	, SourceDirs() 
+	, OnlyStatic(false) {
 	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
 	TagTypes.push_back(mvceditor::TagClass::MEMBER);
 	TagTypes.push_back(mvceditor::TagClass::METHOD);
@@ -561,6 +567,19 @@ void mvceditor::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberNa
 	}
 }
 
+void mvceditor::ExactMemberOnlyTagResultClass::SetMethodType(bool onlyStatic) {
+	TagTypes.clear();
+	TagTypes.push_back(mvceditor::TagClass::METHOD);
+	OnlyStatic = onlyStatic;
+}
+
+void mvceditor::ExactMemberOnlyTagResultClass::SetPropertyType(bool onlyStatic) {
+	TagTypes.clear();
+	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(mvceditor::TagClass::MEMBER);
+	OnlyStatic = onlyStatic;
+}
+
 bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
@@ -571,13 +590,20 @@ bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 	
 	// make sure to use the key because it is indexed
 	sql += "key = ? AND identifier = key";
-	sql += " AND type IN(?, ?, ?)";
+	sql += " AND type IN(?";
+	for (size_t i = 1; i <  TagTypes.size(); ++i) {
+		sql += ",?"; 
+	}
+	sql += ")";
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
 			sql += ",?"; 
 		}
 		sql += ")";
+	}
+	if (OnlyStatic) {
+		sql += " AND is_static = 1"; 
 	}
 	sql += " ORDER BY key";
 	if (doLimit) {
@@ -1726,7 +1752,8 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClass(con
 	std::vector<mvceditor::TagClass> allMatches;	
 	mvceditor::ExactNonMemberTagResultClass exactResult;
 	exactResult.SetTagType(mvceditor::TagClass::CLASS);
-	exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
+	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()); 
+	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
 	allMatches = exactResult.Matches();
 	
@@ -1737,7 +1764,30 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFunction(
 	std::vector<mvceditor::TagClass> allMatches;	
 	mvceditor::ExactNonMemberTagResultClass exactResult;
 	exactResult.SetTagType(mvceditor::TagClass::FUNCTION);
-	exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
+	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
+	exactResult.Set(fullName, tagSearch.GetSourceDirs());
+	exactResult.Prepare(*Session, true);
+	allMatches = exactResult.Matches();
+	
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactMethod(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<mvceditor::TagClass> allMatches;	
+	mvceditor::ExactMemberOnlyTagResultClass exactResult;
+	exactResult.SetMethodType(onlyStatic);
+	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
+	exactResult.Prepare(*Session, true);
+	allMatches = exactResult.Matches();
+	
+	return allMatches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactProperty(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<mvceditor::TagClass> allMatches;	
+	mvceditor::ExactMemberOnlyTagResultClass exactResult;
+	exactResult.SetPropertyType(onlyStatic);
+	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
 	allMatches = exactResult.Matches();
 	

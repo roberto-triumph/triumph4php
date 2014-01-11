@@ -96,7 +96,10 @@ public:
 
 SUITE(PhpIdentifierLintTestClass) {
 
-TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassFunction) {
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassAndFunction) {
+
+	// calling defined classes and defined functions should
+	// not generate any errors
 	wxString cacheCode = mvceditor::CharToWx(
 		"<?php \n"  
 		"class MyClass {} \n"
@@ -105,7 +108,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassFunction) {
 
 	UnicodeString code = mvceditor::CharToIcu(
 		"  $a = new MyClass();\n"
-		"  $a->work();\n"
 		"  doPrint($a);\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
@@ -114,7 +116,31 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassFunction) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
+
+	// test that we resolve the "use" statement when
+	// looking up class names
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {} \n"
+		"function doPrint($a) {} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"use Util\\MyClass as UtilClass;\n"
+		"  $a = new UtilClass();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
+
+	// instantiating an unknown class should generate
+	// an error
 	wxString cacheCode = mvceditor::CharToWx(
 		"<?php \n"  
 		"class MyClass {} \n"
@@ -122,8 +148,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 
 	UnicodeString code = mvceditor::CharToIcu(
 		"  $a = new NoneClass();\n"
-		"  $a->work();\n"
-		"}"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
 	BuildCache();
@@ -131,9 +155,40 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("NoneClass", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
+
+	// class name resolution should look at namespaces too
+	// so if the class being used matches the class
+	// but its from a different namespace then we should
+	// generate an error
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace util {\n "
+		"\n"
+		"class MyClass {} \n"
+		"\n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"  $a = new MyClass();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("MyClass", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
+
+	// calling undefined functions should generate an
+	// error
 	wxString cacheCode = mvceditor::CharToWx(
 		"<?php \n"  
 		"function MyFirstFunction{} \n"
@@ -148,9 +203,15 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("myFirst", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION, Results[0].Type);
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
+
+	// when checking methods/classes, we should recurse through function
+	// arguments.  so we should be able to find an undefined
+	// function that is being called as an argument to another
+	// function
 	wxString cacheCode = mvceditor::CharToWx(
 		"<?php \n"  
 		"function MyFirstFunction() {} \n"
@@ -166,13 +227,20 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("MyThirdFunction", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION, Results[0].Type);
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
+
+	// we should also lookup functions used in
+	// the left hand of the assignment
 	wxString cacheCode = mvceditor::CharToWx(
 		"<?php \n"  
 		"function MyFirstFunction() {} \n"
 		"function MySecondFunction() {} \n"
+		"class MyClass {\n"
+		"  public $name;\n"
+		"}\n"
 	);
 
 	UnicodeString code = mvceditor::CharToIcu(
@@ -184,6 +252,76 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("MyThirdFunction", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownMethod) {
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"class MyClass { \n"
+		"  function work() {} \n"
+		"} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"$myc = new MyClass();\n"
+		"$myc->work();\n"
+		"$myc->notFound();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("notFound", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticMethod) {
+
+	// when we lookup methods, we should lookup only static
+	// methods when a static call is being done.  even
+	// if we have the same method name, the method must
+	// be static if the call is a static call
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"class MyClass { \n"
+		"  function work() {} \n"
+		"} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"MyClass::work();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("work", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"class MyClass { \n"
+		"  var $name; \n"
+		"} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"MyClass::$name;\n"
+		"$myc = new MyClass();\n"
+		"$myc->name;\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("$name", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY, Results[0].Type);
 }
 
 }

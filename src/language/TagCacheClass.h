@@ -280,6 +280,26 @@ public:
 	 * @return std::vector<mvceditor::TagClass> matched resources. will be function tags only
 	 */
 	std::vector<mvceditor::TagClass> ExactFunction(const UnicodeString& search);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches on methods (it will call ExactMethod
+	 * on each tag finder). Note that matching methods from all classes are returned
+	 * @param search string to search for
+	 * @param onlyStatic if TRUE, then only static methods will be returned
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be method tags only
+	 */
+	std::vector<mvceditor::TagClass> ExactMethod(const UnicodeString& search, bool onlyStatic);
+
+	/**
+	 * Searches all the registered caches (working AND global caches)
+	 * Will return only for full exact matches on properties or constants (it will call ExactProperty
+	 * on each tag finder). Note that matching properties/constants from all classes are returned.
+	 * @param search string to search for
+	 * @param onlyStatic if TRUE, then only static properties and constants will be returned
+	 * @return std::vector<mvceditor::TagClass> matched resources. will be function tags only
+	 */
+	std::vector<mvceditor::TagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)

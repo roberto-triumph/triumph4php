@@ -269,6 +269,46 @@ std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactFunction(const U
 	return matches;
 }
 
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactMethod(const UnicodeString& search, bool onlyStatic) {
+	std::vector<mvceditor::TagClass> matches;
+
+	// method search is activated by not giving a class name
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("::") + search);
+
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactMethod(tagSearch, onlyStatic);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			matches.push_back(tag);
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
+std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::ExactProperty(const UnicodeString& search, bool onlyStatic) {
+	std::vector<mvceditor::TagClass> matches;
+
+	// method search is activated by not giving a class name
+	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("::") + search);
+
+	std::vector<mvceditor::ParsedTagFinderClass*> finders = AllFinders();
+	for (size_t i = 0; i < finders.size(); ++i) {
+		mvceditor::ParsedTagFinderClass* tagFinder = finders[i];
+		std::vector<mvceditor::TagClass> finderMatches = tagFinder->ExactProperty(tagSearch, onlyStatic);
+		size_t count = finderMatches.size();
+		for (size_t j = 0; j < count; ++j) {
+			mvceditor::TagClass tag = finderMatches[j];
+			matches.push_back(tag);
+		}
+	}
+	std::sort(matches.begin(), matches.end());
+	return matches;
+}
+
 std::vector<mvceditor::TagClass> mvceditor::TagCacheClass::NearMatchClassesOrFiles(const UnicodeString& search) {
 	std::vector<mvceditor::TagClass> matches;
 	mvceditor::TagSearchClass tagSearch(search);

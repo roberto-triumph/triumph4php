@@ -590,7 +590,8 @@ public:
 	std::vector<mvceditor::TagClass> ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch);
 
 	/**
-	 * Looks for a class name using exact, case insensitive matching. 
+	 * Looks for a class name using exact, case insensitive matching. Note that namespace
+	 * name must also match.
 	 * 
 	 * @param tagSearch the resources to look for
 	 * @return std::vector<TagClass> the matched resources
@@ -601,7 +602,8 @@ public:
 	std::vector<mvceditor::TagClass> ExactClass(const mvceditor::TagSearchClass& tagSearch);
 
 	/**
-	 * Looks for a function name using exact, case insensitive matching. 
+	 * Looks for a function name using exact, case insensitive matching. Note that namespace
+	 * name must also match. 
 	 * 
 	 * @param tagSearch the resources to look for
 	 * @return std::vector<TagClass> the matched resources
@@ -610,6 +612,32 @@ public:
 	 *         the file system.
 	 */
 	std::vector<mvceditor::TagClass> ExactFunction(const mvceditor::TagSearchClass& tagSearch);
+
+	/**
+	 * Looks for a method name using exact, case insensitive matching.  The method name
+	 * is searched from all classes. Note that a limit of at most 10 items is returned
+	 * 
+	 * @param tagSearch the resources to look for
+	 * @param onlyStatic if TRUE, then only static methods will be returned
+	 * @return std::vector<TagClass> the matched resources
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
+	 */
+	std::vector<mvceditor::TagClass> ExactMethod(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic);
+
+	/**
+	 * Looks for a property name using exact, case insensitive matching.  The property name
+	 * is searched from all classes. Note that a limit of at most 10 items is returned	 
+	 * 
+	 * @param tagSearch the resources to look for
+	 * @param onlyStatic if TRUE, then only static properties (and constants) will be returned
+	 * @return std::vector<TagClass> the matched resources
+	 *         Because this search is done on a database,
+	 *         the returned list may contain matches from files that are no longer in 
+	 *         the file system.
+	 */
+	std::vector<mvceditor::TagClass> ExactProperty(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic);
 	
 	/**
 	 * Looks for the class or file tag, using a near-match logic. Logic is as follows:

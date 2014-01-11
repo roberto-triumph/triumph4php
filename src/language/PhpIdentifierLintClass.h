@@ -46,6 +46,7 @@ public:
 		NONE,
 		UNKNOWN_CLASS,
 		UNKNOWN_METHOD,
+		UNKNOWN_PROPERTY,
 		UNKNOWN_FUNCTION,
 		UNKNOWN_INTERFACE
 	};
@@ -125,6 +126,8 @@ public:
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		const int lineNumber);
+
+	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos);
 		
 	void ExpressionVariableFound(pelet::VariableClass* expression);
 
