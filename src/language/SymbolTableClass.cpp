@@ -480,7 +480,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 				chainList.back().Name = 
 					((pelet::NewInstanceExpressionClass*)expression)->ClassName;
 				break;
-			case pelet::ExpressionClass::UNKNOWN:
+			default:
 				type = mvceditor::SymbolClass::UNKNOWN;
 				break;
 			}

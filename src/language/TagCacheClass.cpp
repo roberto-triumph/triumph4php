@@ -27,6 +27,7 @@
 #include <language/DetectedTagFinderResultClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
+#include <globals/GlobalsClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -140,6 +141,15 @@ void mvceditor::TagCacheClass::RemoveWorking(const wxString& fileName) {
 
 void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::TagFinderListClass* cache) {
 	TagFinderList = cache;
+}
+
+void mvceditor::TagCacheClass::RegisterDefault(mvceditor::GlobalsClass& globals) {
+	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
+	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+		globals.Environment.Php.Version);
+	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
+	RegisterGlobal(cache);
 }
 
 mvceditor::TagResultClass* mvceditor::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {

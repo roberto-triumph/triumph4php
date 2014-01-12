@@ -51,6 +51,11 @@ public:
 	UnicodeString VariableName;
 
 	/**
+	 * the file that the error was found in
+	 */
+	UnicodeString File;
+
+	/**
 	 * the line number (1- based) the uninitialized variable was found in
 	 */
 	int LineNumber;
@@ -73,6 +78,36 @@ public:
 };
 
 /**
+ * options that control how the variable linter works
+ */
+class PhpVariableLintOptionsClass {
+
+public:
+	
+	/** 
+	 * if true, variables in the global scope will be checked.  if false,
+	 * only variables inside a method / function will be checked. this is
+	 * useful to turn off checking for global variables in templates,
+	 * since templates inherit variables from their callers in an unknown fashion.
+	 */
+	bool CheckGlobalScope;
+
+	/**
+	 * PHP version to use when parsing source code
+	 */
+	pelet::Versions Version;
+
+	PhpVariableLintOptionsClass();
+	
+	PhpVariableLintOptionsClass(const mvceditor::PhpVariableLintOptionsClass& src);
+
+	PhpVariableLintOptionsClass& operator=(const mvceditor::PhpVariableLintOptionsClass& src);
+
+	void Copy (const mvceditor::PhpVariableLintOptionsClass& src);
+	
+};
+
+/**
  * The PhpVariableLintClass is a class that is used
  * to find any uninitialized variables in a PHP file. If a file
  * contains syntax errors, then uninitialized variables will
@@ -92,7 +127,7 @@ public:
 	 * Set the version that the PHP parser should use. This method should be
 	 * called BEFORE parsing a file / string
 	 */
-	void SetVersion(pelet::Versions version);
+	void SetOptions(const mvceditor::PhpVariableLintOptionsClass& options);
 
 	/**
 	 * @param fileName the file to parse and report errors on.
@@ -177,6 +212,14 @@ private:
 	 * when a variable, expression, etc.. is found
 	 */
 	pelet::ParserClass Parser;
+
+	mvceditor::PhpVariableLintOptionsClass Options;
+
+	/**
+	 * the file being currently parsed. empty string if a string of
+	 * code is being parsed
+	 */
+	UnicodeString File;
 
 	/**
 	 * @param var the expression to check. A Check  will be

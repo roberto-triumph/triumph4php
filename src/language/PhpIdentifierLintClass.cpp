@@ -30,6 +30,7 @@
 
 mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 : Identifier()
+, File()
 , LineNumber(0)
 , Pos(0) 
 , Type(NONE) {
@@ -38,6 +39,7 @@ mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 
 mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const mvceditor::PhpIdentifierLintResultClass& src)
 : Identifier()
+, File()
 , LineNumber(0)
 , Pos(0) 
 , Type(NONE) {
@@ -52,6 +54,7 @@ mvceditor::PhpIdentifierLintResultClass::operator=(const mvceditor::PhpIdentifie
 
 void mvceditor::PhpIdentifierLintResultClass::Copy(const mvceditor::PhpIdentifierLintResultClass& src) {
 	Identifier = src.Identifier;
+	File =  src.File;
 	LineNumber = src.LineNumber;
 	Pos = src.Pos;
 	Type = src.Type;
@@ -61,6 +64,7 @@ void mvceditor::PhpIdentifierLintResultClass::Copy(const mvceditor::PhpIdentifie
 mvceditor::PhpIdentifierLintClass::PhpIdentifierLintClass(mvceditor::TagCacheClass& tagCache)
 : Errors()
 , Parser() 
+, File()
 , TagCache(tagCache) {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
@@ -75,6 +79,7 @@ void mvceditor::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
 bool mvceditor::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName, 
 															std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
 	Errors.clear();
+	File = mvceditor::WxToIcu(fileName.GetFullPath());
 	pelet::LintResultsClass lintResult;
 
 	wxFFile file;
@@ -89,6 +94,7 @@ bool mvceditor::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 															  std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
 	
 	Errors.clear();
+	File = UNICODE_STRING_SIMPLE("");
 	pelet::LintResultsClass lintResult;
 	bool good = Parser.ScanString(code, lintResult);
 	errors = Errors;
@@ -171,8 +177,9 @@ void mvceditor::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewIns
 	std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(fullyQualifiedClassName);
 	if (tags.empty()) {
 		mvceditor::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
 		lintResult.LineNumber = expression->LineNumber;
-		lintResult.Pos = 0;
+		lintResult.Pos = expression->Pos;
 		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
 		lintResult.Identifier = expression->ClassName;
 		Errors.push_back(lintResult);	
@@ -298,8 +305,9 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 		std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
 		if (tags.empty()) {
 			mvceditor::PhpIdentifierLintResultClass lintResult;
+			lintResult.File = File;
 			lintResult.LineNumber = var->LineNumber;
-			lintResult.Pos = 0;
+			lintResult.Pos = var->Pos;
 			lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
 			lintResult.Identifier = functionName;
 			Errors.push_back(lintResult);
@@ -320,8 +328,9 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 			std::vector<mvceditor::TagClass> tags = TagCache.ExactMethod(prop.Name, prop.IsStatic);
 			if (tags.empty()) {
 				mvceditor::PhpIdentifierLintResultClass lintResult;
+				lintResult.File = File;
 				lintResult.LineNumber = var->LineNumber;
-				lintResult.Pos = 0;
+				lintResult.Pos = var->Pos;
 				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
 				lintResult.Identifier = prop.Name;
 				Errors.push_back(lintResult);
@@ -336,8 +345,9 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 			std::vector<mvceditor::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
 			if (tags.empty()) {
 				mvceditor::PhpIdentifierLintResultClass lintResult;
+				lintResult.File = File;
 				lintResult.LineNumber = var->LineNumber;
-				lintResult.Pos = 0;
+				lintResult.Pos = var->Pos;
 				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
 				lintResult.Identifier = prop.Name;
 				Errors.push_back(lintResult);

@@ -33,8 +33,13 @@
 #include <search/DirectorySearchClass.h>
 #include <features/BackgroundFileReaderClass.h>
 #include <features/wxformbuilder/LintFeatureForms.h>
+#include <language/PhpVariableLintClass.h>
+#include <language/PhpIdentifierLintClass.h>
 
 namespace mvceditor {
+
+// forward declaration, defined below
+class LintFeatureClass;
 
 const wxEventType EVENT_LINT_ERROR = wxNewEventType();
 const wxEventType EVENT_LINT_SUMMARY = wxNewEventType();
@@ -49,11 +54,12 @@ class LintResultsEventClass : public wxEvent {
 public:
 
 	/**
-	 * The results for a single file.
+	 * The results for a single file. there could be multiple errors, undefined
+	 * functions, uninitialized variables.
 	 */
-	pelet::LintResultsClass LintResults;
+	std::vector<pelet::LintResultsClass> LintResults;
 
-	LintResultsEventClass(int eventId, const pelet::LintResultsClass& lintResults);
+	LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults);
 
 	wxEvent* Clone() const;
 };
@@ -99,7 +105,7 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass();
+	ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache);
 	
 	/**
 	 * This is the method where the parsing will take place. Will return true
@@ -127,10 +133,9 @@ public:
 	
 	/**
 	 * The last parsing results.
-	 * 
 	 */
-	pelet::LintResultsClass LastResults;
-	
+	std::vector<pelet::LintResultsClass> GetLastErrors();
+
 	/**
 	 * Running count of files that had parse errors.
 	 */
@@ -143,7 +148,17 @@ public:
 	
 private:
 
+	// linters to perform different kinds of checks
 	pelet::ParserClass Parser;
+	mvceditor::PhpVariableLintOptionsClass VariableLinterOptions;
+	mvceditor::PhpVariableLintClass VariableLinter;
+	mvceditor::PhpIdentifierLintClass IdentifierLinter;
+
+	// the results for each linter
+	pelet::LintResultsClass LastResults;
+	std::vector<mvceditor::PhpVariableLintResultClass> VariableResults;
+	std::vector<mvceditor::PhpIdentifierLintResultClass> IdentifierResults;
+	
 };
 
 /**
@@ -166,10 +181,10 @@ public:
 	 *
 	 * @param sources the locations and include/exclude wildcards of files that need to be parsed.  Parsing will
 	 *        be recursive (sub directories will be parsed also).
-	 * @param environment to know which PHP version to check against
+	 * @param globals to know which PHP version to check against, and to get the location of the tag cache files
 	 * @return bool TRUE if sources is not empty
 	 */
-	bool InitDirectoryLint(std::vector<mvceditor::SourceClass> sources, const EnvironmentClass& environment);
+	bool InitDirectoryLint(std::vector<mvceditor::SourceClass> sources, mvceditor::GlobalsClass& globals);
 
 	/**
 	 * Lint checks the given file in the current thread.  
@@ -177,12 +192,11 @@ public:
 	 * Lint errors will be propagated as events.
 	 * @param wxString fileName the full path of the file to lint
 	 * @param globals needed to perform exclude wildcard checks
-	 * @param environment to know which PHP version to check against
-	 * @param results the lint error, will only be filled when there is a lint error
+	 * @param results the lint errors, will only be filled when there is a lint error
 	 * @return TRUE if the file contains a lint error.
 	 */
-	bool LintSingleFile(const wxString& fileName, const mvceditor::GlobalsClass& globals, const EnvironmentClass& environment,
-		pelet::LintResultsClass& results);
+	bool LintSingleFile(const wxString& fileName, mvceditor::GlobalsClass& globals,
+		std::vector<pelet::LintResultsClass>& results);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -212,6 +226,10 @@ protected:
 
 private:
 
+	// needed by PhpIdentifierLintClass in order to find
+	// function/class names
+	mvceditor::TagCacheClass TagCache;
+
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
 };
 
@@ -222,7 +240,7 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, std::vector<pelet::LintResultsClass>& lintErrors);
+	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, mvceditor::LintFeatureClass& feature);
 	
 	/**
 	 * adds to the list box widget AND the parseResults data structure
@@ -283,7 +301,7 @@ private:
 
 	NotebookClass* Notebook;
 
-	std::vector<pelet::LintResultsClass>& LintErrors;
+	mvceditor::LintFeatureClass& Feature;
 
 	int TotalFiles;
 
@@ -298,7 +316,7 @@ class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
 
 public:
 
-	LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const pelet::LintResultsClass& result);
+	LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results);
 
 private:
 
@@ -317,7 +335,7 @@ private:
 	/**
 	 * the lint error to show
 	 */
-	pelet::LintResultsClass LintResult;
+	std::vector<pelet::LintResultsClass> LintResults;
 };
 
 /**
@@ -333,6 +351,13 @@ public:
 	 * will be performed.
 	 */
 	bool CheckOnSave;
+
+	/**
+	 * errors that have been encountered so far.
+	 */
+	std::vector<pelet::LintResultsClass> LintErrors;
+	std::vector<mvceditor::PhpVariableLintResultClass> VariableResults;
+	std::vector<mvceditor::PhpIdentifierLintResultClass> IdentifierResults;
 
 	LintFeatureClass(mvceditor::AppClass& app);
 
@@ -376,11 +401,6 @@ private:
 	 * to stop the lint action if the user closes the tab
 	 */
 	int RunningActionId;
-
-	/**
-	 * This will hold all info about parse errors.
-	 */
-	std::vector<pelet::LintResultsClass> LintErrors;
 	
 	DECLARE_EVENT_TABLE()
 };

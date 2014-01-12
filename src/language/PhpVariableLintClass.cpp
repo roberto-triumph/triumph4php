@@ -29,6 +29,7 @@
 
 mvceditor::PhpVariableLintResultClass::PhpVariableLintResultClass()
 : VariableName()
+, File()
 , LineNumber(0)
 , Pos(0) 
 , Type(NONE) {
@@ -37,6 +38,7 @@ mvceditor::PhpVariableLintResultClass::PhpVariableLintResultClass()
 
 mvceditor::PhpVariableLintResultClass::PhpVariableLintResultClass(const mvceditor::PhpVariableLintResultClass& src)
 : VariableName()
+, File()
 , LineNumber(0)
 , Pos(0) 
 , Type(NONE) {
@@ -51,17 +53,41 @@ mvceditor::PhpVariableLintResultClass::operator=(const mvceditor::PhpVariableLin
 
 void mvceditor::PhpVariableLintResultClass::Copy(const mvceditor::PhpVariableLintResultClass& src) {
 	VariableName = src.VariableName;
+	File = src.File;
 	LineNumber = src.LineNumber;
 	Pos = src.Pos;
 	Type = src.Type;
 }
 
+mvceditor::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass(const mvceditor::PhpVariableLintOptionsClass& src)
+: CheckGlobalScope(false)
+, Version(pelet::PHP_53) {
+	Copy(src);
+}
+
+mvceditor::PhpVariableLintOptionsClass& mvceditor::PhpVariableLintOptionsClass::operator=(const mvceditor::PhpVariableLintOptionsClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::PhpVariableLintOptionsClass::Copy(const mvceditor::PhpVariableLintOptionsClass& src) {
+	CheckGlobalScope = src.CheckGlobalScope;
+	Version = src.Version;
+}
+
+mvceditor::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass()
+: CheckGlobalScope(false)
+, Version(pelet::PHP_53) {
+
+}
 
 mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 : Errors()
 , ScopeVariables()
 , PredefinedVariables()
-, Parser() {
+, Parser() 
+, Options()
+, File() {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
@@ -88,16 +114,18 @@ mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 	}
 }
 
-void mvceditor::PhpVariableLintClass::SetVersion(pelet::Versions version) {
-	Parser.SetVersion(version);
+void mvceditor::PhpVariableLintClass::SetOptions(const mvceditor::PhpVariableLintOptionsClass& options) {
+	Options = options;
 }
 
 bool mvceditor::PhpVariableLintClass::ParseFile(const wxFileName& fileName, 
 															std::vector<mvceditor::PhpVariableLintResultClass>& errors) {
 	Errors.clear();
 	ScopeVariables.clear();
+	Parser.SetVersion(Options.Version);
+	File = mvceditor::WxToIcu(fileName.GetFullPath());
+	
 	pelet::LintResultsClass lintResult;
-
 	wxFFile file;
 	if (file.Open(fileName.GetFullPath(), wxT("rb"))) {
 		bool good = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), lintResult);
@@ -111,6 +139,9 @@ bool mvceditor::PhpVariableLintClass::ParseString(const UnicodeString& code,
 	
 	Errors.clear();
 	ScopeVariables.clear();
+	Parser.SetVersion(Options.Version);
+	File = UNICODE_STRING_SIMPLE("");
+
 	pelet::LintResultsClass lintResult;
 	bool good = Parser.ScanString(code, lintResult);
 	errors = Errors;
@@ -362,25 +393,22 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	// TODO:
 	// more checks that would be great to implement
 	//  1. variable inside interporlated strings  "this is your name: {$name}"
-	   ///  2. functions calls to functions that are not defined in a project
-  	   ///  3. new calls with classes that are not defined in a project
-	   ///  4. undefined properties of an object
-	   ///  5. undefined methods of an object
-	//  6. variable variables  "$obj->{$methodName}"
-	  ///  9. attempt to inherit from undefined base classes
-	  /// 10. attempt to implement undefined interfaces
-	  /// 11. type hints with classes that are not defined
-	  /// 12. namespace declarations with namespaces that are not defined
+	//  2. variable variables  "$obj->{$methodName}"
 	if (!var->ChainList[0].IsFunction) {
-		UnicodeString varName = var->ChainList[0].Name;
-		if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)
-			&& PredefinedVariables.end() == std::find(PredefinedVariables.begin(), PredefinedVariables.end(), varName)) {
-			mvceditor::PhpVariableLintResultClass lintResult;
-			lintResult.LineNumber = var->LineNumber;
-			lintResult.Pos = 0;
-			lintResult.Type = mvceditor::PhpVariableLintResultClass::UNINITIALIZED_VARIABLE;
-			lintResult.VariableName = varName;
-			Errors.push_back(lintResult);
+		
+		// if options say to not check variables in global scope, then dont check
+		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {
+			UnicodeString varName = var->ChainList[0].Name;
+			if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)
+				&& PredefinedVariables.end() == std::find(PredefinedVariables.begin(), PredefinedVariables.end(), varName)) {
+				mvceditor::PhpVariableLintResultClass lintResult;
+				lintResult.File = File;
+				lintResult.LineNumber = var->LineNumber;
+				lintResult.Pos = var->Pos;
+				lintResult.Type = mvceditor::PhpVariableLintResultClass::UNINITIALIZED_VARIABLE;
+				lintResult.VariableName = varName;
+				Errors.push_back(lintResult);
+			}
 		}
 	}
 	if (var->ChainList[0].IsFunction) {

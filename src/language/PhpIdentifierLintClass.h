@@ -57,6 +57,11 @@ public:
 	UnicodeString Identifier;
 
 	/**
+	 * the file that ther identifier was found in
+	 */
+	UnicodeString File;
+
+	/**
 	 * the line number (1- based) the unknown identifier was found in
 	 */
 	int LineNumber;
@@ -171,6 +176,12 @@ private:
 	 * when a variable, expression, etc.. is found
 	 */
 	pelet::ParserClass Parser;
+
+	/**
+	 * the file being currently parsed. empty string when a string of
+	 * code is parsed.
+	 */
+	UnicodeString File;
 
 	/**
 	 * used to lookup classes, functions, methods

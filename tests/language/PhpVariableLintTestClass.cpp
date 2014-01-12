@@ -36,18 +36,21 @@ class PhpVariableLintTestFixtureClass {
 
 public:
 
+	mvceditor::PhpVariableLintOptionsClass Options;
 	mvceditor::PhpVariableLintClass Lint;
 	std::vector<mvceditor::PhpVariableLintResultClass> Results;
 	bool HasError;
 
 	PhpVariableLintTestFixtureClass() 
-	: Lint() 
+	: Options()
+	, Lint() 
 	, Results()
 	, HasError(false) {
-		Lint.SetVersion(pelet::PHP_53);
+		Options.Version = pelet::PHP_53;
 	}
 
 	void Parse(const UnicodeString& code) {
+		Lint.SetOptions(Options);
 		HasError = Lint.ParseString(code, Results);
 	}
 
@@ -165,6 +168,18 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
+
+	// if the options say to not check global variables, then
+	// don't check global variables
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"  $a->work();\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"
@@ -260,7 +275,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 	// must recurse down constructor call and any method chaining 
 	// in case an argument
 	// is the result of another function call
-	Lint.SetVersion(pelet::PHP_54);
+	Options.Version = pelet::PHP_54;
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
@@ -307,6 +322,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 		"require __DIR__ . $file;\n"
 		"require_once __DIR__ . $file2;\n"
 	);
+	Options.CheckGlobalScope = true;
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(3, Results);

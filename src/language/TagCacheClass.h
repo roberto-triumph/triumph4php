@@ -44,6 +44,7 @@ class TagFinderClass;
 class TagResultClass;
 class FileTagResultClass;
 class ParsedTagFinderClass;
+class GlobalsClass;
 
 /**
  * The working cache is an in-memory cache of source code that is being edited
@@ -175,6 +176,13 @@ public:
 	 * @param tagFinderList this class will own the pointer
 	 */
 	void RegisterGlobal(mvceditor::TagFinderListClass* tagFinderList);
+
+	/**
+	 * Set the global cache using the default settings (from Asset). After a call
+	 * to this method, the cache is available for use by 
+	 * the ExpressionCompletionMatches and ResourceMatches methods
+	 */
+	void RegisterDefault(mvceditor::GlobalsClass& globals);
 	
 	/**
 	 * Searches the parsed tag finder
