@@ -161,6 +161,7 @@ void mvceditor::PhpVariableLintClass::MethodFound(const UnicodeString& namespace
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ScopeVariables.clear();
+	ScopeVariables.push_back(UNICODE_STRING_SIMPLE("$this"));
 }
 
 void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
@@ -394,7 +395,12 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	// more checks that would be great to implement
 	//  1. variable inside interporlated strings  "this is your name: {$name}"
 	//  2. variable variables  "$obj->{$methodName}"
-	if (!var->ChainList[0].IsFunction) {
+	//
+	// note that a "variable" could also be a static method call
+	// ie "User::all()", but this does not contain a variable so
+	// we skip this
+	if (!var->ChainList[0].IsFunction &&  !var->ChainList[0].Name.isEmpty() &&
+		var->ChainList[0].Name.charAt(0) == '$') {
 		
 		// if options say to not check variables in global scope, then dont check
 		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {

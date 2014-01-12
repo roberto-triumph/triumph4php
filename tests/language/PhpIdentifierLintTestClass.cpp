@@ -75,13 +75,15 @@ public:
 		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
 	}
 
-	void BuildCache() {
+	void BuildCache(bool includeNativeFunctions = false) {
 		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*session, mvceditor::ResourceSqlSchemaAsset()); 
 
 		mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
 		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-		
+		if (includeNativeFunctions) {
+			tagFinderList->InitNativeTag(mvceditor::NativeFunctionsAsset());
+		}
 		mvceditor::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));
 		while (search.More()) {
@@ -136,6 +138,28 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
+
+	// test that we don't flag native functions (strlen, strcmp, etc....)
+	// as unkown, we should always look them up in the global
+	// namespace even when the code is inside a namespace
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"function doPrint($a) {} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"namespace Util; \n"
+		"$a = strlen('a long string');\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache(true);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 

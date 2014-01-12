@@ -180,6 +180,36 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
+
+	// $this variable is always defined in methods
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"class MyClass {\n"
+		"  function work() {\n"
+		"    $this->work();\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"class MyClass {\n"
+		"  function work() {\n"
+		"    if (self::workOnce()) {\n"
+		"        // nothing \n"
+		"    }\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"
@@ -350,6 +380,20 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	CHECK_EQUAL(4, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
 	CHECK_EQUAL(4, Results[1].LineNumber);
+}
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
+
+	// $this variable is never defined in a function
+	UnicodeString code = mvceditor::CharToIcu(
+		"  function work() {\n"
+		"    $this->work();\n"
+		"  }\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_UNISTR_EQUALS("$this", Results[0].VariableName);
+	CHECK_EQUAL(2, Results[0].LineNumber);
 }
 
 }

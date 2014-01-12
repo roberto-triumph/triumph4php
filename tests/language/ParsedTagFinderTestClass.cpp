@@ -40,7 +40,7 @@
 #include <algorithm>
 
 /**
- * This is a fixture to test that the tag finder works with
+ * This is a fixture to test that the tag finder works with-
  * files.  We will use this sparingly since the parser (really the
  * LexicalAnalyzerClass) is the one responsible for tokenizing 
  * the input.

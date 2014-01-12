@@ -25,6 +25,7 @@
 #include <language/PhpIdentifierLintClass.h>
 #include <language/TagCacheClass.h>
 #include <globals/String.h>
+#include <language/ParsedTagFinderClass.h>
 #include <wx/ffile.h>
 #include <algorithm>
 
@@ -301,17 +302,32 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 	if (var->ChainList[0].IsFunction) {
 		
 		// check the function name
+		// we check to see if the function is a native function first
+		// native functions never have a namespace
+		// but the parser always returns a fully qualified name because
+		// it does not know what functions are native and which aren't
 		UnicodeString functionName = var->ChainList[0].Name;
-		std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
-		if (tags.empty()) {
-			mvceditor::PhpIdentifierLintResultClass lintResult;
-			lintResult.File = File;
-			lintResult.LineNumber = var->LineNumber;
-			lintResult.Pos = var->Pos;
-			lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
-			lintResult.Identifier = functionName;
-			Errors.push_back(lintResult);
-
+		int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+		bool functionFound = false;
+		if (pos >= 0) {
+			UnicodeString unqualifiedName;
+			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
+			mvceditor::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
+			if (result) {
+				functionFound = !result->Empty();
+			}
+		}
+		if (!functionFound) {
+			std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
+			if (tags.empty()) {
+				mvceditor::PhpIdentifierLintResultClass lintResult;
+				lintResult.File = File;
+				lintResult.LineNumber = var->LineNumber;
+				lintResult.Pos = var->Pos;
+				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
+				lintResult.Identifier = functionName;
+				Errors.push_back(lintResult);
+			}
 		}
 
 		// check the function parameters
