@@ -340,13 +340,9 @@ solution "mvc-editor"
 		kind "ConsoleApp"
 		files {
 			"profilers/tag_finder_profiler.cpp",
-			"src/globals/Errors.cpp",
-			"src/globals/Assets.cpp",
-			"src/globals/Sqlite.cpp",
-			"src/globals/TagClass.cpp",
+			"src/globals/*.cpp",
 			"src/language/*.cpp",
-			"src/search/*.cpp",
-			"src/globals/String.cpp"
+			"src/search/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
 		links { "pelet" }
