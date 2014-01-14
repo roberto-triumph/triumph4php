@@ -63,15 +63,19 @@ wxEvent* mvceditor::LintResultsSummaryEventClass::Clone() const {
 }
 
 
-mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache) 
-	: LastResults()	
-	, WithErrors(0)
-	, WithNoErrors(0)
-	, Parser() 
-	, VariableLinterOptions()
-	, VariableLinter()
-	, IdentifierLinter(tagCache) {
-		
+mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache, const mvceditor::LintFeatureOptionsClass& options) 
+: WithErrors(0)
+, WithNoErrors(0) 
+, Options(options)
+, Parser() 	
+, VariableLinterOptions()
+, VariableLinter()
+, IdentifierLinter(tagCache)
+, LastResults()
+, VariableResults()
+, IdentifierResults()
+{
+	VariableLinterOptions.CheckGlobalScope = Options.CheckGlobalScopeVariables;
 }
 
 void mvceditor::ParserDirectoryWalkerClass::ResetTotals() {
@@ -100,11 +104,15 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 		hasErrors = true;
 	}
 	wxFileName wxf(fileName);
-	if (VariableLinter.ParseFile(wxf, VariableResults)) {
-		hasErrors = true;
+	if (Options.CheckUninitializedVariables) {
+		if (VariableLinter.ParseFile(wxf, VariableResults)) {
+			hasErrors = true;
+		}
 	}
-	if (IdentifierLinter.ParseFile(wxf, IdentifierResults)) {
-		hasErrors = true;
+	if (Options.CheckUnknownIdentifiers) {
+		if (IdentifierLinter.ParseFile(wxf, IdentifierResults)) {
+			hasErrors = true;
+		}
 	}
 
 	if (!hasErrors) {
@@ -154,10 +162,12 @@ std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetL
 	return allResults;
 }
 
-mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, 
+																		int eventId,
+																		const mvceditor::LintFeatureOptionsClass& options)
 	: BackgroundFileReaderClass(runningThreads, eventId)
 	, TagCache()
-	, ParserDirectoryWalker(TagCache) {
+	, ParserDirectoryWalker(TagCache, options) {
 		
 }
 
@@ -283,7 +293,6 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 			it++;
 		}
 	}
-	// TODO remove other errors too
 	if (found) {
 		ErrorFiles--;
 		UpdateSummary();
@@ -386,7 +395,7 @@ void mvceditor::LintResultsPanelClass::ShowLintError(int index) {
 
 mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app) 
 	: FeatureClass(app)
-	, CheckOnSave(true)
+	, Options()
 	, LintErrors()
 	, VariableResults()
 	, IdentifierResults()
@@ -419,11 +428,17 @@ void mvceditor::LintFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void mvceditor::LintFeatureClass::LoadPreferences(wxConfigBase* config) {
-	config->Read(wxT("/LintCheck/CheckOnSave"), &CheckOnSave);
+	config->Read(wxT("/LintCheck/CheckOnSave"), &Options.CheckOnSave);
+	config->Read(wxT("/LintCheck/CheckUninitializedVariables"), &Options.CheckUninitializedVariables);
+	config->Read(wxT("/LintCheck/CheckUnknownIdentifiers"), &Options.CheckUnknownIdentifiers);
+	config->Read(wxT("/LintCheck/CheckGlobalScopeVariables"), &Options.CheckGlobalScopeVariables);
 }
 void mvceditor::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("/LintCheck/CheckOnSave"), CheckOnSave);
+	config->Write(wxT("/LintCheck/CheckOnSave"), Options.CheckOnSave);
+	config->Write(wxT("/LintCheck/CheckUninitializedVariables"), Options.CheckUninitializedVariables);
+	config->Write(wxT("/LintCheck/CheckUnknownIdentifiers"), Options.CheckUnknownIdentifiers);
+	config->Write(wxT("/LintCheck/CheckGlobalScopeVariables"), Options.CheckGlobalScopeVariables);
 }
 
 void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
@@ -432,7 +447,7 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 		return;
 	}
 	if (App.Globals.HasSources()) {
-		mvceditor::LintBackgroundFileReaderClass* reader = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
+		mvceditor::LintBackgroundFileReaderClass* reader = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER, Options);
 		std::vector<mvceditor::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
@@ -548,9 +563,9 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& 
 
 	// if user has configure to do lint check on saving or user is cleaning up
 	// errors (after they manually lint checked the project) then re-check
-	if (hasErrors || CheckOnSave) {
+	if (hasErrors || Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE);
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
 		bool good = thread->InitSingleFileLint(fileName, App.Globals);
 	
 		// handle the case where user has saved a file but has not clicked
@@ -596,8 +611,17 @@ mvceditor::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent
 																mvceditor::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
-	wxGenericValidator checkValidator(&Feature.CheckOnSave);
+	wxGenericValidator checkValidator(&Feature.Options.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);
+
+	wxGenericValidator checkUninitializedValidator(&Feature.Options.CheckUninitializedVariables);
+	CheckUnitializedVariables->SetValidator(checkUninitializedValidator);
+
+	wxGenericValidator checkGlobalValidator(&Feature.Options.CheckGlobalScopeVariables);
+	CheckUnitializedGlobalVariables->SetValidator(checkGlobalValidator);
+
+	wxGenericValidator checkIdentifiersValidator(&Feature.Options.CheckUnknownIdentifiers);
+	CheckUnknownIdentifiers->SetValidator(checkIdentifiersValidator);
 }
 
 mvceditor::LintErrorPanelClass::LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
@@ -639,6 +663,34 @@ void mvceditor::LintErrorPanelClass::DoDestroy() {
 	this->Destroy();
 }
 
+
+mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass()
+: CheckOnSave(true)
+, CheckUninitializedVariables(true)
+, CheckUnknownIdentifiers(false)
+, CheckGlobalScopeVariables(false) {
+
+}
+
+mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass(const mvceditor::LintFeatureOptionsClass& src)
+: CheckOnSave(true)
+, CheckUninitializedVariables(true)
+, CheckUnknownIdentifiers(false)
+, CheckGlobalScopeVariables(false) {
+	Copy(src);
+}
+
+mvceditor::LintFeatureOptionsClass& mvceditor::LintFeatureOptionsClass::operator=(const mvceditor::LintFeatureOptionsClass& src)  {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::LintFeatureOptionsClass::Copy(const mvceditor::LintFeatureOptionsClass& src) {
+	CheckOnSave = src.CheckOnSave;
+	CheckUninitializedVariables = src.CheckUninitializedVariables;
+	CheckUnknownIdentifiers = src.CheckUnknownIdentifiers;
+	CheckGlobalScopeVariables = src.CheckGlobalScopeVariables;
+}
 
 BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler) 
 	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintFeatureClass::OnLintMenu)

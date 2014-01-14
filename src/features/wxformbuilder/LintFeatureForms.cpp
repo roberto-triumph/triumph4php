@@ -46,27 +46,40 @@ LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 
 LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	wxBoxSizer* BozSizer;
-	BozSizer = new wxBoxSizer( wxVERTICAL );
+	wxStaticBoxSizer* sbSizer2;
+	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Lint Preferences") ), wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGidSizer;
-	FlexGidSizer = new wxFlexGridSizer( 1, 1, 0, 0 );
+	FlexGidSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGidSizer->AddGrowableCol( 0 );
-	FlexGidSizer->AddGrowableRow( 0 );
+	FlexGidSizer->AddGrowableRow( 1 );
 	FlexGidSizer->SetFlexibleDirection( wxBOTH );
 	FlexGidSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxStaticBoxSizer* TopSizer;
-	TopSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Preferences") ), wxVERTICAL );
+	Help = new wxStaticText( this, wxID_ANY, wxT("The lint preferences control the types of PHP errors that MVC Editor can detect.\n\nPerform lint check on file save \nWhen enabled, a lint check will be performed when the user saves a PHP file.\n\nCheck Uninitialized variables \nChecks for PHP variables that are being read before they have been initialized. Note \nthat this check is only done on variables inside a function or method.\n\nCheck Uninitialized global variables \nLike above, but it checks global variables. The reason it is disabled by default is because \nglobal variables are usually assigned via a template mechanism; checking for initialization \non global variables would lead to many false positives.\n\nCheck for unknown classes, methods and functions \nEach referenced class name, method name or function. In order for this check to\nwork properly there must be at least one defined project, and it must have\nbeen indexed.\n"), wxDefaultPosition, wxDefaultSize, 0 );
+	Help->Wrap( -1 );
+	FlexGidSizer->Add( Help, 0, wxALL, 5 );
+	
+	wxBoxSizer* ChecksSizer;
+	ChecksSizer = new wxBoxSizer( wxVERTICAL );
 	
 	CheckOnSave = new wxCheckBox( this, wxID_ANY, wxT("Perform lint check on file save"), wxDefaultPosition, wxDefaultSize, 0 );
-	TopSizer->Add( CheckOnSave, 0, wxALL, 5 );
+	ChecksSizer->Add( CheckOnSave, 0, wxALL, 5 );
 	
-	FlexGidSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	CheckUnitializedVariables = new wxCheckBox( this, wxID_ANY, wxT("Check uninitialized variables"), wxDefaultPosition, wxDefaultSize, 0 );
+	ChecksSizer->Add( CheckUnitializedVariables, 0, wxALL, 5 );
 	
-	BozSizer->Add( FlexGidSizer, 1, wxEXPAND, 5 );
+	CheckUnitializedGlobalVariables = new wxCheckBox( this, wxID_ANY, wxT("Check Uninitialized global variables"), wxDefaultPosition, wxDefaultSize, 0 );
+	ChecksSizer->Add( CheckUnitializedGlobalVariables, 0, wxALL, 5 );
 	
-	this->SetSizer( BozSizer );
+	CheckUnknownIdentifiers = new wxCheckBox( this, wxID_ANY, wxT("Check unknown classes, methods, and functions"), wxDefaultPosition, wxDefaultSize, 0 );
+	ChecksSizer->Add( CheckUnknownIdentifiers, 0, wxALL, 5 );
+	
+	FlexGidSizer->Add( ChecksSizer, 1, wxEXPAND, 5 );
+	
+	sbSizer2->Add( FlexGidSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( sbSizer2 );
 	this->Layout();
 }
 

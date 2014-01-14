@@ -98,6 +98,47 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
 
+/**
+ * Stores flags that determine how strict linting will be 
+ */
+class LintFeatureOptionsClass {
+
+public:
+
+	/**
+	 * If TRUE, then when a file is saved; a lint check on that file
+	 * will be performed.
+	 */
+	bool CheckOnSave;
+
+	/**
+	 * if TRUE, then a check for uninitialized variables is done
+	 * it will done only on variables in a function or method.
+	 */
+	bool CheckUninitializedVariables;
+
+	/**
+	 * if TRUE, then methods, classes will be checked for existence
+	 * when they are being called.  this requires that a project 
+	 * be indexes.
+	 */
+	bool CheckUnknownIdentifiers;
+
+	/**
+	 * if TRUE, then a check for uninitialized variables is done
+	 * on global variables
+	 */
+	bool CheckGlobalScopeVariables;
+
+	LintFeatureOptionsClass();
+
+	LintFeatureOptionsClass(const mvceditor::LintFeatureOptionsClass& src);
+
+	mvceditor::LintFeatureOptionsClass& operator=(const mvceditor::LintFeatureOptionsClass& src);
+
+	void Copy(const mvceditor::LintFeatureOptionsClass& src);
+};
+
 /** 
  * This class will help in parsing the large project. It will enable access
  * to DirectorySearch and easily parse many files.
@@ -105,7 +146,7 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache);
+	ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache, const mvceditor::LintFeatureOptionsClass& options);
 	
 	/**
 	 * This is the method where the parsing will take place. Will return true
@@ -148,6 +189,9 @@ public:
 	
 private:
 
+	// flags that control which checks to perform
+	mvceditor::LintFeatureOptionsClass Options;
+
 	// linters to perform different kinds of checks
 	pelet::ParserClass Parser;
 	mvceditor::PhpVariableLintOptionsClass VariableLinterOptions;
@@ -172,9 +216,12 @@ public:
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
 	 * 	      as well as WORK_* events
-	 * @see mvceditor::ThreadWithHeartbeat class
+	 * @param eventId the ID of the generated events
+	 * @param options flags to control how strict linter will be
+	 * @see mvceditor::ActionClass class
 	 */
-	LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+		const mvceditor::LintFeatureOptionsClass& options);
 	
 	/**
 	 * prepare to lint a list of directories
@@ -346,14 +393,11 @@ class LintFeatureClass : public FeatureClass {
 	
 public:
 	
-	/**
-	 * If TRUE, then when a file is saved; a lint check on that file
-	 * will be performed.
-	 */
-	bool CheckOnSave;
+	mvceditor::LintFeatureOptionsClass Options;
 
 	/**
-	 * errors that have been encountered so far.
+	 * errors that have been encountered so far. there are 3 types
+	 * of errors because there are different type of linters.
 	 */
 	std::vector<pelet::LintResultsClass> LintErrors;
 	std::vector<mvceditor::PhpVariableLintResultClass> VariableResults;
