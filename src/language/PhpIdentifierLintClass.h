@@ -27,6 +27,7 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
+#include <globals/String.h>
 #include <wx/filename.h>
 
 namespace mvceditor {
@@ -189,6 +190,24 @@ private:
 	mvceditor::TagCacheClass& TagCache;
 
 	/**
+	 * caching results of methods and function lookups, will 
+	 * only hit the tag cache once per file per method/function
+	 */
+	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> 
+		FoundClasses,
+		FoundMethods,
+		FoundProperties,
+		FoundFunctions,
+		FoundStaticMethods,
+		FoundStaticProperties,
+		NotFoundClasses,
+		NotFoundMethods,
+		NotFoundProperties,
+		NotFoundFunctions,
+		NotFoundStaticMethods,
+		NotFoundStaticProperties;
+
+	/**
 	 * @param var the expression to check. A Check  will be
 	 *       done to see if any of the identifiers used in the 
 	 *       given expression are not found in the cache
@@ -215,6 +234,14 @@ private:
 	 *        created and appended to the Errors vector.
 	 */
 	void CheckArrayDefinition(pelet::ArrayExpressionClass* expr);
+
+	void CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var);
+
+	void CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var);
+
+	void CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var);
+
+	void CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression);
 
 };
 

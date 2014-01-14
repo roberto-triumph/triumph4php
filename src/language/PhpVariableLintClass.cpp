@@ -82,7 +82,8 @@ mvceditor::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass()
 }
 
 mvceditor::PhpVariableLintClass::PhpVariableLintClass()
-: Errors()
+: ExpressionObserverClass()
+, Errors()
 , ScopeVariables()
 , PredefinedVariables()
 , Parser() 
@@ -110,7 +111,7 @@ mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 		UNICODE_STRING_SIMPLE("$argv")
 	};
 	for (int i = 0; i < 14; ++i) {
-		PredefinedVariables.push_back(variables[i]);
+		PredefinedVariables[variables[i]] = 1;
 	}
 }
 
@@ -161,7 +162,7 @@ void mvceditor::PhpVariableLintClass::MethodFound(const UnicodeString& namespace
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ScopeVariables.clear();
-	ScopeVariables.push_back(UNICODE_STRING_SIMPLE("$this"));
+	ScopeVariables[UNICODE_STRING_SIMPLE("$this")] = 1;
 }
 
 void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
@@ -172,9 +173,9 @@ void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespa
 
 void mvceditor::PhpVariableLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
 	
-	// functino arguments go in the initialized list
+	// function arguments go in the initialized list
 	if (!variable->ChainList.empty()) {
-		ScopeVariables.push_back(variable->ChainList[0].Name);
+		ScopeVariables[variable->ChainList[0].Name] = 1;
 	}
 }
 
@@ -198,7 +199,7 @@ void mvceditor::PhpVariableLintClass::ExpressionAssignmentFound(pelet::Assignmen
 	if (expression->Destination.ChainList.size() == 1 && 
 		!expression->Destination.ChainList[0].IsFunction) {
 		
-		ScopeVariables.push_back(expression->Destination.ChainList[0].Name);
+		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
 	}
 }
 
@@ -209,7 +210,7 @@ void mvceditor::PhpVariableLintClass::ExpressionAssignmentCompoundFound(pelet::A
 	if (expression->Variable.ChainList.size() == 1 && 
 		!expression->Variable.ChainList[0].IsFunction) {
 		
-		ScopeVariables.push_back(expression->Variable.ChainList[0].Name);
+		ScopeVariables[expression->Variable.ChainList[0].Name] = 1;
 	}
 }
 
@@ -262,7 +263,7 @@ void mvceditor::PhpVariableLintClass::StatementGlobalVariablesFound(pelet::Globa
 	for (size_t i = 0; i < variables->Variables.size(); ++i) {
 		if (!variables->Variables[i]->ChainList.empty()) {
 			UnicodeString varName = variables->Variables[i]->ChainList[0].Name;
-			ScopeVariables.push_back(varName);
+			ScopeVariables[varName] = 1;
 		}
 	}
 }
@@ -274,7 +275,7 @@ void mvceditor::PhpVariableLintClass::StatementStaticVariablesFound(pelet::Stati
 	for (size_t i = 0; i < variables->Variables.size(); ++i) {
 		if (!variables->Variables[i]->ChainList.empty()) {
 			UnicodeString varName = variables->Variables[i]->ChainList[0].Name;
-			ScopeVariables.push_back(varName);
+			ScopeVariables[varName] = 1;
 		}
 	}
 }
@@ -288,22 +289,22 @@ void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpre
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
 	// scope for the closure.
-	std::vector<UnicodeString> closureScopeVariables;
+	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> closureScopeVariables;
 	for (size_t i = 0; i < expr->Parameters.size(); ++i) {
 		pelet::VariableClass* param = expr->Parameters[i];
 		if (!param->ChainList.empty()) {
-			closureScopeVariables.push_back(param->ChainList[0].Name);
+			closureScopeVariables[param->ChainList[0].Name] = 1;
 		}
 	}
 	for (size_t i = 0; i < expr->LexicalVars.size(); ++i) {
 		pelet::VariableClass* param = expr->LexicalVars[i];
 		if (!param->ChainList.empty()) {
-			closureScopeVariables.push_back(param->ChainList[0].Name);
+			closureScopeVariables[param->ChainList[0].Name] = 1;
 		}
 	}
 
 	// copy the current scope to be replaced back after we deal with the closure
-	std::vector<UnicodeString> oldScope = ScopeVariables;
+	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> oldScope = ScopeVariables;
 	ScopeVariables = closureScopeVariables;
 
 	for (size_t i = 0; i < expr->Statements.Size(); ++i) {
@@ -337,7 +338,7 @@ void mvceditor::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::Assig
 		if (var.ChainList.size() == 1 && 
 			!var.ChainList[0].IsFunction) {
 			
-			ScopeVariables.push_back(var.ChainList[0].Name);
+			ScopeVariables[var.ChainList[0].Name] = 1;
 		}
 	}
 }
@@ -405,8 +406,8 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		// if options say to not check variables in global scope, then dont check
 		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {
 			UnicodeString varName = var->ChainList[0].Name;
-			if (ScopeVariables.end() == std::find(ScopeVariables.begin(), ScopeVariables.end(), varName)
-				&& PredefinedVariables.end() == std::find(PredefinedVariables.begin(), PredefinedVariables.end(), varName)) {
+			if (ScopeVariables.find(varName) == ScopeVariables.end()
+				&& PredefinedVariables.find(varName) == PredefinedVariables.end()) {
 				mvceditor::PhpVariableLintResultClass lintResult;
 				lintResult.File = File;
 				lintResult.LineNumber = var->LineNumber;

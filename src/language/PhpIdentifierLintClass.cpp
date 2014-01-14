@@ -29,6 +29,25 @@
 #include <wx/ffile.h>
 #include <algorithm>
 
+static void AddMagicMethods(std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass>& methods) {
+
+	// magic methods, never unknown 
+	methods[UNICODE_STRING_SIMPLE("__construct")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__destruct")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__call()")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__callStatic")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__get")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__set")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__isset")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__unset")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__sleep")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__wakeup")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__toString")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__invoke")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__set_state")] = 1;
+	methods[UNICODE_STRING_SIMPLE("__clone")] = 1;
+}
+
 mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 : Identifier()
 , File()
@@ -63,10 +82,23 @@ void mvceditor::PhpIdentifierLintResultClass::Copy(const mvceditor::PhpIdentifie
 
 
 mvceditor::PhpIdentifierLintClass::PhpIdentifierLintClass(mvceditor::TagCacheClass& tagCache)
-: Errors()
+: ExpressionObserverClass()
+, Errors()
 , Parser() 
 , File()
-, TagCache(tagCache) {
+, TagCache(tagCache)
+, FoundClasses()
+, FoundMethods()
+, FoundProperties()
+, FoundFunctions()
+, FoundStaticMethods()
+, FoundStaticProperties()
+, NotFoundClasses()
+, NotFoundMethods()
+, NotFoundProperties()
+, NotFoundFunctions()
+, NotFoundStaticMethods()
+, NotFoundStaticProperties() {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
@@ -80,6 +112,23 @@ void mvceditor::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
 bool mvceditor::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName, 
 															std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
 	Errors.clear();
+	FoundClasses.clear();
+	FoundMethods.clear();
+	FoundProperties.clear();
+	FoundFunctions.clear();
+	FoundStaticMethods.clear();
+	FoundStaticProperties.clear();
+	NotFoundClasses.clear();
+	NotFoundMethods.clear();
+	NotFoundProperties.clear();
+	NotFoundFunctions.clear();
+	NotFoundStaticMethods.clear();
+	NotFoundStaticProperties.clear();
+
+	AddMagicMethods(FoundMethods);
+	AddMagicMethods(FoundStaticMethods);
+	
+
 	File = mvceditor::WxToIcu(fileName.GetFullPath());
 	pelet::LintResultsClass lintResult;
 
@@ -95,10 +144,28 @@ bool mvceditor::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 															  std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
 	
 	Errors.clear();
+	FoundClasses.clear();
+	FoundMethods.clear();
+	FoundProperties.clear();
+	FoundFunctions.clear();
+	FoundStaticMethods.clear();
+	FoundStaticProperties.clear();
+	NotFoundClasses.clear();
+	NotFoundMethods.clear();
+	NotFoundProperties.clear();
+	NotFoundFunctions.clear();
+	NotFoundStaticMethods.clear();
+	NotFoundStaticProperties.clear();
+
+	// magic methods, never unknown 
+	AddMagicMethods(FoundMethods);
+	AddMagicMethods(FoundStaticMethods);
+
 	File = UNICODE_STRING_SIMPLE("");
 	pelet::LintResultsClass lintResult;
 	bool good = Parser.ScanString(code, lintResult);
 	errors = Errors;
+
 	return !errors.empty();
 }
 
@@ -173,18 +240,7 @@ void mvceditor::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewIns
 	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
 		CheckExpression(*constructorArg);
 	}
-
-	UnicodeString fullyQualifiedClassName = expression->ClassName;
-	std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(fullyQualifiedClassName);
-	if (tags.empty()) {
-		mvceditor::PhpIdentifierLintResultClass lintResult;
-		lintResult.File = File;
-		lintResult.LineNumber = expression->LineNumber;
-		lintResult.Pos = expression->Pos;
-		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
-		lintResult.Identifier = expression->ClassName;
-		Errors.push_back(lintResult);	
-	}
+	CheckClassName(expression->ClassName, expression);
 
 	// check any function args to any chained method calls.
 	std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression->ChainList.begin();
@@ -300,57 +356,25 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 	// 4. namespace declarations with namespaces that are not defined
 	// 5. unused namespace imports
 	if (var->ChainList[0].IsFunction) {
+		CheckFunctionName(var->ChainList[0], var);
 		
-		// check the function name
-		// we check to see if the function is a native function first
-		// native functions never have a namespace
-		// but the parser always returns a fully qualified name because
-		// it does not know what functions are native and which aren't
-		UnicodeString functionName = var->ChainList[0].Name;
-		int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
-		bool functionFound = false;
-		if (pos >= 0) {
-			UnicodeString unqualifiedName;
-			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
-			mvceditor::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
-			if (result) {
-				functionFound = !result->Empty();
-			}
-		}
-		if (!functionFound) {
-			std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
-			if (tags.empty()) {
-				mvceditor::PhpIdentifierLintResultClass lintResult;
-				lintResult.File = File;
-				lintResult.LineNumber = var->LineNumber;
-				lintResult.Pos = var->Pos;
-				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
-				lintResult.Identifier = functionName;
-				Errors.push_back(lintResult);
-			}
-		}
-
 		// check the function parameters
 		std::vector<pelet::ExpressionClass*>::const_iterator it;
 		for (it = var->ChainList[0].CallArguments.begin(); it != var->ChainList[0].CallArguments.end(); ++it) {
 			CheckExpression(*it);
 		}
 	}
+	else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
+
+		// a classname in a static method call, ie User::DEFAULT_NAME
+		CheckClassName(var->ChainList[0].Name, var);
+	}
 
 	// check the rest of the variable property/method accesses
 	for (size_t i = 1; i < var->ChainList.size(); ++i) {
 		pelet::VariablePropertyClass prop = var->ChainList[i];
 		if (prop.IsFunction) {
-			std::vector<mvceditor::TagClass> tags = TagCache.ExactMethod(prop.Name, prop.IsStatic);
-			if (tags.empty()) {
-				mvceditor::PhpIdentifierLintResultClass lintResult;
-				lintResult.File = File;
-				lintResult.LineNumber = var->LineNumber;
-				lintResult.Pos = var->Pos;
-				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
-				lintResult.Identifier = prop.Name;
-				Errors.push_back(lintResult);
-			}
+			CheckMethodName(prop, var);
 
 			// check the function parameters
 			std::vector<pelet::ExpressionClass*>::const_iterator itArg;
@@ -387,5 +411,209 @@ void mvceditor::PhpIdentifierLintClass::CheckArrayDefinition(pelet::ArrayExpress
 			CheckExpression(pair->Key);
 		}
 		CheckExpression(pair->Value);
+	}
+}
+
+void mvceditor::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var) {
+
+	// we check to see if the function is a native function first
+	// native functions never have a namespace
+	// but the parser always returns a fully qualified name because
+	// it does not know what functions are native and which aren't
+	UnicodeString functionName = functionProp.Name;
+	UnicodeString unqualifiedName;
+	int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+	bool isUnknown = false;
+	bool foundInMap = false;
+	if (pos >= 0) {		
+		functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
+	}
+	if (!unqualifiedName.isEmpty() && FoundFunctions.find(unqualifiedName) != FoundFunctions.end()) {
+		isUnknown = false;
+		foundInMap = true;
+	}
+	else if (!unqualifiedName.isEmpty() && NotFoundFunctions.find(unqualifiedName) != NotFoundFunctions.end()) {
+		isUnknown = true;
+		foundInMap = true;
+	}
+	else if (!unqualifiedName.isEmpty()) {
+		// not found in our little cache. lookup in the big cache
+		mvceditor::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
+		if (result && !result->Empty()) {
+			FoundFunctions[unqualifiedName] = 1;
+			isUnknown = false;
+			foundInMap = true;
+		}
+		else {
+			NotFoundFunctions[unqualifiedName] = 1;
+			isUnknown = true;
+		}
+		if (result) {
+			delete result;
+		}
+	}
+	if (!foundInMap && !isUnknown) {
+
+		// check the fully qualified function name
+		// dont check the native tags, as native PHP functions are never namespaced
+		if (FoundFunctions.find(functionName) != FoundFunctions.end()) {
+			isUnknown = false;
+		}
+		else if (NotFoundFunctions.find(functionName) != NotFoundFunctions.end()) {
+			isUnknown = true;
+		}
+		else {
+			// not found in our little cache. lookup in the big cache
+			std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
+			if (!tags.empty()) {
+				FoundFunctions[functionName] = 1;
+				isUnknown = false;
+			}
+			else {
+				NotFoundFunctions[functionName] = 1;
+				isUnknown = true;
+			}
+		}
+	}
+	if (isUnknown) {
+		mvceditor::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = var->LineNumber;
+		lintResult.Pos = var->Pos;
+		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
+		lintResult.Identifier = functionName;
+		Errors.push_back(lintResult);
+	}
+}
+
+void mvceditor::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var) {
+
+	// magic methods, constructors are always put in the cache automatically above
+	// this same code will work for those also
+
+	bool isUnknown = false;
+	// check out little cache, different maps depending on static vs instances methods
+	if (methodProp.IsStatic && FoundStaticMethods.find(methodProp.Name) != FoundStaticMethods.end()) {
+		isUnknown = false;
+	}
+	else if (methodProp.IsStatic && NotFoundStaticMethods.find(methodProp.Name) != NotFoundStaticMethods.end()) {
+		isUnknown = true;
+	}
+	else if (!methodProp.IsStatic && FoundMethods.find(methodProp.Name) != FoundMethods.end()) {
+		isUnknown = false;
+	}
+	else if (!methodProp.IsStatic && NotFoundMethods.find(methodProp.Name) != NotFoundMethods.end()) {
+		isUnknown = true;
+	}
+	else {
+		std::vector<mvceditor::TagClass> tags = TagCache.ExactMethod(methodProp.Name, methodProp.IsStatic);
+		if (!tags.empty() && !methodProp.IsStatic) {
+			FoundMethods[methodProp.Name] = 1;
+			isUnknown = false;
+		}
+		else if (tags.empty() && !methodProp.IsStatic) {
+			NotFoundMethods[methodProp.Name] = 1;
+			isUnknown = true;
+		}
+		else if (!tags.empty() && methodProp.IsStatic) {
+			FoundStaticMethods[methodProp.Name] = 1;
+			isUnknown = false;
+		}
+		else if (tags.empty() && methodProp.IsStatic) {
+			NotFoundStaticMethods[methodProp.Name] = 1;
+			isUnknown = true;
+		}
+	}
+
+	if (isUnknown) {
+		mvceditor::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = var->LineNumber;
+		lintResult.Pos = var->Pos;
+		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
+		lintResult.Identifier = methodProp.Name;
+		Errors.push_back(lintResult);
+	}
+}
+
+void mvceditor::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
+	bool isUnknown = false;
+	
+	// check out little cache, different maps depending on static vs instances methods
+	if (propertyProp.IsStatic && FoundStaticProperties.find(propertyProp.Name) != FoundStaticProperties.end()) {
+		isUnknown = false;
+	}
+	else if (propertyProp.IsStatic && NotFoundStaticProperties.find(propertyProp.Name) != NotFoundStaticProperties.end()) {
+		isUnknown = true;
+	}
+	else if (!propertyProp.IsStatic && FoundProperties.find(propertyProp.Name) != FoundProperties.end()) {
+		isUnknown = false;
+	}
+	else if (!propertyProp.IsStatic && NotFoundProperties.find(propertyProp.Name) != NotFoundProperties.end()) {
+		isUnknown = true;
+	}
+	else {
+		std::vector<mvceditor::TagClass> tags = TagCache.ExactProperty(propertyProp.Name, propertyProp.IsStatic);
+		if (!tags.empty() && !propertyProp.IsStatic) {
+			FoundProperties[propertyProp.Name] = 1;
+			isUnknown = false;
+		}
+		else if (tags.empty() && !propertyProp.IsStatic) {
+			NotFoundProperties[propertyProp.Name] = 1;
+			isUnknown = true;
+		}
+		else if (!tags.empty() && propertyProp.IsStatic) {
+			FoundStaticProperties[propertyProp.Name] = 1;
+			isUnknown = false;
+		}
+		else if (tags.empty() && propertyProp.IsStatic) {
+			NotFoundStaticProperties[propertyProp.Name] = 1;
+			isUnknown = true;
+		}
+	}
+
+	if (isUnknown) {
+		mvceditor::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = var->LineNumber;
+		lintResult.Pos = var->Pos;
+		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
+		lintResult.Identifier = propertyProp.Name;
+		Errors.push_back(lintResult);
+	}
+}
+
+
+void mvceditor::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression) {
+	if (className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||
+		className.compare(UNICODE_STRING_SIMPLE("self")) == 0 ||
+		className.compare(UNICODE_STRING_SIMPLE("static")) == 0) {
+		return;
+	}
+	if (FoundClasses.find(className) != FoundClasses.end()) {
+		return;
+	}
+	bool isUnknown = false;
+	if (NotFoundClasses.find(className) != NotFoundClasses.end()) {
+		isUnknown = true;
+	}
+	else {
+		std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(className);
+		if (tags.empty()) {
+			isUnknown = true;
+			NotFoundClasses[className] = 1;
+		}
+		else {
+			FoundClasses[className] = 1;
+		}
+	}
+	if (isUnknown) {
+		mvceditor::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = expression->LineNumber;
+		lintResult.Pos = expression->Pos;
+		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
+		lintResult.Identifier = className;
+		Errors.push_back(lintResult);	
 	}
 }

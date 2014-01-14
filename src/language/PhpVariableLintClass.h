@@ -28,6 +28,7 @@
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
 #include <wx/filename.h>
+#include <globals/String.h>
 
 namespace mvceditor {
 
@@ -195,9 +196,8 @@ private:
 
 	/**
 	 * variables found in the current scope
-	 // TODO: should be map for O(1) access since we are always checking this
 	 */
-	std::vector<UnicodeString> ScopeVariables;
+	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> ScopeVariables;
 
 	/**
 	 * variables already defined when parsing this file. The 
@@ -205,7 +205,7 @@ private:
 	 * other variables we know exist when the parsed file
 	 * is included.
 	 */
-	std::vector<UnicodeString> PredefinedVariables;
+	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> PredefinedVariables;
 
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods

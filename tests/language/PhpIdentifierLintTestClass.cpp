@@ -139,6 +139,127 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassSelfReference) {
+
+	// test that the "self" keyword is never seen as an unknown class
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  const MAX = 1000; \n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"   function work($d) { \n"
+		"     return $d < self::MAX ; \n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassParentReference) {
+
+	// test that the "parent" keyword is never seen as an unknown class
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  const MAX = 1000; \n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"   function work($d) { \n"
+		"     return $d < parent::MAX ; \n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
+
+	// test that the "static" keyword is never seen as an unknown class
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  public static $iMax = 1000; \n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"  public static $iMax = 100; \n"
+		"   function work($d) { \n"
+		"     return $d < static::MAX; \n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
+
+	// test that the "__constructor" method is never seen as an unknown class
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  public static $iMax = 1000; \n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"   function __construct() { \n"
+		"     parent::__construct(); \n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
+
+	// test that the "magic" method is never seen as an unknown class
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  public static $iMax = 1000; \n"
+		"}\n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"   function __construct() { \n"
+		"     $this->__get(); \n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 
 	// test that we don't flag native functions (strlen, strcmp, etc....)
@@ -154,6 +275,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 		"namespace Util; \n"
 		"$a = strlen('a long string');\n"
 	);
+
 	SetupFile(wxT("MyClass.php"), cacheCode);
 	BuildCache(true);
 	Parse(code);
@@ -179,6 +301,29 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("NoneClass", Results[0].Identifier);
+	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
+
+	// callint a static method on an unknown class should generate
+	// an error
+	wxString cacheCode = mvceditor::CharToWx(
+		"<?php \n"  
+		"class MyClass {\n"
+		"  static function work() {} \n"
+		"} \n"
+	);
+
+	UnicodeString code = mvceditor::CharToIcu(
+		"  $a = NyClass::work();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("NyClass", Results[0].Identifier);
 	CHECK_EQUAL(mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
 }
 
