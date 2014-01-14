@@ -38,6 +38,7 @@
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_RESULTS_GAUGE = wxNewId();
 const int ID_LINT_READER = wxNewId();
+const int ID_LINT_READER_SAVE = wxNewId();
 const int ID_LINT_ERROR_PANEL = wxNewId();
 
 mvceditor::LintResultsEventClass::LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults)
@@ -95,7 +96,7 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 
 	wxFFile file(fileName, wxT("rb"));
 	bool hasErrors = false;
-	if (Parser.LintFile(file.fp(), mvceditor::WxToIcu(fileName), LastResults)) {
+	if (!Parser.LintFile(file.fp(), mvceditor::WxToIcu(fileName), LastResults)) {
 		hasErrors = true;
 	}
 	wxFileName wxf(fileName);
@@ -172,35 +173,36 @@ bool mvceditor::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<mvc
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fileName, mvceditor::GlobalsClass& globals, 
-															  std::vector<pelet::LintResultsClass>& results) {
-
-	// ATTN: use a local instance of ParserDirectoryWalkerClass, tagCache so that this method is thread safe
-	// and can be run when a background thread is already running.
-	bool error = false;
-	if (globals.HasAPhpExtension(fileName)) {
-		mvceditor::TagCacheClass tagCache;
-		tagCache.RegisterDefault(globals);
-		ParserDirectoryWalkerClass walker(tagCache);
-		walker.SetVersion(globals.Environment.Php.Version);
-		error = walker.Walk(fileName);
-		if (error) {
-			results = walker.GetLastErrors();			
+bool mvceditor::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileName& fileName, mvceditor::GlobalsClass& globals) {
+	
+	bool good = false;
+	if (globals.HasAPhpExtension(fileName.GetFullPath())) {
+		mvceditor::SourceClass src;
+		src.SetIncludeWildcards(fileName.GetFullName());
+		src.RootDirectory.AssignDir(fileName.GetPath());
+		std::vector<mvceditor::SourceClass> srcs;
+		srcs.push_back(src);
+		if (Init(srcs)) {
+			TagCache.RegisterDefault(globals);
+			ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
+			ParserDirectoryWalker.ResetTotals();
+			good = true;
 		}
 	}
-	return error;
+	return good;
 }
 
 bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
-	if (error) {
-		mvceditor::LintResultsEventClass lintResultsEvent(ID_LINT_READER, ParserDirectoryWalker.GetLastErrors());
+	std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
+	if (error && !lintErrors.empty()) {
+		mvceditor::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
 		PostEvent(lintResultsEvent);
 	}
 	if (!search.More() && !IsCancelled()) {
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
-		mvceditor::LintResultsSummaryEventClass summaryEvent(ID_LINT_READER, totalFiles, errorFiles);
+		mvceditor::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
 		PostEvent(summaryEvent);
 	}
 	return !error;
@@ -229,24 +231,28 @@ mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id
 			
 }
 
-void mvceditor::LintResultsPanelClass::AddError(const pelet::LintResultsClass& lintError) {
-	wxString err = mvceditor::IcuToWx(lintError.Error);
-	wxString line;
-	int capacity = lintError.Error.length() + lintError.UnicodeFilename.length() + 50;
-	UnicodeString msg;
-	int written = u_sprintf(msg.getBuffer(capacity), 
-		"%.*S on %.*S line %d near Position %d\n", 
-		lintError.Error.length(),
-		lintError.Error.getBuffer(),
-		lintError.UnicodeFilename.length(),
-		lintError.UnicodeFilename.getBuffer(),
-		lintError.LineNumber,
-		lintError.CharacterPosition
-	);
-	msg.releaseBuffer(written);
-	wxString wxMsg = mvceditor::IcuToWx(msg);
-	Feature.LintErrors.push_back(lintError);
-	ErrorsList->AppendString(wxMsg);
+void mvceditor::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
+	std::vector<pelet::LintResultsClass>::const_iterator it;
+	for (it = lintErrors.begin(); it != lintErrors.end(); ++it) {
+		pelet::LintResultsClass lintError = *it;
+		wxString err = mvceditor::IcuToWx(lintError.Error);
+		wxString line;
+		int capacity = lintError.Error.length() + lintError.UnicodeFilename.length() + 50;
+		UnicodeString msg;
+		int written = u_sprintf(msg.getBuffer(capacity), 
+			"%.*S on %.*S line %d near Position %d\n", 
+			lintError.Error.length(),
+			lintError.Error.getBuffer(),
+			lintError.UnicodeFilename.length(),
+			lintError.UnicodeFilename.getBuffer(),
+			lintError.LineNumber,
+			lintError.CharacterPosition
+		);
+		msg.releaseBuffer(written);
+		wxString wxMsg = mvceditor::IcuToWx(msg);
+		Feature.LintErrors.push_back(lintError);
+		ErrorsList->AppendString(wxMsg);
+	}
 }
 
 void mvceditor::LintResultsPanelClass::ClearErrors() {
@@ -284,34 +290,6 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	}
 }
 
-void mvceditor::LintResultsPanelClass::AddErrorsFor(const wxString& fileName, const pelet::LintResultsClass& lintResult) {
-	// remove the lint result data structures as well as the 
-	// display list
-	std::vector<pelet::LintResultsClass>::iterator it = Feature.LintErrors.begin();
-	int i = 0;
-	bool found = false;
-	UnicodeString uniFileName = mvceditor::WxToIcu(fileName);
-	while (it != Feature.LintErrors.end()) {
-		if (it->UnicodeFilename == uniFileName) {
-			it = Feature.LintErrors.erase(it);
-			ErrorsList->Delete(i);
-			i--;
-			found = true;
-		}
-		else {
-			i++;
-			it++;
-		}
-	}
-	AddError(lintResult);
-
-	// if this file has an error for the first time, increment the counter
-	if (!found) {
-		ErrorFiles++;
-	}
-	UpdateSummary();
-}
-
 void mvceditor::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
 	TotalFiles = totalFiles;
 	ErrorFiles = errorFiles;
@@ -333,10 +311,10 @@ void mvceditor::LintResultsPanelClass::UpdateSummary() {
 
 void mvceditor::LintResultsPanelClass::OnListDoubleClick(wxCommandEvent& event) {
 	int index = event.GetInt();
-	DisplayLintError(index);
+	GoToAndDisplayLintError(index);
 }
 
-void mvceditor::LintResultsPanelClass::DisplayLintError(int index) {
+void mvceditor::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
 	pelet::LintResultsClass results = Feature.LintErrors[index];
 
 	wxString file = mvceditor::IcuToWx(results.UnicodeFilename);
@@ -348,11 +326,11 @@ void mvceditor::LintResultsPanelClass::SelectNextError() {
 	int selected = ErrorsList->GetSelection();
 	if (selected != wxNOT_FOUND && ((unsigned int)selected  + 1) < ErrorsList->GetCount()) {
 		ErrorsList->SetSelection(selected + 1);
-		DisplayLintError(selected + 1);
+		GoToAndDisplayLintError(selected + 1);
 	}
 	else if (ErrorsList->GetCount() > 0) {
 		ErrorsList->SetSelection(0);
-		DisplayLintError(0);
+		GoToAndDisplayLintError(0);
 	}
 }
 
@@ -360,11 +338,49 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 	int selected = ErrorsList->GetSelection();
 	if (selected != wxNOT_FOUND && (selected  - 1) >= 0) {
 		ErrorsList->SetSelection(selected - 1);
-		DisplayLintError(selected - 1);
+		GoToAndDisplayLintError(selected - 1);
 	}
 	else if (ErrorsList->GetCount() > 0) {
 		ErrorsList->SetSelection(ErrorsList->GetCount() - 1);
-		DisplayLintError(ErrorsList->GetCount() - 1);
+		GoToAndDisplayLintError(ErrorsList->GetCount() - 1);
+	}
+}
+
+void mvceditor::LintResultsPanelClass::ShowLintError(int index) {
+	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (!codeControl) {
+		return;
+	}
+	wxString fileName = codeControl->GetFileName();
+	pelet::LintResultsClass result = Feature.LintErrors[index];
+	wxString resultFile = mvceditor::CharToWx(result.File.c_str());
+	if (resultFile != fileName) {
+		return;
+	}
+	codeControl->MarkLintError(result);
+
+	// lines from scintilla are 0 based, but lint results lines are 1-based
+	int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
+	int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
+	if (result.LineNumber < firstVisibleLine || result.LineNumber >= lastVisibleLine) {
+		
+		// the error is out of view show a message, remove any other existing message
+		codeControl->Freeze();
+		wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
+		if (old) {
+			old->Destroy();
+		}
+		std::vector<pelet::LintResultsClass> results;
+		results.push_back(result);
+		mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, results);
+		wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
+		point.y = point.y - errorPanel->GetSize().GetY();
+		if (point.y < 0) {
+			point.y = 0;
+		}
+		errorPanel->SetPosition(point);
+		errorPanel->SetFocus();
+		codeControl->Thaw();
 	}
 }
 
@@ -478,10 +494,29 @@ void mvceditor::LintFeatureClass::OnLintError(mvceditor::LintResultsEventClass& 
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
 		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
-		for (size_t i = 0; i < results.size(); ++i) {
-			resultsPanel->AddError(results[i]);
-		}
+		resultsPanel->AddErrors(results);
 	}
+}
+
+void mvceditor::LintFeatureClass::OnLintErrorAfterSave(mvceditor::LintResultsEventClass& event) {
+	std::vector<pelet::LintResultsClass> results = event.LintResults;
+	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
+	mvceditor::LintResultsPanelClass* resultsPanel = NULL;
+	if (window) {
+		resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+	}
+	else {
+		resultsPanel = new mvceditor::LintResultsPanelClass(GetMainWindow(), ID_LINT_RESULTS_PANEL,
+			GetNotebook(), *this);
+		wxBitmap lintBitmap = mvceditor::IconImageAsset(wxT("lint-check"));
+		GetToolsNotebook()->AddPage(resultsPanel, _("Lint Check"), false, lintBitmap);
+	}
+
+	// do not set focus the list, just the overlay
+	// of the error
+	int i = LintErrors.size();
+	resultsPanel->AddErrors(results);
+	resultsPanel->ShowLintError(i);
 }
 
 void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
@@ -515,52 +550,20 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& 
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER);
-		bool error = thread->LintSingleFile(fileName, App.Globals, lintResults);
-		if (error && !lintResults.empty()) {
-			
-			// handle the case where user has saved a file but has not clicked
-			// on the Lint project button.
-			if (resultsPanel) {
-
-				// remove lint results for this file from the display list	
-				// and put the new error
-				for (size_t i = 0; i < lintResults.size(); ++i) {
-					resultsPanel->AddErrorsFor(fileName, lintResults[i]);
-				}
-			}
-			if (codeControl) {
-				for (size_t i = 0; i < lintResults.size(); ++i) {
-					codeControl->MarkLintError(lintResults[i]);
-				}
-
-				// lines from scintilla are 0 based, but lint results lines are 1-based
-				int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
-				int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
-				if (lintResults[0].LineNumber < firstVisibleLine || lintResults[0].LineNumber >= lastVisibleLine) {
-					
-					// the error is out of view show a message, remove any other existing message
-					codeControl->Freeze();
-					wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
-					if (old) {
-						old->Destroy();
-					}
-					mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, lintResults);
-					wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
-					point.y = point.y - errorPanel->GetSize().GetY();
-					if (point.y < 0) {
-						point.y = 0;
-					}
-					errorPanel->SetPosition(point);
-					errorPanel->SetFocus();
-					codeControl->Thaw();
-				}
-			}
-		}
-		else if (resultsPanel) {
+		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE);
+		bool good = thread->InitSingleFileLint(fileName, App.Globals);
+	
+		// handle the case where user has saved a file but has not clicked
+		// on the Lint project button.
+		if (resultsPanel) {
 			resultsPanel->RemoveErrorsFor(fileName);
 		}
-		delete thread;
+		if (good) {
+			App.RunningThreads.Queue(thread);
+		}
+		else {
+			delete thread;
+		}
 	}
 }
 
@@ -648,5 +651,6 @@ BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintFeatureClass::OnNotebookPageClosed)
 	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintError)
+	EVT_LINT_ERROR(ID_LINT_READER_SAVE, mvceditor::LintFeatureClass::OnLintErrorAfterSave)
 	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintSummary)
 END_EVENT_TABLE()

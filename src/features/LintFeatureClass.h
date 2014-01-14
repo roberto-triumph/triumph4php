@@ -187,21 +187,18 @@ public:
 	bool InitDirectoryLint(std::vector<mvceditor::SourceClass> sources, mvceditor::GlobalsClass& globals);
 
 	/**
-	 * Lint checks the given file in the current thread.  
+	 * prepare to lint a list a single file
 	 *
-	 * Lint errors will be propagated as events.
-	 * @param wxString fileName the full path of the file to lint
-	 * @param globals needed to perform exclude wildcard checks
-	 * @param results the lint errors, will only be filled when there is a lint error
-	 * @return TRUE if the file contains a lint error.
+	 * @param fileName the full path of the file to lint
+	 * @param globals nto know which PHP version to check against, and to get the location of the tag cache files
+	 * @return TRUE if the filename is OK (a valid file name, PHP extension)
 	 */
-	bool LintSingleFile(const wxString& fileName, mvceditor::GlobalsClass& globals,
-		std::vector<pelet::LintResultsClass>& results);
+	bool InitSingleFileLint(const wxFileName& fileName, mvceditor::GlobalsClass& globals);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
 	 * Only use this method after the EVENT_ACTION_COMPLETE event is dispatched.
-	 * (ie dont cll this while the background thread is running).
+	 * (ie don't call this while the background thread is running).
 	 *
 	 * @param totalFiles the number of files checked will be set here
 	 * @param erroFiles the number of files with lint errors will be set here
@@ -243,9 +240,9 @@ public:
 	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, mvceditor::LintFeatureClass& feature);
 	
 	/**
-	 * adds to the list box widget AND the parseResults data structure
+	 * adds to the list box widget AND the global list
 	 */
-	void AddError(const pelet::LintResultsClass& lintError);
+	void AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors);
 	
 	/**
 	 * deletes from the list box widget AND the parseResults data structure
@@ -259,18 +256,21 @@ public:
 	void RemoveErrorsFor(const wxString& fileName);
 
 	/**
-	 * add a lint error, and updates the total counts. 
-	 * This would be called when a user introduces a lint error.
+	 * Marks up the source code control window with the error that is located
+	 * at the given index.  For example; if given index is 0 then the first lint 
+	 * result file (added via AddError()) . This method will NOT scroll the errored
+	 * line into view.
 	 */
-	void AddErrorsFor(const wxString& fileName, const pelet::LintResultsClass& lintResult);
+	void ShowLintError(int index);
 
 	/**
 	 * Marks up the source code control window with the error that is located
 	 * at the given index.  For example; if given index is 0 then the first lint 
 	 * result file (added via AddError()) will be opened, scrolled to the lint error line, and the 
-	 * editor will be marked up.
+	 * editor will be marked up. This method WILL scroll the errored
+	 * line into view.
 	 */
-	void DisplayLintError(int index);
+	void GoToAndDisplayLintError(int index);
 
 	/**
 	 * Will highlight the next error (from the one that is currently selected) in the lint results list AND 
@@ -384,6 +384,8 @@ private:
 	void OnPreviousLintError(wxCommandEvent& event);
 	
 	void OnLintError(mvceditor::LintResultsEventClass& event);
+
+	void OnLintErrorAfterSave(mvceditor::LintResultsEventClass& event);
 
 	void OnLintFileComplete(wxCommandEvent& event);
 

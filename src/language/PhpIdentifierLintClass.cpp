@@ -351,6 +351,12 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 				lintResult.Identifier = prop.Name;
 				Errors.push_back(lintResult);
 			}
+
+			// check the function parameters
+			std::vector<pelet::ExpressionClass*>::const_iterator itArg;
+			for (itArg = prop.CallArguments.begin(); itArg != prop.CallArguments.end(); ++itArg) {
+				CheckExpression(*itArg);
+			}
 		}
 		else if (prop.IsArrayAccess && prop.ArrayAccess) {
 
