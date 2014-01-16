@@ -135,6 +135,7 @@ std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetL
 		mvceditor::PhpVariableLintResultClass variableResult = VariableResults[i];
 		lintResult.Error = UNICODE_STRING_SIMPLE("Uninitialized variable ") + variableResult.VariableName;
 		lintResult.File = mvceditor::IcuToChar(variableResult.File);
+		lintResult.UnicodeFilename = variableResult.File;
 		lintResult.LineNumber = variableResult.LineNumber;
 		lintResult.CharacterPosition = variableResult.Pos;
 		allResults.push_back(lintResult);
@@ -155,6 +156,7 @@ std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetL
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown function ") + identifierResult.Identifier;
 		}
 		lintResult.File = mvceditor::IcuToChar(identifierResult.File);
+		lintResult.UnicodeFilename = identifierResult.File;
 		lintResult.LineNumber = identifierResult.LineNumber;
 		lintResult.CharacterPosition = identifierResult.Pos;
 		allResults.push_back(lintResult);
@@ -284,7 +286,9 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	while (it != Feature.LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = Feature.LintErrors.erase(it);
-			ErrorsList->Delete(i);
+			if (i > 0 && ErrorsList->GetCount() < (size_t)i) {
+				ErrorsList->Delete(i);
+			}
 			i--;
 			found = true;
 		}
