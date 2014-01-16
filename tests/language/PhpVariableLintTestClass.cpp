@@ -210,6 +210,19 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
+
+	// arrays can be initialized and assigned at the same time
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($a) {\n"
+		"  $data['name'] = 'John';\n"
+		"  var_dump($data);\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"

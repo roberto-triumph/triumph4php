@@ -196,8 +196,14 @@ void mvceditor::PhpVariableLintClass::ExpressionAssignmentFound(pelet::Assignmen
 	CheckExpression(expression->Expression);
 	
 	// for now, ignore assignments to properties ie. $obj->prop1
+	// but we want to check arrays ie $data['name'] = '';
 	if (expression->Destination.ChainList.size() == 1 && 
 		!expression->Destination.ChainList[0].IsFunction) {
+		
+		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
+	}
+	else if (expression->Destination.ChainList.size() > 1 && 
+		expression->Destination.ChainList[1].IsArrayAccess) {
 		
 		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
 	}
