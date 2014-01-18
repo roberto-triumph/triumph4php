@@ -184,7 +184,6 @@ void mvceditor::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 }
 
 void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
-	int choice = event.GetSelection();
 	wxCommandEvent listBoxEvent(wxEVT_COMMAND_LISTBOX_SELECTED, wxID_ANY);
 	int sel = Styles->GetSelection();
 	if (sel < 0) {

@@ -625,7 +625,6 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event)
 void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	bool doRun = false;
 	std::vector<wxFileName> dirs;
 	std::vector<wxFileName> files;
 	while (index != wxNOT_FOUND) {
@@ -1267,8 +1266,8 @@ mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const
 , OldFile(oldFile.GetFullPath())
 , NewName(newName.c_str())
 , DirsDeleted()
-, DirsNotDeleted()
 , FilesDeleted()
+, DirsNotDeleted()
 , FilesNotDeleted()
 , Action(mvceditor::ExplorerModifyActionClass::RENAME_FILE)
 , Success(success)
@@ -1284,8 +1283,8 @@ mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId,
 , OldFile()
 , NewName()
 , DirsDeleted()
-, DirsNotDeleted()
 , FilesDeleted()
+, DirsNotDeleted()
 , FilesNotDeleted()
 , Action(mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS)
 , Success(success)
