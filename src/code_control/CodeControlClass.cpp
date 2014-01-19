@@ -363,16 +363,16 @@ void mvceditor::CodeControlClass::SetMargin() {
 
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	wxString file = GetFileName();
-	if (Globals->HasAPhpExtension(file)) {
+	if (Globals->FileTypes.HasAPhpExtension(file)) {
 		SetDocumentMode(mvceditor::CodeControlClass::PHP);
 	}
-	else if (Globals->HasACssExtension(file)) {
+	else if (Globals->FileTypes.HasACssExtension(file)) {
 		SetDocumentMode(mvceditor::CodeControlClass::CSS);
 	}
-	else if (Globals->HasASqlExtension(file)) {
+	else if (Globals->FileTypes.HasASqlExtension(file)) {
 		SetDocumentMode(mvceditor::CodeControlClass::SQL);
 	}
-	else if (Globals->HasAJsExtension(file)) {
+	else if (Globals->FileTypes.HasAJsExtension(file)) {
 		SetDocumentMode(mvceditor::CodeControlClass::JS);
 	}
 	else {

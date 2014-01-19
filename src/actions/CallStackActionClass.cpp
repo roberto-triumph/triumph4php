@@ -25,12 +25,12 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetStatus(_("Call Stack Gen"));
 	bool ret = false;
 	Version = globals.Environment.Php.Version;
-	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
+	std::vector<wxString> otherFileExtensions = globals.FileTypes.GetNonPhpFileExtensions();
 
 	// register the project tag DB file now so that it is available for code completion
 	// the tag cache will own these pointers
 	mvceditor::TagFinderListClass* projectCache = new mvceditor::TagFinderListClass;
-	projectCache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, Version);
+	projectCache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, Version);
 
 	// initialize the detected tag cache too so that more methods can be resolved
 	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);

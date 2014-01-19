@@ -53,11 +53,20 @@ void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 	// config will leave the defaults alone if keys are not found in the config
-	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.PhpFileExtensionsString);
-	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.CssFileExtensionsString);
-	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.SqlFileExtensionsString);
-	config->Read(wxT("/Project/JsFileExtensions"), &App.Globals.JsFileExtensionsString);
-	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.MiscFileExtensionsString);
+	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.FileTypes.PhpFileExtensionsString);
+	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.FileTypes.CssFileExtensionsString);
+	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.FileTypes.SqlFileExtensionsString);
+	config->Read(wxT("/Project/JsFileExtensions"), &App.Globals.FileTypes.JsFileExtensionsString);
+	config->Read(wxT("/Project/ConfigFileExtensions"), &App.Globals.FileTypes.ConfigFileExtensionsString);
+	config->Read(wxT("/Project/CrontabFileExtensions"), &App.Globals.FileTypes.CrontabFileExtensionsString);
+	config->Read(wxT("/Project/YamlFileExtensions"), &App.Globals.FileTypes.YamlFileExtensionsString);
+	config->Read(wxT("/Project/XmlFileExtensions"), &App.Globals.FileTypes.XmlFileExtensionsString);
+	config->Read(wxT("/Project/RubyFileExtensions"), &App.Globals.FileTypes.RubyFileExtensionsString);
+	config->Read(wxT("/Project/LuaFileExtensions"), &App.Globals.FileTypes.LuaFileExtensionsString);
+	config->Read(wxT("/Project/MarkdownFileExtensions"), &App.Globals.FileTypes.MarkdownFileExtensionsString);
+	config->Read(wxT("/Project/BashFileExtensions"), &App.Globals.FileTypes.BashFileExtensionsString);
+	config->Read(wxT("/Project/DiffFileExtensions"), &App.Globals.FileTypes.DiffFileExtensionsString);
+	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.FileTypes.MiscFileExtensionsString);
 	
 	App.Globals.Projects.clear();
 	wxString key;
@@ -104,11 +113,20 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
-	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.CssFileExtensionsString);
-	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.SqlFileExtensionsString);
-	config->Write(wxT("/Project/JsFileExtensions"), App.Globals.JsFileExtensionsString);
-	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.MiscFileExtensionsString);
+	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.FileTypes.PhpFileExtensionsString);
+	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.FileTypes.CssFileExtensionsString);
+	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.FileTypes.SqlFileExtensionsString);
+	config->Write(wxT("/Project/JsFileExtensions"), App.Globals.FileTypes.JsFileExtensionsString);
+	config->Write(wxT("/Project/ConfigFileExtensions"), App.Globals.FileTypes.ConfigFileExtensionsString);
+	config->Write(wxT("/Project/CrontabFileExtensions"), App.Globals.FileTypes.CrontabFileExtensionsString);
+	config->Write(wxT("/Project/YamlFileExtensions"), App.Globals.FileTypes.YamlFileExtensionsString);
+	config->Write(wxT("/Project/XmlFileExtensions"), App.Globals.FileTypes.XmlFileExtensionsString);
+	config->Write(wxT("/Project/RubyFileExtensions"), App.Globals.FileTypes.RubyFileExtensionsString);
+	config->Write(wxT("/Project/LuaFileExtensions"), App.Globals.FileTypes.LuaFileExtensionsString);
+	config->Write(wxT("/Project/MarkdownFileExtensions"), App.Globals.FileTypes.MarkdownFileExtensionsString);
+	config->Write(wxT("/ProjectBashFileExtensions"), App.Globals.FileTypes.BashFileExtensionsString);
+	config->Write(wxT("/Project/DiffFileExtensions"), App.Globals.FileTypes.DiffFileExtensionsString);	
+	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.FileTypes.MiscFileExtensionsString);
 
 	// remove all project from the config
 	wxString key;
@@ -327,20 +345,49 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
 : ProjectPreferencesGeneratedPanelClass(parent) {
-	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.PhpFileExtensionsString, PhpLabel);
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectFeature.App.Globals.CssFileExtensionsString, CssLabel);
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.CssFileExtensionsString, CssLabel);
 	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.SqlFileExtensionsString, SqlLabel);
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
-	NonEmptyTextValidatorClass jsFileExtensionsValidator(&projectFeature.App.Globals.JsFileExtensionsString, JsLabel);
+	NonEmptyTextValidatorClass jsFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.JsFileExtensionsString, JsLabel);
 	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
+	NonEmptyTextValidatorClass configFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.ConfigFileExtensionsString, ConfigLabel);
+	ConfigFileExtensions->SetValidator(configFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass crontabFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.CrontabFileExtensionsString, CrontabLabel);
+	CrontabFileExtensions->SetValidator(crontabFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass yamlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.YamlFileExtensionsString, YamlLabel);
+	YamlFileExtensions->SetValidator(yamlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass xmlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.XmlFileExtensionsString, XmlLabel);
+	XmlFileExtensions->SetValidator(xmlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass rubyFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.RubyFileExtensionsString, RubyLabel);
+	RubyFileExtensions->SetValidator(rubyFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass luaFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.LuaFileExtensionsString, LuaLabel);
+	LuaFileExtensions->SetValidator(luaFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass markdownFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MarkdownFileExtensionsString, MarkdownLabel);
+	MarkdownFileExtensions->SetValidator(markdownFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass bashFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.BashFileExtensionsString, BashLabel);
+	BashFileExtensions->SetValidator(bashFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass diffFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.DiffFileExtensionsString, DiffLabel);
+	DiffFileExtensions->SetValidator(diffFileExtensionsValidator);
+	
+	
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
+	
 }
 
 mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)

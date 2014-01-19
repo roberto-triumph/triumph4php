@@ -136,7 +136,8 @@ mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mv
 void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals) {
 	SearchStrings = searches;
 	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+	cache->InitGlobalTag(globals.TagCacheDbFileName, 
+		globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);

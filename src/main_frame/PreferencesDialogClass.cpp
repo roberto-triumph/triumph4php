@@ -77,11 +77,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	NeedsRetag = false;
 	pelet::Versions oldPhpVersion = Globals.Environment.Php.Version;
 	wxString oldPhpExecutable = Globals.Environment.Php.PhpExecutablePath;
-	wxString oldExtensions = Globals.PhpFileExtensionsString 
-		+ Globals.SqlFileExtensionsString
-		+ Globals.CssFileExtensionsString
-		+ Globals.JsFileExtensionsString
-		+ Globals.MiscFileExtensionsString;
+	wxString oldExtensions = Globals.FileTypes.GetAllSourceFileExtensionsString();
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		KeyboardShortcutsPanel->ApplyChanges();
 		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
@@ -90,11 +86,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (OldSettingsDir != SettingsDir) {
 			ChangedSettingsDir = true;
 		}
-		wxString newExtensions = Globals.PhpFileExtensionsString 
-			+ Globals.SqlFileExtensionsString
-			+ Globals.CssFileExtensionsString
-			+ Globals.JsFileExtensionsString
-			+ Globals.MiscFileExtensionsString;
+		wxString newExtensions = Globals.FileTypes.GetAllSourceFileExtensionsString();
 		if (oldExtensions != newExtensions) {
 			NeedsRetag = true;
 		}

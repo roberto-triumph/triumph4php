@@ -32,6 +32,7 @@
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/TemplateFileTagClass.h>
 #include <language/TagCacheClass.h>
+#include <globals/FileTypeClass.h>
 #include <vector>
 
 namespace mvceditor {
@@ -88,33 +89,11 @@ public:
 	 * The name of the browser that is selected
 	 */
 	wxString ChosenBrowser;
-
+	
 	/**
-	 * Serialized PHP file filters string from the config
+	 * Holds all of the file type => file extension associations
 	 */
-	wxString PhpFileExtensionsString;
-
-	/**
-	 * Serialized CSS file filters string from the config
-	 */
-	wxString CssFileExtensionsString;
-
-	/**
-	 * Serialized SQL file filters string from the config
-	 */
-	wxString SqlFileExtensionsString;
-
-	/**
-	 * Serialized JS file filters string from the config
-	 */
-	wxString JsFileExtensionsString;
-
-	/**
-	 * Serialized miscalleneous file filters string from the config
-	 * basically any files that we want to open in the editor, like
-	 * XML files, YML files, etc...
-	 */
-	wxString MiscFileExtensionsString;
+	mvceditor::FileTypeClass FileTypes;
 
 	/**
 	 * The location of the tag cache db. The tag DB file contains all of
@@ -202,90 +181,12 @@ public:
 	bool HasSources() const;
 
 	/**
-	 * Returns the valid PHP file extensions
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetPhpFileExtensions() const;
-
-	/**
-	 * Returns the valid CSS file extensions
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetCssFileExtensions() const;
-
-	/**
-	 * Returns the valid SQL file extensions 
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetSqlFileExtensions() const;
-
-	/**
-	 * Returns the valid JS (javascript) file extensions 
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetJsFileExtensions() const;
-
-	/**
-	 * Returns the valid Misc. file extensions
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetMiscFileExtensions() const;
-	
-	/**
-	 * Returns the all file extensions exception PHP file extensions
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetNonPhpFileExtensions() const;
-
-	/**
-	 * Returns the all file extensions that we want the editor to open
-	 *   php, css, sql, and misc
-	 * @return std::vector<wxString> a copy of the file extensions
-	 */
-	std::vector<wxString> GetAllSourceFileExtensions() const;
-
-	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
 	 * the sources directories and the php file 
 	 * extensions wilcard. Careful, This method will return FALSE 
 	 * for php files that are NOT in a project. 
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath) const;
-
-	/**
-	 * @return TRUE if given full path is a PHP file, as determined only by
-	 * the php file extensions wilcard. This method will return TRUE 
-	 * for php files that are NOT in a project.
-	 */
-	bool HasAPhpExtension(const wxString& fullPath) const;
-
-	/**
-	 * @return TRUE if given full path is a SQL file, as determined only by
-	 * the sql file extensions wilcard. This method will return TRUE 
-	 * for sql files that are NOT in a project.
-	 */
-	bool HasASqlExtension(const wxString& fullPath) const;
-
-	/**
-	 * @return TRUE if given full path is a JS file, as determined only by
-	 * the js file extensions wilcard. This method will return TRUE 
-	 * for js files that are NOT in a project.
-	 */
-	bool HasAJsExtension(const wxString& fullPath) const;
-
-	/**
-	 * @return TRUE if given full path is a CSS file, as determined only by
-	 * the css file extensions wilcard. This method will return TRUE 
-	 * for css files that are NOT in a project.
-	 */
-	bool HasACssExtension(const wxString& fullPath) const;
-
-	/**
-	 * @return TRUE if given full path is a misc file, as determined only by
-	 * the misc file extensions wilcard. This method will return TRUE 
-	 * for misc files that are NOT in a project.
-	 */
-	bool HasAMiscExtension(const wxString& fullPath) const;
 
 	/**
 	 * removes the source directory from the given full path.

@@ -128,7 +128,7 @@ void mvceditor::TotalTagSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 
 	// only need to initialize the global tag cache, will not show native tags 
 	// because there is no file that needs to be opened
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	TagCache.RegisterGlobal(cache);
 	

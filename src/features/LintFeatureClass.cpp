@@ -118,7 +118,7 @@ bool mvceditor::LintBackgroundFileReaderClass::LintSingleFile(const wxString& fi
 	// ATTN: use a local instance of ParserClass so that this method is thread safe
 	// and can be run when a background thread is already running.
 	bool error = false;
-	if (globals.HasAPhpExtension(fileName)) {
+	if (globals.FileTypes.HasAPhpExtension(fileName)) {
 		ParserDirectoryWalkerClass walker;
 		walker.SetVersion(environment.Php.Version);
 		error = walker.Walk(fileName);

@@ -506,23 +506,49 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 }
 
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
-	wxString phpLabel = Globals->PhpFileExtensionsString,
-		cssLabel = Globals->CssFileExtensionsString,
-		sqlLabel = Globals->SqlFileExtensionsString,
-		jsLabel = Globals->JsFileExtensionsString;
+	wxString phpLabel = Globals->FileTypes.PhpFileExtensionsString,
+		cssLabel = Globals->FileTypes.CssFileExtensionsString,
+		sqlLabel = Globals->FileTypes.SqlFileExtensionsString,
+		jsLabel = Globals->FileTypes.JsFileExtensionsString,
+		configLabel = Globals->FileTypes.ConfigFileExtensionsString,
+		crontabLabel = Globals->FileTypes.CrontabFileExtensionsString,
+		yamlLabel = Globals->FileTypes.YamlFileExtensionsString,
+		xmlLabel = Globals->FileTypes.XmlFileExtensionsString,
+		rubyLabel = Globals->FileTypes.RubyFileExtensionsString,
+		luaLabel = Globals->FileTypes.LuaFileExtensionsString,
+		markdownLabel = Globals->FileTypes.MarkdownFileExtensionsString,
+		bashLabel = Globals->FileTypes.BashFileExtensionsString,
+		diffLabel = Globals->FileTypes.DiffFileExtensionsString;
+		
 	phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
 	jsLabel.Replace(wxT(";"), wxT(" "));
-	wxString php = Globals->PhpFileExtensionsString,
-		css = Globals->CssFileExtensionsString,
-		sql = Globals->SqlFileExtensionsString,
-		js = Globals->JsFileExtensionsString;
+	configLabel.Replace(wxT(";"), wxT(" "));
+	crontabLabel.Replace(wxT(";"), wxT(" "));
+	yamlLabel.Replace(wxT(";"), wxT(" "));
+	xmlLabel.Replace(wxT(";"), wxT(" "));
+	rubyLabel.Replace(wxT(";"), wxT(" "));
+	luaLabel.Replace(wxT(";"), wxT(" "));
+	markdownLabel.Replace(wxT(";"), wxT(" "));
+	bashLabel.Replace(wxT(";"), wxT(" "));
+	diffLabel.Replace(wxT(";"), wxT(" "));
+	
+	wxString php = Globals->FileTypes.PhpFileExtensionsString,
+		css = Globals->FileTypes.CssFileExtensionsString,
+		sql = Globals->FileTypes.SqlFileExtensionsString,
+		js = Globals->FileTypes.JsFileExtensionsString,
+		config = Globals->FileTypes.ConfigFileExtensionsString,
+		crontab = Globals->FileTypes.CrontabFileExtensionsString,
+		yaml = Globals->FileTypes.YamlFileExtensionsString,
+		xml = Globals->FileTypes.XmlFileExtensionsString,
+		ruby = Globals->FileTypes.RubyFileExtensionsString,
+		lua = Globals->FileTypes.LuaFileExtensionsString,
+		markdown = Globals->FileTypes.MarkdownFileExtensionsString,
+		bash = Globals->FileTypes.BashFileExtensionsString,
+		diff = Globals->FileTypes.DiffFileExtensionsString;
 	wxString allSourceCode = 
-			Globals->PhpFileExtensionsString + wxT(";") + 
-			Globals->CssFileExtensionsString + wxT(";") + 
-			Globals->SqlFileExtensionsString + wxT(";") + 
-			Globals->JsFileExtensionsString;
+			Globals->FileTypes.GetAllSourceFileExtensionsString();
 
 	wxString fileFilter = 
 		wxString::Format(wxT("All Source Code Files (%s)|%s|"), allSourceCode.c_str(), allSourceCode.c_str()) +
@@ -530,6 +556,15 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
 		wxString::Format(wxT("SQL Files (%s)|%s|"), sqlLabel.c_str(), sql.c_str()) +
 		wxString::Format(wxT("Javascript Files (%s)|%s|"), jsLabel.c_str(), js.c_str()) +
+		wxString::Format(wxT("Config Files (%s)|%s|"), configLabel.c_str(), config.c_str()) +
+		wxString::Format(wxT("Crontab Files (%s)|%s|"), crontabLabel.c_str(), crontab.c_str()) +
+		wxString::Format(wxT("YAML Files (%s)|%s|"), yamlLabel.c_str(), yaml.c_str()) +
+		wxString::Format(wxT("XML Files (%s)|%s|"), xmlLabel.c_str(), xml.c_str()) +
+		wxString::Format(wxT("Ruby Files (%s)|%s|"), rubyLabel.c_str(), ruby.c_str()) +
+		wxString::Format(wxT("Lua Files (%s)|%s|"), luaLabel.c_str(), lua.c_str()) +
+		wxString::Format(wxT("Markdown Files (%s)|%s|"), markdownLabel.c_str(), markdown.c_str()) +
+		wxString::Format(wxT("Bash Files (%s)|%s|"), bashLabel.c_str(), bash.c_str()) +
+		wxString::Format(wxT("Diff Files (%s)|%s|"), diffLabel.c_str(), diff.c_str()) +
 		wxT("All Files (*.*)|*.*");
 	return fileFilter;
 }

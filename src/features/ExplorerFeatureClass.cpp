@@ -567,19 +567,19 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 
 int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
-	if (Feature.App.Globals.HasAPhpExtension(fullPath)) {
+	if (Feature.App.Globals.FileTypes.HasAPhpExtension(fullPath)) {
 		return LIST_FILE_PHP;
 	}
-	if (Feature.App.Globals.HasASqlExtension(fullPath)) {
+	if (Feature.App.Globals.FileTypes.HasASqlExtension(fullPath)) {
 		return LIST_FILE_SQL;
 	} 
-	if (Feature.App.Globals.HasACssExtension(fullPath)) {
+	if (Feature.App.Globals.FileTypes.HasACssExtension(fullPath)) {
 		return LIST_FILE_CSS;
 	}
-	if (Feature.App.Globals.HasAJsExtension(fullPath)) {
+	if (Feature.App.Globals.FileTypes.HasAJsExtension(fullPath)) {
 		return LIST_FILE_JS;
 	}
-	if (Feature.App.Globals.HasAMiscExtension(fullPath)) {
+	if (Feature.App.Globals.FileTypes.HasAMiscExtension(fullPath)) {
 		return LIST_FILE_TEXT;
 	}
 	return LIST_FILE_OTHER;
@@ -678,7 +678,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 	std::vector<wxString> extensions;
 	wxString dialogTitle;
 	if (event.GetId() == ID_EXPLORER_LIST_CREATE_PHP) {
-		extensions = Feature.App.Globals.GetPhpFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.php");
 		}
@@ -688,7 +688,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		dialogTitle =_("Create a new PHP file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
-		extensions = Feature.App.Globals.GetSqlFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.sql");
 		}
@@ -698,7 +698,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		dialogTitle =_("Create a new SQL file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
-		extensions = Feature.App.Globals.GetCssFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.css");
 		}
@@ -708,7 +708,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		dialogTitle =_("Create a new CSS file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_JS) {
-		extensions = Feature.App.Globals.GetJsFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.js");
 		}
@@ -920,17 +920,17 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 	wxPoint point = event.GetPosition();
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
-		wxString allExtensions = Feature.App.Globals.PhpFileExtensionsString + wxT(";") +
-			Feature.App.Globals.CssFileExtensionsString + wxT(";") +
-			Feature.App.Globals.SqlFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.JsFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.MiscFileExtensionsString;
+		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
+			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
+			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.MiscFileExtensionsString;
 
 		wxString allFiles = wxT("*");
-		wxString phpExtensions = Feature.App.Globals.PhpFileExtensionsString;
-		wxString cssExtensions = Feature.App.Globals.CssFileExtensionsString;
-		wxString sqlExtensions = Feature.App.Globals.SqlFileExtensionsString;
-		wxString jsExtensions = Feature.App.Globals.JsFileExtensionsString;
+		wxString phpExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString;
+		wxString cssExtensions = Feature.App.Globals.FileTypes.CssFileExtensionsString;
+		wxString sqlExtensions = Feature.App.Globals.FileTypes.SqlFileExtensionsString;
+		wxString jsExtensions = Feature.App.Globals.FileTypes.JsFileExtensionsString;
 		wxMenu menu;
 	
 		wxMenuItem* item;
@@ -965,19 +965,19 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
-		extensions = Feature.App.Globals.GetAllSourceFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
 	}
 	else if (ID_FILTER_PHP == FilterChoice) {
-		extensions = Feature.App.Globals.GetPhpFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
 	}
 	else if (ID_FILTER_CSS == FilterChoice) {
-		extensions = Feature.App.Globals.GetCssFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
 	}
 	else if (ID_FILTER_SQL == FilterChoice) {
-		extensions = Feature.App.Globals.GetSqlFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
 	}
 	else if (ID_FILTER_JS == FilterChoice) {
-		extensions = Feature.App.Globals.GetJsFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
 	}
 
 	// no extension == ID_FILTER_ALL

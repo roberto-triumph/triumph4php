@@ -679,7 +679,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
-		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.PhpFileExtensionsString);
+		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.FileTypes.PhpFileExtensionsString);
 	}
 	std::vector<mvceditor::SourceClass> sources = feature.App.Globals.AllEnabledSources();
 	for (size_t i = 0; i < sources.size(); ++i) {
