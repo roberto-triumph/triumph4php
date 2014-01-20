@@ -595,7 +595,7 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 		bashLabel = Globals->FileTypes.BashFileExtensionsString,
 		diffLabel = Globals->FileTypes.DiffFileExtensionsString;
 		
-	phpLabel.Replace(wxT(";"), wxT(" "));
+	/*phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
 	jsLabel.Replace(wxT(";"), wxT(" "));
@@ -608,7 +608,7 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	markdownLabel.Replace(wxT(";"), wxT(" "));
 	bashLabel.Replace(wxT(";"), wxT(" "));
 	diffLabel.Replace(wxT(";"), wxT(" "));
-	
+	*/
 	wxString php = Globals->FileTypes.PhpFileExtensionsString,
 		css = Globals->FileTypes.CssFileExtensionsString,
 		sql = Globals->FileTypes.SqlFileExtensionsString,
