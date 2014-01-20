@@ -297,14 +297,10 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 , RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
 	FilesImageList = new wxImageList(16, 16);
+	
+	mvceditor::FillWithFileType(*FilesImageList);
 	FilesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-sql")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-css")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-javascript")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
 	SourcesImageList = new wxImageList(16, 16);
@@ -568,21 +564,48 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
 	if (Feature.App.Globals.FileTypes.HasAPhpExtension(fullPath)) {
-		return LIST_FILE_PHP;
+		return mvceditor::IMGLIST_PHP;
 	}
 	if (Feature.App.Globals.FileTypes.HasASqlExtension(fullPath)) {
-		return LIST_FILE_SQL;
+		return mvceditor::IMGLIST_SQL;
 	} 
 	if (Feature.App.Globals.FileTypes.HasACssExtension(fullPath)) {
-		return LIST_FILE_CSS;
+		return mvceditor::IMGLIST_CSS;
 	}
 	if (Feature.App.Globals.FileTypes.HasAJsExtension(fullPath)) {
-		return LIST_FILE_JS;
+		return mvceditor::IMGLIST_JS;
+	}
+	if (Feature.App.Globals.FileTypes.HasAConfigExtension(fullPath)) {
+		return mvceditor::IMGLIST_CONFIG;
+	}
+	if (Feature.App.Globals.FileTypes.HasACrontabExtension(fullPath)) {
+		return mvceditor::IMGLIST_CRONTAB;
+	} 
+	if (Feature.App.Globals.FileTypes.HasAYamlExtension(fullPath)) {
+		return mvceditor::IMGLIST_YAML;
+	}
+	if (Feature.App.Globals.FileTypes.HasAXmlExtension(fullPath)) {
+		return mvceditor::IMGLIST_XML;
+	}
+	if (Feature.App.Globals.FileTypes.HasARubyExtension(fullPath)) {
+		return mvceditor::IMGLIST_RUBY;
+	}
+	if (Feature.App.Globals.FileTypes.HasALuaExtension(fullPath)) {
+		return mvceditor::IMGLIST_LUA;
+	}
+	if (Feature.App.Globals.FileTypes.HasAMarkdownExtension(fullPath)) {
+		return mvceditor::IMGLIST_MARKDOWN;
+	} 
+	if (Feature.App.Globals.FileTypes.HasABashExtension(fullPath)) {
+		return mvceditor::IMGLIST_BASH;
+	}
+	if (Feature.App.Globals.FileTypes.HasADiffExtension(fullPath)) {
+		return mvceditor::IMGLIST_DIFF;
 	}
 	if (Feature.App.Globals.FileTypes.HasAMiscExtension(fullPath)) {
-		return LIST_FILE_TEXT;
+		return mvceditor::IMGLIST_MISC;
 	}
-	return LIST_FILE_OTHER;
+	return mvceditor::IMGLIST_NONE;
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
@@ -1010,7 +1033,7 @@ void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFil
 		wxListItem column1;
 		column1.SetColumn(0);
 		column1.SetId(newRowNumber);
-		column1.SetImage(LIST_FOLDER);
+		column1.SetImage(SOURCE_FOLDER);
 		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
 		column1.SetText(newName);
 		SourcesList->InsertItem(column1);

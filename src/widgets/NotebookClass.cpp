@@ -28,6 +28,7 @@
 #include <search/FindInFilesClass.h>
 #include <MvcEditor.h>
 #include <globals/Errors.h>
+#include <widgets/FileTypeImageList.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
@@ -35,6 +36,61 @@
 
 int ID_CLOSE_ALL_TABS = wxNewId();
 int ID_CLOSE_TAB = wxNewId();
+
+/**
+ * convert a code control document mode to a 
+ * image list number; to determine what image
+ * to show in the notebook tab based on the document
+ * mode.
+ */
+static int ImageId(mvceditor::CodeControlClass::Mode mode) {
+	int imgId = mvceditor::IMGLIST_NONE;
+	switch (mode) {
+	case mvceditor::CodeControlClass::TEXT:
+		imgId = mvceditor::IMGLIST_MISC;
+		break;
+	case mvceditor::CodeControlClass::SQL:
+		imgId = mvceditor::IMGLIST_SQL;
+		break;
+	case mvceditor::CodeControlClass::CSS:
+		imgId = mvceditor::IMGLIST_CSS;
+		break;
+	case mvceditor::CodeControlClass::PHP:
+		imgId = mvceditor::IMGLIST_PHP;
+		break;
+	case mvceditor::CodeControlClass::JS:
+		imgId = mvceditor::IMGLIST_JS;
+		break;
+	case mvceditor::CodeControlClass::CONFIG:
+		imgId = mvceditor::IMGLIST_CONFIG;
+		break;
+	case mvceditor::CodeControlClass::CRONTAB:
+		imgId = mvceditor::IMGLIST_CRONTAB;
+		break;
+	case mvceditor::CodeControlClass::YAML:
+		imgId = mvceditor::IMGLIST_YAML;
+		break;
+	case mvceditor::CodeControlClass::XML:
+		imgId = mvceditor::IMGLIST_XML;
+		break;
+	case mvceditor::CodeControlClass::RUBY:
+		imgId = mvceditor::IMGLIST_RUBY;
+		break;
+	case mvceditor::CodeControlClass::LUA:
+		imgId = mvceditor::IMGLIST_LUA;
+		break;
+	case mvceditor::CodeControlClass::MARKDOWN:
+		imgId = mvceditor::IMGLIST_MARKDOWN;
+		break;
+	case mvceditor::CodeControlClass::BASH:
+		imgId = mvceditor::IMGLIST_BASH;
+		break;
+	case mvceditor::CodeControlClass::DIFF:
+		imgId = mvceditor::IMGLIST_DIFF;
+		break;
+	}
+	return imgId;
+}
 
 mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style)
@@ -45,6 +101,8 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, ContextMenu(NULL)
 	, NewPageNumber(1) 
 	, TabIndexRightClickEvent(-1) {
+	
+	ImageList = NULL;
 }
 
 mvceditor::NotebookClass::~NotebookClass() {
@@ -153,6 +211,11 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode) {
+	if (NULL == ImageList) {
+		ImageList = new wxImageList(16, 16);
+		mvceditor::FillWithFileType(*ImageList);
+		AssignImageList(ImageList);
+	}
 	wxString format;
 	switch (mode) {
 		case mvceditor::CodeControlClass::TEXT:
@@ -202,18 +265,10 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 	page->SetDocumentMode(mode);
-	wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
-	if (mvceditor::CodeControlClass::PHP == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
-	}
-	else if (mvceditor::CodeControlClass::CSS == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
-	}
-	else if (mvceditor::CodeControlClass::SQL == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
-	}
-
-	AddPage(page, wxString::Format(format, NewPageNumber++), true, docBitmap);
+	
+	int imgId = ImageId(mode);
+	
+	AddPage(page, wxString::Format(format, NewPageNumber++), true, imgId);
 
 	mvceditor::CodeControlEventClass newEvent(mvceditor::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
@@ -237,6 +292,12 @@ void mvceditor::NotebookClass::LoadPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
+	if (NULL == ImageList) {
+		ImageList = new wxImageList(16, 16);
+		mvceditor::FillWithFileType(*ImageList);
+		AssignImageList(ImageList);
+	}
+	
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
@@ -276,25 +337,13 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
-			int mode = newCode->GetDocumentMode();
-			wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
-			if (mvceditor::CodeControlClass::PHP == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
-			}
-			else if (mvceditor::CodeControlClass::CSS == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
-			}
-			else if (mvceditor::CodeControlClass::SQL == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
-			}
-			else if (mvceditor::CodeControlClass::JS == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-javascript"));
-			}
-
+			mvceditor::CodeControlClass::Mode mode = newCode->GetDocumentMode();
+			int imgId = ImageId(mode);
+			
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
-			this->AddPage(newCode, fileName.GetFullName(), true, docBitmap);
+			this->AddPage(newCode, fileName.GetFullName(), true, imgId);
 
 			// tell the app that a file has been opened
 			mvceditor::CodeControlEventClass openEvent(mvceditor::EVENT_APP_FILE_OPENED, newCode);
