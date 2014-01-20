@@ -373,6 +373,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	else {
 		DocumentMode = TEXT;
 	}
+	ApplyPreferences();
 }
 
 void mvceditor::CodeControlClass::ApplyPreferences() {
