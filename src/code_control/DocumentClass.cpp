@@ -1036,7 +1036,7 @@ wxString mvceditor::PhpDocumentClass::GetJavascriptKeywords() const {
 
 mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::GlobalsClass* globals, const mvceditor::DatabaseTagClass& currentDbTag) 
 	: TextDocumentClass() 
-	, Globals(globals)
+		, Globals(globals)
 	, CurrentDbTag(currentDbTag) {
 		
 }

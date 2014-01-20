@@ -57,6 +57,22 @@ class GlobalsClass;
  */
 extern const wxEventType EVT_MOTION_ALT;
 
+// margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
+// margin 2 for lint error markers
+extern const int CODE_CONTROL_LINT_RESULT_MARKER;
+extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
+
+// the indicator to show squiggly lines for lint errors
+extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
+
+// the indicator to show boxes around found words when user double clicks
+// on a word
+extern const int CODE_CONTROL_INDICATOR_FIND;
+
+// start stealing styles from "asp javascript" we will never use those styles
+extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
+
+
 /**
  * source code control with the following enhancements.
  * - PHP autocompletion of structures found in the current project.
@@ -100,7 +116,19 @@ public:
 		/**
 		 * Javascript (pure JS files only)
 		 */
-		JS
+		JS,
+		
+		// the rest of the document types are not slightly supported
+		// syntax highlighting works but not much else
+		CONFIG,
+		CRONTAB,
+		YAML,
+		XML,
+		RUBY,
+		LUA,
+		MARKDOWN,
+		BASH,
+		DIFF
 	};
 
 	/**
@@ -404,43 +432,6 @@ private:
 // wxStyledTextCtrl is super-configurable.  These methods will turn on
 // some sensible defaults for plain-text, PHP, HTML, and SQL editing.
 //------------------------------------------------------------------------
-
-	/**
-	 * set the margin look of the source control
-	 */
-	void SetMargin();
-
-	/**
-	 * Set the font, EOL, tab options of the source control
-	 * Set generic defaults for plain text editing.
-	 */
-	void SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles);
-
-	/**
-	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
-	 * HTML and Javascript editing as well.
-	 */
-	void SetPhpOptions();
-
-	/**
-	 * Set the SQL highlight options of the source control
-	 */
-	void SetSqlOptions();
-
-	/**
-	 * Set the CSS highlight options of the source control
-	 */
-	void SetCssOptions();
-
-	/**
-	 * Set the JS highlight options of the source control
-	 */
-	void SetJsOptions();
-
-	/**
-	 * Set the font settings for plain text documents.
-	 */
-	void SetPlainTextOptions();
 
 	/**
 	 * Determine the correct document Mode and sets it (causing a repaint)

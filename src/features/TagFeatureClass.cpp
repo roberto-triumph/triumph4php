@@ -269,8 +269,8 @@ void mvceditor::TagFeatureClass::OnActionComplete(mvceditor::ActionEventClass& e
 	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+void mvceditor::TagFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
+	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
 	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
@@ -781,7 +781,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_UPDATE_UI(wxID_ANY, mvceditor::TagFeatureClass::OnUpdateUi)
 
 	EVT_APP_FILE_CLOSED(mvceditor::TagFeatureClass::OnAppFileClosed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::TagFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(mvceditor::TagFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
 	EVT_APP_FILE_RENAMED(mvceditor::TagFeatureClass::OnAppFileRenamed)
@@ -790,7 +790,7 @@ BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
 	EVT_APP_DIR_RENAMED(mvceditor::TagFeatureClass::OnAppDirRenamed)
 
 	// we will treat file new and file opened the same
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_NEW, mvceditor::TagFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_NEW(mvceditor::TagFeatureClass::OnAppFileOpened)
 	
 	// we will treat new exernal file and file external modified the same
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED, mvceditor::TagFeatureClass::OnAppFileExternallyModified)

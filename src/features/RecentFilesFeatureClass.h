@@ -63,7 +63,7 @@ private:
 	 * when a file has been opened, add it to the recent
 	 * list.
 	 */
-	void OnAppFileOpened(wxCommandEvent& event);
+	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * when a file has been created, add it to the recent

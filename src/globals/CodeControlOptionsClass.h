@@ -105,6 +105,14 @@ public:
 	// JsStyles apply Javascript files (*.js), not javascript
 	// embedded in HTML
 	std::vector<StylePreferenceClass> JsStyles;
+	std::vector<StylePreferenceClass> ConfigStyles;
+	std::vector<StylePreferenceClass> CrontabStyles;
+	std::vector<StylePreferenceClass> YamlStyles;
+	std::vector<StylePreferenceClass> RubyStyles;
+	std::vector<StylePreferenceClass> LuaStyles;
+	std::vector<StylePreferenceClass> MarkdownStyles;
+	std::vector<StylePreferenceClass> BashStyles;
+	std::vector<StylePreferenceClass> DiffStyles;
 	
 	/**
 	 *  This is the entire list of styles that can have font/color attached to.
@@ -226,6 +234,11 @@ public:
 	void Copy(const mvceditor::CodeControlOptionsClass& src);
 	
 	/**
+	 * @return concatenation of all styles for all languages
+	 */
+	std::vector<mvceditor::StylePreferenceClass> AllStyles() const;
+	
+	/**
 	 * Load state from persistent storage
 	 * 
 	 * @param wxConfigBase* config the config
@@ -242,7 +255,7 @@ public:
 	 */
 	enum MARGINS {
 		MARGIN_LINE_NUMBER = 0,
-		MARGIN_CODE_FOLDING = 1	
+		MARGIN_CODE_FOLDING = 1
 	};
 	
 	/**

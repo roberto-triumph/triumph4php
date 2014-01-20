@@ -52,7 +52,6 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
 	EditorBehavior = new EditorBehaviorPanelClass(notebook, Preferences.CodeControlOptions);
 	notebook->AddPage(EditorBehavior, _("Editor Behavior"));
-	notebook->AddPage(new EditColorsPanelClass(notebook, Preferences.CodeControlOptions), _("Styles && Colors"));
 	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
 

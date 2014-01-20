@@ -170,6 +170,33 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 		case mvceditor::CodeControlClass::JS:
 			format = _("Untitled %d.js");
 			break;
+		case mvceditor::CodeControlClass::CONFIG:
+			format = _("Untitled %d.conf");
+			break;
+		case mvceditor::CodeControlClass::CRONTAB:
+			format = _("Untitled %d");
+			break;
+		case mvceditor::CodeControlClass::YAML:
+			format = _("Untitled %d.yml");
+			break;
+		case mvceditor::CodeControlClass::XML:
+			format = _("Untitled %d.xml");
+			break;
+		case mvceditor::CodeControlClass::RUBY:
+			format = _("Untitled %d.rb");
+			break;
+		case mvceditor::CodeControlClass::LUA:
+			format = _("Untitled %d.lua");
+			break;
+		case mvceditor::CodeControlClass::MARKDOWN:
+			format = _("Untitled %d.md");
+			break;
+		case mvceditor::CodeControlClass::BASH:
+			format = _("Untitled %d.sh");
+			break;
+		case mvceditor::CodeControlClass::DIFF:
+			format = _("Untitled %d.diff");
+			break;
 	}
 	
 	// make sure to use a unique ID, other source code depends on this
@@ -188,7 +215,7 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, docBitmap);
 
-	wxCommandEvent newEvent(mvceditor::EVENT_APP_FILE_NEW);
+	mvceditor::CodeControlEventClass newEvent(mvceditor::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
 	
 }
@@ -270,8 +297,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 			this->AddPage(newCode, fileName.GetFullName(), true, docBitmap);
 
 			// tell the app that a file has been opened
-			wxCommandEvent openEvent(mvceditor::EVENT_APP_FILE_OPENED);
-			openEvent.SetString(fileName.GetFullPath());
+			mvceditor::CodeControlEventClass openEvent(mvceditor::EVENT_APP_FILE_OPENED, newCode);
 			EventSink->Publish(openEvent);
 		}
 		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {

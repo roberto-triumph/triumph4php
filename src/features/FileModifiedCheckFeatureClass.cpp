@@ -183,8 +183,8 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
-	wxString fullPath = event.GetString();
+void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
+	wxString fullPath = event.GetCodeControl()->GetFileName();
 	bool isInSources = false;
 	bool doAddWatch = false;
 
@@ -785,7 +785,7 @@ const wxEventType mvceditor::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
 BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureClass)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::FileModifiedCheckFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)

@@ -1044,7 +1044,7 @@ BEGIN_EVENT_TABLE(mvceditor::MainFrameClass,  MainFrameGeneratedClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::AppEventListenerForFrameClass, wxEvtHandler)
-	EVT_APP_FILE_OPEN(mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
+	EVT_CMD_FILE_OPEN(mvceditor::AppEventListenerForFrameClass::OnCmdFileOpen)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CREATED, mvceditor::AppEventListenerForFrameClass::OnAppFileCreated)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)

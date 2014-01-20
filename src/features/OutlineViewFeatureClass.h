@@ -161,7 +161,7 @@ public:
 	 */
 	void StartTagSearch(const std::vector<UnicodeString>& searchStrings);
 	
-private:		
+private:
 		
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
@@ -177,7 +177,7 @@ private:
 	 * This method will get called by the EVENT_APP_FILE_OPENED event is generated;
 	 * ie when parsing of the code in the active code control buffer has been completed.
 	 */
-	void OnAppFileOpened(wxCommandEvent& event);
+	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * once tag searching finishes, update the tree control

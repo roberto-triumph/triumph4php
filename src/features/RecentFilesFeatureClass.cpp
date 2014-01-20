@@ -91,8 +91,8 @@ void mvceditor::RecentFilesFeatureClass::OnRecentFileMenu(wxCommandEvent &event)
 	}
 }
 
-void mvceditor::RecentFilesFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
-	wxString fileName = event.GetString();
+void mvceditor::RecentFilesFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
+	wxString fileName = event.GetCodeControl()->GetFileName();
 	FileHistory.AddFileToHistory(fileName);
 	SavePreferences();
 }
@@ -110,6 +110,6 @@ BEGIN_EVENT_TABLE(mvceditor::RecentFilesFeatureClass, wxEvtHandler)
 	* we have to listen to all menu events
 	*/
 	EVT_MENU_RANGE(mvceditor::MENU_RECENT_FILES, mvceditor::MENU_RECENT_FILES + MAX_RECENT_FILES, mvceditor::RecentFilesFeatureClass::OnRecentFileMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::RecentFilesFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(mvceditor::RecentFilesFeatureClass::OnAppFileOpened)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_CREATED, mvceditor::RecentFilesFeatureClass::OnAppFileCreated)
 END_EVENT_TABLE()

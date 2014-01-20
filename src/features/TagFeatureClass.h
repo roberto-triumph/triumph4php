@@ -130,7 +130,7 @@ private:
 	 * This method will start re-parsing the document in the background. this will allow the 
 	 * code completion to be up-to-date after a file is *opened*
 	 */
-	void OnAppFileOpened(wxCommandEvent& event);
+	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * This method will start re-parsing the document in the background. this will allow the 
