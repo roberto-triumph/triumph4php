@@ -26,6 +26,7 @@
 #include <globals/FileTypeClass.h>
 #include <wx/tokenzr.h>
 #include <wx/filefn.h> 
+#include <wx/filename.h>
 
 /**
  * @return exploded list of wildcards, split by semicolon
@@ -48,8 +49,11 @@ static std::vector<wxString> Explode(const wxString& extensionsString) {
 static bool HasExtension(const wxString& fullPath, const wxString& extensionsString) {
 	std::vector<wxString> wildcards = Explode(extensionsString);
 	bool found = false;
+	wxFileName file(fullPath);
+	wxString nameOnly = file.IsOk() ? file.GetFullName() : fullPath;
 	for (size_t i = 0; i < wildcards.size(); ++i) {
-		if (wxMatchWild(wildcards[i], fullPath)) {
+		wxString wildcard = wildcards[i];
+		if (wxMatchWild(wildcard, nameOnly, false)) {
 			found = true;
 			break;
 		}
