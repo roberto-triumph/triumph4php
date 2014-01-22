@@ -27,6 +27,8 @@
 -- this function will also enclose the path in quotes; allowing file paths with spaces to be used.
 -- main purpose of this function is to generate paths that can be embedded into strings that consist
 -- of system commands.
+-- be careful, the result of this function is NOT suitable for file functions
+-- ie. os.isfile() since the result is already enclosed in quotes!
 function normalizepath(filepath) 
 	if not path.isabsolute(filepath) then
 		filepath = os.getcwd() .. "/" .. filepath
@@ -41,12 +43,31 @@ function normalizepath(filepath)
 	return filepath
 end
 
+--
+-- Checks that a program exists in the system by taking the binary 
+-- and the arg and executing it.  If the system call fails,
+-- then the program does not exist, and the script ends.
+-- most of the time, the arg will be '--version' as this 
+-- is the easiest way to check for program existence.
+--
+-- @param pathsToCheck a table of strings or a single string
+--
+function programexistence(prog, arg, extraMessage)
+	cmdString = string.format("\"%s\" %s", prog, arg)
+	if 0 ~= os.execute(cmdString) then
+		print (prog .. " not found. " .. extraMessage)
+		print "Program will now exit"
+		os.exit(1)
+	end
+end
+
+--
 -- takes a path relative to the project root and checks that it exists in the file system. if
 -- the file does not exist the program will exit.
 --
 -- @param pathsToCheck a table of strings or a single string
 --
-function existence(pathsToCheck)
+function existence(pathsToCheck, extraMessage)
 	paths = {}
 	if 'string' == type(pathsToCheck) then
 		table.insert(paths, pathsToCheck)
@@ -58,12 +79,31 @@ function existence(pathsToCheck)
 	for key, value in pairs(paths) do
 		if not os.isfile(value) then
 			print("Required file not found: " .. value)
+			print(extraMessage)
 			print "Program will now exit"
 			os.exit(1)
 		end
 	end
 end
 
+function existenceOrDownloadExtract(zipFile, downloadUrl, extraMessage)
+	zipFullPath = normalizepath(zipFile);
+	if (not os.isfile(zipFile)) then
+		print(extraMessage)
+		downloadCmd = string.format("%s --output-document=%s %s",
+			WGET,
+			zipFullPath,
+			downloadUrl);
+		extractCmd = string.format("%s x %s",
+			SEVENZIP, zipFullPath
+		);
+		batchexecute(normalizepath("lib"), {
+			downloadCmd,
+			extractCmd
+		})		
+	end
+end
+		
 --
 -- execute a table of commands
 -- if a single command fails then the program will exit

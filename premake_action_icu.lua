@@ -23,46 +23,51 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
-function prepCurl()
-	curlDir =  normalizepath("lib/curl");
+function prepIcu()
 	if os.is "windows" then
 		
-		-- compile curl
-		curlPath = normalizepath("lib/curl");
-		curlDebugBinPath = normalizepath(CURL_DEBUG_BIN_DIR .. "/*.dll")
-		curlReleaseBinPath = normalizepath(CURL_RELEASE_BIN_DIR .. "/*.dll")
-		rootPath = normalizepath("")
-		batchexecute(curlPath, {
+		-- getting 4.2 on windows, 4.8 requires a newer visual studio
+		icuZip = "lib/icu4c-4_2_1-src.zip";
+		icuDownload = "http://download.icu-project.org/files/icu4c/4.2.1/icu4c-4_2_1-src.zip"
+		existenceOrDownloadExtract(icuZip, icuDownload, "Downloading ICU dependency");
+		
+		-- compile ICU
+		icuPath = normalizepath("lib/icu/source/allinone");
+		rootPath = normalizepath("");
+		batchexecute(rootDir, {
 		
 			-- wrap around quotes in case path has spaces
 			"\"" .. VSVARS .. "\"",
-			"buildconf.bat",
-			"cd winbuild",
-			"nmake /f Makefile.vc mode=dll DEBUG=yes USE_IDN=no",
-			"nmake /f Makefile.vc mode=dll DEBUG=no USE_IDN=no",
+			"cd " .. icuPath,
+			
+			-- rebuild (clean) the solutions
+			-- otherwise there is a link error the second time 
+			"vcbuild allinone.sln  \"Debug|Win32\"",
+			"vcbuild allinone.sln  \"Release|Win32\"",
 			"cd " .. rootPath,
-			"xcopy /S /Y " .. curlDebugBinPath .. " \"Debug\\\"",
-			"xcopy /S /Y " .. curlReleaseBinPath .. " \"Release\\\""
-		});		
+			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*42d.dll") .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*41d.dll") .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/icudt42.dll") .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*42.dll") .. " \"Release\\\"",
+			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*41d.dll") .. " \"Release\\\""
+		});
 	else  
 	
-		-- CURL_LIB_DIR is already the result of a os.searchpath
-		-- which searched the default locations for the curl library
-		curlLib = CURL_LIB_DIR
-		if curlLib == nil then
-			error (
-				"CURL libraries not found.  " .. 
-				"Please install the CURL client library, or change the location of \n" ..
-				"CURL_LIB_DIR in premake_opts_linux.lua.\n" ..
-				"You can install curl via your package manager; ie. sudo apt-get install libcurl-dev\n"
+		-- on linux, we check that the icu config binary exists, as we use that
+		-- binary to get the location of the shared libraries
+		print(ICU_CONFIG .. " --exists")
+		if 0 ~= os.execute(ICU_CONFIG .. " --exists") then
+			error ("Could not execute icu-config. \n" ..
+				"Please install the ICU library, or change the location of \n" ..
+				"ICU_CONFIG in premake_opts_linux.lua.\n" ..
+				"You can install ICU via your package manager; ie. sudo apt-get install libicu-dev\n"
 			)
 		end
 	end
 end
 
-
 newaction {
 	trigger = "curl",
-	description = "Build the CURL (HTTP) library",
+	description = "Build the ICU (Unicode) library",
 	execute = prepCurl
 }

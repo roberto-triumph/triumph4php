@@ -25,8 +25,7 @@
 
 newaction {
 	trigger = "generate",
-	description = "Generate the source code for the PHP parser and PHP lexer. This needs to be done " ..
-					"whenever any bison or re2c files are modified.",
+	description = "Regenerate the source code for the PHP parser and PHP lexer.",
 	execute = function()
 	
 		-- regenerate the parser and lexer implementation files
