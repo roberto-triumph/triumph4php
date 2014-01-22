@@ -164,10 +164,10 @@ void MyApp::BuildGlobals() {
 	}
 
 	// needed so that we can know what files need to be parsed
-	Globals.PhpFileExtensionsString = wxT("*.php");
-	Globals.CssFileExtensionsString = wxT("*.css");
-	Globals.SqlFileExtensionsString = wxT("*.php");
-	Globals.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
+	Globals.FileTypes.PhpFileExtensionsString = wxT("*.php");
+	Globals.FileTypes.CssFileExtensionsString = wxT("*.css");
+	Globals.FileTypes.SqlFileExtensionsString = wxT("*.php");
+	Globals.FileTypes.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
 
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
