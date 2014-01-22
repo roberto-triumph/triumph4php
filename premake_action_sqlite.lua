@@ -77,5 +77,5 @@ end
 newaction {
 	trigger = "sqlite",
 	description = "Fetch the SQLite client library or check for its existence",
-	execute = prepCurl
+	execute = prepSqlite
 }

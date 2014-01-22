@@ -54,5 +54,5 @@ end
 newaction {
 	trigger = "mysql",
 	description = "Fetch the MySQL client library or check for its existence",
-	execute = prepCurl
+	execute = prepMysql
 }

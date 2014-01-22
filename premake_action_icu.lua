@@ -67,7 +67,7 @@ function prepIcu()
 end
 
 newaction {
-	trigger = "curl",
+	trigger = "icu",
 	description = "Build the ICU (Unicode) library",
-	execute = prepCurl
+	execute = prepIcu
 }
