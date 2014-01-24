@@ -290,7 +290,7 @@ FindInFilesResultsPanelGeneratedClass::FindInFilesResultsPanelGeneratedClass( wx
 	
 	FlexGridSizer->Add( TopGridSizer, 1, wxEXPAND, 5 );
 	
-	ResultsList = new wxListBox( this, ID_FIND_IN_FILES_RESULTS, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_EXTENDED|wxLB_NEEDED_SB ); 
+	ResultsList =  new wxDataViewListCtrl(this, ID_RESULTS_LIST);
 	FlexGridSizer->Add( ResultsList, 1, wxALL|wxEXPAND, 5 );
 	
 	BoxSizer->Add( FlexGridSizer, 1, wxEXPAND|wxALL, 5 );
@@ -309,7 +309,6 @@ FindInFilesResultsPanelGeneratedClass::FindInFilesResultsPanelGeneratedClass( wx
 	StopButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnStopButton ), NULL, this );
 	RegexReplaceWithHelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Connect( wxEVT_KILL_FOCUS, wxFocusEventHandler( FindInFilesResultsPanelGeneratedClass::OnKillFocusReplaceText ), NULL, this );
-	ResultsList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnDoubleClick ), NULL, this );
 }
 
 FindInFilesResultsPanelGeneratedClass::~FindInFilesResultsPanelGeneratedClass()
@@ -325,6 +324,5 @@ FindInFilesResultsPanelGeneratedClass::~FindInFilesResultsPanelGeneratedClass()
 	StopButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnStopButton ), NULL, this );
 	RegexReplaceWithHelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnRegExReplaceHelpButton ), NULL, this );
 	ReplaceWithText->Disconnect( wxEVT_KILL_FOCUS, wxFocusEventHandler( FindInFilesResultsPanelGeneratedClass::OnKillFocusReplaceText ), NULL, this );
-	ResultsList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( FindInFilesResultsPanelGeneratedClass::OnDoubleClick ), NULL, this );
 	
 }

@@ -240,6 +240,21 @@ public:
 	int GetCurrentLineNumber();
 	
 	/**
+	 * Returns the start of the current hit. If FindNext() returned true, then this is the position 
+	 * where the match was found in. Position number starts at 0
+	 * and it's relative to the start of the file.
+	 * @return int
+	 */
+	int GetFileOffset();
+	
+	/**
+	 * Returns the offset where the hit is found in the matching line. 0-based
+	 * and it's relative to the beginning of the line
+	 * @return int 0 <= GetLineOffset() <= GetCurrentLine.length()
+	 */
+	int GetLineOffset();
+	
+	/**
 	 * Get the file contents from the file and write them to the string
 	 * @param fileName full path of the file to open
 	 * @param content the file contents will be written to this variable
@@ -281,6 +296,27 @@ private:
 	 * @var int
 	 */
 	int LineNumber;
+	
+	/**
+	 * The offset where the hit is found in the matching line.. 0-based
+	 * 
+	 * @var int
+	 */
+	int LineOffset;
+	
+	/**
+	 * The start of the hit (relative to the start of the file) found by FindNext
+	 * 
+	 * @var int
+	 */
+	int FileOffset;
+	
+	/**
+	 * The current position of the start of the current line
+	 * 
+	 * @var int
+	 */
+	int LineStartOffset;
 	
 	/**
 	 * Close the associated input streams.

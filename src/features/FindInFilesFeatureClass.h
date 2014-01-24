@@ -65,6 +65,20 @@ public:
 	 * line where the hit was found (1- based)
 	 */
 	int LineNumber;
+	
+	/**
+	 * character position where the hit was found (0- based),
+	 * relative to the start of the line.
+	 * 
+	 * 0 <= LineOffset < Preview.Length()
+	 */
+	int LineOffset;
+	
+	/**
+	 * character position where the hit was found (0- based)
+	 * relative to the beginning of the file.
+	 */
+	int FileOffset;
 
 	FindInFilesHitClass();
 
@@ -80,10 +94,14 @@ public:
 	 * wxStrings are shallow-cloned.
 
 	 * @param fileName the full path to the file
-	 * @parm preview the contents of the line where the hit ocurred
-	 * @param lineNumber line (1 based) where the hit ocurred
+	 * @param preview the contents of the line where the hit ocurred
+	 * @param lineNumber line (1 based) where the hit 
+	 * @param lineOffset character position (0 based) where the hit ocurred. relative to the line
+	 * @param fileOffset character position (0 based) where the hit ocurred, relative to the beginning
+	 *        of the file
 	 */
-	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber);
+	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber, int lineOffset, 
+		int fileOffset);
 
 	/**
 	 * This will fully clone hit. Deep copy makes assignment thread-safe because by default
@@ -226,7 +244,7 @@ protected:
 	void OnReplaceInAllFilesButton(wxCommandEvent& event);
 	void OnFileHit(mvceditor::FindInFilesHitEventClass& event);
 	void OnStopButton(wxCommandEvent& event);
-	void OnDoubleClick(wxCommandEvent& event);
+	void OnRowActivated(wxDataViewEvent& event);
 	void OnCopySelectedButton(wxCommandEvent& event);
 	void OnCopyAllButton(wxCommandEvent& event);
 	void OnFindInFilesComplete(wxCommandEvent& event);
