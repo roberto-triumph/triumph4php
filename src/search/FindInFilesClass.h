@@ -229,7 +229,7 @@ public:
 	 * 
 	 * @return UnicodeString
 	 */
-	UnicodeString GetCurrentLine();
+	UnicodeString GetCurrentLine() const;
 	
 	/**
 	 * Returns the current line number. If FindNext() returned true, then this line number is the line number that the match
@@ -237,7 +237,7 @@ public:
 	 * 
 	 * @return int
 	 */
-	int GetCurrentLineNumber();
+	int GetCurrentLineNumber() const;
 	
 	/**
 	 * Returns the start of the current hit. If FindNext() returned true, then this is the position 
@@ -245,14 +245,19 @@ public:
 	 * and it's relative to the start of the file.
 	 * @return int
 	 */
-	int GetFileOffset();
+	int GetFileOffset() const;
 	
 	/**
 	 * Returns the offset where the hit is found in the matching line. 0-based
 	 * and it's relative to the beginning of the line
 	 * @return int 0 <= GetLineOffset() <= GetCurrentLine.length()
 	 */
-	int GetLineOffset();
+	int GetLineOffset() const;
+	
+	/**
+	 * @return the character length of matched text
+	 */
+	int GetMatchLength() const;
 	
 	/**
 	 * Get the file contents from the file and write them to the string
@@ -317,6 +322,12 @@ private:
 	 * @var int
 	 */
 	int LineStartOffset;
+	
+	/**
+	 * The length of the currently matched hit
+	 * @var int
+	 */
+	int MatchLength;
 	
 	/**
 	 * Close the associated input streams.

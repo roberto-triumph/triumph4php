@@ -44,7 +44,8 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 	, LineNumber(0) 
 	, LineOffset(0)
 	, FileOffset(0)
-	, LineStartOffset(0) {
+	, LineStartOffset(0) 
+	, MatchLength(0) {
 }
 
 mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
@@ -59,7 +60,8 @@ mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFile
 	, LineNumber(0) 
 	, LineOffset(0)
 	, FileOffset(0)
-	, LineStartOffset(0) {
+	, LineStartOffset(0) 
+	, MatchLength(0) {
 	Copy(findInFiles);
 }
 
@@ -80,6 +82,7 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 	LineOffset = 0;
 	FileOffset = 0;
 	LineStartOffset = 0;
+	MatchLength = 0;
 	CurrentLine.remove();
 	CleanupStreams();
 	if (!fileName.empty()) {
@@ -96,7 +99,7 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 
 bool mvceditor::FindInFilesClass::FindNext() {
 	LineOffset = 0;
-	int32_t length = 0;
+	MatchLength = 0;
 	bool found = false;
 	if (File) {
 		while (!u_feof(File)) {
@@ -106,7 +109,7 @@ bool mvceditor::FindInFilesClass::FindNext() {
 			UChar* buf = CurrentLine.getBuffer(2048);
 			u_fgets(buf, 2047, File);
 			CurrentLine.releaseBuffer(-1);
-			found = Finder.FindNext(CurrentLine, LineOffset) && Finder.GetLastMatch(LineOffset, length);
+			found = Finder.FindNext(CurrentLine, 0) && Finder.GetLastMatch(LineOffset, MatchLength);
 			if (found) {
 				FileOffset = LineStartOffset + LineOffset;
 				LineStartOffset += CurrentLine.length();
@@ -121,19 +124,23 @@ bool mvceditor::FindInFilesClass::FindNext() {
 	return found;
 }
 
-int mvceditor::FindInFilesClass::GetCurrentLineNumber() {
+int mvceditor::FindInFilesClass::GetCurrentLineNumber() const {
 	return LineNumber;
 }
 
-int mvceditor::FindInFilesClass::GetLineOffset() {
+int mvceditor::FindInFilesClass::GetLineOffset() const {
 	return LineOffset;
 }
 
-int mvceditor::FindInFilesClass::GetFileOffset() {
+int mvceditor::FindInFilesClass::GetFileOffset() const {
 	return FileOffset;
 }
 
-UnicodeString mvceditor::FindInFilesClass::GetCurrentLine() {
+int mvceditor::FindInFilesClass::GetMatchLength() const {
+	return MatchLength;
+}
+
+UnicodeString mvceditor::FindInFilesClass::GetCurrentLine() const {
 	return CurrentLine;
 }
 
@@ -249,6 +256,7 @@ void mvceditor::FindInFilesClass::Copy(const FindInFilesClass& src) {
 	LineOffset = 0;
 	FileOffset = 0;
 	LineStartOffset = 0;
+	MatchLength = 0;
 }
 
 void mvceditor::FindInFilesClass::CleanupStreams() {
