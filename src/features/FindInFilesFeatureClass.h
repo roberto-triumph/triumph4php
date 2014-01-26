@@ -417,6 +417,16 @@ private:
 	 * @param i index of hit to show. i is 0-based
 	 */
 	void ShowMatch(int i);
+	
+	/**
+ 	 * Shows the i'th match. Will set the cursor to the position of the match, opening the file
+	 * it if it's not already open. Additionally, it will scroll the ith match into
+	 * view.  This is useful when the user cycles through the matches with the keyboard
+	 * shortcut; the proper match is selected and shown into view
+	 *
+	 * @param i index of hit to show. i is 0-based
+	 */
+	void ShowMatchAndEnsureVisible(int i);
 
 	void OnActionComplete(mvceditor::ActionEventClass& event);
 

@@ -426,15 +426,14 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
 	int selected = ResultsList->GetSelectedRow();
 	int next = 0;
-	if (selected > 0 && selected < ((int)ResultsList->GetItemCount() - 1)) {
+	if (selected >= 0 && selected < ((int)ResultsList->GetItemCount() - 1)) {
 		next = selected + 1;
 	}
 	else {
 		// loop back to the beginning
 		next = 0;
 	}
-	ShowMatch(next);
-	ResultsList->SelectRow(next);
+	ShowMatchAndEnsureVisible(next);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
@@ -448,8 +447,7 @@ void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 		// loop back to the end
 		next = ResultsList->GetItemCount() - 1;
 	}
-	ShowMatch(next);
-	ResultsList->SelectRow(next);
+	ShowMatchAndEnsureVisible(next);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
@@ -654,26 +652,29 @@ void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	}
 	wxString fileName = AllHits[i].FileName;
 	int line = AllHits[i].LineNumber;
-	--line; // line is 1-based but wxSTC lines start at zero
 	Notebook->LoadPage(fileName);
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 			
 		// search for the expression and highlight it. search from the start of the line.
-		int32_t pos = codeControl->PositionFromLine(line);
+		int32_t startPos = AllHits[i].FileOffset;
 		int32_t length = 0;
 		FinderClass finder;
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
-			if (finder.FindNext(codeControl->GetSafeText(), pos) && finder.GetLastMatch(pos, length)) {
-				
-				//we want the cursor to be in the beginning of the hit hece pos is 2nd parameter
-				codeControl->SetCurrentPos(pos);
-				codeControl->SetAnchor(pos);
-				codeControl->SetSelectionAndEnsureVisible(pos + length, pos);
+			if (finder.FindNext(codeControl->GetSafeText(), startPos) && finder.GetLastMatch(startPos, length)) {
+				codeControl->MarkSearchHitAndGoto(line, startPos, startPos + length);
+				codeControl->SetFocus();
 			}
 		}
 	}
+}
+
+void mvceditor::FindInFilesResultsPanelClass::ShowMatchAndEnsureVisible(int i) {
+	ShowMatch(i);
+	ResultsList->SelectRow(i);
+	wxDataViewItem item = ResultsList->GetCurrentItem();
+	ResultsList->EnsureVisible(item);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEvent& event) {

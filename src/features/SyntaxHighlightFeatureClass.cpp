@@ -331,6 +331,10 @@ void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeCon
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
 	}
 
+	// set the search hit margin; we want this marker to be available to
+	// all file types
+	ctrl->MarkerDefine(CODE_CONTROL_SEARCH_HIT_MARKER, wxSTC_MARK_SHORTARROW, *wxYELLOW, *wxYELLOW);
+	
 	// in wxWidgets 2.9.5, need to set margin after setting the lexer
 	// otherwise code folding does not work
 	SetMargin(ctrl);

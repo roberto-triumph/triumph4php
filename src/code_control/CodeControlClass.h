@@ -58,9 +58,12 @@ class GlobalsClass;
 extern const wxEventType EVT_MOTION_ALT;
 
 // margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
-// margin 2 for lint error markers
+// margin 2 for lint error markers, margin 3 got search hits
 extern const int CODE_CONTROL_LINT_RESULT_MARKER;
 extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
+extern const int CODE_CONTROL_SEARCH_HIT_MARKER;
+extern const int CODE_CONTROL_SEARCH_HIT_MARGIN;
+
 
 // the indicator to show squiggly lines for lint errors
 extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
@@ -340,6 +343,29 @@ public:
 	 * results. Markings are moved from this window only.
 	 */
 	void ClearLintErrors();
+	
+	/**
+	 * Put an arrow in the margin of the line where a match ocurred
+	 * The markers will stay until the user types in one character
+	 * @param lineNumber 1-based
+	 */
+	void MarkSearchHit(int lineNumber);
+
+	/**
+	 * Marks a search hit, sets the current position to the
+	 * position where the hit is located selects the hit
+	 * and makes sure the hit is visible
+	 * @param lineNumber 1-based
+	 * @param startPos uft-8 position 
+	 * @param endPos uft-8 position 
+	 */
+	void MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos);
+
+	/**
+	 * Remove any and all markings caused by search hits.
+	 * Markings are moved from this window only.
+	 */
+	void ClearSearchMarkers();
 
 	/**
 	 * Set the connection to use to fetch the SQL table metadata
@@ -592,6 +618,11 @@ private:
 	 * this control was last set to touched = false
 	 */
 	bool IsTouched;
+	
+	/**
+	 * if true then this control has at least one search marker visible
+	 */
+	bool HasSearchMarkers;
 
 	DECLARE_EVENT_TABLE()
 };

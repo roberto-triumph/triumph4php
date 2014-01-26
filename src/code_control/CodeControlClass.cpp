@@ -44,6 +44,8 @@
 
 const int mvceditor::CODE_CONTROL_LINT_RESULT_MARKER = 2;
 const int mvceditor::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_MARKER = 3;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_MARGIN = 3;
 
 // the indicator to show squiggly lines for lint errors
 const int mvceditor::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
@@ -69,7 +71,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
 		, IsHidden(false) 
-		, IsTouched(false) {
+		, IsTouched(false) 
+		, HasSearchMarkers(false) {
 	Document = NULL;
 	
 	// we will handle right-click menu ourselves
@@ -257,6 +260,7 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	// the folded line is expanded
 	int currentLine = GetCurrentLine();
 	EnsureVisible(currentLine + 1);
+	
 	event.Skip();
 }
 
@@ -454,14 +458,23 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	// set touched flag if the character was a normal or shifted character, symbol
 	// or number
 	int key = event.GetKeyCode();
+	bool hasChanged = false;
 	if (!event.HasModifiers() && key > WXK_SPACE && key < WXK_DELETE) {
 		IsTouched = true;
+		hasChanged = true;
 	}
 	else if (!event.HasModifiers() && WXK_BACK == key) {
 		IsTouched = true;
+		hasChanged = true;
 	}
 	if (!event.HasModifiers() && key >= WXK_NUMPAD0 && key < WXK_DIVIDE) {
 		IsTouched = true;
+		hasChanged = true;
+	}
+	
+	// if there was a search marker, delete it
+	if (hasChanged && HasSearchMarkers) {
+		ClearSearchMarkers();
 	}
 	event.Skip();
 }
@@ -578,6 +591,34 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
 	IndicatorClearRange(0, GetTextLength());
 	AnnotationClearAll();
+}
+
+void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber) {
+	
+	// line is 1-based but wxSTC lines start at zero
+	MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_MARKER);
+	HasSearchMarkers = true;
+}
+
+void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos) {
+	MarkSearchHit(lineNumber);
+	SetSelectionAndEnsureVisible(startPos, endPos);
+	
+	int byteNumber = 0;
+	int documentLength = GetTextLength();
+	char* buf = new char[documentLength];
+
+	// GET_TEXT  message
+	SendMsg(2182, documentLength, (long)buf);
+	byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, startPos);
+	GotoPos(byteNumber);
+
+	delete[] buf;
+}
+
+void mvceditor::CodeControlClass::ClearSearchMarkers() {
+	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_MARKER);
+	HasSearchMarkers = false;
 }
 
 void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {
