@@ -134,7 +134,7 @@ bool mvceditor::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 
 	wxFFile file;
 	if (file.Open(fileName.GetFullPath(), wxT("rb"))) {
-		bool good = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), lintResult);
+		Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), lintResult);
 		errors = Errors;
 	}
 	return !errors.empty();
@@ -163,7 +163,7 @@ bool mvceditor::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 
 	File = UNICODE_STRING_SIMPLE("");
 	pelet::LintResultsClass lintResult;
-	bool good = Parser.ScanString(code, lintResult);
+	Parser.ScanString(code, lintResult);
 	errors = Errors;
 
 	return !errors.empty();
@@ -339,6 +339,15 @@ void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* 
 		break;
 	case pelet::ExpressionClass::CLOSURE:
 		ExpressionClosureFound((pelet::ClosureExpressionClass*)expr);
+		break;
+	case pelet::ExpressionClass::ARRAY_PAIR:
+	
+		// we dont event get array pairs by themselves, they come in 
+		// with the array
+		break;
+	case pelet::ExpressionClass::UNKNOWN:
+	
+		// cannot check unknown expressions
 		break;
 	}
 }
