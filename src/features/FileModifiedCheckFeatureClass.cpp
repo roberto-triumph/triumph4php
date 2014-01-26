@@ -756,7 +756,9 @@ void mvceditor::VolumeListActionClass::BackgroundWork() {
 }
 
 void mvceditor::VolumeListActionClass::DoCancel() {
+#ifdef __WXMSW__
 	wxFSVolume::CancelSearch();
+#endif
 }
 
 wxString mvceditor::VolumeListActionClass::GetLabel() const {
