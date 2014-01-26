@@ -872,7 +872,10 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		
 		SetIndicatorCurrent(INDICATOR_PHP_LINT);
 		SetIndicatorValue(INDICATOR_PHP_LINT);
-		IndicatorFillRange(byteNumber, 10);
+
+		// fill until the end of the word
+		int end = WordEndPosition(byteNumber, true);
+		IndicatorFillRange(byteNumber, end - byteNumber);
 
 		delete[] buf;
 	}

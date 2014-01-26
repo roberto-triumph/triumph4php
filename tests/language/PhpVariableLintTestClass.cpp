@@ -223,6 +223,21 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
+
+	// assignment in conditional still count as initialized
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc($a) {\n"
+		"  $fp = fopen('data.txt');\n"
+		"  while (!feof($fp) && ($line = fgets($fp))) {\n"
+		"      var_dump($line);\n"
+		"  }\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = mvceditor::CharToIcu(
 		"function myFunc() {\n"

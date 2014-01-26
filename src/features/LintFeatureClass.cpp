@@ -643,9 +643,7 @@ void mvceditor::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
 		return;
 	}
 	if (event.GetKeyCode() == WXK_SPACE) {
-
-		// scintilla lines are 0-based, lint error lines are 1 based
-		CodeControl->GotoLine(LintResults[0].LineNumber - 1);
+		CodeControl->MarkLintErrorAndGoto(LintResults[0]);
 		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
 		return;
 	}
@@ -653,9 +651,7 @@ void mvceditor::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
 }
 
 void mvceditor::LintErrorPanelClass::OnGoToLink(wxHyperlinkEvent& event) {
-
-	// scintilla lines are 0-based, lint error lines are 1 based
-	CodeControl->GotoLine(LintResults[0].LineNumber - 1);
+	CodeControl->MarkLintErrorAndGoto(LintResults[0]);
 	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
 }
 
