@@ -44,8 +44,8 @@
 
 const int mvceditor::CODE_CONTROL_LINT_RESULT_MARKER = 2;
 const int mvceditor::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
-const int mvceditor::CODE_CONTROL_SEARCH_HIT_MARKER = 3;
-const int mvceditor::CODE_CONTROL_SEARCH_HIT_MARGIN = 3;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
 
 // the indicator to show squiggly lines for lint errors
 const int mvceditor::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
@@ -593,15 +593,20 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	AnnotationClearAll();
 }
 
-void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber) {
+void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
 	
 	// line is 1-based but wxSTC lines start at zero
-	MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_MARKER);
+	if (goodHit) {
+		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
+	}
+	else {
+		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
+	}
 	HasSearchMarkers = true;
 }
 
-void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos) {
-	MarkSearchHit(lineNumber);
+void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit) {
+	MarkSearchHit(lineNumber, goodHit);
 	SetSelectionAndEnsureVisible(startPos, endPos);
 	
 	int byteNumber = 0;
@@ -617,7 +622,8 @@ void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int start
 }
 
 void mvceditor::CodeControlClass::ClearSearchMarkers() {
-	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_MARKER);
+	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
+	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
 	HasSearchMarkers = false;
 }
 

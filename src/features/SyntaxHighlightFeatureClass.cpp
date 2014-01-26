@@ -27,6 +27,7 @@
 #include <MvcEditor.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <code_control/CodeControlStyles.h>
+#include <globals/Assets.h>
 
 mvceditor::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(mvceditor::AppClass& app)
 	: FeatureClass(app) {
@@ -239,6 +240,12 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextC
 				break;
 		}
 	}
+	
+	
+	// set the search hit margin; we want this marker to be available to
+	// all file types
+	ctrl->MarkerDefineBitmap(CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, SearchHitGoodBitmap); 
+	ctrl->MarkerDefineBitmap(CODE_CONTROL_SEARCH_HIT_BAD_MARKER, SearchHitBadBitmap);
 	SetLexerStyles(ctrl, styles);
 }
 
@@ -331,10 +338,6 @@ void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeCon
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
 	}
 
-	// set the search hit margin; we want this marker to be available to
-	// all file types
-	ctrl->MarkerDefine(CODE_CONTROL_SEARCH_HIT_MARKER, wxSTC_MARK_SHORTARROW, *wxYELLOW, *wxYELLOW);
-	
 	// in wxWidgets 2.9.5, need to set margin after setting the lexer
 	// otherwise code folding does not work
 	SetMargin(ctrl);
@@ -409,6 +412,13 @@ void mvceditor::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ct
 void mvceditor::SyntaxHighlightFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	mvceditor::EditColorsPanelClass* panel = new mvceditor::EditColorsPanelClass(parent, *this);
 	parent->AddPage(panel, _("Styles && Colors"));
+}
+
+void mvceditor::SyntaxHighlightFeatureClass::OnAppReady(wxCommandEvent& event) {
+	
+	// load the images once at startup
+	SearchHitGoodBitmap = mvceditor::AutoCompleteImageAsset(wxT("magnifier"));
+	SearchHitBadBitmap = mvceditor::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
 }
 
 mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::SyntaxHighlightFeatureClass& feature)
@@ -670,6 +680,7 @@ void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 BEGIN_EVENT_TABLE(mvceditor::SyntaxHighlightFeatureClass, mvceditor::FeatureClass)
 	EVT_APP_FILE_NEW(mvceditor::SyntaxHighlightFeatureClass::OnFileNew)
 	EVT_APP_FILE_OPEN(mvceditor::SyntaxHighlightFeatureClass::OnFileOpen)
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::SyntaxHighlightFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::SyntaxHighlightFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()
 

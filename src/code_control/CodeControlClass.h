@@ -61,8 +61,8 @@ extern const wxEventType EVT_MOTION_ALT;
 // margin 2 for lint error markers, margin 3 got search hits
 extern const int CODE_CONTROL_LINT_RESULT_MARKER;
 extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
-extern const int CODE_CONTROL_SEARCH_HIT_MARKER;
-extern const int CODE_CONTROL_SEARCH_HIT_MARGIN;
+extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
+extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
 
 
 // the indicator to show squiggly lines for lint errors
@@ -348,18 +348,22 @@ public:
 	 * Put an arrow in the margin of the line where a match ocurred
 	 * The markers will stay until the user types in one character
 	 * @param lineNumber 1-based
+	 * @param goodHit if TRUE then we show a different marker than
+	 *        when hit is no longer at the expected pos
 	 */
-	void MarkSearchHit(int lineNumber);
+	void MarkSearchHit(int lineNumber, bool goodHit);
 
 	/**
 	 * Marks a search hit, sets the current position to the
 	 * position where the hit is located selects the hit
 	 * and makes sure the hit is visible
 	 * @param lineNumber 1-based
-	 * @param startPos uft-8 position 
-	 * @param endPos uft-8 position 
+	 * @param startPos character position 
+	 * @param endPos character position 
+	 * @param goodHit if TRUE then we show a different marker than
+	 *        when hit is no longer at the expected pos
 	 */
-	void MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos);
+	void MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit);
 
 	/**
 	 * Remove any and all markings caused by search hits.

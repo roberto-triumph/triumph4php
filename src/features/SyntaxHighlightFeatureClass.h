@@ -156,6 +156,17 @@ private:
 	 * Set the font settings for plain text documents.
 	 */
 	void SetPlainTextOptions(wxStyledTextCtrl* ctrl);
+	
+	/**
+	 * on app start we load the bitmaps we use
+	 * on the margin markers
+	 */
+	void OnAppReady(wxCommandEvent& event);
+	
+	// bitmaps to show in the margin for search hits
+	// we load from disk once per feature
+	wxBitmap SearchHitGoodBitmap;
+	wxBitmap SearchHitBadBitmap;
 
 	DECLARE_EVENT_TABLE()
 };

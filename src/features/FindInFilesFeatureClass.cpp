@@ -663,7 +663,16 @@ void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
 			if (finder.FindNext(codeControl->GetSafeText(), startPos) && finder.GetLastMatch(startPos, length)) {
-				codeControl->MarkSearchHitAndGoto(line, startPos, startPos + length);
+				codeControl->MarkSearchHitAndGoto(line, startPos, startPos + length, true);
+				codeControl->SetFocus();
+			}
+			else {
+				
+				// hit is no longer there, still go to the
+				// line
+				// it seems pretty weird for the editor to open the file
+				// but not go to the line.
+				codeControl->MarkSearchHitAndGoto(line, AllHits[i].FileOffset, AllHits[i].FileOffset, false);
 				codeControl->SetFocus();
 			}
 		}

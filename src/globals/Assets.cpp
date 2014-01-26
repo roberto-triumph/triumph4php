@@ -68,13 +68,14 @@ wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	fileName.Normalize();
 	wxASSERT(fileName.IsOk());
 	wxBitmap bitmap;
-	bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_XPM);
+	bool loaded = bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_XPM);
+	wxASSERT_MSG(loaded, wxT("failed to load: ") + fileName.GetFullPath());
 	return bitmap;
 }
 
 wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
-		wxImage::AddHandler(new wxPNGHandler());	
+		wxImage::AddHandler(new wxPNGHandler());
 	}
 	wxBitmap bitmap;
 	wxStandardPaths paths = wxStandardPaths::Get();
