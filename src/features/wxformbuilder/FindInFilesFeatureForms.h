@@ -26,7 +26,7 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/bmpbuttn.h>
-#include <wx/listbox.h>
+#include <wx/dataview.h>
 #include <wx/panel.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 			ID_STOPBUTTON,
 			ID_REPLACEREGEXHELPBUTTON,
 			ID_REPLACETEXT,
-			ID_FIND_IN_FILES_RESULTS,
+			ID_RESULTS_LIST,
 		};
 		
 		wxBitmapButton* ReplaceButton;
@@ -115,7 +115,7 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 		wxComboBox* ReplaceWithText;
 		wxStaticText* FindLabel;
 		wxStaticText* ResultText;
-		wxListBox* ResultsList;
+		wxDataViewListCtrl* ResultsList;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnReplaceButton( wxCommandEvent& event ) { event.Skip(); }
@@ -128,7 +128,6 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 		virtual void OnStopButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnKillFocusReplaceText( wxFocusEvent& event ) { event.Skip(); }
-		virtual void OnDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

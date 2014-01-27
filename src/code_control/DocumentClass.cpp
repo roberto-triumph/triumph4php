@@ -154,7 +154,13 @@ static const wxString CSS_PSEUDOCLASSES = wxString::FromAscii(
 	"optional required right root target valid visited"
 );
 
-static const wxString JAVASCRIPT_KEYWORDS = wxT("");
+
+// from
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Reserved_Words
+static const wxString JAVASCRIPT_KEYWORDS = wxString::FromAscii(
+	"break case catch continue debugger default delete do else finally for function "
+	"if in instanceof new return switch this throw try typeof var void  while with"
+);
 
 enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_VARIABLE = 1,
@@ -1031,7 +1037,7 @@ wxString mvceditor::PhpDocumentClass::GetJavascriptKeywords() const {
 
 mvceditor::SqlDocumentClass::SqlDocumentClass(mvceditor::GlobalsClass* globals, const mvceditor::DatabaseTagClass& currentDbTag) 
 	: TextDocumentClass() 
-	, Globals(globals)
+		, Globals(globals)
 	, CurrentDbTag(currentDbTag) {
 		
 }
@@ -1200,4 +1206,56 @@ bool mvceditor::CssDocumentClass::InCommentOrStringStyle(int posToCheck) {
 
 	// dont match braces inside strings or comments.
 	return wxSTC_CSS_COMMENT == style || wxSTC_CSS_DOUBLESTRING == style || wxSTC_CSS_SINGLESTRING == style;
+}
+
+mvceditor::JsDocumentClass::JsDocumentClass() 
+	: TextDocumentClass() {
+		
+}
+
+bool mvceditor::JsDocumentClass::CanAutoComplete() {
+	return false;
+}
+
+
+wxString mvceditor::JsDocumentClass::GetJsKeywords() const {
+	return JAVASCRIPT_KEYWORDS;
+}
+
+void mvceditor::JsDocumentClass::MatchBraces(int posToCheck) {
+	if (!InCommentOrStringStyle(posToCheck)) {
+		wxChar c1 = Ctrl->GetCharAt(posToCheck),
+		            c2 = Ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1 || wxT('{') == c1 || wxT('}') == c1) {
+			posToCheck = posToCheck;
+		}
+		else if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
+			posToCheck = posToCheck - 1;
+		}
+		else  {
+			posToCheck = -1;
+		}
+		if (posToCheck >= 0) {
+			int pos = Ctrl->BraceMatch(posToCheck);
+			if (wxSTC_INVALID_POSITION == pos) {
+				Ctrl->BraceBadLight(posToCheck);
+			}
+			else {
+				Ctrl->BraceHighlight(posToCheck, pos);
+			}
+		}
+		else {
+			Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+		}
+	}
+	else {
+		Ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+	}
+}
+
+bool mvceditor::JsDocumentClass::InCommentOrStringStyle(int posToCheck) {
+	int style = Ctrl->GetStyleAt(posToCheck);
+
+	// dont match braces inside strings or comments.
+	return wxSTC_C_COMMENT == style || wxSTC_C_STRING == style || wxSTC_C_CHARACTER == style;
 }

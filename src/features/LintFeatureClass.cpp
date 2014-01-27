@@ -188,7 +188,7 @@ bool mvceditor::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<mvc
 bool mvceditor::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileName& fileName, mvceditor::GlobalsClass& globals) {
 	
 	bool good = false;
-	if (globals.HasAPhpExtension(fileName.GetFullPath())) {
+	if (globals.FileTypes.HasAPhpExtension(fileName.GetFullPath())) {
 		mvceditor::SourceClass src;
 		src.SetIncludeWildcards(fileName.GetFullName());
 		src.RootDirectory.AssignDir(fileName.GetPath());

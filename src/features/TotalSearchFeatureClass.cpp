@@ -27,6 +27,7 @@
 #include <globals/Assets.h>
 #include <MvcEditor.h>
 #include <wx/imaglist.h>
+#include <wx/wupdlock.h>
 
 static int ID_DIALOG_TIMER = wxNewId();
 static int ID_TAG_SEARCH = wxNewId();
@@ -120,12 +121,17 @@ mvceditor::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, mvce
 , RunningThreads() 
 , Results() 
 , SelectedTags(selectedTags) 
-, LineNumber(lineNumber) {
+, LineNumber(lineNumber) 
+, IsCacheBeingBuilt(false)
+, IsCacheEmpty(false) {
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 	Timer.Start(300, wxTIMER_CONTINUOUS);
 	
 	MatchesList->Clear();
+	CacheStatusLabel->SetLabel(wxT("Cache Status: OK"));
+
+	UpdateCacheStatus();
 }
 
 void mvceditor::TotalSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
@@ -235,8 +241,18 @@ void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 }
 
 void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
-	wxString text = SearchText->GetValue();
+	UpdateCacheStatus();
+
+	// don't want to query the cache while the cache is being 
+	// built. this is because the tag cache is built using
+	// sqlite and sqlite cannot handle simultaneous reads and
+	// writes.
+	if (IsCacheBeingBuilt) {
+		return;
+	}
 	
+	wxString text = SearchText->GetValue();
+
 	// trim spaces from the ends
 	text.Trim(false).Trim(true);
 	if (text != LastSearch && text.length() > 2) {
@@ -277,12 +293,22 @@ void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSear
 			desc = tag->PhpTag.FullPath;
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
+			mvceditor::DatabaseTagClass dbTag;
+			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Data for ") + tag->TableTag.TableName;
+			desc = _("Database Table Data for ") 
+				+ tag->TableTag.TableName 
+				+ _(" in connection ") 
+				+ mvceditor::IcuToWx(dbTag.Label);
 		}
 		else if (mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
+			mvceditor::DatabaseTagClass dbTag;
+			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Definition for ") + tag->TableTag.TableName;
+			desc = _("Database Table Definition for ") 
+				+ tag->TableTag.TableName 
+				+ _(" in connection ") 
+				+ mvceditor::IcuToWx(dbTag.Label);
 		}
 		
 		MatchesList->Append(value + wxT(" - ") + desc);
@@ -312,6 +338,39 @@ void mvceditor::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 	RunningThreads.Shutdown();
 	RunningThreads.RemoveEventHandler(this);
 	EndModal(wxOK);
+}
+
+void mvceditor::TotalSearchDialogClass::UpdateCacheStatus() {
+	if (Feature.App.Sequences.Running()) {
+
+		// only update the label when there is a change in 
+		// indexing status, that way we eliminate flicker
+		if (!IsCacheBeingBuilt) {
+			wxWindowUpdateLocker locker(this);
+			CacheStatusLabel->SetLabel(wxT("Cache Status: Indexing"));
+			this->Layout();
+		}
+		IsCacheBeingBuilt = true;
+		return;
+	}
+	
+	if (Feature.App.Globals.TagCache.IsFileCacheEmpty()) {
+		if (!IsCacheEmpty) {
+			wxWindowUpdateLocker locker(this);
+			CacheStatusLabel->SetLabel(wxT("Cache Status: Empty"));
+			this->Layout();
+		}
+		IsCacheEmpty = true;
+		return;
+	}
+	if (IsCacheBeingBuilt && !Feature.App.Sequences.Running()) {
+		
+		// here the tag parsing has finished 
+		IsCacheBeingBuilt = false;
+		wxWindowUpdateLocker locker(this);
+		CacheStatusLabel->SetLabel(wxT("Cache Status: OK"));
+		this->Layout();
+	}
 }
 
 BEGIN_EVENT_TABLE(mvceditor::TotalSearchFeatureClass, mvceditor::FeatureClass)

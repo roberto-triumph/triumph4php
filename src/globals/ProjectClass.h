@@ -78,6 +78,15 @@ public:
 	std::vector<wxString> SqlFileExtensions;
 
 	/**
+	 * The wildcard patterns that will be used to find JS files in this
+	 * project.
+	 * Each item in the array will be one wildcard expression; where each
+	 * expression can contain either a '*' or a '?' for use in the
+	 * wxMatchWild() function.
+	 */
+	std::vector<wxString> JsFileExtensions;
+
+	/**
 	 * The wildcard patterns that will be used to find miscalleneous files in this
 	 * project. Misc. files are files that do not contain code but still want
 	 * to open them in the editor.
@@ -129,7 +138,7 @@ public:
 	 * this project to find all relevant files; ie PHP, CSS, SQL,
 	 * and all misc file extensions.
 	 *
-	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL,
+	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
 	 * and misc file extensions) added to each sources. 
 	 */
 	std::vector<mvceditor::SourceClass> AllSources() const;

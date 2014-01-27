@@ -103,9 +103,27 @@ WX_INCLUDE_DIRS_RELEASE =  { wxWidgetsDir .. "/include/", wxWidgetsDir .. "/lib/
 -- the styled text control library
 WX_LIB_STC_RELEASE = "wxmsw29u_stc"
 
+-- location of the Git executable. this is used by the
+-- setupdev action to get all submodule
+GIT = 'git.exe';
+
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
-CMAKE = 'cmake.exe';
+CMAKE = 'cmake';
+
+-- location of 7-zip, used to unzip downloaded binaries of MVC Editor
+-- dependencies from the Internet
+SEVENZIP = '7za';
+
+-- location of wget, used to retrieve some of MVC Editor
+-- dependencies from the Internet
+WGET = 'wget';
+
+-- location of the batch file that setups the Visual Studio
+-- dev environment (adds compiler, linker to the PATH). this 
+-- i used by the setupdev action to compile some of the 
+-- dependencies
+VSVARS = "C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\Common7\\Tools\\vsvars32.bat";
 
 -- will look for MySQL files in these directories
 -- not easy to get MySQL Connector C libs in windows
@@ -130,16 +148,21 @@ MVCEDITOR_DB_PASSWORD = ''
 
 -- will look for SQLite in these directories
 -- read lib/sqlite/README  for more info
-sqliteDir = os.getenv("MVCEDITOR_SQLITE_DIR")
-if (not sqliteDir) then
-	sqliteDir = "lib/sqlite";
-	print("Using default dir for SQLITE driver: " .. sqliteDir)
+sqliteIncludeDir = os.getenv("MVCEDITOR_SQLITE_INCLUDE_DIR")
+if (not sqliteIncludeDir) then
+	sqliteIncludeDir = "lib/sqlite-amalgamation-3071300";
+	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteIncludeDir)
 end
-SQLITE_INCLUDE_DIR = sqliteDir .. '/include'
-SQLITE_LIB = sqliteDir .. '/lib/sqlite3.lib'
-SQLITE_LIB_DIR = sqliteDir .. '/lib'
-SQLITE_LIB_NAME = 'sqlite3.lib'
+SQLITE_INCLUDE_DIR = sqliteIncludeDir
 
+sqliteLibDir = os.getenv("MVCEDITOR_SQLITE_LIB_DIR")
+if (not sqliteLibDir) then
+	sqliteLibDir = "lib/sqlite-dll-win32-x86-3071300";
+	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteLibDir)
+end
+SQLITE_LIB = sqliteLibDir.. '/sqlite3.lib'
+SQLITE_LIB_DIR = sqliteLibDir 
+SQLITE_LIB_NAME = 'sqlite3.lib'
 
 -- will look for CURL in these directories
 -- these are the directories where

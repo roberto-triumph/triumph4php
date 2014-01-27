@@ -47,7 +47,7 @@ bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 	SetProgressMode(mvceditor::ActionClass::DETERMINATE);
 	
 	// ATTN: assumes that all projects have the same extension
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
 	// if we were not given projects, scan all of them
 	if (!DoTouchedProjects) {
@@ -132,7 +132,7 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	// need to clear the entire cache, then add only the newly enabled projects
 	globals.TagCache.Clear();
 	pelet::Versions version = globals.Environment.Php.Version;
-	std::vector<wxString> otherFileExtensions = globals.GetNonPhpFileExtensions();
+	std::vector<wxString> otherFileExtensions = globals.FileTypes.GetNonPhpFileExtensions();
 	
 	// the tag cache will own the global cache pointers
 	// register the project tag DB file now so that it is available for code completion
@@ -141,7 +141,7 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	// the tag cache will own these pointers
 	mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
 	tagFinderList->InitNativeTag(mvceditor::NativeFunctionsAsset());
-	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), otherFileExtensions, version);
+	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, version);
 	tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
 	globals.TagCache.RegisterGlobal(tagFinderList);
 }
@@ -179,7 +179,7 @@ bool mvceditor::ProjectTagDirectoryActionClass::Init(mvceditor::GlobalsClass& gl
 		}
 	}
 	if (isDirFromProject) {
-		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
 	}
 	return isDirFromProject; 
@@ -245,7 +245,8 @@ bool mvceditor::ProjectTagSingleFileActionClass::Init(mvceditor::GlobalsClass& g
 		}
 	}
 	if (isFileFromProject) {
-		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+			globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
 	}
 	return isFileFromProject; 
@@ -291,7 +292,8 @@ void mvceditor::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& 
 }
 
 bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 	std::vector<mvceditor::ProjectClass>::const_iterator project;
 	std::vector<mvceditor::SourceClass>::const_iterator src;
 	wxString path = OldFileName.GetFullPath();
@@ -362,7 +364,8 @@ void mvceditor::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& o
 }
 
 bool mvceditor::ProjectTagDirectoryRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 	return TagFinderList.IsTagFinderInit;
 }
 

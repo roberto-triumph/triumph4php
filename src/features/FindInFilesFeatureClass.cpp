@@ -47,6 +47,87 @@ static const int ID_REGEX_REPLACE_MENU_START = 10000;
 // memory
 static const size_t MAX_HITS = 1000;
 
+
+class FindInFilesPreviewRenderer : public wxDataViewCustomRenderer {
+
+public:
+	
+	mvceditor::FindInFilesHitClass Hit;
+	
+	FindInFilesPreviewRenderer()
+	: wxDataViewCustomRenderer(wxT("mvceditor::FindInFilesHitClass")) {
+		
+	}
+	
+	bool SetValue(const wxVariant& value) {
+		bool ret = true;
+		wxAny any = value.GetAny();
+		ret = any.GetAs(&Hit);
+		return ret;
+	}
+	
+	bool GetValue(wxVariant& value) const {
+		bool ret = true;
+		wxAny any = value.GetAny();
+		any = Hit;
+		return ret;
+	}
+	
+	wxSize GetSize() const {
+		wxString preview = Hit.Preview;
+		preview.Trim(true);
+		preview.Trim(false);
+		return GetTextExtent(preview);
+	}
+	
+	bool Render(wxRect rect, wxDC* dc, int state) {
+		bool ret = true;
+		wxString preview = Hit.Preview;
+		
+		// we want to trim the leading whitespace so that the
+		// preview text is aligned left; however trimming the
+		// leading spaces means that we need to account for the
+		// number of spaces we trimmed so that we split
+		// the before/after hit string correctly
+		size_t spaceCount = 0;
+		for (; spaceCount < preview.length(); ++spaceCount) {
+			if (preview[spaceCount] != ' ' && preview[spaceCount] != '\t' 
+				&& preview[spaceCount] != '\v'
+				&& preview[spaceCount] != '\r' && preview[spaceCount] != '\n') {
+				break;
+			}
+		}
+		
+		preview.Trim(false);
+		
+		// break the preview into before/during/after hit.
+		// taking into account the spaces that were trimmed 
+		// from the beginning of the string
+		wxString beforeHit = preview.Mid(0, Hit.LineOffset - 1 - spaceCount);
+		wxString hit = preview.Mid(Hit.LineOffset - spaceCount, Hit.MatchLength);
+		wxString afterHit = preview.Mid(Hit.LineOffset + Hit.MatchLength - spaceCount);
+		
+		wxSize sizeBeforeHit = GetTextExtent(beforeHit);
+		wxSize sizeHit = GetTextExtent(hit);
+		
+		wxPoint posBeforeHit = rect.GetTopLeft();
+		wxPoint posHit = rect.GetTopLeft();
+		posHit.x += sizeBeforeHit.GetWidth();
+		wxPoint posAfterHit = rect.GetTopLeft();
+		posAfterHit.x += sizeBeforeHit.GetWidth() + sizeHit.GetWidth();
+		
+		
+		dc->DrawText(beforeHit, posBeforeHit);
+		dc->SetBackgroundMode(wxSOLID);
+		dc->SetTextBackground(*wxYELLOW);
+		dc->DrawText(hit, posHit);
+		dc->SetBackgroundMode(wxTRANSPARENT);
+		dc->DrawText(afterHit, posAfterHit);
+		
+		return ret;
+	}
+};
+
 static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFilesHitClass>& allHits) {
 	std::vector<wxString>  files;
 	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
@@ -61,25 +142,37 @@ static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFi
 }
 
 mvceditor::FindInFilesHitClass::FindInFilesHitClass()
-	: FileName()
+	: wxObject()
+	, FileName()
 	, Preview()
-	, LineNumber() {
+	, LineNumber() 
+	, LineOffset(0)
+	, FileOffset(0) 
+	, MatchLength(0) {
 
 }
 
-mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber)
-
+mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, 
+	int lineNumber, int lineOffset, int fileOffset, int matchLength)
+	: wxObject()
 	// use c_str() to deep copy
-	: FileName(fileName.c_str())
+	, FileName(fileName.c_str())
 	, Preview(preview.c_str())
-	, LineNumber(lineNumber) {
+	, LineNumber(lineNumber) 
+	, LineOffset(lineOffset) 
+	, FileOffset(fileOffset) 
+	, MatchLength(matchLength) {
 
 }
 
 mvceditor::FindInFilesHitClass::FindInFilesHitClass(const mvceditor::FindInFilesHitClass& hit) 
-	: FileName()
+	: wxObject()
+	, FileName()
 	, Preview() 
-	, LineNumber() {
+	, LineNumber(1) 
+	, LineOffset(0)
+	, FileOffset(0) 
+	, MatchLength(0) {
 	Copy(hit);
 }
 
@@ -88,12 +181,29 @@ mvceditor::FindInFilesHitClass& mvceditor::FindInFilesHitClass::operator=(const 
 	return *this;
 }
 
+bool mvceditor::FindInFilesHitClass::operator==(const mvceditor::FindInFilesHitClass& hit) {
+	return FileName == hit.FileName 
+		&& LineNumber == hit.LineNumber
+		&& LineOffset == hit.LineOffset
+		&& FileOffset == hit.FileOffset;
+}
 
 void mvceditor::FindInFilesHitClass::Copy(const mvceditor::FindInFilesHitClass& hit) {
 	FileName = hit.FileName.c_str();
 	Preview = hit.Preview.c_str();
 	LineNumber = hit.LineNumber;
+	LineOffset = hit.LineOffset;
+	FileOffset = hit.FileOffset;
+	MatchLength = hit.MatchLength;
 }
+
+IMPLEMENT_DYNAMIC_CLASS(mvceditor::FindInFilesHitClass, wxObject)
+namespace mvceditor {
+
+	IMPLEMENT_VARIANT_OBJECT(FindInFilesHitClass)
+
+}
+
 
 mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass> &hits)
 	: wxEvent(eventId, mvceditor::EVENT_FIND_IN_FILES_FILE_HIT)
@@ -151,13 +261,17 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 		std::vector<mvceditor::FindInFilesHitClass> hits;
 		if (it == SkipFiles.end()) {
 			bool destroy = IsCancelled();
-			do {			
+			do {
 				if (destroy) {
 					break;
 				}
 				mvceditor::FindInFilesHitClass hit(fileName, 
 					mvceditor::IcuToWx(FindInFiles.GetCurrentLine()), 
-					FindInFiles.GetCurrentLineNumber());
+					FindInFiles.GetCurrentLineNumber(),
+					FindInFiles.GetLineOffset(),
+					FindInFiles.GetFileOffset(),
+					FindInFiles.GetMatchLength()
+				);
 				hits.push_back(hit);
 
 			}
@@ -210,6 +324,16 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	StopButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("stop")));
 	CopySelectedButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy")));
 	CopyAllButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy-all")));
+	
+	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT, 
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	ResultsList->AppendTextColumn(_("Line Number"), wxDATAVIEW_CELL_INERT, 
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	
+	FindInFilesPreviewRenderer* previewRenderer = new FindInFilesPreviewRenderer();
+	wxDataViewColumn* previewColumn = new wxDataViewColumn(_("Preview"),
+		previewRenderer, 2, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	ResultsList->AppendColumn(previewColumn, wxT("mvceditor::FindInFilesHitClass"));
 }
 
 mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
@@ -246,7 +370,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		SetStatus(_("Searching"));
 
 		// lets do the find in the opened files ourselves so that the hits are not stale
-		FindInOpenedFiles();			
+		FindInOpenedFiles();
 	}
 	else {
 		wxMessageBox(_("Please enter a valid expression and path."));
@@ -281,7 +405,8 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 
 						// lineNumber is zero-based but we want to display it as 1-based
 						lineNumber++;
-						mvceditor::FindInFilesHitClass hit(fileName, lineText, lineNumber);
+						mvceditor::FindInFilesHitClass hit(fileName, lineText, lineNumber,
+							next - start, next, length);
 						hits.push_back(hit);
 						next = charPos + length;
 					}
@@ -299,35 +424,30 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 }
 
 void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
-	wxArrayInt selections;
-	ResultsList->GetSelections(selections);
-	ResultsList->DeselectAll();
-	int sel;
-	if (selections.GetCount() > 0 && selections[0] < ((int)ResultsList->GetCount() - 1)) {
-		sel = selections[0] + 1;
+	int selected = ResultsList->GetSelectedRow();
+	int next = 0;
+	if (selected >= 0 && selected < ((int)ResultsList->GetItemCount() - 1)) {
+		next = selected + 1;
 	}
 	else {
 		// loop back to the beginning
-		sel = 0;
+		next = 0;
 	}
-	ShowMatch(sel);
-	ResultsList->SetSelection(sel);
+	ShowMatchAndEnsureVisible(next);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
-	wxArrayInt selections;
-	ResultsList->GetSelections(selections);
-	ResultsList->DeselectAll();
-	int sel;
-	if (selections.GetCount() > 0 && selections[0] > 0) {
-		sel = selections[0] - 1;
+	int selected = ResultsList->GetSelectedRow();
+	int next = 0;
+	if (selected > 0) {
+		next = selected - 1;
 	}
 	else {
+		
 		// loop back to the end
-		sel = ResultsList->GetCount() - 1;
+		next = ResultsList->GetItemCount() - 1;
 	}
-	ShowMatch(sel);
-	ResultsList->SetSelection(sel);
+	ShowMatchAndEnsureVisible(next);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
@@ -489,13 +609,14 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 		// in MSW the list control does not render the \t use another delimiter
 		wxString format = wxT("%s\t:%d\t:%s");
 		for (hit = hits.begin(); hit != hits.end(); ++hit) {
-			wxString msg = wxString::Format(format, hit->FileName.c_str(), hit->LineNumber, hit->Preview.c_str());
-			msg.Trim();
-			hitList.Add(msg.SubString(0, 200));
+			wxVector<wxVariant> data;
+			data.push_back(hit->FileName);
+			data.push_back(wxString::Format(wxT("%d"), hit->LineNumber));
+			wxAny any(*hit);
+			data.push_back(any);
+			
+			ResultsList->AppendItem(data);
 		}
-		ResultsList->Freeze();
-		ResultsList->Append(hitList);
-		ResultsList->Thaw();
 		AllHits.insert(AllHits.end(), hits.begin(), hits.end());
 	}
 	else {
@@ -520,53 +641,61 @@ void mvceditor::FindInFilesResultsPanelClass::Stop() {
 	EnableButtons(false, enableIterators, enableIterators);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnDoubleClick(wxCommandEvent& event) {
-	int sel = event.GetSelection();
+void mvceditor::FindInFilesResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
+	int sel = ResultsList->GetSelectedRow();
 	ShowMatch(sel);
 }
 
 void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
-	wxString result = ResultsList->GetString(i);
-	int index = result.Find(wxT("\t:"));
-	if (index > -1) {
-		wxString fileName = result.substr(0, index);
-		long line = 0;
-		size_t indexAfterPos = result.find(wxT("\t:"), index + 2);
-		if (indexAfterPos != std::string::npos) {
-			wxString posString = result.substr(index + 2, indexAfterPos - index);
-			posString.ToLong(&line);
-			--line; // line is 1-based but wxSTC lines start at zero
-		}
-		Notebook->LoadPage(fileName);
-		CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-		if (codeControl) {
+	if (i < 0 || i >= (int)AllHits.size()) {
+		return;
+	}
+	wxString fileName = AllHits[i].FileName;
+	int line = AllHits[i].LineNumber;
+	Notebook->LoadPage(fileName);
+	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	if (codeControl) {
 			
-			// search for the expression and highlight it. search from the start of the line.
-			int32_t pos = codeControl->PositionFromLine(line);
-			int32_t length = 0;
-			FinderClass finder;
-			FindInFiles.CopyFinder(finder);
-			if (finder.Prepare()) {
-				if (finder.FindNext(codeControl->GetSafeText(), pos) && finder.GetLastMatch(pos, length)) {
-					
-					//we want the cursor to be in the beginning of the hit hece pos is 2nd parameter
-					codeControl->SetCurrentPos(pos);
-					codeControl->SetAnchor(pos);
-					codeControl->SetSelectionAndEnsureVisible(pos + length, pos);
-				}
+		// search for the expression and highlight it. search from the start of the line.
+		int32_t startPos = AllHits[i].FileOffset;
+		int32_t length = 0;
+		FinderClass finder;
+		FindInFiles.CopyFinder(finder);
+		if (finder.Prepare()) {
+			if (finder.FindNext(codeControl->GetSafeText(), startPos) && finder.GetLastMatch(startPos, length)) {
+				codeControl->MarkSearchHitAndGoto(line, startPos, startPos + length, true);
+				codeControl->SetFocus();
+			}
+			else {
+				
+				// hit is no longer there, still go to the
+				// line
+				// it seems pretty weird for the editor to open the file
+				// but not go to the line.
+				codeControl->MarkSearchHitAndGoto(line, AllHits[i].FileOffset, AllHits[i].FileOffset, false);
+				codeControl->SetFocus();
 			}
 		}
 	}
 }
 
+void mvceditor::FindInFilesResultsPanelClass::ShowMatchAndEnsureVisible(int i) {
+	ShowMatch(i);
+	ResultsList->SelectRow(i);
+	wxDataViewItem item = ResultsList->GetCurrentItem();
+	ResultsList->EnsureVisible(item);
+}
+
 void mvceditor::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEvent& event) {
-	wxArrayInt selections;
-	if (ResultsList->GetSelections(selections) > 0) {
-		wxString selectedItems;
-		for (size_t i = 0; i < selections.Count(); i++) {
-			selectedItems += ResultsList->GetString(selections[i]);
-			selectedItems += wxTextFile::GetEOL();
-		}
+	int selected = ResultsList->GetSelectedRow();
+	if (selected != wxNOT_FOUND) {
+		wxString selectedItems = ResultsList->GetTextValue(selected, 0) 
+			+ wxT(",")
+			+ ResultsList->GetTextValue(selected, 1)
+			+ wxT(",")
+			+ ResultsList->GetTextValue(selected, 2);
+		selectedItems += wxTextFile::GetEOL();
+		
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(selectedItems));
 			wxTheClipboard->Close();
@@ -575,13 +704,20 @@ void mvceditor::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEven
 }
 
 void mvceditor::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& event) {
-	wxArrayString selectedItemsArray = ResultsList->GetStrings();
+	if (ResultsList->GetItemCount() <= 0) {
+		return;
+	}
 	wxString selectedItems;
-	for (size_t i = 0; i < selectedItemsArray.Count(); i++) {
-		selectedItems += selectedItemsArray[i];
+	for (int i = 0; i < ResultsList->GetItemCount(); ++i) {
+		selectedItems += ResultsList->GetTextValue(i, 0) 
+			+ wxT(",")
+			+ ResultsList->GetTextValue(i, 1)
+			+ wxT(",")
+			+ ResultsList->GetTextValue(i, 2);
 		selectedItems += wxTextFile::GetEOL();
 	}
-	if (selectedItemsArray.Count() && wxTheClipboard->Open()) {
+		
+	if (wxTheClipboard->Open()) {
 		wxTheClipboard->SetData(new wxTextDataObject(selectedItems));
 		wxTheClipboard->Close();
 	}
@@ -679,7 +815,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
-		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.PhpFileExtensionsString);
+		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.FileTypes.PhpFileExtensionsString);
 	}
 	std::vector<mvceditor::SourceClass> sources = feature.App.Globals.AllEnabledSources();
 	for (size_t i = 0; i < sources.size(); ++i) {
@@ -934,6 +1070,8 @@ BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPan
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	
+	EVT_DATAVIEW_ITEM_ACTIVATED(FindInFilesResultsPanelGeneratedClass::ID_RESULTS_LIST, mvceditor::FindInFilesResultsPanelClass::OnRowActivated)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::FindInFilesFeatureClass, wxEvtHandler)

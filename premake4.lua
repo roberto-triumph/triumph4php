@@ -31,12 +31,15 @@ else
 	error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
 end
 dofile "premake_functions.lua"
-dofile "premake_action_prep.lua"
 dofile "premake_action_dist.lua"
 dofile "premake_action_generate.lua"
 dofile "premake_action_soci.lua"
 dofile "premake_action_wxwidgets.lua"
 dofile "premake_action_curl.lua"
+dofile "premake_action_icu.lua"
+dofile "premake_action_mysql.lua"
+dofile "premake_action_sqlite.lua"
+dofile "premake_action_setupdev.lua"
 
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations

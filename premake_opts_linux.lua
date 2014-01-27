@@ -105,6 +105,7 @@ SQLITE_LIB_DIR = os.pathsearch('libsqlite3.so',
 
 -- will look for CURL in these directories
 CURL_INCLUDE_DIR = '/usr/include/'
+CURL_LIB_NAME = 'libcurl.so'
 CURL_LIB_DIR = os.pathsearch('libcurl.so', 
 	"/usr/lib", 
 	"/usr/lib/x86_64-linux-gnu/",

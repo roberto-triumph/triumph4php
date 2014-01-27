@@ -24,16 +24,12 @@ namespace mvceditor{ class NotebookClass; }
 #include <wx/icon.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
-#include <wx/stattext.h>
-#include <wx/choice.h>
-#include <wx/statbox.h>
-#include <wx/listbox.h>
-#include <wx/fontpicker.h>
-#include <wx/clrpicker.h>
 #include <wx/checkbox.h>
-#include <wx/panel.h>
 #include <wx/spinctrl.h>
+#include <wx/stattext.h>
 #include <wx/radiobox.h>
+#include <wx/statbox.h>
+#include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -144,62 +140,6 @@ class MainFrameGeneratedClass : public wxFrame
 		
 		MainFrameGeneratedClass( wxWindow* parent, wxWindowID id = ID_MAINFRAMEGENERATEDCLASS, const wxString& title = _("MVC Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~MainFrameGeneratedClass();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class EditColorsPanelGeneratedClass
-///////////////////////////////////////////////////////////////////////////////
-class EditColorsPanelGeneratedClass : public wxPanel 
-{
-	DECLARE_EVENT_TABLE()
-	private:
-		
-		// Private event handlers
-		void _wxFB_OnThemeChoice( wxCommandEvent& event ){ OnThemeChoice( event ); }
-		void _wxFB_OnListBox( wxCommandEvent& event ){ OnListBox( event ); }
-		void _wxFB_OnFontChanged( wxFontPickerEvent& event ){ OnFontChanged( event ); }
-		void _wxFB_OnColorChanged( wxColourPickerEvent& event ){ OnColorChanged( event ); }
-		void _wxFB_OnCheck( wxCommandEvent& event ){ OnCheck( event ); }
-		
-	
-	protected:
-		enum
-		{
-			ID_THEMEHELP = 1000,
-			ID_FOREGROUND_COLOR,
-			ID_BACKGROUND_COLOR,
-			ID_BOLD,
-			ID_ITALIC,
-			ID_PREVIEWLABEL,
-		};
-		
-		wxStaticText* ThemeHelp;
-		wxChoice* Theme;
-		wxListBox* Styles;
-		wxStaticText* StyleFontLabel;
-		wxFontPickerCtrl* Font;
-		wxStaticText* ForegroundColorLabel;
-		wxColourPickerCtrl* ForegroundColor;
-		wxStaticText* BackgroundColorLabel;
-		wxColourPickerCtrl* BackgroundColor;
-		wxCheckBox* Bold;
-		wxCheckBox* Italic;
-		wxFlexGridSizer* StyleEditSizer;
-		wxStaticText* PreviewLabel;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnThemeChoice( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnListBox( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFontChanged( wxFontPickerEvent& event ) { event.Skip(); }
-		virtual void OnColorChanged( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnCheck( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		EditColorsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 533,480 ), long style = wxTAB_TRAVERSAL );
-		~EditColorsPanelGeneratedClass();
 	
 };
 

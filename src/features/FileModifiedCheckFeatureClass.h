@@ -69,7 +69,7 @@ private:
 	 * In case the file that was opened is not part of a project
 	 * OR it is in a network drive, create a watch for it
 	 */
-	void OnAppFileOpened(wxCommandEvent& event);
+	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * In case the file that was closed and is not part of a project

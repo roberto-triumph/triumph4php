@@ -284,6 +284,12 @@ private:
 	 * The context menu for handling right-click options
 	 */
 	wxMenu* ContextMenu;
+	
+	/**
+	 * image list for icons in each tab
+	 * will be owned by the base class
+	 */
+	wxImageList* ImageList;
 		
 	/**
 	 * To give a friendly number to new files. 

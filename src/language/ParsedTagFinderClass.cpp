@@ -1825,15 +1825,15 @@ bool mvceditor::ParsedTagFinderClass::IsFileCacheEmpty() {
 	if (!IsInit()) {
 		return true;
 	}
-	int count = 0;
+	int fileItemId = 0;
 	try {
-		Session->once << "SELECT COUNT(*) FROM file_items;", soci::into(count);
+		Session->once << "SELECT file_item_id FROM file_items LIMIT 1;", soci::into(fileItemId);
 	} catch (std::exception& e) {
 		wxString msg = mvceditor::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
-	return count <= 0;
+	return fileItemId <= 0;
 }
 
 bool mvceditor::ParsedTagFinderClass::IsResourceCacheEmpty() {

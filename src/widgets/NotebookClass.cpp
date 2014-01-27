@@ -28,6 +28,7 @@
 #include <search/FindInFilesClass.h>
 #include <MvcEditor.h>
 #include <globals/Errors.h>
+#include <widgets/FileTypeImageList.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
@@ -35,6 +36,61 @@
 
 int ID_CLOSE_ALL_TABS = wxNewId();
 int ID_CLOSE_TAB = wxNewId();
+
+/**
+ * convert a code control document mode to a 
+ * image list number; to determine what image
+ * to show in the notebook tab based on the document
+ * mode.
+ */
+static int ImageId(mvceditor::CodeControlClass::Mode mode) {
+	int imgId = mvceditor::IMGLIST_NONE;
+	switch (mode) {
+	case mvceditor::CodeControlClass::TEXT:
+		imgId = mvceditor::IMGLIST_MISC;
+		break;
+	case mvceditor::CodeControlClass::SQL:
+		imgId = mvceditor::IMGLIST_SQL;
+		break;
+	case mvceditor::CodeControlClass::CSS:
+		imgId = mvceditor::IMGLIST_CSS;
+		break;
+	case mvceditor::CodeControlClass::PHP:
+		imgId = mvceditor::IMGLIST_PHP;
+		break;
+	case mvceditor::CodeControlClass::JS:
+		imgId = mvceditor::IMGLIST_JS;
+		break;
+	case mvceditor::CodeControlClass::CONFIG:
+		imgId = mvceditor::IMGLIST_CONFIG;
+		break;
+	case mvceditor::CodeControlClass::CRONTAB:
+		imgId = mvceditor::IMGLIST_CRONTAB;
+		break;
+	case mvceditor::CodeControlClass::YAML:
+		imgId = mvceditor::IMGLIST_YAML;
+		break;
+	case mvceditor::CodeControlClass::XML:
+		imgId = mvceditor::IMGLIST_XML;
+		break;
+	case mvceditor::CodeControlClass::RUBY:
+		imgId = mvceditor::IMGLIST_RUBY;
+		break;
+	case mvceditor::CodeControlClass::LUA:
+		imgId = mvceditor::IMGLIST_LUA;
+		break;
+	case mvceditor::CodeControlClass::MARKDOWN:
+		imgId = mvceditor::IMGLIST_MARKDOWN;
+		break;
+	case mvceditor::CodeControlClass::BASH:
+		imgId = mvceditor::IMGLIST_BASH;
+		break;
+	case mvceditor::CodeControlClass::DIFF:
+		imgId = mvceditor::IMGLIST_DIFF;
+		break;
+	}
+	return imgId;
+}
 
 mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style)
@@ -45,6 +101,8 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, ContextMenu(NULL)
 	, NewPageNumber(1) 
 	, TabIndexRightClickEvent(-1) {
+	
+	ImageList = NULL;
 }
 
 mvceditor::NotebookClass::~NotebookClass() {
@@ -153,6 +211,11 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 	}
 }
 void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode) {
+	if (NULL == ImageList) {
+		ImageList = new wxImageList(16, 16);
+		mvceditor::FillWithFileType(*ImageList);
+		AssignImageList(ImageList);
+	}
 	wxString format;
 	switch (mode) {
 		case mvceditor::CodeControlClass::TEXT:
@@ -167,25 +230,47 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 		case mvceditor::CodeControlClass::PHP:
 			format = _("Untitled %d.php");
 			break;
+		case mvceditor::CodeControlClass::JS:
+			format = _("Untitled %d.js");
+			break;
+		case mvceditor::CodeControlClass::CONFIG:
+			format = _("Untitled %d.conf");
+			break;
+		case mvceditor::CodeControlClass::CRONTAB:
+			format = _("Untitled %d");
+			break;
+		case mvceditor::CodeControlClass::YAML:
+			format = _("Untitled %d.yml");
+			break;
+		case mvceditor::CodeControlClass::XML:
+			format = _("Untitled %d.xml");
+			break;
+		case mvceditor::CodeControlClass::RUBY:
+			format = _("Untitled %d.rb");
+			break;
+		case mvceditor::CodeControlClass::LUA:
+			format = _("Untitled %d.lua");
+			break;
+		case mvceditor::CodeControlClass::MARKDOWN:
+			format = _("Untitled %d.md");
+			break;
+		case mvceditor::CodeControlClass::BASH:
+			format = _("Untitled %d.sh");
+			break;
+		case mvceditor::CodeControlClass::DIFF:
+			format = _("Untitled %d.diff");
+			break;
 	}
 	
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 	page->SetDocumentMode(mode);
-	wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
-	if (mvceditor::CodeControlClass::PHP == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
-	}
-	else if (mvceditor::CodeControlClass::CSS == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
-	}
-	else if (mvceditor::CodeControlClass::SQL == mode) {
-		docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
-	}
+	
+	int imgId = ImageId(mode);
+	
+	AddPage(page, wxString::Format(format, NewPageNumber++), true, imgId);
 
-	AddPage(page, wxString::Format(format, NewPageNumber++), true, docBitmap);
-
-	wxCommandEvent newEvent(mvceditor::EVENT_APP_FILE_NEW);
+	mvceditor::CodeControlEventClass newEvent(mvceditor::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
 	
 }
@@ -207,6 +292,12 @@ void mvceditor::NotebookClass::LoadPage() {
 }
 
 void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
+	if (NULL == ImageList) {
+		ImageList = new wxImageList(16, 16);
+		mvceditor::FillWithFileType(*ImageList);
+		AssignImageList(ImageList);
+	}
+	
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
@@ -246,26 +337,16 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
-			int mode = newCode->GetDocumentMode();
-			wxBitmap docBitmap = mvceditor::IconImageAsset(wxT("document-text"));
-			if (mvceditor::CodeControlClass::PHP == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-php"));
-			}
-			else if (mvceditor::CodeControlClass::CSS == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-css"));
-			}
-			else if (mvceditor::CodeControlClass::SQL == mode) {
-				docBitmap = mvceditor::IconImageAsset(wxT("document-sql"));
-			}
-
+			mvceditor::CodeControlClass::Mode mode = newCode->GetDocumentMode();
+			int imgId = ImageId(mode);
+			
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
-			this->AddPage(newCode, fileName.GetFullName(), true, docBitmap);
+			this->AddPage(newCode, fileName.GetFullName(), true, imgId);
 
 			// tell the app that a file has been opened
-			wxCommandEvent openEvent(mvceditor::EVENT_APP_FILE_OPENED);
-			openEvent.SetString(fileName.GetFullPath());
+			mvceditor::CodeControlEventClass openEvent(mvceditor::EVENT_APP_FILE_OPENED, newCode);
 			EventSink->Publish(openEvent);
 		}
 		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
@@ -500,25 +581,65 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 }
 
 wxString mvceditor::NotebookClass::CreateWildcardString() const {
-	wxString phpLabel = Globals->PhpFileExtensionsString,
-		cssLabel = Globals->CssFileExtensionsString,
-		sqlLabel = Globals->SqlFileExtensionsString;
-	phpLabel.Replace(wxT(";"), wxT(" "));
+	wxString phpLabel = Globals->FileTypes.PhpFileExtensionsString,
+		cssLabel = Globals->FileTypes.CssFileExtensionsString,
+		sqlLabel = Globals->FileTypes.SqlFileExtensionsString,
+		jsLabel = Globals->FileTypes.JsFileExtensionsString,
+		configLabel = Globals->FileTypes.ConfigFileExtensionsString,
+		crontabLabel = Globals->FileTypes.CrontabFileExtensionsString,
+		yamlLabel = Globals->FileTypes.YamlFileExtensionsString,
+		xmlLabel = Globals->FileTypes.XmlFileExtensionsString,
+		rubyLabel = Globals->FileTypes.RubyFileExtensionsString,
+		luaLabel = Globals->FileTypes.LuaFileExtensionsString,
+		markdownLabel = Globals->FileTypes.MarkdownFileExtensionsString,
+		bashLabel = Globals->FileTypes.BashFileExtensionsString,
+		diffLabel = Globals->FileTypes.DiffFileExtensionsString;
+		
+	/*phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
-	wxString php = Globals->PhpFileExtensionsString,
-		css = Globals->CssFileExtensionsString,
-		sql = Globals->SqlFileExtensionsString;
+	jsLabel.Replace(wxT(";"), wxT(" "));
+	configLabel.Replace(wxT(";"), wxT(" "));
+	crontabLabel.Replace(wxT(";"), wxT(" "));
+	yamlLabel.Replace(wxT(";"), wxT(" "));
+	xmlLabel.Replace(wxT(";"), wxT(" "));
+	rubyLabel.Replace(wxT(";"), wxT(" "));
+	luaLabel.Replace(wxT(";"), wxT(" "));
+	markdownLabel.Replace(wxT(";"), wxT(" "));
+	bashLabel.Replace(wxT(";"), wxT(" "));
+	diffLabel.Replace(wxT(";"), wxT(" "));
+	*/
+	wxString php = Globals->FileTypes.PhpFileExtensionsString,
+		css = Globals->FileTypes.CssFileExtensionsString,
+		sql = Globals->FileTypes.SqlFileExtensionsString,
+		js = Globals->FileTypes.JsFileExtensionsString,
+		config = Globals->FileTypes.ConfigFileExtensionsString,
+		crontab = Globals->FileTypes.CrontabFileExtensionsString,
+		yaml = Globals->FileTypes.YamlFileExtensionsString,
+		xml = Globals->FileTypes.XmlFileExtensionsString,
+		ruby = Globals->FileTypes.RubyFileExtensionsString,
+		lua = Globals->FileTypes.LuaFileExtensionsString,
+		markdown = Globals->FileTypes.MarkdownFileExtensionsString,
+		bash = Globals->FileTypes.BashFileExtensionsString,
+		diff = Globals->FileTypes.DiffFileExtensionsString;
 	wxString allSourceCode = 
-			Globals->PhpFileExtensionsString + wxT(";") + 
-			Globals->CssFileExtensionsString + wxT(";") + 
-			Globals->SqlFileExtensionsString;
+			Globals->FileTypes.GetAllSourceFileExtensionsString();
 
 	wxString fileFilter = 
 		wxString::Format(wxT("All Source Code Files (%s)|%s|"), allSourceCode.c_str(), allSourceCode.c_str()) +
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +
 		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
 		wxString::Format(wxT("SQL Files (%s)|%s|"), sqlLabel.c_str(), sql.c_str()) +
+		wxString::Format(wxT("Javascript Files (%s)|%s|"), jsLabel.c_str(), js.c_str()) +
+		wxString::Format(wxT("Config Files (%s)|%s|"), configLabel.c_str(), config.c_str()) +
+		wxString::Format(wxT("Crontab Files (%s)|%s|"), crontabLabel.c_str(), crontab.c_str()) +
+		wxString::Format(wxT("YAML Files (%s)|%s|"), yamlLabel.c_str(), yaml.c_str()) +
+		wxString::Format(wxT("XML Files (%s)|%s|"), xmlLabel.c_str(), xml.c_str()) +
+		wxString::Format(wxT("Ruby Files (%s)|%s|"), rubyLabel.c_str(), ruby.c_str()) +
+		wxString::Format(wxT("Lua Files (%s)|%s|"), luaLabel.c_str(), lua.c_str()) +
+		wxString::Format(wxT("Markdown Files (%s)|%s|"), markdownLabel.c_str(), markdown.c_str()) +
+		wxString::Format(wxT("Bash Files (%s)|%s|"), bashLabel.c_str(), bash.c_str()) +
+		wxString::Format(wxT("Diff Files (%s)|%s|"), diffLabel.c_str(), diff.c_str()) +
 		wxT("All Files (*.*)|*.*");
 	return fileFilter;
 }
@@ -533,7 +654,10 @@ int mvceditor::NotebookClass::WilcardIndex(mvceditor::CodeControlClass::Mode mod
 	else if (mvceditor::CodeControlClass::SQL == mode) {
 		return 2;
 	}
-	return 3;
+	else if (mvceditor::CodeControlClass::JS == mode) {
+		return 3;
+	}
+	return 4;
 }
 
 void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {

@@ -85,6 +85,11 @@ private:
 	 */
 	void OnProjectDefine(wxCommandEvent& event);
 
+	/**
+	 * Open up a "simple" dialog so that the user create a new project
+	 */
+	void OnCreateNewProject(wxCommandEvent& event);
+
 	DECLARE_EVENT_TABLE()
 	
 };

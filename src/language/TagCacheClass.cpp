@@ -145,7 +145,7 @@ void mvceditor::TagCacheClass::RegisterGlobal(mvceditor::TagFinderListClass* cac
 
 void mvceditor::TagCacheClass::RegisterDefault(mvceditor::GlobalsClass& globals) {
 	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
@@ -408,9 +408,7 @@ void mvceditor::TagCacheClass::Print() {
 bool mvceditor::TagCacheClass::IsFileCacheEmpty() {
 
 	// if at least one tag finder is not empty, return false
-	if (TagFinderList && TagFinderList->IsNativeTagFinderInit && !TagFinderList->NativeTagFinder.IsFileCacheEmpty()) {
-		return false;
-	}
+	// no need to check native tag cache, as that is always not empty
 	if (TagFinderList && TagFinderList->IsTagFinderInit && !TagFinderList->TagFinder.IsFileCacheEmpty()) {
 		return false;
 	}

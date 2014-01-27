@@ -140,6 +140,53 @@ private:
 };
 
 /**
+ * Performs an exact match lookup on table names 
+ */
+class ExactSqlResourceTableResultClass : public mvceditor::SqliteResultClass {
+public:
+
+	/**
+	 * The matched table name
+	 */
+	std::string TableName;
+	
+	/**
+	 * The name of the connection that the table was found in
+	 */
+	std::string Connection;
+	
+	ExactSqlResourceTableResultClass();
+		
+	/**
+	 * set the (partial) name to lookup
+	 */
+	void SetLookup(const wxString& lookup, const std::string& connectionHash);
+		
+	/**
+	 * prepares and runs the query
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+
+	/**
+	 * get the next result. the result can be read from the
+	 * TableName, Connection members
+	 */
+	void Next();
+	
+private:
+
+	/**
+	 * adopts the statement and binds the statement result to
+	 * the class members
+	 */
+	bool Init(soci::statement* stmt);
+	
+	std::string Lookup;
+		
+	std::string ConnectionHash;
+};
+
+/**
  * Performs a prefix lookup on column names 
  */
 class SqlResourceColumnResultClass : public mvceditor::SqliteResultClass {

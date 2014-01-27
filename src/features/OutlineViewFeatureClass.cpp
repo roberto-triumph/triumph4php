@@ -136,7 +136,8 @@ mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mv
 void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals) {
 	SearchStrings = searches;
 	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+	cache->InitGlobalTag(globals.TagCacheDbFileName, 
+		globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
@@ -318,12 +319,12 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebo
 	event.Skip();
 }
 
-void mvceditor::OutlineViewFeatureClass::OnAppFileOpened(wxCommandEvent& event) {
+void mvceditor::OutlineViewFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	if (window != NULL) {
-		wxString fileName = event.GetString();
+		wxString fileName = event.GetCodeControl()->GetFileName();
 		std::vector<UnicodeString> searchStrings;
 		searchStrings.push_back(mvceditor::WxToIcu(fileName));
 		StartTagSearch(searchStrings);
@@ -1111,7 +1112,7 @@ BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
 		mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_OPENED, mvceditor::OutlineViewFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(mvceditor::OutlineViewFeatureClass::OnAppFileOpened)
 	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, mvceditor::OutlineViewFeatureClass::OnTagSearchComplete)
 END_EVENT_TABLE()
 

@@ -43,6 +43,7 @@ static int ID_EXPLORER_LIST_DELETE = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_PHP = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_SQL = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_CSS = wxNewId();
+static int ID_EXPLORER_LIST_CREATE_JS = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_TEXT = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_DIRECTORY = wxNewId();
 static int ID_EXPLORER_LIST_SHELL = wxNewId();
@@ -53,6 +54,7 @@ static int ID_FILTER_ALL = wxNewId();
 static int ID_FILTER_PHP = wxNewId();
 static int ID_FILTER_CSS = wxNewId();
 static int ID_FILTER_SQL = wxNewId();
+static int ID_FILTER_JS = wxNewId();
 
 /**
  * comparator function that compares 2 filenames by using the full name
@@ -177,7 +179,10 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
-		panel->RefreshDir(paths.GetDocumentsDir());
+		wxString documentsDirString = paths.GetDocumentsDir();
+		wxFileName documentsDir;
+		documentsDir.AssignDir(documentsDirString);
+		panel->RefreshDir(documentsDir);
 	}
 }
 
@@ -266,6 +271,22 @@ void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& even
 	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
 }
 
+void mvceditor::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
+	mvceditor::ModalExplorerPanelClass* panel = NULL;
+	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
+	if (!window) {	
+		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		AddToolsWindow(panel, _("Explorer"));
+	}
+	else {
+		panel = (mvceditor::ModalExplorerPanelClass*)window;
+	}
+	wxString dir = event.GetString();
+	wxFileName projectDir;
+	projectDir.AssignDir(dir);
+	panel->RefreshDir(projectDir);
+}
+
 mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
@@ -276,13 +297,10 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 , RunningThreads()
 , FilterChoice(ID_FILTER_ALL) {
 	FilesImageList = new wxImageList(16, 16);
+	
+	mvceditor::FillWithFileType(*FilesImageList);
 	FilesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-sql")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-css")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-text")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("document-blank")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
 	SourcesImageList = new wxImageList(16, 16);
@@ -402,6 +420,7 @@ void mvceditor::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 	menu.Append(ID_EXPLORER_LIST_CREATE_PHP, _("New PHP File"), _("Create a new PHP file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_SQL, _("New SQL File"), _("Create a new SQL file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New CSS File"), _("Create a new CSS file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New JS File"), _("Create a new JS file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_TEXT, _("New text File"), _("Create a new text file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_DIRECTORY, _("New Directory"), _("Create a new directory in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
@@ -440,6 +459,7 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 
 void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
 												 int totalFiles, int totalSubDirs) {
+	bool changedDir = CurrentListDir != currentDir;
 	CurrentListDir = currentDir;
 	Directory->SetValue(currentDir.GetPath());
 
@@ -511,12 +531,20 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	}
 	List->SetFocus();
 
-	if (Watcher) {
-		delete Watcher;
+	// only recreate the watch when the explorer shows a new dir
+	// this method will be called as a result of an external file
+	// watcher event (new/delete file), if there are many events in
+	// quick succession a crash would happen. in reality we 
+	// only need to recreate the watch when the explorer is being 
+	// pointed into a different directory than previous
+	if (changedDir) {
+		if (Watcher) {
+			delete Watcher;
+		}
+		Watcher = new wxFileSystemWatcher();
+		Watcher->SetOwner(this);
+		Watcher->Add(currentDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 	}
-	Watcher = new wxFileSystemWatcher();
-	Watcher->SetOwner(this);
-	Watcher->Add(currentDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 }
 
 bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
@@ -535,19 +563,49 @@ bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 
 int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
-	if (Feature.App.Globals.HasAPhpExtension(fullPath)) {
-		return LIST_FILE_PHP;
+	if (Feature.App.Globals.FileTypes.HasAPhpExtension(fullPath)) {
+		return mvceditor::IMGLIST_PHP;
 	}
-	if (Feature.App.Globals.HasASqlExtension(fullPath)) {
-		return LIST_FILE_SQL;
+	if (Feature.App.Globals.FileTypes.HasASqlExtension(fullPath)) {
+		return mvceditor::IMGLIST_SQL;
 	} 
-	if (Feature.App.Globals.HasACssExtension(fullPath)) {
-		return LIST_FILE_CSS;
+	if (Feature.App.Globals.FileTypes.HasACssExtension(fullPath)) {
+		return mvceditor::IMGLIST_CSS;
 	}
-	if (Feature.App.Globals.HasAMiscExtension(fullPath)) {
-		return LIST_FILE_TEXT;
+	if (Feature.App.Globals.FileTypes.HasAJsExtension(fullPath)) {
+		return mvceditor::IMGLIST_JS;
 	}
-	return LIST_FILE_OTHER;
+	if (Feature.App.Globals.FileTypes.HasAConfigExtension(fullPath)) {
+		return mvceditor::IMGLIST_CONFIG;
+	}
+	if (Feature.App.Globals.FileTypes.HasACrontabExtension(fullPath)) {
+		return mvceditor::IMGLIST_CRONTAB;
+	} 
+	if (Feature.App.Globals.FileTypes.HasAYamlExtension(fullPath)) {
+		return mvceditor::IMGLIST_YAML;
+	}
+	if (Feature.App.Globals.FileTypes.HasAXmlExtension(fullPath)) {
+		return mvceditor::IMGLIST_XML;
+	}
+	if (Feature.App.Globals.FileTypes.HasARubyExtension(fullPath)) {
+		return mvceditor::IMGLIST_RUBY;
+	}
+	if (Feature.App.Globals.FileTypes.HasALuaExtension(fullPath)) {
+		return mvceditor::IMGLIST_LUA;
+	}
+	if (Feature.App.Globals.FileTypes.HasAMarkdownExtension(fullPath)) {
+		return mvceditor::IMGLIST_MARKDOWN;
+	} 
+	if (Feature.App.Globals.FileTypes.HasABashExtension(fullPath)) {
+		return mvceditor::IMGLIST_BASH;
+	}
+	if (Feature.App.Globals.FileTypes.HasADiffExtension(fullPath)) {
+		return mvceditor::IMGLIST_DIFF;
+	}
+	if (Feature.App.Globals.FileTypes.HasAMiscExtension(fullPath)) {
+		return mvceditor::IMGLIST_MISC;
+	}
+	return mvceditor::IMGLIST_NONE;
 }
 
 void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
@@ -643,7 +701,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 	std::vector<wxString> extensions;
 	wxString dialogTitle;
 	if (event.GetId() == ID_EXPLORER_LIST_CREATE_PHP) {
-		extensions = Feature.App.Globals.GetPhpFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.php");
 		}
@@ -653,7 +711,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		dialogTitle =_("Create a new PHP file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
-		extensions = Feature.App.Globals.GetSqlFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.sql");
 		}
@@ -663,7 +721,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		dialogTitle =_("Create a new SQL file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
-		extensions = Feature.App.Globals.GetCssFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.css");
 		}
@@ -671,6 +729,16 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 			ext = extensions[0];
 		}
 		dialogTitle =_("Create a new CSS file");
+	}
+	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_JS) {
+		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
+		if (extensions.empty()) {
+			ext = wxT("*.js");
+		}
+		else {
+			ext = extensions[0];
+		}
+		dialogTitle =_("Create a new JS file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_TEXT) {
 		ext = wxT("*.txt");
@@ -875,15 +943,17 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 	wxPoint point = event.GetPosition();
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
-		wxString allExtensions = Feature.App.Globals.PhpFileExtensionsString + wxT(";") +
-			Feature.App.Globals.CssFileExtensionsString + wxT(";") +
-			Feature.App.Globals.SqlFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.MiscFileExtensionsString;
+		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
+			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
+			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.MiscFileExtensionsString;
 
 		wxString allFiles = wxT("*");
-		wxString phpExtensions = Feature.App.Globals.PhpFileExtensionsString;
-		wxString cssExtensions = Feature.App.Globals.CssFileExtensionsString;
-		wxString sqlExtensions = Feature.App.Globals.SqlFileExtensionsString;
+		wxString phpExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString;
+		wxString cssExtensions = Feature.App.Globals.FileTypes.CssFileExtensionsString;
+		wxString sqlExtensions = Feature.App.Globals.FileTypes.SqlFileExtensionsString;
+		wxString jsExtensions = Feature.App.Globals.FileTypes.JsFileExtensionsString;
 		wxMenu menu;
 	
 		wxMenuItem* item;
@@ -902,6 +972,9 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 		item = menu.AppendRadioItem(ID_FILTER_SQL, wxString::Format(wxT("SQL Files (%s)"), sqlExtensions.c_str()), _("Show SQL Files"));
 		item->Check(ID_FILTER_SQL == FilterChoice);
 
+		item = menu.AppendRadioItem(ID_FILTER_JS, wxString::Format(wxT("JS Files (%s)"), jsExtensions.c_str()), _("Show JS Files"));
+		item->Check(ID_FILTER_JS == FilterChoice);
+
 		FilterButton->PopupMenu(&menu);
 	}
 
@@ -915,16 +988,19 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
-		extensions = Feature.App.Globals.GetAllSourceFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
 	}
 	else if (ID_FILTER_PHP == FilterChoice) {
-		extensions = Feature.App.Globals.GetPhpFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
 	}
 	else if (ID_FILTER_CSS == FilterChoice) {
-		extensions = Feature.App.Globals.GetCssFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
 	}
 	else if (ID_FILTER_SQL == FilterChoice) {
-		extensions = Feature.App.Globals.GetSqlFileExtensions();
+		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
+	}
+	else if (ID_FILTER_JS == FilterChoice) {
+		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
 	}
 
 	// no extension == ID_FILTER_ALL
@@ -957,7 +1033,7 @@ void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFil
 		wxListItem column1;
 		column1.SetColumn(0);
 		column1.SetId(newRowNumber);
-		column1.SetImage(LIST_FOLDER);
+		column1.SetImage(SOURCE_FOLDER);
 		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
 		column1.SetText(newName);
 		SourcesList->InsertItem(column1);
@@ -1301,7 +1377,8 @@ BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
 	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
-	
+	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CREATED, mvceditor::ExplorerFeatureClass::OnAppProjectCreated)
+
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
 END_EVENT_TABLE()
 
@@ -1312,6 +1389,7 @@ BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPane
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_JS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_DIRECTORY, mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory)
 	EVT_MENU(ID_EXPLORER_LIST_SHELL, mvceditor::ModalExplorerPanelClass::OnListMenuShell)
@@ -1323,5 +1401,6 @@ BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPane
 	EVT_MENU(ID_FILTER_PHP, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_CSS, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_SQL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_JS, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::ModalExplorerPanelClass::OnFsWatcher)
 END_EVENT_TABLE()

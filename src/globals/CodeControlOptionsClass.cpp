@@ -30,6 +30,15 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass()
 : PhpStyles() 
 , SqlStyles()
 , CssStyles()
+, JsStyles()
+, ConfigStyles()
+, CrontabStyles()
+, YamlStyles()
+, RubyStyles()
+, LuaStyles()
+, MarkdownStyles()
+, BashStyles()
+, DiffStyles()
 , CodeStyles() 
 , SpacesPerIndent(0) 
 , TabWidth(4) 
@@ -63,6 +72,16 @@ void mvceditor::CodeControlOptionsClass::Copy(const mvceditor::CodeControlOption
 	PhpStyles = src.PhpStyles; 
 	SqlStyles = src.SqlStyles;
 	CssStyles = src.CssStyles;
+	JsStyles = src.JsStyles;
+	ConfigStyles = src.ConfigStyles;
+	CrontabStyles = src.CrontabStyles; 
+	YamlStyles = src.YamlStyles;
+	RubyStyles = src.RubyStyles;
+	LuaStyles = src.LuaStyles;
+	MarkdownStyles = src.MarkdownStyles;
+	BashStyles = src.BashStyles;
+	DiffStyles = src.DiffStyles;
+
 	CodeStyles = src.CodeStyles; 
 	SpacesPerIndent = src.SpacesPerIndent;
 	TabWidth = src.TabWidth;
@@ -91,6 +110,25 @@ mvceditor::StylePreferenceClass& mvceditor::CodeControlOptionsClass::FindByStcSt
 	return styles[0];
 }
 
+std::vector<mvceditor::StylePreferenceClass> mvceditor::CodeControlOptionsClass::AllStyles() const {
+	std::vector<mvceditor::StylePreferenceClass> all;
+	
+	all.insert(all.end(), PhpStyles.begin(), PhpStyles.end());
+	all.insert(all.end(), SqlStyles.begin(), SqlStyles.end());
+	all.insert(all.end(), CssStyles.begin(), CssStyles.end());
+	all.insert(all.end(), JsStyles.begin(), JsStyles.end());
+	all.insert(all.end(), ConfigStyles.begin(), ConfigStyles.end());
+	all.insert(all.end(), CrontabStyles.begin(), CrontabStyles.end());
+	all.insert(all.end(), YamlStyles.begin(), YamlStyles.end());
+	all.insert(all.end(), RubyStyles.begin(), RubyStyles.end());
+	all.insert(all.end(), LuaStyles.begin(), LuaStyles.end());
+	all.insert(all.end(), MarkdownStyles.begin(), MarkdownStyles.end());
+	all.insert(all.end(), BashStyles.begin(), BashStyles.end());
+	all.insert(all.end(), DiffStyles.begin(), DiffStyles.end());
+	
+	return all;
+}
+
 void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/SpacesPerIndent"), &SpacesPerIndent);
 	config->Read(wxT("EditorBehavior/TabWidth"), &TabWidth);
@@ -108,14 +146,10 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), &TrimTrailingSpaceBeforeSave);
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
 	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
-	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		PhpStyles[i].Read(config);
-	}
-	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		SqlStyles[i].Read(config);
-	}
-	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		CssStyles[i].Read(config);
+	
+	std::vector<mvceditor::StylePreferenceClass> allStyles = AllStyles();
+	for (size_t i = 0; i < allStyles.size(); ++i) {
+		allStyles[i].Read(config);
 	}
 }
 	 
@@ -136,14 +170,10 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), TrimTrailingSpaceBeforeSave);
 	config->Write(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), RemoveTrailingBlankLinesBeforeSave);
 	config->Write(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), EnableCallTipsOnMouseHover);
-	for (size_t i = 0; i < PhpStyles.size(); ++i) {
-		PhpStyles[i].Write(config);
-	}
-	for (size_t i = 0; i < SqlStyles.size(); ++i) {
-		SqlStyles[i].Write(config);
-	}
-	for (size_t i = 0; i < CssStyles.size(); ++i) {
-		CssStyles[i].Write(config);
+	
+	std::vector<mvceditor::StylePreferenceClass> allStyles = AllStyles();
+	for (size_t i = 0; i < allStyles.size(); ++i) {
+		allStyles[i].Write(config);
 	}
 }
 

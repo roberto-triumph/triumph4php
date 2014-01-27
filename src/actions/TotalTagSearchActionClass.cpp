@@ -128,7 +128,7 @@ void mvceditor::TotalTagSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 
 	// only need to initialize the global tag cache, will not show native tags 
 	// because there is no file that needs to be opened
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.GetPhpFileExtensions(), globals.GetMiscFileExtensions(),
+	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	TagCache.RegisterGlobal(cache);
 	
@@ -182,13 +182,16 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 	}
 	delete results;
 	
-	mvceditor::SqlResourceTableResultClass tableResults;
-	tableResults.SetLookup(mvceditor::IcuToWx(SearchString), "");
-	SqlTagCache.Exec(&tableResults);
-	while (tableResults.More()) {
+	// now look for any sql resources (tables)
+	// do an exact match first
+	bool foundExactMatchTable = false;
+	mvceditor::ExactSqlResourceTableResultClass exactTableResults;
+	exactTableResults.SetLookup(mvceditor::IcuToWx(SearchString), "");
+	SqlTagCache.Exec(&exactTableResults);
+	while (exactTableResults.More()) {
 		mvceditor::DatabaseTableTagClass tableTag;
-		tableTag.TableName = mvceditor::CharToWx(tableResults.TableName.c_str());
-		tableTag.ConnectionHash = mvceditor::CharToWx(tableResults.Connection.c_str());
+		tableTag.TableName = mvceditor::CharToWx(exactTableResults.TableName.c_str());
+		tableTag.ConnectionHash = mvceditor::CharToWx(exactTableResults.Connection.c_str());
 		
 		mvceditor::TotalTagResultClass result(tableTag);
 		matches.push_back(result);
@@ -196,9 +199,30 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 		mvceditor::TotalTagResultClass resultDefinition(tableTag);
 		result.Type = mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG;
 		matches.push_back(result);
-		tableResults.Next();
+		exactTableResults.Next();
+		foundExactMatchTable = true;
 	}
-	
+	if (!foundExactMatchTable) {
+
+		// if we did not find an exact match on the table names
+		// then do a near match
+		mvceditor::SqlResourceTableResultClass tableResults;
+		tableResults.SetLookup(mvceditor::IcuToWx(SearchString), "");
+		SqlTagCache.Exec(&tableResults);
+		while (tableResults.More()) {
+			mvceditor::DatabaseTableTagClass tableTag;
+			tableTag.TableName = mvceditor::CharToWx(tableResults.TableName.c_str());
+			tableTag.ConnectionHash = mvceditor::CharToWx(tableResults.Connection.c_str());
+			
+			mvceditor::TotalTagResultClass result(tableTag);
+			matches.push_back(result);
+			
+			mvceditor::TotalTagResultClass resultDefinition(tableTag);
+			result.Type = mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG;
+			matches.push_back(result);
+			tableResults.Next();
+		}
+	}
 	if (!IsCancelled()) {
 		mvceditor::TagSearchClass tagSearch(SearchString);
 

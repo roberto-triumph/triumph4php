@@ -45,6 +45,7 @@ mvceditor::ProjectClass::ProjectClass()
 	, PhpFileExtensions()
 	, CssFileExtensions()
 	, SqlFileExtensions()
+	, JsFileExtensions()
 	, MiscFileExtensions()
 	, IsEnabled(true) {
 }
@@ -55,6 +56,7 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	, PhpFileExtensions(project.PhpFileExtensions)
 	, CssFileExtensions(project.CssFileExtensions)
 	, SqlFileExtensions(project.SqlFileExtensions) 
+	, JsFileExtensions(project.JsFileExtensions) 
 	, MiscFileExtensions(project.MiscFileExtensions)
 	, IsEnabled(project.IsEnabled) {
 }
@@ -66,6 +68,7 @@ void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) 
 	PhpFileExtensions = project.PhpFileExtensions;
 	CssFileExtensions = project.CssFileExtensions;
 	SqlFileExtensions = project.SqlFileExtensions;
+	JsFileExtensions = project.JsFileExtensions;
 	MiscFileExtensions = project.MiscFileExtensions;
 }
 
@@ -100,6 +103,7 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const 
 	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
 	wxString allExtensionsString = Join(allExtensions, wxT(";"));
 
 	// make the new sources to return
@@ -148,6 +152,7 @@ bool mvceditor::ProjectClass::IsASourceFile(const wxString& fullPath) const {
 		allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
 		allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
 		allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+		allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
 
 		std::vector<wxString>::const_iterator s;
 		for (s = allExtensions.begin(); !matches && s != allExtensions.end(); ++s) {
@@ -178,5 +183,6 @@ std::vector<wxString> mvceditor::ProjectClass::GetNonPhpExtensions() const {
 	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
+	allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
 	return allExtensions;
 }

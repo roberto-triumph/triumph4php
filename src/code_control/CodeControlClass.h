@@ -57,6 +57,25 @@ class GlobalsClass;
  */
 extern const wxEventType EVT_MOTION_ALT;
 
+// margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
+// margin 2 for lint error markers, margin 3 got search hits
+extern const int CODE_CONTROL_LINT_RESULT_MARKER;
+extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
+extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
+extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
+
+
+// the indicator to show squiggly lines for lint errors
+extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
+
+// the indicator to show boxes around found words when user double clicks
+// on a word
+extern const int CODE_CONTROL_INDICATOR_FIND;
+
+// start stealing styles from "asp javascript" we will never use those styles
+extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
+
+
 /**
  * source code control with the following enhancements.
  * - PHP autocompletion of structures found in the current project.
@@ -83,7 +102,7 @@ public:
 		TEXT,
 
 		/**
-		 * The full functionalityL code completion, call tips, syntax highlighting, the works
+		 * The full functionality code completion, call tips, syntax highlighting, the works
 		 */
 		PHP,
 
@@ -95,7 +114,24 @@ public:
 		/**
 		 * CSS style sheets (pure CSS files only)
 		 */
-		CSS
+		CSS,
+
+		/**
+		 * Javascript (pure JS files only)
+		 */
+		JS,
+		
+		// the rest of the document types are not slightly supported
+		// syntax highlighting works but not much else
+		CONFIG,
+		CRONTAB,
+		YAML,
+		XML,
+		RUBY,
+		LUA,
+		MARKDOWN,
+		BASH,
+		DIFF
 	};
 
 	/**
@@ -307,6 +343,33 @@ public:
 	 * results. Markings are moved from this window only.
 	 */
 	void ClearLintErrors();
+	
+	/**
+	 * Put an arrow in the margin of the line where a match ocurred
+	 * The markers will stay until the user types in one character
+	 * @param lineNumber 1-based
+	 * @param goodHit if TRUE then we show a different marker than
+	 *        when hit is no longer at the expected pos
+	 */
+	void MarkSearchHit(int lineNumber, bool goodHit);
+
+	/**
+	 * Marks a search hit, sets the current position to the
+	 * position where the hit is located selects the hit
+	 * and makes sure the hit is visible
+	 * @param lineNumber 1-based
+	 * @param startPos character position 
+	 * @param endPos character position 
+	 * @param goodHit if TRUE then we show a different marker than
+	 *        when hit is no longer at the expected pos
+	 */
+	void MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit);
+
+	/**
+	 * Remove any and all markings caused by search hits.
+	 * Markings are moved from this window only.
+	 */
+	void ClearSearchMarkers();
 
 	/**
 	 * Set the connection to use to fetch the SQL table metadata
@@ -399,38 +462,6 @@ private:
 // wxStyledTextCtrl is super-configurable.  These methods will turn on
 // some sensible defaults for plain-text, PHP, HTML, and SQL editing.
 //------------------------------------------------------------------------
-
-	/**
-	 * set the margin look of the source control
-	 */
-	void SetMargin();
-
-	/**
-	 * Set the font, EOL, tab options of the source control
-	 * Set generic defaults for plain text editing.
-	 */
-	void SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles);
-
-	/**
-	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
-	 * HTML and Javascript editing as well.
-	 */
-	void SetPhpOptions();
-
-	/**
-	 * Set the SQL highlight options of the source control
-	 */
-	void SetSqlOptions();
-
-	/**
-	 * Set the CSS highlight options of the source control
-	 */
-	void SetCssOptions();
-
-	/**
-	 * Set the font settings for plain text documents.
-	 */
-	void SetPlainTextOptions();
 
 	/**
 	 * Determine the correct document Mode and sets it (causing a repaint)
@@ -591,6 +622,11 @@ private:
 	 * this control was last set to touched = false
 	 */
 	bool IsTouched;
+	
+	/**
+	 * if true then this control has at least one search marker visible
+	 */
+	bool HasSearchMarkers;
 
 	DECLARE_EVENT_TABLE()
 };

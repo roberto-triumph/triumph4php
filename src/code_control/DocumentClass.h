@@ -65,7 +65,7 @@ public:
 	 * it optional so that editing documents labeled as plain text can be as
 	 * smooth as possible.
 	 *
-	 * Sub classes can return TRUE here, but if they don then they must also
+	 * Sub classes can return TRUE here, but if they do then they must also
 	 * implement HandleAutoCompletion method.
 	 * This method will be called in response to a user keypress; speed is
 	 * crucial here.
@@ -419,6 +419,28 @@ public:
 	
 	wxString GetCssPseudoClasses() const;
 
+	/**
+	 * Match any parenthesis or braces
+	 */
+	void MatchBraces(int posToCheck);
+
+	/**
+	 * check to see if the give pos is at a CSS comment or CSS string
+	 */
+	bool InCommentOrStringStyle(int posToCheck); 
+
+};
+
+class JsDocumentClass : public TextDocumentClass {
+
+public:
+
+	JsDocumentClass();
+
+	bool CanAutoComplete();
+	
+	wxString GetJsKeywords() const;
+	
 	/**
 	 * Match any parenthesis or braces
 	 */

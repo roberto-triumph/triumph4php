@@ -23,40 +23,69 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+function prepWxWidgets()
+	if os.is "windows" then
+		print "Compiling wxWidgets; this will take a several minutes..."
+		wxBuildDir = normalizepath("lib/wxWidgets/build/msw");		
+		wxSamplesDir = normalizepath("lib/wxWidgets/samples");
+		rootPath = normalizepath("");
+		batchexecute(rootDir, {
+			
+			-- wrap around quotes in case path has spaces
+			"\"" .. VSVARS .. "\"",
+			
+			-- debug version of wxWidgets
+			"cd " .. wxBuildDir,
+			"nmake -f makefile.vc BUILD=debug SHARED=1",
+			"cd " .. wxSamplesDir, 
+			"nmake -f makefile.vc BUILD=debug SHARED=1",
+			
+			-- release version of wxWidgets
+			"cd " .. wxBuildDir,
+			"nmake -f makefile.vc BUILD=release SHARED=1",
+			"cd " .. wxSamplesDir,
+			"nmake -f makefile.vc BUILD=release SHARED=1",
+			
+			-- copy DLLs to the output directory
+			"cd " .. rootPath,
+			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxbase*ud_*.dll") .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxmsw*ud_*.dll") .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxbase*u_*.dll") .. " \"Release\\\"",
+			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxmsw*u_*.dll") .. " \"Release\\\""
+		});
+	else 
+
+		-- build wxWidgets using make
+		wxBuild = normalizepath("lib/wxWidgets/mvc-editor/")
+		batchexecute('lib/wxWidgets', {
+			"mkdir -p " .. wxBuild,
+			"./configure --enable-debug --with-gtk --enable-unicode --prefix=" .. wxBuild,
+			"make",
+			"make install"
+		})
+		
+		print(WX_CONFIG .. " --version")
+		if 0 ~= os.execute(WX_CONFIG .. " --version") then
+			error "Could not execute wx-config. Change the location of WX_CONFIG in premake_opts_linux.lua.\n"
+		end
+
+		-- copy wxWidgets libraries to the same dir as our executable
+		-- use the wx-config to get the location of the libraries
+		cmd = WX_CONFIG .. ' --prefix'
+		cmdStream = io.popen(cmd)
+		cmdOutput = cmdStream:read("*l")
+		cmdStream:close()
+		
+		libDir = cmdOutput .. '/lib'
+		batchexecute(normalizepath(""), {
+			"cp -r " .. libDir .. "/*.so* Debug/",
+			"cp -r " .. libDir .. "/*.so* Release/"
+		});
+		end
+end
+
 newaction {
 	trigger = "wxwidgets",
 	description = "Build the wxWidgets library",
-	execute = function()
-		WXWIDGETS_BUILD_DIR =  normalizepath("lib/wxWidgets/mvc-editor");
-		WXWIDGETS_ROOT = normalizepath("lib/wxWidgets")
-		WXWIDGETS_SRC = normalizepath("lib/wxWidgets/src")
-		if os.is "windows" then
-
-			-- create a setup.h if it does not exist
-			-- the repo does not have it
-			-- but it has a template (setup0.h) that contains the recommended settings
-			setupSrc = "lib/wxWidgets/include/wx/msw/setup0.h"
-			setupDest = "lib/wxWidgets/include/wx/msw/setup.h"
-			if not os.copyfile(setupSrc, setupDest) then
-				error("could not create setup.h at " .. setupDest .. " from " .. setupSrc)
-			end
-
-			print ("Open the solution (for your Visual Studio version) found at " .. normalizepath("lib/wxWidgets/build/msw/"))
-			print "Build the solution in DLL Debug configuration"
-			print "Build the solution in DLL Release configuration"
-			print "Note that you will have the builds will fail. Retry a couple of times"
-			print "This is due to the dependencies not being setup correctly."
-			print "see http://wiki.wxwidgets.org/Microsoft_Visual_C%2B%2B_Guide"
-		else 
-
-			-- now build wxWidgets
-            WX_BUILD = normalizepath("lib/wxWidgets/mvc-editor/")
-			batchexecute('lib/wxWidgets', {
-            "mkdir -p " .. WX_BUILD,
-			"./configure --enable-debug --with-gtk --enable-unicode --prefix=" .. WX_BUILD,
-			"make",
-			"make install"
-			})
-		end
-	end
+	execute = prepWxWidgets
 }

@@ -40,16 +40,36 @@ class ProjectPreferencesGeneratedPanelClass : public wxPanel
 		wxStaticText* WildcardHelpText;
 		wxStaticText* PhpLabel;
 		wxTextCtrl* PhpFileExtensions;
+		wxStaticText* JsLabel;
+		wxTextCtrl* JsFileExtensions;
 		wxStaticText* CssLabel;
 		wxTextCtrl* CssFileExtensions;
 		wxStaticText* SqlLabel;
 		wxTextCtrl* SqlFileExtensions;
+		wxStaticText* ConfigLabel;
+		wxTextCtrl* ConfigFileExtensions;
+		wxStaticText* CrontabLabel;
+		wxTextCtrl* CrontabFileExtensions;
+		wxStaticText* YamlLabel;
+		wxTextCtrl* YamlFileExtensions;
+		wxStaticText* XmlLabel;
+		wxTextCtrl* XmlFileExtensions;
+		wxStaticText* RubyLabel;
+		wxTextCtrl* RubyFileExtensions;
+		wxStaticText* LuaLabel;
+		wxTextCtrl* LuaFileExtensions;
+		wxStaticText* MarkdownLabel;
+		wxTextCtrl* MarkdownFileExtensions;
+		wxStaticText* DiffLabel;
+		wxTextCtrl* DiffFileExtensions;
+		wxStaticText* BashLabel;
+		wxTextCtrl* BashFileExtensions;
 		wxStaticText* MiscLabel;
 		wxTextCtrl* MiscFileExtensions;
 	
 	public:
 		
-		ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,416 ), long style = wxTAB_TRAVERSAL );
+		ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,550 ), long style = wxTAB_TRAVERSAL );
 		~ProjectPreferencesGeneratedPanelClass();
 	
 };

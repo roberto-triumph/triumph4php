@@ -11,12 +11,12 @@
 
 ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
-	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 2, 1, 0, 0 );
-	fgSizer2->AddGrowableCol( 0 );
-	fgSizer2->AddGrowableRow( 0 );
-	fgSizer2->SetFlexibleDirection( wxBOTH );
-	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* FlexSizer;
+	FlexSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexSizer->AddGrowableCol( 0 );
+	FlexSizer->AddGrowableRow( 0 );
+	FlexSizer->SetFlexibleDirection( wxBOTH );
+	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* StaticBoxSizerFileTypes;
 	StaticBoxSizerFileTypes = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Associations") ), wxVERTICAL );
@@ -38,8 +38,9 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	AssociationsGridSizer->Add( AssociationsBoxSizer, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* AssociationsFormSizer;
-	AssociationsFormSizer = new wxFlexGridSizer( 4, 2, 0, 0 );
+	AssociationsFormSizer = new wxFlexGridSizer( 7, 4, 0, 0 );
 	AssociationsFormSizer->AddGrowableCol( 1 );
+	AssociationsFormSizer->AddGrowableCol( 3 );
 	AssociationsFormSizer->SetFlexibleDirection( wxBOTH );
 	AssociationsFormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -49,6 +50,13 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	
 	PhpFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	AssociationsFormSizer->Add( PhpFileExtensions, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	JsLabel = new wxStaticText( this, wxID_ANY, _("JS Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	JsLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( JsLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	JsFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( JsFileExtensions, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	CssLabel = new wxStaticText( this, wxID_ANY, _("CSS Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	CssLabel->Wrap( -1 );
@@ -64,6 +72,69 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	SqlFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	AssociationsFormSizer->Add( SqlFileExtensions, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
+	ConfigLabel = new wxStaticText( this, wxID_ANY, _("Config Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	ConfigLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( ConfigLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	ConfigFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( ConfigFileExtensions, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	CrontabLabel = new wxStaticText( this, wxID_ANY, _("Crontab Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	CrontabLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( CrontabLabel, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	CrontabFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( CrontabFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	YamlLabel = new wxStaticText( this, wxID_ANY, _("YAML Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	YamlLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( YamlLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	YamlFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( YamlFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	XmlLabel = new wxStaticText( this, wxID_ANY, _("XML Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	XmlLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( XmlLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	XmlFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( XmlFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	RubyLabel = new wxStaticText( this, wxID_ANY, _("Ruby Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	RubyLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( RubyLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	RubyFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( RubyFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	LuaLabel = new wxStaticText( this, wxID_ANY, _("Lua Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	LuaLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( LuaLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	LuaFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( LuaFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	MarkdownLabel = new wxStaticText( this, wxID_ANY, _("Markdown Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	MarkdownLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( MarkdownLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	MarkdownFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( MarkdownFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	DiffLabel = new wxStaticText( this, wxID_ANY, _("Diff Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	DiffLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( DiffLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	DiffFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( DiffFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
+	BashLabel = new wxStaticText( this, wxID_ANY, _("Bash Files"), wxDefaultPosition, wxDefaultSize, 0 );
+	BashLabel->Wrap( -1 );
+	AssociationsFormSizer->Add( BashLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	BashFileExtensions = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	AssociationsFormSizer->Add( BashFileExtensions, 1, wxALL|wxEXPAND, 5 );
+	
 	MiscLabel = new wxStaticText( this, wxID_ANY, _("Misc. Files"), wxDefaultPosition, wxDefaultSize, 0 );
 	MiscLabel->Wrap( -1 );
 	AssociationsFormSizer->Add( MiscLabel, 0, wxALL, 5 );
@@ -75,9 +146,9 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	
 	StaticBoxSizerFileTypes->Add( AssociationsGridSizer, 1, wxEXPAND, 5 );
 	
-	fgSizer2->Add( StaticBoxSizerFileTypes, 1, wxALL|wxEXPAND, 5 );
+	FlexSizer->Add( StaticBoxSizerFileTypes, 1, wxALL|wxEXPAND, 5 );
 	
-	this->SetSizer( fgSizer2 );
+	this->SetSizer( FlexSizer );
 	this->Layout();
 }
 

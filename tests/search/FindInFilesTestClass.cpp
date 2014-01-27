@@ -67,6 +67,7 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturns
 	CHECK(FindInFiles.Prepare());
 	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
 	CHECK_EQUAL(2, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(12, FindInFiles.GetFileOffset());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingFromTheMiddle) {
@@ -76,10 +77,13 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearc
 	CHECK(FindInFiles.Prepare());
 	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
 	CHECK_EQUAL(3, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(34, FindInFiles.GetFileOffset());
 	CHECK(FindInFiles.FindNext());
 	CHECK_EQUAL(4, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(53, FindInFiles.GetFileOffset());
 	CHECK(FindInFiles.FindNext());
 	CHECK_EQUAL(5, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(78, FindInFiles.GetFileOffset());
 	CHECK_EQUAL(false, FindInFiles.FindNext());
 	
 }
@@ -91,6 +95,7 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearc
 	CHECK(FindInFiles.Prepare());
 	CHECK(FindInFiles.Walk(TestProjectDir + wxT("user.php")));
 	CHECK_EQUAL(2, FindInFiles.GetCurrentLineNumber());
+	CHECK_EQUAL(12, FindInFiles.GetFileOffset());
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldNotLocateNextMatchWhenNoMatchIsFound) {

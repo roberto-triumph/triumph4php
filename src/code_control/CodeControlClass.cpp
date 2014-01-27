@@ -42,21 +42,20 @@
 // This causes problems when Scintilla is handling UTF-8 documents.
 // There is a method called GetSafeSubString() that will help you in this regard.
 
-
-// margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
-// margin 2 for lint error markers
-static const int LINT_RESULT_MARKER = 2;
-static const int LINT_RESULT_MARGIN = 2;
+const int mvceditor::CODE_CONTROL_LINT_RESULT_MARKER = 2;
+const int mvceditor::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
+const int mvceditor::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
 
 // the indicator to show squiggly lines for lint errors
-static const int INDICATOR_PHP_LINT = 0;
+const int mvceditor::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
 
 // the indicator to show boxes around found words when user double clicks
 // on a word
-static const int INDICATOR_FIND = 1;
+const int mvceditor::CODE_CONTROL_INDICATOR_FIND = 1;
 
 // start stealing styles from "asp javascript" we will never use those styles
-static const int STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
+const int mvceditor::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
 mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  mvceditor::GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
@@ -72,7 +71,8 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 		, WordHighlightIsWordHighlighted(false)
 		, DocumentMode(TEXT) 
 		, IsHidden(false) 
-		, IsTouched(false) {
+		, IsTouched(false) 
+		, HasSearchMarkers(false) {
 	Document = NULL;
 	
 	// we will handle right-click menu ourselves
@@ -260,6 +260,7 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	// the folded line is expanded
 	int currentLine = GetCurrentLine();
 	EnsureVisible(currentLine + 1);
+	
 	event.Skip();
 }
 
@@ -332,80 +333,54 @@ void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	}
 }
 
-void mvceditor::CodeControlClass::SetMargin() {
-	if (CodeControlOptions.EnableLineNumbers) {
-		SetMarginType(CodeControlOptionsClass::MARGIN_LINE_NUMBER, wxSTC_MARGIN_NUMBER);
-		SetMarginWidth(CodeControlOptionsClass::MARGIN_LINE_NUMBER, TextWidth(wxSTC_STYLE_LINENUMBER, wxT("_99999")));
-	}
-	else {
-		SetMarginWidth(CodeControlOptionsClass::MARGIN_LINE_NUMBER, 0);
-	}
-	if (CodeControlOptions.EnableCodeFolding) {
-		SetProperty(wxT("fold"), wxT("1"));
-		SetProperty(wxT("fold.comment"), wxT("1"));
-		SetProperty(wxT("fold.html"), wxT("1"));
-		SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED);
-		SetMarginType(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
-		SetMarginWidth(CodeControlOptionsClass::MARGIN_CODE_FOLDING, 16);
-		SetMarginSensitive(CodeControlOptionsClass::MARGIN_CODE_FOLDING, true);
-		SetMarginMask(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MASK_FOLDERS);
-	}
-	else {
-		SetProperty(wxT("fold"), wxT("0"));
-		SetProperty(wxT("fold.comment"), wxT("0"));
-		SetProperty(wxT("fold.html"), wxT("0"));
-		SetFoldFlags(0);
-		SetMarginType(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
-		SetMarginWidth(CodeControlOptionsClass::MARGIN_CODE_FOLDING, 0);
-		SetMarginSensitive(CodeControlOptionsClass::MARGIN_CODE_FOLDING, false);
-	}
-}
-
 void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
-	wxString file = GetFileName();
-	
-	bool found = false;
-	std::vector<wxString> wildcards = Globals->GetPhpFileExtensions();
-	for (size_t i = 0; i < wildcards.size(); ++i) {
-		if (wxMatchWild(wildcards[i], file)) {
-			found = true;
-			SetDocumentMode(mvceditor::CodeControlClass::PHP);
-			break;
-		}
+	wxString fileName = GetFileName();
+	if (Globals->FileTypes.HasAPhpExtension(fileName)) {
+		DocumentMode = PHP;
 	}
-	if (!found) {
-		wildcards = Globals->GetCssFileExtensions();
-		for (size_t i = 0; i < wildcards.size(); ++i) {
-			if (wxMatchWild(wildcards[i], file)) {
-				found = true;
-				SetDocumentMode(mvceditor::CodeControlClass::CSS);
-				break;
-			}
-		}	
+	else if (Globals->FileTypes.HasASqlExtension(fileName)) {
+		DocumentMode = SQL;
 	}
-	if (!found) {
-		wildcards = Globals->GetSqlFileExtensions();
-		for (size_t i = 0; i < wildcards.size(); ++i) {
-			if (wxMatchWild(wildcards[i], file)) {
-				found = true;
-				SetDocumentMode(mvceditor::CodeControlClass::SQL);
-				break;
-			}
-		}
+	else if (Globals->FileTypes.HasACssExtension(fileName)) {
+		DocumentMode = CSS;
 	}
-	if (!found) {
-		SetDocumentMode(mvceditor::CodeControlClass::TEXT);
+	else if (Globals->FileTypes.HasAJsExtension(fileName)) {
+		DocumentMode = JS;
 	}
+	else if (Globals->FileTypes.HasAConfigExtension(fileName)) {
+		DocumentMode = CONFIG;
+	}
+	else if (Globals->FileTypes.HasACrontabExtension(fileName)) {
+		DocumentMode = CRONTAB;
+	}
+	else if (Globals->FileTypes.HasAYamlExtension(fileName)) {
+		DocumentMode = YAML;
+	}
+	else if (Globals->FileTypes.HasAXmlExtension(fileName)) {
+		DocumentMode = XML;
+	}
+	else if (Globals->FileTypes.HasARubyExtension(fileName)) {
+		DocumentMode = RUBY;
+	}
+	else if (Globals->FileTypes.HasALuaExtension(fileName)) {
+		DocumentMode = LUA;
+	}
+	else if (Globals->FileTypes.HasAMarkdownExtension(fileName)) {
+		DocumentMode = MARKDOWN;
+	}
+	else if (Globals->FileTypes.HasABashExtension(fileName)) {
+		DocumentMode = BASH;
+	}
+	else if (Globals->FileTypes.HasADiffExtension(fileName)) {
+		DocumentMode = DIFF;
+	}
+	else {
+		DocumentMode = TEXT;
+	}
+	ApplyPreferences();
 }
 
 void mvceditor::CodeControlClass::ApplyPreferences() {
-	if (CodeControlOptions.EnableWordWrap) {
-		SetWrapMode(wxSTC_WRAP_WORD);
-		SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
-	}
-	else {
-		SetWrapMode(wxSTC_WRAP_NONE);
-	}
 	if (Document) {
 		
 		// need this here so that any events are not propagated while the object is
@@ -417,326 +392,22 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
 		Document = new mvceditor::SqlDocumentClass(Globals, CurrentDbTag);
 		Document->SetControl(this);
-		SetCodeControlOptions(CodeControlOptions.SqlStyles);
-		SetSqlOptions();
 	}
 	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
 		Document = new mvceditor::PhpDocumentClass(Globals);
 		Document->SetControl(this);
-		SetCodeControlOptions(CodeControlOptions.PhpStyles);
-		SetPhpOptions();
 	}
 	else if (mvceditor::CodeControlClass::CSS == DocumentMode) {
 		Document = new mvceditor::CssDocumentClass();
 		Document->SetControl(this);
-		SetCodeControlOptions(CodeControlOptions.CssStyles);
-		SetCssOptions();
+	}
+	else if (mvceditor::CodeControlClass::JS == DocumentMode) {
+		Document = new mvceditor::JsDocumentClass();
+		Document->SetControl(this);
 	}
 	else {
-		
-		// use the PHP styles; needed to get the caret and margin styling right
-		SetCodeControlOptions(CodeControlOptions.PhpStyles);
 		Document = new mvceditor::TextDocumentClass();
 		Document->SetControl(this);
-		SetPlainTextOptions();
-	}
-
-	// in wxWidgets 2.9.5, need to set margin after setting the lexer
-	// otherwise code folding does not work
-	SetMargin();
-	Colourise(0, -1);
-}
-
-void mvceditor::CodeControlClass::SetPhpOptions() {
-	
-	// set the lexer before setting the keywords
-	SetLexer(wxSTC_LEX_HTML);
-	
-	// 7 = as per scintilla docs, HTML lexer uses 7 bits for styles
-	SetStyleBits(7);
-	
-	// Some languages, such as HTML may contain embedded languages, VBScript
-	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
-	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
-	// and 5 is for SGML and DTD keywords
-	SetKeyWords(0, ((mvceditor::PhpDocumentClass*)Document)->GetHtmlKeywords());
-	SetKeyWords(1, ((mvceditor::PhpDocumentClass*)Document)->GetJavascriptKeywords());
-	SetKeyWords(4, ((mvceditor::PhpDocumentClass*)Document)->GetPhpKeywords());
-	
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]{}|;'\",./<?"));
-	AutoCompSetSeparator('\n');
-	AutoCompSetChooseSingle(true);
-	AutoCompSetFillUps(wxT("(["));
-	AutoCompSetIgnoreCase(true);
-	
-	// need to add the namespace operator here, it was the only way i could get the
-	// autocompletion to workwith namespaces.
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\"));
-	
-	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	SetMarginWidth(LINT_RESULT_MARGIN, 16);
-	SetMarginSensitive(LINT_RESULT_MARGIN, false);
-	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	
-	// syntax coloring
-	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
-		int style = pref.StcStyle;
-		if (wxSTC_HPHP_DEFAULT == style) {
-			
-			// use the PHP default settings as the catch-all for settings not yet exposed
-			// (Javascript) so the user sees a uniform style.
-			int styles[] = {
-				wxSTC_STYLE_DEFAULT, wxSTC_HJ_START, wxSTC_HJ_DEFAULT, 
-				wxSTC_HJ_COMMENT, wxSTC_HJ_COMMENTLINE, wxSTC_HJ_COMMENTDOC, 
-				wxSTC_HJ_NUMBER, wxSTC_HJ_WORD, wxSTC_HJ_KEYWORD, 
-				wxSTC_HJ_DOUBLESTRING, wxSTC_HJ_SINGLESTRING, wxSTC_HJ_SYMBOLS, 
-
-				// sgml styles take care of the <!DOCTYPE declarations
-				wxSTC_HJ_STRINGEOL, wxSTC_HJ_REGEX, wxSTC_H_SGML_1ST_PARAM, 
-				wxSTC_H_SGML_1ST_PARAM_COMMENT, wxSTC_H_SGML_BLOCK_DEFAULT, wxSTC_H_SGML_COMMAND, 
-				wxSTC_H_SGML_COMMENT, wxSTC_H_SGML_DEFAULT, wxSTC_H_SGML_DOUBLESTRING, 
-				wxSTC_H_SGML_ENTITY, wxSTC_H_SGML_ERROR, wxSTC_H_SGML_SIMPLESTRING, 
-				wxSTC_H_SGML_SPECIAL
-			};
-			for (int j = 0; j < 25; ++j) {
-				StyleSetFont(styles[j], pref.Font);
-				StyleSetForeground(styles[j], pref.Color);
-				StyleSetBackground(styles[j], pref.BackgroundColor);
-				StyleSetBold(styles[j], pref.IsBold);
-				StyleSetItalic(styles[j], pref.IsItalic);
-			}
-		}
-		StyleSetFont(style, pref.Font);
-		StyleSetForeground(style, pref.Color);
-		StyleSetBackground(style, pref.BackgroundColor);
-		StyleSetBold(style, pref.IsBold);
-		StyleSetItalic(style, pref.IsItalic);
-	}
-
-	// the annotation styles
-	StyleSetForeground(STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
-	StyleSetBackground(STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-	StyleSetBold(STYLE_PHP_LINT_ANNOTATION, true);
-	StyleSetItalic(STYLE_PHP_LINT_ANNOTATION, true);
-
-	// the lint error marker styles
-	IndicatorSetStyle(INDICATOR_PHP_LINT, wxSTC_INDIC_SQUIGGLE);
-	IndicatorSetForeground(INDICATOR_PHP_LINT, *wxRED);
-
-	// the found match indicator style
-	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
-		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
-	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
-}
-
-void mvceditor::CodeControlClass::SetSqlOptions() {	
-	SetLexer(wxSTC_LEX_SQL);
-	
-	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
-	SetStyleBits(5);
-	
-	SetKeyWords(0, ((mvceditor::SqlDocumentClass*)Document)->GetMySqlKeywords());
-	SetKeyWords(1, wxT(""));
-	SetKeyWords(2, wxT(""));
-	SetKeyWords(3, wxT(""));
-	SetKeyWords(4, wxT(""));
-	
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
-	AutoCompSetSeparator(' ');
-	AutoCompSetChooseSingle(true);
-	AutoCompSetIgnoreCase(true);
-	AutoCompSetFillUps(wxT("(["));
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-	
-	for (size_t i = 0; i < CodeControlOptions.SqlStyles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = CodeControlOptions.SqlStyles[i];
-		int style = pref.StcStyle;
-		if (wxSTC_SQL_DEFAULT == style) {
-			
-			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
-			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
-			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
-			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
-			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
-			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
-		}
-		StyleSetFont(style, pref.Font);
-		StyleSetForeground(style, pref.Color);
-		StyleSetBackground(style, pref.BackgroundColor);
-		StyleSetBold(style, pref.IsBold);
-		StyleSetItalic(style, pref.IsItalic);	
-	}
-
-	// the found match indicator style
-	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
-		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
-	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
-}
-
-void mvceditor::CodeControlClass::SetCssOptions() {
-	SetLexer(wxSTC_LEX_CSS);
-	
-	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
-	SetStyleBits(5);
-	
-	// got this by looking at LexCSS.cxx (bottom of the file)
-	// keywords 0 => CSS 1 keywords
-	// keywords 1 => Pseudo classes
-	// keywords 2 => CSS 2 keywords but we will pass all keywords in 0
-	SetKeyWords(0,  ((mvceditor::CssDocumentClass*)Document)->GetCssKeywords());
-	SetKeyWords(1,  ((mvceditor::CssDocumentClass*)Document)->GetCssPseudoClasses());
-	SetKeyWords(2, wxT(""));
-
-	AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
-	AutoCompSetSeparator(' ');
-	AutoCompSetIgnoreCase(true);
-	AutoCompSetChooseSingle(true);
-	AutoCompSetFillUps(wxT("([:"));
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-	
-	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = CodeControlOptions.CssStyles[i];
-		int style = pref.StcStyle;
-		if (wxSTC_CSS_DEFAULT == style) {
-			
-			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
-			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
-			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
-			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
-			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
-			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
-		}
-		StyleSetFont(style, pref.Font);
-		StyleSetForeground(style, pref.Color);
-		StyleSetBackground(style, pref.BackgroundColor);
-		StyleSetBold(style, pref.IsBold);
-		StyleSetItalic(style, pref.IsItalic);	
-	}
-
-	// the found match indicator style
-	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
-		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
-	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
-}
-
-void mvceditor::CodeControlClass::SetPlainTextOptions() {
-	
-	SetLexer(wxSTC_LEX_NULL);
-
-	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
-	SetStyleBits(5);
-	SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-	
-	SetMarginType(LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	SetMarginWidth(LINT_RESULT_MARGIN, 16);
-	SetMarginSensitive(LINT_RESULT_MARGIN, false);
-	SetMarginMask(LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	MarkerDefine(LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
-	
-	// syntax coloring; use the same font as PHP code for now
-	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = CodeControlOptions.PhpStyles[i];
-		int style = pref.StcStyle;
-		if (wxSTC_HPHP_DEFAULT == style) {
-			
-			// wxSTC_STYLE_DEFAULT controls the background of the portions where text does not reach
-			StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
-			StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
-			StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
-			StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
-			StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
-
-			// 0 = only style since plain text files dont use a scintilla lexer
-			StyleSetFont(0, pref.Font);
-			StyleSetForeground(0, pref.Color);
-			StyleSetBackground(0, pref.BackgroundColor);
-			StyleSetBold(0, pref.IsBold);
-			StyleSetItalic(0, pref.IsItalic);
-		}
-		StyleSetFont(style, pref.Font);
-		StyleSetForeground(style, pref.Color);
-		StyleSetBackground(style, pref.BackgroundColor);
-		StyleSetBold(style, pref.IsBold);
-		StyleSetItalic(style, pref.IsItalic);	
-	}
-
-	// the found match indicator style
-	mvceditor::StylePreferenceClass pref = CodeControlOptions.FindByStcStyle(CodeControlOptions.PhpStyles, 
-		mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT);
-	IndicatorSetStyle(INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
-	IndicatorSetForeground(INDICATOR_FIND, pref.Color);
-}
-
-void mvceditor::CodeControlClass::SetCodeControlOptions(const std::vector<mvceditor::StylePreferenceClass>& styles) {
-	if (CodeControlOptions.IndentUsingTabs) {
-		SetUseTabs(true);
-		SetTabWidth(CodeControlOptions.TabWidth);
-		SetIndent(0);
-		SetTabIndents(true);
-		SetBackSpaceUnIndents(true);
-	}
-	else {
-		SetUseTabs(false);
-		SetTabWidth(CodeControlOptions.SpacesPerIndent);
-		SetIndent(CodeControlOptions.SpacesPerIndent);
-		SetTabIndents(false);
-		SetBackSpaceUnIndents(false);
-	}
-	if (CodeControlOptions.RightMargin > 0) {
-		SetEdgeMode(wxSTC_EDGE_LINE);
-		SetEdgeColumn(CodeControlOptions.RightMargin);
-	}
-	else {
-		SetEdgeMode(wxSTC_EDGE_NONE);
-	}
-	SetIndentationGuides(CodeControlOptions.EnableIndentationGuides);
-	SetEOLMode(CodeControlOptions.LineEndingMode);
-	SetViewEOL(CodeControlOptions.EnableLineEndings);
-	
-	// caret, line, selection, margin colors
-	for (size_t i = 0; i < styles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = styles[i];
-		int style = pref.StcStyle;
-		switch (style) {
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
-				SetCaretForeground(pref.Color);
-				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
-				SetCaretLineVisible(true);
-				SetCaretLineBackground(pref.BackgroundColor);
-				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
-				SetSelForeground(true, pref.Color);
-				SetSelBackground(true, pref.BackgroundColor);
-				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
-				if (CodeControlOptions.EnableCodeFolding) {
-					SetFoldMarginColour(true, pref.BackgroundColor);
-					SetFoldMarginHiColour(true, pref.BackgroundColor);
-					MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, pref.BackgroundColor, pref.Color);
-					MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, pref.BackgroundColor, pref.Color);
-				}
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
-				if (CodeControlOptions.RightMargin > 0) {
-					SetEdgeColour(pref.Color);
-				}
-				break;
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
-				// since we need to share one indicator with the matching word highlight
-				// and the parse errors indicators; we will set this setting when the 
-				// user initiates the matching word feature
-				break;
-		}
 	}
 }
 
@@ -755,8 +426,8 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	}
 
 	// remove any previous match indicators
-	SetIndicatorCurrent(INDICATOR_FIND);
-	SetIndicatorValue(INDICATOR_FIND);
+	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
+	SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
 	IndicatorClearRange(0, GetTextLength());
 		
 	EventSink.Publish(event);
@@ -787,14 +458,23 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	// set touched flag if the character was a normal or shifted character, symbol
 	// or number
 	int key = event.GetKeyCode();
+	bool hasChanged = false;
 	if (!event.HasModifiers() && key > WXK_SPACE && key < WXK_DELETE) {
 		IsTouched = true;
+		hasChanged = true;
 	}
 	else if (!event.HasModifiers() && WXK_BACK == key) {
 		IsTouched = true;
+		hasChanged = true;
 	}
 	if (!event.HasModifiers() && key >= WXK_NUMPAD0 && key < WXK_DIVIDE) {
 		IsTouched = true;
+		hasChanged = true;
+	}
+	
+	// if there was a search marker, delete it
+	if (hasChanged && HasSearchMarkers) {
+		ClearSearchMarkers();
 	}
 	event.Skip();
 }
@@ -838,8 +518,8 @@ void mvceditor::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
 	
 		// kill any current highlight searches
-		SetIndicatorCurrent(INDICATOR_FIND);
-		SetIndicatorValue(INDICATOR_FIND);
+		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
+		SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
 		IndicatorClearRange(0, GetTextLength());
 
 		WordHighlightIsWordHighlighted = false;
@@ -848,8 +528,8 @@ void mvceditor::CodeControlClass::UndoHighlight() {
 
 void mvceditor::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
 	WordHighlightIsWordHighlighted = true;
-	SetIndicatorCurrent(INDICATOR_FIND);
-	SetIndicatorValue(INDICATOR_FIND);
+	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
+	SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
 	IndicatorFillRange(utf8Start, utf8Length);
 }
 
@@ -859,7 +539,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 	// the squigglies properly
 	int byteNumber = 0;
 	if (result.CharacterPosition >= 0) {
-		MarkerAdd(result.LineNumber - 1, LINT_RESULT_MARKER);
+		MarkerAdd(result.LineNumber - 1, CODE_CONTROL_LINT_RESULT_MARKER);
 
 		int charNumber = result.CharacterPosition;
 
@@ -870,8 +550,8 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		SendMsg(2182, documentLength, (long)buf);
 		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
 		
-		SetIndicatorCurrent(INDICATOR_PHP_LINT);
-		SetIndicatorValue(INDICATOR_PHP_LINT);
+		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_PHP_LINT);
+		SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
 
 		// fill until the end of the word
 		int end = WordEndPosition(byteNumber, true);
@@ -885,7 +565,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 	error += wxString::Format(wxT(" on line %d, offset %d"), result.LineNumber, result.CharacterPosition);
 	AnnotationSetVisible(wxSTC_ANNOTATION_BOXED);
 	AnnotationSetText(result.LineNumber, error);
-	AnnotationSetStyle(result.LineNumber, STYLE_PHP_LINT_ANNOTATION);
+	AnnotationSetStyle(result.LineNumber, CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION);
 }
 
 void mvceditor::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
@@ -909,11 +589,45 @@ void mvceditor::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsC
 }
 
 void mvceditor::CodeControlClass::ClearLintErrors() {
-	MarkerDeleteAll(LINT_RESULT_MARKER);
-	SetIndicatorCurrent(INDICATOR_PHP_LINT);
-	SetIndicatorValue(INDICATOR_PHP_LINT);
+	MarkerDeleteAll(CODE_CONTROL_LINT_RESULT_MARKER);
+	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_PHP_LINT);
+	SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
 	IndicatorClearRange(0, GetTextLength());
 	AnnotationClearAll();
+}
+
+void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
+	
+	// line is 1-based but wxSTC lines start at zero
+	if (goodHit) {
+		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
+	}
+	else {
+		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
+	}
+	HasSearchMarkers = true;
+}
+
+void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit) {
+	MarkSearchHit(lineNumber, goodHit);
+	SetSelectionAndEnsureVisible(startPos, endPos);
+	
+	int byteNumber = 0;
+	int documentLength = GetTextLength();
+	char* buf = new char[documentLength];
+
+	// GET_TEXT  message
+	SendMsg(2182, documentLength, (long)buf);
+	byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, startPos);
+	GotoPos(byteNumber);
+
+	delete[] buf;
+}
+
+void mvceditor::CodeControlClass::ClearSearchMarkers() {
+	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
+	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
+	HasSearchMarkers = false;
 }
 
 void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {

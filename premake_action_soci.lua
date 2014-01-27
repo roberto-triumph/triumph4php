@@ -23,94 +23,126 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+function prepSoci() 
+	SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor");
+	SOCI_ROOT = normalizepath("lib/soci")
+	SOCI_SRC = normalizepath("lib/soci/src")
+	if os.is "windows" then
+
+		-- compile SOCI
+		-- exclude SOCI from linking against Boost. we don't use it
+		sociPath = normalizepath("lib/soci")
+		sociBuildDir =  normalizepath("lib/soci/mvc-editor")
+		sociSrc = normalizepath("lib/soci/src")
+		rootPath = normalizepath("")
+		batchexecute(sociSrc, {
+			CMAKE ..
+				" -G \"Visual Studio 9 2008\"" ..
+				" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_INCLUDE_DIR) ..
+				" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_LIB) ..
+				" -DCMAKE_INSTALL_PREFIX=" .. sociBuildDir .. 
+				" -DSQLITE3_INCLUDE_DIR=" .. normalizepath(SQLITE_INCLUDE_DIR) ..
+				" -DSQLITE3_LIBRARY=" .. normalizepath(SQLITE_LIB) ..
+				" -DWITH_MYSQL=YES " ..
+				" -DWITH_ODBC=NO " ..
+				" -DWITH_ORACLE=NO " ..
+				" -DWITH_POSTGRESQL=NO " ..
+				" -DWITH_SQLITE3=YES " ..
+				" -DWITH_BOOST=NO " ..
+				" -DSOCI_TESTS=YES ",
+			
+			-- wrap around quotes in case path has spaces
+			"\"" .. VSVARS .. "\"",
+			"vcbuild SOCI.sln \"Debug|Win32\"",
+			"vcbuild SOCI.sln \"Release|Win32\"",
+			"vcbuild INSTALL.vcproj \"Debug|Win32\"",
+			"vcbuild INSTALL.vcproj \"Release|Win32\"",
+			"cd " .. rootPath,
+			"xcopy /S /Y " .. normalizepath('lib/soci/src/bin/Debug/*.dll') .. " \"Debug\\\"",
+			"xcopy /S /Y " .. normalizepath('lib/soci/src/bin/Release/*.dll') .. " \"Release\\\"",
+			
+		})
+	else 
+		sociInstallDebugDir = normalizepath("lib/soci/mvc-editor/Debug")
+		sociInstallReleaseDir = normalizepath("lib/soci/mvc-editor/Release")
+
+		batchexecute(normalizepath(""), {
+			"mkdir -p " .. sociInstallDebugDir,
+			"mkdir -p " .. sociInstallReleaseDir
+		})
+		
+		-- now build SOCI
+		-- exclude SOCI from linking against Boost. we don't use it
+		batchexecute(sociInstallDebugDir, {
+			CMAKE ..
+				" -G \"Unix Makefiles\"" ..
+				" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+				" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
+				" -DCMAKE_INSTALL_PREFIX=" .. sociInstallDebugDir ..
+				" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+				" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
+				" -DWITH_MYSQL=YES " ..
+				" -DWITH_MYSQL=ODBC " ..
+				" -DWITH_ORACLE=NO " ..
+				" -DWITH_POSTGRESQL=NO " ..
+				" -DWITH_SQLITE3=YES " ..
+				" -DWITH_BOOST=NO" ..
+				" -DSOCI_TESTS=YES " ..
+				" -DCMAKE_BUILD_TYPE=Debug " .. 
+				" " .. SOCI_SRC,
+			"make",
+			"make install"
+		})
+		
+		-- build release mode
+		batchexecute(sociInstallReleaseDir, {
+			CMAKE ..
+				" -G \"Unix Makefiles\"" ..
+				" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+				" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
+				" -DCMAKE_INSTALL_PREFIX=" .. sociInstallReleaseDir ..
+				" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+				" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
+				" -DWITH_MYSQL=YES " ..
+				" -DWITH_MYSQL=ODBC " ..
+				" -DWITH_ORACLE=NO " ..
+				" -DWITH_POSTGRESQL=NO " ..
+				" -DWITH_SQLITE3=YES " ..
+				" -DWITH_BOOST=NO" ..
+				" -DSOCI_TESTS=YES " ..
+				" -DCMAKE_BUILD_TYPE=Debug " .. 
+				" " .. SOCI_SRC,
+			"make",
+			"make install"
+		});
+		
+		-- soci lib dirs are named according to architecture
+		foundCount = 0;
+		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib64/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib64/*.so* Debug/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib/*.so* Debug/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib64/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib64/*.so* Release/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib/*.so*");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib/*.so* Release/");
+			foundCount = foundCount + 1;
+		end
+	end
+end
+
 newaction {
 	trigger = "soci",
 	description = "Build the SOCI (database access) library",
-	execute = function()
-		batchexecute(normalizepath("lib/soci"), { string.format("%s --version", CMAKE) }, "cmake not found. Compiling SOCI requires CMake. SOCI cannot be built.")
-		SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor");
-		SOCI_ROOT = normalizepath("lib/soci")
-		SOCI_SRC = normalizepath("lib/soci/src")
-		if os.is "windows" then
-			
-			-- exclude SOCI from linking against Boost. we don't use it
-			-- generate a solution file
-			batchexecute(SOCI_SRC, {
-				CMAKE ..
-					" -G \"Visual Studio 9 2008\"" ..
-					" -DMYSQL_INCLUDE_DIR=" .. normalizepath(MYSQL_INCLUDE_DIR) ..
-					" -DMYSQL_LIBRARY=" .. normalizepath(MYSQL_LIB) ..
-					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_BUILD_DIR .. 
-					" -DSQLITE3_INCLUDE_DIR=" .. normalizepath(SQLITE_INCLUDE_DIR) ..
-					" -DSQLITE3_LIBRARY=" .. normalizepath(SQLITE_LIB) ..
-					" -DWITH_MYSQL=YES " ..
-					" -DWITH_ODBC=NO " ..
-					" -DWITH_ORACLE=NO " ..
-					" -DWITH_POSTGRESQL=NO " ..
-					" -DWITH_SQLITE3=YES " ..
-					" -DWITH_BOOST=NO " ..
-					" -DSOCI_TESTS=YES "
-			})
-			print "Check the output above.  If it reads \"SOCI_MYSQL = OFF\" or \"SOCI_SQLITE3 = OFF\" then you will need to do some investigation."
-			print "Otherwise, you will now need to open the generated solution file and build it from there."
-			print ("Open the solution found at " .. normalizepath("lib/soci/src/SOCI.sln"))
-			print "Build the solution in Debug configuration"
-			print "Build the solution in Release configuration"
-		else 
-			SOCI_INSTALL_DEBUG_DIR = normalizepath("lib/soci/mvc-editor/Debug")
-			SOCI_INSTALL_RELEASE_DIR = normalizepath("lib/soci/mvc-editor/Release")
-			SOCI_BUILD_DEBUG_DIR = normalizepath("lib/soci/mvc-editor-debug-build")
-			SOCI_BUILD_RELEASE_DIR = normalizepath("lib/soci/mvc-editor-release-build")
-			
-			batchexecute(normalizepath(""), {
-				"mkdir -p " .. SOCI_BUILD_DEBUG_DIR,
-				"mkdir -p " .. SOCI_BUILD_RELEASE_DIR
-			})
-			
-			-- now build SOCI
-			-- exclude SOCI from linking against Boost. we don't use it
-			batchexecute(SOCI_BUILD_DEBUG_DIR, {
-				CMAKE ..
-					" -G \"Unix Makefiles\"" ..
-					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
-					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
-					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_INSTALL_DEBUG_DIR ..
-					" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
-					" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
-					" -DWITH_MYSQL=YES " ..
-					" -DWITH_MYSQL=ODBC " ..
-					" -DWITH_ORACLE=NO " ..
-					" -DWITH_POSTGRESQL=NO " ..
-					" -DWITH_SQLITE3=YES " ..
-					" -DWITH_BOOST=NO" ..
-					" -DSOCI_TESTS=YES " ..
-					" -DCMAKE_BUILD_TYPE=Debug " .. 
-					" " .. SOCI_SRC,
-				"make",
-				"make install"
-			})
-			
-			-- build release mode
-			batchexecute(SOCI_BUILD_RELEASE_DIR, {
-				CMAKE ..
-					" -G \"Unix Makefiles\"" ..
-					" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
-					" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
-					" -DCMAKE_INSTALL_PREFIX=" .. SOCI_INSTALL_RELEASE_DIR ..
-					" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
-					" -DSQLITE3_LIBRARIES=" .. normalizepath(SQLITE_LIB_DIR) ..
-					" -DWITH_MYSQL=YES " ..
-					" -DWITH_MYSQL=ODBC " ..
-					" -DWITH_ORACLE=NO " ..
-					" -DWITH_POSTGRESQL=NO " ..
-					" -DWITH_SQLITE3=YES " ..
-					" -DWITH_BOOST=NO" ..
-					" -DSOCI_TESTS=YES " ..
-					" -DCMAKE_BUILD_TYPE=Debug " .. 
-					" " .. SOCI_SRC,
-				"make",
-				"make install"
-			})
-		end
-	end
+	execute = prepSoci
 }

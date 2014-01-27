@@ -45,16 +45,28 @@ mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
 }
 
 void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_PROJECT + 3, _("Projects"), _("Add additional source directories to the current project"), wxITEM_NORMAL);
+	fileMenu->Append(mvceditor::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
+	fileMenu->Append(mvceditor::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
+	
 }
 
 void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 	// config will leave the defaults alone if keys are not found in the config
-	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.PhpFileExtensionsString);
-	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.CssFileExtensionsString);
-	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.SqlFileExtensionsString);
-	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.MiscFileExtensionsString);
+	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.FileTypes.PhpFileExtensionsString);
+	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.FileTypes.CssFileExtensionsString);
+	config->Read(wxT("/Project/SqlFileExtensions"), &App.Globals.FileTypes.SqlFileExtensionsString);
+	config->Read(wxT("/Project/JsFileExtensions"), &App.Globals.FileTypes.JsFileExtensionsString);
+	config->Read(wxT("/Project/ConfigFileExtensions"), &App.Globals.FileTypes.ConfigFileExtensionsString);
+	config->Read(wxT("/Project/CrontabFileExtensions"), &App.Globals.FileTypes.CrontabFileExtensionsString);
+	config->Read(wxT("/Project/YamlFileExtensions"), &App.Globals.FileTypes.YamlFileExtensionsString);
+	config->Read(wxT("/Project/XmlFileExtensions"), &App.Globals.FileTypes.XmlFileExtensionsString);
+	config->Read(wxT("/Project/RubyFileExtensions"), &App.Globals.FileTypes.RubyFileExtensionsString);
+	config->Read(wxT("/Project/LuaFileExtensions"), &App.Globals.FileTypes.LuaFileExtensionsString);
+	config->Read(wxT("/Project/MarkdownFileExtensions"), &App.Globals.FileTypes.MarkdownFileExtensionsString);
+	config->Read(wxT("/Project/BashFileExtensions"), &App.Globals.FileTypes.BashFileExtensionsString);
+	config->Read(wxT("/Project/DiffFileExtensions"), &App.Globals.FileTypes.DiffFileExtensionsString);
+	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.FileTypes.MiscFileExtensionsString);
 	
 	App.Globals.Projects.clear();
 	wxString key;
@@ -101,10 +113,20 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
-	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.PhpFileExtensionsString);
-	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.CssFileExtensionsString);
-	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.SqlFileExtensionsString);
-	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.MiscFileExtensionsString);
+	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.FileTypes.PhpFileExtensionsString);
+	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.FileTypes.CssFileExtensionsString);
+	config->Write(wxT("/Project/SqlFileExtensions"), App.Globals.FileTypes.SqlFileExtensionsString);
+	config->Write(wxT("/Project/JsFileExtensions"), App.Globals.FileTypes.JsFileExtensionsString);
+	config->Write(wxT("/Project/ConfigFileExtensions"), App.Globals.FileTypes.ConfigFileExtensionsString);
+	config->Write(wxT("/Project/CrontabFileExtensions"), App.Globals.FileTypes.CrontabFileExtensionsString);
+	config->Write(wxT("/Project/YamlFileExtensions"), App.Globals.FileTypes.YamlFileExtensionsString);
+	config->Write(wxT("/Project/XmlFileExtensions"), App.Globals.FileTypes.XmlFileExtensionsString);
+	config->Write(wxT("/Project/RubyFileExtensions"), App.Globals.FileTypes.RubyFileExtensionsString);
+	config->Write(wxT("/Project/LuaFileExtensions"), App.Globals.FileTypes.LuaFileExtensionsString);
+	config->Write(wxT("/Project/MarkdownFileExtensions"), App.Globals.FileTypes.MarkdownFileExtensionsString);
+	config->Write(wxT("/ProjectBashFileExtensions"), App.Globals.FileTypes.BashFileExtensionsString);
+	config->Write(wxT("/Project/DiffFileExtensions"), App.Globals.FileTypes.DiffFileExtensionsString);	
+	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.FileTypes.MiscFileExtensionsString);
 
 	// remove all project from the config
 	wxString key;
@@ -229,6 +251,87 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 	}
 }
 
+void mvceditor::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
+	
+	// make sure that no existing project index or wipe action is running
+	// as we will re-trigger an index if the user makes any modifications to
+	// the project sources
+	if (App.Sequences.Running()) {
+		wxString msg = wxString::FromAscii(
+			"There is an existing background task running. Since the changes "
+			"made from this dialog may re-trigger a project index sequence, "
+			"you may not make modifications until the existing background task ends.\n"
+			"Would you like to stop the current background tasks? If you answer no, the "
+			"projects dialog will not be opened."
+		);
+		msg = wxGetTranslation(msg);
+		int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, GetMainWindow());
+		if (wxYES != ret) {
+			return;
+		}
+
+		// user said yes, we should stop the running tasks
+		App.Sequences.Stop();
+		App.RunningThreads.StopAll();
+	}
+
+	wxDirDialog dirDialog(GetMainWindow(), _("Choose Project Root Directory"));
+	if (dirDialog.ShowModal() == wxID_OK) {
+		wxString dir = dirDialog.GetPath();
+		wxFileName rootPath;
+		rootPath.AssignDir(dir);
+		wxString projectName = rootPath.GetDirs().Last();
+
+		mvceditor::ProjectClass newProject;
+		mvceditor::SourceClass newSource;
+		newSource.RootDirectory = rootPath;
+		newSource.SetIncludeWildcards(wxT("*.*"));
+		newProject.AddSource(newSource);
+		newProject.Label = projectName;
+		newProject.IsEnabled = true;
+
+		App.Globals.Projects.push_back(newProject);
+
+		// for new projects we need to fill in the file extensions
+		// the rest of the app assumes they are already filled in
+		App.Globals.AssignFileExtensions(newProject);
+
+		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+		App.EventSink.Publish(evt);
+		wxConfigBase* config = wxConfig::Get();
+		config->Flush();
+
+		// signal that this app has modified the config file, that way the external
+		// modification check fails and the user will not be prompted to reload the config
+		App.UpdateConfigModifiedTime();
+
+		// start the sequence that will update all global data structures
+		// delete the cache files for the projects the user has removed
+		// remove tags from deleted projects
+		// if at least 1 project was re-enabled, then prompt for re-tagging
+		// note that we always want to start the sequence, because
+		// the sequence disables projects that were removed.
+		// if user only disabled projects, no need to prompt since no projects
+		// will be re-tagged
+		wxString msg = wxString::FromAscii(
+			"Would you like to re-tag your newly created project at this time?"
+		);
+		msg = wxGetTranslation(msg);
+		int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
+		if (wxYES == ret) {
+
+			// user does not want to re-tag newly enabled projects
+			std::vector<mvceditor::ProjectClass> empty;
+			std::vector<mvceditor::ProjectClass> touchedProjects;
+			touchedProjects.push_back(newProject);
+			App.Sequences.ProjectDefinitionsUpdated(touchedProjects, empty);
+		}
+		wxCommandEvent newProjectEvt(mvceditor::EVENT_APP_PROJECT_CREATED);
+		newProjectEvt.SetString(dir);
+		App.EventSink.Publish(newProjectEvt);
+	}
+}
+
 void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	
 	// start the sequence that will update all global data structures
@@ -242,17 +345,49 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 
 mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
 : ProjectPreferencesGeneratedPanelClass(parent) {
-	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.PhpFileExtensionsString, PhpLabel);
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectFeature.App.Globals.CssFileExtensionsString, CssLabel);
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.CssFileExtensionsString, CssLabel);
 	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
 
-	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.SqlFileExtensionsString, SqlLabel);
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
 	
-	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.MiscFileExtensionsString, MiscLabel);
+	NonEmptyTextValidatorClass jsFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.JsFileExtensionsString, JsLabel);
+	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
+
+	NonEmptyTextValidatorClass configFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.ConfigFileExtensionsString, ConfigLabel);
+	ConfigFileExtensions->SetValidator(configFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass crontabFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.CrontabFileExtensionsString, CrontabLabel);
+	CrontabFileExtensions->SetValidator(crontabFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass yamlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.YamlFileExtensionsString, YamlLabel);
+	YamlFileExtensions->SetValidator(yamlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass xmlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.XmlFileExtensionsString, XmlLabel);
+	XmlFileExtensions->SetValidator(xmlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass rubyFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.RubyFileExtensionsString, RubyLabel);
+	RubyFileExtensions->SetValidator(rubyFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass luaFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.LuaFileExtensionsString, LuaLabel);
+	LuaFileExtensions->SetValidator(luaFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass markdownFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MarkdownFileExtensionsString, MarkdownLabel);
+	MarkdownFileExtensions->SetValidator(markdownFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass bashFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.BashFileExtensionsString, BashLabel);
+	BashFileExtensions->SetValidator(bashFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass diffFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.DiffFileExtensionsString, DiffLabel);
+	DiffFileExtensions->SetValidator(diffFileExtensionsValidator);
+	
+	
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
+	
 }
 
 mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)
@@ -695,7 +830,8 @@ void mvceditor::MultipleSelectDialogClass::OnCancelButton(wxCommandEvent& event)
 }
 
 BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_PROJECT + 3, mvceditor::ProjectFeatureClass::OnProjectDefine)
+	EVT_MENU(mvceditor::MENU_PROJECT + 0, mvceditor::ProjectFeatureClass::OnProjectDefine)
+	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectFeatureClass::OnCreateNewProject)
 
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)

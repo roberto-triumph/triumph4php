@@ -52,7 +52,6 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
 	EditorBehavior = new EditorBehaviorPanelClass(notebook, Preferences.CodeControlOptions);
 	notebook->AddPage(EditorBehavior, _("Editor Behavior"));
-	notebook->AddPage(new EditColorsPanelClass(notebook, Preferences.CodeControlOptions), _("Styles && Colors"));
 	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
 
@@ -77,10 +76,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	NeedsRetag = false;
 	pelet::Versions oldPhpVersion = Globals.Environment.Php.Version;
 	wxString oldPhpExecutable = Globals.Environment.Php.PhpExecutablePath;
-	wxString oldExtensions = Globals.PhpFileExtensionsString 
-		+ Globals.SqlFileExtensionsString
-		+ Globals.CssFileExtensionsString
-		+ Globals.MiscFileExtensionsString;
+	wxString oldExtensions = Globals.FileTypes.GetAllSourceFileExtensionsString();
 	if (Validate() && book->Validate() && TransferDataFromWindow() && book->TransferDataFromWindow()) {
 		KeyboardShortcutsPanel->ApplyChanges();
 		Preferences.KeyProfiles = KeyboardShortcutsPanel->GetProfiles();
@@ -89,10 +85,7 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 		if (OldSettingsDir != SettingsDir) {
 			ChangedSettingsDir = true;
 		}
-		wxString newExtensions = Globals.PhpFileExtensionsString 
-			+ Globals.SqlFileExtensionsString
-			+ Globals.CssFileExtensionsString
-			+ Globals.MiscFileExtensionsString;
+		wxString newExtensions = Globals.FileTypes.GetAllSourceFileExtensionsString();
 		if (oldExtensions != newExtensions) {
 			NeedsRetag = true;
 		}

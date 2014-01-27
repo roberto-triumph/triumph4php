@@ -30,6 +30,7 @@
 #include <actions/ActionClass.h>
 #include <wx/imaglist.h>
 #include <wx/fswatcher.h>
+#include <widgets/FileTypeImageList.h>
 
 namespace mvceditor {
 
@@ -113,6 +114,11 @@ private:
 	 * when projects list is updated, we need to update our sources list
 	 */
 	void OnAppPreferencesSaved(wxCommandEvent& event);
+
+	/**
+	 * when a new project is created, show it in the explorer panel
+	 */
+	void OnAppProjectCreated(wxCommandEvent& event);
 	
 	/**
 	 * toolbar to hold the explorer buttons
@@ -182,13 +188,8 @@ private:
 	int FilterChoice;
 
 	enum ListImages {
-		LIST_FOLDER,
-		LIST_PARENT_FOLDER,
-		LIST_FILE_PHP,
-		LIST_FILE_SQL,
-		LIST_FILE_CSS,
-		LIST_FILE_TEXT,
-		LIST_FILE_OTHER
+		LIST_FOLDER = mvceditor::IMGLIST_NONE + 1,
+		LIST_PARENT_FOLDER
 	};
 
 	enum SourceImages {

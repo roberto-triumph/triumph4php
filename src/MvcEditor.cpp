@@ -51,6 +51,7 @@
 #include <features/VersionUpdateFeatureClass.h>
 #include <features/TotalSearchFeatureClass.h>
 #include <features/DocCommentFeatureClass.h>
+#include <features/SyntaxHighlightFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -263,6 +264,8 @@ void mvceditor::AppClass::CreateFeatures() {
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new DocCommentFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new SyntaxHighlightFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

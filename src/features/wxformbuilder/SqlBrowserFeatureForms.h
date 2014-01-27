@@ -28,7 +28,7 @@
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
 #include <wx/checklst.h>
-#include <wx/scrolwin.h>
+#include <wx/aui/auibook.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -208,11 +208,7 @@ class TableDefinitionPanelGeneratedClass : public wxPanel
 		wxChoice* Connections;
 		wxStaticText* TableLabel;
 		wxTextCtrl* TableName;
-		wxScrolledWindow* GridsPanel;
-		wxStaticText* ColumnsLabel;
-		wxGrid* ColumnsGrid;
-		wxStaticText* IndicesLabel;
-		wxGrid* IndicesGrid;
+		wxAuiNotebook* Notebook;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
@@ -222,8 +218,42 @@ class TableDefinitionPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		TableDefinitionPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		TableDefinitionPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 719,415 ), long style = wxTAB_TRAVERSAL );
 		~TableDefinitionPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DefinitionIndicesPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DefinitionIndicesPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxGrid* IndicesGrid;
+	
+	public:
+		
+		DefinitionIndicesPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 666,260 ), long style = wxTAB_TRAVERSAL );
+		~DefinitionIndicesPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DefinitionColumnsPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DefinitionColumnsPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxGrid* ColumnsGrid;
+	
+	public:
+		
+		DefinitionColumnsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 690,299 ), long style = wxTAB_TRAVERSAL );
+		~DefinitionColumnsPanelGeneratedClass();
 	
 };
 

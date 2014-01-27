@@ -100,16 +100,31 @@ private:
 // forward declaration to prevent recompilation when CodeControlClass is updated
 class CodeControlClass;
 
-
 /**
- * event gets generated when a file is saved.
+ * event gets generated when a file is saved. The event will be
+ * of type CodeControlEventClass
  */
 extern const wxEventType EVENT_APP_FILE_SAVED;
 
 /**
- * event gets generated when a file is closed.
+ * event gets generated when a file is closed. The event will be
+ * of type CodeControlEventClass
  */
 extern const wxEventType EVENT_APP_FILE_CLOSED;
+
+
+/**
+ * Notification that an existing file has been opened. The event will be
+ * of type CodeControlEventClass
+ */
+extern const wxEventType EVENT_APP_FILE_OPENED;
+
+/**
+ * Notification that a new code control tab has been created.  Since this is a 
+ * file not yet on the file system, there is no filename associated with the new 
+ * tab. The event will be of type CodeControlEventClass
+ */
+extern const wxEventType EVENT_APP_FILE_NEW;
 
 /**
  * This is an event that will tell a feature that a file has been saved.
@@ -224,6 +239,16 @@ public:
 
 typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
+#define EVT_APP_FILE_NEW(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+	
+#define EVT_APP_FILE_OPEN(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+
 #define EVT_APP_FILE_SAVED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
@@ -248,7 +273,7 @@ typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 	
 typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
 	
-#define EVT_APP_FILE_OPEN(fn) \
+#define EVT_CMD_FILE_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenFileCommandEventClassFunction, & fn ), (wxObject *) NULL ),
@@ -283,24 +308,11 @@ extern const wxEventType EVENT_APP_READY;
 extern const wxEventType EVENT_APP_EXIT;
 
 /**
- * Notification that an existing file has been opened.  The event will contain
- * the full path of the file that was opened in the GetString() method; 
- */
-extern const wxEventType EVENT_APP_FILE_OPENED;
-
-/**
  * Notification that a new file has been created on the file system.  A file is created when
  * the user opens a new buffer and then saves it. The event will contain
  * the full path of the file that was opened in the GetString() method; 
  */
 extern const wxEventType EVENT_APP_FILE_CREATED;
-
-/**
- * Notification that a new code control tab has been created.  Since this is a 
- * file not yet on the file system, there is no filename associated with the new 
- * tab.
- */
-extern const wxEventType EVENT_APP_FILE_NEW;
 
 /**
  * Notification that a file has been reverted (all changed in memory undone). The event will contain
@@ -410,6 +422,15 @@ extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
  * The global config (wxConfig::Get()) should be used.
  */
 extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
+
+/**
+ * Notification that a new project was created via the "New Project"
+ * menu (not the "Defined Projects" menu). The generated event will be
+ * a wxCommandEvent, its GetString() will be contain the directory
+ * of the created project.
+ */
+extern const wxEventType EVENT_APP_PROJECT_CREATED;
+
 
 /**
  * Tell the app to open a new file.

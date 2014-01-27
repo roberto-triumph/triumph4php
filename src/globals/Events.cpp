@@ -135,6 +135,7 @@ const wxEventType mvceditor::EVENT_APP_DIR_DELETED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_DIR_RENAMED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
+const wxEventType mvceditor::EVENT_APP_PROJECT_CREATED = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 const wxEventType mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();

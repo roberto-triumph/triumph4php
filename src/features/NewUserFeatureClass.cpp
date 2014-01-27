@@ -61,13 +61,13 @@ mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::G
 , Globals(globals)
 , ConfigFileDir(configFileDir) {
 
-	wxTextValidator phpFileExtensionsValidator(wxFILTER_EMPTY, &globals.PhpFileExtensionsString);
+	wxTextValidator phpFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.PhpFileExtensionsString);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
-	wxTextValidator sqlFileExtensionsValidator(wxFILTER_EMPTY, &globals.SqlFileExtensionsString);
+	wxTextValidator sqlFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.SqlFileExtensionsString);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
-	wxTextValidator cssFileExtensionsValidator(wxFILTER_EMPTY, &globals.CssFileExtensionsString);
+	wxTextValidator cssFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.CssFileExtensionsString);
 	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
-	wxTextValidator miscFileExtensionsValidator(wxFILTER_EMPTY, &globals.MiscFileExtensionsString);
+	wxTextValidator miscFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.MiscFileExtensionsString);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
 
 	wxGenericValidator phpInstalledValidator(&globals.Environment.Php.Installed);
