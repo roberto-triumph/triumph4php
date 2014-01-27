@@ -286,7 +286,7 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	while (it != Feature.LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = Feature.LintErrors.erase(it);
-			if (i > 0 && ErrorsList->GetCount() < (size_t)i) {
+			if (i >= 0 && (size_t)i < ErrorsList->GetCount()) {
 				ErrorsList->Delete(i);
 			}
 			i--;
@@ -360,6 +360,9 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 }
 
 void mvceditor::LintResultsPanelClass::ShowLintError(int index) {
+	if (index < 0 || (size_t)index >= Feature.LintErrors.size()) {
+		return;
+	}
 	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (!codeControl) {
 		return;
