@@ -86,6 +86,8 @@ mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 , Errors()
 , ScopeVariables()
 , PredefinedVariables()
+, HasExtractCall(false)
+, HasIncludeCall(false)
 , Parser() 
 , Options()
 , File() {
@@ -124,6 +126,8 @@ bool mvceditor::PhpVariableLintClass::ParseFile(const wxFileName& fileName,
 	Errors.clear();
 	ScopeVariables.clear();
 	Parser.SetVersion(Options.Version);
+	HasExtractCall = false;
+	HasIncludeCall = false;
 	File = mvceditor::WxToIcu(fileName.GetFullPath());
 	
 	pelet::LintResultsClass lintResult;
@@ -141,6 +145,8 @@ bool mvceditor::PhpVariableLintClass::ParseString(const UnicodeString& code,
 	Errors.clear();
 	ScopeVariables.clear();
 	Parser.SetVersion(Options.Version);
+	HasExtractCall = false;
+	HasIncludeCall = false;
 	File = UNICODE_STRING_SIMPLE("");
 
 	pelet::LintResultsClass lintResult;
@@ -163,12 +169,16 @@ void mvceditor::PhpVariableLintClass::MethodFound(const UnicodeString& namespace
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	ScopeVariables.clear();
 	ScopeVariables[UNICODE_STRING_SIMPLE("$this")] = 1;
+	HasExtractCall = false;
+	HasIncludeCall = false;
 }
 
 void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
 											const UnicodeString& comment, const int lineNumber) {
 	ScopeVariables.clear();
+	HasExtractCall = false;
+	HasIncludeCall = false;
 }
 
 void mvceditor::PhpVariableLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
@@ -192,7 +202,7 @@ void mvceditor::PhpVariableLintClass::ExpressionAssignmentFound(pelet::Assignmen
 			CheckExpression(expression->Destination.ChainList[i].ArrayAccess);
 		}
 	}
-	
+
 	CheckExpression(expression->Expression);
 	
 	// for now, ignore assignments to properties ie. $obj->prop1
@@ -288,6 +298,10 @@ void mvceditor::PhpVariableLintClass::StatementStaticVariablesFound(pelet::Stati
 
 void mvceditor::PhpVariableLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
 	CheckExpression(expr->Expression);
+	
+	// set the flag after we check the expression on the right; that way
+	// we can find unitialized variables in the expression on the right
+	HasIncludeCall = true;
 }
 
 void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
@@ -311,7 +325,12 @@ void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpre
 
 	// copy the current scope to be replaced back after we deal with the closure
 	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> oldScope = ScopeVariables;
+	bool oldExtractCalled = HasExtractCall;
+	bool oldIncludeCalled = HasIncludeCall;
+	
 	ScopeVariables = closureScopeVariables;
+	HasExtractCall = false;
+	HasIncludeCall = false;
 
 	for (size_t i = 0; i < expr->Statements.Size(); ++i) {
 		if (pelet::StatementClass::EXPRESSION == expr->Statements.TypeAt(i)) {
@@ -321,7 +340,36 @@ void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpre
 	
 	// put the old scope back
 	ScopeVariables = oldScope;
+	HasExtractCall = oldExtractCalled;
+	HasIncludeCall = oldIncludeCalled;
 }
+
+void mvceditor::PhpVariableLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
+	
+	// for isset expression, we want to see if any expression is an assignment 
+	// expression if so, then we set the destination variable as a scope variable
+	for (size_t i = 0; i < expression->Expressions.size(); ++i) {
+		/*if (pelet::ExpressionClass::ASSIGNMENT == expression->Expressions[i]->ExpressionType) {
+		
+			// for now, ignore assignments to properties ie. $obj->prop1
+			// but we want to check arrays ie $data['name'] = '';
+			pelet::AssignmentExpressionClass* assignment = (pelet::AssignmentExpressionClass*)expression->Expressions[i];
+			if (assignment->Destination.ChainList.size() == 1 && 
+				!assignment->Destination.ChainList[0].IsFunction) {
+				
+				ScopeVariables[assignment->Destination.ChainList[0].Name] = 1;
+			}
+			else if (assignment->Destination.ChainList.size() > 1 && 
+				assignment->Destination.ChainList[1].IsArrayAccess) {
+				
+				ScopeVariables[assignment->Destination.ChainList[0].Name] = 1;
+			}
+		}
+		 */
+		CheckExpression(expression->Expressions[i]);
+	}
+}
+
 void mvceditor::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
 
 	// check any array accesses in the destination variables
@@ -390,6 +438,8 @@ void mvceditor::PhpVariableLintClass::CheckExpression(pelet::ExpressionClass* ex
 	case pelet::ExpressionClass::CLOSURE:
 		ExpressionClosureFound((pelet::ClosureExpressionClass*)expr);
 		break;
+	case pelet::ExpressionClass::ISSET:
+		ExpressionIssetFound((pelet::IssetExpressionClass*)expr);
 	case pelet::ExpressionClass::ARRAY_PAIR:
 	
 		// we dont event get array pairs by themselves, they come in 
@@ -421,7 +471,9 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		// if options say to not check variables in global scope, then dont check
 		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {
 			UnicodeString varName = var->ChainList[0].Name;
-			if (ScopeVariables.find(varName) == ScopeVariables.end()
+			if (!HasExtractCall
+				&& !HasIncludeCall
+				&& ScopeVariables.find(varName) == ScopeVariables.end()
 				&& PredefinedVariables.find(varName) == PredefinedVariables.end()) {
 				mvceditor::PhpVariableLintResultClass lintResult;
 				lintResult.File = File;
@@ -435,10 +487,25 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	}
 	if (var->ChainList[0].IsFunction) {
 		
-		// check the function parameters
-		std::vector<pelet::ExpressionClass*>::const_iterator it;
-		for (it = var->ChainList[0].CallArguments.begin(); it != var->ChainList[0].CallArguments.end(); ++it) {
-			CheckExpression(*it);
+		// is this a call to extract()
+		if (var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("extract"), 0) == 0) {
+			HasExtractCall = true;
+		}
+	}
+		
+	// check the function parameters
+	for (size_t i = 0; i < var->ChainList.size(); ++i) {
+		if (var->ChainList[i].IsFunction) {
+			std::vector<pelet::ExpressionClass*>::const_iterator it;
+			for (it = var->ChainList[i].CallArguments.begin(); it != var->ChainList[i].CallArguments.end(); ++it) {
+				if ((*it)->ExpressionType == pelet::ExpressionClass::VARIABLE) {
+					pelet::VariableClass* argVar = (pelet::VariableClass*)*it;
+					if (!argVar->ChainList.empty() && !argVar->ChainList[0].IsFunction) {
+						ScopeVariables[argVar->ChainList[0].Name] = 1;
+					}
+				}
+				CheckExpression(*it);
+			}
 		}
 	}
 

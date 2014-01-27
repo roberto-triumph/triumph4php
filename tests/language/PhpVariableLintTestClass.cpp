@@ -140,8 +140,11 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 
 	// function parameters should be automatically declared
 	UnicodeString code = mvceditor::CharToIcu(
-		"function myFunc($a) {\n"
+		"function myFunc($a, &$b) {\n"
 		"  $a->work();\n"
+		"  if (!$b) {\n"
+		"    $b = true;\n"
+		"  }\n"
 		"}"
 	);
 	Parse(code);
@@ -210,6 +213,46 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
+	
+	// when the extract() function is used, we can't really
+	// detect wich variables have been initialized, as 
+	// extract defines variables based on the array keys.
+	// in this case, we disable variable linting on
+	// the scope
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"class MyClass {\n"
+		"  function work($arrVars) {\n"
+		"    extract($arrVars);\n"
+		"    echo $name;\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
+	
+	// when include() is used, we can't really
+	// detect wich variables have been initialized, as 
+	// include brings in new variables to the current scope
+	// in this case, we disable variable linting on
+	// the scope
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"class MyClass {\n"
+		"  function work($arrVars) {\n"
+		"    include('config.php');\n"
+		"    echo $config->database->host;\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 
 	// arrays can be initialized and assigned at the same time
@@ -232,6 +275,38 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 		"  while (!feof($fp) && ($line = fgets($fp))) {\n"
 		"      var_dump($line);\n"
 		"  }\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+/*
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
+
+	// a variable being checked with the isset keyword
+	// should not be labeled as unitialized
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
+		"   if (isset($arrPairs)) {\n"
+		"    return $arrPairs[0];\n"
+		"  }\n"
+		"  return '';\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+*/
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
+
+	// assignment in conditional still count as initialized
+	UnicodeString code = mvceditor::CharToIcu(
+		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
+		"   if (isset($arrNames[$name = $class->getName()])) {\n"
+		"    return $arrValues[$name];\n"
+		"  }\n"
+		"  return '';\n"
 		"}"
 	);
 	Parse(code);
@@ -284,7 +359,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 	CHECK_UNISTR_EQUALS("$b", Results[2].VariableName);
 	CHECK_EQUAL(10, Results[2].LineNumber);
 }
-
+/*
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
@@ -304,6 +379,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
+
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 
@@ -326,6 +402,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
+*/
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 
@@ -383,13 +460,15 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	Options.CheckGlobalScope = true;
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
-	CHECK_VECTOR_SIZE(3, Results);
+	
+	// only the first $file variable should be
+	// labeled as uninitialized, when we encounter an
+	// include/require there could be variables imported
+	// into the current scope.
+	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$file", Results[0].VariableName);
 	CHECK_EQUAL(1, Results[0].LineNumber);
-	CHECK_UNISTR_EQUALS("$file", Results[1].VariableName);
-	CHECK_EQUAL(2, Results[1].LineNumber);
-	CHECK_UNISTR_EQUALS("$file", Results[2].VariableName);
-	CHECK_EQUAL(3, Results[2].LineNumber);
+	
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {

@@ -287,6 +287,7 @@ void mvceditor::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExp
 		}
 	}
 }
+
 void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
 
 	// check any array accesses in the destination variables
@@ -297,6 +298,15 @@ void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::Ass
 	}
 	
 	CheckExpression(expression->Expression);
+}
+
+void mvceditor::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
+
+	// check any array accesses in the destination variables
+	// ie $user[$name]
+	for (size_t i = 0; i < expression->Expressions.size(); ++i) {
+		CheckExpression(expression->Expressions[i]);
+	}
 }
 
 void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) {
@@ -339,6 +349,9 @@ void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* 
 		break;
 	case pelet::ExpressionClass::CLOSURE:
 		ExpressionClosureFound((pelet::ClosureExpressionClass*)expr);
+		break;
+	case pelet::ExpressionClass::ISSET:
+		ExpressionIssetFound((pelet::IssetExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::ARRAY_PAIR:
 	

@@ -184,6 +184,8 @@ public:
 	void ExpressionIncludeFound(pelet::IncludeExpressionClass* expr);
 
 	void ExpressionClosureFound(pelet::ClosureExpressionClass* expr);
+	
+	void ExpressionIssetFound(pelet::IssetExpressionClass* expression);
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
@@ -206,6 +208,20 @@ private:
 	 * is included.
 	 */
 	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> PredefinedVariables;
+	
+	/**
+	 * flag that will be set when the extract function was called.
+	 * we detect the use of extract so that we don't label variables
+	 * as uninitialized after a call to extract
+	 */
+	bool HasExtractCall;
+	
+	/**
+	 * flag that will be set when the include keyword was used.
+	 * we detect the use of include so that we don't label variables
+	 * as uninitialized after a call to include
+	 */
+	bool HasIncludeCall;
 
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods
