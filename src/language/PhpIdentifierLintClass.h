@@ -164,6 +164,8 @@ public:
 	void ExpressionClosureFound(pelet::ClosureExpressionClass* expr);
 	
 	void ExpressionIssetFound(pelet::IssetExpressionClass* expression);
+	
+	void ExpressionEvalFound(pelet::EvalExpressionClass* expression);
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 

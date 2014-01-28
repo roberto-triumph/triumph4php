@@ -309,6 +309,10 @@ void mvceditor::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpress
 	}
 }
 
+void mvceditor::PhpIdentifierLintClass::ExpressionEvalFound(pelet::EvalExpressionClass* expression) {
+	CheckExpression(expression->Expression);
+}
+
 void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	switch (expr->ExpressionType) {
 	case pelet::ExpressionClass::ARRAY:
@@ -352,6 +356,9 @@ void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* 
 		break;
 	case pelet::ExpressionClass::ISSET:
 		ExpressionIssetFound((pelet::IssetExpressionClass*)expr);
+		break;
+	case pelet::ExpressionClass::EVAL:
+		ExpressionEvalFound((pelet::EvalExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::ARRAY_PAIR:
 	

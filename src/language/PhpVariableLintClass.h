@@ -186,6 +186,8 @@ public:
 	void ExpressionClosureFound(pelet::ClosureExpressionClass* expr);
 	
 	void ExpressionIssetFound(pelet::IssetExpressionClass* expression);
+	
+	void ExpressionEvalFound(pelet::EvalExpressionClass* expression);
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
@@ -215,6 +217,13 @@ private:
 	 * as uninitialized after a call to extract
 	 */
 	bool HasExtractCall;
+	
+	/**
+	 * flag that will be set when the eval function was called.
+	 * we detect the use of eval so that we don't label variables
+	 * as uninitialized after a call to eval
+	 */
+	bool HasEvalCall;
 	
 	/**
 	 * flag that will be set when the include keyword was used.

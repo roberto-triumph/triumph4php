@@ -233,6 +233,26 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
+	
+	// when the eval() function is used, we can't really
+	// detect wich variables have been initialized, as 
+	// eval can create new variables.
+	// in this case, we disable variable linting on
+	// the scope
+	Options.CheckGlobalScope = false;
+	UnicodeString code = mvceditor::CharToIcu(
+		"class MyClass {\n"
+		"  function work($arrVars) {\n"
+		"    eval('$arr3 = 4;');\n"
+		"    echo $arr3;\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
 	
 	// when include() is used, we can't really

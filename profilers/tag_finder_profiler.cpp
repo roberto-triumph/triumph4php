@@ -27,6 +27,7 @@
 #include <pelet/ParserClass.h>
 #include <language/SymbolTableClass.h>
 #include <language/TagCacheClass.h>
+#include <language/PhpVariableLintClass.h>
 #include <search/DirectorySearchClass.h>
 #include <language/ParsedTagFinderClass.h>
 #include <globals/Assets.h>
@@ -58,6 +59,11 @@ void ProfileParser();
 void ProfileParserOnLargeProject();
 
 /**
+ * Profiles the variable linter on a large project (500k LOC).
+ */
+void ProfileVariableLintOnLargeProject();
+
+/**
  * Profiles the ParsedTagFinderClass.  This function requires that the
  * tag cache has already been built.
  */
@@ -81,6 +87,28 @@ private:
 
 	pelet::ParserClass Parser;
 };
+
+
+/** 
+ * This class will help in linting a large project
+ */
+class VariableLinterWalkerClass : public mvceditor::DirectoryWalkerClass {
+public:
+
+	VariableLinterWalkerClass();
+	
+	virtual bool Walk(const wxString& file);
+	
+	int WithErrors;
+	
+	int WithNoErrors;
+	
+private:
+
+	mvceditor::PhpVariableLintOptionsClass Options;
+	mvceditor::PhpVariableLintClass Linter;
+};
+
 
 /**
  * Profiles a large project (500k LOC). It profiles the time it takes to build
@@ -114,7 +142,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
-		DirName = wxT("/home/roberto/workspace/sample_php_project/");
+		DirName = wxT("/home/roberto/public_html/tci_umbrellaservices");
 		DbFileName = wxT("resource.db");
 	}
 	std::string test;
@@ -124,7 +152,8 @@ int main(int argc, char** argv) {
 			<< "2. Parser" << std::endl
 			<< "3. Lint (On Project)" << std::endl
 			<< "4. TagParser (On Project)" << std::endl
-			<< "5. TagFinder (On Project)" << std::endl;
+			<< "5. TagFinder (On Project)" << std::endl
+			<< "6. Variable Linter (On Project)" << std::endl;
 		std::string in;
 		std::cin >> test;	
 	}
@@ -132,30 +161,34 @@ int main(int argc, char** argv) {
 		test = argv[1];
 	}
 
-	if (test == "lexer") {
+	if (test == "1") {
 		ProfileLexer();
 	}
-	else if (test == "parser") {
+	else if (test == "2") {
 		ProfileParser();
 	}
-	else if (test == "lint") {
+	else if (test == "3") {
 		ProfileParserOnLargeProject();
 	}
-	else if (test == "tagparser") {
+	else if (test == "4") {
 		ProfileTagParserOnLargeProject();
 	}
-	else if (test == "tagfinder") {
+	else if (test == "5") {
 		ProfileTagSearch();
+	}
+	else if (test == "6") {
+		ProfileVariableLintOnLargeProject();
 	}
 	else if (test == "--help" || test == "-h") {
 		std::cout << "this is a program that is used to profile PHP parsing ang tag cache" << std::endl
 			<< "usage: tag_finder_profiler [test]" << std::endl
 			 << "[test] can be one of:" << std::endl
-			<< "lexer" << std::endl
-			<< "parser" << std::endl
-			<< "lint (On Project)" << std::endl
-			<< "tagparser (On Project)" << std::endl
-			<< "tagfinder (On Project)" << std::endl;
+			<< "1 (for lexer)" << std::endl
+			<< "2 (for parser)" << std::endl
+			<< "3 (for lint On Project)" << std::endl
+			<< "4 (for tagparser On Project)" << std::endl
+			<< "5 (for tagfinder On Project)" << std::endl
+			<< "6 (for variable linter On Project)" << std::endl;
 	}
 	else {
 		std::cout << "unknown test:" << test << std::endl;
@@ -307,7 +340,7 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 	: WithErrors(0)
 	, WithNoErrors(0)
 	, Parser() {
-		
+	Parser.SetVersion(pelet::PHP_54);
 }
 
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
@@ -345,5 +378,60 @@ void ProfileParserOnLargeProject() {
 	}
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for ParserClass LintFile on entire project:%ld ms\n", time.ToLong());
+	printf("Files with errors:%d\nFiles with no errors:%d\n", walker.WithErrors, walker.WithNoErrors);
+}
+
+
+VariableLinterWalkerClass::VariableLinterWalkerClass() 
+	: WithErrors(0)
+	, WithNoErrors(0)
+	, Options()
+	, Linter() {
+	
+	Options.CheckGlobalScope = false;
+	Options.Version = pelet::PHP_54;
+	Linter.SetOptions(Options);
+}
+
+bool VariableLinterWalkerClass::Walk(const wxString& file) {
+	if (file.EndsWith(wxT(".php"))) {
+		std::vector<mvceditor::PhpVariableLintResultClass> results;
+		std::string stdFile(file.ToAscii());
+		if (Linter.ParseFile(wxFileName(file), results)) {
+			UFILE *out = u_finit(stdout, NULL, NULL);
+			for (size_t i = 0; i < results.size(); ++i) {
+				u_fprintf(out, "unitialized variable `%S` on file %S around line %d\n", 
+					results[i].VariableName.getTerminatedBuffer(),
+					results[i].File.getTerminatedBuffer(),
+					results[i].LineNumber);
+			
+			}
+			u_fclose(out);
+			WithErrors++;
+		}
+		else {
+			WithNoErrors++;
+		}
+		return true;
+	}
+	return false;
+}
+
+void ProfileVariableLintOnLargeProject() {
+	printf("*******\n");
+	mvceditor::DirectorySearchClass search;
+	wxLongLong time;
+	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
+		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
+			(const char*)DirName.ToAscii());
+		return;
+	}
+	time = wxGetLocalTimeMillis();
+	VariableLinterWalkerClass walker;
+	while (search.More()) {
+		search.Walk(walker);
+	}
+	time = wxGetLocalTimeMillis() - time;
+	printf("time for PhpVariable Linter on entire project:%ld ms\n", time.ToLong());
 	printf("Files with errors:%d\nFiles with no errors:%d\n", walker.WithErrors, walker.WithNoErrors);
 }

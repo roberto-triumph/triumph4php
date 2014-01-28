@@ -87,6 +87,7 @@ mvceditor::PhpVariableLintClass::PhpVariableLintClass()
 , ScopeVariables()
 , PredefinedVariables()
 , HasExtractCall(false)
+, HasEvalCall(false)
 , HasIncludeCall(false)
 , Parser() 
 , Options()
@@ -127,6 +128,7 @@ bool mvceditor::PhpVariableLintClass::ParseFile(const wxFileName& fileName,
 	ScopeVariables.clear();
 	Parser.SetVersion(Options.Version);
 	HasExtractCall = false;
+	HasEvalCall = false;
 	HasIncludeCall = false;
 	File = mvceditor::WxToIcu(fileName.GetFullPath());
 	
@@ -146,6 +148,7 @@ bool mvceditor::PhpVariableLintClass::ParseString(const UnicodeString& code,
 	ScopeVariables.clear();
 	Parser.SetVersion(Options.Version);
 	HasExtractCall = false;
+	HasEvalCall = false;
 	HasIncludeCall = false;
 	File = UNICODE_STRING_SIMPLE("");
 
@@ -170,6 +173,7 @@ void mvceditor::PhpVariableLintClass::MethodFound(const UnicodeString& namespace
 	ScopeVariables.clear();
 	ScopeVariables[UNICODE_STRING_SIMPLE("$this")] = 1;
 	HasExtractCall = false;
+	HasEvalCall = false;
 	HasIncludeCall = false;
 }
 
@@ -178,6 +182,7 @@ void mvceditor::PhpVariableLintClass::FunctionFound(const UnicodeString& namespa
 											const UnicodeString& comment, const int lineNumber) {
 	ScopeVariables.clear();
 	HasExtractCall = false;
+	HasEvalCall = false;
 	HasIncludeCall = false;
 }
 
@@ -326,10 +331,12 @@ void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpre
 	// copy the current scope to be replaced back after we deal with the closure
 	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> oldScope = ScopeVariables;
 	bool oldExtractCalled = HasExtractCall;
+	bool oldEvalCalled = HasEvalCall;
 	bool oldIncludeCalled = HasIncludeCall;
 	
 	ScopeVariables = closureScopeVariables;
 	HasExtractCall = false;
+	HasEvalCall = false;
 	HasIncludeCall = false;
 
 	for (size_t i = 0; i < expr->Statements.Size(); ++i) {
@@ -341,6 +348,7 @@ void mvceditor::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpre
 	// put the old scope back
 	ScopeVariables = oldScope;
 	HasExtractCall = oldExtractCalled;
+	HasEvalCall = oldEvalCalled;
 	HasIncludeCall = oldIncludeCalled;
 }
 
@@ -368,6 +376,11 @@ void mvceditor::PhpVariableLintClass::ExpressionIssetFound(pelet::IssetExpressio
 		 */
 		CheckExpression(expression->Expressions[i]);
 	}
+}
+
+void mvceditor::PhpVariableLintClass::ExpressionEvalFound(pelet::EvalExpressionClass* expression) {
+	HasEvalCall = true;
+	CheckExpression(expression->Expression);
 }
 
 void mvceditor::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
@@ -440,6 +453,10 @@ void mvceditor::PhpVariableLintClass::CheckExpression(pelet::ExpressionClass* ex
 		break;
 	case pelet::ExpressionClass::ISSET:
 		ExpressionIssetFound((pelet::IssetExpressionClass*)expr);
+		break;
+	case pelet::ExpressionClass::EVAL:
+		ExpressionEvalFound((pelet::EvalExpressionClass*) expr);
+		break;
 	case pelet::ExpressionClass::ARRAY_PAIR:
 	
 		// we dont event get array pairs by themselves, they come in 
@@ -472,6 +489,7 @@ void mvceditor::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {
 			UnicodeString varName = var->ChainList[0].Name;
 			if (!HasExtractCall
+				&& !HasEvalCall
 				&& !HasIncludeCall
 				&& ScopeVariables.find(varName) == ScopeVariables.end()
 				&& PredefinedVariables.find(varName) == PredefinedVariables.end()) {
