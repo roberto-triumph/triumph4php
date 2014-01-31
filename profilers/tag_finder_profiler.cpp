@@ -35,6 +35,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/filefn.h>
+#include <wx/ffile.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
 #include <unicode/uclean.h>
@@ -345,9 +346,13 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
+		if (file.Find(wxT("FlattenExceptionTest.php")) != wxNOT_FOUND) {
+			printf("file= %s\n", mvceditor::WxToChar(file).c_str());
+		}
 		pelet::LintResultsClass error;
-		std::string stdFile(file.ToAscii());
-		if (Parser.LintFile(stdFile, error)) {
+		wxFFile ffile(file);
+		UnicodeString uniFile = mvceditor::WxToIcu(file);
+		if (Parser.LintFile(ffile.fp(), uniFile, error)) {
 			WithNoErrors++;
 		}
 		else {
