@@ -25,23 +25,17 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	Label->Wrap( -1 );
 	FlexSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
 	
-	ErrorsList = new wxListBox( this, ID_ERRORS_LIST, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_HSCROLL|wxLB_NEEDED_SB ); 
+	ErrorsList = new wxDataViewListCtrl(this, ID_ERRORS_LIST);
 	FlexSizer->Add( ErrorsList, 1, wxALL|wxEXPAND, 5 );
 	
 	BoxSizer->Add( FlexSizer, 1, wxEXPAND, 5 );
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
-	
-	// Connect Events
-	ErrorsList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnListDoubleClick ), NULL, this );
 }
 
 LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 {
-	// Disconnect Events
-	ErrorsList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnListDoubleClick ), NULL, this );
-	
 }
 
 LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )

@@ -240,35 +240,35 @@ mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id
 	, Feature(feature)
 	, TotalFiles(0)
 	, ErrorFiles(0) {
-			
+	
+	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	ErrorsList->AppendTextColumn(_("Line  Number"), wxDATAVIEW_CELL_INERT,
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	ErrorsList->AppendTextColumn(_("Error"), wxDATAVIEW_CELL_INERT,
+		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 }
 
 void mvceditor::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
 	std::vector<pelet::LintResultsClass>::const_iterator it;
 	for (it = lintErrors.begin(); it != lintErrors.end(); ++it) {
 		pelet::LintResultsClass lintError = *it;
-		wxString err = mvceditor::IcuToWx(lintError.Error);
-		wxString line;
-		int capacity = lintError.Error.length() + lintError.UnicodeFilename.length() + 50;
-		UnicodeString msg;
-		int written = u_sprintf(msg.getBuffer(capacity), 
-			"%.*S on %.*S line %d near Position %d\n", 
-			lintError.Error.length(),
-			lintError.Error.getBuffer(),
-			lintError.UnicodeFilename.length(),
-			lintError.UnicodeFilename.getBuffer(),
-			lintError.LineNumber,
-			lintError.CharacterPosition
-		);
-		msg.releaseBuffer(written);
-		wxString wxMsg = mvceditor::IcuToWx(msg);
+		
 		Feature.LintErrors.push_back(lintError);
-		ErrorsList->AppendString(wxMsg);
+		
+		wxString wxFile = mvceditor::IcuToWx(lintError.UnicodeFilename);
+		wxString errorMsg = mvceditor::IcuToWx(lintError.Error);
+		wxVector<wxVariant> values;
+		values.push_back(wxFile);
+		values.push_back(wxString::Format(wxT("%d"), lintError.LineNumber));
+		values.push_back(errorMsg);
+		
+		ErrorsList->AppendItem(values);
 	}
 }
 
 void mvceditor::LintResultsPanelClass::ClearErrors() {
-	ErrorsList->Clear();
+	ErrorsList->DeleteAllItems();
 	Feature.LintErrors.clear();
 	Feature.VariableResults.clear();
 	Feature.IdentifierResults.clear();
@@ -286,8 +286,8 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	while (it != Feature.LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = Feature.LintErrors.erase(it);
-			if (i >= 0 && (size_t)i < ErrorsList->GetCount()) {
-				ErrorsList->Delete(i);
+			if (i >= 0 && (size_t)i < ErrorsList->GetItemCount()) {
+				ErrorsList->DeleteItem(i);
 			}
 			i--;
 			found = true;
@@ -322,8 +322,8 @@ void mvceditor::LintResultsPanelClass::UpdateSummary() {
 	}
 }
 
-void mvceditor::LintResultsPanelClass::OnListDoubleClick(wxCommandEvent& event) {
-	int index = event.GetInt();
+void mvceditor::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
+	int index = ErrorsList->GetSelectedRow();
 	GoToAndDisplayLintError(index);
 }
 
@@ -336,26 +336,26 @@ void mvceditor::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
 }
 
 void mvceditor::LintResultsPanelClass::SelectNextError() {
-	int selected = ErrorsList->GetSelection();
-	if (selected != wxNOT_FOUND && ((unsigned int)selected  + 1) < ErrorsList->GetCount()) {
-		ErrorsList->SetSelection(selected + 1);
+	int selected = ErrorsList->GetSelectedRow();
+	if (selected != wxNOT_FOUND && ((unsigned int)selected  + 1) < ErrorsList->GetItemCount()) {
+		ErrorsList->SelectRow(selected + 1);
 		GoToAndDisplayLintError(selected + 1);
 	}
-	else if (ErrorsList->GetCount() > 0) {
-		ErrorsList->SetSelection(0);
+	else if (ErrorsList->GetItemCount() > 0) {
+		ErrorsList->SelectRow(0);
 		GoToAndDisplayLintError(0);
 	}
 }
 
 void mvceditor::LintResultsPanelClass::SelectPreviousError() {
-	int selected = ErrorsList->GetSelection();
+	int selected = ErrorsList->GetSelectedRow();
 	if (selected != wxNOT_FOUND && (selected  - 1) >= 0) {
-		ErrorsList->SetSelection(selected - 1);
+		ErrorsList->SelectRow(selected - 1);
 		GoToAndDisplayLintError(selected - 1);
 	}
-	else if (ErrorsList->GetCount() > 0) {
-		ErrorsList->SetSelection(ErrorsList->GetCount() - 1);
-		GoToAndDisplayLintError(ErrorsList->GetCount() - 1);
+	else if (ErrorsList->GetItemCount() > 0) {
+		ErrorsList->SelectRow(ErrorsList->GetItemCount() - 1);
+		GoToAndDisplayLintError(ErrorsList->GetItemCount() - 1);
 	}
 }
 
@@ -708,4 +708,8 @@ BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler)
 	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintError)
 	EVT_LINT_ERROR(ID_LINT_READER_SAVE, mvceditor::LintFeatureClass::OnLintErrorAfterSave)
 	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintSummary)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(mvceditor::LintResultsPanelClass, LintResultsGeneratedPanelClass )
+	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, mvceditor::LintResultsPanelClass::OnRowActivated)
 END_EVENT_TABLE()

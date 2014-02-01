@@ -342,7 +342,7 @@ public:
 	 */
 	void UpdateSummary();
 	
-	virtual void OnListDoubleClick(wxCommandEvent& event);
+	void OnRowActivated(wxDataViewEvent& event);
 
 private:
 
@@ -353,6 +353,8 @@ private:
 	int TotalFiles;
 
 	int ErrorFiles;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 /**

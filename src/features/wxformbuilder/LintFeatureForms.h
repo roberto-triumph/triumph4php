@@ -14,7 +14,7 @@
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/listbox.h>
+#include <wx/dataview.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/checkbox.h>
@@ -37,11 +37,7 @@ class LintResultsGeneratedPanelClass : public wxPanel
 		};
 		
 		wxStaticText* Label;
-		wxListBox* ErrorsList;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
-		
+		wxDataViewListCtrl* ErrorsList;
 	
 	public:
 		
