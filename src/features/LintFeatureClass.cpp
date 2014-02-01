@@ -641,16 +641,12 @@ mvceditor::LintErrorPanelClass::LintErrorPanelClass(mvceditor::CodeControlClass*
 }
 
 void mvceditor::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
-	if (event.GetKeyCode() == WXK_ESCAPE) {
-		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
-		return;
-	}
 	if (event.GetKeyCode() == WXK_SPACE) {
 		CodeControl->MarkLintErrorAndGoto(LintResults[0]);
 		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
 		return;
 	}
-	event.Skip();
+	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
 }
 
 void mvceditor::LintErrorPanelClass::OnGoToLink(wxHyperlinkEvent& event) {

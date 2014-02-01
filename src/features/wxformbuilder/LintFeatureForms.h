@@ -88,7 +88,7 @@ class LintErrorGeneratedPanelClass : public wxPanel
 	
 	public:
 		
-		LintErrorGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,77 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
+		LintErrorGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,77 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL|wxWANTS_CHARS );
 		~LintErrorGeneratedPanelClass();
 	
 };
