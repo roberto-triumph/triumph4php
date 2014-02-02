@@ -72,6 +72,11 @@ EOF;
 		echo "Missing argument: --detectorDbFileName. See --help for details.\n";
 		exit(-1);
 	}
+	
+	if (!extension_loaded('pdo_sqlite') || !extension_loaded('PDO')) {
+		echo "The script " . basename(__FILE__) . " requires the PDO and pdo_sqlite PHP extensions.";
+		exit(-1);
+	}
 
 	// call the function that will return all detected URLs
 	$doSkip = TRUE;
