@@ -58,6 +58,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnectionChoice( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGridRightClick( wxGridEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -254,6 +255,38 @@ class DefinitionColumnsPanelGeneratedClass : public wxPanel
 		
 		DefinitionColumnsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 690,299 ), long style = wxTAB_TRAVERSAL );
 		~DefinitionColumnsPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlCopyDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlCopyDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* ColumnDelimLabel;
+		wxTextCtrl* ColumnDelim;
+		wxStaticText* ColumnEnclosureLabel;
+		wxTextCtrl* ColumnEnclosure;
+		wxStaticText* RowDelimLabel;
+		wxTextCtrl* RowDelim;
+		wxStaticText* NullFillterLabel;
+		wxTextCtrl* NullFiller;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SqlCopyDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlCopyDialogGeneratedClass();
 	
 };
 

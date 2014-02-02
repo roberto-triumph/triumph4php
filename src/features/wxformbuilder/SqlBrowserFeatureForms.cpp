@@ -86,6 +86,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	// Connect Events
 	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
 	Connections->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
+	ResultsGrid->Connect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( SqlBrowserPanelGeneratedClass::OnGridRightClick ), NULL, this );
 }
 
 SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
@@ -93,6 +94,7 @@ SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
 	// Disconnect Events
 	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
 	Connections->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
+	ResultsGrid->Disconnect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( SqlBrowserPanelGeneratedClass::OnGridRightClick ), NULL, this );
 	
 }
 
@@ -497,4 +499,75 @@ DefinitionColumnsPanelGeneratedClass::DefinitionColumnsPanelGeneratedClass( wxWi
 
 DefinitionColumnsPanelGeneratedClass::~DefinitionColumnsPanelGeneratedClass()
 {
+}
+
+SqlCopyDialogGeneratedClass::SqlCopyDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* DialogSizer;
+	DialogSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	DialogSizer->SetFlexibleDirection( wxBOTH );
+	DialogSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* InputSizer;
+	InputSizer = new wxFlexGridSizer( 5, 2, 0, 0 );
+	InputSizer->SetFlexibleDirection( wxBOTH );
+	InputSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	ColumnDelimLabel = new wxStaticText( this, wxID_ANY, wxT("Column Delimiter"), wxDefaultPosition, wxDefaultSize, 0 );
+	ColumnDelimLabel->Wrap( -1 );
+	InputSizer->Add( ColumnDelimLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	ColumnDelim = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	InputSizer->Add( ColumnDelim, 0, wxALL, 5 );
+	
+	ColumnEnclosureLabel = new wxStaticText( this, wxID_ANY, wxT("Column Enclosure"), wxDefaultPosition, wxDefaultSize, 0 );
+	ColumnEnclosureLabel->Wrap( -1 );
+	InputSizer->Add( ColumnEnclosureLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	ColumnEnclosure = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	InputSizer->Add( ColumnEnclosure, 0, wxALL, 5 );
+	
+	RowDelimLabel = new wxStaticText( this, wxID_ANY, wxT("Row Delimiter"), wxDefaultPosition, wxDefaultSize, 0 );
+	RowDelimLabel->Wrap( -1 );
+	InputSizer->Add( RowDelimLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
+	
+	RowDelim = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	InputSizer->Add( RowDelim, 0, wxALL, 5 );
+	
+	NullFillterLabel = new wxStaticText( this, wxID_ANY, wxT("NULL Filler"), wxDefaultPosition, wxDefaultSize, 0 );
+	NullFillterLabel->Wrap( -1 );
+	InputSizer->Add( NullFillterLabel, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	NullFiller = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	InputSizer->Add( NullFiller, 0, wxALL, 5 );
+	
+	DialogSizer->Add( InputSizer, 1, wxEXPAND, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonSizer->AddButton( ButtonSizerCancel );
+	ButtonSizer->Realize();
+	DialogSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( DialogSizer );
+	this->Layout();
+	DialogSizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	ButtonSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+SqlCopyDialogGeneratedClass::~SqlCopyDialogGeneratedClass()
+{
+	// Disconnect Events
+	ButtonSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyDialogGeneratedClass::OnOkButton ), NULL, this );
+	
 }

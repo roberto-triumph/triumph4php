@@ -33,6 +33,7 @@
 #include <language/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <wx/thread.h>
+#include <wx/txtstrm.h>
 #include <vector>
 #include <unicode/unistr.h>
 
@@ -277,6 +278,60 @@ private:
 };
 
 /**
+ * class that holds what delimiters to use
+ * for columns/rows when exporting to clipboard
+ * or to a file
+ */
+class SqlCopyOptionsClass {
+	
+public:
+	
+	/**
+	 * string to put before / after each cell
+	 *  (except first and last)
+	 */
+	wxString ColumnDelim;
+	
+	/**
+	 * string to put before / after each cell
+	 * but before / after each delimiter. Any
+	 * 
+	 */
+	wxString ColumnEnclosure;
+	
+	/**
+	 * string to put before / after each row
+	 *  (except first and last)
+	 */
+	wxString RowDelim;
+
+	/**
+	 * string to fill in when a NULL cell is
+	 * seen
+	 */
+	wxString NullFiller;
+	
+	SqlCopyOptionsClass();
+	
+	SqlCopyOptionsClass(const mvceditor::SqlCopyOptionsClass& src);
+	
+	mvceditor::SqlCopyOptionsClass& operator=(const mvceditor::SqlCopyOptionsClass& src);
+	
+	void Copy(const mvceditor::SqlCopyOptionsClass& src);
+	
+	/**
+	 * writes the given rows to the given output stream using
+	 * the delimiters that are set 
+	 */
+	void Export(std::vector<wxString> values, wxTextOutputStream& stream);
+	
+	/**
+	 * write the row delimiter to the stream
+	 */
+	void EndRow(wxTextOutputStream& stream);
+};
+
+/**
  * Panel which shows results from a SQL query.
  */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
@@ -397,6 +452,20 @@ private:
 	 * Refesh the table results by re-executing the query
 	 */
 	void OnRefreshButton(wxCommandEvent& event);
+	
+	/**
+	 * When the user right-mouse clicks on a cell, show a context
+	 * menu
+	 */
+	void OnGridRightClick(wxGridEvent& event);
+	
+	// grid context menu handlers
+	void OnCopyAllRows(wxCommandEvent& event);
+	void OnCopyRow(wxCommandEvent& event);
+	void OnCopyCellData(wxCommandEvent& event);
+	void OnOpenInEditor(wxCommandEvent& event);
+	int SelectedCol;
+	int SelectedRow;
 
 	/**
 	 * The connection info
@@ -446,7 +515,12 @@ private:
 	 * needed to create the results panel and attach it to the tools window.
 	 */
 	SqlBrowserFeatureClass* Feature;
-
+	
+	/**
+	 * delimiters for rows/cols when exporting data
+	 */
+	SqlCopyOptionsClass CopyOptions;
+	
 	/**
 	 * This ID will be used to differentiate between the events that the various panels will generate.
 	 * Each panel will only handles the events generated from its own MultipleSqlExecute class.
@@ -566,6 +640,8 @@ public:
 	
 	void NewSqlBuffer(const wxString& sql);
 	
+	void NewTextBuffer(const wxString& text);
+	
 private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
@@ -612,6 +688,31 @@ private:
 	void SavePreferences();
 	
 	DECLARE_EVENT_TABLE()
+};
+
+
+/**
+ * dialog that prompts the user what delimiters to use
+ * for columns/rows when exporting to clipboard
+ * or to a file
+ */
+class SqlCopyDialogClass : public SqlCopyDialogGeneratedClass {
+
+public:
+	
+	SqlCopyDialogClass(wxWindow* parent, int id, mvceditor::SqlCopyOptionsClass& options);
+
+protected:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	void OnCancelButton(wxCommandEvent& event);
+
+private:
+
+	mvceditor::SqlCopyOptionsClass EditedOptions;
+	
+	mvceditor::SqlCopyOptionsClass& OriginalOptions;
 };
 
 }

@@ -35,6 +35,8 @@
 #include <sqlite3.h>
 #include <wx/artprov.h>
 #include <wx/wupdlock.h>
+#include <wx/clipbrd.h>
+#include <wx/sstream.h>
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();
@@ -43,6 +45,11 @@ static const int ID_SQL_TABLE_DEFINITION = wxNewId();
 static const int ID_SQL_TABLE_INDICES = wxNewId();
 static const int ID_SQL_TABLE_CREATE = wxNewId();
 static const int ID_PANEL_TABLE_DEFINITION = wxNewId();
+
+static const int ID_GRID_COPY_CELL = wxNewId();
+static const int ID_GRID_COPY_ROW = wxNewId();
+static const int ID_GRID_COPY_ALL = wxNewId();
+static const int ID_GRID_OPEN_IN_EDITOR = wxNewId();
 
 /**
  * @param grid the grid to put the results in. any previous grid values are cleared. this function will not own the pointer
@@ -538,6 +545,8 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other,
 		mvceditor::SqlBrowserFeatureClass* feature) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
+	, SelectedCol(-1)
+	, SelectedRow(-1)
 	, Query(other)
 	, ConnectionIdentifier()
 	, LastError()
@@ -545,7 +554,8 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, RunningActionId(0) 
 	, Results()
 	, Gauge(gauge)
-	, Feature(feature) {
+	, Feature(feature) 
+	, CopyOptions() {
 	CodeControl = NULL;
 	QueryId = id;
 	ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
@@ -813,6 +823,101 @@ void mvceditor::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) 
 	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	if (sel >= 0 && sel < dbTags.size()) {
 		SetCurrentInfo(dbTags[sel]);
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
+	wxMenu menu;
+	
+	menu.Append(ID_GRID_COPY_ALL, _("Copy All Rows"), _("Copies all rows to the clipboard"));
+	menu.Append(ID_GRID_COPY_CELL, _("Copy Cell Data"), _("Copies cell data to the clipboard"));
+	menu.Append(ID_GRID_COPY_ROW, _("Copy Row"), _("Copies the entire row to the clipboard"));
+	menu.Append(ID_GRID_OPEN_IN_EDITOR, _("Open Cell in New Buffer"), _("Opens the cell data into an untitled doc"));
+	
+	SelectedCol = event.GetCol();
+	SelectedRow = event.GetRow();
+	this->PopupMenu(&menu, event.GetPosition());
+}
+
+void mvceditor::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	if (ResultsGrid->GetRows() > 2000) {
+		wxMessageBox(wxT("There are too many rows to copy to the clipboard"), wxT("Copy All Rows"));
+		return;
+	}
+	mvceditor::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
+	if (wxOK == copyDialog.ShowModal()) {
+		std::vector<wxString> values;
+		wxStringOutputStream ostream;
+		wxTextOutputStream tstream(ostream, wxEOL_UNIX);
+		int cols = ResultsGrid->GetCols();
+		int rows = ResultsGrid->GetRows();
+		for (int r = 0; r < rows; ++r) {
+			for (int c = 0; c < cols; ++c) {
+				wxString val = ResultsGrid->GetCellValue(r, c);
+				values.push_back(val);
+			}
+			CopyOptions.Export(values, tstream);
+			CopyOptions.EndRow(tstream);
+			values.clear();
+		}
+		wxString toExport = ostream.GetString();
+		if (!toExport.empty()) {
+			if (wxTheClipboard->Open()) {
+				wxTheClipboard->SetData(new wxTextDataObject(toExport));
+				wxTheClipboard->Close();
+			}
+		}
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	mvceditor::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
+	if (wxOK == copyDialog.ShowModal()) {
+		std::vector<wxString> values;
+		wxStringOutputStream ostream;
+		wxTextOutputStream tstream(ostream, wxEOL_UNIX);
+		for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+			wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
+			values.push_back(val);
+		}
+		CopyOptions.Export(values, tstream);
+		
+		wxString toExport = ostream.GetString();
+		if (!toExport.empty()) {
+			if (wxTheClipboard->Open()) {
+				wxTheClipboard->SetData(new wxTextDataObject(toExport));
+				wxTheClipboard->Close();
+			}
+		}
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	wxString val = ResultsGrid->GetCellValue(SelectedRow, SelectedCol);
+	if (!val.empty()) {
+		if (wxTheClipboard->Open()) {
+			wxTheClipboard->SetData(new wxTextDataObject(val));
+			wxTheClipboard->Close();
+		}
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	wxString val = ResultsGrid->GetCellValue(SelectedRow, SelectedCol);
+	if (!val.empty()) {
+		Feature->NewTextBuffer(val);
 	}
 }
 
@@ -1156,6 +1261,14 @@ void mvceditor::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
 	}
 }
 
+void mvceditor::SqlBrowserFeatureClass::NewTextBuffer(const wxString& text) {
+	GetNotebook()->AddMvcEditorPage(mvceditor::CodeControlClass::TEXT);
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (ctrl) {
+		ctrl->SetText(text);
+	}
+}
+
 void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event) {
 	
 	// find the connection to use by hash, 
@@ -1370,6 +1483,123 @@ void mvceditor::DefinitionColumnsPanelClass::Fill(mvceditor::SqlResultClass* res
 }
 
 
+mvceditor::SqlCopyOptionsClass::SqlCopyOptionsClass()
+: ColumnDelim(wxT(","))
+, ColumnEnclosure(wxT("\""))
+, RowDelim(wxT("\\n"))
+, NullFiller(wxT("")) {
+}
+
+mvceditor::SqlCopyOptionsClass::SqlCopyOptionsClass(const mvceditor::SqlCopyOptionsClass& src)
+: ColumnDelim(wxT(","))
+, ColumnEnclosure(wxT("\""))
+, RowDelim(wxT("\n"))
+, NullFiller(wxT("")) {
+	Copy(src);
+}
+
+mvceditor::SqlCopyOptionsClass& mvceditor::SqlCopyOptionsClass::operator=(const mvceditor::SqlCopyOptionsClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::SqlCopyOptionsClass::Copy(const mvceditor::SqlCopyOptionsClass& src) {
+	ColumnDelim = src.ColumnDelim;
+	ColumnEnclosure = src.ColumnEnclosure;
+	RowDelim = src.RowDelim;
+	NullFiller = src.NullFiller;
+}
+
+void mvceditor::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutputStream& stream) {
+	wxString trueColumnDelim;
+	if (ColumnDelim == wxT("\\t")) {
+		trueColumnDelim = wxT("\t");
+	}
+	else if (ColumnDelim == wxT("\\n")) {
+		trueColumnDelim = wxT("\n");
+	}
+	else if (ColumnDelim == wxT("\\f")) {
+		trueColumnDelim = wxT("\f");
+	}
+	else {
+		trueColumnDelim = ColumnDelim;
+	}
+	
+	
+	size_t size = values.size();
+	for (size_t i = 0; i < size; ++i) {
+		wxString val = values[i];
+		
+		stream.WriteString(ColumnEnclosure);
+		
+		// write the cell value
+		if (val == wxT("<NULL>")) {
+			stream.WriteString(NullFiller);
+		}
+		else {
+			for (size_t j = 0; j < val.length(); ++j) {
+				if (val[j] == ColumnEnclosure) {
+					stream.PutChar(wxT('\\'));
+					stream.WriteString(ColumnEnclosure);
+				}
+				else {
+					stream.PutChar(val[j]);
+				}
+			}
+		}
+		stream.WriteString(ColumnEnclosure);
+		
+		if (i >= 0 && i < (size - 1)) {
+			stream.WriteString(trueColumnDelim);
+		}
+	}
+}
+
+void mvceditor::SqlCopyOptionsClass::EndRow(wxTextOutputStream& stream) {
+	wxString trueRowDelim;
+	if (RowDelim == wxT("\\t")) {
+		trueRowDelim = wxT("\t");
+	}
+	else if (RowDelim == wxT("\\n")) {
+		trueRowDelim = wxT("\n");
+	}
+	else if (RowDelim == wxT("\\f")) {
+		trueRowDelim = wxT("\f");
+	}
+	else {
+		trueRowDelim = RowDelim;
+	}
+	stream.WriteString(trueRowDelim);
+}
+
+mvceditor::SqlCopyDialogClass::SqlCopyDialogClass(wxWindow* parent, int id, mvceditor::SqlCopyOptionsClass& options)
+: SqlCopyDialogGeneratedClass(parent, id)
+, EditedOptions(options) 
+, OriginalOptions(options) {
+	
+	wxTextValidator columnDelimValidator(wxFILTER_NONE, &EditedOptions.ColumnDelim);
+	ColumnDelim->SetValidator(columnDelimValidator);
+	
+	wxTextValidator columnEnclosureValidator(wxFILTER_NONE, &EditedOptions.ColumnEnclosure);
+	ColumnEnclosure->SetValidator(columnEnclosureValidator);
+	
+	wxTextValidator rowDelimValidator(wxFILTER_NONE, &EditedOptions.RowDelim);
+	RowDelim->SetValidator(rowDelimValidator);
+	
+	wxTextValidator nullFillerValidator(wxFILTER_NONE, &EditedOptions.NullFiller);
+	NullFiller->SetValidator(nullFillerValidator);
+}
+
+
+void mvceditor::SqlCopyDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void mvceditor::SqlCopyDialogClass::OnOkButton(wxCommandEvent& event) {
+	OriginalOptions = EditedOptions;
+	
+	EndModal(wxOK);
+}
 
 
 
@@ -1390,6 +1620,10 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass
 	EVT_COMMAND(wxID_ANY, QUERY_COMPLETE_EVENT, mvceditor::SqlBrowserPanelClass::OnQueryComplete)
 	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionProgress)
 	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionComplete)
+	EVT_MENU(ID_GRID_COPY_ALL, mvceditor::SqlBrowserPanelClass::OnCopyAllRows)
+	EVT_MENU(ID_GRID_COPY_ROW, mvceditor::SqlBrowserPanelClass::OnCopyRow)
+	EVT_MENU(ID_GRID_COPY_CELL, mvceditor::SqlBrowserPanelClass::OnCopyCellData)
+	EVT_MENU(ID_GRID_OPEN_IN_EDITOR, mvceditor::SqlBrowserPanelClass::OnOpenInEditor)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlConnectionListDialogClass, SqlConnectionListDialogGeneratedClass)
@@ -1405,4 +1639,3 @@ BEGIN_EVENT_TABLE(mvceditor::TableDefinitionPanelClass, TableDefinitionPanelGene
 	EVT_COMMAND(ID_SQL_TABLE_INDICES, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
 	EVT_COMMAND(ID_SQL_TABLE_CREATE, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
-
