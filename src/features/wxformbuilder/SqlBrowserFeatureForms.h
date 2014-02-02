@@ -29,6 +29,7 @@
 #include <wx/filepicker.h>
 #include <wx/checklst.h>
 #include <wx/aui/auibook.h>
+#include <wx/radiobox.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -287,6 +288,34 @@ class SqlCopyDialogGeneratedClass : public wxDialog
 		
 		SqlCopyDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlCopyAsInsertDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlCopyAsInsertDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* ColumnsLabel;
+		wxCheckListBox* Columns;
+		wxRadioBox* LineModeRadio;
+		wxButton* CheckAll;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SqlCopyAsInsertDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As SQL Insert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,478 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlCopyAsInsertDialogGeneratedClass();
 	
 };
 

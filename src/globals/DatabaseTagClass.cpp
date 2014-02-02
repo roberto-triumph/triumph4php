@@ -31,6 +31,7 @@
 #include <globals/Errors.h>
 #include <unicode/ustdio.h>
 #include <string>
+#include <algorithm>
  
 mvceditor::DatabaseTagClass::DatabaseTagClass()
 	: Label()
@@ -88,6 +89,7 @@ mvceditor::SqlResultClass::SqlResultClass()
 	, Row()
 	, StringResults()
 	, ColumnNames()
+	, TableNames()
 	, Query()
 	, QueryTime()
 	, LineNumber(0)
@@ -103,6 +105,7 @@ mvceditor::SqlResultClass::~SqlResultClass() {
 
 void mvceditor::SqlResultClass::Close() {
 	ColumnNames.clear();
+	TableNames.clear();
 	StringResults.clear();
 	AffectedRows = 0;
 	HasRows = false;
@@ -112,12 +115,14 @@ void mvceditor::SqlResultClass::Close() {
 void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, 
 									 const UnicodeString& sqlString, bool hasRows) {
 	ColumnNames.clear();
+	TableNames.clear();
 	StringResults.clear();
 	Query = sqlString;
 	std::vector<soci::indicator> columnIndicators;
 	HasRows = hasRows;
 	AffectedRows = query.GetAffectedRows(stmt);
-	if (Success && HasRows && query.ColumnNames(Row, ColumnNames, Error)) {
+	if (Success && HasRows && query.ColumnNames(Row, ColumnNames, Error)
+			&& query.TableNames(session, stmt, Row.size(), TableNames, Error)) {
 		bool more = true;
 		bool hasError = false;
 
@@ -307,6 +312,45 @@ bool mvceditor::SqlQueryClass::ColumnNames(soci::row& row, std::vector<UnicodeSt
 			soci::column_properties props = row.get_properties(i);
 			UnicodeString col = mvceditor::CharToIcu(props.get_name().c_str());
 			columnNames.push_back(col);
+		}
+		data = true;
+	}
+	catch (std::exception const& e) {
+		data = false;
+		error = mvceditor::CharToIcu(e.what());
+	}
+	return data;
+}
+
+bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statement& stmt, int columnCount, 
+	std::vector<UnicodeString>& tableNames, UnicodeString& error) {
+	bool data = false;
+	try {
+		
+		// soci does not have an interface for getting table names,
+		// we do it ourselves by accessing the "backends"
+		std::string backendName = session.get_backend_name();
+		if (backendName.compare("mysql") == 0) {
+			soci::mysql_statement_backend* backend = static_cast<soci::mysql_statement_backend*>(stmt.get_backend());
+			for (int i = 0; i < columnCount; ++i) {
+				MYSQL_FIELD* field = mysql_fetch_field(backend->result_);
+				const char* tbl = field->org_table;
+				
+				UnicodeString uniTable = mvceditor::CharToIcu(tbl);
+				if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
+					tableNames.push_back(uniTable);
+				}
+			}
+		}
+		else if (backendName.compare("sqlite3") == 0) {
+			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+			for (int i = 0; i < columnCount; ++i) {
+				const char* tbl = sqlite3_column_table_name(backend->stmt_, i);
+				UnicodeString uniTable = mvceditor::CharToIcu(tbl);
+				if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
+					tableNames.push_back(uniTable);
+				}
+			}
 		}
 		data = true;
 	}

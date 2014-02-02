@@ -193,6 +193,11 @@ public:
 	 * The names of the columns in the result.
 	 */
 	std::vector<UnicodeString> ColumnNames;
+	
+	/**
+	 * The names of the columns in the result.
+	 */
+	std::vector<UnicodeString> TableNames;
 
 	/**
 	 * The query that was executed.
@@ -334,6 +339,22 @@ class SqlQueryClass {
 	 * @return bool true on success, false on error
 	 */
 	bool ColumnNames(soci::row& row, std::vector<UnicodeString>& colummNames, UnicodeString& error);
+	
+	/**
+	 * Populates columnNames with the name of the tables in the current result.
+	 * Returns false when there are no more results.
+	 * Note: the tableNames vector may be populated with empty strings
+	 * if the query contains an expression
+	 * 
+	 * @param session the connection
+	 * @param stmt the prepared statement
+	 * @params columnCount the number of columns in the result
+	 * @param tableNames vector of table names will be populated
+	 * @param error will be populated when an error ocurrs
+	 * @return bool true on success, false on error
+	 */
+	bool TableNames(soci::session& session, soci::statement& stmt, int columnCount,
+		std::vector<UnicodeString>& tableNames, UnicodeString& error);
 	
 	/**
 	 * Populates columnNames with the name of the columns in the current result.

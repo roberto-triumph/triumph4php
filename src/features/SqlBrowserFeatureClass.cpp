@@ -48,8 +48,11 @@ static const int ID_PANEL_TABLE_DEFINITION = wxNewId();
 
 static const int ID_GRID_COPY_CELL = wxNewId();
 static const int ID_GRID_COPY_ROW = wxNewId();
+static const int ID_GRID_COPY_ROW_SQL = wxNewId();
+static const int ID_GRID_COPY_ROW_PHP = wxNewId();
 static const int ID_GRID_COPY_ALL = wxNewId();
 static const int ID_GRID_OPEN_IN_EDITOR = wxNewId();
+
 
 /**
  * @param grid the grid to put the results in. any previous grid values are cleared. this function will not own the pointer
@@ -109,6 +112,16 @@ static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results
 
 	// unfreeze the grid
 	grid->EndBatch();
+}
+
+mvceditor::QueryCompleteEventClass::QueryCompleteEventClass(mvceditor::SqlResultClass* results, int eventId)
+: wxEvent(eventId, mvceditor::QUERY_COMPLETE_EVENT)
+, Results(results) {
+	
+}
+
+wxEvent* mvceditor::QueryCompleteEventClass::Clone() const {
+	return new mvceditor::QueryCompleteEventClass(Results, GetId());
 }
 
 mvceditor::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag)
@@ -206,8 +219,8 @@ void mvceditor::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event
 	event.Skip();
 }
 
-void mvceditor::MysqlConnectionDialogClass::ShowTestResults(wxCommandEvent& event) {
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+void mvceditor::MysqlConnectionDialogClass::ShowTestResults(mvceditor::QueryCompleteEventClass& event) {
+	mvceditor::SqlResultClass* result = event.Results;
 	wxString error = mvceditor::IcuToWx(result->Error);
 	bool success = result->Success;
 	
@@ -416,8 +429,8 @@ void mvceditor::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEven
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::ShowTestResults(wxCommandEvent& event) {
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+void mvceditor::SqlConnectionListDialogClass::ShowTestResults(mvceditor::QueryCompleteEventClass& event) {
+	mvceditor::SqlResultClass* result = event.Results;
 	wxString error = mvceditor::IcuToWx(result->Error);
 	bool success = result->Success;
 	
@@ -479,8 +492,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			// but dont post if the query was cancelled
 			// careful: leak will happen when panel is closed since event won't be handled
 			if (!IsCancelled()) {
-				wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
-				evt.SetClientData(results);
+				mvceditor::QueryCompleteEventClass evt(results, QueryId);
 				PostEvent(evt);
 			}
 			else {
@@ -497,8 +509,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 		results->Success = false;
 		results->HasRows = false;
 		results->Error = error;
-		wxCommandEvent evt(QUERY_COMPLETE_EVENT, QueryId);
-		evt.SetClientData(results);
+		mvceditor::QueryCompleteEventClass evt(results, QueryId);
 		PostEvent(evt);
 	}
 }
@@ -553,6 +564,7 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, LastQuery()
 	, RunningActionId(0) 
 	, Results()
+	, RowToSqlInsert()
 	, Gauge(gauge)
 	, Feature(feature) 
 	, CopyOptions() {
@@ -652,10 +664,17 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnQueryComplete(wxCommandEvent& event) {
+void mvceditor::SqlBrowserPanelClass::OnQueryComplete(mvceditor::QueryCompleteEventClass& event) {
 	if (event.GetId() == QueryId) {
-		mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+		mvceditor::SqlResultClass* result = event.Results;
 		Results.push_back(result);
+		
+		RowToSqlInsert.Columns = result->ColumnNames;
+		RowToSqlInsert.CheckedColumns = result->ColumnNames;
+		RowToSqlInsert.TableName = UNICODE_STRING_SIMPLE("");
+		if (result->TableNames.size() == 1) {
+			RowToSqlInsert.TableName = result->TableNames[0];
+		}
 	}
 	else {
 		event.Skip();
@@ -828,11 +847,18 @@ void mvceditor::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) 
 
 void mvceditor::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
 	wxMenu menu;
+	wxMenuItem* item;
 	
-	menu.Append(ID_GRID_COPY_ALL, _("Copy All Rows"), _("Copies all rows to the clipboard"));
-	menu.Append(ID_GRID_COPY_CELL, _("Copy Cell Data"), _("Copies cell data to the clipboard"));
-	menu.Append(ID_GRID_COPY_ROW, _("Copy Row"), _("Copies the entire row to the clipboard"));
-	menu.Append(ID_GRID_OPEN_IN_EDITOR, _("Open Cell in New Buffer"), _("Opens the cell data into an untitled doc"));
+	item = menu.Append(ID_GRID_COPY_ALL, _("Copy All Rows"), _("Copies all rows to the clipboard"));
+	item = menu.Append(ID_GRID_COPY_CELL, _("Copy Cell Data"), _("Copies cell data to the clipboard"));
+	item = menu.Append(ID_GRID_COPY_ROW, _("Copy Row"), _("Copies the entire row to the clipboard"));
+	item = menu.Append(ID_GRID_COPY_ROW_SQL, _("Copy Row As SQL"), _("Copies the entire row As SQL to the clipboard"));
+	item->Enable(!RowToSqlInsert.TableName.isEmpty());
+		
+	item = menu.Append(ID_GRID_COPY_ROW_PHP, _("Copy Row As PHP"), _("Copies the entire row As a PHP Array to the clipboard"));
+	item->Enable(!RowToSqlInsert.TableName.isEmpty());
+	
+	item = menu.Append(ID_GRID_OPEN_IN_EDITOR, _("Open Cell in New Buffer"), _("Opens the cell data into an untitled doc"));
 	
 	SelectedCol = event.GetCol();
 	SelectedRow = event.GetRow();
@@ -896,6 +922,42 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
 			}
 		}
 	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	if (RowToSqlInsert.TableName.isEmpty()) {
+		return;
+	}
+	RowToSqlInsert.Values.clear();
+	RowToSqlInsert.CheckedValues.clear();
+	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
+		RowToSqlInsert.Values.push_back(mvceditor::WxToIcu(val));
+	}
+	RowToSqlInsert.CheckedValues = RowToSqlInsert.Values;
+		
+	mvceditor::SqlCopyAsInsertDialogClass copyDialog(this, wxID_ANY, RowToSqlInsert);
+	if (wxOK == copyDialog.ShowModal() && !RowToSqlInsert.CheckedColumns.empty() 
+			&& !RowToSqlInsert.CheckedValues.empty()) {
+		UnicodeString sql = RowToSqlInsert.CreateStatement(Query.DatabaseTag.Driver);
+		
+		
+		wxString wxSql = mvceditor::IcuToWx(sql);
+		if (wxTheClipboard->Open()) {
+			wxTheClipboard->SetData(new wxTextDataObject(wxSql));
+			wxTheClipboard->Close();
+		}
+	}
+}
+
+void mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
+	if (SelectedCol < 0 || SelectedRow < 0) {
+		return;
+	}
+	
 }
 
 void mvceditor::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
@@ -1373,9 +1435,9 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 	}
 }
 
-void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(wxCommandEvent& event) {
+void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(mvceditor::QueryCompleteEventClass& event) {
 	wxWindowUpdateLocker locker(this);
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	mvceditor::SqlResultClass* result = event.Results;
 	if (result) {
 		DefinitionColumnsPanel->Fill(result);
 		delete result;
@@ -1383,9 +1445,9 @@ void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(wxCommandEvent& e
 	this->Layout();
 }
 
-void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(wxCommandEvent& event) {
+void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(mvceditor::QueryCompleteEventClass& event) {
 	wxWindowUpdateLocker locker(this);
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+	mvceditor::SqlResultClass* result = event.Results;
 	if (result) {
 		DefinitionIndicesPanel->Fill(result);
 		delete result;
@@ -1431,8 +1493,8 @@ void mvceditor::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(wxCommandEvent& event) {
-	mvceditor::SqlResultClass* result = (mvceditor::SqlResultClass*)event.GetClientData();
+void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(mvceditor::QueryCompleteEventClass& event) {
+	mvceditor::SqlResultClass* result = event.Results;
 	if (!result) {
 		return;
 	}
@@ -1602,6 +1664,145 @@ void mvceditor::SqlCopyDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 
+mvceditor::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
+	mvceditor::RowToSqlInsertClass& rowToSql)
+: SqlCopyAsInsertDialogGeneratedClass(parent, id)
+, EditedRowToSql(rowToSql)
+, RowToSql(rowToSql) {
+	
+	for (size_t i = 0; i < RowToSql.Columns.size(); ++i) {
+		Columns->Append(mvceditor::IcuToWx(RowToSql.Columns[i]));
+		Columns->Check(i);
+	}
+	
+	if (EditedRowToSql.LineMode == mvceditor::RowToSqlInsertClass::SINGLE_LINE) {
+		LineModeRadio->SetSelection(0);
+	}
+	else {
+		LineModeRadio->SetSelection(1);
+	}
+}
+
+void mvceditor::SqlCopyAsInsertDialogClass::OnCancelButton(wxCommandEvent& event) {
+	return EndModal(wxCANCEL);
+}
+
+void mvceditor::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
+	TransferDataFromWindow();
+	
+	EditedRowToSql.CheckedColumns.clear();
+	EditedRowToSql.CheckedValues.clear();
+	for (size_t i = 0; i < Columns->GetCount(); ++i) {
+		if (Columns->IsChecked(i)) {
+			EditedRowToSql.CheckedColumns.push_back(EditedRowToSql.Columns[i]);
+			if (i >= 0 && i < EditedRowToSql.Values.size()) {
+				EditedRowToSql.CheckedValues.push_back(EditedRowToSql.Values[i]);
+			}
+		}
+	}
+	
+	if (LineModeRadio->GetSelection() == 0) {
+		EditedRowToSql.LineMode = mvceditor::RowToSqlInsertClass::SINGLE_LINE;
+	}
+	else {
+		EditedRowToSql.LineMode = mvceditor::RowToSqlInsertClass::MULTI_LINE;
+	}
+	
+	RowToSql = EditedRowToSql;
+	
+	return EndModal(wxOK);
+}
+
+mvceditor::RowToSqlInsertClass::RowToSqlInsertClass()
+: Values()
+, Columns()
+, TableName()
+, CheckedColumns()
+, CheckedValues()
+, LineMode(MULTI_LINE)
+{
+}
+
+mvceditor::RowToSqlInsertClass::RowToSqlInsertClass(const mvceditor::RowToSqlInsertClass& src)
+: Values()
+, Columns()
+, TableName()
+, CheckedColumns()
+, CheckedValues()
+, LineMode(MULTI_LINE)
+{
+	Copy(src);
+}
+
+mvceditor::RowToSqlInsertClass& mvceditor::RowToSqlInsertClass::operator=(const mvceditor::RowToSqlInsertClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::RowToSqlInsertClass::Copy(const mvceditor::RowToSqlInsertClass& src) {
+	Values = src.Values;
+	Columns = src.Columns;
+	TableName = src.TableName;
+	CheckedColumns = src.CheckedColumns;
+	CheckedValues = src.CheckedValues;
+	LineMode = src.LineMode;
+}
+
+UnicodeString mvceditor::RowToSqlInsertClass::CreateStatement(mvceditor::DatabaseTagClass::Drivers driver) const {
+	UnicodeString query;
+	
+	UnicodeString columnDelim;
+	switch (driver) {
+	case mvceditor::DatabaseTagClass::MYSQL:
+		columnDelim = '`';
+		break;
+	case mvceditor::DatabaseTagClass::SQLITE:
+		columnDelim = '"';
+		break;
+	}
+	bool doMultiLine = MULTI_LINE == LineMode;
+	
+	query = UNICODE_STRING_SIMPLE("INSERT INTO ");
+	query += TableName;
+	query += UNICODE_STRING_SIMPLE(" (");
+	for (size_t i = 0; i < CheckedColumns.size(); ++i) {
+		if (doMultiLine && (i % 5) == 0) {
+			query += UNICODE_STRING_SIMPLE("\n");
+		}
+		query += columnDelim + CheckedColumns[i] + columnDelim;
+		if (i < (CheckedColumns.size() - 1)) {
+			query += UNICODE_STRING_SIMPLE(",");
+		}
+		
+	}
+	if (doMultiLine) {
+		query += UNICODE_STRING_SIMPLE("\n");
+	}
+	query += UNICODE_STRING_SIMPLE(" ) VALUES (");
+	
+	for (size_t i = 0; i < CheckedValues.size(); ++i) {
+		if (doMultiLine && (i % 5) == 0) {
+			query += UNICODE_STRING_SIMPLE("\n");
+		}
+		UnicodeString val = CheckedValues[i];
+		if (val.compare(UNICODE_STRING_SIMPLE("<NULL>")) == 0) {
+			val = UNICODE_STRING_SIMPLE("NULL");
+		}
+		else {
+			val = UNICODE_STRING_SIMPLE("'") + val + UNICODE_STRING_SIMPLE("'");
+		}
+		
+		query += val;
+		if (i < (CheckedValues.size() - 1)) {
+			query += UNICODE_STRING_SIMPLE(", ");
+		}
+		
+	}
+	query += UNICODE_STRING_SIMPLE(");");
+	return query;
+}
+
+
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
@@ -1617,25 +1818,32 @@ BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
-	EVT_COMMAND(wxID_ANY, QUERY_COMPLETE_EVENT, mvceditor::SqlBrowserPanelClass::OnQueryComplete)
+	EVT_QUERY_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnQueryComplete)
 	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionProgress)
 	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionComplete)
 	EVT_MENU(ID_GRID_COPY_ALL, mvceditor::SqlBrowserPanelClass::OnCopyAllRows)
 	EVT_MENU(ID_GRID_COPY_ROW, mvceditor::SqlBrowserPanelClass::OnCopyRow)
+	EVT_MENU(ID_GRID_COPY_ROW_SQL, mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql)
+	EVT_MENU(ID_GRID_COPY_ROW_PHP, mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp)
 	EVT_MENU(ID_GRID_COPY_CELL, mvceditor::SqlBrowserPanelClass::OnCopyCellData)
 	EVT_MENU(ID_GRID_OPEN_IN_EDITOR, mvceditor::SqlBrowserPanelClass::OnOpenInEditor)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::SqlConnectionListDialogClass, SqlConnectionListDialogGeneratedClass)
-	EVT_COMMAND(ID_SQL_LIST_TEST, QUERY_COMPLETE_EVENT, mvceditor::SqlConnectionListDialogClass::ShowTestResults)
+	EVT_QUERY_COMPLETE(ID_SQL_LIST_TEST, mvceditor::SqlConnectionListDialogClass::ShowTestResults)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
-	EVT_COMMAND(ID_SQL_EDIT_TEST, QUERY_COMPLETE_EVENT, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
+	EVT_QUERY_COMPLETE(ID_SQL_EDIT_TEST, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(mvceditor::TableDefinitionPanelClass, TableDefinitionPanelGeneratedClass)
-	EVT_COMMAND(ID_SQL_TABLE_DEFINITION, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete)
-	EVT_COMMAND(ID_SQL_TABLE_INDICES, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
-	EVT_COMMAND(ID_SQL_TABLE_CREATE, QUERY_COMPLETE_EVENT, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_DEFINITION, mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_INDICES, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_CREATE, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
+
+
+
+
+

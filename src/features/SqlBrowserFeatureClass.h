@@ -49,6 +49,31 @@ namespace mvceditor {
  */
 const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
 
+class QueryCompleteEventClass : public wxEvent {
+
+public: 
+	/**
+	 * this class will not delete the pointer; the 
+	 * event handler should
+	 */
+	mvceditor::SqlResultClass* Results;
+	
+	
+	QueryCompleteEventClass(mvceditor::SqlResultClass* results, int eventId);
+	
+	wxEvent* Clone() const;
+
+};
+
+typedef void (wxEvtHandler::*QueryCompleteEventClassFunction)(QueryCompleteEventClass&);
+
+#define EVT_QUERY_COMPLETE(id, fn) \
+	DECLARE_EVENT_TABLE_ENTRY(mvceditor::QUERY_COMPLETE_EVENT, id, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( QueryCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+
+
+
 // forward declarations; definitons are at the bottom of this file
 class SqlBrowserFeatureClass;
 class MultipleSqlExecuteClass;
@@ -91,7 +116,7 @@ private:
 	 */
 	void OnCancelButton(wxCommandEvent& event);
 		
-	void ShowTestResults(wxCommandEvent& event);
+	void ShowTestResults(mvceditor::QueryCompleteEventClass& event);
 	
 	/**
 	 * to execute the test query
@@ -150,7 +175,7 @@ private:
 	
 	void OnListDoubleClick(wxCommandEvent& event);
 	
-	void ShowTestResults(wxCommandEvent& event);
+	void ShowTestResults(mvceditor::QueryCompleteEventClass& event);
 	
 	/**
 	 * add a tag to the interface and to the backing list
@@ -332,6 +357,65 @@ public:
 };
 
 /**
+ * class that will convert a row from the SQL results to
+ * a SQL INSERT statement
+ */
+class RowToSqlInsertClass {
+	
+	public:
+
+	/**
+	 * The values of the row; to be put in
+	 * the INSERT statement
+	 */
+	std::vector<UnicodeString> Values;
+	
+	/**
+	 * All of the available columns of the table
+	 */
+	std::vector<UnicodeString> Columns;
+	
+	/**
+	 * The name of the table; to put in the 
+	 * INSERT statement
+	 */
+	UnicodeString TableName;
+	
+	/**
+	 * The columns that will be used in the INSERT
+	 * statement
+	 */
+	std::vector<UnicodeString> CheckedColumns;
+	
+	/**
+	 * The values that will be used in the INSERT
+	 * statement
+	 */
+	std::vector<UnicodeString> CheckedValues;
+	
+	/**
+	 * 0 == put entire statement in one line
+	 * 1 == put statement in multiple lines
+	 */
+	int LineMode;
+	
+	enum {
+		SINGLE_LINE,
+		MULTI_LINE
+	};
+	
+	RowToSqlInsertClass();
+	
+	RowToSqlInsertClass(const mvceditor::RowToSqlInsertClass& src);
+	
+	UnicodeString CreateStatement(mvceditor::DatabaseTagClass::Drivers driver) const;
+	
+	mvceditor::RowToSqlInsertClass& operator=(const mvceditor::RowToSqlInsertClass& src);
+	
+	void Copy(const mvceditor::RowToSqlInsertClass& src);
+};
+
+/**
  * Panel which shows results from a SQL query.
  */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
@@ -373,7 +457,7 @@ public:
 	/**
 	 * When a query has finished running display the results in the grid
 	 */
-	void OnQueryComplete(wxCommandEvent& event);
+	void OnQueryComplete(mvceditor::QueryCompleteEventClass& event);
 	
 	/**
 	 * signal to this panel that the user changed the connection.
@@ -462,6 +546,8 @@ private:
 	// grid context menu handlers
 	void OnCopyAllRows(wxCommandEvent& event);
 	void OnCopyRow(wxCommandEvent& event);
+	void OnCopyRowAsSql(wxCommandEvent& event);
+	void OnCopyRowAsPhp(wxCommandEvent& event);
 	void OnCopyCellData(wxCommandEvent& event);
 	void OnOpenInEditor(wxCommandEvent& event);
 	int SelectedCol;
@@ -498,6 +584,11 @@ private:
 	 * the accumulated results. This class will DELETE the pointers once it has rendered them.
 	 */
 	std::vector<SqlResultClass*> Results;
+	
+	/**
+	 * the names of the columns of this result
+	 */
+	mvceditor::RowToSqlInsertClass RowToSqlInsert;
 	
 	/**
 	 * To get the query that needs to be run. One results panel will be linked with exactly one code control.
@@ -571,15 +662,15 @@ public:
 	
 private:
 
-	void OnColumnSqlComplete(wxCommandEvent& event);
+	void OnColumnSqlComplete(mvceditor::QueryCompleteEventClass& event);
 	
-	void OnIndexSqlComplete(wxCommandEvent& event);
+	void OnIndexSqlComplete(mvceditor::QueryCompleteEventClass& event);
 	
 	void OnTableNameEnter(wxCommandEvent& event);
 	
 	void OnSqlButton(wxCommandEvent& event);
 	
-	void OnCreateSqlComplete(wxCommandEvent& event);
+	void OnCreateSqlComplete(mvceditor::QueryCompleteEventClass& event);
 	
 	void OnRefreshButton(wxCommandEvent& event);
 
@@ -713,6 +804,36 @@ private:
 	mvceditor::SqlCopyOptionsClass EditedOptions;
 	
 	mvceditor::SqlCopyOptionsClass& OriginalOptions;
+};
+
+/**
+ * This dilaog will prompt the user to select the columns that
+ * will be included in the SQL INSERT statement that is copied
+ * to the clipboard
+ */
+class SqlCopyAsInsertDialogClass : public SqlCopyAsInsertDialogGeneratedClass {
+
+public:
+	
+	SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
+		mvceditor::RowToSqlInsertClass& rowToSql);
+	
+private:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	void OnCancelButton(wxCommandEvent& event);
+	
+	/**
+	 * the object being edited
+	 */
+	mvceditor::RowToSqlInsertClass EditedRowToSql;
+	
+	/**
+	 * the object passed in the constructor, only 
+	 * changed when the user clicks OK
+	 */
+	mvceditor::RowToSqlInsertClass& RowToSql;
 };
 
 }
