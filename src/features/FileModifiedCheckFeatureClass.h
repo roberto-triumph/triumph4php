@@ -76,7 +76,7 @@ private:
 	 * OR it is in a network drive, remove the watch we created for it
 	 */
 	void OnAppFileClosed(mvceditor::CodeControlEventClass& event);
-
+	
 	/**
 	 * when the timer is up then handle the files that the fs watcher notified us 
 	 * that were changed
@@ -92,7 +92,7 @@ private:
 	 /**
 	 * prompt the user to reload modified files or save deleted files
 	 */
-	void OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event);
+	void PollFileModifiedPrompt(const wxFileName& fileName, bool isDeleted);
 
 	/**
 	 * special handling for files that are open. For open files that were externally modified
@@ -227,6 +227,15 @@ private:
 	 * PHP tags.
 	 */
 	wxDateTime LastWatcherEventTime;
+	
+	/**
+	 * the number of consecutive times that we have polled a file
+	 * and it did not exist.  We use this number to see if a polled
+	 * file was actually deleted.  Some editors delete /swap files 
+	 * when saving, and we want to check more than once to see if 
+	 * a polled file was actually deleted
+	 */
+	int PollDeleteCount;
 
 	/**
 	 * will be set to TRUE if the watcher saw an error event.  We may get 

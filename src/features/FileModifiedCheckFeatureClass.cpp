@@ -151,6 +151,7 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , NetworkVolumes()
 , FilesToPoll()
 , LastWatcherEventTime() 
+, PollDeleteCount(0)
 , IsWatchError(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
@@ -375,7 +376,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	DirsExternallyCreated.clear();
 	DirsExternallyModified.clear();
 	DirsExternallyDeleted.clear();
-	Timer.Start(250, wxTIMER_CONTINUOUS);
+	Timer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
@@ -534,7 +535,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 		msg += _("The checked files will be reloaded. Unchecked files will not be reloaded, allowing you to overwrite the files.");
 	}
 	wxMultiChoiceDialog dialog(GetMainWindow(), msg, _("Files Externally Modified"), 
-		choices, wxOK | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+		choices, wxOK | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxCENTRE);
 	dialog.ShowModal();
 	wxArrayInt selections = dialog.GetSelections();
 
@@ -584,7 +585,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxStr
 		// send the deleted file event to the app
 		wxCommandEvent deleteEvt(mvceditor::EVENT_APP_FILE_DELETED);
 		deleteEvt.SetString(fullPath);
-		App.EventSink.Publish(deleteEvt);		
+		App.EventSink.Publish(deleteEvt);
 	}
 
 	// only show a message if a file that is being edited was deleted
@@ -593,7 +594,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxStr
 		message += _("The following files have been deleted externally.\n");
 		message += _("You will need to save the file to store the contents.\n\n");
 		message += files;
-		int opts = wxICON_QUESTION;
+		int opts = wxICON_QUESTION | wxCENTRE;
 		wxMessageBox(message, _("Warning"), opts, GetMainWindow());
 	}
 }
@@ -665,70 +666,77 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 	if (FilesToPoll.empty()) {
 		return;
 	}
-	mvceditor::NotebookClass* notebook = GetNotebook();
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (!ctrl) {
+		return;
+	}
+	wxFileName ctrlFileName(ctrl->GetFileName());
 	
-	std::vector<mvceditor::FileModifiedTimeClass> fileMods;
-
 	// loop through all of the opened files to get the files to
 	// be checked
 	// no need to check new files as they are not yet in the file system
+	bool found = false;
 	for (size_t i = 0; i < FilesToPoll.size(); ++i) {
-		mvceditor::FileModifiedTimeClass fileMod;
-		fileMod.FileName = FilesToPoll[i];
-		for (size_t j = 0; j < notebook->GetPageCount(); ++j) {
-
-			// get the last modified time from the file at the time we opened the file
-			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(j);
-			if (ctrl->GetFileName() == FilesToPoll[i].GetFullPath()) {
-				fileMod.ModifiedTime = ctrl->GetFileOpenedDateTime();
-				fileMods.push_back(fileMod);
-				break;
-			}
+		if (ctrlFileName == FilesToPoll[i]) {
+			found = true;
+			break;
 		}
 	}
-	if (!fileMods.empty()) {
-
-		// stop the timer that way we dont check files again until the user answers some questions
+	if (!found) {
+		return;
+	}
+	wxDateTime modifiedDateTime;
+	wxDateTime lastModifiedTime = ctrl->GetFileOpenedDateTime();
+	bool exists = ctrlFileName.FileExists();
+	if (exists) {
+		modifiedDateTime = ctrlFileName.GetModificationTime();
+	}
+	if (!exists && PollDeleteCount <= 2) {
+		
+		// files doesnt exist. it may actually, but it may be in
+		// the process of being moved by an external editor.
+		// increment the delete count, and try to read next
+		// timer tick
+		PollDeleteCount++;
+	}
+	else if (!exists && PollDeleteCount > 2) {
+		
+		// we tried to get the modified time but it has
+		// not existed.  assume file was delted.
 		PollTimer.Stop();
-		mvceditor::FileModifiedCheckActionClass* action = 
-			new mvceditor::FileModifiedCheckActionClass(App.RunningThreads, ID_FILE_MODIFIED_POLL);
-		action->SetFiles(fileMods);
-		App.RunningThreads.Queue(action);
+		PollFileModifiedPrompt(ctrlFileName, true);
+		PollDeleteCount = 0;
+		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+		
+	}
+	else if (exists && modifiedDateTime.IsValid() && modifiedDateTime.IsLaterThan(lastModifiedTime)) {
+		
+		// file time has been updated; file has been modified
+		PollTimer.Stop();
+		PollFileModifiedPrompt(ctrlFileName, false);
+		PollDeleteCount = 0;
+		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete(mvceditor::FilesModifiedEventClass& event) {
-    mvceditor::NotebookClass* notebook = GetNotebook();
-    size_t notebookSize = notebook->GetPageCount();
-    if (notebookSize > 0 && (event.Modified.size() + event.Deleted.size()) > 0) {
-			std::map<wxString, mvceditor::CodeControlClass*> openedFilesWithCodeControl;
-			for (size_t i = 0; i < notebookSize; ++i) {
-				mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-				openedFilesWithCodeControl[ctrl->GetFileName()] = ctrl;
-			}
+void mvceditor::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName& fileName, bool isFileDeleted) {
+	std::map<wxString, mvceditor::CodeControlClass*> codeControls;
+	std::map<wxString, int> filesToPrompt;
+	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (!isFileDeleted && ctrl) {
 
-            if (!event.Modified.empty()) {
-
-				// group the modified file with its code control. then we will prompt the user
-				// which files they want to keep/revert
-				std::map<wxString, mvceditor::CodeControlClass*> filesToPrompt;
-				for (size_t i = 0; i < event.Modified.size(); ++i) {
-					wxString fullPath = event.Modified[i].GetFullPath();
-					if (openedFilesWithCodeControl.count(fullPath) > 0) {
-						filesToPrompt[fullPath] = openedFilesWithCodeControl[fullPath];
-					}
-				}
-				FilesModifiedPrompt(filesToPrompt);
-            }
-            if (!event.Deleted.empty()) {
-					std::map<wxString, int> deletedFiles;
-					for (size_t i = 0; i < event.Deleted.size(); ++i) {
-						deletedFiles[event.Deleted[i].GetFullPath()] = 1;
-					}
-                    FilesDeletedPrompt(openedFilesWithCodeControl, deletedFiles);
-            }
-    }
-    PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+		// group the modified file with its code control. then we will prompt the user
+		// which files they want to keep/revert
+		filesToPrompt[fileName.GetFullPath()] = 1;
+		codeControls[fileName.GetFullPath()] = ctrl;
+		FilesModifiedPrompt(codeControls);
+	}
+	else if (ctrl) {
+		std::map<wxString, int> deletedFiles;
+		filesToPrompt[fileName.GetFullPath()] = 1;
+		codeControls[fileName.GetFullPath()] = ctrl;
+		FilesDeletedPrompt(codeControls, filesToPrompt);
+	}
 }
 
 mvceditor::VolumeListActionClass::VolumeListActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
@@ -789,7 +797,6 @@ BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureCl
 	EVT_APP_FILE_CLOSED(mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)
-	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnFilesCheckComplete)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 	EVT_ACTION_VOLUME_LIST(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete)
