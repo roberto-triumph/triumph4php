@@ -153,7 +153,14 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent
 }
 
 void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
-	mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
+	wxString msg = event.GetString();
+	wxString extensionMissingErr = wxT("requires the PDO and pdo_sqlite PHP extensions.");
+	if (msg.Find(extensionMissingErr) != wxNOT_FOUND) {
+		mvceditor::EditorLogError(mvceditor::ERR_MISSING_PHP_EXTENSIONS, msg);
+	}
+	else {
+		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
+	}
 	if (ParamsQueue.empty()) {
 		SignalEnd();
 	}

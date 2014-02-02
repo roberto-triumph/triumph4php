@@ -44,6 +44,10 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			msg = mvceditor::MessageWithFix(_("PHP binary not found. ") + extra,
 				_("Go To Project ... Environment to choose the location of the PHP binary."));
 			break;
+		case mvceditor::ERR_MISSING_PHP_EXTENSIONS:
+			msg = mvceditor::MessageWithFix(_("Missing required extensions. ") + extra, 
+				_("Enable the PDO and pdo_sqlite extensions in your PHP installation."));
+			break;
 		case mvceditor::ERR_LOW_RESOURCES:
 			msg = mvceditor::MessageWithFix(_("Your system is way too busy. Please try again later. ") + extra,
 				_("Try closing some programs non-essential program or restarting MVC Editor."));
