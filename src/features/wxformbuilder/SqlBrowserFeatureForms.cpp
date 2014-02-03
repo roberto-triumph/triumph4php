@@ -628,6 +628,7 @@ SqlCopyAsInsertDialogGeneratedClass::SqlCopyAsInsertDialogGeneratedClass( wxWind
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	CheckAll->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnCheckAll ), NULL, this );
 	ButtonSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnOkButton ), NULL, this );
 }
@@ -635,7 +636,84 @@ SqlCopyAsInsertDialogGeneratedClass::SqlCopyAsInsertDialogGeneratedClass( wxWind
 SqlCopyAsInsertDialogGeneratedClass::~SqlCopyAsInsertDialogGeneratedClass()
 {
 	// Disconnect Events
+	CheckAll->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnCheckAll ), NULL, this );
 	ButtonSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsInsertDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
+
+SqlCopyAsPhpDialogGeneratedClass::SqlCopyAsPhpDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* DialogSizer;
+	DialogSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	DialogSizer->AddGrowableCol( 0 );
+	DialogSizer->AddGrowableRow( 0 );
+	DialogSizer->SetFlexibleDirection( wxBOTH );
+	DialogSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* InputSizer;
+	InputSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	InputSizer->AddGrowableCol( 0 );
+	InputSizer->AddGrowableRow( 1 );
+	InputSizer->SetFlexibleDirection( wxBOTH );
+	InputSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	ColumnsLabel = new wxStaticText( this, wxID_ANY, wxT("Select Columns To Include"), wxDefaultPosition, wxDefaultSize, 0 );
+	ColumnsLabel->Wrap( -1 );
+	InputSizer->Add( ColumnsLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	wxArrayString ColumnsChoices;
+	Columns = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ColumnsChoices, 0 );
+	InputSizer->Add( Columns, 1, wxALL|wxEXPAND, 5 );
+	
+	DialogSizer->Add( InputSizer, 1, wxEXPAND, 5 );
+	
+	wxString CopyValuesChoices[] = { wxT("Yes"), wxT("No") };
+	int CopyValuesNChoices = sizeof( CopyValuesChoices ) / sizeof( wxString );
+	CopyValues = new wxRadioBox( this, wxID_ANY, wxT("Copy Values"), wxDefaultPosition, wxDefaultSize, CopyValuesNChoices, CopyValuesChoices, 1, wxRA_SPECIFY_ROWS );
+	CopyValues->SetSelection( 0 );
+	DialogSizer->Add( CopyValues, 1, wxALL|wxEXPAND, 5 );
+	
+	wxString ArraySyntaxRadioChoices[] = { wxT("PHP 5.3"), wxT("PHP 5.4") };
+	int ArraySyntaxRadioNChoices = sizeof( ArraySyntaxRadioChoices ) / sizeof( wxString );
+	ArraySyntaxRadio = new wxRadioBox( this, wxID_ANY, wxT("Array Syntax"), wxDefaultPosition, wxDefaultSize, ArraySyntaxRadioNChoices, ArraySyntaxRadioChoices, 1, wxRA_SPECIFY_ROWS );
+	ArraySyntaxRadio->SetSelection( 1 );
+	DialogSizer->Add( ArraySyntaxRadio, 1, wxALL|wxEXPAND, 5 );
+	
+	wxBoxSizer* BottomSizer;
+	BottomSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	CheckAll = new wxButton( this, wxID_ANY, wxT("Check All"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
+	BottomSizer->Add( CheckAll, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonSizer->AddButton( ButtonSizerCancel );
+	ButtonSizer->Realize();
+	BottomSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	DialogSizer->Add( BottomSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( DialogSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	CheckAll->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnCheckAll ), NULL, this );
+	ButtonSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+SqlCopyAsPhpDialogGeneratedClass::~SqlCopyAsPhpDialogGeneratedClass()
+{
+	// Disconnect Events
+	CheckAll->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnCheckAll ), NULL, this );
+	ButtonSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnOkButton ), NULL, this );
 	
 }

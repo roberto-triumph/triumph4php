@@ -416,6 +416,73 @@ class RowToSqlInsertClass {
 };
 
 /**
+ * Class that converts a row of SQL data to a PHP
+ * array
+ */
+class RowToPhpClass {
+	
+public:
+
+	/**
+	 * All of the available columns of the table
+	 */
+	std::vector<UnicodeString> Columns;
+	
+	/**
+	 * All of the row's values
+	 */
+	std::vector<UnicodeString> Values;
+	
+	/**
+	 * The columns that will be used in the INSERT
+	 * statement
+	 */
+	std::vector<UnicodeString> CheckedColumns;
+	
+	/**
+	 * The values that will be used in the INSERT
+	 * statement
+	 */
+	std::vector<UnicodeString> CheckedValues;
+	
+	/**
+	 * 0 == the array will contain the row's values as
+	 * the array values
+	 * 1 == the array will contain empty strings as
+	 * the array values
+	 */
+	int CopyValues;
+	
+	enum {
+		VALUES_ROW,
+		VALUES_EMPTY
+	};
+	
+	/**
+	 * 0 == the array will be written using PHP < 5.4 
+	 * syntax (array keyword)
+	 * 1 ==  the array will be written using PHP 5.4+
+	 * syntax ( short array syntax '[')
+	 */
+	int ArraySyntax;
+	
+	enum {
+		SYNTAX_KEYWORD,
+		SYNTAX_OPERATOR
+	};
+	
+	RowToPhpClass();
+	
+	RowToPhpClass(const mvceditor::RowToPhpClass& src);
+	
+	mvceditor::RowToPhpClass& operator=(const mvceditor::RowToPhpClass& src);
+	
+	void Copy(const mvceditor::RowToPhpClass& src);
+	
+	UnicodeString CreatePhpArray();
+};
+
+/**
  * Panel which shows results from a SQL query.
  */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
@@ -586,9 +653,15 @@ private:
 	std::vector<SqlResultClass*> Results;
 	
 	/**
-	 * the names of the columns of this result
+	 * to convert a row of data into a sql INSERT statement
 	 */
 	mvceditor::RowToSqlInsertClass RowToSqlInsert;
+	
+	/**
+	 * to convert a row of a data into a
+	 * PHP array
+	 */
+	mvceditor::RowToPhpClass RowToPhp;
 	
 	/**
 	 * To get the query that needs to be run. One results panel will be linked with exactly one code control.
@@ -824,6 +897,8 @@ private:
 	
 	void OnCancelButton(wxCommandEvent& event);
 	
+	void OnCheckAll(wxCommandEvent& event);
+	
 	/**
 	 * the object being edited
 	 */
@@ -834,6 +909,29 @@ private:
 	 * changed when the user clicks OK
 	 */
 	mvceditor::RowToSqlInsertClass& RowToSql;
+	
+	bool HasCheckedAll;
+};
+
+class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
+	
+public:
+
+	SqlCopyAsPhpDialogClass(wxWindow* parent, int id, mvceditor::RowToPhpClass& rowToPhp);
+	
+private:
+
+	void OnOkButton(wxCommandEvent& event);
+	
+	void OnCancelButton(wxCommandEvent& event);
+	
+	void OnCheckAll(wxCommandEvent& event);
+	
+	mvceditor::RowToPhpClass EditedRowToPhp;
+	
+	mvceditor::RowToPhpClass& RowToPhp;
+	
+	bool HasCheckedAll;
 };
 
 }

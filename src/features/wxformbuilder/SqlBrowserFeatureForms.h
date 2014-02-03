@@ -308,6 +308,7 @@ class SqlCopyAsInsertDialogGeneratedClass : public wxDialog
 		wxButton* ButtonSizerCancel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnCheckAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
 		
@@ -316,6 +317,36 @@ class SqlCopyAsInsertDialogGeneratedClass : public wxDialog
 		
 		SqlCopyAsInsertDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As SQL Insert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,478 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyAsInsertDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlCopyAsPhpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlCopyAsPhpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* ColumnsLabel;
+		wxCheckListBox* Columns;
+		wxRadioBox* CopyValues;
+		wxRadioBox* ArraySyntaxRadio;
+		wxButton* CheckAll;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCheckAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SqlCopyAsPhpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As PHP Array"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,510 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlCopyAsPhpDialogGeneratedClass();
 	
 };
 

@@ -565,6 +565,7 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, RunningActionId(0) 
 	, Results()
 	, RowToSqlInsert()
+	, RowToPhp()
 	, Gauge(gauge)
 	, Feature(feature) 
 	, CopyOptions() {
@@ -675,6 +676,9 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(mvceditor::QueryCompleteEv
 		if (result->TableNames.size() == 1) {
 			RowToSqlInsert.TableName = result->TableNames[0];
 		}
+		
+		RowToPhp.Columns = result->ColumnNames;
+		RowToPhp.CheckedColumns = result->ColumnNames;
 	}
 	else {
 		event.Skip();
@@ -856,8 +860,6 @@ void mvceditor::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
 	item->Enable(!RowToSqlInsert.TableName.isEmpty());
 		
 	item = menu.Append(ID_GRID_COPY_ROW_PHP, _("Copy Row As PHP"), _("Copies the entire row As a PHP Array to the clipboard"));
-	item->Enable(!RowToSqlInsert.TableName.isEmpty());
-	
 	item = menu.Append(ID_GRID_OPEN_IN_EDITOR, _("Open Cell in New Buffer"), _("Opens the cell data into an untitled doc"));
 	
 	SelectedCol = event.GetCol();
@@ -944,7 +946,6 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 			&& !RowToSqlInsert.CheckedValues.empty()) {
 		UnicodeString sql = RowToSqlInsert.CreateStatement(Query.DatabaseTag.Driver);
 		
-		
 		wxString wxSql = mvceditor::IcuToWx(sql);
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(wxSql));
@@ -957,7 +958,24 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
-	
+	RowToPhp.Values.clear();
+	RowToPhp.CheckedValues.clear();
+	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
+		RowToPhp.Values.push_back(mvceditor::WxToIcu(val));
+	}
+		
+	mvceditor::SqlCopyAsPhpDialogClass copyDialog(this, wxID_ANY, RowToPhp);
+	if (wxOK == copyDialog.ShowModal() && !RowToPhp.CheckedColumns.empty() 
+			&& !RowToPhp.CheckedValues.empty()) {
+		UnicodeString code = RowToPhp.CreatePhpArray();
+		
+		wxString wxCode = mvceditor::IcuToWx(code);
+		if (wxTheClipboard->Open()) {
+			wxTheClipboard->SetData(new wxTextDataObject(wxCode));
+			wxTheClipboard->Close();
+		}
+	}
 }
 
 void mvceditor::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
@@ -1668,7 +1686,8 @@ mvceditor::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* pare
 	mvceditor::RowToSqlInsertClass& rowToSql)
 : SqlCopyAsInsertDialogGeneratedClass(parent, id)
 , EditedRowToSql(rowToSql)
-, RowToSql(rowToSql) {
+, RowToSql(rowToSql)
+, HasCheckedAll(false) {
 	
 	for (size_t i = 0; i < RowToSql.Columns.size(); ++i) {
 		Columns->Append(mvceditor::IcuToWx(RowToSql.Columns[i]));
@@ -1680,6 +1699,13 @@ mvceditor::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* pare
 	}
 	else {
 		LineModeRadio->SetSelection(1);
+	}
+}
+
+void mvceditor::SqlCopyAsInsertDialogClass::OnCheckAll(wxCommandEvent& event) {
+	HasCheckedAll = !HasCheckedAll;
+	for (size_t i = 0; i < Columns->GetCount(); ++i) {
+		Columns->Check(i, HasCheckedAll);
 	}
 }
 
@@ -1803,6 +1829,149 @@ UnicodeString mvceditor::RowToSqlInsertClass::CreateStatement(mvceditor::Databas
 }
 
 
+mvceditor::RowToPhpClass::RowToPhpClass()
+: Columns()
+, Values()
+, CheckedColumns()
+, CheckedValues()
+, CopyValues(VALUES_ROW)
+, ArraySyntax(SYNTAX_KEYWORD) {
+}
+
+mvceditor::RowToPhpClass::RowToPhpClass(const mvceditor::RowToPhpClass& src)
+: Columns()
+, Values()
+, CheckedColumns()
+, CheckedValues()
+, CopyValues(VALUES_ROW)
+, ArraySyntax(SYNTAX_KEYWORD) {
+	Copy(src);
+}
+
+mvceditor::RowToPhpClass& mvceditor::RowToPhpClass::operator=(const mvceditor::RowToPhpClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void mvceditor::RowToPhpClass::Copy(const mvceditor::RowToPhpClass& src) {
+	Columns = src.Columns;
+	Values = src.Values;
+	CheckedColumns = src.CheckedColumns;
+	CheckedValues = src.CheckedValues;
+	CopyValues = src.CopyValues;
+	ArraySyntax = src.ArraySyntax;
+}
+
+UnicodeString mvceditor::RowToPhpClass::CreatePhpArray() {
+	UnicodeString code;
+	UnicodeString endCode;
+	if (SYNTAX_KEYWORD == ArraySyntax) {
+		code += UNICODE_STRING_SIMPLE("array (\n");
+		endCode =  UNICODE_STRING_SIMPLE(")\n");
+	}
+	else {
+		code += UNICODE_STRING_SIMPLE("[\n");
+		endCode =  UNICODE_STRING_SIMPLE("]\n");
+	}
+	for (size_t i = 0; i < CheckedColumns.size(); ++i) {
+		code += UNICODE_STRING_SIMPLE("  ");
+		code += UNICODE_STRING_SIMPLE("'");
+		code += CheckedColumns[i];
+		code += UNICODE_STRING_SIMPLE("'");
+		code += UNICODE_STRING_SIMPLE(" => ");
+		
+		UnicodeString val;
+		if (VALUES_ROW == CopyValues && i < CheckedValues.size()) {
+			val = CheckedValues[i];
+			if (val.compare(UNICODE_STRING_SIMPLE("<NULL>")) == 0) {
+				code += UNICODE_STRING_SIMPLE("NULL");
+			}
+			else {
+				code += UNICODE_STRING_SIMPLE("'");
+				code += val;
+				code += UNICODE_STRING_SIMPLE("'");
+			}
+			
+		}
+		else {
+			code += UNICODE_STRING_SIMPLE("''");
+		}
+			
+		if (i < (CheckedColumns.size() - 1)) {
+			code += UNICODE_STRING_SIMPLE(",");
+		}
+		code += UNICODE_STRING_SIMPLE("\n");
+	}
+	code += endCode;
+	code += UNICODE_STRING_SIMPLE("\n");
+	return code;
+}
+
+mvceditor::SqlCopyAsPhpDialogClass::SqlCopyAsPhpDialogClass(wxWindow* parent, int id, mvceditor::RowToPhpClass& rowToPhp)
+: SqlCopyAsPhpDialogGeneratedClass(parent, id)
+, EditedRowToPhp(rowToPhp)
+, RowToPhp(rowToPhp) 
+, HasCheckedAll(false) {
+	
+	if (mvceditor::RowToPhpClass::SYNTAX_KEYWORD == rowToPhp.ArraySyntax) {
+		ArraySyntaxRadio->SetSelection(0);
+	}
+	else {
+		ArraySyntaxRadio->SetSelection(1);
+	}
+	if (mvceditor::RowToPhpClass::VALUES_ROW == rowToPhp.CopyValues) {
+		CopyValues->SetSelection(0);
+	}
+	else {
+		CopyValues->SetSelection(1);
+	}
+	for(size_t i = 0; i < rowToPhp.Columns.size(); ++i) {
+		Columns->AppendString(mvceditor::IcuToWx(rowToPhp.Columns[i]));
+		Columns->Check(i);
+	}
+}
+
+void mvceditor::SqlCopyAsPhpDialogClass::OnCheckAll(wxCommandEvent& event) {
+	HasCheckedAll = !HasCheckedAll;
+	for (size_t i = 0; i < Columns->GetCount(); ++i) {
+		Columns->Check(i, HasCheckedAll);
+	}
+}
+
+void mvceditor::SqlCopyAsPhpDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void mvceditor::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (mvceditor::RowToPhpClass::SYNTAX_KEYWORD == ArraySyntaxRadio->GetSelection()) {
+		EditedRowToPhp.ArraySyntax = mvceditor::RowToPhpClass::SYNTAX_KEYWORD;
+	}
+	else {
+		EditedRowToPhp.ArraySyntax = mvceditor::RowToPhpClass::SYNTAX_OPERATOR;
+	}
+	if (mvceditor::RowToPhpClass::VALUES_ROW == CopyValues->GetSelection()) {
+		EditedRowToPhp.CopyValues = mvceditor::RowToPhpClass::VALUES_ROW;
+	}
+	else {
+		EditedRowToPhp.CopyValues = mvceditor::RowToPhpClass::VALUES_EMPTY;
+	}
+	
+	EditedRowToPhp.CheckedColumns.clear();
+	EditedRowToPhp.CheckedValues.clear();
+	
+	for (size_t i = 0; i < Columns->GetCount(); ++i) {
+		if (Columns->IsChecked(i)) {
+			EditedRowToPhp.CheckedColumns.push_back(EditedRowToPhp.Columns[i]);
+			if (i < EditedRowToPhp.Values.size()) {
+				EditedRowToPhp.CheckedValues.push_back(EditedRowToPhp.Values[i]);
+			}
+		}
+	}
+	
+	RowToPhp = EditedRowToPhp;
+	
+	EndModal(wxOK);
+}
 
 BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
@@ -1842,8 +2011,5 @@ BEGIN_EVENT_TABLE(mvceditor::TableDefinitionPanelClass, TableDefinitionPanelGene
 	EVT_QUERY_COMPLETE(ID_SQL_TABLE_INDICES, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
 	EVT_QUERY_COMPLETE(ID_SQL_TABLE_CREATE, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
-
-
-
 
 
