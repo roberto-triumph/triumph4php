@@ -103,7 +103,7 @@ public:
 		// break the preview into before/during/after hit.
 		// taking into account the spaces that were trimmed 
 		// from the beginning of the string
-		wxString beforeHit = preview.Mid(0, Hit.LineOffset - 1 - spaceCount);
+		wxString beforeHit = preview.Mid(0, Hit.LineOffset - spaceCount);
 		wxString hit = preview.Mid(Hit.LineOffset - spaceCount, Hit.MatchLength);
 		wxString afterHit = preview.Mid(Hit.LineOffset + Hit.MatchLength - spaceCount);
 		
@@ -405,8 +405,9 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 
 						// lineNumber is zero-based but we want to display it as 1-based
 						lineNumber++;
-						mvceditor::FindInFilesHitClass hit(fileName, lineText, lineNumber,
-							next - start, next, length);
+						mvceditor::FindInFilesHitClass hit(
+							fileName, lineText, lineNumber,
+							charPos - start, next, length);
 						hits.push_back(hit);
 						next = charPos + length;
 					}
