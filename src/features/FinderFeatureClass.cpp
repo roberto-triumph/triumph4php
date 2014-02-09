@@ -127,11 +127,11 @@ void mvceditor::FinderPanelClass::Find(bool findNext) {
 			Finder.FindPrevious(codeControl->GetSafeText(), position - 2);
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
-				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 				int lineNumber = codeControl->LineFromPosition(position);
 				
 				// lineNumber seems to start at zero
 				++lineNumber;
+				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
 		}
@@ -334,11 +334,11 @@ void mvceditor::ReplacePanelClass::Find(bool findNext) {
 			Finder.FindPrevious(codeControl->GetSafeText(), position - 2);
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
-				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 				int lineNumber = codeControl->LineFromPosition(position);
 				
 				// lineNumber seems to start at zero
 				++lineNumber;
+				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
 		}
