@@ -143,6 +143,23 @@ private:
 	 * directories fail to notify of file changes inside of sub-directories.
 	 */
 	void OnVolumeListComplete(mvceditor::VolumeListEventClass& event);
+	
+	/**
+	 * when the file modified times have been queried, prompt the user
+	 * if the files have been modified externally
+	 */
+	void OnFileExternallyModifiedCheck(mvceditor::FilesModifiedEventClass& event);
+	
+	/**
+	 * when a file has been saved, we set the JustSaved flag
+	 * when a file is saved, we ignore the results of the file modified
+	 * checks that are done in the background; since the user just
+	 * saved the file, the modified time we have in memory is now out of
+	 * date, the modified time is changed, but the user knows about
+	 * the change, so we dont have to  prompt them about
+	 * the file modification.
+	 */
+	void OnFileSaved(mvceditor::CodeControlEventClass& event);
 
 	/**
 	 * timer that we will use to see if file system watcher events have been captured. in this timer's
@@ -236,13 +253,23 @@ private:
 	 * a polled file was actually deleted
 	 */
 	int PollDeleteCount;
-
+	
 	/**
 	 * will be set to TRUE if the watcher saw an error event.  We may get 
 	 * error events when a project source dir has been deleted. In this case, 
 	 * we want to prompt the user on what action to take
 	 */
 	bool IsWatchError;
+
+	/**
+	 * when a file is saved, we ignore the results of the file modified
+	 * checks that are done in the background; since the user just
+	 * saved the file, the modified time we have in memory is now out of
+	 * date, the modified time is changed, but the user knows about
+	 * the change, so we dont have to  prompt them about
+	 * the file modification.
+	 */
+	bool JustSaved;
 	
 	DECLARE_EVENT_TABLE()
 

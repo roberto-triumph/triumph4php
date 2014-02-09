@@ -33,6 +33,7 @@
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
 static int ID_FILE_MODIFIED_POLL = wxNewId();
+static int ID_FILE_MODIFIED_ACTION = wxNewId();
 
 /**
  * collapse a list of paths into files and directories.  The collapsing part is that
@@ -152,7 +153,8 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 , FilesToPoll()
 , LastWatcherEventTime() 
 , PollDeleteCount(0)
-, IsWatchError(false) {
+, IsWatchError(false)
+, JustSaved(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
 }
@@ -674,7 +676,8 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 	
 	// loop through all of the opened files to get the files to
 	// be checked
-	// no need to check new files as they are not yet in the file system
+	// for now, we will only check the file that
+	// is being edited (the tab that is selected)
 	bool found = false;
 	for (size_t i = 0; i < FilesToPoll.size(); ++i) {
 		if (ctrlFileName == FilesToPoll[i]) {
@@ -685,11 +688,49 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 	if (!found) {
 		return;
 	}
-	wxDateTime modifiedDateTime;
-	wxDateTime lastModifiedTime = ctrl->GetFileOpenedDateTime();
-	bool exists = ctrlFileName.FileExists();
-	if (exists) {
-		modifiedDateTime = ctrlFileName.GetModificationTime();
+	
+	PollTimer.Stop();
+	
+	mvceditor::FileModifiedCheckActionClass* action = new mvceditor::FileModifiedCheckActionClass
+		(App.RunningThreads, ID_FILE_MODIFIED_ACTION);
+	std::vector<mvceditor::FileModifiedTimeClass> filesToCheck;
+	mvceditor::FileModifiedTimeClass fileToCheck;
+	fileToCheck.FileName = ctrlFileName;
+	fileToCheck.ModifiedTime = ctrl->GetFileOpenedDateTime(); 
+	filesToCheck.push_back(fileToCheck);
+	
+	action->SetFiles(filesToCheck);
+	
+	// reset the saved flag
+	// if the user happens to save after we queue the modified time check
+	// action, then the check will say the file has been modified, but 
+	// in this case the file has been knowingly modified by the user, so
+	// we suppress the prompt
+	JustSaved = false;
+	App.RunningThreads.Queue(action);
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(mvceditor::FilesModifiedEventClass& event) {
+	if (JustSaved) {
+		
+		// ignoring results, file has just been saved
+		// if the user happens to save after we queue the modified time check
+		// action, then the check will say the file has been modified, but 
+		// in this case the file has been knowingly modified by the user, so
+		// we suppress the prompt
+		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+		return;
+	}
+	// since we only gave it one file
+	bool exists = event.Deleted.empty();
+	bool modified = !event.Modified.empty();
+	
+	wxFileName ctrlFileName;
+	if (modified) {
+		ctrlFileName.Assign(event.Modified[0]);
+	}
+	else if (!exists) {
+		ctrlFileName.Assign(event.Deleted[0]);
 	}
 	if (!exists && PollDeleteCount <= 2) {
 		
@@ -703,20 +744,21 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 		
 		// we tried to get the modified time but it has
 		// not existed.  assume file was delted.
-		PollTimer.Stop();
 		PollFileModifiedPrompt(ctrlFileName, true);
 		PollDeleteCount = 0;
-		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 		
 	}
-	else if (exists && modifiedDateTime.IsValid() && modifiedDateTime.IsLaterThan(lastModifiedTime)) {
+	else if (exists && modified) {
 		
 		// file time has been updated; file has been modified
-		PollTimer.Stop();
 		PollFileModifiedPrompt(ctrlFileName, false);
 		PollDeleteCount = 0;
-		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 	}
+	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+}
+
+void mvceditor::FileModifiedCheckFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
+	JustSaved = true;
 }
 
 void mvceditor::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName& fileName, bool isFileDeleted) {
@@ -797,7 +839,9 @@ BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureCl
 	EVT_APP_FILE_CLOSED(mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_ACTION, mvceditor::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck)
 	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
 	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 	EVT_ACTION_VOLUME_LIST(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete)
+	EVT_APP_FILE_SAVED(mvceditor::FileModifiedCheckFeatureClass::OnFileSaved)
 END_EVENT_TABLE()
