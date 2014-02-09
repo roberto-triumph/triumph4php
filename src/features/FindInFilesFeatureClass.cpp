@@ -831,7 +831,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	int foundIndex = -1;
 	wxString lastUsedPath = feature.PreviousFindInFiles.Source.RootDirectory.GetFullPath();
 	if (!lastUsedPath.IsEmpty()) {
-		int foundIndex = Directory->FindString(lastUsedPath, false);
+		foundIndex = Directory->FindString(lastUsedPath, false);
 		if (foundIndex >= 0) {
 			isUsed = true;
 		}
