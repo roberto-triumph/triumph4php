@@ -346,9 +346,11 @@ bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statemen
 			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
 			for (int i = 0; i < columnCount; ++i) {
 				const char* tbl = sqlite3_column_table_name(backend->stmt_, i);
-				UnicodeString uniTable = mvceditor::CharToIcu(tbl);
-				if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
-					tableNames.push_back(uniTable);
+				if (tbl) {
+					UnicodeString uniTable = mvceditor::CharToIcu(tbl);
+					if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
+						tableNames.push_back(uniTable);
+					}
 				}
 			}
 		}

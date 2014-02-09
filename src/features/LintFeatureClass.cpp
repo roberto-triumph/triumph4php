@@ -286,7 +286,7 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	while (it != Feature.LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
 			it = Feature.LintErrors.erase(it);
-			if (i >= 0 && (size_t)i < ErrorsList->GetItemCount()) {
+			if (i >= 0 && i < ErrorsList->GetItemCount()) {
 				ErrorsList->DeleteItem(i);
 			}
 			i--;
@@ -337,7 +337,7 @@ void mvceditor::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
 
 void mvceditor::LintResultsPanelClass::SelectNextError() {
 	int selected = ErrorsList->GetSelectedRow();
-	if (selected != wxNOT_FOUND && ((unsigned int)selected  + 1) < ErrorsList->GetItemCount()) {
+	if (selected != wxNOT_FOUND && (selected  + 1) < ErrorsList->GetItemCount()) {
 		ErrorsList->SelectRow(selected + 1);
 		GoToAndDisplayLintError(selected + 1);
 	}
@@ -374,30 +374,6 @@ void mvceditor::LintResultsPanelClass::ShowLintError(int index) {
 		return;
 	}
 	codeControl->MarkLintError(result);
-
-	// lines from scintilla are 0 based, but lint results lines are 1-based
-	int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
-	int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
-	if (result.LineNumber < firstVisibleLine || result.LineNumber >= lastVisibleLine) {
-		
-		// the error is out of view show a message, remove any other existing message
-		codeControl->Freeze();
-		wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
-		if (old) {
-			old->Destroy();
-		}
-		std::vector<pelet::LintResultsClass> results;
-		results.push_back(result);
-		mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, results);
-		wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
-		point.y = point.y - errorPanel->GetSize().GetY();
-		if (point.y < 0) {
-			point.y = 0;
-		}
-		errorPanel->SetPosition(point);
-		errorPanel->SetFocus();
-		codeControl->Thaw();
-	}
 }
 
 mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app) 
@@ -524,21 +500,54 @@ void mvceditor::LintFeatureClass::OnLintErrorAfterSave(mvceditor::LintResultsEve
 	std::vector<pelet::LintResultsClass> results = event.LintResults;
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	mvceditor::LintResultsPanelClass* resultsPanel = NULL;
+	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (window) {
 		resultsPanel = (mvceditor::LintResultsPanelClass*) window;
-	}
-	else {
-		resultsPanel = new mvceditor::LintResultsPanelClass(GetMainWindow(), ID_LINT_RESULTS_PANEL,
-			GetNotebook(), *this);
-		wxBitmap lintBitmap = mvceditor::IconImageAsset(wxT("lint-check"));
-		GetToolsNotebook()->AddPage(resultsPanel, _("Lint Check"), false, lintBitmap);
-	}
 
-	// do not set focus the list, just the overlay
-	// of the error
-	int i = LintErrors.size();
-	resultsPanel->AddErrors(results);
-	resultsPanel->ShowLintError(i);
+		// do not set focus the list, just the overlay
+        // of the error
+        int i = LintErrors.size(); 
+        resultsPanel->AddErrors(results);
+        resultsPanel->ShowLintError(i);
+	}
+	else if (codeControl && results.empty()) {
+		
+		// no errors!
+		codeControl->ClearLintErrors();
+	}
+	else if (codeControl && !results.empty()) {
+
+		// if the lint results panel is not open, just show
+		// a small panel instead of creating the tools window,
+		// which will startle the user
+
+		// lines from scintilla are 0 based, but lint results lines are 1-based
+		int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
+		int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
+		if (results[0].LineNumber < firstVisibleLine || results[0].LineNumber >= lastVisibleLine) {
+			
+			// the error is out of view show a message, remove any other existing message
+			codeControl->Freeze();
+			wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
+			if (old) {
+				old->Destroy();
+			}
+			mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, results);
+			wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
+			point.y = point.y - errorPanel->GetSize().GetY();
+			if (point.y < 0) {
+				point.y = 0;
+			}
+			errorPanel->SetPosition(point);
+			errorPanel->SetFocus();
+			codeControl->Thaw();
+		}
+		else {
+
+			// the error is in view, just show an annotation
+			codeControl->MarkLintError(results[0]);
+		}
+	}
 }
 
 void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
