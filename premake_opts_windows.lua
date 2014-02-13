@@ -185,3 +185,35 @@ CURL_RELEASE_INCLUDE_DIR = curlReleaseDir .. '/include'
 CURL_RELEASE_LIB = curlReleaseDir .. '/lib/libcurl.lib'
 CURL_RELEASE_LIB_DIR = curlReleaseDir .. '/lib'
 CURL_RELEASE_BIN_DIR = curlReleaseDir .. '/bin'
+
+-- location of the final lib directory
+-- all of the dependant shared libraries (DLLs) will be placed here
+-- by default this will be the same directory as the directory where
+-- the executable is located. in MSW, DLLs are searched in the
+-- same directory as the executable; it is easiest to place them
+-- together.
+-- lib dir can be relative, it is relative it is assumed to be
+-- relative to the executable location
+MVCEDITOR_LIB_DIR = os.getenv("MVCEDITOR_LIB_DIR");
+if (not MVCEDITOR_LIB_DIR) then
+    MVCEDITOR_LIB_DIR = ".";
+    print ("Using default location of " .. MVCEDITOR_LIB_DIR .. " for shared libraries location")
+end
+
+-- location of the asset directory
+-- the asset directory contains non-source code files needed
+-- by MVC Editor fto function properly.  Assets include
+-- images
+-- sql scripts (to create the tag cache)
+-- PHP scripts (PHP detectors)
+--
+-- in MSW, assets live right in a sub directory of where
+-- the executable is located
+-- asset dir can be relative, it is relative it is assumed to be
+-- relative to the executable location
+MVCEDITOR_ASSET_DIR = os.getenv("MVCEDITOR_ASSET_DIR")
+if (not MVCEDITOR_ASSET_DIR) then
+    MVCEDITOR_ASSET_DIR = '../assets'
+    print("Using default location of " .. MVCEDITOR_ASSET_DIR .. " for assets location")
+end
+

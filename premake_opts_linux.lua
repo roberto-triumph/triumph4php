@@ -68,6 +68,30 @@ if (not WX_CONFIG) then
 end
 
 
+SOCI_DEBUG_INCLUDE_DIR = os.getenv("MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR");
+if (not SOCI_DEBUG_INCLUDE_DIR) then
+    SOCI_DEBUG_INCLUDE_DIR = 'lib/soci/mvc-editor/Debug/include';
+    print "Using default location of lib/soci/mvc-editor/Debug/include for SOCI debug include dir"
+end
+
+SOCI_DEBUG_LIB_DIR = os.getenv("MVCEDITOR_SOCI_DEBUG_LIB_DIR");
+if (not SOCI_DEBUG_LIB_DIR) then
+    SOCI_DEBUG_LIB_DIR = 'lib/soci/mvc-editor/Debug/lib64';
+    print "Using default location of lib/soci/mvc-editor/Debug/lib64 for SOCI debug lib dir"
+end
+
+SOCI_RELEASE_INCLUDE_DIR = os.getenv("MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR");
+if (not SOCI_RELEASE_INCLUDE_DIR) then
+    SOCI_RELEASE_INCLUDE_DIR = 'lib/soci/mvc-editor/Release/include';
+    print "Using default location of lib/soci/mvc-editor/Release/include for SOCI release include dir"
+end
+
+SOCI_RELEASE_LIB_DIR = os.getenv("MVCEDITOR_SOCI_RELEASE_LIB_DIR");
+if (not SOCI_RELEASE_LIB_DIR) then
+    SOCI_RELEASE_LIB_DIR = 'lib/soci/mvc-editor/Release/lib64';
+    print "Using default location of lib/soci/mvc-editor/Release/lib64 for SOCI release lib dir"
+end
+
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
 CMAKE = 'cmake';
@@ -111,4 +135,53 @@ CURL_LIB_DIR = os.pathsearch('libcurl.so',
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
+
+-- location where the makefiles / codelist solution files will be placed
+BUILD_SCRIPTS_DIR = os.getenv("MVCEDITOR_BUILD_SCRIPTS_DIR");
+if (not BUILD_SCRIPTS_DIR) then
+    BUILD_SCRIPTS_DIR = 'build/';
+    if (_ACTION) then
+        BUILD_SCRIPTS_DIR = 'build/' .. _ACTION
+    end
+    print ("Using default location of " .. BUILD_SCRIPTS_DIR .. " for build scripts location")
+end
+
+
+-- location of the final lib directory
+-- all of the dependant shared libraries (*.so) will be placed here
+-- by default this will be the same directory as the directory where
+-- the executable is located. in linux, we want our version patched
+-- version of wxWidgets and SOCI to be used, so we compile them,  place 
+-- them in a directory, and we add a compile flag to look for
+-- so files in a specific location (-rpath) so that we don't 
+-- use the system version of the libraries. Furthermore, when we
+-- make distribution packages (DEB files), we place them in a separate
+-- location as well.
+-- lib dir can be relative, it is relative it is assumed to be
+-- relative to the executable location
+MVCEDITOR_LIB_DIR = os.getenv("MVCEDITOR_LIB_DIR");
+if (not MVCEDITOR_LIB_DIR) then
+    MVCEDITOR_LIB_DIR = ".";
+    print ("Using default location of " .. MVCEDITOR_LIB_DIR .. " for shared libraries location")
+end
+
+
+-- location of the asset directory
+-- the asset directory contains non-source code files needed
+-- by MVC Editor fto function properly.  Assets include
+-- images
+-- sql scripts (to create the tag cache)
+-- PHP scripts (PHP detectors)
+--
+-- in linux, assets live right in a separate directory that is
+-- adjacent to the executable. Furthermore, when we
+-- make distribution packages (DEB files), we place them in a separate
+-- location as well.
+-- asset dir can be relative, it is relative it is assumed to be
+-- relative to the executable location
+MVCEDITOR_ASSET_DIR = os.getenv("MVCEDITOR_ASSET_DIR")
+if (not MVCEDITOR_ASSET_DIR) then
+    MVCEDITOR_ASSET_DIR = '../assets'
+    print("Using default location of " .. MVCEDITOR_ASSET_DIR .. " for assets location")
+end
 

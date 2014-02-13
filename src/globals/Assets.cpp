@@ -27,49 +27,68 @@
 #include <wx/image.h>
 #include <wx/fileconf.h>
 
+// these macros will expand a macro into its 
+// these are needed to expand the asset root location 
+// which is given as a macro by the premake script
+#define MVC_STR_EXPAND(s) #s
+#define MVC_STR(s) MVC_STR_EXPAND(s)
+
+/**
+ * @return wxFileName the root directory of the asset directory
+ *         The asset directory is set via #define, this function
+ *         will construct a wxFileName from it depending on whether
+ *         the asset directory is relative or absolute.
+ */
+static wxFileName AssetRootDir() {
+	
+	std::string stdRoot;
+	#ifdef MVCEDITOR_ASSET_DIR
+		stdRoot = MVC_STR(MVCEDITOR_ASSET_DIR);
+	#endif
+	
+    wxFileName assetRoot;
+    wxString assetDir = wxString::FromAscii(stdRoot.c_str());
+    if (assetDir.StartsWith(wxT("/"))) {
+        assetRoot.AssignDir(assetDir);
+    }
+    else {
+        
+        // assume that the path is relative to the executable
+		wxStandardPaths paths = wxStandardPaths::Get();
+		wxFileName pathExecutableFileName(paths.GetExecutablePath());
+		wxString assetStr = pathExecutableFileName.GetPathWithSep() + assetDir;
+		assetRoot.AssignDir(assetStr);
+		assetRoot.Normalize();
+    }
+    return assetRoot;
+}
+
 wxFileName mvceditor::NativeFunctionsAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("php.db");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	return fileName;
+	wxFileName asset = AssetRootDir();
+	wxFileName dbFile(asset.GetPath(), wxT("php.db"));
+	return dbFile;
 }
 
 wxFileName mvceditor::ResourceSqlSchemaAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("sql") + wxFileName::GetPathSeparator() +
-							  wxT("resources.sql");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	return fileName;
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("sql"));
+	
+	wxFileName sqlFile(asset.GetPath(), wxT("resources.sql"));
+	return sqlFile;
 }
 
 wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	
 	}
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-							  wxT("auto_complete") + wxFileName::GetPathSeparator() +
-							  imageName +
-	                          wxT(".xpm");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	wxASSERT(fileName.IsOk());
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("auto_complete"));
+	wxFileName iconFile(asset.GetPath(), imageName + wxT(".xpm"));
+	
+	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
-	bool loaded = bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_XPM);
-	wxASSERT_MSG(loaded, wxT("failed to load: ") + fileName.GetFullPath());
+	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_XPM);
+	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return bitmap;
 }
 
@@ -77,45 +96,33 @@ wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
 		wxImage::AddHandler(new wxPNGHandler());
 	}
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("icons"));
+    wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
+    
+	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-							  wxT("icons") + wxFileName::GetPathSeparator() +
-							  imageName +
-	                          wxT(".png");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	wxASSERT(fileName.IsOk());
-	bitmap.LoadFile(fileName.GetFullPath(), wxBITMAP_TYPE_PNG);
+	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return bitmap;
 }
 
-
 wxFileName mvceditor::PhpDetectorsBaseAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors");
+    wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("php_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
 wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("url_detectors");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("php_detectors"));
+	asset.AppendDir(wxT("url_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -130,15 +137,12 @@ wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("template_files_detectors");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("php_detectors"));
+	asset.AppendDir(wxT("template_files_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -163,15 +167,12 @@ wxFileName mvceditor::TagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::TagDetectorsGlobalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("tag_detectors");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("php_detectors"));
+	asset.AppendDir(wxT("tag_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -186,15 +187,12 @@ wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("database_detectors");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("php_detectors"));
+	asset.AppendDir(wxT("database_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -209,15 +207,12 @@ wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
 }
 
 wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("php_detectors") + wxFileName::GetPathSeparator() +
-		wxT("config_detectors");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("php_detectors"));
+	asset.AppendDir(wxT("config_detectors"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -309,28 +304,19 @@ void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
 }
 
 wxFileName mvceditor::DetectorSqlSchemaAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString nativeFileName = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-	                          wxT("..") + wxFileName::GetPathSeparator() +
-	                          wxT("resources") + wxFileName::GetPathSeparator() +
-	                          wxT("sql") + wxFileName::GetPathSeparator() +
-							  wxT("detectors.sql");
-	wxFileName fileName(nativeFileName);
-	fileName.Normalize();
-	return fileName;
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("sql"));
+	
+	wxFileName sqlFile(asset.GetPath(), wxT("detectors.sql"));
+	return sqlFile;
 }
 
 wxFileName mvceditor::SkeletonsBaseAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName pathExecutableFileName(paths.GetExecutablePath());
-	wxString scriptsFullPath = pathExecutableFileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME) +
-		wxT("..") + wxFileName::GetPathSeparator() +
-		wxT("resources") + wxFileName::GetPathSeparator() +
-		wxT("skeletons");
+	wxFileName asset = AssetRootDir();
+	asset.AppendDir(wxT("skeletons"));
+	
 	wxFileName scriptsFileName;
-	scriptsFileName.AssignDir(scriptsFullPath);
-	scriptsFileName.Normalize();
+	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
 }
 
@@ -353,9 +339,7 @@ wxFileName mvceditor::DetectorCacheAsset() {
 }
 
 wxFileName mvceditor::VersionFileAsset() {
-	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName versionFile(paths.GetExecutablePath());
-	versionFile.RemoveLastDir();
-	versionFile.SetFullName(wxT("version.txt"));
+	wxFileName asset = AssetRootDir();
+	wxFileName versionFile(asset.GetPath(), wxT("version.txt"));
 	return versionFile;
 }

@@ -155,30 +155,27 @@ function sociconfiguration(config)
 	else 
 		if config == "Debug" then
 			includedirs {
-				"lib/soci/mvc-editor/Debug/include",
-				"lib/soci/mvc-editor/Debug/include/soci",
+				SOCI_DEBUG_INCLUDE_DIR,
+				SOCI_DEBUG_INCLUDE_DIR .. "/soci",
 				MYSQL_INCLUDE_DIR,
 				SQLITE_INCLUDE_DIR
 			}
 		end
 		if config == "Release" then
 			includedirs {
-				"lib/soci/mvc-editor/Release/include",
-				"lib/soci/mvc-editor/Release/include/soci",
+				SOCI_RELEASE_INCLUDE_DIR,
+				SOCI_RELEASE_INCLUDE_DIR .. "/soci",
 				MYSQL_INCLUDE_DIR,
 				SQLITE_INCLUDE_DIR
 			}
 		end
 
 		-- soci creates lib directory with the architecture name
-		if (os.isdir("lib/soci/mvc-editor/Debug/lib64") and config == "Debug") then
-			libdirs { "lib/soci/mvc-editor/Debug/lib64" }
-		elseif (os.isdir("lib/soci/mvc-editor/Release/lib64") and config == "Release") then
-			libdirs { "lib/soci/mvc-editor/Release/lib64" }
-		elseif (os.isdir("lib/soci/mvc-editor/Debug/lib") and config == "Debug") then
-			libdirs { "lib/soci/mvc-editor/Debug/lib" }
-		elseif (os.isdir("lib/soci/mvc-editor/Release/lib") and config == "Release") then
-			libdirs { "lib/soci/mvc-editor/Release/lib" }
+		if (config == "Debug") then
+			libdirs { SOCI_DEBUG_LIB_DIR }
+		end
+        if (config == "Release") then
+			libdirs { SOCI_RELEASE_LIB_DIR }
 		end
 		links { 
 			"soci_core", 
@@ -187,7 +184,7 @@ function sociconfiguration(config)
 		}
 		links { 
 			string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
-			string.match(SQLITE_LIB_NAME , "^lib([%w_]+)%.so$") 
+			string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.so$") 
 		}
 	end
 end
@@ -220,18 +217,22 @@ function pickywarnings(action)
 		-- since Visual Studio is not C99 compliant
 		buildoptions { "-Wall", "-Werror", "-Wvla" }
 	end
-end
-
--- solution directory structure
+end-- solution directory structure
 -- the toolset files will be deposited in the build/ directory
 -- each toolset will have its own directory
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
 -- compile flags will be set to be stricter than normal
 solution "mvc-editor"
-	if _ACTION then
-		location ("build/" .. _ACTION)
-	end
-	configurations { "Debug", "Release"}
+	location (BUILD_SCRIPTS_DIR)
+	
+	configurations { "Release", "Debug"}
+
+    -- the location of the assets (images, sql scripts, etc)
+    -- we want to control its location so that we build distribution
+    -- packages properly
+    defines {
+        string.format("MVCEDITOR_ASSET_DIR=%s", MVCEDITOR_ASSET_DIR)
+    }
 	configuration "Debug"
 		objdir "Debug"
 		targetdir "Debug"
@@ -241,8 +242,8 @@ solution "mvc-editor"
 		targetdir "Release"
 	configuration "gmake or codelite"
 
-		-- link against our own version of wxWidgets / ICU instead of any installed in the system
-		linkoptions { "-Wl,-rpath=./" }
+		-- link against our own version of wxWidgets / SOCI instead of any installed in the system
+		linkoptions { string.format("-Wl,-rpath=%s", MVCEDITOR_LIB_DIR)  }
 
 
 	project "mvc-editor"
@@ -259,7 +260,7 @@ solution "mvc-editor"
 			"lib/keybinder/include/", 
 			"lib/pelet/include"
 		}
-		links { "tests", "keybinder", "pelet" }
+		links { "keybinder", "pelet" }
 
 		configuration "Debug"
 			pickywarnings(_ACTION)

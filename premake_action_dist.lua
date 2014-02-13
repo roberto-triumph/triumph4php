@@ -25,22 +25,22 @@
 newaction {
 	trigger = "dist",
 	description = "Build the MVC Editor distributable.",
-	execute = function()		
+	execute = function()
 		if os.is "windows" then
 			if os.isdir("dist") then
 				os.execute("rmdir /s /q dist")
 			end
-			os.execute(
-				"mkdir dist && " .. 
-				"mkdir dist\\mvc-editor\\bin && " .. 
-				"mkdir dist\\mvc-editor\\lib &&" .. 
-				"mkdir dist\\mvc-editor\\resources && " ..
-				"mkdir dist\\mvc-editor\\php_detectors && "  .. 
-				"xcopy /S /Y Release\\*.dll dist\\mvc-editor\\bin && " ..
-				"copy Release\\mvc-editor.exe dist\\mvc-editor\\bin &&" ..
-				"xcopy  /S /Y resources\\* dist\\mvc-editor\\resources && " ..
-				"xcopy  /S /Y php_detectors\\* dist\\mvc-editor\\php_detectors "
-			)
+			batchexecute({
+				"mkdir dist",
+				"mkdir dist\\mvc-editor\\bin",
+				"mkdir dist\\mvc-editor\\lib",
+				"mkdir dist\\mvc-editor\\resources",
+				"mkdir dist\\mvc-editor\\php_detectors",
+				"xcopy /S /Y Release\\*.dll dist\\mvc-editor\\bin",
+				"copy Release\\mvc-editor.exe dist\\mvc-editor\\bin",
+				"xcopy  /S /Y resources\\* dist\\mvc-editor\\resources",
+				"xcopy  /S /Y php_detectors\\* dist\\mvc-editor\\php_detectors"
+			});
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
@@ -50,29 +50,86 @@ newaction {
 				os.execute(cmd) 
 			end
 		else
-			os.execute(
-				"rm -rf dist && " .. 
-				"mkdir -p dist/mvc-editor/bin && " .. 
-				"mkdir -p dist/mvc-editor/resources && " .. 
-				"mkdir -p dist/mvc-editor/php_detectors && " .. 
-				"cp -R Release/*so* dist/mvc-editor/bin && " .. 
-				"cp Release/mvc-editor dist/mvc-editor/bin/mvc-editor && " .. 
-				"cp -R resources/* dist/mvc-editor/resources/ && " .. 
-				"cp -R php_detectors/* dist/mvc-editor/php_detectors" 
-			);
+			workDir = normalizepath("../mvc-editor-0.6")
+			workLibDir = normalizepath("../mvc-editor-0.6/Release/libs")
+			rootDir = normalizepath("./")
+			libWildcards =  normalizepath("./Release/*.so*")
+			assetDir = "/usr/share/mvc-editor/assets"
+			branch = "master";
+			
+			os.execute(string.format("rm -rf %s", workDir))
+						
+			batchexecute(rootDir, {
+			
+				-- clone the project into a new, temp directory
+				string.format("git clone . %s", workDir),
+				string.format("cd %s", workDir),
+				string.format("git checkout %s", branch),
+				"git submodule init",
+				"git submodule update lib/pelet",
+				
+				-- copy the compiled 3rd party dependencies into the work dir
+				string.format("install -d %s Release/libs", libWildcards)
+			})
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
-			cmd = "git describe --long > dist/mvc-editor/version.txt"
+			cmd = "cd " .. workDir .. " && git describe --long > version.txt"
 			if 0 ~= os.execute(cmd) then
-				cmd = "git describe --all --long > dist/mvc-editor/version.txt"
+				cmd = "cd " .. workDir .. " && git describe --all --long > version.txt"
 				os.execute(cmd) 
 			end
+
+
+			batchexecute(workDir, {
 			
-			os.execute(
-				"cd dist && " .. 
-				"tar cjf mvc-editor.tar.bz2 mvc-editor"
-			);
+				-- create the makefiles, which will be used to build
+				-- the release version of the project
+				-- basically, this command makes the work directory use
+				-- the wxWidgets, SOCI installation in the main project dir (which
+				-- are already compiled, the work dir does not have them and we
+				-- want to avoid re-compiling them)
+				-- also, we generate the Makefiles in the root of the project
+				-- also, we want to set the assets dir to the final location
+				-- of the assets (in the system where the .deb file will be installed
+				-- ie the end user machine)
+				"MVCEDITOR_WXCONFIG=" .. WX_CONFIG .. " " ..
+				"MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR=" .. SOCI_DEBUG_INCLUDE_DIR .. " " ..
+				"MVCEDITOR_SOCI_DEBUG_LIB_DIR=" .. SOCI_DEBUG_LIB_DIR  .. " "  ..
+				"MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR=" .. SOCI_RELEASE_INCLUDE_DIR .. " " ..
+				"MVCEDITOR_SOCI_RELEASE_LIB_DIR=" .. SOCI_RELEASE_LIB_DIR .. " " .. 
+				"MVCEDITOR_BUILD_SCRIPTS_DIR=. " .. 
+				"MVCEDITOR_LIB_DIR=" .. workLibDir .. " " ..
+				"MVCEDITOR_ASSET_DIR=" .. assetDir .. " " ..
+				"./premake4 gmake",
+				
+				-- this will prep the dir to be a debian work dir
+				"dh_make -s --email roberto@mvceditor.com  --native",
+
+				-- populate the install file, the file that tells which files to 
+				-- include in the .deb file
+				-- double quote the backslash since we have to escape the backslash in the shell
+				"echo 'Release/mvc-editor usr/bin\\n' > debian/install",
+				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/mvc-editor\" }' >> debian/install",
+
+				-- regex is complicated
+				-- find the basename from the asset file, then remove it
+				-- for example, from  "assets/icons/database-delete.png"
+				-- we want to end up with the line 
+				-- "assets/icons/database-delete.png usr/share/mvc-editor/icons"
+				-- double quote the backslash since we have to escape the backslash in the shell
+				"find assets/  -type f -name \"*\" -printf '%p /%h\n' | sed 's/\\/assets/usr\\/share\\/mvc-editor/g' >> debian/install",
+
+				-- mofiy the makefile to only build the main app not all of the examples, profilers, 
+				"sed -i 's/all: \$(PROJECTS)/all: mvc-editor/g' Makefile",
+				
+				-- finally, create the .deb this command will basically run our makefile
+				-- gather all of the 3rd party libs and assets and package them
+				-- we need to set the LD_LIBRAR_PATH so that dpkg finds our dependencies
+				-- -b means we create the binary only package, also -us -uc
+				-- creates an unsigned version
+				"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:Release/libs:Release dpkg-buildpackage -b -us -uc"
+			});
 		end
 		
 		
