@@ -65,11 +65,14 @@ newaction {
 				string.format("git clone . %s", workDir),
 				string.format("cd %s", workDir),
 				string.format("git checkout %s", branch),
-				"git submodule init",
-				"git submodule update lib/pelet",
+				
 				
 				-- copy the compiled 3rd party dependencies into the work dir
-				string.format("install -d %s Release/libs", libWildcards)
+				"install -d Release/libs",
+				string.format("cp -r %s %s", os.getcwd() .. "/Release/*.so*", "Release/libs"),
+				
+				"git submodule init",
+				"git submodule update lib/pelet"
 			})
 			
 			-- get the version info from git and populate the version file
@@ -93,11 +96,11 @@ newaction {
 				-- also, we want to set the assets dir to the final location
 				-- of the assets (in the system where the .deb file will be installed
 				-- ie the end user machine)
-				"MVCEDITOR_WXCONFIG=" .. WX_CONFIG .. " " ..
-				"MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR=" .. SOCI_DEBUG_INCLUDE_DIR .. " " ..
-				"MVCEDITOR_SOCI_DEBUG_LIB_DIR=" .. SOCI_DEBUG_LIB_DIR  .. " "  ..
-				"MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR=" .. SOCI_RELEASE_INCLUDE_DIR .. " " ..
-				"MVCEDITOR_SOCI_RELEASE_LIB_DIR=" .. SOCI_RELEASE_LIB_DIR .. " " .. 
+				"MVCEDITOR_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
+				"MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
+				"MVCEDITOR_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
+				"MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
+				"MVCEDITOR_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
 				"MVCEDITOR_BUILD_SCRIPTS_DIR=. " .. 
 				"MVCEDITOR_LIB_DIR=" .. workLibDir .. " " ..
 				"MVCEDITOR_ASSET_DIR=" .. assetDir .. " " ..
