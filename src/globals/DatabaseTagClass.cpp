@@ -395,7 +395,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					break;
 				case soci::dt_date:
 					tm = row.get<std::tm>(i);
-					if (tm.tm_year != 0 && tm.tm_mon != 0 && tm.tm_mday != 0) {
+					if (tm.tm_year != 0 && tm.tm_mday != 0) {
 						wxDateTime date(tm);
 						out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
 					}
