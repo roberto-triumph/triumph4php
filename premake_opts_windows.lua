@@ -200,6 +200,16 @@ if (not MVCEDITOR_LIB_DIR) then
     print ("Using default location of " .. MVCEDITOR_LIB_DIR .. " for shared libraries location")
 end
 
+-- location where the vs solution files will be placed
+BUILD_SCRIPTS_DIR = os.getenv("MVCEDITOR_BUILD_SCRIPTS_DIR");
+if (not BUILD_SCRIPTS_DIR) then
+    BUILD_SCRIPTS_DIR = 'build/';
+    if (_ACTION) then
+        BUILD_SCRIPTS_DIR = 'build/' .. _ACTION
+    end
+    print ("Using default location of " .. BUILD_SCRIPTS_DIR .. " for build scripts location")
+end
+
 -- location of the asset directory
 -- the asset directory contains non-source code files needed
 -- by MVC Editor fto function properly.  Assets include

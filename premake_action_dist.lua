@@ -30,23 +30,20 @@ newaction {
 			if os.isdir("dist") then
 				os.execute("rmdir /s /q dist")
 			end
-			batchexecute({
+			batchexecute(normalizepath(""), {
 				"mkdir dist",
 				"mkdir dist\\mvc-editor\\bin",
-				"mkdir dist\\mvc-editor\\lib",
-				"mkdir dist\\mvc-editor\\resources",
-				"mkdir dist\\mvc-editor\\php_detectors",
+				"mkdir dist\\mvc-editor\\assets",
 				"xcopy /S /Y Release\\*.dll dist\\mvc-editor\\bin",
 				"copy Release\\mvc-editor.exe dist\\mvc-editor\\bin",
-				"xcopy  /S /Y resources\\* dist\\mvc-editor\\resources",
-				"xcopy  /S /Y php_detectors\\* dist\\mvc-editor\\php_detectors"
+				"xcopy  /S /Y assets\\* dist\\mvc-editor\\assets"
 			});
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
-			cmd = "git describe --long > dist\\mvc-editor\\version.txt"
+			cmd = "git describe --long > dist\\mvc-editor\\assets\\version.txt"
 			if 0 ~= os.execute(cmd) then
-				cmd = "git describe --all --long > dist\\mvc-editor\\version.txt"
+				cmd = "git describe --all --long > dist\\mvc-editor\\assets\\version.txt"
 				os.execute(cmd) 
 			end
 		else
@@ -133,8 +130,6 @@ newaction {
 				-- creates an unsigned version
 				"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:Release/libs:Release dpkg-buildpackage -b -us -uc"
 			});
-		end
-		
-		
+		end	
 	end
 }
