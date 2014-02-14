@@ -242,7 +242,7 @@ class CreditsDialogClass : public wxDialog
 	
 	public:
 		
-		CreditsDialogClass( wxWindow* parent, wxWindowID id = ID_CREDITSDIALOGGENERATEDCLASS, const wxString& title = _("Credits"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 668,392 ), long style = wxDEFAULT_DIALOG_STYLE );
+		CreditsDialogClass( wxWindow* parent, wxWindowID id = ID_CREDITSDIALOGGENERATEDCLASS, const wxString& title = _("Credits"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~CreditsDialogClass();
 	
 };
@@ -269,7 +269,7 @@ class LicenseDialogClass : public wxDialog
 	
 	public:
 		
-		LicenseDialogClass( wxWindow* parent, wxWindowID id = ID_LICENSEDIAOGCLASS, const wxString& title = _("License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 431,410 ), long style = wxDEFAULT_DIALOG_STYLE );
+		LicenseDialogClass( wxWindow* parent, wxWindowID id = ID_LICENSEDIAOGCLASS, const wxString& title = _("License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~LicenseDialogClass();
 	
 };

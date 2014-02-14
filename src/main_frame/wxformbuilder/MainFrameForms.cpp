@@ -305,7 +305,9 @@ CreditsDialogClass::CreditsDialogClass( wxWindow* parent, wxWindowID id, const w
 	Sizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer9;
-	fgSizer9 = new wxFlexGridSizer( 4, 1, 0, 0 );
+	fgSizer9 = new wxFlexGridSizer( 3, 1, 0, 0 );
+	fgSizer9->AddGrowableCol( 0 );
+	fgSizer9->AddGrowableRow( 1 );
 	fgSizer9->SetFlexibleDirection( wxBOTH );
 	fgSizer9->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -397,7 +399,7 @@ CreditsDialogClass::CreditsDialogClass( wxWindow* parent, wxWindowID id, const w
 	m_staticText14->Wrap( -1 );
 	bSizer17->Add( m_staticText14, 0, wxALL, 5 );
 	
-	m_hyperlink5 = new wxHyperlinkCtrl( this, wxID_ANY, _("http://www.gnu.org/software/bison/,"), wxT("http://www.gnu.org/software/bison/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	m_hyperlink5 = new wxHyperlinkCtrl( this, wxID_ANY, _("http://www.gnu.org/software/bison/"), wxT("http://www.gnu.org/software/bison/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	bSizer17->Add( m_hyperlink5, 0, wxALL, 5 );
 	
 	GridSizer->Add( bSizer17, 1, wxEXPAND, 5 );
@@ -409,7 +411,7 @@ CreditsDialogClass::CreditsDialogClass( wxWindow* parent, wxWindowID id, const w
 	m_staticText11->Wrap( -1 );
 	bSizer19->Add( m_staticText11, 0, wxALL, 5 );
 	
-	m_hyperlink2 = new wxHyperlinkCtrl( this, wxID_ANY, _("http://site.icu-project.org/"), wxT("http://site.icu-project.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	m_hyperlink2 = new wxHyperlinkCtrl( this, wxID_ANY, _("http://site.icu-project.org/"), wxT("http://site.icu-project.org/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	bSizer19->Add( m_hyperlink2, 0, wxALL, 5 );
 	
 	GridSizer->Add( bSizer19, 1, wxEXPAND, 5 );
@@ -453,6 +455,7 @@ CreditsDialogClass::CreditsDialogClass( wxWindow* parent, wxWindowID id, const w
 	
 	this->SetSizer( Sizer );
 	this->Layout();
+	Sizer->Fit( this );
 	
 	this->Centre( wxBOTH );
 }
@@ -492,6 +495,7 @@ LicenseDialogClass::LicenseDialogClass( wxWindow* parent, wxWindowID id, const w
 	
 	this->SetSizer( Sizer );
 	this->Layout();
+	Sizer->Fit( this );
 	
 	this->Centre( wxBOTH );
 }

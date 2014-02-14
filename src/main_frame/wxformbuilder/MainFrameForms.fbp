@@ -1827,7 +1827,7 @@
             <property name="minimum_size"></property>
             <property name="name">CreditsDialogClass</property>
             <property name="pos"></property>
-            <property name="size">668,392</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Credits</property>
@@ -1881,14 +1881,14 @@
                     <object class="wxFlexGridSizer" expanded="0">
                         <property name="cols">1</property>
                         <property name="flexible_direction">wxBOTH</property>
-                        <property name="growablecols"></property>
-                        <property name="growablerows"></property>
+                        <property name="growablecols">0</property>
+                        <property name="growablerows">1</property>
                         <property name="hgap">0</property>
                         <property name="minimum_size"></property>
                         <property name="name">fgSizer9</property>
                         <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
                         <property name="permission">none</property>
-                        <property name="rows">4</property>
+                        <property name="rows">3</property>
                         <property name="vgap">0</property>
                         <object class="sizeritem" expanded="0">
                             <property name="border">10</property>
@@ -2803,7 +2803,7 @@
                                                 <property name="hidden">0</property>
                                                 <property name="hover_color"></property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">http://www.gnu.org/software/bison/,</property>
+                                                <property name="label">http://www.gnu.org/software/bison/</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_hyperlink5</property>
@@ -2930,7 +2930,7 @@
                                                 <property name="hidden">0</property>
                                                 <property name="hover_color"></property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">http://site.icu-project.org/</property>
+                                                <property name="label">http://site.icu-project.org/</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">m_hyperlink2</property>
@@ -3324,7 +3324,7 @@
                 </object>
             </object>
         </object>
-        <object class="Dialog" expanded="0">
+        <object class="Dialog" expanded="1">
             <property name="bg"></property>
             <property name="center">wxBOTH</property>
             <property name="context_help"></property>
@@ -3340,7 +3340,7 @@
             <property name="minimum_size"></property>
             <property name="name">LicenseDialogClass</property>
             <property name="pos"></property>
-            <property name="size">431,410</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE</property>
             <property name="subclass"></property>
             <property name="title">License</property>
@@ -3382,16 +3382,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="0">
+            <object class="wxBoxSizer" expanded="1">
                 <property name="minimum_size"></property>
                 <property name="name">Sizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="0">
+                <object class="sizeritem" expanded="1">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxFlexGridSizer" expanded="0">
+                    <object class="wxFlexGridSizer" expanded="1">
                         <property name="cols">1</property>
                         <property name="flexible_direction">wxBOTH</property>
                         <property name="growablecols">0</property>
