@@ -110,9 +110,9 @@ newaction {
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
-			cmd = "cd " .. workDir .. " && git describe --long > version.txt"
+			cmd = "cd " .. workDir .. " && git describe --long > assets/version.txt"
 			if 0 ~= os.execute(cmd) then
-				cmd = "cd " .. workDir .. " && git describe --all --long > version.txt"
+				cmd = "cd " .. workDir .. " && git describe --all --long > assets/version.txt"
 				os.execute(cmd) 
 			end
 
@@ -132,7 +132,6 @@ newaction {
 				-- include in the .deb file
 				-- double quote the backslash since we have to escape the backslash in the shell
 				"echo 'Release/mvc-editor usr/bin\\n' > debian/install",
-				"echo 'version.txt usr/share/mvc-editor \\n' >> debian/install",
 				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/mvc-editor\" }' >> debian/install",
 				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/mvc-editor\" }' >> debian/install",
 
