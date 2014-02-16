@@ -49,7 +49,7 @@ class DatabaseTagClass {
 public:
 
 	/**
-	 * The RDBMS systems that both the frameworks and MVC Editor supports.
+	 * The RDBMS systems that both the frameworks and Triumph supports.
 	 */
 	enum Drivers {
 		MYSQL,

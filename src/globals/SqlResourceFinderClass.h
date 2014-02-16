@@ -34,7 +34,7 @@ namespace mvceditor {
 
 /**
  * class that will open a connection to a database, get all of the tables
- * and columns, and store them in the mvc editor resources schema.
+ * and columns, and store them in the Triumph resources schema.
  */	
 class SqlResourceFetchClass {
 	
@@ -42,7 +42,7 @@ public:
 
 	/**
 	 *  @param soci::session the session that holds the connection
-	 *         to the mvc editor tag cache
+	 *         to the Triumph tag cache
 	 */
 	SqlResourceFetchClass(soci::session& session);
 	

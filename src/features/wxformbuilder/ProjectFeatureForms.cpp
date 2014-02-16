@@ -31,7 +31,7 @@ ProjectPreferencesGeneratedPanelClass::ProjectPreferencesGeneratedPanelClass( wx
 	wxBoxSizer* AssociationsBoxSizer;
 	AssociationsBoxSizer = new wxBoxSizer( wxVERTICAL );
 	
-	WildcardHelpText = new wxStaticText( this, wxID_ANY, _("MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor's syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.\n\nEach input can contain 1 or more wilcard strings. \nThe allowed wildcard characters are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files with the extension .php or the extension .phtml\n"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	WildcardHelpText = new wxStaticText( this, wxID_ANY, _("Triumph uses file extensions to determine how to display the source code contained within them. Triumph's syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.\n\nEach input can contain 1 or more wilcard strings. \nThe allowed wildcard characters are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files with the extension .php or the extension .phtml\n"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	WildcardHelpText->Wrap( 500 );
 	AssociationsBoxSizer->Add( WildcardHelpText, 1, wxALL|wxEXPAND, 5 );
 	
@@ -170,7 +170,7 @@ ProjectDefinitionDialogGeneratedClass::ProjectDefinitionDialogGeneratedClass( wx
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("A project is a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("A project is a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
 	HelpLabel->Wrap( 500 );
 	FlexGridSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
 	
@@ -250,7 +250,7 @@ ProjectSourceDialogGeneratedClass::ProjectSourceDialogGeneratedClass( wxWindow* 
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("Enter a list of files that you want MVC Editor to track and ignore. \n\nInclude and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.\n\nExlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.\n\nA wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n\nMultiple wildcards are separated by the semicolon (';')\n\nA wildcard can have directory separators; but they must match the operation system's path separator."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("Enter a list of files that you want Triumph to track and ignore. \n\nInclude and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.\n\nExlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.\n\nA wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n\nMultiple wildcards are separated by the semicolon (';')\n\nA wildcard can have directory separators; but they must match the operation system's path separator."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 500 );
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
 	
@@ -315,7 +315,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that MVC Editor looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, MVC Editor will not look at its resource cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that Triumph looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its resource cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
 	HelpLabel->Wrap( 400 );
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
 	

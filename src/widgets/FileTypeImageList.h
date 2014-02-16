@@ -50,7 +50,7 @@ enum Images {
 
 /**
  * fills a wxImageList with the images for each of the
- * file types that MVC Editor supports
+ * file types that Triumph supports
  */
 void FillWithFileType(wxImageList& imgList);
 

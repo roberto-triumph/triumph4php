@@ -269,7 +269,7 @@ SqlConnectionListDialogGeneratedClass::SqlConnectionListDialogGeneratedClass( wx
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("This is the list of connections that are available to MVC Editor. You can add a new connection, and the table names and column names of each enabled connection will be available for code completion."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("This is the list of connections that are available to Triumph. You can add a new connection, and the table names and column names of each enabled connection will be available for code completion."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 500 );
 	BoxSizer->Add( HelpLabel, 0, wxALL|wxEXPAND, 15 );
 	

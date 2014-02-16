@@ -82,8 +82,8 @@ int main() {
 		SourceDir = wxT("C:\\Users\\roberto\\Software\\wamp\\www\\ember");
 		StartingFile = SourceDir + wxT("\\application\\controllers\\news.php");
 		PhpExecutableFullPath = wxT("php.exe");
-		PhpIncludePathFullPath = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors");
-		PhpTagDectectorFullPath = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\tag_detectors\\CodeIgniterTagDetector.php");
+		PhpIncludePathFullPath = wxT("C:\\Users\\roberto\\Documents\\triumph4php\\php_detectors");
+		PhpTagDectectorFullPath = wxT("C:\\Users\\roberto\\Documents\\triumph4php\\php_detectors\\tag_detectors\\CodeIgniterTagDetector.php");
 		TagCacheDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\tags.db");
 		DetectorDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\detectors.db");
 	}
@@ -91,8 +91,8 @@ int main() {
 		SourceDir = wxT("/home/roberto/public_html/ember");
 		StartingFile = SourceDir + wxT("/application/controllers/news.php");
 		PhpExecutableFullPath = wxT("php");
-		PhpIncludePathFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors");
-		PhpTagDectectorFullPath = wxT("/home/roberto/workspace/mvc-editor/php_detectors/tag_detectors/CodeIgniterTagDetector.php");
+		PhpIncludePathFullPath = wxT("/home/roberto/workspace/triumph4php/php_detectors");
+		PhpTagDectectorFullPath = wxT("/home/roberto/workspace/triumph4php/php_detectors/tag_detectors/CodeIgniterTagDetector.php");
 		TagCacheDbFullPath = wxT("/home/roberto/workspace/tags.db");
 		DetectorDbFullPath = wxT("/home/roberto/workspace/detectors.db");
 	}

@@ -32,7 +32,7 @@
 namespace mvceditor {
 
 /**
- * This is the feature that check for new versions of MVC Editor
+ * This is the feature that check for new versions of Triumph
  * Version checking is done by posting to
  * http://updates.mvceditor.com/updates.php and reading the 
  * latest version from the response.
@@ -139,7 +139,7 @@ public:
 };
 
 /**
- * This is the action that checks for new versions of MVC Editor
+ * This is the action that checks for new versions of Triumph
  * Version checking is done by posting to
  * http://updates.mvceditor.com/updates.php and reading the 
  * latest version from the response. Will post an event when the

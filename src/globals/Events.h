@@ -341,7 +341,7 @@ extern const wxEventType EVENT_APP_FILE_DELETED;
  * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
  * GetString() will return the full path to the file.
  *
- * NOTE: This event will only be generated if the file is NOT created in MVC editor.
+ * NOTE: This event will only be generated if the file is NOT created in Triumph.
  * NOTE: This event will only be generated when single files are created. if an entire directory is created, 
  * then only 1 event will be generated: an EVENT_APP_DIR_CREATED, no EVENT_APP_FILE_EXTERNALLY_CREATED events will be
  * generated.
@@ -365,8 +365,8 @@ extern const wxEventType EVENT_APP_FILE_RENAMED;
  * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
  * GetString() will return the full path to the file.
  *
- * NOTE: This event will only be generated if the file is NOT already opened in MVC editor. In the case that
- * a file that is opened in MVC editor is modified externally, the user will be prompted to ignore or reload
+ * NOTE: This event will only be generated if the file is NOT already opened in Triumph. In the case that
+ * a file that is opened in Triumph is modified externally, the user will be prompted to ignore or reload
  * contents from disk, and if the user chooses to reload contents from disk then a "normal" EVENT_APP_FILE_REVERT
  * event is generated instead.
  */
@@ -414,7 +414,7 @@ extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 
 /**
  * Notification that the user preferences (the config INI file) has been updated by an 
- * external process. An example of this is the user having 2 instances of MVC Editor open
+ * external process. An example of this is the user having 2 instances of Triumph open
  * and the user changed preferences in one of the instances.
  *
  * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners

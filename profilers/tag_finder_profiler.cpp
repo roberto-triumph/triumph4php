@@ -137,12 +137,12 @@ int main(int argc, char** argv) {
 		minor;
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
-		FileName = wxT("C:\\Users\\roberto\\Documents\\mvc-editor\\php_detectors\\lib\\Zend\\Config.php");
+		FileName = wxT("C:\\Users\\roberto\\Documents\\triumph4php\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
 		DbFileName = wxT("resource.db");
 	}
 	else {
-		FileName = wxT("/home/roberto/workspace/mvc-editor/php_detectors/lib/Zend/Config.php");
+		FileName = wxT("/home/roberto/workspace/triumph4php/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/public_html/tci_umbrellaservices");
 		DbFileName = wxT("resource.db");
 	}

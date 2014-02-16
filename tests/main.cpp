@@ -206,7 +206,7 @@ int chooseTests() {
 	prompt += "4. Exit the program\n";
 	std::string choice = "";
 
-	std::cout << "MVC Editor test runner." << std::endl;
+	std::cout << "Triumph4PHP test runner." << std::endl;
 	std::cout << prompt;
 	std::cin >> choice;
 	while (choice != "4") {

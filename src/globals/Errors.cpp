@@ -50,7 +50,7 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			break;
 		case mvceditor::ERR_LOW_RESOURCES:
 			msg = mvceditor::MessageWithFix(_("Your system is way too busy. Please try again later. ") + extra,
-				_("Try closing some programs non-essential program or restarting MVC Editor."));
+				_("Try closing some programs non-essential program or restarting Triumph."));
 			break;
 		case mvceditor::ERR_PROJECT_DETECTION:
 			msg = mvceditor::MessageWithFix(_("Error detecting PHP framework. ") + extra,
@@ -62,11 +62,11 @@ wxString MessageFromError(mvceditor::Errors error, const wxString& extra) {
 			break;
 		case mvceditor::ERR_ROGUE_PROCESS:
 			msg = mvceditor::MessageWithFix(_("Could not stop background process. ") + extra,
-				_("Restart MVC Editor"));
+				_("Restart Triumph"));
 			break;
 		case mvceditor::ERR_CHARSET_DETECTION:
 			msg = mvceditor::MessageWithFix(_("Could not open file due to a character set detection error. ") + extra,
-				_("This seems to be a binary, encrypted, or compressed file.  MVC Editor cannot open binary, encrypted, or compressed files."));
+				_("This seems to be a binary, encrypted, or compressed file.  Triumph cannot open binary, encrypted, or compressed files."));
 			break;
 		case mvceditor::ERR_BAD_SQL_CONNECTION:
 			msg = mvceditor::MessageWithFix(_("Error connecting to DB. ") + extra,

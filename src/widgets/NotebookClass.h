@@ -125,7 +125,7 @@ public:
 	
 	/**
 	 * Prompts the user to pick an existing file and loads the contents of the
-	 * file to a new MVC editor page.
+	 * file to a new Triumph page.
 	 */
 	void LoadPage();
 	

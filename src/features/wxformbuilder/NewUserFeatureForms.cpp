@@ -16,14 +16,14 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	wxBoxSizer* DialogSizer;
 	DialogSizer = new wxBoxSizer( wxVERTICAL );
 	
-	MoreLabel = new wxStaticText( this, wxID_ANY, wxT("Thanks for downloading MVC Editor!\nTake a few seconds to configure MVC Editor to your liking.\n\nNote: All of these settings (and many more) can be changed at any time via the Edit ... Preferences menu."), wxDefaultPosition, wxDefaultSize, 0 );
+	MoreLabel = new wxStaticText( this, wxID_ANY, wxT("Thanks for downloading Triumph 4 PHP!\nTake a few seconds to configure Triumph to your liking.\n\nNote: All of these settings (and many more) can be changed at any time via the Edit ... Preferences menu."), wxDefaultPosition, wxDefaultSize, 0 );
 	MoreLabel->Wrap( -1 );
 	DialogSizer->Add( MoreLabel, 0, wxALL|wxEXPAND, 15 );
 	
 	wxStaticBoxSizer* VersionUpdateSizer;
 	VersionUpdateSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Version Updates") ), wxVERTICAL );
 	
-	VersionUpdateHelp = new wxStaticText( this, wxID_ANY, wxT("MVC Editor can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week."), wxDefaultPosition, wxDefaultSize, 0 );
+	VersionUpdateHelp = new wxStaticText( this, wxID_ANY, wxT("Triumph can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week."), wxDefaultPosition, wxDefaultSize, 0 );
 	VersionUpdateHelp->Wrap( 550 );
 	VersionUpdateSizer->Add( VersionUpdateHelp, 0, wxALL, 5 );
 	
@@ -38,7 +38,7 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	wxBoxSizer* SettingsLabelSizer;
 	SettingsLabelSizer = new wxBoxSizer( wxVERTICAL );
 	
-	SettingsHelpLabel = new wxStaticText( this, wxID_ANY, wxT("This is the directory where MVC Editor will store its settings (projects list, tag cache, and preferences)."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	SettingsHelpLabel = new wxStaticText( this, wxID_ANY, wxT("This is the directory where Triumph will store its settings (projects list, tag cache, and preferences)."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	SettingsHelpLabel->Wrap( -1 );
 	SettingsLabelSizer->Add( SettingsHelpLabel, 2, wxALL|wxEXPAND, 5 );
 	
@@ -61,12 +61,12 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	wxStaticBoxSizer* PhpLocationSizer;
 	PhpLocationSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("PHP Location") ), wxVERTICAL );
 	
-	PhpHelpLabel = new wxStaticText( this, wxID_ANY, wxT("The PHP executable is used by MVC Editor when running scripts. It is also used when running framework detection scripts. \n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	PhpHelpLabel = new wxStaticText( this, wxID_ANY, wxT("The PHP executable is used by Triumph when running scripts. It is also used when running framework detection scripts. \n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe."), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	PhpHelpLabel->Wrap( 550 );
 	PhpLocationSizer->Add( PhpHelpLabel, 1, wxALL, 5 );
 	
-	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in MVC Editor"), wxT("https://code.google.com/p/mvc-editor/wiki/FrameworkDetection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	PhpDetectorsLink->SetToolTip( wxT("https://code.google.com/p/mvc-editor/wiki/FrameworkDetection") );
+	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in Triumph 4 PHP"), wxT("https://code.google.com/p/triumph4php/wiki/FrameworkDetection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	PhpDetectorsLink->SetToolTip( wxT("https://code.google.com/p/triumph4php/wiki/FrameworkDetection") );
 	
 	PhpLocationSizer->Add( PhpDetectorsLink, 0, wxALL, 5 );
 	
@@ -81,7 +81,7 @@ NewUserDialogGeneratedClass::NewUserDialogGeneratedClass( wxWindow* parent, wxWi
 	wxStaticBoxSizer* FileSizer;
 	FileSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("File Extensions") ), wxVERTICAL );
 	
-	FileExtensionsHelpLabel = new wxStaticText( this, wxID_ANY, wxT("MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor's syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.\n\nEach input can contain 1 or more wilcard strings. \nThe allowed wildcard characters are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files with the extension .php or the extension .phtml"), wxDefaultPosition, wxDefaultSize, 0 );
+	FileExtensionsHelpLabel = new wxStaticText( this, wxID_ANY, wxT("Triumph uses file extensions to determine how to display the source code contained within them. Triumph's syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.\n\nEach input can contain 1 or more wilcard strings. \nThe allowed wildcard characters are:\n\n* : Will match on zero or more characters\n? : Will match on zero or one character\n; : Separator among multiple wildcards\n\nFor example, the value \"*.php;*.phtml\" will match files with the extension .php or the extension .phtml"), wxDefaultPosition, wxDefaultSize, 0 );
 	FileExtensionsHelpLabel->Wrap( 550 );
 	FileSizer->Add( FileExtensionsHelpLabel, 0, wxALL|wxEXPAND, 5 );
 	

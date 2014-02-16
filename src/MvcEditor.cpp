@@ -202,7 +202,7 @@ bool mvceditor::AppClass::CommandLine() {
 	description[2].shortName = NULL;
 	description[2].type = wxCMD_LINE_VAL_NONE;
 	wxCmdLineParser parser(description, argc, argv);
-	parser.SetLogo(wxT("MVC Editor"));
+	parser.SetLogo(wxT("Triumph"));
 	int result = parser.Parse(true);
 	if (0 == result) {
 		wxString filename,
@@ -357,7 +357,7 @@ void mvceditor::AppClass::StopConfigModifiedCheck() {
 }
 
 void mvceditor::AppClass::UpdateConfigModifiedTime() {
-	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 	if (configFileName.FileExists()) {
 		ConfigLastModified = configFileName.GetModificationTime();
 	}
@@ -384,13 +384,13 @@ void mvceditor::AppTimerClass::Notify() {
 		if (settingsDir.IsOk()) {
 			App.Sequences.AppStart();
 		}
-		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 		if (configFileName.FileExists()) {
 			App.ConfigLastModified = configFileName.GetModificationTime();
 		}
 	}
 	else {
-		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
+		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 		if (configFileName.FileExists()) {
 			mvceditor::FileModifiedCheckActionClass* action = 
 				new mvceditor::FileModifiedCheckActionClass(App.RunningThreads, ID_EVENT_CONFIG_FILE_CHECK);

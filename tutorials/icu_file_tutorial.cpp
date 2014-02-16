@@ -41,9 +41,9 @@ int main(int argc, char **argv)
 {
 	// THIS THE FILE THAT WILL BE OPENED
 #ifdef _WIN32
-	char* fileName = "C:\\Users\\Roberto\\Documents\\mvc-editor\\php_samples\\sample_unicode.php";
+	char* fileName = "C:\\Users\\Roberto\\Documents\\triumph4php\\php_samples\\sample_unicode.php";
 #else 
-	const char* fileName = "/home/roberto/workspace/mvc-editor/php_samples/sample_unicode.php";
+	const char* fileName = "/home/roberto/workspace/triumph4php/php_samples/sample_unicode.php";
 #endif
 
 	FILE* rawFile = fopen(fileName, "r");

@@ -881,7 +881,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">MVC Editor will use these executables when the &quot;Open in File Manager&quot; or &quot;Open in Shell&quot; menus are used.</property>
+                                <property name="label">Triumph will use these executables when the &quot;Open in File Manager&quot; or &quot;Open in Shell&quot; menus are used.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>

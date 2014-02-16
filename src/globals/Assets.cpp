@@ -220,7 +220,7 @@ wxFileName mvceditor::TempDirAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 	tempDir.AssignDir(paths.GetTempDir());
-	tempDir.AppendDir(wxT("mvc-editor"));
+	tempDir.AppendDir(wxT("triumph4php"));
 	if (!tempDir.DirExists()) {
 		wxMkdir(tempDir.GetPath(), 0777);
 	}
@@ -253,12 +253,12 @@ wxFileName mvceditor::BootstrapConfigFileAsset() {
 
 	// look at the local bootstrap config file
 	bootstrapConfigFile.Assign(paths.GetExecutablePath());
-	bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
+	bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	if (!bootstrapConfigFile.FileExists()) {
 		
 		// look at the global config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	}
 	return bootstrapConfigFile;
 }
@@ -287,13 +287,13 @@ void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
 	// settings dir in the local bootstrap file
 	if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
 		bootstrapConfigFile.Assign(paths.GetExecutablePath());
-		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	}
 	else {
 
 		// save settings dire in the global bootstrap config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
-		bootstrapConfigFile.SetFullName(wxT(".mvc-editor-bootstrap.ini"));
+		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	}
 	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
 	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 

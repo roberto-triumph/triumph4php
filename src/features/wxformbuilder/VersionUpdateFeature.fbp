@@ -671,7 +671,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">MVC Editor can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week.</property>
+                                <property name="label">Triumph can check for new versions of the itself.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week.&#x0A;&#x0A;Note that this is only a version check, you will have to download the new version and install it manually.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpText</property>

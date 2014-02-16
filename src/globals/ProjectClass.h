@@ -98,7 +98,7 @@ public:
 	std::vector<wxString> MiscFileExtensions;
 
 	/**
-	 * If TRUE, this project is enabled and is used by MVC Editor.
+	 * If TRUE, this project is enabled and is used by Triumph.
 	 */
 	bool IsEnabled;
 	

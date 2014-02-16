@@ -56,7 +56,7 @@ public:
 	bool IsAuto;
 
 	/**
-	 * if TRUE, PHP is installed in the system. If false, MVC Editor will not
+	 * if TRUE, PHP is installed in the system. If false, Triumph will not
 	 * attempt to run any scripts and should not show the user any "PHP not found"
 	 * errors.
 	 */

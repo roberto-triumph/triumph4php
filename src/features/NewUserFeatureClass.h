@@ -50,7 +50,7 @@ private:
 
 /**
  * The new user dialog will prompt the user to fill in settings needed
- * by MVC Editor to run properly.  This dialog will only be shown once
+ * by Triumph to run properly.  This dialog will only be shown once
  * to the user - the first time the program is run on a machine.
  */
 class NewUserDialogClass : public NewUserDialogGeneratedClass {

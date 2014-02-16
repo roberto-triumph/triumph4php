@@ -21,7 +21,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -69,7 +69,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxFlexGridSizer" expanded="1">
+            <object class="wxFlexGridSizer" expanded="0">
                 <property name="cols">1</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">0</property>
@@ -81,11 +81,11 @@
                 <property name="permission">none</property>
                 <property name="rows">2</property>
                 <property name="vgap">0</property>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxStaticBoxSizer" expanded="1">
+                    <object class="wxStaticBoxSizer" expanded="0">
                         <property name="id">wxID_ANY</property>
                         <property name="label">Editor Associations</property>
                         <property name="minimum_size"></property>
@@ -93,11 +93,11 @@
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">none</property>
                         <event name="OnUpdateUI"></event>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxFlexGridSizer" expanded="1">
+                            <object class="wxFlexGridSizer" expanded="0">
                                 <property name="cols">1</property>
                                 <property name="flexible_direction">wxBOTH</property>
                                 <property name="growablecols">0</property>
@@ -131,7 +131,7 @@
                                                 <property name="font"></property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor&apos;s syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.&#x0A;&#x0A;Each input can contain 1 or more wilcard strings. &#x0A;The allowed wildcard characters are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files with the extension .php or the extension .phtml&#x0A;</property>
+                                                <property name="label">Triumph uses file extensions to determine how to display the source code contained within them. Triumph&apos;s syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.&#x0A;&#x0A;Each input can contain 1 or more wilcard strings. &#x0A;The allowed wildcard characters are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files with the extension .php or the extension .phtml&#x0A;</property>
                                                 <property name="maximum_size"></property>
                                                 <property name="minimum_size"></property>
                                                 <property name="name">WildcardHelpText</property>
@@ -176,11 +176,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND</property>
                                     <property name="proportion">3</property>
-                                    <object class="wxFlexGridSizer" expanded="1">
+                                    <object class="wxFlexGridSizer" expanded="0">
                                         <property name="cols">4</property>
                                         <property name="flexible_direction">wxBOTH</property>
                                         <property name="growablecols">1,3</property>
@@ -1004,11 +1004,11 @@
                                                 <event name="OnUpdateUI"></event>
                                             </object>
                                         </object>
-                                        <object class="sizeritem" expanded="1">
+                                        <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
                                             <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL</property>
                                             <property name="proportion">0</property>
-                                            <object class="wxStaticText" expanded="1">
+                                            <object class="wxStaticText" expanded="0">
                                                 <property name="bg"></property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
@@ -1060,11 +1060,11 @@
                                                 <event name="OnUpdateUI"></event>
                                             </object>
                                         </object>
-                                        <object class="sizeritem" expanded="1">
+                                        <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
                                             <property name="flag">wxALL|wxEXPAND</property>
                                             <property name="proportion">1</property>
-                                            <object class="wxTextCtrl" expanded="1">
+                                            <object class="wxTextCtrl" expanded="0">
                                                 <property name="bg"></property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
@@ -1524,11 +1524,11 @@
                                                 <event name="OnUpdateUI"></event>
                                             </object>
                                         </object>
-                                        <object class="sizeritem" expanded="1">
+                                        <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
                                             <property name="flag">wxALL|wxEXPAND</property>
                                             <property name="proportion">1</property>
-                                            <object class="wxTextCtrl" expanded="1">
+                                            <object class="wxTextCtrl" expanded="0">
                                                 <property name="bg"></property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
@@ -1916,7 +1916,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">A project is a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project.</property>
+                                <property name="label">A project is a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>
@@ -2492,7 +2492,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">Enter a list of files that you want MVC Editor to track and ignore. &#x0A;&#x0A;Include and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.&#x0A;&#x0A;Exlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.&#x0A;&#x0A;A wildcard can have either a &apos;*&apos; or a &apos;?&apos;.&#x0A;&#x0A;* = any number of characters&#x0A;? = 0 or 1 character&#x0A;&#x0A;Multiple wildcards are separated by the semicolon (&apos;;&apos;)&#x0A;&#x0A;A wildcard can have directory separators; but they must match the operation system&apos;s path separator.</property>
+                                <property name="label">Enter a list of files that you want Triumph to track and ignore. &#x0A;&#x0A;Include and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.&#x0A;&#x0A;Exlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.&#x0A;&#x0A;A wildcard can have either a &apos;*&apos; or a &apos;?&apos;.&#x0A;&#x0A;* = any number of characters&#x0A;? = 0 or 1 character&#x0A;&#x0A;Multiple wildcards are separated by the semicolon (&apos;;&apos;)&#x0A;&#x0A;A wildcard can have directory separators; but they must match the operation system&apos;s path separator.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>
@@ -3002,7 +3002,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">This is the list of projects that MVC Editor looks at.&#x0A;&#x0A;A project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, MVC Editor can be told to exclude certain files from the project.&#x0A;&#x0A;A project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, MVC Editor will not look at its resource cache.</property>
+                                <property name="label">This is the list of projects that Triumph looks at.&#x0A;&#x0A;A project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.&#x0A;&#x0A;A project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its resource cache.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>

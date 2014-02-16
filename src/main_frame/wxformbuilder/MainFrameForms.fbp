@@ -21,7 +21,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">1</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Frame" expanded="0">
+        <object class="Frame" expanded="1">
             <property name="bg"></property>
             <property name="center"></property>
             <property name="context_help"></property>
@@ -40,7 +40,7 @@
             <property name="size">800,600</property>
             <property name="style">wxDEFAULT_FRAME_STYLE</property>
             <property name="subclass"></property>
-            <property name="title">MVC Editor</property>
+            <property name="title">Triumph 4 PHP</property>
             <property name="tooltip"></property>
             <property name="validator_data_type"></property>
             <property name="validator_style">wxFILTER_NONE</property>
@@ -1903,7 +1903,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">MVC Editor makes uses of the following open source projects. None of these projects are affiliated with MVC Editor in any way.</property>
+                                <property name="label">Triumph makes uses of the following open source projects. None of these projects are affiliated with Triumph in any way.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">m_staticText8</property>
@@ -3627,7 +3627,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">ID_HELPLALBEL</property>
-                                <property name="label">This is the directory where MVC Editor will store its settings (projects list, tag cache, and preferences).</property>
+                                <property name="label">This is the directory where Triumph will store its settings (projects list, tag cache, and preferences).</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>

@@ -64,7 +64,7 @@ mvceditor::VersionUpdateFeatureClass::VersionUpdateFeatureClass(mvceditor::AppCl
 
 void mvceditor::VersionUpdateFeatureClass::AddHelpMenuItems(wxMenu* helpMenu) {
 	helpMenu->Append(mvceditor::MENU_VERSION_UPDATE, _("Check for updates"),
-		_("Check for new version of MVC Editor"), wxITEM_NORMAL);
+		_("Check for new version of Triumph"), wxITEM_NORMAL);
 }
 
 void mvceditor::VersionUpdateFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {

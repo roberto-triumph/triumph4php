@@ -35,8 +35,8 @@
 namespace mvceditor {
 
 /**
- * A tag list contains all 3 tags db files used by MVC Editor.  All projects' tags
- * are stored in a SQLite file that persisted and then loaded when MVC Editor starts; this way
+ * A tag list contains all 3 tags db files used by Triumph.  All projects' tags
+ * are stored in a SQLite file that persisted and then loaded when Triumph starts; this way
  * the user can jump to files & classes without needing to re-index the 
  * entire project. The tag list also contains tags db files for the 
  * native functions (str_*, array_*) and any detected tags from the 

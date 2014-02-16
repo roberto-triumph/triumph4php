@@ -93,7 +93,7 @@ public:
 };
  
 /**
- * Class that holds all of the URLs that MVC Editor has encountered.
+ * Class that holds all of the URLs that Triumph has encountered.
  * We remember them because they are a relatively expensive to determine (have to
  * use the UrlTagDetectorActionClass).
  * The URLs here are a combination of detected URLs and URLs manually entered in by the user.

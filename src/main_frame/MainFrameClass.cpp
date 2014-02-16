@@ -229,7 +229,7 @@ void mvceditor::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 void mvceditor::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
 	CodeControlClass* code = Notebook->GetCurrentCodeControl();
 	if (NULL != code && !code->IsNew()) {
-		int res = wxMessageBox(_("Reload file and lose all changes?"), _("MVC Editor"), wxICON_QUESTION | wxYES_NO, this);
+		int res = wxMessageBox(_("Reload file and lose all changes?"), _("Triumph"), wxICON_QUESTION | wxYES_NO, this);
 		if (wxYES == res) {
 			code->Revert();
 
@@ -526,8 +526,8 @@ void mvceditor::MainFrameClass::OnContentNotebookPageChanged(wxAuiNotebookEvent&
 void mvceditor::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutDialogInfo info;
 	info.SetCopyright(wxT("(c)2009-2013 Roberto Perpuly"));
-	info.SetDescription(wxT("MVC Editor is an Integrated Development Environment for PHP Web Applications"));
-	info.SetName(wxT("MVC Editor"));
+	info.SetDescription(wxT("Triumph is an Integrated Development Environment for PHP Web Applications"));
+	info.SetName(wxT("Triumph"));
 	
 	// version info is stored in a file
 	// for releases, the distribution script will properly fill in the
@@ -886,11 +886,11 @@ void mvceditor::MainFrameClass::UpdateTitleBar() {
 				// file name empty means this is a new file, use the tab text
 				fileName = Notebook->GetPageText(Notebook->GetPageIndex(codeControl));
 			}
-			SetTitle(_("MVC Editor: ") + fileName);
+			SetTitle(_("Triumph4PHP: ") + fileName);
 		}
 	}
 	else {
-		SetTitle(_("MVC Editor"));
+		SetTitle(_("Triumph4PHP"));
 	}
 }
 

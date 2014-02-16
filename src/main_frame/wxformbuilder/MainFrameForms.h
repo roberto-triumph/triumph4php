@@ -138,7 +138,7 @@ class MainFrameGeneratedClass : public wxFrame
 	
 	public:
 		
-		MainFrameGeneratedClass( wxWindow* parent, wxWindowID id = ID_MAINFRAMEGENERATEDCLASS, const wxString& title = _("MVC Editor"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		MainFrameGeneratedClass( wxWindow* parent, wxWindowID id = ID_MAINFRAMEGENERATEDCLASS, const wxString& title = _("Triumph 4 PHP"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~MainFrameGeneratedClass();
 	
 };

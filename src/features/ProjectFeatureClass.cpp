@@ -336,7 +336,7 @@ void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEve
 	
 	// start the sequence that will update all global data structures
 	// at this point, we dont know which projects need to be reparsed
-	// since another instance of mvc-editor added them, it is assumed that 
+	// since another instance of triumph4php added them, it is assumed that 
 	// the other instance has parsed them and built the cache.  
 	// this instance will just load the cache into memory
 	std::vector<mvceditor::ProjectClass> touchedProjects, removedProjects;
@@ -433,7 +433,7 @@ void mvceditor::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& eve
 		msg += src.RootDirectory.GetFullPath();
 		msg += wxT("\n");
 		msg += 
-			_("MVC Editor will no longer open or index files in the directory. Note that the directory is not actually deleted from the file system");
+			_("Triumph will no longer open or index files in the directory. Note that the directory is not actually deleted from the file system");
 		wxString caption = _("Remove Project Source");
 		int response = wxMessageBox(msg, caption, wxYES_NO, this);
 		if (wxYES == response) {
@@ -619,7 +619,7 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		wxString msg = _("Are you sure you wish to remove the projects\n\n");
 		msg += projectLabels;
 		msg += wxT("\n");
-		msg += _("MVC Editor will no longer open or index files in any sources of this project. Note that no directories are actually deleted from the file system");
+		msg += _("Triumph will no longer open or index files in any sources of this project. Note that no directories are actually deleted from the file system");
 		wxString caption = _("Remove Projects");
 		int response = wxMessageBox(msg, caption, wxYES_NO);
 		if (wxYES == response) {

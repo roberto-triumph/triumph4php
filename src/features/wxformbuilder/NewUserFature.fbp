@@ -97,7 +97,7 @@
                         <property name="font"></property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="label">Thanks for downloading MVC Editor!&#x0A;Take a few seconds to configure MVC Editor to your liking.&#x0A;&#x0A;Note: All of these settings (and many more) can be changed at any time via the Edit ... Preferences menu.</property>
+                        <property name="label">Thanks for downloading Triumph 4 PHP!&#x0A;Take a few seconds to configure Triumph to your liking.&#x0A;&#x0A;Note: All of these settings (and many more) can be changed at any time via the Edit ... Preferences menu.</property>
                         <property name="maximum_size"></property>
                         <property name="minimum_size"></property>
                         <property name="name">MoreLabel</property>
@@ -165,7 +165,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">MVC Editor can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week.</property>
+                                <property name="label">Triumph can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">VersionUpdateHelp</property>
@@ -301,7 +301,7 @@
                                         <property name="font"></property>
                                         <property name="hidden">0</property>
                                         <property name="id">wxID_ANY</property>
-                                        <property name="label">This is the directory where MVC Editor will store its settings (projects list, tag cache, and preferences).</property>
+                                        <property name="label">This is the directory where Triumph will store its settings (projects list, tag cache, and preferences).</property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">SettingsHelpLabel</property>
@@ -601,7 +601,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">The PHP executable is used by MVC Editor when running scripts. It is also used when running framework detection scripts. &#x0A;&#x0A;Choose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe.</property>
+                                <property name="label">The PHP executable is used by Triumph when running scripts. It is also used when running framework detection scripts. &#x0A;&#x0A;Choose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">PhpHelpLabel</property>
@@ -658,7 +658,7 @@
                                 <property name="hidden">0</property>
                                 <property name="hover_color"></property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">More about framework detection in MVC Editor</property>
+                                <property name="label">More about framework detection in Triumph 4 PHP</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">PhpDetectorsLink</property>
@@ -668,8 +668,8 @@
                                 <property name="size"></property>
                                 <property name="style">wxHL_DEFAULT_STYLE</property>
                                 <property name="subclass"></property>
-                                <property name="tooltip">https://code.google.com/p/mvc-editor/wiki/FrameworkDetection</property>
-                                <property name="url">https://code.google.com/p/mvc-editor/wiki/FrameworkDetection</property>
+                                <property name="tooltip">https://code.google.com/p/triumph4php/wiki/FrameworkDetection</property>
+                                <property name="url">https://code.google.com/p/triumph4php/wiki/FrameworkDetection</property>
                                 <property name="validator_data_type"></property>
                                 <property name="validator_style">wxFILTER_NONE</property>
                                 <property name="validator_type">wxDefaultValidator</property>
@@ -846,7 +846,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">MVC Editor uses file extensions to determine how to display the source code contained within them. MVC Editor&apos;s syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.&#x0A;&#x0A;Each input can contain 1 or more wilcard strings. &#x0A;The allowed wildcard characters are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files with the extension .php or the extension .phtml</property>
+                                <property name="label">Triumph uses file extensions to determine how to display the source code contained within them. Triumph&apos;s syntax highlighting and source code parsing features use these settings to determine which files contain PHP, SQL, and CSS source code. You can change the file extensions if desired.&#x0A;&#x0A;Each input can contain 1 or more wilcard strings. &#x0A;The allowed wildcard characters are:&#x0A;&#x0A;* : Will match on zero or more characters&#x0A;? : Will match on zero or one character&#x0A;; : Separator among multiple wildcards&#x0A;&#x0A;For example, the value &quot;*.php;*.phtml&quot; will match files with the extension .php or the extension .phtml</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">FileExtensionsHelpLabel</property>

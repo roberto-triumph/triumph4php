@@ -68,10 +68,10 @@ public:
 };
 
 /**
- * A source class represents a group of files that MVC editor will 
+ * A source class represents a group of files that Triumph will 
  * look at when indexing a project. A user will define the locations 
  * and wildcards. Source directories contain any files that the 
- * user wants to open in MVC Editor. Additionally, it defines wildcards
+ * user wants to open in Triumph. Additionally, it defines wildcards
  * to ignore certain files in a source directory, for example for
  * ignoring cached files, or log files. Source directories are always
  * recursive; once a directory is labeled as a source all sub-directories

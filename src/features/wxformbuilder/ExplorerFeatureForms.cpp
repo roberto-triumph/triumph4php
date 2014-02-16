@@ -129,7 +129,7 @@ ExplorerOptionsGeneratedPanelClass::ExplorerOptionsGeneratedPanelClass( wxWindow
 	wxStaticBoxSizer* StaticBoxSizer;
 	StaticBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Explorer Executables") ), wxVERTICAL );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("MVC Editor will use these executables when the \"Open in File Manager\" or \"Open in Shell\" menus are used."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("Triumph will use these executables when the \"Open in File Manager\" or \"Open in Shell\" menus are used."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 400 );
 	StaticBoxSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 15 );
 	

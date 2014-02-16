@@ -55,7 +55,7 @@ public:
 
 	/**
 	 * initialize the global data structures.  Note that these are not
-	 * retrieved from the MVC Editor .ini file; they are hardcoded into
+	 * retrieved from the Triumph .ini file; they are hardcoded into
 	 * this program.
 	 */
 	void BuildGlobals();

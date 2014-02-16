@@ -35,7 +35,7 @@ namespace mvceditor
 /**
  * This class holds the wildcards for all of the 
  * different file types that are treated specially by 
- * MVC Editor. There is one class total, not one class per
+ * Triumph. There is one class total, not one class per
  * file type.
  */
 class FileTypeClass {

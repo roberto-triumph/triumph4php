@@ -63,14 +63,14 @@ static int LoadKeyProfileBindings(std::vector<mvceditor::DynamicCmdClass>& dynam
 	//  ... other top-level confg items ...
 	//  ProfileSelected = 1
 	//  [keyprof_0]
-	//  ProfileName = "MVC Editor shortcuts"
-	//  ProfileDescription = "MVC Editor shortcuts"
+	//  ProfileName = "Triumph shortcuts"
+	//  ProfileDescription = "Triumph shortcuts"
 	//  Shortcut-File-Open = "CTRL+O"
 	//  Shortcut-File-New = "CTRL+N"
 	//  ... other commands ...
 	//  [keyprof_1]
-	//  ProfileName = "MVC Editor shortcuts"
-	//  ProfileDescription = "MVC Editor shortcuts"
+	//  ProfileName = "Triumph shortcuts"
+	//  ProfileDescription = "Triumph shortcuts"
 	//  Shortcut-File-Open = "CTRL+ALT+O"
 	//  Shortcut-File-New = "CTRL+SHIFT+N"
 	//  ... other commands ...
@@ -182,7 +182,7 @@ static bool LoadKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& default
 	else if (profiles.IsEmpty()) {
 
 		// no profiles were stored; use the defaults
-		wxKeyProfile* profile = new wxKeyProfile(wxT("MVC Editor keyboard shortcuts"), wxT("MVC Editor keyboard shortcuts"));
+		wxKeyProfile* profile = new wxKeyProfile(wxT("Triumph keyboard shortcuts"), wxT("Triumph keyboard shortcuts"));
 		for (size_t i = 0; i < defaultShortcuts.size(); ++i) {
 			profile->AddCmd(defaultShortcuts[i].CloneCommand());
 		}
@@ -207,14 +207,14 @@ static bool SaveKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& default
 	//  ... other top-level confg items ...
 	//  ProfileSelected = 1
 	//  [keyprof_0]
-	//  ProfileName = "MVC Editor shortcuts"
-	//  ProfileDescription = "MVC Editor shortcuts"
+	//  ProfileName = "Triumph shortcuts"
+	//  ProfileDescription = "Triumph shortcuts"
 	//  Shortcut-File-Open = "CTRL+O"
 	//  Shortcut-File-New = "CTRL+N"
 	//  ... other commands ...
 	//  [keyprof_1]
-	//  ProfileName = "MVC Editor shortcuts"
-	//  ProfileDescription = "MVC Editor shortcuts"
+	//  ProfileName = "Triumph shortcuts"
+	//  ProfileDescription = "Triumph shortcuts"
 	//  Shortcut-File-Open = "CTRL+ALT+O"
 	//  Shortcut-File-New = "CTRL+SHIFT+N"
 	//  ... other commands ...
@@ -372,8 +372,8 @@ void mvceditor::PreferencesClass::Save() {
 
 void mvceditor::PreferencesClass::InitConfig() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("mvc-editor.ini"));
-	wxFileConfig* config = new wxFileConfig(wxT("mvc_editor"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
+	wxFileConfig* config = new wxFileConfig(wxT("triumph4php"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(config);
 	// this config will be automatically deleted by wxWidgets at the end
 }

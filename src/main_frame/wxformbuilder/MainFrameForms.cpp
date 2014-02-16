@@ -311,7 +311,7 @@ CreditsDialogClass::CreditsDialogClass( wxWindow* parent, wxWindowID id, const w
 	fgSizer9->SetFlexibleDirection( wxBOTH );
 	fgSizer9->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText8 = new wxStaticText( this, wxID_ANY, _("MVC Editor makes uses of the following open source projects. None of these projects are affiliated with MVC Editor in any way."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Triumph makes uses of the following open source projects. None of these projects are affiliated with Triumph in any way."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText8->Wrap( -1 );
 	fgSizer9->Add( m_staticText8, 0, wxALL, 10 );
 	
@@ -518,7 +518,7 @@ SettingsDirectoryGeneratedPanelClass::SettingsDirectoryGeneratedPanelClass( wxWi
 	wxStaticBoxSizer* SettingsSizer;
 	SettingsSizer = new wxStaticBoxSizer( new wxStaticBox( this, ID_SETTINGSSIZER, _("Settings Directory") ), wxVERTICAL );
 	
-	HelpLabel = new wxStaticText( this, ID_HELPLALBEL, _("This is the directory where MVC Editor will store its settings (projects list, tag cache, and preferences)."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel = new wxStaticText( this, ID_HELPLALBEL, _("This is the directory where Triumph will store its settings (projects list, tag cache, and preferences)."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 450 );
 	SettingsSizer->Add( HelpLabel, 0, wxALL, 5 );
 	

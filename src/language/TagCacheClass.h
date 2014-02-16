@@ -109,7 +109,7 @@ private:
 
 /**
  * This class represents all the most up-to-date resources of the currently opened project
- * in MVC Editor.  It consists of a series of "global" caches together with a 
+ * in Triumph.  It consists of a series of "global" caches together with a 
  * separate cache for all files that are being edited.  The reason for putting opened files
  * in their own cache is for speed and accuracy; while a file is being edited (but the new
  * contents have not yet been flushed to disk) we can parse the code control content for resources without 

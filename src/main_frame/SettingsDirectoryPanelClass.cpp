@@ -41,7 +41,7 @@ static wxFileName AppDir() {
 	// lets remove it so that the settings dir is in the top-level
 	// of the installation directory
 	tempDir.RemoveLastDir();
-	tempDir.AppendDir(wxT(".mvc-editor"));
+	tempDir.AppendDir(wxT(".triumph4php"));
 	return tempDir;
 }
 
@@ -53,7 +53,7 @@ static wxFileName UserDir() {
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 	tempDir.AssignDir(paths.GetUserConfigDir());
-	tempDir.AppendDir(wxT(".mvc-editor"));
+	tempDir.AppendDir(wxT(".triumph4php"));
 	return tempDir;
 }
 

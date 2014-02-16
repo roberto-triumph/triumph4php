@@ -89,7 +89,7 @@ VersionUpdatePreferencesGeneratedPanelClass::VersionUpdatePreferencesGeneratedPa
 	wxStaticBoxSizer* UpdatesSizer;
 	UpdatesSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Version Updates") ), wxVERTICAL );
 	
-	HelpText = new wxStaticText( this, wxID_ANY, wxT("MVC Editor can check for new versions of the editor.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText = new wxStaticText( this, wxID_ANY, wxT("Triumph can check for new versions of the itself.  Version checking requires an active internet connection. If enabled, version update checks will be done once a week.\n\nNote that this is only a version check, you will have to download the new version and install it manually."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( 550 );
 	UpdatesSizer->Add( HelpText, 0, wxALL, 5 );
 	

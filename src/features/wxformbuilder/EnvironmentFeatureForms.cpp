@@ -36,7 +36,7 @@ WebBrowserEditPanelGeneratedClass::WebBrowserEditPanelGeneratedClass( wxWindow* 
 	HelpSizer->SetFlexibleDirection( wxBOTH );
 	HelpSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This is the list of web browsers that MVC Editor is aware of. MVC Editor will be able to open web pages with any of these browsers. The name is a human friendly name that will be shown, the browser location is the full path to the web browser executable. It is possible to add multiple versions of the same browser  (two version of Firefox for example). You can add a new entry by clicking on the \"Add\" button."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This is the list of web browsers that Triumph is aware of. Triumph will be able to open web pages with any of these browsers. The name is a human friendly name that will be shown, the browser location is the full path to the web browser executable. It is possible to add multiple versions of the same browser  (two version of Firefox for example). You can add a new entry by clicking on the \"Add\" button."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( 500 );
 	HelpSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	
@@ -120,7 +120,7 @@ ApacheEnvironmentPanelGeneratedClass::ApacheEnvironmentPanelGeneratedClass( wxWi
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpText = new wxStaticText( this, wxID_ANY, _("This dialog shows the Apache configuration that is currently being used by MVC Editor.  This page lists all defined virtual hosts MVC Editor will use when showing PHP pages in web browsers."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText = new wxStaticText( this, wxID_ANY, _("This dialog shows the Apache configuration that is currently being used by Triumph.  This page lists all defined virtual hosts Triumph will use when showing PHP pages in web browsers."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( 500 );
 	FlexGridSizer->Add( HelpText, 1, wxALL|wxALIGN_RIGHT|wxEXPAND, 5 );
 	
@@ -205,7 +205,7 @@ PhpEnvironmentPanelGeneratedClass::PhpEnvironmentPanelGeneratedClass( wxWindow* 
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This dialog shows the PHP configuration that is currently being used by MVC Editor.  This page lists the executable that  MVC Editor will use when running scripts or detecting the PHP framework that a project is using.\n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe.\n\nThe version dropdown will determine which version of PHP MVC Editor will use for source code parsing. Choose \"Auto\" to have MVC Editor use the same version as the PHP executable; or one of the other versions to use have MVC Editor use a different version."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText = new wxStaticText( this, ID_HELPTEXT, _("This dialog shows the PHP configuration that is currently being used by Triumph.  This page lists the executable that  Triumph will use when running scripts or detecting the PHP framework that a project is using.\n\nChoose the location of the PHP binary.  If you are running on a Windows PC, choose php-win.exe.\n\nThe version dropdown will determine which version of PHP Triumph will use for source code parsing. Choose \"Auto\" to have Triumph use the same version as the PHP executable; or one of the other versions to use have Triumph use a different version."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpText->Wrap( 450 );
 	GridSizer->Add( HelpText, 1, wxALL|wxEXPAND, 5 );
 	

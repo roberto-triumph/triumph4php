@@ -108,9 +108,9 @@ wxString mvceditor::UrlTagDetectorClass::Label() {
 
 wxString mvceditor::UrlTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
-		"URL Detectors are PHP scripts that MVC Editor uses to find out "
+		"URL Detectors are PHP scripts that Triumph uses to find out "
 		"all of the valid URL routes for your projects.  \n"
-		"MVC Editor can detect routes for CodeIgniter projects.\n"
+		"Triumph can detect routes for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -159,9 +159,9 @@ wxString mvceditor::TemplateFileTagsDetectorClass::Label() {
 
 wxString mvceditor::TemplateFileTagsDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
-		"Template files detectors are PHP scripts that MVC Editor uses to find out "
+		"Template files detectors are PHP scripts that Triumph uses to find out "
 		"all of the 'view' files for your projects.  \n"
-		"MVC Editor can detect view files for CodeIgniter projects.\n"
+		"Triumph can detect view files for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -209,9 +209,9 @@ wxString mvceditor::TagDetectorClass::Label() {
 
 wxString mvceditor::TagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
-		"Tag Detectors are PHP scripts that MVC Editor uses to find out "
+		"Tag Detectors are PHP scripts that Triumph uses to find out "
 		"any tags (methods, properties, or classes) that PHP frameworks dynamically create.  \n"
-		"MVC Editor can detect tags for CodeIgniter projects.\n"
+		"Triumph can detect tags for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -258,9 +258,9 @@ wxString mvceditor::DatabaseTagDetectorClass::Label() {
 
 wxString mvceditor::DatabaseTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
-		"Database Detectors are PHP scripts that MVC Editor uses to find out "
+		"Database Detectors are PHP scripts that Triumph uses to find out "
 		"any database connections that PHP frameworks dynamically create.  \n"
-		"MVC Editor can detect database connections for CodeIgniter projects.\n"
+		"Triumph can detect database connections for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;
@@ -308,9 +308,9 @@ wxString mvceditor::ConfigTagDetectorClass::Label() {
 
 wxString mvceditor::ConfigTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
-		"Config Detectors are PHP scripts that MVC Editor uses to find out "
+		"Config Detectors are PHP scripts that Triumph uses to find out "
 		"any config files that PHP frameworks use.  \n"
-		"MVC Editor can detect config files for CodeIgniter projects.\n"
+		"Triumph can detect config files for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
 	return help;

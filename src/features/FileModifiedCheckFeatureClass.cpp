@@ -396,7 +396,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 			// file is opened, but since file modified time is newer than what the code 
 			// control read in then it means that the file was modified externally
 			// checking the timestamps also lets us skip  files that are saved inside of the editor 
-			// by the user clicking "save" on mvc editor. do nothing
+			// by the user clicking "save" on Triumph. do nothing
 			// because the cache will be updated via the EVT_APP_FILE_SAVED handler
 			filesToPrompt[fullPath] = openedFiles[fullPath];
 		}

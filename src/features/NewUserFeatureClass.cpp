@@ -77,7 +77,7 @@ mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::G
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 		tempDir.AssignDir(paths.GetUserConfigDir());
-		tempDir.AppendDir(wxT(".mvc-editor"));
+		tempDir.AppendDir(wxT(".triumph4php"));
 	label += wxT(" (") + tempDir.GetPath() + wxT(")");
 	UserDataDirectory->SetLabel(label);
 
@@ -122,7 +122,7 @@ void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 		// lets remove it so that the settings dir is in the top-level
 		// of the installation directory
 		tempDir.RemoveLastDir();
-		tempDir.AppendDir(wxT(".mvc-editor"));
+		tempDir.AppendDir(wxT(".triumph4php"));
 		if (!tempDir.DirExists()) {
 			bool created = wxMkdir(tempDir.GetPath(), 0777);
 			if (!created) {
@@ -141,7 +141,7 @@ void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 		// create our subDir if it does not exist
 		wxFileName tempDir;
 		tempDir.AssignDir(paths.GetUserConfigDir());
-		tempDir.AppendDir(wxT(".mvc-editor"));
+		tempDir.AppendDir(wxT(".triumph4php"));
 		if (!tempDir.DirExists()) {
 			bool created = wxMkdir(tempDir.GetPath(), 0777);
 			if (!created) {
