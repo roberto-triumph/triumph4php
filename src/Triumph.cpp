@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/cmdline.h>
 #include <wx/fileconf.h>
 #include <unicode/uclean.h>

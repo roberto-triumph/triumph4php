@@ -24,7 +24,7 @@
  */
 #include <features/EnvironmentFeatureClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/valgen.h>

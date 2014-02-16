@@ -29,7 +29,7 @@
 #include <globals/FileName.h>
 #include <search/Directory.h>
 #include <widgets/FilePickerValidatorClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
 #include <wx/stdpaths.h>

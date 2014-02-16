@@ -30,7 +30,7 @@
 #include <wx/numdlg.h>
 #include <wx/valgen.h>
 #include <wx/valtext.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 
 static const int ID_FIND_PANEL = wxNewId(); 
 static const int ID_REPLACE_PANEL = wxNewId(); 

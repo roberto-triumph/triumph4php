@@ -26,7 +26,7 @@
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <search/FindInFilesClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <globals/Errors.h>
 #include <widgets/FileTypeImageList.h>
 #include <wx/artprov.h>

@@ -27,7 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <widgets/ChooseUrlDialogClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <algorithm>
 

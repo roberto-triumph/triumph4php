@@ -29,7 +29,7 @@
 #include <globals/Events.h>
 #include <actions/TagWipeActionClass.h>
 #include <globals/TagList.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>

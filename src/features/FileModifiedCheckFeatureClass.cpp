@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/FileModifiedCheckFeatureClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <globals/Errors.h>
 #include <globals/Events.h>
 #include <wx/choicdlg.h>

@@ -24,7 +24,7 @@
  */
 #include <main_frame/MainFrameClass.h>
 #include <features/FeatureClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <globals/Assets.h>

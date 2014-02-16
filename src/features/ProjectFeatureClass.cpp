@@ -26,7 +26,7 @@
 #include <widgets/NonEmptyTextValidatorClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
 #include <wx/filename.h>

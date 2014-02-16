@@ -24,7 +24,7 @@
  */
 #include <features/NewUserFeatureClass.h>
 #include <globals/Assets.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/stdpaths.h>
 #include <wx/fileconf.h>

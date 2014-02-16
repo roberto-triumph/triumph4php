@@ -24,7 +24,7 @@
  */
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <code_control/DocumentClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>

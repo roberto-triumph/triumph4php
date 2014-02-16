@@ -30,7 +30,7 @@
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/SequenceClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 
 static const int ID_TEMPLATE_FILES_PANEL = wxNewId();

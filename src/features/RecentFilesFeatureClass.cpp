@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/RecentFilesFeatureClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 
 static int MAX_RECENT_FILES = 10;
 

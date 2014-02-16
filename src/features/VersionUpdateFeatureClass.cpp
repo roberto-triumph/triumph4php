@@ -24,7 +24,7 @@
  */
 #include <features/VersionUpdateFeatureClass.h>
 #include <globals/Assets.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <curl/curl.h>
 #include <wx/ffile.h>
 #include <wx/valgen.h>

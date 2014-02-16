@@ -31,7 +31,7 @@
 #include <language/TagParserClass.h>
 #include <globals/Sqlite.h>
 #include <widgets/TreeItemDataStringClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/regex.h>

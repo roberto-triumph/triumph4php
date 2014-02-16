@@ -1,6 +1,6 @@
 
 #include <features/DocCommentFeatureClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <unicode/unistr.h>
 #include <wx/tokenzr.h>
 

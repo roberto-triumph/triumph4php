@@ -24,7 +24,7 @@
  */
 #include <features/ConfigFilesFeatureClass.h>
 #include <actions/ConfigTagDetectorActionClass.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 
 // max amount of menu items to show
 // the 100 is due to the menu ids allocated to each feature in

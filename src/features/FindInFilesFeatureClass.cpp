@@ -28,7 +28,7 @@
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <globals/Errors.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>

@@ -25,7 +25,7 @@
 #include <features/TotalSearchFeatureClass.h>
 #include <search/FindInFilesClass.h>
 #include <globals/Assets.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/imaglist.h>
 #include <wx/wupdlock.h>
 

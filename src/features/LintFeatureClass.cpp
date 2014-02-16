@@ -27,7 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <globals/Events.h>
 #include <unicode/unistr.h>
 #include <wx/artprov.h>

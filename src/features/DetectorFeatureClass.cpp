@@ -33,7 +33,7 @@
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/file.h>
 #include <wx/ffile.h>

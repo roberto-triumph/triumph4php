@@ -26,7 +26,7 @@
 #include <globals/String.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
-#include <MvcEditor.h>
+#include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/sstream.h>
