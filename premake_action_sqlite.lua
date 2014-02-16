@@ -27,12 +27,12 @@ function prepSqlite()
 	
 	if os.is "windows" then
 		 sqliteZip = "lib/sqlite-dll-win32-x86-3071300.zip";
-		 sqliteDownload = "http://www.mvceditor.com/blog/wp-content/uploads/2014/01/sqlite-dll-win32-x86-3071300.zip"
+		 sqliteDownload = "http://www.triumph4php.com/blog/wp-content/uploads/2014/01/sqlite-dll-win32-x86-3071300.zip"
 		 existenceOrDownloadExtract(sqliteZip, sqliteDownload, "Downloading SQLITE dependency");
 		
 		--  the amalgamation contains the header files, necessary for compilation
 		 sqliteZip = "lib/sqlite-amalgamation-3071300.zip";
-		 sqliteDownload = "http://www.mvceditor.com/blog/wp-content/uploads/2014/01/sqlite-amalgamation-3071300.zip"
+		 sqliteDownload = "http://www.triumph4php.com/blog/wp-content/uploads/2014/01/sqlite-amalgamation-3071300.zip"
 		 existenceOrDownloadExtract(sqliteZip, sqliteDownload, "Downloading SQLITE dependency");
 		 
 		 -- copy the sqlite dll into its own dir

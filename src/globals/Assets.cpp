@@ -30,8 +30,8 @@
 // these macros will expand a macro into its 
 // these are needed to expand the asset root location 
 // which is given as a macro by the premake script
-#define MVC_STR_EXPAND(s) #s
-#define MVC_STR(s) MVC_STR_EXPAND(s)
+#define T4P_STR_EXPAND(s) #s
+#define T4P_STR(s) T4P_STR_EXPAND(s)
 
 /**
  * @return wxFileName the root directory of the asset directory
@@ -42,8 +42,8 @@
 static wxFileName AssetRootDir() {
 	
 	std::string stdRoot;
-	#ifdef MVCEDITOR_ASSET_DIR
-		stdRoot = MVC_STR(MVCEDITOR_ASSET_DIR);
+	#ifdef T4P_ASSET_DIR
+		stdRoot = T4P_STR(T4P_ASSET_DIR);
 	#endif
 	
     wxFileName assetRoot;

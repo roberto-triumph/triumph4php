@@ -29,8 +29,8 @@
 // these macros will expand a macro into its 
 // these are needed to expand the DB user/pwd which
 // are given as macros by the premake script
-#define MVC_STR_EXPAND(s) #s
-#define MVC_STR(s) MVC_STR_EXPAND(s)
+#define T4P_STR_EXPAND(s) #s
+#define T4P_STR(s) T4P_STR_EXPAND(s)
  
  
 DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDatabaseName)
@@ -53,14 +53,14 @@ DatabaseTestFixtureClass::~DatabaseTestFixtureClass() {
 }
 
 std::string DatabaseTestFixtureClass::UserName() const {
-	std::string user = MVC_STR(MVCEDITOR_DB_USER);
+	std::string user = T4P_STR(T4P_DB_USER);
 	return user;
 }
 
 std::string DatabaseTestFixtureClass::Password() const {
 	std::string pwd;
-	#ifdef MVCEDITOR_DB_PASSWORD
-		pwd	= MVC_STR(MVCEDITOR_DB_PASSWORD);
+	#ifdef T4P_DB_PASSWORD
+		pwd	= T4P_STR(T4P_DB_PASSWORD);
 	#endif
 	return pwd;
 }

@@ -24,7 +24,7 @@
 -------------------------------------------------------------------
 newaction {
 	trigger = "dist",
-	description = "Build the MVC Editor distributable.",
+	description = "Build the Triumph distributable.",
 	execute = function()
 		if os.is "windows" then
 			if os.isdir("dist") then
@@ -32,26 +32,26 @@ newaction {
 			end
 			batchexecute(normalizepath(""), {
 				"mkdir dist",
-				"mkdir dist\\mvc-editor\\bin",
-				"mkdir dist\\mvc-editor\\assets",
-				"xcopy /S /Y Release\\*.dll dist\\mvc-editor\\bin",
-				"copy Release\\mvc-editor.exe dist\\mvc-editor\\bin",
-				"xcopy  /S /Y assets\\* dist\\mvc-editor\\assets"
+				"mkdir dist\\triumph\\bin",
+				"mkdir dist\\triumph\\assets",
+				"xcopy /S /Y Release\\*.dll dist\\triumph\\bin",
+				"copy Release\\triumph.exe dist\\triumph\\bin",
+				"xcopy  /S /Y assets\\* dist\\triumph\\assets"
 			});
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
-			cmd = "git describe --long > dist\\mvc-editor\\assets\\version.txt"
+			cmd = "git describe --long > dist\\triumph\\assets\\version.txt"
 			if 0 ~= os.execute(cmd) then
-				cmd = "git describe --all --long > dist\\mvc-editor\\assets\\version.txt"
+				cmd = "git describe --all --long > dist\\triumph\\assets\\version.txt"
 				os.execute(cmd) 
 			end
 		else
-			workDir = path.getabsolute("../mvc-editor-0.6")
-			workLibDir = path.getabsolute("../mvc-editor-0.6/Release/libs")
+			workDir = path.getabsolute("../triumph-0.6")
+			workLibDir = path.getabsolute("../triumph-0.6/Release/libs")
 			rootDir = normalizepath("./")
 			libWildcards =  normalizepath("./Release/*.so*")
-			assetDir = "/usr/share/mvc-editor"
+			assetDir = "/usr/share/triumph"
 			branch = "master";
 			debianControl = path.getabsolute("../debian.control");
 			
@@ -75,14 +75,14 @@ newaction {
 					-- also, we want to set the assets dir to the final location
 					-- of the assets (in the system where the .deb file will be installed
 					-- ie the end user machine)
-					"MVCEDITOR_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
-					"MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
-					"MVCEDITOR_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
-					"MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
-					"MVCEDITOR_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
-					"MVCEDITOR_BUILD_SCRIPTS_DIR=. " .. 
-					"MVCEDITOR_LIB_DIR=" .. workLibDir .. " " ..
-					"MVCEDITOR_ASSET_DIR=" .. assetDir .. " " ..
+					"T4P_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
+					"T4P_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
+					"T4P_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
+					"T4P_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
+					"T4P_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
+					"T4P_BUILD_SCRIPTS_DIR=. " .. 
+					"T4P_LIB_DIR=" .. workLibDir .. " " ..
+					"T4P_ASSET_DIR=" .. assetDir .. " " ..
 					"./premake4 gmake",
 					
 					-- this will prep the dir to be a debian work dir
@@ -118,33 +118,33 @@ newaction {
 
 
 			batchexecute(workDir, {
-				"MVCEDITOR_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
-				"MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
-				"MVCEDITOR_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
-				"MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
-				"MVCEDITOR_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
-				"MVCEDITOR_BUILD_SCRIPTS_DIR=. " .. 
-				"MVCEDITOR_LIB_DIR=" .. workLibDir .. " " ..
-				"MVCEDITOR_ASSET_DIR=" .. assetDir .. " " ..
+				"T4P_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
+				"T4P_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
+				"T4P_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
+				"T4P_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
+				"T4P_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
+				"T4P_BUILD_SCRIPTS_DIR=. " .. 
+				"T4P_LIB_DIR=" .. workLibDir .. " " ..
+				"T4P_ASSET_DIR=" .. assetDir .. " " ..
 				"./premake4 gmake",
 
 				-- populate the install file, the file that tells which files to 
 				-- include in the .deb file
 				-- double quote the backslash since we have to escape the backslash in the shell
-				"echo 'Release/mvc-editor usr/bin\\n' > debian/install",
-				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/mvc-editor\" }' >> debian/install",
-				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/mvc-editor\" }' >> debian/install",
+				"echo 'Release/triumph usr/bin\\n' > debian/install",
+				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph\" }' >> debian/install",
+				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph\" }' >> debian/install",
 
 				-- regex is complicated
 				-- find the basename from the asset file, then remove it
 				-- for example, from  "assets/icons/database-delete.png"
 				-- we want to end up with the line 
-				-- "assets/icons/database-delete.png usr/share/mvc-editor/icons"
+				-- "assets/icons/database-delete.png usr/share/triumph/icons"
 				-- double quote the backslash since we have to escape the backslash in the shell
-				"find assets/  -type f -name \"*\" -printf '%p /%h\n' | sed 's/\\/assets/usr\\/share\\/mvc-editor/g' >> debian/install",
+				"find assets/  -type f -name \"*\" -printf '%p /%h\n' | sed 's/\\/assets/usr\\/share\\/triumph/g' >> debian/install",
 
 				-- mofiy the makefile to only build the main app not all of the examples, profilers, 
-				"sed -i 's/all: \$(PROJECTS)/all: mvc-editor/g' Makefile",
+				"sed -i 's/all: \$(PROJECTS)/all: triumph/g' Makefile",
 				
 				-- modify the license file to be our own
 				"cat LICENSE > debian/copyright",

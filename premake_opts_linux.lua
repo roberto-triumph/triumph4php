@@ -27,7 +27,7 @@
 
 -- 
 -- Below are constants for the various external binaries needed for compiling
--- MVC Editor. These can be changed when the dependant libraries (ICU,
+-- Triumph. These can be changed when the dependant libraries (ICU,
 -- wxWidgets, cmake) are not installed system-wide
 --
 
@@ -36,7 +36,7 @@
 -- Note that if you change this then it's because you installed ICU in a 
 -- non-standard location; this means you will also need to add the ICU 
 -- lib directory to your LD_LIBRARY_PATH, otherwise the ICU library 
--- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
+-- will not be found at runtime (ie. when you try to execute triumph.exe).
 ICU_CONFIG = 'icu-config'
 
 -- location to the wx-config executable. In linux systems we use this 
@@ -44,7 +44,7 @@ ICU_CONFIG = 'icu-config'
 -- Note that if you change this then it's because you installed wxWidgets in a 
 -- non-standard location; this means you will also need to add the wxWidgets 
 -- lib directory to your LD_LIBRARY_PATH, otherwise the wxWidgets library 
--- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
+-- will not be found at runtime (ie. when you try to execute triumph.exe).
 -- Also, if you build wxWidgets yourself, you will need to build the Unicode
 -- version
 -- Your command line to build wxWidgets should look like this (for Release mode):
@@ -61,35 +61,35 @@ ICU_CONFIG = 'icu-config'
 --
 -- Consult the wxWidgets for more info if necessary
 --
-WX_CONFIG = os.getenv("MVCEDITOR_WXCONFIG")
+WX_CONFIG = os.getenv("T4P_WXCONFIG")
 if (not WX_CONFIG) then
-    WX_CONFIG = 'lib/wxWidgets/mvc-editor/bin/wx-config'
-    print "Using default location of lib/wxWidgets/mvc-editor/bin/wx-config for wxWidgets dir"
+    WX_CONFIG = 'lib/wxWidgets/triumph/bin/wx-config'
+    print "Using default location of lib/wxWidgets/triumph/bin/wx-config for wxWidgets dir"
 end
 
 
-SOCI_DEBUG_INCLUDE_DIR = os.getenv("MVCEDITOR_SOCI_DEBUG_INCLUDE_DIR");
+SOCI_DEBUG_INCLUDE_DIR = os.getenv("T4P_SOCI_DEBUG_INCLUDE_DIR");
 if (not SOCI_DEBUG_INCLUDE_DIR) then
-    SOCI_DEBUG_INCLUDE_DIR = 'lib/soci/mvc-editor/Debug/include';
-    print "Using default location of lib/soci/mvc-editor/Debug/include for SOCI debug include dir"
+    SOCI_DEBUG_INCLUDE_DIR = 'lib/soci/triumph/Debug/include';
+    print "Using default location of lib/soci/triumph/Debug/include for SOCI debug include dir"
 end
 
-SOCI_DEBUG_LIB_DIR = os.getenv("MVCEDITOR_SOCI_DEBUG_LIB_DIR");
+SOCI_DEBUG_LIB_DIR = os.getenv("T4P_SOCI_DEBUG_LIB_DIR");
 if (not SOCI_DEBUG_LIB_DIR) then
-    SOCI_DEBUG_LIB_DIR = 'lib/soci/mvc-editor/Debug/lib64';
-    print "Using default location of lib/soci/mvc-editor/Debug/lib64 for SOCI debug lib dir"
+    SOCI_DEBUG_LIB_DIR = 'lib/soci/triumph/Debug/lib64';
+    print "Using default location of lib/soci/triumph/Debug/lib64 for SOCI debug lib dir"
 end
 
-SOCI_RELEASE_INCLUDE_DIR = os.getenv("MVCEDITOR_SOCI_RELEASE_INCLUDE_DIR");
+SOCI_RELEASE_INCLUDE_DIR = os.getenv("T4P_SOCI_RELEASE_INCLUDE_DIR");
 if (not SOCI_RELEASE_INCLUDE_DIR) then
-    SOCI_RELEASE_INCLUDE_DIR = 'lib/soci/mvc-editor/Release/include';
-    print "Using default location of lib/soci/mvc-editor/Release/include for SOCI release include dir"
+    SOCI_RELEASE_INCLUDE_DIR = 'lib/soci/triumph/Release/include';
+    print "Using default location of lib/soci/triumph/Release/include for SOCI release include dir"
 end
 
-SOCI_RELEASE_LIB_DIR = os.getenv("MVCEDITOR_SOCI_RELEASE_LIB_DIR");
+SOCI_RELEASE_LIB_DIR = os.getenv("T4P_SOCI_RELEASE_LIB_DIR");
 if (not SOCI_RELEASE_LIB_DIR) then
-    SOCI_RELEASE_LIB_DIR = 'lib/soci/mvc-editor/Release/lib64';
-    print "Using default location of lib/soci/mvc-editor/Release/lib64 for SOCI release lib dir"
+    SOCI_RELEASE_LIB_DIR = 'lib/soci/triumph/Release/lib64';
+    print "Using default location of lib/soci/triumph/Release/lib64 for SOCI release lib dir"
 end
 
 -- location of the cmake executable. cmake is used to build the SOCI
@@ -109,11 +109,11 @@ MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so',
 	"/usr/lib/i386-linux-gnu/"
 );
 
--- On some unit tests, MVC Editor attempt to connect to a database
+-- On some unit tests, Triumph attempt to connect to a database
 -- Set the username and password to use here.
--- MVC Editor will create (and drop) the schema that it uses
-MVCEDITOR_DB_USER = 'mvc-editor';
-MVCEDITOR_DB_PASSWORD = '';
+-- Triumph will create (and drop) the schema that it uses
+T4P_DB_USER = 'triumph';
+T4P_DB_PASSWORD = '';
 
 -- will look for SQLite in these directories
 SQLITE_INCLUDE_DIR = '/usr/include/'
@@ -137,7 +137,7 @@ CURL_LIB_DIR = os.pathsearch('libcurl.so',
 );
 
 -- location where the makefiles / codelist solution files will be placed
-BUILD_SCRIPTS_DIR = os.getenv("MVCEDITOR_BUILD_SCRIPTS_DIR");
+BUILD_SCRIPTS_DIR = os.getenv("T4P_BUILD_SCRIPTS_DIR");
 if (not BUILD_SCRIPTS_DIR) then
     BUILD_SCRIPTS_DIR = 'build/';
     if (_ACTION) then
@@ -159,16 +159,16 @@ end
 -- location as well.
 -- lib dir can be relative, it is relative it is assumed to be
 -- relative to the executable location
-MVCEDITOR_LIB_DIR = os.getenv("MVCEDITOR_LIB_DIR");
-if (not MVCEDITOR_LIB_DIR) then
-    MVCEDITOR_LIB_DIR = ".";
-    print ("Using default location of " .. MVCEDITOR_LIB_DIR .. " for shared libraries location")
+T4P_LIB_DIR = os.getenv("T4P_LIB_DIR");
+if (not T4P_LIB_DIR) then
+    T4P_LIB_DIR = ".";
+    print ("Using default location of " .. T4P_LIB_DIR .. " for shared libraries location")
 end
 
 
 -- location of the asset directory
 -- the asset directory contains non-source code files needed
--- by MVC Editor fto function properly.  Assets include
+-- by Triumph to function properly.  Assets include
 -- images
 -- sql scripts (to create the tag cache)
 -- PHP scripts (PHP detectors)
@@ -179,9 +179,9 @@ end
 -- location as well.
 -- asset dir can be relative, it is relative it is assumed to be
 -- relative to the executable location
-MVCEDITOR_ASSET_DIR = os.getenv("MVCEDITOR_ASSET_DIR")
-if (not MVCEDITOR_ASSET_DIR) then
-    MVCEDITOR_ASSET_DIR = '../assets'
-    print("Using default location of " .. MVCEDITOR_ASSET_DIR .. " for assets location")
+T4P_ASSET_DIR = os.getenv("T4P_ASSET_DIR")
+if (not T4P_ASSET_DIR) then
+    T4P_ASSET_DIR = '../assets'
+    print("Using default location of " .. T4P_ASSET_DIR .. " for assets location")
 end
 

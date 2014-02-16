@@ -25,13 +25,13 @@
 
 --
 -- Below are constants for the various external binaries needed for compiling
--- MVC Editor. These can be changed when the dependant libraries (ICU,
+-- Triumph. These can be changed when the dependant libraries (ICU,
 -- wxWidgets, cmake) are not installed system-wide
 --
 
 -- location to the ICU release libraries. Make sure to copy the
 -- ICU DLLs to the Release directory, otherwise the ICU library
--- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
+-- will not be found at runtime (ie. when you try to execute triumph.exe).
 -- Use the "prep" premake action to copy the DLLs.
 ICU_LIBS_RELEASE = {
        "icudt", "icuin", "icuio", "icule",
@@ -40,14 +40,14 @@ ICU_LIBS_RELEASE = {
 
 -- location to the ICU debug libraries. Make sure to copy the
 -- ICU DLLs to the Debug directory, otherwise the ICU library
--- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
+-- will not be found at runtime (ie. when you try to execute triumph.exe).
 -- Use the "prep" premake action to copy the DLLs.
 ICU_LIBS_DEBUG = {
        "icudt", "icuind", "icuiod", "iculed",
        "iculxd", "icutud", "icuucd"
 }
 
-icuDir = os.getenv("MVCEDITOR_ICU_DIR")
+icuDir = os.getenv("T4P_ICU_DIR")
 if (not icuDir) then
 	icuDir = "lib/icu"
 	print "Using default location of lib/icu for ICU dir"
@@ -61,7 +61,7 @@ ICU_INCLUDE_DIR = icuDir .. "/include/"
 
 -- location to the wxWidgets libraries. Make sure to copy the
 -- wxWidgets DLLs to the Debug directory, otherwise the wxWidgets library
--- will not be found at runtime (ie. when you try to execute mvc-editor.exe).
+-- will not be found at runtime (ie. when you try to execute triumph.exe).
 -- Also, if you build wxWidgets yourself, you will need to build the Unicode
 -- DLL versions
 --
@@ -90,7 +90,7 @@ WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html", "wxm
 -- the styled text control library
 WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
 
-wxWidgetsDir = os.getenv("MVCEDITOR_WXWIDGETS_DIR")
+wxWidgetsDir = os.getenv("T4P_WXWIDGETS_DIR")
 if (not wxWidgetsDir) then
 	wxWidgetsDir = "lib/wxWidgets"
 	print "Using default location of lib/wxWidgets for wxWidgets dir"
@@ -111,11 +111,11 @@ GIT = 'git.exe';
 -- library (Database Access wrapper)
 CMAKE = 'cmake';
 
--- location of 7-zip, used to unzip downloaded binaries of MVC Editor
+-- location of 7-zip, used to unzip downloaded binaries of Triumph
 -- dependencies from the Internet
 SEVENZIP = '7za';
 
--- location of wget, used to retrieve some of MVC Editor
+-- location of wget, used to retrieve some of Triumph
 -- dependencies from the Internet
 WGET = 'wget';
 
@@ -129,7 +129,7 @@ VSVARS = "C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\Common7\\Tools\\
 -- not easy to get MySQL Connector C libs in windows
 -- doing a manual, binary install
 
-mysqlDir = os.getenv("MVCEDITOR_MYSQL_CONNECTOR_DIR")
+mysqlDir = os.getenv("T4P_MYSQL_CONNECTOR_DIR")
 if (not mysqlDir) then
 
 	mysqlDir = "lib/mysql-connector-c-noinstall-6.0.2-win32"
@@ -140,22 +140,22 @@ MYSQL_LIB = mysqlDir .. '/lib/libmysql.lib'
 MYSQL_LIB_DIR = mysqlDir .. '/lib/'
 MYSQL_LIB_NAME = 'libmysql.lib'
 
--- On some unit tests, MVC Editor attempt to connect to a database
+-- On some unit tests, Triumph attempt to connect to a database
 -- Set the username and password to use here.
--- MVC Editor will create (and drop) the schema that it uses
-MVCEDITOR_DB_USER = 'mvc-editor'
-MVCEDITOR_DB_PASSWORD = ''
+-- Triumph will create (and drop) the schema that it uses
+T4P_DB_USER = 'triumph'
+T4P_DB_PASSWORD = ''
 
 -- will look for SQLite in these directories
 -- read lib/sqlite/README  for more info
-sqliteIncludeDir = os.getenv("MVCEDITOR_SQLITE_INCLUDE_DIR")
+sqliteIncludeDir = os.getenv("T4P_SQLITE_INCLUDE_DIR")
 if (not sqliteIncludeDir) then
 	sqliteIncludeDir = "lib/sqlite-amalgamation-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteIncludeDir)
 end
 SQLITE_INCLUDE_DIR = sqliteIncludeDir
 
-sqliteLibDir = os.getenv("MVCEDITOR_SQLITE_LIB_DIR")
+sqliteLibDir = os.getenv("T4P_SQLITE_LIB_DIR")
 if (not sqliteLibDir) then
 	sqliteLibDir = "lib/sqlite-dll-win32-x86-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteLibDir)
@@ -166,7 +166,7 @@ SQLITE_LIB_NAME = 'sqlite3.lib'
 
 -- will look for CURL in these directories
 -- these are the directories where
-curlDebugDir = os.getenv("MVCEDITOR_CURL_DEBUG_DIR")
+curlDebugDir = os.getenv("T4P_CURL_DEBUG_DIR")
 if (not curlDebugDir) then
 	curlDebugDir = "lib/curl/builds/libcurl-debug-dll-ipv6-sspi";
 	print("Using default dir for CURL debug: " .. curlDebugDir)
@@ -176,7 +176,7 @@ CURL_DEBUG_LIB = curlDebugDir .. '/lib/libcurl.lib'
 CURL_DEBUG_LIB_DIR = curlDebugDir .. '/lib'
 CURL_DEBUG_BIN_DIR = curlDebugDir .. '/bin'
 
-curlReleaseDir = os.getenv("MVCEDITOR_CURL_RELEASE_DIR")
+curlReleaseDir = os.getenv("T4P_CURL_RELEASE_DIR")
 if (not curlReleaseDir) then
 	curlReleaseDir = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
 	print("Using default dir for CURL Release: " .. curlReleaseDir)
@@ -194,14 +194,14 @@ CURL_RELEASE_BIN_DIR = curlReleaseDir .. '/bin'
 -- together.
 -- lib dir can be relative, it is relative it is assumed to be
 -- relative to the executable location
-MVCEDITOR_LIB_DIR = os.getenv("MVCEDITOR_LIB_DIR");
-if (not MVCEDITOR_LIB_DIR) then
-    MVCEDITOR_LIB_DIR = ".";
-    print ("Using default location of " .. MVCEDITOR_LIB_DIR .. " for shared libraries location")
+T4P_LIB_DIR = os.getenv("T4P_LIB_DIR");
+if (not T4P_LIB_DIR) then
+    T4P_LIB_DIR = ".";
+    print ("Using default location of " .. T4P_LIB_DIR .. " for shared libraries location")
 end
 
 -- location where the vs solution files will be placed
-BUILD_SCRIPTS_DIR = os.getenv("MVCEDITOR_BUILD_SCRIPTS_DIR");
+BUILD_SCRIPTS_DIR = os.getenv("T4P_BUILD_SCRIPTS_DIR");
 if (not BUILD_SCRIPTS_DIR) then
     BUILD_SCRIPTS_DIR = 'build/';
     if (_ACTION) then
@@ -212,7 +212,7 @@ end
 
 -- location of the asset directory
 -- the asset directory contains non-source code files needed
--- by MVC Editor fto function properly.  Assets include
+-- by Triumph fto function properly.  Assets include
 -- images
 -- sql scripts (to create the tag cache)
 -- PHP scripts (PHP detectors)
@@ -221,9 +221,9 @@ end
 -- the executable is located
 -- asset dir can be relative, it is relative it is assumed to be
 -- relative to the executable location
-MVCEDITOR_ASSET_DIR = os.getenv("MVCEDITOR_ASSET_DIR")
-if (not MVCEDITOR_ASSET_DIR) then
-    MVCEDITOR_ASSET_DIR = '../assets'
-    print("Using default location of " .. MVCEDITOR_ASSET_DIR .. " for assets location")
+T4P_ASSET_DIR = os.getenv("T4P_ASSET_DIR")
+if (not T4P_ASSET_DIR) then
+    T4P_ASSET_DIR = '../assets'
+    print("Using default location of " .. T4P_ASSET_DIR .. " for assets location")
 end
 

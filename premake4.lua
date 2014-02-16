@@ -28,7 +28,7 @@ if os.is("windows") then
 elseif os.is("linux") then
 	dofile "premake_opts_linux.lua"
 else
-	error "You are running on a non-supported operating system. MVC Editor cannot be built.\n"
+	error "You are running on a non-supported operating system. triumph4php cannot be built.\n"
 end
 dofile "premake_functions.lua"
 dofile "premake_action_dist.lua"
@@ -132,8 +132,8 @@ function sociconfiguration(config)
 	}
 	if os.is "windows" then 
 		includedirs {
-			"lib/soci/mvc-editor/include",
-			"lib/soci/mvc-editor/include/soci",
+			"lib/soci/triumph/include",
+			"lib/soci/triumph/include/soci",
 			MYSQL_INCLUDE_DIR,
 			SQLITE_INCLUDE_DIR
 		}
@@ -149,7 +149,7 @@ function sociconfiguration(config)
 		}
 		
 		-- grab the libraries from the build directory.  the ones from
-		-- from the install directory (lib/soci/mvc-editor) do not work (programs 
+		-- from the install directory (lib/soci/triumph) do not work (programs 
 		-- that use them crash)
 		libdirs { "lib/soci/src/lib/Release" }
 	else 
@@ -222,17 +222,17 @@ end-- solution directory structure
 -- each toolset will have its own directory
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
 -- compile flags will be set to be stricter than normal
-solution "mvc-editor"
+solution "triumph4php"
 	location (BUILD_SCRIPTS_DIR)
 	
 	configurations { "Release", "Debug"}
 
-    -- the location of the assets (images, sql scripts, etc)
-    -- we want to control its location so that we build distribution
-    -- packages properly
-    defines {
-        string.format("MVCEDITOR_ASSET_DIR=%s", MVCEDITOR_ASSET_DIR)
-    }
+	-- the location of the assets (images, sql scripts, etc)
+	-- we want to control its location so that we build distribution
+	-- packages properly
+	defines {
+		string.format("T4P_ASSET_DIR=%s", T4P_ASSET_DIR)
+	}
 	configuration "Debug"
 		objdir "Debug"
 		targetdir "Debug"
@@ -243,10 +243,10 @@ solution "mvc-editor"
 	configuration "gmake or codelite"
 
 		-- link against our own version of wxWidgets / SOCI instead of any installed in the system
-		linkoptions { string.format("-Wl,-rpath=%s", MVCEDITOR_LIB_DIR)  }
+		linkoptions { string.format("-Wl,-rpath=%s", T4P_LIB_DIR)  }
 
 
-	project "mvc-editor"
+	project "triumph4php"
 		language "C++"
 		kind "WindowedApp"
 		
@@ -272,7 +272,7 @@ solution "mvc-editor"
 			
 			-- use the local update server in debug  
 			defines { 
-				string.format("MVCEDITOR_UPDATE_HOST=%s", 'updates.localhost')
+				string.format("T4P_UPDATE_HOST=%s", 'updates.localhost')
 			}
 
 		configuration "Release"
@@ -285,7 +285,7 @@ solution "mvc-editor"
 			
 			-- use the public update server in release
 			defines { 
-				string.format("MVCEDITOR_UPDATE_HOST=%s", 'updates.mvceditor.com')
+				string.format("T4P_UPDATE_HOST=%s", 'updates.mvceditor.com')
 			}
 
 	project "tests"
@@ -306,15 +306,15 @@ solution "mvc-editor"
 		-- use double quotes because visual studio already escapes
 		-- defines with double quotes
 		defines {
-			string.format("MVCEDITOR_DB_USER=%s", MVCEDITOR_DB_USER)
+			string.format("T4P_DB_USER=%s", T4P_DB_USER)
 		}
 
 		-- handle empty password correctly; just don't define the macro
 		-- this is so that the next word of the generated command line does
 		-- not become the password
-		if string.len(MVCEDITOR_DB_PASSWORD) > 0 then
+		if string.len(T4P_DB_PASSWORD) > 0 then
 			defines {
-				string.format("MVCEDITOR_DB_PASSWORD=%s", MVCEDITOR_DB_PASSWORD)
+				string.format("T4P_DB_PASSWORD=%s", T4P_DB_PASSWORD)
 			}
 		end;
 		includedirs { 

@@ -24,7 +24,7 @@
 -------------------------------------------------------------------
 
 function prepSoci() 
-	SOCI_BUILD_DIR =  normalizepath("lib/soci/mvc-editor");
+	SOCI_BUILD_DIR =  normalizepath("lib/soci/triumph");
 	SOCI_ROOT = normalizepath("lib/soci")
 	SOCI_SRC = normalizepath("lib/soci/src")
 	if os.is "windows" then
@@ -32,7 +32,7 @@ function prepSoci()
 		-- compile SOCI
 		-- exclude SOCI from linking against Boost. we don't use it
 		sociPath = normalizepath("lib/soci")
-		sociBuildDir =  normalizepath("lib/soci/mvc-editor")
+		sociBuildDir =  normalizepath("lib/soci/triumph")
 		sociSrc = normalizepath("lib/soci/src")
 		rootPath = normalizepath("")
 		batchexecute(sociSrc, {
@@ -63,8 +63,8 @@ function prepSoci()
 			
 		})
 	else 
-		sociInstallDebugDir = normalizepath("lib/soci/mvc-editor/Debug")
-		sociInstallReleaseDir = normalizepath("lib/soci/mvc-editor/Release")
+		sociInstallDebugDir = normalizepath("lib/soci/triumph/Debug")
+		sociInstallReleaseDir = normalizepath("lib/soci/triumph/Release")
 
 		batchexecute(normalizepath(""), {
 			"mkdir -p " .. sociInstallDebugDir,
@@ -118,24 +118,24 @@ function prepSoci()
 		
 		-- soci lib dirs are named according to architecture
 		foundCount = 0;
-		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib64/*.so*");
+		libs = os.matchfiles("lib/soci/triumph/Debug/lib64/*.so*");
 		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib64/*.so* Debug/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib64/*.so* Debug/");
 			foundCount = foundCount + 1;
 		end
-		libs = os.matchfiles("lib/soci/mvc-editor/Debug/lib/*.so*");
+		libs = os.matchfiles("lib/soci/triumph/Debug/lib/*.so*");
 		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Debug/lib/*.so* Debug/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib/*.so* Debug/");
 			foundCount = foundCount + 1;
 		end
-		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib64/*.so*");
+		libs = os.matchfiles("lib/soci/triumph/Release/lib64/*.so*");
 		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib64/*.so* Release/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib64/*.so* Release/");
 			foundCount = foundCount + 1;
 		end
-		libs = os.matchfiles("lib/soci/mvc-editor/Release/lib/*.so*");
+		libs = os.matchfiles("lib/soci/triumph/Release/lib/*.so*");
 		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/mvc-editor/Release/lib/*.so* Release/");
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib/*.so* Release/");
 			foundCount = foundCount + 1;
 		end
 	end

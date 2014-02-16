@@ -48,7 +48,7 @@ function setupDev()
 		"to compile from the command line.  This batch file comes with Visual\n" ..
 		"Studio Express. You can set the proper location for the file by editing\n" ..
 		"premake_opts_windows.lua. Or if you don't have Visual Studio installed\n" ..
-		"you will have to install it. Currently, MVC Editor requires use of the\n" ..
+		"you will have to install it. Currently, triumph4php requires use of the\n" ..
 		"Visual Studio compiler on windows\n"
 	existence({
 		VSVARS
@@ -79,10 +79,10 @@ function setupDev()
 	prepSoci();
 	prepWxWidgets();
 	
-	print "SUCCESS! All dependencies are met. Next step is to build MVC Editor in your environment.";
+	print "SUCCESS! All dependencies are met. Next step is to build triumph4php in your environment.";
 	if os.is "windows" then
 		print "premake4.exe vs2008\n"
-		print "Then open the Visual Studio solution in build\\vs2008\\mvc-editor.sln" 
+		print "Then open the Visual Studio solution in build\\vs2008\\triumph4php.sln" 
 	elseif os.is "linux" then
 		print "./premake gmake\n  OR \n ./premake codelite"
 	end

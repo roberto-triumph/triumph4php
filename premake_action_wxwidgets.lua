@@ -56,7 +56,7 @@ function prepWxWidgets()
 	else 
 
 		-- build wxWidgets using make
-		wxBuild = normalizepath("lib/wxWidgets/mvc-editor/")
+		wxBuild = normalizepath("lib/wxWidgets/triumph/")
 		batchexecute('lib/wxWidgets', {
 			"mkdir -p " .. wxBuild,
 			"./configure --enable-debug --with-gtk --enable-unicode --prefix=" .. wxBuild,
