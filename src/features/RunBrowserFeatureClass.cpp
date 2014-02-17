@@ -34,11 +34,11 @@
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;
 
-static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvceditor::EnvironmentClass* environment) {
+static void ExternalBrowser(const wxString& browserName, const wxURI& url, t4p::EnvironmentClass* environment) {
 	wxFileName webBrowserPath;
 	bool found = environment->FindBrowserByName(browserName, webBrowserPath);
 	if (!found || !webBrowserPath.IsOk()) {
-		mvceditor::EditorLogWarning(mvceditor::ERR_BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
+		t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, webBrowserPath.GetFullPath());
 		return;
 	}
 	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
@@ -51,7 +51,7 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
 	// that the browser crashed. 
 	long pid = wxExecute(cmd, wxEXEC_ASYNC | wxEXEC_MAKE_GROUP_LEADER);
 	if (pid <= 0) {
-		mvceditor::EditorLogWarning(mvceditor::ERR_BAD_WEB_BROWSER_EXECUTABLE, cmd);
+		t4p::EditorLogWarning(t4p::ERR_BAD_WEB_BROWSER_EXECUTABLE, cmd);
 	}
 }
 
@@ -68,12 +68,12 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, mvced
  *         
  */
 static std::vector<wxBitmap> BrowserIconsLoad() {
-	wxBitmap browserOperaBitmap = mvceditor::IconImageAsset(wxT("browser-opera"));
-	wxBitmap browserChromeBitmap = mvceditor::IconImageAsset(wxT("browser-chrome"));
-	wxBitmap browserInternetExplorerBitmap = mvceditor::IconImageAsset(wxT("browser-internet-explorer"));
-	wxBitmap browserFirefoxBitmap = mvceditor::IconImageAsset(wxT("browser-firefox"));
-	wxBitmap browserSafariBitmap = mvceditor::IconImageAsset(wxT("browser-safari"));
-	wxBitmap browserGenericBitmap = mvceditor::IconImageAsset(wxT("browser-generic"));
+	wxBitmap browserOperaBitmap = t4p::IconImageAsset(wxT("browser-opera"));
+	wxBitmap browserChromeBitmap = t4p::IconImageAsset(wxT("browser-chrome"));
+	wxBitmap browserInternetExplorerBitmap = t4p::IconImageAsset(wxT("browser-internet-explorer"));
+	wxBitmap browserFirefoxBitmap = t4p::IconImageAsset(wxT("browser-firefox"));
+	wxBitmap browserSafariBitmap = t4p::IconImageAsset(wxT("browser-safari"));
+	wxBitmap browserGenericBitmap = t4p::IconImageAsset(wxT("browser-generic"));
 
 	std::vector<wxBitmap> icons;
 	icons.push_back(browserChromeBitmap);
@@ -122,7 +122,7 @@ static void BrowserIconsMenuSet(std::vector<wxBitmap>&  browserIcons, wxMenuItem
 	}
 }
 
-mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& app)
+t4p::RunBrowserFeatureClass::RunBrowserFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) 
 	, RecentUrls()
 	, BrowserMenu()
@@ -134,27 +134,27 @@ mvceditor::RunBrowserFeatureClass::RunBrowserFeatureClass(mvceditor::AppClass& a
 	, IsWaitingForUrlDetection(false) {
 }
 
-void mvceditor::RunBrowserFeatureClass::AddWindows() {
+void t4p::RunBrowserFeatureClass::AddWindows() {
 	BrowserToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
 	BrowserToolbar->SetFont(App.Preferences.ApplicationFont);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
-    wxBitmap browserBitmap = mvceditor::IconImageAsset(wxT("browser-generic"));
-	wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run-browser"));
-	wxBitmap searchUrlBitmap = mvceditor::IconImageAsset(wxT("search-url-tags"));
-	wxBitmap recentUrlBitmap = mvceditor::IconImageAsset(wxT("recent-urls"));
+    wxBitmap browserBitmap = t4p::IconImageAsset(wxT("browser-generic"));
+	wxBitmap runBitmap = t4p::IconImageAsset(wxT("run-browser"));
+	wxBitmap searchUrlBitmap = t4p::IconImageAsset(wxT("search-url-tags"));
+	wxBitmap recentUrlBitmap = t4p::IconImageAsset(wxT("recent-urls"));
 
-	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
-    BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
+	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
+    BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
 	BrowserToolbar->AddSeparator();
-    BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"), recentUrlBitmap);
-    BrowserToolbar->SetToolDropDown(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
+    BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"), recentUrlBitmap);
+    BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
 	
 	
-	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Run In Web Browser"), runBitmap);
-	BrowserToolbar->AddTool(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, _("Search for URLs..."), searchUrlBitmap);
+	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Run In Web Browser"), runBitmap);
+	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, _("Search for URLs..."), searchUrlBitmap);
 	BrowserToolbar->SetOverflowVisible(false);
     BrowserToolbar->Realize();
 
@@ -166,13 +166,13 @@ void mvceditor::RunBrowserFeatureClass::AddWindows() {
 	);
 }
 
-void mvceditor::RunBrowserFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::RunBrowserFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	//std::map<int, wxString> menuItemIds;
-	//menuItemIds[mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
+	//menuItemIds[t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
 	//AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 	// dont use the config; use the Environment that has already been seeded with 
 	// the proper data
@@ -182,17 +182,17 @@ void mvceditor::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 		App.Globals.ChosenBrowser = browserNames[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
+		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
 		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
 		if (index >= 0 && index < (int)browserIcons.size()) {		
-			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
+			BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
 		BrowserToolbar->Realize();
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 
 	// need to update the browser toolbar if the user updates the environment
 	std::vector<wxString> browserNames = App.Globals.Environment.BrowserNames();
@@ -203,27 +203,27 @@ void mvceditor::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event
 		App.Globals.ChosenBrowser = browserNames[0];
 	}
 	if (BrowserToolbar) {
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
+		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
 		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
 		if (index >= 0 && index < (int)browserIcons.size()) {		
-			BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
+			BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnRunInWebBrowser(wxCommandEvent& event) {
+void t4p::RunBrowserFeatureClass::OnRunInWebBrowser(wxCommandEvent& event) {
 	wxString browserName = App.Globals.ChosenBrowser;
 	wxURI url = App.Globals.CurrentUrl.Url;
 	if (!browserName.IsEmpty() && !url.BuildURI().IsEmpty()) {
-		mvceditor::EnvironmentClass* environment = GetEnvironment();
+		t4p::EnvironmentClass* environment = GetEnvironment();
 		ExternalBrowser(browserName, url, environment);
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
+void t4p::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent& event) {
 	if (!event.IsDropDownClicked()) {
 		event.Skip();
 		return;
@@ -241,7 +241,7 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent&
 	std::vector<wxString> browserNames = App.Globals.Environment.BrowserNames();
 	for (size_t i = 0; i < browserNames.size();  ++i) {
 		wxString browserName = browserNames[i];
-		wxMenuItem* menuItem =  new wxMenuItem(BrowserMenu.get(), mvceditor::MENU_RUN_BROWSER + i, browserName);
+		wxMenuItem* menuItem =  new wxMenuItem(BrowserMenu.get(), t4p::MENU_RUN_BROWSER + i, browserName);
 		BrowserIconsMenuSet(browserIcons, menuItem);
 		BrowserMenu->Append(menuItem);
 	}
@@ -256,12 +256,12 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown(wxAuiToolBarEvent&
 	BrowserToolbar->SetToolSticky(event.GetId(), false);
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
+void t4p::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 	if (event.IsDropDownClicked()) {
 		if (RecentUrls.empty()) {
 			return;
 		}
-		wxBitmap recentUrlBitmap = mvceditor::IconImageAsset(wxT("recent-urls"));
+		wxBitmap recentUrlBitmap = t4p::IconImageAsset(wxT("recent-urls"));
 
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		
@@ -278,7 +278,7 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 			// make sure to watch out for ampersans in the URL, so that the menu does not think 
 			// they are menu accelerators
 			url.Replace(wxT("&"), wxT("&&"));
-			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + i, url);
+			wxMenuItem* menuItem =  new wxMenuItem(UrlMenu.get(), t4p::MENU_RUN_BROWSER + MAX_BROWSERS + i, url);
 			menuItem->SetBitmap(recentUrlBitmap);
 			UrlMenu->Append(menuItem);
 		}
@@ -297,13 +297,13 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& eve
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
+void t4p::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 	std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();
 	if (IsUrlCacheStale) {
 		IsWaitingForUrlDetection = true;
 
-		mvceditor::UrlTagDetectorActionClass* action = new mvceditor::UrlTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR);
-		std::vector<mvceditor::GlobalActionClass*> actions;
+		t4p::UrlTagDetectorActionClass* action = new t4p::UrlTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR);
+		std::vector<t4p::GlobalActionClass*> actions;
 		actions.push_back(action);
 		App.Sequences.Build(actions);
 
@@ -311,29 +311,29 @@ void mvceditor::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 			GaugeDialog->Destroy();
 			GaugeDialog = NULL;
 		}
-		GaugeDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
+		GaugeDialog = new t4p::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
 	}
 	else if (App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
 		ShowUrlDialog();
 	}
 	else {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER,
+		t4p::EditorLogWarning(t4p::WARNING_OTHER,
 			_("Could not determine URL routes."));
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
-	mvceditor::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlTagFinder, App.Globals.Projects, App.Globals.CurrentUrl);
+void t4p::RunBrowserFeatureClass::ShowUrlDialog() {
+	t4p::ChooseUrlDialogClass dialog(GetMainWindow(), App.Globals.UrlTagFinder, App.Globals.Projects, App.Globals.CurrentUrl);
 	if (wxOK == dialog.ShowModal() && !App.Globals.CurrentUrl.Url.BuildURI().IsEmpty()) {
 				
 		// 'select' the URL (make it the current in the toolbar)
-		BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App.Globals.CurrentUrl.Url.BuildURI());
+		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, App.Globals.CurrentUrl.Url.BuildURI());
 		BrowserToolbar->Realize();
 		AuiManager->Update();
 
 		// add it to the Recent list, or push up to the top of the Recent list if its already there
 		bool found = false;
-		for (std::vector<mvceditor::UrlTagClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
+		for (std::vector<t4p::UrlTagClass>::iterator it = RecentUrls.begin(); it  != RecentUrls.end(); ++it) {
 			if (it->Url == App.Globals.CurrentUrl.Url) {
 				found = true;
 				RecentUrls.erase(it);
@@ -344,7 +344,7 @@ void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
 		if (!found) {
 			RecentUrls.insert(RecentUrls.begin(), App.Globals.CurrentUrl);
 		}
-		mvceditor::EnvironmentClass* environment = GetEnvironment();
+		t4p::EnvironmentClass* environment = GetEnvironment();
 		wxString browserName = App.Globals.ChosenBrowser;
 		if (!browserName.IsEmpty()) {
 			ExternalBrowser(browserName, App.Globals.CurrentUrl.Url, environment);
@@ -352,7 +352,7 @@ void mvceditor::RunBrowserFeatureClass::ShowUrlDialog() {
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
+void t4p::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
 
 	// detect the chosen browser based on the menu item name
 	// change the current selection only if name is found
@@ -366,9 +366,9 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& ev
 
 			std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 			int browserIndex = BrowserIconsIndex(browserIcons, name);
-			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
+			BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
 			if (browserIndex >= 0 && browserIndex < (int)browserIcons.size()) {
-				BrowserToolbar->SetToolBitmap(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[browserIndex]);
+				BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[browserIndex]);
 			}
 			BrowserToolbar->Realize();
 			AuiManager->Update();
@@ -376,14 +376,14 @@ void mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event) {
+void t4p::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event) {
 	
 	// detect the chosen url based on the menu item name
 	// change the current selection only if name is found
 	// change both the data structure and the toolbar 
 	if (UrlMenu.get()) {
 		wxString name = UrlMenu->GetLabelText(event.GetId());
-		mvceditor::UrlTagClass urlTag;
+		t4p::UrlTagClass urlTag;
 		bool found = false;
 		for (size_t i = 0; i < RecentUrls.size(); i++) {
 			if (RecentUrls[i].Url.BuildURI() == name) {
@@ -394,25 +394,25 @@ void mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem(wxCommandEvent& event)
 		}
 		if (found) {
 			App.Globals.CurrentUrl = urlTag;
-			BrowserToolbar->SetToolLabel(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);
+			BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, name);
 			BrowserToolbar->Realize();
 			AuiManager->Update();
 		}
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
+void t4p::RunBrowserFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	if (IsUrlCacheStale) {
 
 		// already know that cache is stale, then no need to check for dirty again
 		return;
 	}
-	mvceditor::CodeControlClass* control = event.GetCodeControl();
+	t4p::CodeControlClass* control = event.GetCodeControl();
 	if (!control) {
 		return;
 	}
 	wxString fileName = control->GetFileName();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<t4p::ProjectClass>::const_iterator project;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
 			IsUrlCacheStale = true;
@@ -421,7 +421,7 @@ void mvceditor::RunBrowserFeatureClass::OnFileSaved(mvceditor::CodeControlEventC
 	}
 }
 
-void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(mvceditor::ActionEventClass& event) {
+void t4p::RunBrowserFeatureClass::OnUrlDetectionComplete(t4p::ActionEventClass& event) {
 	IsUrlCacheStale = false;
 	if (!IsWaitingForUrlDetection) {
 
@@ -438,18 +438,18 @@ void mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete(mvceditor::Action
 	ShowUrlDialog();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::RunBrowserFeatureClass, wxEvtHandler) 
+BEGIN_EVENT_TABLE(t4p::RunBrowserFeatureClass, wxEvtHandler) 
 	
-	// if the end values of the ranges need to be modified, need to modify mvceditor::FeatureClass::MenuIds as well
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + 0, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS - 1, mvceditor::RunBrowserFeatureClass::OnBrowserToolMenuItem)
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS, mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS - 1, mvceditor::RunBrowserFeatureClass::OnUrlToolMenuItem)
-	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, mvceditor::RunBrowserFeatureClass::OnRunInWebBrowser)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, mvceditor::RunBrowserFeatureClass::OnBrowserToolDropDown)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, mvceditor::RunBrowserFeatureClass::OnUrlToolDropDown)
-	EVT_TOOL(mvceditor::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, mvceditor::RunBrowserFeatureClass::OnUrlSearchTool)
+	// if the end values of the ranges need to be modified, need to modify t4p::FeatureClass::MenuIds as well
+	EVT_MENU_RANGE(t4p::MENU_RUN_BROWSER + 0, t4p::MENU_RUN_BROWSER + MAX_BROWSERS - 1, t4p::RunBrowserFeatureClass::OnBrowserToolMenuItem)
+	EVT_MENU_RANGE(t4p::MENU_RUN_BROWSER + MAX_BROWSERS, t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS - 1, t4p::RunBrowserFeatureClass::OnUrlToolMenuItem)
+	EVT_TOOL(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, t4p::RunBrowserFeatureClass::OnRunInWebBrowser)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, t4p::RunBrowserFeatureClass::OnBrowserToolDropDown)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, t4p::RunBrowserFeatureClass::OnUrlToolDropDown)
+	EVT_TOOL(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, t4p::RunBrowserFeatureClass::OnUrlSearchTool)
 
 	// application events
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::RunBrowserFeatureClass::OnPreferencesSaved)
-	EVT_APP_FILE_SAVED(mvceditor::RunBrowserFeatureClass::OnFileSaved)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::RunBrowserFeatureClass::OnUrlDetectionComplete)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::RunBrowserFeatureClass::OnPreferencesSaved)
+	EVT_APP_FILE_SAVED(t4p::RunBrowserFeatureClass::OnFileSaved)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR, t4p::RunBrowserFeatureClass::OnUrlDetectionComplete)
 END_EVENT_TABLE()

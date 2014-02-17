@@ -22,13 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GLOBALACTIONCLASS_H__
-#define __MVCEDITOR_GLOBALACTIONCLASS_H__
+#ifndef __T4P_GLOBALACTIONCLASS_H__
+#define __T4P_GLOBALACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
 #include <globals/GlobalsClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * An action is any short or long-lived process that reads Global data structures
@@ -40,13 +40,13 @@ namespace mvceditor {
  * assignment operator and copy constructors are NOT thread-safe (produce
  * shallow copies)
  */
-class GlobalActionClass : public mvceditor::ActionClass {
+class GlobalActionClass : public t4p::ActionClass {
 
 public:
 
-	GlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	virtual bool Init(mvceditor::GlobalsClass& globals) = 0;
+	virtual bool Init(t4p::GlobalsClass& globals) = 0;
 
 	virtual bool DoAsync();
 };
@@ -56,15 +56,15 @@ public:
  * small, quick actions that modify GlobalsClass in a specific 
  * manner. 
  */
-class InitializerGlobalActionClass : public mvceditor::GlobalActionClass {
+class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	InitializerGlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
-	virtual void Work(mvceditor::GlobalsClass& globals) = 0;
+	virtual void Work(t4p::GlobalsClass& globals) = 0;
 
 	void BackgroundWork();
 

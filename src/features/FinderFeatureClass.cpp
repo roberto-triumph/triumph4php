@@ -42,16 +42,16 @@ static const int ID_REGEX_MENU_START = 11000;
 static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
 static const int ID_REGEX_REPLACE_MENU_START = 13000;
 
-mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId, 
-											  mvceditor::FinderClass& finder,
-											  mvceditor::NotebookClass* notebook, wxAuiManager* auiManager)
+t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId, 
+											  t4p::FinderClass& finder,
+											  t4p::NotebookClass* notebook, wxAuiManager* auiManager)
 		: FinderPanelGeneratedClass(parent, windowId)
 		, Finder(finder)
 		, ComboBoxHistory(FindText)
 		, Notebook(notebook)
 		, AuiManager(auiManager) 
 		, CurrentInsertionPointFind(0) {
-	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
+	t4p::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
@@ -69,18 +69,18 @@ mvceditor::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId,
 	TransferDataToWindow();
 }
 
-void mvceditor::FinderPanelClass::SetFocusOnFindText() {
+void t4p::FinderPanelClass::SetFocusOnFindText() {
 	FindText->SetFocus();
 }
 
-void mvceditor::FinderPanelClass::SetExpression(const wxString& expression) {
+void t4p::FinderPanelClass::SetExpression(const wxString& expression) {
 	FindText->SetValue(expression);
 	
 	// set the expression on the underlying finder  object
 	TransferDataFromWindow();
 }
 
-void mvceditor::FinderPanelClass::FindNext() {
+void t4p::FinderPanelClass::FindNext() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find();
@@ -95,7 +95,7 @@ void mvceditor::FinderPanelClass::FindNext() {
 	}	
 }
 
-void mvceditor::FinderPanelClass::FindPrevious() {
+void t4p::FinderPanelClass::FindPrevious() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find(false);
@@ -110,7 +110,7 @@ void mvceditor::FinderPanelClass::FindPrevious() {
 	}	
 }
 
-void mvceditor::FinderPanelClass::Find(bool findNext) {
+void t4p::FinderPanelClass::Find(bool findNext) {
 	
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = 
@@ -141,12 +141,12 @@ void mvceditor::FinderPanelClass::Find(bool findNext) {
 	}
 }
 
-void mvceditor::FinderPanelClass::OnNextButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnNextButton(wxCommandEvent& event) {
 	FindNext();
 	ComboBoxHistory.Save();
 }
 
-void mvceditor::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii("Find modes:\n"
 	  "Exact:\n"
 	  "Searching will be done using exact, case sensitive matching\n\n"
@@ -159,16 +159,16 @@ void mvceditor::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Find Help"), wxOK, this);
 }
 
-void mvceditor::FinderPanelClass::OnOkButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnOkButton(wxCommandEvent& event) {
 	Show(false);
 }
 
-void mvceditor::FinderPanelClass::OnPreviousButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnPreviousButton(wxCommandEvent& event) {
 	FindPrevious();
 	ComboBoxHistory.Save();
 }
 
-void mvceditor::FinderPanelClass::SetStatus(const wxString& message) {
+void t4p::FinderPanelClass::SetStatus(const wxString& message) {
 	ResultText->SetLabel(message);
 	
 	// label might grow/shrink according to new text, must
@@ -184,35 +184,35 @@ void mvceditor::FinderPanelClass::SetStatus(const wxString& message) {
 	Refresh();
 }
 
-void mvceditor::FinderPanelClass::OnCloseButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnCloseButton(wxCommandEvent& event) {
 	AuiManager->GetPane(this).Hide();
 	AuiManager->Update();
 
 	// give focus back to the code control
 	// better user experience
-	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->SetFocus();
 	}
 }
 
-void mvceditor::FinderPanelClass::OnFindEnter(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnFindEnter(wxCommandEvent& event) {
 	OnNextButton(event);
 }
 
-void mvceditor::FinderPanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
+void t4p::FinderPanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
+	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
-void mvceditor::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
+void t4p::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
 	int id = event.GetId() - ID_REGEX_MENU_START;
-	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
+	t4p::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
-void mvceditor::FinderPanelClass::OnFindKillFocus(wxFocusEvent& event) {
+void t4p::FinderPanelClass::OnFindKillFocus(wxFocusEvent& event) {
 
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -221,14 +221,14 @@ void mvceditor::FinderPanelClass::OnFindKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
+void t4p::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
 
 		// give focus back to the code control
 		// better user experience
-		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
@@ -238,8 +238,8 @@ void mvceditor::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	}	
 }
 
-mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder,
-												mvceditor::NotebookClass* notebook, wxAuiManager* auiManager)
+t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder,
+												t4p::NotebookClass* notebook, wxAuiManager* auiManager)
 		: ReplacePanelGeneratedClass(parent, windowId)
 		, Finder(finder)
 		, FindHistory(FindText)
@@ -248,7 +248,7 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, 
 		, AuiManager(auiManager)
 		, CurrentInsertionPointFind(0) 
 		, CurrentInsertionPointReplace(0) {
-	mvceditor::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
+	t4p::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
 	wxGenericValidator modeValidator(&Finder.Mode);
 	FinderMode->SetValidator(modeValidator);
@@ -276,18 +276,18 @@ mvceditor::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, 
 	TransferDataToWindow();
 }
 
-void mvceditor::ReplacePanelClass::SetFocusOnFindText() {
+void t4p::ReplacePanelClass::SetFocusOnFindText() {
 	FindText->SetFocus();
 }
 
-void mvceditor::ReplacePanelClass::SetExpression(const wxString& expression) {
+void t4p::ReplacePanelClass::SetExpression(const wxString& expression) {
 	FindText->SetValue(expression);
 	
 	// set the expression on the underlying finder  object
 	TransferDataFromWindow();
 }
 
-void mvceditor::ReplacePanelClass::FindNext() {
+void t4p::ReplacePanelClass::FindNext() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find();
@@ -302,7 +302,7 @@ void mvceditor::ReplacePanelClass::FindNext() {
 	}	
 }
 
-void mvceditor::ReplacePanelClass::FindPrevious() {
+void t4p::ReplacePanelClass::FindPrevious() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find(false);
@@ -317,7 +317,7 @@ void mvceditor::ReplacePanelClass::FindPrevious() {
 	}	
 }
 
-void mvceditor::ReplacePanelClass::Find(bool findNext) {
+void t4p::ReplacePanelClass::Find(bool findNext) {
 	
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = 
@@ -349,12 +349,12 @@ void mvceditor::ReplacePanelClass::Find(bool findNext) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnNextButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnNextButton(wxCommandEvent& event) {
 	FindNext();
 	FindHistory.Save();
 }
 
-void mvceditor::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii("Find modes:\n"
 	  "Exact:\n"
 	  "Searching will be done using exact, case sensitive matching\n\n"
@@ -367,16 +367,16 @@ void mvceditor::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Replace Help"), wxOK, this);
 }
 
-void mvceditor::ReplacePanelClass::OnOkButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnOkButton(wxCommandEvent& event) {
 	Show(false);
 }
 
-void mvceditor::ReplacePanelClass::OnPreviousButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnPreviousButton(wxCommandEvent& event) {
 	FindPrevious();
 	FindHistory.Save();
 }
 
-void mvceditor::ReplacePanelClass::SetStatus(const wxString& message) {
+void t4p::ReplacePanelClass::SetStatus(const wxString& message) {
 	ResultText->SetLabel(message);
 	
 	// label might grow/shrink according to new text, must
@@ -392,21 +392,21 @@ void mvceditor::ReplacePanelClass::SetStatus(const wxString& message) {
 	Refresh();
 }
 
-void mvceditor::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
 	AuiManager->GetPane(this).Hide();
 	AuiManager->Update();
 
 	// give focus back to the code control
 	// better user experience
-	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->SetFocus();
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
-		mvceditor::CodeControlClass* codeControl = 
+		t4p::CodeControlClass* codeControl = 
 				Notebook->GetCodeControl(Notebook->GetSelection());	
 		int32_t position = 0,
 			length = 0;
@@ -417,7 +417,7 @@ void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 		if (codeControl && Finder.GetLastMatch(position, length) &&
 			Finder.GetLastReplacementText(text, replaceText)) {
 			codeControl->SetSelectionByCharacterPosition(position, position + length);
-			codeControl->ReplaceSelection(mvceditor::IcuToWx(replaceText));
+			codeControl->ReplaceSelection(t4p::IcuToWx(replaceText));
 			codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length());
 			Find(true);
 			ReplaceHistory.Save();
@@ -428,7 +428,7 @@ void mvceditor::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow() && Finder.Prepare()) {
 		
 		// if user changed tabs, GetLastReplacementText will return false
@@ -447,8 +447,8 @@ void mvceditor::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeControl = 
+void t4p::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
 			
 	// if user changes to new tab, undo will undo changes to that file
@@ -465,15 +465,15 @@ void mvceditor::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnFindEnter(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnFindEnter(wxCommandEvent& event) {
 	OnNextButton(event);
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceEnter(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceEnter(wxCommandEvent& event) {
 	OnReplaceButton(event);
 }
 
-void mvceditor::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
+void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
@@ -489,7 +489,7 @@ void mvceditor::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 
 		// give focus back to the code control
 		// better user experience
-		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
@@ -499,7 +499,7 @@ void mvceditor::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
@@ -517,7 +517,7 @@ void mvceditor::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 
 		// give focus back to the code control
 		// better user experience
-		mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
@@ -527,37 +527,37 @@ void mvceditor::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ReplacePanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_REPLACE_FIND_MENU_START);
+	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_REPLACE_FIND_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceRegExFindHelpButton(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	t4p::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
 	PopupMenu(&regExMenu);
 }
 
-void mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
 	wxString symbols;
 	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
-	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id,CurrentInsertionPointReplace);
+	t4p::AddSymbolToReplaceRegularExpression(ReplaceWithText, id,CurrentInsertionPointReplace);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
-void mvceditor::ReplacePanelClass::InsertRegExSymbol(wxCommandEvent& event) {
+void t4p::ReplacePanelClass::InsertRegExSymbol(wxCommandEvent& event) {
 	int id = event.GetId() -  ID_REGEX_REPLACE_FIND_MENU_START;
-	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
+	t4p::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
-void mvceditor::ReplacePanelClass::EnableReplaceButtons(bool enable) {
+void t4p::ReplacePanelClass::EnableReplaceButtons(bool enable) {
 	ReplaceButton->Enable(enable);
 	UndoButton->Enable(enable);
 }
 
-void mvceditor::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
+void t4p::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
 
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -566,7 +566,7 @@ void mvceditor::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
+void t4p::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
 
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -575,31 +575,31 @@ void mvceditor::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 
-mvceditor::FinderFeatureClass::FinderFeatureClass(mvceditor::AppClass& app)
+t4p::FinderFeatureClass::FinderFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) 
 	, Finder()
 	, FinderReplace() {
 }
 	
-void mvceditor::FinderFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(mvceditor::MENU_FINDER + 0, _("Find\tCTRL+F"), _("Find"));
-	editMenu->Append(mvceditor::MENU_FINDER + 1, _("Find Next\tF3"), _("Advance to the next match"));
-	editMenu->Append(mvceditor::MENU_FINDER + 2, _("Find Previous\tSHIFT+F3"), _("Advance to the previous match"));
-	editMenu->Append(mvceditor::MENU_FINDER + 3, _("Replace\tCTRL+H"), _("Find and Replace in current file"));
-	editMenu->Append(mvceditor::MENU_FINDER + 4, _("Go To Line\tCTRL+G"), _("Go To Line"));
+void t4p::FinderFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+	editMenu->Append(t4p::MENU_FINDER + 0, _("Find\tCTRL+F"), _("Find"));
+	editMenu->Append(t4p::MENU_FINDER + 1, _("Find Next\tF3"), _("Advance to the next match"));
+	editMenu->Append(t4p::MENU_FINDER + 2, _("Find Previous\tSHIFT+F3"), _("Advance to the previous match"));
+	editMenu->Append(t4p::MENU_FINDER + 3, _("Replace\tCTRL+H"), _("Find and Replace in current file"));
+	editMenu->Append(t4p::MENU_FINDER + 4, _("Go To Line\tCTRL+G"), _("Go To Line"));
 }
 
-void mvceditor::FinderFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::FinderFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_FINDER + 0] = wxT("Find-Show Find Panel");
-	menuItemIds[mvceditor::MENU_FINDER + 1] = wxT("Find-Next");
-	menuItemIds[mvceditor::MENU_FINDER + 2] = wxT("Find-Previous");
-	menuItemIds[mvceditor::MENU_FINDER + 3] = wxT("Find-Replace");
-	menuItemIds[mvceditor::MENU_FINDER + 4] = wxT("Find-Go To Line");
+	menuItemIds[t4p::MENU_FINDER + 0] = wxT("Find-Show Find Panel");
+	menuItemIds[t4p::MENU_FINDER + 1] = wxT("Find-Next");
+	menuItemIds[t4p::MENU_FINDER + 2] = wxT("Find-Previous");
+	menuItemIds[t4p::MENU_FINDER + 3] = wxT("Find-Replace");
+	menuItemIds[t4p::MENU_FINDER + 4] = wxT("Find-Go To Line");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Finder/Wrap"), &Finder.Wrap);
 	config->Read(wxT("/Finder/Mode"), &Finder.Mode);
 	config->Read(wxT("/Finder/ReplaceWrap"), &FinderReplace.Wrap);
@@ -607,7 +607,7 @@ void mvceditor::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
 
-void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
+void t4p::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	parent->Freeze();
 	bool transferExpression = false;
@@ -634,7 +634,7 @@ void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 		FinderPanelClass* panel = (FinderPanelClass*) window;
 		wxString selectedText = GetSelectedText();
 		if (selectedText.empty() && transferExpression) {
-			selectedText = mvceditor::IcuToWx(FinderReplace.Expression);
+			selectedText = t4p::IcuToWx(FinderReplace.Expression);
 		}
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
@@ -646,8 +646,8 @@ void mvceditor::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 	AuiManager->Update();
 }
 	
-void mvceditor::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+void t4p::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
@@ -659,8 +659,8 @@ void mvceditor::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
 	}
 }
 	
-void mvceditor::FinderFeatureClass::OnEditFindPrevious(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeControl  = GetCurrentCodeControl();
+void t4p::FinderFeatureClass::OnEditFindPrevious(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl  = GetCurrentCodeControl();
 	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
@@ -671,7 +671,7 @@ void mvceditor::FinderFeatureClass::OnEditFindPrevious(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
+void t4p::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	parent->Freeze();
 	bool transferExpression = false; 
@@ -700,7 +700,7 @@ void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 		ReplacePanelClass* panel = (ReplacePanelClass*) window;
 		wxString selectedText = GetSelectedText();
 		if (selectedText.empty() && transferExpression) {
-			selectedText = mvceditor::IcuToWx(Finder.Expression);
+			selectedText = t4p::IcuToWx(Finder.Expression);
 		}
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
@@ -712,7 +712,7 @@ void mvceditor::FinderFeatureClass::OnEditReplace(wxCommandEvent& event) {
 	AuiManager->Update();
 }
 
-void mvceditor::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
+void t4p::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int maxLines = codeControl->GetLineCount();
@@ -727,8 +727,8 @@ void mvceditor::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::FinderFeatureClass::OnDoubleClick(wxStyledTextEvent& event) {
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::FinderFeatureClass::OnDoubleClick(wxStyledTextEvent& event) {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl) {
 		return;
 	}
@@ -742,20 +742,20 @@ void mvceditor::FinderFeatureClass::OnDoubleClick(wxStyledTextEvent& event) {
 		
 		// GET_TEXT  message
 		ctrl->SendMsg(2182, documentLength, (long)buf);
-		mvceditor::FinderActionClass* action = new mvceditor::FinderActionClass(App.RunningThreads, ID_FINDER_ACTION, word,
+		t4p::FinderActionClass* action = new t4p::FinderActionClass(App.RunningThreads, ID_FINDER_ACTION, word,
 			buf, documentLength);
 		App.RunningThreads.Queue(action);
 	}
 }
 
-void mvceditor::FinderFeatureClass::OnFinderHit(mvceditor::FinderHitEventClass& event) {
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::FinderFeatureClass::OnFinderHit(t4p::FinderHitEventClass& event) {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 		ctrl->HighlightWord(event.Start, event.Length);
 	}
 }
 
-mvceditor::FinderActionClass::FinderActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+t4p::FinderActionClass::FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const UnicodeString& search, char* utf8Buf, int bufLength)
 : ActionClass(runningThreads, eventId)
 , Finder()
@@ -763,14 +763,14 @@ mvceditor::FinderActionClass::FinderActionClass(mvceditor::RunningThreadsClass& 
 , Utf8Buf(utf8Buf) 
 , BufferLength(bufLength) {
 	Finder.Expression = search;
-	Finder.Mode = mvceditor::FinderClass::EXACT;
+	Finder.Mode = t4p::FinderClass::EXACT;
 }
 
-void mvceditor::FinderActionClass::BackgroundWork() {
+void t4p::FinderActionClass::BackgroundWork() {
 	if (!Finder.Prepare()) {
 		return;
 	}
-	Code = mvceditor::CharToIcu(Utf8Buf);
+	Code = t4p::CharToIcu(Utf8Buf);
 	int32_t nextIndex(0);
 	bool found = Finder.FindNext(Code, nextIndex);
 	int32_t matchStart(0);
@@ -778,10 +778,10 @@ void mvceditor::FinderActionClass::BackgroundWork() {
 	while (found) {
 		if (Finder.GetLastMatch(matchStart, matchLength)) {
 			// convert match back to UTF-8 ugh
-			int utf8Start = mvceditor::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart);
-			int utf8End = mvceditor::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart + matchLength);
+			int utf8Start = t4p::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart);
+			int utf8End = t4p::CharToUtf8Pos(Utf8Buf, BufferLength, matchStart + matchLength);
 
-			mvceditor::FinderHitEventClass hit(GetEventId(), utf8Start, utf8End - utf8Start);
+			t4p::FinderHitEventClass hit(GetEventId(), utf8Start, utf8End - utf8Start);
 			PostEvent(hit);
 			nextIndex = matchStart + matchLength + 1; // prevent infinite find next's
 		}
@@ -794,86 +794,86 @@ void mvceditor::FinderActionClass::BackgroundWork() {
 	
 }
 
-wxString mvceditor::FinderActionClass::GetLabel() const {
+wxString t4p::FinderActionClass::GetLabel() const {
 	return wxT("Finder Search");
 }
 
-mvceditor::FinderHitEventClass::FinderHitEventClass(int id, int start, int length)
-: wxEvent(id, mvceditor::EVENT_FINDER_ACTION)
+t4p::FinderHitEventClass::FinderHitEventClass(int id, int start, int length)
+: wxEvent(id, t4p::EVENT_FINDER_ACTION)
 , Start(start)
 , Length(length) {
 	
 }
 
-wxEvent* mvceditor::FinderHitEventClass::Clone() const {
-	return new mvceditor::FinderHitEventClass(GetId(), Start, Length);
+wxEvent* t4p::FinderHitEventClass::Clone() const {
+	return new t4p::FinderHitEventClass(GetId(), Start, Length);
 }
 
-const wxEventType mvceditor::EVENT_FINDER_ACTION = wxNewEventType();
+const wxEventType t4p::EVENT_FINDER_ACTION = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::FinderPanelClass, FinderPanelGeneratedClass)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ZERO, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_STRING, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, mvceditor::FinderPanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::FinderPanelClass::InsertRegExSymbol)
+BEGIN_EVENT_TABLE(t4p::FinderPanelClass, FinderPanelGeneratedClass)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ZERO, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_STRING, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, t4p::FinderPanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, t4p::FinderPanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::ReplacePanelClass, ReplacePanelGeneratedClass)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::ReplacePanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_STRING, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, mvceditor::ReplacePanelClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::ReplacePanelClass::InsertRegExSymbol)
+BEGIN_EVENT_TABLE(t4p::ReplacePanelClass, ReplacePanelGeneratedClass)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, t4p::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, t4p::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, t4p::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, t4p::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, t4p::ReplacePanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_END_OF_LINE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DIGIT, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_COMMENT, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_DOT_ALL, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_MULTI_LINE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_UWORD, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_STRING, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, t4p::ReplacePanelClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, t4p::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::FinderFeatureClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_FINDER + 0, mvceditor::FinderFeatureClass::OnEditFind)
-	EVT_MENU(mvceditor::MENU_FINDER + 1, mvceditor::FinderFeatureClass::OnEditFindNext)
-	EVT_MENU(mvceditor::MENU_FINDER + 2, mvceditor::FinderFeatureClass::OnEditFindPrevious)
-	EVT_MENU(mvceditor::MENU_FINDER + 3, mvceditor::FinderFeatureClass::OnEditReplace)
-	EVT_MENU(mvceditor::MENU_FINDER + 4, mvceditor::FinderFeatureClass::OnEditGoToLine)
-	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::FinderFeatureClass::OnDoubleClick)
-	EVT_FINDER(ID_FINDER_ACTION, mvceditor::FinderFeatureClass::OnFinderHit)
+BEGIN_EVENT_TABLE(t4p::FinderFeatureClass, wxEvtHandler) 
+	EVT_MENU(t4p::MENU_FINDER + 0, t4p::FinderFeatureClass::OnEditFind)
+	EVT_MENU(t4p::MENU_FINDER + 1, t4p::FinderFeatureClass::OnEditFindNext)
+	EVT_MENU(t4p::MENU_FINDER + 2, t4p::FinderFeatureClass::OnEditFindPrevious)
+	EVT_MENU(t4p::MENU_FINDER + 3, t4p::FinderFeatureClass::OnEditReplace)
+	EVT_MENU(t4p::MENU_FINDER + 4, t4p::FinderFeatureClass::OnEditGoToLine)
+	EVT_STC_DOUBLECLICK(wxID_ANY, t4p::FinderFeatureClass::OnDoubleClick)
+	EVT_FINDER(ID_FINDER_ACTION, t4p::FinderFeatureClass::OnFinderHit)
 END_EVENT_TABLE()
 

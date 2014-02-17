@@ -43,56 +43,56 @@ int ID_CLOSE_TAB = wxNewId();
  * to show in the notebook tab based on the document
  * mode.
  */
-static int ImageId(mvceditor::CodeControlClass::Mode mode) {
-	int imgId = mvceditor::IMGLIST_NONE;
+static int ImageId(t4p::CodeControlClass::Mode mode) {
+	int imgId = t4p::IMGLIST_NONE;
 	switch (mode) {
-	case mvceditor::CodeControlClass::TEXT:
-		imgId = mvceditor::IMGLIST_MISC;
+	case t4p::CodeControlClass::TEXT:
+		imgId = t4p::IMGLIST_MISC;
 		break;
-	case mvceditor::CodeControlClass::SQL:
-		imgId = mvceditor::IMGLIST_SQL;
+	case t4p::CodeControlClass::SQL:
+		imgId = t4p::IMGLIST_SQL;
 		break;
-	case mvceditor::CodeControlClass::CSS:
-		imgId = mvceditor::IMGLIST_CSS;
+	case t4p::CodeControlClass::CSS:
+		imgId = t4p::IMGLIST_CSS;
 		break;
-	case mvceditor::CodeControlClass::PHP:
-		imgId = mvceditor::IMGLIST_PHP;
+	case t4p::CodeControlClass::PHP:
+		imgId = t4p::IMGLIST_PHP;
 		break;
-	case mvceditor::CodeControlClass::JS:
-		imgId = mvceditor::IMGLIST_JS;
+	case t4p::CodeControlClass::JS:
+		imgId = t4p::IMGLIST_JS;
 		break;
-	case mvceditor::CodeControlClass::CONFIG:
-		imgId = mvceditor::IMGLIST_CONFIG;
+	case t4p::CodeControlClass::CONFIG:
+		imgId = t4p::IMGLIST_CONFIG;
 		break;
-	case mvceditor::CodeControlClass::CRONTAB:
-		imgId = mvceditor::IMGLIST_CRONTAB;
+	case t4p::CodeControlClass::CRONTAB:
+		imgId = t4p::IMGLIST_CRONTAB;
 		break;
-	case mvceditor::CodeControlClass::YAML:
-		imgId = mvceditor::IMGLIST_YAML;
+	case t4p::CodeControlClass::YAML:
+		imgId = t4p::IMGLIST_YAML;
 		break;
-	case mvceditor::CodeControlClass::XML:
-		imgId = mvceditor::IMGLIST_XML;
+	case t4p::CodeControlClass::XML:
+		imgId = t4p::IMGLIST_XML;
 		break;
-	case mvceditor::CodeControlClass::RUBY:
-		imgId = mvceditor::IMGLIST_RUBY;
+	case t4p::CodeControlClass::RUBY:
+		imgId = t4p::IMGLIST_RUBY;
 		break;
-	case mvceditor::CodeControlClass::LUA:
-		imgId = mvceditor::IMGLIST_LUA;
+	case t4p::CodeControlClass::LUA:
+		imgId = t4p::IMGLIST_LUA;
 		break;
-	case mvceditor::CodeControlClass::MARKDOWN:
-		imgId = mvceditor::IMGLIST_MARKDOWN;
+	case t4p::CodeControlClass::MARKDOWN:
+		imgId = t4p::IMGLIST_MARKDOWN;
 		break;
-	case mvceditor::CodeControlClass::BASH:
-		imgId = mvceditor::IMGLIST_BASH;
+	case t4p::CodeControlClass::BASH:
+		imgId = t4p::IMGLIST_BASH;
 		break;
-	case mvceditor::CodeControlClass::DIFF:
-		imgId = mvceditor::IMGLIST_DIFF;
+	case t4p::CodeControlClass::DIFF:
+		imgId = t4p::IMGLIST_DIFF;
 		break;
 	}
 	return imgId;
 }
 
-mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
+t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
@@ -105,24 +105,24 @@ mvceditor::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	ImageList = NULL;
 }
 
-mvceditor::NotebookClass::~NotebookClass() {
+t4p::NotebookClass::~NotebookClass() {
 	delete ContextMenu;
 }
 
-mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCodeControl(size_t pageNumber) const {
-	mvceditor::CodeControlClass* codeControl = NULL;
+t4p::CodeControlClass* t4p::NotebookClass::GetCodeControl(size_t pageNumber) const {
+	t4p::CodeControlClass* codeControl = NULL;
 	if (pageNumber < GetPageCount()) {
 		wxWindow* window = GetPage(pageNumber);
-		codeControl = (mvceditor::CodeControlClass*)window;
+		codeControl = (t4p::CodeControlClass*)window;
 	}
 	return codeControl;
 }
 
-mvceditor::CodeControlClass* mvceditor::NotebookClass::GetCurrentCodeControl() const {
+t4p::CodeControlClass* t4p::NotebookClass::GetCurrentCodeControl() const {
 	return GetCodeControl(GetSelection());
 }
 
-void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
+void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	int currentPage = event.GetSelection();
 	bool vetoed = false;
 	CodeControlClass* codeCtrl = GetCodeControl(currentPage);
@@ -143,7 +143,7 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	if (!vetoed && codeCtrl) {
 
 		// tell the app that a file has been closed
-		mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_CLOSED, codeCtrl);
+		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_CLOSED, codeCtrl);
 		EventSink->Publish(codeControlEvent);
 	}
 	if (!vetoed) {
@@ -151,7 +151,7 @@ void mvceditor::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	}
 }
 
-bool mvceditor::NotebookClass::SavePage(int pageIndex) {
+bool t4p::NotebookClass::SavePage(int pageIndex) {
 	CodeControlClass* phpSourceCodeCtrl = GetCodeControl(
 			pageIndex);
 	bool saved = false;
@@ -176,7 +176,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 				SetPageText(pageIndex, newFilename);
 				saved = true;
 
-				wxCommandEvent createdEvt(mvceditor::EVENT_APP_FILE_CREATED);
+				wxCommandEvent createdEvt(t4p::EVENT_APP_FILE_CREATED);
 				createdEvt.SetString(newFullPath);
 				EventSink->Publish(createdEvt);
 			}
@@ -193,7 +193,7 @@ bool mvceditor::NotebookClass::SavePage(int pageIndex) {
 	return saved;
 }
 
-void mvceditor::NotebookClass::MarkPageAsModified(int windowId) {
+void t4p::NotebookClass::MarkPageAsModified(int windowId) {
 	int pageNumber = GetPageIndex(FindWindow(windowId));
 	wxString filename = GetPageText(pageNumber);
 	if (!filename.EndsWith(wxT("*"))) {
@@ -202,7 +202,7 @@ void mvceditor::NotebookClass::MarkPageAsModified(int windowId) {
 	}
 }
 
-void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
+void t4p::NotebookClass::MarkPageAsNotModified(int windowId) {
 	int pageNumber = GetPageIndex(FindWindow(windowId));
 	wxString filename = GetPageText(pageNumber);
 	if (filename.EndsWith(wxT("*"))) {
@@ -210,54 +210,54 @@ void mvceditor::NotebookClass::MarkPageAsNotModified(int windowId) {
 		SetPageText(pageNumber, filename);
 	}
 }
-void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode) {
+void t4p::NotebookClass::AddTriumphPage(t4p::CodeControlClass::Mode mode) {
 	if (NULL == ImageList) {
 		ImageList = new wxImageList(16, 16);
-		mvceditor::FillWithFileType(*ImageList);
+		t4p::FillWithFileType(*ImageList);
 		AssignImageList(ImageList);
 	}
 	wxString format;
 	switch (mode) {
-		case mvceditor::CodeControlClass::TEXT:
+		case t4p::CodeControlClass::TEXT:
 			format = _("Untitled %d.txt");
 			break;
-		case mvceditor::CodeControlClass::SQL:
+		case t4p::CodeControlClass::SQL:
 			format = _("Untitled %d.sql");
 			break;
-		case mvceditor::CodeControlClass::CSS:
+		case t4p::CodeControlClass::CSS:
 			format = _("Untitled %d.css");
 			break;
-		case mvceditor::CodeControlClass::PHP:
+		case t4p::CodeControlClass::PHP:
 			format = _("Untitled %d.php");
 			break;
-		case mvceditor::CodeControlClass::JS:
+		case t4p::CodeControlClass::JS:
 			format = _("Untitled %d.js");
 			break;
-		case mvceditor::CodeControlClass::CONFIG:
+		case t4p::CodeControlClass::CONFIG:
 			format = _("Untitled %d.conf");
 			break;
-		case mvceditor::CodeControlClass::CRONTAB:
+		case t4p::CodeControlClass::CRONTAB:
 			format = _("Untitled %d");
 			break;
-		case mvceditor::CodeControlClass::YAML:
+		case t4p::CodeControlClass::YAML:
 			format = _("Untitled %d.yml");
 			break;
-		case mvceditor::CodeControlClass::XML:
+		case t4p::CodeControlClass::XML:
 			format = _("Untitled %d.xml");
 			break;
-		case mvceditor::CodeControlClass::RUBY:
+		case t4p::CodeControlClass::RUBY:
 			format = _("Untitled %d.rb");
 			break;
-		case mvceditor::CodeControlClass::LUA:
+		case t4p::CodeControlClass::LUA:
 			format = _("Untitled %d.lua");
 			break;
-		case mvceditor::CodeControlClass::MARKDOWN:
+		case t4p::CodeControlClass::MARKDOWN:
 			format = _("Untitled %d.md");
 			break;
-		case mvceditor::CodeControlClass::BASH:
+		case t4p::CodeControlClass::BASH:
 			format = _("Untitled %d.sh");
 			break;
-		case mvceditor::CodeControlClass::DIFF:
+		case t4p::CodeControlClass::DIFF:
 			format = _("Untitled %d.diff");
 			break;
 	}
@@ -270,12 +270,12 @@ void mvceditor::NotebookClass::AddMvcEditorPage(mvceditor::CodeControlClass::Mod
 	
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, imgId);
 
-	mvceditor::CodeControlEventClass newEvent(mvceditor::EVENT_APP_FILE_NEW, page);
+	t4p::CodeControlEventClass newEvent(t4p::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
 	
 }
 
-void mvceditor::NotebookClass::LoadPage() {
+void t4p::NotebookClass::LoadPage() {
 	wxString fileFilter = CreateWildcardString();
 	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""), 
 			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
@@ -291,10 +291,10 @@ void mvceditor::NotebookClass::LoadPage() {
 	}
 }
 
-void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
+void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 	if (NULL == ImageList) {
 		ImageList = new wxImageList(16, 16);
-		mvceditor::FillWithFileType(*ImageList);
+		t4p::FillWithFileType(*ImageList);
 		AssignImageList(ImageList);
 	}
 	
@@ -330,14 +330,14 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 		UnicodeString fileContents;	
 
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
-		mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
-		if (error == mvceditor::FindInFilesClass::NONE) {
+		t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
+		if (error == t4p::FindInFilesClass::NONE) {
 
 			// make sure to use a unique ID, other source code depends on this
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents);
 
-			mvceditor::CodeControlClass::Mode mode = newCode->GetDocumentMode();
+			t4p::CodeControlClass::Mode mode = newCode->GetDocumentMode();
 			int imgId = ImageId(mode);
 			
 			// if user dragged in a file on an opened file we want still want to accept dragged files
@@ -346,14 +346,14 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 			this->AddPage(newCode, fileName.GetFullName(), true, imgId);
 
 			// tell the app that a file has been opened
-			mvceditor::CodeControlEventClass openEvent(mvceditor::EVENT_APP_FILE_OPENED, newCode);
+			t4p::CodeControlEventClass openEvent(t4p::EVENT_APP_FILE_OPENED, newCode);
 			EventSink->Publish(openEvent);
 		}
-		else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
-			mvceditor::EditorLogError(mvceditor::ERR_INVALID_FILE, filename);
+		else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
+			t4p::EditorLogError(t4p::ERR_INVALID_FILE, filename);
 		}
-		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, filename);
+		else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, filename);
 		}
 	}
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
@@ -361,7 +361,7 @@ void mvceditor::NotebookClass::LoadPage(const wxString& filename, bool doFreeze)
 	}
 }
 
-void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
+void t4p::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
 	
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
@@ -380,7 +380,7 @@ void mvceditor::NotebookClass::LoadPages(const std::vector<wxString>& filenames)
 	}
 }
 
-void mvceditor::NotebookClass::RefreshCodeControlOptions() {
+void t4p::NotebookClass::RefreshCodeControlOptions() {
 	for (size_t i = 0; i < GetPageCount(); ++i) {
 		CodeControlClass* control = GetCodeControl(i);
 		if (control) {
@@ -389,12 +389,12 @@ void mvceditor::NotebookClass::RefreshCodeControlOptions() {
 	}	
 }
 
-bool mvceditor::NotebookClass::SaveCurrentPage() {
+bool t4p::NotebookClass::SaveCurrentPage() {
 	int currentPage = GetSelection();
 	return SavePage(currentPage);
 }
 
-bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
+bool t4p::NotebookClass::SaveCurrentPageAsNew() {
 	int currentPage = GetSelection();
 	bool saved = false;
 	CodeControlClass* codeCtrl = GetCodeControl(currentPage);
@@ -413,7 +413,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 				// SaveAs should have no effect on the state of the
 				// code control so dont use the control's save methods
 				wxString newFullPath = fileDialog.GetPath();
-				wxString code = mvceditor::IcuToWx(codeCtrl->GetSafeText());
+				wxString code = t4p::IcuToWx(codeCtrl->GetSafeText());
 				wxFile saveAsFile(newFullPath, wxFile::write);
 				saved = saveAsFile.IsOpened() && saveAsFile.Write(code);
 				if (!saved) {
@@ -421,7 +421,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 				}
 				saveAsFile.Close();
 
-				wxCommandEvent createdEvt(mvceditor::EVENT_APP_FILE_CREATED);
+				wxCommandEvent createdEvt(t4p::EVENT_APP_FILE_CREATED);
 				createdEvt.SetString(newFullPath);
 				EventSink->Publish(createdEvt);
 			}
@@ -430,7 +430,7 @@ bool mvceditor::NotebookClass::SaveCurrentPageAsNew() {
 	return saved;
 }
 
-bool mvceditor::NotebookClass::SaveAllModifiedPages() {
+bool t4p::NotebookClass::SaveAllModifiedPages() {
 	std::vector<int> modifiedPageIndexes;
 	std::vector<wxString> modifiedPageNames;
 	bool changed = true;
@@ -458,7 +458,7 @@ bool mvceditor::NotebookClass::SaveAllModifiedPages() {
 	return changed;
 }
 
-void mvceditor::NotebookClass::SaveAllModifiedPagesWithoutPrompting() {
+void t4p::NotebookClass::SaveAllModifiedPagesWithoutPrompting() {
 	for (size_t i = 0; i < GetPageCount(); i++) {
 		if (IsPageModified(i)) {
 			SavePage(i);
@@ -466,12 +466,12 @@ void mvceditor::NotebookClass::SaveAllModifiedPagesWithoutPrompting() {
 	}
 }
 
-bool mvceditor::NotebookClass::IsPageModified(int pageNumber) const {
+bool t4p::NotebookClass::IsPageModified(int pageNumber) const {
 	CodeControlClass* codeCtrl = GetCodeControl(pageNumber);
 	return codeCtrl && codeCtrl->GetModify();
 }
 
-bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modifiedPageNames, std::vector<int>& modifiedPageIndexes) const {
+bool t4p::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modifiedPageNames, std::vector<int>& modifiedPageIndexes) const {
 	bool modified = false;
 	for (size_t i = 0; i < GetPageCount(); ++i) {
 		if (IsPageModified(i)) {
@@ -487,7 +487,7 @@ bool mvceditor::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modif
 	return modified;
 }
 
-void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
+void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	TabIndexRightClickEvent = event.GetSelection();
 	if (NULL == ContextMenu) {
 		CreateContextMenu();
@@ -496,22 +496,22 @@ void mvceditor::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::NotebookClass::CreateContextMenu() {
+void t4p::NotebookClass::CreateContextMenu() {
 	ContextMenu = new wxMenu;
 	ContextMenu->Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
 	ContextMenu->Append(ID_CLOSE_TAB, wxT("Close This Tab"));
 }
 
-void mvceditor::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
+void t4p::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 	if (SaveAllModifiedPages()) {
 		CloseAllPages();
 	}
 }
 
-void mvceditor::NotebookClass::CloseAllPages() {
+void t4p::NotebookClass::CloseAllPages() {
 	while (GetPageCount() > 0) {
-		mvceditor::CodeControlClass* codeCtrl = GetCodeControl(0);
-		mvceditor::CodeControlEventClass codeControlEvent(mvceditor::EVENT_APP_FILE_CLOSED, codeCtrl);
+		t4p::CodeControlClass* codeCtrl = GetCodeControl(0);
+		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_CLOSED, codeCtrl);
 		EventSink->Publish(codeControlEvent);
 
 		DeletePage(0);
@@ -528,12 +528,12 @@ void mvceditor::NotebookClass::CloseAllPages() {
 	}
 }
 
-void mvceditor::NotebookClass::CloseCurrentPage() {
+void t4p::NotebookClass::CloseCurrentPage() {
 	int currentPage = GetSelection();
 	ClosePage(currentPage);
 }
 
-void mvceditor::NotebookClass::ClosePage(int index) {
+void t4p::NotebookClass::ClosePage(int index) {
 	bool isPageClosed = false;
 	if (IsPageModified(index)) {
 		wxString pageName = GetPageText(index);
@@ -569,7 +569,7 @@ void mvceditor::NotebookClass::ClosePage(int index) {
 	}
 }
 
-std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
+std::vector<wxString> t4p::NotebookClass::GetOpenedFiles() const {
 	std::vector<wxString> files;
 	for (size_t j = 0; j < GetPageCount(); ++j) {
 		CodeControlClass* control = GetCodeControl(j);
@@ -580,7 +580,7 @@ std::vector<wxString> mvceditor::NotebookClass::GetOpenedFiles() const {
 	return files;
 }
 
-wxString mvceditor::NotebookClass::CreateWildcardString() const {
+wxString t4p::NotebookClass::CreateWildcardString() const {
 	wxString phpLabel = Globals->FileTypes.PhpFileExtensionsString,
 		cssLabel = Globals->FileTypes.CssFileExtensionsString,
 		sqlLabel = Globals->FileTypes.SqlFileExtensionsString,
@@ -644,33 +644,33 @@ wxString mvceditor::NotebookClass::CreateWildcardString() const {
 	return fileFilter;
 }
 
-int mvceditor::NotebookClass::WilcardIndex(mvceditor::CodeControlClass::Mode mode) {
-	if (mvceditor::CodeControlClass::PHP == mode) {
+int t4p::NotebookClass::WilcardIndex(t4p::CodeControlClass::Mode mode) {
+	if (t4p::CodeControlClass::PHP == mode) {
 		return 0;
 	}
-	else if (mvceditor::CodeControlClass::CSS == mode) {
+	else if (t4p::CodeControlClass::CSS == mode) {
 		return 1;
 	}
-	else if (mvceditor::CodeControlClass::SQL == mode) {
+	else if (t4p::CodeControlClass::SQL == mode) {
 		return 2;
 	}
-	else if (mvceditor::CodeControlClass::JS == mode) {
+	else if (t4p::CodeControlClass::JS == mode) {
 		return 3;
 	}
 	return 4;
 }
 
-void mvceditor::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
+void t4p::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
 	int selected = event.GetSelection();
 	int num = GetPageCount();
 	for (int i = 0; i < num; ++i) {
-		mvceditor::CodeControlClass* ctrl = GetCodeControl(i);
+		t4p::CodeControlClass* ctrl = GetCodeControl(i);
 		ctrl->SetAsHidden(i != selected);
 	}
 	event.Skip();
 }
 
-void mvceditor::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
+void t4p::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
 
 	// get the tab that was right clicked; the tab right menu event holds
 	// the index of the tab we want to close
@@ -680,12 +680,12 @@ void mvceditor::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::FileDropTargetClass::FileDropTargetClass(mvceditor::NotebookClass* notebook) :
+t4p::FileDropTargetClass::FileDropTargetClass(t4p::NotebookClass* notebook) :
 	Notebook(notebook) {
 
 }
 
-bool mvceditor::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files) {
+bool t4p::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files) {
 	std::vector<wxString> fileVector;
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		fileVector.push_back(files[i]);
@@ -694,15 +694,15 @@ bool mvceditor::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxA
 	return true;
 }
 
-BEGIN_EVENT_TABLE(mvceditor::NotebookClass, wxAuiNotebook)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
-		mvceditor::NotebookClass::SavePageIfModified)
-	EVT_AUINOTEBOOK_TAB_RIGHT_UP(mvceditor::ID_CODE_NOTEBOOK,
-		mvceditor::NotebookClass::ShowContextMenu)
-	EVT_MENU(ID_CLOSE_ALL_TABS, mvceditor::NotebookClass::OnCloseAllPages)
-	EVT_MENU(ID_CLOSE_TAB, mvceditor::NotebookClass::OnMenuClosePage)
+BEGIN_EVENT_TABLE(t4p::NotebookClass, wxAuiNotebook)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, 
+		t4p::NotebookClass::SavePageIfModified)
+	EVT_AUINOTEBOOK_TAB_RIGHT_UP(t4p::ID_CODE_NOTEBOOK,
+		t4p::NotebookClass::ShowContextMenu)
+	EVT_MENU(ID_CLOSE_ALL_TABS, t4p::NotebookClass::OnCloseAllPages)
+	EVT_MENU(ID_CLOSE_TAB, t4p::NotebookClass::OnMenuClosePage)
 
 	// using OnPageChanging instead of OnPageChanged because onPageChanged
 	// generates multiple events (not quite sure why yet)
-	EVT_AUINOTEBOOK_PAGE_CHANGING(mvceditor::ID_CODE_NOTEBOOK, mvceditor::NotebookClass::OnPageChanging)
+	EVT_AUINOTEBOOK_PAGE_CHANGING(t4p::ID_CODE_NOTEBOOK, t4p::NotebookClass::OnPageChanging)
 END_EVENT_TABLE()

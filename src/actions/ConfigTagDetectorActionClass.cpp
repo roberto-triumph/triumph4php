@@ -29,7 +29,7 @@
 
 static const int ID_CONFIG_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::ConfigTagDetectorParamsClass::ConfigTagDetectorParamsClass() 
+t4p::ConfigTagDetectorParamsClass::ConfigTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -38,7 +38,7 @@ mvceditor::ConfigTagDetectorParamsClass::ConfigTagDetectorParamsClass()
 
 }
 
-wxString mvceditor::ConfigTagDetectorParamsClass::BuildCmdLine() const {
+wxString t4p::ConfigTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -48,7 +48,7 @@ wxString mvceditor::ConfigTagDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: wxEvtHandler()
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
@@ -56,7 +56,7 @@ mvceditor::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(mvceditor:
 
 }
 
-bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ConfigTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	if (globals.Environment.Php.NotInstalled()) {
 		return false;
 	}
@@ -66,8 +66,8 @@ bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& glob
 	}
 	std::vector<wxString> detectorScripts = DetectorScripts();
 
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	std::vector<wxString>::const_iterator scriptName;
 
 	// need to call each config detector once for each different source directory
@@ -77,9 +77,9 @@ bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& glob
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (source->Exists()) {
 					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-						mvceditor::ConfigTagDetectorParamsClass params;
+						t4p::ConfigTagDetectorParamsClass params;
 						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
-						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
+						params.PhpIncludePath.Assign(t4p::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
 						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
@@ -98,24 +98,24 @@ bool mvceditor::ConfigTagDetectorActionClass::Init(mvceditor::GlobalsClass& glob
 	return started;
 }
 
-bool mvceditor::ConfigTagDetectorActionClass::DoAsync() {
+bool t4p::ConfigTagDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::ConfigTagDetectorActionClass::GetLabel() const {
+wxString t4p::ConfigTagDetectorActionClass::GetLabel() const {
 	return wxT("Config Tag Detectors");
 }
 
-void mvceditor::ConfigTagDetectorActionClass::BackgroundWork() {
+void t4p::ConfigTagDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-bool mvceditor::ConfigTagDetectorActionClass::NextDetection() {
+bool t4p::ConfigTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return false;
 	}
-	mvceditor::ConfigTagDetectorParamsClass params = ParamsQueue.front();
+	t4p::ConfigTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
@@ -126,21 +126,21 @@ bool mvceditor::ConfigTagDetectorActionClass::NextDetection() {
 	return Process.Init(cmdLine, ID_CONFIG_TAG_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::ConfigTagDetectorActionClass::DetectorScripts() {
+std::vector<wxString> t4p::ConfigTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
-	mvceditor::RecursiveDirTraverserClass traverser(scripts);
+	t4p::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
-	if (globalDir.Open(mvceditor::ConfigTagDetectorsGlobalAsset().GetFullPath())) {
+	if (globalDir.Open(t4p::ConfigTagDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::ConfigTagDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(t4p::ConfigTagDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;
 }
 
-void mvceditor::ConfigTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void t4p::ConfigTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		SignalEnd();
 	}
@@ -149,14 +149,14 @@ void mvceditor::ConfigTagDetectorActionClass::OnProcessComplete(wxCommandEvent &
 	}
 }
 
-void mvceditor::ConfigTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void t4p::ConfigTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	wxString msg = event.GetString();
 	wxString extensionMissingErr = wxT("requires the PDO and pdo_sqlite PHP extensions.");
 	if (msg.Find(extensionMissingErr) != wxNOT_FOUND) {
-		mvceditor::EditorLogError(mvceditor::ERR_MISSING_PHP_EXTENSIONS, msg);
+		t4p::EditorLogError(t4p::ERR_MISSING_PHP_EXTENSIONS, msg);
 	}
 	else {
-		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
+		t4p::EditorLogError(t4p::WARNING_OTHER, event.GetString());
 	}
 	if (ParamsQueue.empty()) {
 		SignalEnd();
@@ -167,7 +167,7 @@ void mvceditor::ConfigTagDetectorActionClass::OnProcessFailed(wxCommandEvent &ev
 }
 
 
-BEGIN_EVENT_TABLE(mvceditor::ConfigTagDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::ConfigTagDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::ConfigTagDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(t4p::ConfigTagDetectorActionClass, wxEvtHandler) 
+	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_COMPLETE, t4p::ConfigTagDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_CONFIG_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_FAILED, t4p::ConfigTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

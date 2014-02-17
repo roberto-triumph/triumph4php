@@ -28,52 +28,52 @@
 #include <wx/combobox.h>
 #include <wx/msgdlg.h>
 
-mvceditor::UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty)
+t4p::UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty)
 	: wxValidator()
 	, Data(data) 
 	, DoAllowEmpty(doAllowEmpty) {
 }
 
-wxObject* mvceditor::UnicodeStringValidatorClass::Clone() const {
-	mvceditor::UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass(Data, DoAllowEmpty);
+wxObject* t4p::UnicodeStringValidatorClass::Clone() const {
+	t4p::UnicodeStringValidatorClass* other = new UnicodeStringValidatorClass(Data, DoAllowEmpty);
 	return other;
 }
 
-bool mvceditor::UnicodeStringValidatorClass::TransferFromWindow() {
+bool t4p::UnicodeStringValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	if (t) {
 		wxString val = t->GetValue();
-		*Data = mvceditor::WxToIcu(val);
+		*Data = t4p::WxToIcu(val);
 		ret = true;
 	}
 	else if(combo) {
 		wxString val = combo->GetValue();
-		*Data = mvceditor::WxToIcu(val);
+		*Data = t4p::WxToIcu(val);
 		ret = true;
 	}
 	return ret;
 }
 
-bool mvceditor::UnicodeStringValidatorClass::TransferToWindow() {
+bool t4p::UnicodeStringValidatorClass::TransferToWindow() {
 	bool ret = false;
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	if (t) {
-		wxString val = mvceditor::IcuToWx(*Data);
+		wxString val = t4p::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
 	}
 	if (combo) {
-		wxString val = mvceditor::IcuToWx(*Data);
+		wxString val = t4p::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
 	}
 	return ret;
 }
 
-bool mvceditor::UnicodeStringValidatorClass::Validate(wxWindow* parent) {
+bool t4p::UnicodeStringValidatorClass::Validate(wxWindow* parent) {
 	wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	wxString val;

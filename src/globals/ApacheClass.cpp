@@ -59,7 +59,7 @@ Include conf/vhosts/ *.conf
 
 */
 
-mvceditor::ApacheClass::ApacheClass()
+t4p::ApacheClass::ApacheClass()
 	: ManualConfiguration(false)
 	, VirtualHostMappings()
 	, HttpdPath()
@@ -67,7 +67,7 @@ mvceditor::ApacheClass::ApacheClass()
 	, Port(0) { 
 }
 
-mvceditor::ApacheClass::ApacheClass(const mvceditor::ApacheClass& src) 
+t4p::ApacheClass::ApacheClass(const t4p::ApacheClass& src) 
 	: ManualConfiguration()
 	, VirtualHostMappings()
 	, HttpdPath()
@@ -76,12 +76,12 @@ mvceditor::ApacheClass::ApacheClass(const mvceditor::ApacheClass& src)
 	Copy(src);
 }
 
-mvceditor::ApacheClass& mvceditor::ApacheClass::operator=(const mvceditor::ApacheClass& src) {
+t4p::ApacheClass& t4p::ApacheClass::operator=(const t4p::ApacheClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::ApacheClass::Copy(const mvceditor::ApacheClass& src) {
+void t4p::ApacheClass::Copy(const t4p::ApacheClass& src) {
 
 	// make sure to completely copy wxStrings 
 	ManualConfiguration = src.ManualConfiguration;
@@ -95,17 +95,17 @@ void mvceditor::ApacheClass::Copy(const mvceditor::ApacheClass& src) {
 	}
 }
 
-void mvceditor::ApacheClass::ClearMappings() {
+void t4p::ApacheClass::ClearMappings() {
 	VirtualHostMappings.clear();
 }
 
-bool mvceditor::ApacheClass::Walk(const wxString& file) {
+bool t4p::ApacheClass::Walk(const wxString& file) {
 	// in MSW MSI install of apache, there are two sets of configs. one in an "original" directory
 	// let's skip this for now
 	return !file.Contains(wxT("\\original\\")) && (file.EndsWith(wxT("httpd.conf")) || file.EndsWith(wxT("apache2.conf")));
 }
 
-bool mvceditor::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
+bool t4p::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
 	HttpdPath = httpdPath;
 	if (!ManualConfiguration && Walk(httpdPath)) {
 		VirtualHostMappings.clear();
@@ -119,7 +119,7 @@ bool mvceditor::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
 	return false;
 }
 
-void mvceditor::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPath, wxString hostName) {
+void t4p::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPath, wxString hostName) {
 	if (!hostName.EndsWith(wxT("/"))) {
 		hostName += wxT("/");
 	}
@@ -133,7 +133,7 @@ void mvceditor::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPat
 	VirtualHostMappings[filename.GetFullPath()] = hostName;
 }
 
-void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
+void t4p::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
 	
 	// normalize just like the SetVirtualHostMapping() method 
 	wxFileName filename;
@@ -145,7 +145,7 @@ void mvceditor::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystem
 	}
 }
 
-wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
+wxString t4p::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 
 	// normalize the given path; also convert to lower case so that we make case-insesitive
 	// comparisons (to handle windows paths). also add a trailing slash if fileSystemPath
@@ -186,7 +186,7 @@ wxString mvceditor::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 	return url;
 }
 
-wxString mvceditor::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString& uriPath) const {
+wxString t4p::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString& uriPath) const {
 
 	// normalize the given path; also convert to lower case so that we make case-insesitive
 	// comparisons (to handle windows paths)
@@ -222,11 +222,11 @@ wxString mvceditor::ApacheClass::GetUri(const wxString& fileSystemPath, const wx
 	return url;
 }
 
-wxString mvceditor::ApacheClass::GetHttpdPath() const {
+wxString t4p::ApacheClass::GetHttpdPath() const {
 	return HttpdPath;
 }
 
-std::map<wxString, wxString> mvceditor::ApacheClass::GetVirtualHostMappings() const {
+std::map<wxString, wxString> t4p::ApacheClass::GetVirtualHostMappings() const {
 	std::map<wxString, wxString>mappings;
 	for (std::map<wxString, wxString>::const_iterator it = VirtualHostMappings.begin(); it != VirtualHostMappings.end(); ++it) {
 		mappings[it->first] = it->second;
@@ -234,7 +234,7 @@ std::map<wxString, wxString> mvceditor::ApacheClass::GetVirtualHostMappings() co
 	return mappings;
 }
 
-void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
+void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 	if (wxFileExists(includedFile)) {
 		wxTextFile file;
 		if (file.Open(includedFile)) {
@@ -384,7 +384,7 @@ void mvceditor::ApacheClass::ParseApacheConfigFile(const wxString& includedFile)
 	}
 }
 
-wxString mvceditor::ApacheClass::MakeAbsolute(wxString configPath) {
+wxString t4p::ApacheClass::MakeAbsolute(wxString configPath) {
 	wxString serverRootNative(ServerRoot);
 	
 	// in windows apache installs, paths use forward slashes ie. "c:/wamp/bin/apache/2.2.17/conf"
@@ -402,6 +402,6 @@ wxString mvceditor::ApacheClass::MakeAbsolute(wxString configPath) {
 	return fileName.GetFullPath();
 }
 
-int mvceditor::ApacheClass::GetListenPort() const {
+int t4p::ApacheClass::GetListenPort() const {
 	return Port;
 }

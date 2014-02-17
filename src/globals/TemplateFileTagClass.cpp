@@ -29,19 +29,19 @@
 #include <globals/Sqlite.h>
 #include <wx/tokenzr.h>
 
-mvceditor::TemplateFileTagClass::TemplateFileTagClass()
+t4p::TemplateFileTagClass::TemplateFileTagClass()
 	:  FullPath()
 	, Variables() {
 
 }
 
-mvceditor::TemplateFileTagClass::TemplateFileTagClass(const mvceditor::TemplateFileTagClass& src)
+t4p::TemplateFileTagClass::TemplateFileTagClass(const t4p::TemplateFileTagClass& src)
 	: FullPath()
 	, Variables() {
 	Copy(src);
 }
 
-void mvceditor::TemplateFileTagClass::Copy(const mvceditor::TemplateFileTagClass& src) {
+void t4p::TemplateFileTagClass::Copy(const t4p::TemplateFileTagClass& src) {
 	
 	// copy is thread-safe, wxString needs to be cloned
 	FullPath = src.FullPath.c_str();
@@ -51,41 +51,41 @@ void mvceditor::TemplateFileTagClass::Copy(const mvceditor::TemplateFileTagClass
 	}
 }
 
-mvceditor::TemplateFileTagClass& mvceditor::TemplateFileTagClass::operator=(const mvceditor::TemplateFileTagClass& src) {
+t4p::TemplateFileTagClass& t4p::TemplateFileTagClass::operator=(const t4p::TemplateFileTagClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector<wxString>& variables) {
+void t4p::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector<wxString>& variables) {
 	FullPath = fullPath;
 	Variables = variables;
 }
 
-mvceditor::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
+t4p::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
 	: Session() 
 	, IsInitialized(false) {
 
 }
 
-void mvceditor::TemplateFileTagFinderClass::Init(const wxFileName& detectorDbFileName) {
+void t4p::TemplateFileTagFinderClass::Init(const wxFileName& detectorDbFileName) {
 	IsInitialized = false;
 	try {
 		Session.close();
-		std::string stdDbName = mvceditor::WxToChar(detectorDbFileName.GetFullPath());
+		std::string stdDbName = t4p::WxToChar(detectorDbFileName.GetFullPath());
 
 		// we should be able to open this since it has been created by
 		// the DetectorCacheDbVersionActionClass
 		Session.open(*soci::factory_sqlite3(), stdDbName);
 		IsInitialized = true;
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 }
 
-std::vector<mvceditor::TemplateFileTagClass> mvceditor::TemplateFileTagFinderClass::All() {
-	std::vector<mvceditor::TemplateFileTagClass> templates;
+std::vector<t4p::TemplateFileTagClass> t4p::TemplateFileTagFinderClass::All() {
+	std::vector<t4p::TemplateFileTagClass> templates;
 	if (!IsInitialized) {
 		return templates;
 	}
@@ -98,9 +98,9 @@ std::vector<mvceditor::TemplateFileTagClass> mvceditor::TemplateFileTagFinderCla
 	);
 	if (stmt.execute(true)) {
 		do {
-			mvceditor::TemplateFileTagClass templateFile;
-			templateFile.FullPath = mvceditor::CharToWx(fullPath.c_str());
-			wxString wxVariables = mvceditor::CharToWx(variables.c_str());
+			t4p::TemplateFileTagClass templateFile;
+			templateFile.FullPath = t4p::CharToWx(fullPath.c_str());
+			wxString wxVariables = t4p::CharToWx(variables.c_str());
 			wxStringTokenizer tok(wxVariables, wxT(","));
 			while (tok.HasMoreTokens()) {
 				templateFile.Variables.push_back(tok.NextToken());

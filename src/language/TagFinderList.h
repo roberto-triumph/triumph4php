@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGFINDERLIST_H__
-#define __MVCEDITOR_TAGFINDERLIST_H__
+#ifndef __T4P_TAGFINDERLIST_H__
+#define __T4P_TAGFINDERLIST_H__
 
 #include <language/TagParserClass.h>
 #include <language/ParsedTagFinderClass.h>
@@ -32,7 +32,7 @@
 #include <vector>
 
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * A tag list contains all 3 tags db files used by Triumph.  All projects' tags
@@ -49,23 +49,23 @@ public:
 	/**
 	 * The object that will parse and persist tags
 	 */
-	mvceditor::TagParserClass TagParser;
+	t4p::TagParserClass TagParser;
 
 	/**
 	 * The object that will be used to lookup project tags
 	 * This class will own this pointer
 	 */
-	mvceditor::ParsedTagFinderClass TagFinder;
+	t4p::ParsedTagFinderClass TagFinder;
 
 	/**
 	 * The object that will be used to lookup php native function tags
 	 */
-	mvceditor::ParsedTagFinderClass NativeTagFinder;
+	t4p::ParsedTagFinderClass NativeTagFinder;
 
 	/**
 	 * The object that will be used to lookup tags
 	 */
-	mvceditor::SqliteFinderClass DetectedTagFinder;
+	t4p::SqliteFinderClass DetectedTagFinder;
 
 	/**
 	 * TRUE if NativeTagFinder has an opened and valid connection
@@ -150,7 +150,7 @@ public:
 	 * given by the directorySearch will be parsed and its resources will be stored
 	 * in the database.
 	 *
-	 * @see mvceditor::TagParserClass::Walk
+	 * @see t4p::TagParserClass::Walk
 	 * @param directorySearch keeps track of the file to parse
 	 */
 	void  Walk(DirectorySearchClass& directorySearch);
@@ -197,25 +197,25 @@ public:
 	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
+	void ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 	
 	/**
 	 * queries all tag finders for resources that nearly match tagSearch (begin with). Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
+	void NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
 	 * appended to the matches vector.
 	 */
-	void ExactTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
 	 * appended to the matches vector.
 	 */
-	void NearMatchTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches);
+	void NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches);
 
 private:
 

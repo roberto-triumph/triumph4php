@@ -26,13 +26,13 @@
 #include <wx/filepicker.h>
 #include <wx/msgdlg.h>
 
-mvceditor::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
+t4p::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
 : wxValidator() 
 , Data(data) {
 
 }
 
-bool mvceditor::FilePickerValidatorClass::TransferToWindow() {
+bool t4p::FilePickerValidatorClass::TransferToWindow() {
 	bool ret = false;
 	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 	if (ctrl) {
@@ -42,7 +42,7 @@ bool mvceditor::FilePickerValidatorClass::TransferToWindow() {
 	return ret;
 }
 
-bool mvceditor::FilePickerValidatorClass::TransferFromWindow() {
+bool t4p::FilePickerValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 	if (ctrl) {
@@ -52,7 +52,7 @@ bool mvceditor::FilePickerValidatorClass::TransferFromWindow() {
 	return ret;
 }
 
-bool mvceditor::FilePickerValidatorClass::Validate(wxWindow* parent) {
+bool t4p::FilePickerValidatorClass::Validate(wxWindow* parent) {
 	bool ret = false;
 	wxFilePickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxFilePickerCtrl);
 	if (ctrl) {
@@ -64,7 +64,7 @@ bool mvceditor::FilePickerValidatorClass::Validate(wxWindow* parent) {
 	return ret;
 }
 
-wxObject* mvceditor::FilePickerValidatorClass::Clone() const {
-	mvceditor::FilePickerValidatorClass* other = new mvceditor::FilePickerValidatorClass(Data);
+wxObject* t4p::FilePickerValidatorClass::Clone() const {
+	t4p::FilePickerValidatorClass* other = new t4p::FilePickerValidatorClass(Data);
 	return other;
 }

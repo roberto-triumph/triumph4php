@@ -27,7 +27,7 @@
 #include <language/DetectedTagFinderResultClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::TagFinderListClass::TagFinderListClass()
+t4p::TagFinderListClass::TagFinderListClass()
 	: TagParser() 
 	, TagFinder()
 	, NativeTagFinder()
@@ -41,7 +41,7 @@ mvceditor::TagFinderListClass::TagFinderListClass()
 {
 
 }
-mvceditor::TagFinderListClass::~TagFinderListClass() {
+t4p::TagFinderListClass::~TagFinderListClass() {
 	TagParser.Close();
 	if (TagDbSession) {
 		TagDbSession->close();
@@ -57,7 +57,7 @@ mvceditor::TagFinderListClass::~TagFinderListClass() {
 	}
 }
 
-void mvceditor::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName, 
+void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName, 
 									   const std::vector<wxString>& phpFileExtensions, 
 									   const std::vector<wxString>& miscFileExtensions,
 									   pelet::Versions version) {
@@ -73,7 +73,7 @@ void mvceditor::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileNam
 	}
 }
 
-void mvceditor::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
+void t4p::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
 												 const std::vector<wxString>& phpFileExtensions, 
 												 const std::vector<wxString>& miscFileExtensions,
 												 pelet::Versions version) {
@@ -89,7 +89,7 @@ void mvceditor::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
 	}
 }
 
-void mvceditor::TagFinderListClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
+void t4p::TagFinderListClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
 	DetectedTagDbSession = new soci::session;
 	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
@@ -98,7 +98,7 @@ void mvceditor::TagFinderListClass::InitDetectorTag(const wxFileName& detectorDb
 	}
 }
 
-void mvceditor::TagFinderListClass::AdoptDetectorTag(soci::session* session) {
+void t4p::TagFinderListClass::AdoptDetectorTag(soci::session* session) {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
 	IsDetectedTagFinderInit = NULL != session;
 	DetectedTagDbSession = session;
@@ -107,7 +107,7 @@ void mvceditor::TagFinderListClass::AdoptDetectorTag(soci::session* session) {
 	}
 }
 
-void mvceditor::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) {
+void t4p::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) {
 	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
 	NativeDbSession = new soci::session;
 	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
@@ -116,7 +116,7 @@ void mvceditor::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFile
 	}
 }
 
-void mvceditor::TagFinderListClass::AdoptNativeTag(soci::session* session) {
+void t4p::TagFinderListClass::AdoptNativeTag(soci::session* session) {
 	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
 	IsNativeTagFinderInit = NULL != session;
 	NativeDbSession = session;
@@ -125,10 +125,10 @@ void mvceditor::TagFinderListClass::AdoptNativeTag(soci::session* session) {
 	}
 }
 
-bool mvceditor::TagFinderListClass::Open(soci::session* session, const wxString& dbName) {
+bool t4p::TagFinderListClass::Open(soci::session* session, const wxString& dbName) {
 	bool ret = false;
 	try {
-		std::string stdDbName = mvceditor::WxToChar(dbName);
+		std::string stdDbName = t4p::WxToChar(dbName);
 		
 		// we should be able to open this since it has been created by
 		// the TagCacheDbVersionActionClass
@@ -136,22 +136,22 @@ bool mvceditor::TagFinderListClass::Open(soci::session* session, const wxString&
 
 		// set a busy handler so that if we attempt to query while the file is locked, we 
 		// sleep for a bit then try again
-		mvceditor::SqliteSetBusyTimeout(*session, 200);
+		t4p::SqliteSetBusyTimeout(*session, 200);
 		ret = true;
 	} catch(std::exception const& e) {
 		session->close();
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
-void mvceditor::TagFinderListClass::Walk(mvceditor::DirectorySearchClass& search) {
+void t4p::TagFinderListClass::Walk(t4p::DirectorySearchClass& search) {
 	search.Walk(TagParser);
 }
 
 
-std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeString className, UnicodeString methodName) {
+std::vector<UnicodeString> t4p::TagFinderListClass::ClassParents(UnicodeString className, UnicodeString methodName) {
 	std::vector<UnicodeString> parents;
 	bool found = false;
 	UnicodeString classToLookup = className;
@@ -181,7 +181,7 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassParents(UnicodeSt
 	return parents;
 }
 
-std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const UnicodeString& className, 
+std::vector<UnicodeString> t4p::TagFinderListClass::ClassUsedTraits(const UnicodeString& className, 
 												  const std::vector<UnicodeString>& parentClassNames, 
 												  const UnicodeString& methodName,
 												  const std::vector<wxFileName>& sourceDirs) {
@@ -223,15 +223,15 @@ std::vector<UnicodeString> mvceditor::TagFinderListClass::ClassUsedTraits(const 
 }
 
 
-UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString resourceToLookup, const std::vector<wxFileName>& sourceDirs) {
+UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourceToLookup, const std::vector<wxFileName>& sourceDirs) {
 	UnicodeString type;
-	mvceditor::TagSearchClass tagSearch(resourceToLookup);
+	t4p::TagSearchClass tagSearch(resourceToLookup);
 	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
 	tagSearch.SetSourceDirs(sourceDirs);
 	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 	
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
-		mvceditor::DetectedTagExactMemberResultClass detectedResult;
+		t4p::DetectedTagExactMemberResultClass detectedResult;
 		std::vector<UnicodeString> classNames = tagSearch.GetClassHierarchy();
 		detectedResult.Set(classNames, tagSearch.GetMethodName(), sourceDirs);
 		if (DetectedTagFinder.Exec(&detectedResult)) {
@@ -240,7 +240,7 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 		}
 	}
 	if (type.isEmpty() && IsTagFinderInit) {
-		mvceditor::TagResultClass* tagResults = tagSearch.CreateExactResults();
+		t4p::TagResultClass* tagResults = tagSearch.CreateExactResults();
 		if (TagFinder.Exec(tagResults)) {
 
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
@@ -260,7 +260,7 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 
 			// if the given string was a class name, return the class name
 			// if the given string was a method, return the method's return type
-			if (mvceditor::TagClass::CLASS == tagResults->Tag.Type) {
+			if (t4p::TagClass::CLASS == tagResults->Tag.Type) {
 				type = fullyQualifiedClass;
 			}
 			else {
@@ -279,10 +279,10 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 		// when we query do not use source_id
 		std::vector<wxFileName> emptySourceDirs;
 		tagSearch.SetSourceDirs(emptySourceDirs);
-		mvceditor::TagResultClass* tagResults = tagSearch.CreateExactResults();
+		t4p::TagResultClass* tagResults = tagSearch.CreateExactResults();
 		if (NativeTagFinder.Exec(tagResults)) {
 			tagResults->Next();
-			type =  mvceditor::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
+			type =  t4p::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
 		}
 		delete tagResults;
 
@@ -290,7 +290,7 @@ UnicodeString mvceditor::TagFinderListClass::ResolveResourceType(UnicodeString r
 	return type;
 }
 
-UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString className, int fileTagId) {
+UnicodeString t4p::TagFinderListClass::ParentClassName(UnicodeString className, int fileTagId) {
 	UnicodeString parent;
 	if (IsTagFinderInit) {
 		parent = TagFinder.ParentClassName(className, 0);
@@ -301,10 +301,10 @@ UnicodeString mvceditor::TagFinderListClass::ParentClassName(UnicodeString class
 	return parent;
 }
 
-void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches,
+void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	tagSearch.SetSourceDirs(sourceDirs);
-	mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+	t4p::TagResultClass* result = tagSearch.CreateExactResults();
 	if (IsTagFinderInit && TagFinder.Exec(result)) {
 		while (result->More()) {
 			result->Next();
@@ -328,7 +328,7 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 
 	tagSearch.SetSourceDirs(sourceDirs);
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
-		mvceditor::DetectedTagExactMemberResultClass detectedResult;
+		t4p::DetectedTagExactMemberResultClass detectedResult;
 		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		if (DetectedTagFinder.Exec(&detectedResult)) {
 			while (detectedResult.More()) {
@@ -339,7 +339,7 @@ void mvceditor::TagFinderListClass::ExactMatchesFromAll(mvceditor::TagSearchClas
 	}
 }
 
-void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches,
+void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	if (tagSearch.GetClassName().isEmpty() && tagSearch.GetMethodName().isEmpty() && tagSearch.GetNamespaceName().length() <= 1) {
 		
@@ -347,7 +347,7 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 		return;
 	}
 	tagSearch.SetSourceDirs(sourceDirs);
-	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	if (IsTagFinderInit && TagFinder.Exec(result)) {
 		while (result->More()) {
 			result->Next();
@@ -371,7 +371,7 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 
 	tagSearch.SetSourceDirs(sourceDirs);
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
-		mvceditor::DetectedTagNearMatchMemberResultClass detectedResult;
+		t4p::DetectedTagNearMatchMemberResultClass detectedResult;
 		detectedResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		if (DetectedTagFinder.Exec(&detectedResult)) {
 			while (detectedResult.More()) {
@@ -382,44 +382,44 @@ void mvceditor::TagFinderListClass::NearMatchesFromAll(mvceditor::TagSearchClass
 	}
 }
 
-void mvceditor::TagFinderListClass::ExactTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
 
 		// no class = impossible to have traits
 		return;
 	}
-	mvceditor::TraitTagResultClass traitResult;
+	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), true, tagSearch.GetSourceDirs());
 	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
-		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
-		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 }
 
-void mvceditor::TagFinderListClass::NearMatchTraitAliasesFromAll(mvceditor::TagSearchClass& tagSearch, std::vector<mvceditor::TagClass>& matches) {
+void t4p::TagFinderListClass::NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
 
 		// no class = impossible to have traits
 		return;
 	}
-	mvceditor::TraitTagResultClass traitResult;
+	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), false, tagSearch.GetSourceDirs());
 	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
-		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
-		std::vector<mvceditor::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}

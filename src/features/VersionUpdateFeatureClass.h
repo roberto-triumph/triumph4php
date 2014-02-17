@@ -22,25 +22,25 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef _MVCEDITOR_VERSIONUPDATEFEATURECLASS_H__
-#define _MVCEDITOR_VERSIONUPDATEFEATURECLASS_H__
+#ifndef __T4P_VERSIONUPDATEFEATURECLASS_H__
+#define __T4P_VERSIONUPDATEFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/VersionUpdateFeatureForms.h>
 #include <actions/ActionClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This is the feature that check for new versions of Triumph
  * Version checking is done by posting to
- * http://updates.mvceditor.com/updates.php and reading the 
+ * http://updates.triumph4php.com/updates.php and reading the 
  * latest version from the response.
  */
 class VersionUpdateFeatureClass : public FeatureClass {
 public:
 
-	VersionUpdateFeatureClass(mvceditor::AppClass& app);
+	VersionUpdateFeatureClass(t4p::AppClass& app);
 
 	void AddHelpMenuItems(wxMenu* helpMenu);
 
@@ -103,7 +103,7 @@ class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
 public:
 
 	VersionUpdateDialogClass(wxWindow* parent, int id, 
-		mvceditor::RunningThreadsClass& runningThreads,
+		t4p::RunningThreadsClass& runningThreads,
 		const wxString& currentVersion, 
 		bool showNewVersion,
 		wxString newVersion);
@@ -122,7 +122,7 @@ private:
 
 	wxTimer Timer;
 
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 
 	bool StartedCheck;
 
@@ -134,22 +134,22 @@ class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGenera
 
 public:
 
-	VersionUpdatePreferencesPanelClass(wxWindow* parent, mvceditor::PreferencesClass& preferences);
+	VersionUpdatePreferencesPanelClass(wxWindow* parent, t4p::PreferencesClass& preferences);
 
 };
 
 /**
  * This is the action that checks for new versions of Triumph
  * Version checking is done by posting to
- * http://updates.mvceditor.com/updates.php and reading the 
+ * http://updates.triumph4php.com/updates.php and reading the 
  * latest version from the response. Will post an event when the
  * response is returned from the server.
  */
-class VersionUpdateActionClass : public mvceditor::ActionClass {
+class VersionUpdateActionClass : public t4p::ActionClass {
 
 public:
 
-	VersionUpdateActionClass(mvceditor::RunningThreadsClass& runningThreads, 
+	VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads, 
 		int eventId, const wxString& currentVersion);
 
 protected:

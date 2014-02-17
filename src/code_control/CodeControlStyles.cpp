@@ -25,13 +25,13 @@
 #include <code_control/CodeControlStyles.h>
 #include <wx/stc/stc.h>
 
-static void NewStyle(std::vector<mvceditor::StylePreferenceClass>& styles, int stcId, const char* label) {
-	mvceditor::StylePreferenceClass pref;
+static void NewStyle(std::vector<t4p::StylePreferenceClass>& styles, int stcId, const char* label) {
+	t4p::StylePreferenceClass pref;
 	pref.Control(stcId, label);
 	styles.push_back(pref); 
 }
 
-void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& options) {	
+void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {	
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {  
 		options.LineEndingMode = wxSTC_EOL_CRLF;
@@ -58,12 +58,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD, "PHP Mismatched Brace");
 	NewStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER, "PHP Line Number Margin");
 	NewStyle(options.PhpStyles, wxSTC_STYLE_INDENTGUIDE, "PHP Indentation Guides");
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "PHP Caret");
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "PHP Current Line"); 
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "PHP Selection"); 
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "PHP Code Fold Margin"); 
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "PHP Right Margin"); 
-	NewStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "PHP Highlight Matches"); 
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "PHP Caret");
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "PHP Current Line"); 
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "PHP Selection"); 
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "PHP Code Fold Margin"); 
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "PHP Right Margin"); 
+	NewStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "PHP Highlight Matches"); 
 
 	NewStyle(options.PhpStyles, wxSTC_H_DEFAULT, "HTML Default");
 	NewStyle(options.PhpStyles, wxSTC_H_TAG, "HTML Known Tag");
@@ -130,12 +130,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD, "Javascript Mismatched Brace");
 	NewStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER, "Javascript Line Number Margin");
 	NewStyle(options.JsStyles, wxSTC_STYLE_INDENTGUIDE, "Javascript Indentation Guides");
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Javascript Caret");
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Javascript Current Line"); 
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Javascript Selection"); 
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Javascript Code Fold Margin"); 
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Javascript Right Margin"); 
-	NewStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Javascript Highlight Matches"); 
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Javascript Caret");
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Javascript Current Line"); 
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Javascript Selection"); 
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Javascript Code Fold Margin"); 
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Javascript Right Margin"); 
+	NewStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Javascript Highlight Matches"); 
 	
 
 	NewStyle(options.SqlStyles, wxSTC_SQL_DEFAULT, "SQL Default");
@@ -161,12 +161,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD, "SQL Mismatched Brace");
 	NewStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER, "SQL Line Number Margin");
 	NewStyle(options.SqlStyles, wxSTC_STYLE_INDENTGUIDE, "SQL Indentation Guides");
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "SQL Caret");
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "SQL Current Line"); 
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "SQL Selection"); 
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "SQL Code Fold Margin"); 
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "SQL Right Margin"); 
-	NewStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "SQL Highlight Matches"); 
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "SQL Caret");
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "SQL Current Line"); 
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "SQL Selection"); 
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "SQL Code Fold Margin"); 
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "SQL Right Margin"); 
+	NewStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "SQL Highlight Matches"); 
 
 	NewStyle(options.CssStyles, wxSTC_CSS_DEFAULT, "CSS Default");
 	NewStyle(options.CssStyles, wxSTC_CSS_TAG, "CSS Tag Selector");
@@ -189,12 +189,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD, "CSS Mismatched Brace");
 	NewStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER, "CSS Line Number Margin");
 	NewStyle(options.CssStyles, wxSTC_STYLE_INDENTGUIDE, "CSS Indentation Guides");
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "CSS Caret");
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "CSS Current Line"); 
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "CSS Selection"); 
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "CSS Code Fold Margin"); 
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "CSS Right Margin"); 
-	NewStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "CSS Highlight Matches"); 
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "CSS Caret");
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "CSS Current Line"); 
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "CSS Selection"); 
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "CSS Code Fold Margin"); 
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "CSS Right Margin"); 
+	NewStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "CSS Highlight Matches"); 
 
 	NewStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT, "Config Default");
 	NewStyle(options.ConfigStyles, wxSTC_CONF_COMMENT, "Config Comment");
@@ -210,12 +210,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD, "Mismatched Brace");
 	NewStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER, "Line Number Margin");
 	NewStyle(options.ConfigStyles, wxSTC_STYLE_INDENTGUIDE, "Indentation Guides");
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Config Caret");
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Config Current Line"); 
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Config Selection"); 
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Config Code Fold Margin"); 
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Config Right Margin"); 
-	NewStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Config Highlight Matches"); 
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Config Caret");
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Config Current Line"); 
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Config Selection"); 
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Config Code Fold Margin"); 
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Config Right Margin"); 
+	NewStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Config Highlight Matches"); 
 
 	NewStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT, "Crontab Default");
 	NewStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK, "Crontab Asterisk");
@@ -232,12 +232,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD, "Crontab Mismatched Brace");
 	NewStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER, "Crontab Line Number Margin");
 	NewStyle(options.CrontabStyles, wxSTC_STYLE_INDENTGUIDE, "Crontab Indentation Guides");
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Crontab Caret");
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Crontab Current Line"); 
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Crontab Selection"); 
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Crontab Code Fold Margin"); 
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Crontab Right Margin"); 
-	NewStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Crontab Highlight Matches"); 
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Crontab Caret");
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Crontab Current Line"); 
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Crontab Selection"); 
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Crontab Code Fold Margin"); 
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Crontab Right Margin"); 
+	NewStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Crontab Highlight Matches"); 
 
 	NewStyle(options.YamlStyles, wxSTC_YAML_DEFAULT, "YAML Default");
 	NewStyle(options.YamlStyles, wxSTC_YAML_COMMENT, "YAML Comment");
@@ -253,12 +253,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD, "YAML Mismatched Brace");
 	NewStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER, "YAML Line Number Margin");
 	NewStyle(options.YamlStyles, wxSTC_STYLE_INDENTGUIDE, "YAML Indentation Guides");
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "YAML Caret");
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "YAML Current Line"); 
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "YAML Selection"); 
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "YAML Code Fold Margin"); 
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "YAML Right Margin"); 
-	NewStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "YAML Highlight Matches"); 
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "YAML Caret");
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "YAML Current Line"); 
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "YAML Selection"); 
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "YAML Code Fold Margin"); 
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "YAML Right Margin"); 
+	NewStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "YAML Highlight Matches"); 
 	
 	NewStyle(options.RubyStyles, wxSTC_RB_DEFAULT, "Ruby Default");
 	NewStyle(options.RubyStyles, wxSTC_RB_BACKTICKS, "Ruby Backticks");
@@ -298,12 +298,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD, "Ruby Mismatched Brace");
 	NewStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER, "Ruby Line Number Margin");
 	NewStyle(options.RubyStyles, wxSTC_STYLE_INDENTGUIDE, "Ruby Indentation Guides");
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Ruby Caret");
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Ruby Current Line"); 
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Ruby Selection"); 
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Ruby Code Fold Margin"); 
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Ruby Right Margin"); 
-	NewStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Ruby Highlight Matches"); 
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Ruby Caret");
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Ruby Current Line"); 
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Ruby Selection"); 
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Ruby Code Fold Margin"); 
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Ruby Right Margin"); 
+	NewStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Ruby Highlight Matches"); 
 
 	NewStyle(options.LuaStyles, wxSTC_LUA_DEFAULT, "Lua Default");
 	NewStyle(options.LuaStyles, wxSTC_LUA_CHARACTER, "Lua Character");
@@ -330,12 +330,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD, "Lua Mismatched Brace");
 	NewStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER, "Lua Line Number Margin");
 	NewStyle(options.LuaStyles, wxSTC_STYLE_INDENTGUIDE, "Lua Indentation Guides");
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Lua Caret");
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Lua Current Line"); 
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Lua Selection"); 
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Lua Code Fold Margin"); 
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Lua Right Margin"); 
-	NewStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Lua Highlight Matches"); 
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Lua Caret");
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Lua Current Line"); 
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Lua Selection"); 
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Lua Code Fold Margin"); 
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Lua Right Margin"); 
+	NewStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Lua Highlight Matches"); 
 
 	NewStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT, "Markdown Default");
 	NewStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE, "Markdown Block quote");
@@ -363,12 +363,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD, "Markdown Mismatched Brace");
 	NewStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER, "Markdown Line Number Margin");
 	NewStyle(options.MarkdownStyles, wxSTC_STYLE_INDENTGUIDE, "Markdown Indentation Guides");
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Markdown Caret");
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Markdown Current Line"); 
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Markdown Selection"); 
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Markdown Code Fold Margin"); 
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Markdown Right Margin"); 
-	NewStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Markdown Highlight Matches"); 
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Markdown Caret");
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Markdown Current Line"); 
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Markdown Selection"); 
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Markdown Code Fold Margin"); 
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Markdown Right Margin"); 
+	NewStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Markdown Highlight Matches"); 
 
 	NewStyle(options.BashStyles, wxSTC_SH_DEFAULT, "Bash Default");
 	NewStyle(options.BashStyles, wxSTC_SH_BACKTICKS, "Bash Backticks");
@@ -387,12 +387,12 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD, "Bash Mismatched Brace");
 	NewStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER, "Bash Line Number Margin");
 	NewStyle(options.BashStyles, wxSTC_STYLE_INDENTGUIDE, "Bash Indentation Guides");
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Bash Caret");
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Bash Current Line"); 
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Bash Selection"); 
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Bash Code Fold Margin"); 
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Bash Right Margin"); 
-	NewStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Bash Highlight Matches"); 
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Bash Caret");
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Bash Current Line"); 
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Bash Selection"); 
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Bash Code Fold Margin"); 
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Bash Right Margin"); 
+	NewStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Bash Highlight Matches"); 
 
 	NewStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT, "Diff Default");
 	NewStyle(options.DiffStyles, wxSTC_DIFF_ADDED, "Diff Added");
@@ -406,14 +406,14 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 	NewStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD, "Diff Mismatched Brace");
 	NewStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER, "Diff Line Number Margin");
 	NewStyle(options.DiffStyles, wxSTC_STYLE_INDENTGUIDE, "Diff Indentation Guides");
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Diff Caret");
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Diff Current Line"); 
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Diff Selection"); 
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Diff Code Fold Margin"); 
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Diff Right Margin"); 
-	NewStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Diff Highlight Matches"); 
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET, "Diff Caret");
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE, "Diff Current Line"); 
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION, "Diff Selection"); 
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING, "Diff Code Fold Margin"); 
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN, "Diff Right Margin"); 
+	NewStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT, "Diff Highlight Matches"); 
 
-	mvceditor::CodeControlStylesSetTheme(options, mvceditor::CodeControlStylesGetThemes()[0]);
+	t4p::CodeControlStylesSetTheme(options, t4p::CodeControlStylesGetThemes()[0]);
 }
 
 
@@ -424,7 +424,7 @@ void mvceditor::CodeControlStylesInit(mvceditor::CodeControlOptionsClass& option
 
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
-static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -552,12 +552,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#79ABFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -622,12 +622,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#C7DD0C"));
@@ -642,12 +642,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#D8D8D8"));
@@ -670,12 +670,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -691,12 +691,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
@@ -713,12 +713,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -734,12 +734,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#D8D8D8"));
@@ -779,12 +779,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#FFC600"));
@@ -811,12 +811,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#FFC600"));
@@ -844,12 +844,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#FFC600"));
@@ -868,12 +868,12 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -887,14 +887,14 @@ static void SetToOblivionTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -1022,12 +1022,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -1092,12 +1092,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#83786E"));
@@ -1112,12 +1112,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#E79E3C"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F8E1AA"));
@@ -1140,12 +1140,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1161,12 +1161,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D6C248"));
@@ -1183,12 +1183,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1204,12 +1204,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F8E1AA"));
@@ -1249,12 +1249,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#D6C248"));
@@ -1281,12 +1281,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#D6C248"));
@@ -1314,12 +1314,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#D6C248"));
@@ -1338,12 +1338,12 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -1357,14 +1357,14 @@ static void SetToRettaTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C97138"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C97138"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8E1AA"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -1492,12 +1492,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -1562,12 +1562,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#93A1A1"));
@@ -1582,12 +1582,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#B58900"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#657A81"));
@@ -1610,12 +1610,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1631,12 +1631,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#657A81"));
@@ -1653,12 +1653,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1674,12 +1674,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#657A81"));
@@ -1719,12 +1719,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -1751,12 +1751,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#2AA198"));
@@ -1784,12 +1784,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#2AA198"));
@@ -1808,12 +1808,12 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -1827,14 +1827,14 @@ static void SetToSolarized_lightTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#586E75"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#657A81"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -1962,12 +1962,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#268BD2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -2032,12 +2032,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#586E75"));
@@ -2052,12 +2052,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#B58900"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#839496"));
@@ -2080,12 +2080,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2101,12 +2101,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#B58900"));
@@ -2123,12 +2123,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2144,12 +2144,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#839496"));
@@ -2189,12 +2189,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -2221,12 +2221,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#2AA198"));
@@ -2254,12 +2254,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#2AA198"));
@@ -2278,12 +2278,12 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -2297,14 +2297,14 @@ static void SetToSolarized_darkTheme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#657B83"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#657B83"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#839496"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -2432,12 +2432,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#729fcf"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -2502,12 +2502,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#888a85"));
@@ -2522,12 +2522,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#d3d7cf"));
@@ -2550,12 +2550,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2571,12 +2571,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
@@ -2593,12 +2593,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2614,12 +2614,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#d3d7cf"));
@@ -2659,12 +2659,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#edd400"));
@@ -2691,12 +2691,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#edd400"));
@@ -2724,12 +2724,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#edd400"));
@@ -2748,12 +2748,12 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -2767,14 +2767,14 @@ static void SetToGedit_original_oblivionTheme(mvceditor::CodeControlOptionsClass
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2e3436"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#d3d7cf"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -2902,12 +2902,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#D4C4A9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -2972,12 +2972,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#99968b"));
@@ -2992,12 +2992,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#8ac6f2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#f6f3e8"));
@@ -3020,12 +3020,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3041,12 +3041,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#f3f6ee"));
@@ -3063,12 +3063,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3084,12 +3084,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#f6f3e8"));
@@ -3129,12 +3129,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#95e454"));
@@ -3161,12 +3161,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#95e454"));
@@ -3194,12 +3194,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#95e454"));
@@ -3218,12 +3218,12 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -3237,14 +3237,14 @@ static void SetToWombatTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#242424"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#f6f3e8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -3372,12 +3372,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -3442,12 +3442,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
@@ -3462,12 +3462,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#82677E"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#C0C0C0"));
@@ -3490,12 +3490,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3511,12 +3511,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
@@ -3533,12 +3533,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3554,12 +3554,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#C0C0C0"));
@@ -3599,12 +3599,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -3631,12 +3631,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#c78d9b"));
@@ -3664,12 +3664,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#c78d9b"));
@@ -3688,12 +3688,12 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -3707,14 +3707,14 @@ static void SetToBlack_pastelTheme(mvceditor::CodeControlOptionsClass& options) 
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -3842,12 +3842,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#79ABFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -3912,12 +3912,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00cc00"));
@@ -3932,12 +3932,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#3333ff"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
@@ -3960,12 +3960,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -3981,12 +3981,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
@@ -4003,12 +4003,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -4024,12 +4024,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
@@ -4069,12 +4069,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#990000"));
@@ -4101,12 +4101,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#990000"));
@@ -4134,12 +4134,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#990000"));
@@ -4158,12 +4158,12 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -4177,14 +4177,14 @@ static void SetToVisual_studioTheme(mvceditor::CodeControlOptionsClass& options)
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -4312,12 +4312,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -4382,12 +4382,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
@@ -4402,12 +4402,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#93C763"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E0E2E4"));
@@ -4430,12 +4430,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4451,12 +4451,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
@@ -4473,12 +4473,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4494,12 +4494,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E0E2E4"));
@@ -4539,12 +4539,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#EC7600"));
@@ -4571,12 +4571,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#EC7600"));
@@ -4604,12 +4604,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#EC7600"));
@@ -4628,12 +4628,12 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -4647,14 +4647,14 @@ static void SetToObsidianTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#293134"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -4782,12 +4782,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -4852,12 +4852,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
@@ -4872,12 +4872,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
@@ -4900,12 +4900,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#008000"));
@@ -4921,12 +4921,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
@@ -4943,12 +4943,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#008000"));
@@ -4964,12 +4964,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
@@ -5009,12 +5009,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#A31515"));
@@ -5041,12 +5041,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#A31515"));
@@ -5074,12 +5074,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#A31515"));
@@ -5098,12 +5098,12 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -5117,14 +5117,14 @@ static void SetToAs_visual_studio_2010Theme(mvceditor::CodeControlOptionsClass& 
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -5252,12 +5252,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#A19A83"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -5322,12 +5322,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AEAEAE"));
@@ -5342,12 +5342,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#A38474"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#C0B6A8"));
@@ -5370,12 +5370,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5391,12 +5391,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
@@ -5413,12 +5413,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5434,12 +5434,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#C0B6A8"));
@@ -5479,12 +5479,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -5511,12 +5511,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
@@ -5544,12 +5544,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
@@ -5568,12 +5568,12 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -5587,14 +5587,14 @@ static void SetToHavenjarkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#2D3639"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#C0B6A8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -5722,12 +5722,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#5c8198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -5792,12 +5792,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#17608f"));
@@ -5812,12 +5812,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#688046"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
@@ -5840,12 +5840,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5861,12 +5861,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
@@ -5883,12 +5883,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5904,12 +5904,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
@@ -5949,12 +5949,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#92679a"));
@@ -5981,12 +5981,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#92679a"));
@@ -6014,12 +6014,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#92679a"));
@@ -6038,12 +6038,12 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -6057,14 +6057,14 @@ static void SetToTangoTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -6192,12 +6192,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#2b6488"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -6262,12 +6262,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#d7d3cc"));
@@ -6282,12 +6282,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#606060"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#430400"));
@@ -6310,12 +6310,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6331,12 +6331,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#5f97a9"));
@@ -6353,12 +6353,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6374,12 +6374,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#430400"));
@@ -6419,12 +6419,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#585545"));
@@ -6451,12 +6451,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#585545"));
@@ -6484,12 +6484,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#585545"));
@@ -6508,12 +6508,12 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -6527,14 +6527,14 @@ static void SetToSchussTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#430400"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -6662,12 +6662,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#000080"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -6732,12 +6732,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
@@ -6752,12 +6752,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
@@ -6780,12 +6780,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6801,12 +6801,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#8000FF"));
@@ -6823,12 +6823,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6844,12 +6844,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
@@ -6889,12 +6889,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#808080"));
@@ -6921,12 +6921,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#808080"));
@@ -6954,12 +6954,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#808080"));
@@ -6978,12 +6978,12 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -6997,14 +6997,14 @@ static void SetToNotepad_defaultTheme(mvceditor::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#808080"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -7132,12 +7132,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#3C758D"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -7202,12 +7202,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#8146A2"));
@@ -7222,12 +7222,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#EC691E"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
@@ -7250,12 +7250,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7271,12 +7271,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FFFFFF"));
@@ -7293,12 +7293,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7314,12 +7314,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
@@ -7359,12 +7359,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#477488"));
@@ -7391,12 +7391,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#477488"));
@@ -7424,12 +7424,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#477488"));
@@ -7448,12 +7448,12 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -7467,14 +7467,14 @@ static void SetToVibrant_inkTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#191919"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -7602,12 +7602,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#79ABFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -7672,12 +7672,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00E000"));
@@ -7692,12 +7692,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#00D0D0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#D0D0D0"));
@@ -7720,12 +7720,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7741,12 +7741,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D0D0D0"));
@@ -7763,12 +7763,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7784,12 +7784,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#D0D0D0"));
@@ -7829,12 +7829,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#DC78DC"));
@@ -7861,12 +7861,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#DC78DC"));
@@ -7894,12 +7894,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#DC78DC"));
@@ -7918,12 +7918,12 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -7937,14 +7937,14 @@ static void SetToRecogneyesTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#101020"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#D0D0D0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -8072,12 +8072,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#0066FF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -8142,12 +8142,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FF9900"));
@@ -8162,12 +8162,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#333333"));
@@ -8190,12 +8190,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8211,12 +8211,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#0000FF"));
@@ -8233,12 +8233,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8254,12 +8254,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#333333"));
@@ -8299,12 +8299,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC0000"));
@@ -8331,12 +8331,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC0000"));
@@ -8364,12 +8364,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC0000"));
@@ -8388,12 +8388,12 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -8407,14 +8407,14 @@ static void SetToMrTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -8542,12 +8542,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#4B9CE9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -8612,12 +8612,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#A8A8A8"));
@@ -8632,12 +8632,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#EA9C77"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F9F9F9"));
@@ -8660,12 +8660,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8681,12 +8681,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F9F9F9"));
@@ -8703,12 +8703,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8724,12 +8724,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F9F9F9"));
@@ -8769,12 +8769,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#76BA53"));
@@ -8801,12 +8801,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#76BA53"));
@@ -8834,12 +8834,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#76BA53"));
@@ -8858,12 +8858,12 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -8877,14 +8877,14 @@ static void SetToSunburstTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F9F9F9"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -9012,12 +9012,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -9082,12 +9082,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#CD8B00"));
@@ -9102,12 +9102,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#808BED"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#CFBFAD"));
@@ -9130,12 +9130,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9151,12 +9151,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#CFBFAD"));
@@ -9173,12 +9173,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9194,12 +9194,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#CFBFAD"));
@@ -9239,12 +9239,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#FFCD8B"));
@@ -9271,12 +9271,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#FFCD8B"));
@@ -9304,12 +9304,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#FFCD8B"));
@@ -9328,12 +9328,12 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -9347,14 +9347,14 @@ static void SetToInkpotTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#2B91AF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#2B91AF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F27"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -9482,12 +9482,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#5c8198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -9552,12 +9552,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#334466"));
@@ -9572,12 +9572,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#5c8198"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
@@ -9600,12 +9600,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9621,12 +9621,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#333333"));
@@ -9643,12 +9643,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9664,12 +9664,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
@@ -9709,12 +9709,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#333333"));
@@ -9741,12 +9741,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#333333"));
@@ -9774,12 +9774,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#333333"));
@@ -9798,12 +9798,12 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -9817,14 +9817,14 @@ static void SetToMinimalTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#666666"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -9952,12 +9952,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#D4C4A9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -10022,12 +10022,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
@@ -10042,12 +10042,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#8DCBE2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E2E2E2"));
@@ -10070,12 +10070,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10091,12 +10091,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
@@ -10113,12 +10113,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10134,12 +10134,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E2E2E2"));
@@ -10179,12 +10179,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -10211,12 +10211,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
@@ -10244,12 +10244,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
@@ -10268,12 +10268,12 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -10287,14 +10287,14 @@ static void SetToNightlion_aptana_themeTheme(mvceditor::CodeControlOptionsClass&
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#C0C0C0"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1E1E1E"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E2E2E2"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -10422,12 +10422,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#79ABFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -10492,12 +10492,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#75715E"));
@@ -10512,12 +10512,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#66CCB3"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F8F8F2"));
@@ -10540,12 +10540,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10561,12 +10561,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
@@ -10583,12 +10583,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10604,12 +10604,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F8F8F2"));
@@ -10649,12 +10649,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#E6DB74"));
@@ -10681,12 +10681,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#E6DB74"));
@@ -10714,12 +10714,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#E6DB74"));
@@ -10738,12 +10738,12 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -10757,14 +10757,14 @@ static void SetToMonokaiTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#F8F8F2"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -10892,12 +10892,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -10962,12 +10962,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FFFFFF"));
@@ -10982,12 +10982,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FF007F"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#CFBFAD"));
@@ -11010,12 +11010,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11031,12 +11031,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FF007F"));
@@ -11053,12 +11053,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11074,12 +11074,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#CFBFAD"));
@@ -11119,12 +11119,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#ECE47E"));
@@ -11151,12 +11151,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#ECE47E"));
@@ -11184,12 +11184,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#ECE47E"));
@@ -11208,12 +11208,12 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -11227,14 +11227,14 @@ static void SetToSublime_text_2Theme(mvceditor::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#272822"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#CFBFAD"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -11362,12 +11362,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -11432,12 +11432,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
@@ -11452,12 +11452,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#a57b61"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E0E2E4"));
@@ -11480,12 +11480,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11501,12 +11501,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
@@ -11523,12 +11523,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11544,12 +11544,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E0E2E4"));
@@ -11589,12 +11589,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -11621,12 +11621,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#c78d9b"));
@@ -11654,12 +11654,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#c78d9b"));
@@ -11678,12 +11678,12 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -11697,14 +11697,14 @@ static void SetToPastelTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#81969A"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#81969A"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1f2223"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#E0E2E4"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -11832,12 +11832,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#D4C4A9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -11902,12 +11902,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
@@ -11922,12 +11922,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#F0DFAF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#DCDCCC"));
@@ -11950,12 +11950,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -11971,12 +11971,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
@@ -11993,12 +11993,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -12014,12 +12014,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#DCDCCC"));
@@ -12059,12 +12059,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -12091,12 +12091,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
@@ -12124,12 +12124,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
@@ -12148,12 +12148,12 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -12167,14 +12167,14 @@ static void SetToZenburn_highcontrastTheme(mvceditor::CodeControlOptionsClass& o
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#9FAFAF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#9FAFAF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#1F1F1F"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#DCDCCC"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -12302,12 +12302,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#F7C527"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -12372,12 +12372,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#666666"));
@@ -12392,12 +12392,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
@@ -12420,12 +12420,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12441,12 +12441,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FFFFFF"));
@@ -12463,12 +12463,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12484,12 +12484,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
@@ -12529,12 +12529,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#00a40f"));
@@ -12561,12 +12561,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#00a40f"));
@@ -12594,12 +12594,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#00a40f"));
@@ -12618,12 +12618,12 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -12637,14 +12637,14 @@ static void SetToFrontenddevTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#999999"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#000000"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#FFFFFF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
-static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
+static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -12772,12 +12772,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#55aa55"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -12842,12 +12842,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AD95AF"));
@@ -12862,12 +12862,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#295F94"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#585858"));
@@ -12890,12 +12890,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -12911,12 +12911,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
@@ -12933,12 +12933,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -12954,12 +12954,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#585858"));
@@ -12999,12 +12999,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#317ECC"));
@@ -13031,12 +13031,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#317ECC"));
@@ -13064,12 +13064,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#317ECC"));
@@ -13088,12 +13088,12 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -13107,15 +13107,15 @@ static void SetToRoboticketTheme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("#FF0000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("#AFBFCF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("#AFBFCF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("#F5F5F5"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("#585858"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
 
-void mvceditor::CodeControlStylesSetTheme(mvceditor::CodeControlOptionsClass& options, const wxString& theme) {
+void t4p::CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxString& theme) {
 	if (theme == wxT("Oblivion")) {
 		SetToOblivionTheme(options);
 	}
@@ -13198,7 +13198,7 @@ void mvceditor::CodeControlStylesSetTheme(mvceditor::CodeControlOptionsClass& op
 		SetToRoboticketTheme(options);
 	}
 }
-wxArrayString mvceditor::CodeControlStylesGetThemes() {
+wxArrayString t4p::CodeControlStylesGetThemes() {
 	wxArrayString themes;
 		themes.Add(wxT("Oblivion"));
 	themes.Add(wxT("Retta"));

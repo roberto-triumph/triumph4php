@@ -49,9 +49,9 @@ public:
 	
 	virtual int OnExit();
 	
-	mvceditor::CodeControlOptionsClass Options;
-	mvceditor::GlobalsClass Globals;
-	mvceditor::EventSinkClass EventSink;
+	t4p::CodeControlOptionsClass Options;
+	t4p::GlobalsClass Globals;
+	t4p::EventSinkClass EventSink;
 };
 
 /**
@@ -65,7 +65,7 @@ public:
 	/**
 	 * This class will NOT own the codeControl pointer
 	 */
-	FileDropTargetClass(mvceditor::CodeControlClass* codeControl);
+	FileDropTargetClass(t4p::CodeControlClass* codeControl);
 
 	/** 
 	 * Called by wxWidgets when user drags a file to this application frame. All files dragged in will be opened
@@ -75,10 +75,10 @@ public:
 
 private:
 
-	mvceditor::CodeControlClass* CodeControl;
+	t4p::CodeControlClass* CodeControl;
 };
 
-FileDropTargetClass::FileDropTargetClass(mvceditor::CodeControlClass* codeControl) :
+FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl) :
 	CodeControl(codeControl) {
 
 }
@@ -99,7 +99,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 		return false;
 	}
 	UnicodeString contents;
-	mvceditor::FindInFilesClass::FileContents(fileNameString, contents);
+	t4p::FindInFilesClass::FileContents(fileNameString, contents);
 	CodeControl->TrackFile(fileNameString, contents);
 	return true;
 }
@@ -133,7 +133,7 @@ private:
 		ID_HELP
 	};
 	
-	mvceditor::CodeControlClass* Ctrl;
+	t4p::CodeControlClass* Ctrl;
 	
 	CodeControlProfilerAppClass& App;
 	
@@ -152,14 +152,14 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 }
 
 bool CodeControlProfilerAppClass::OnInit() {
-	mvceditor::CodeControlStylesInit(Options);
+	t4p::CodeControlStylesInit(Options);
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass;
+	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass;
 	std::vector<wxString> phpFileFilters,
 		miscFileFilters;
 	phpFileFilters.push_back(wxT("*.php"));
-	tagFinderlist->InitGlobalTag(mvceditor::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
+	tagFinderlist->InitGlobalTag(t4p::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
 	Globals.TagCache.RegisterGlobal(tagFinderlist);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
@@ -177,9 +177,9 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
 			wxSize(1024, 768)) 
 	, App(app) {
-	Ctrl = new mvceditor::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
+	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
-	Ctrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	Ctrl->SetDocumentMode(t4p::CodeControlClass::PHP);
 	CreateMenu();
 }
 

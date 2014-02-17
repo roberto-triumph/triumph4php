@@ -30,7 +30,7 @@
 #include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * These event will be dispatched to the handler. Note that the 
@@ -66,7 +66,7 @@ extern const wxEventType EVENT_FILE_READ;
  * to iterate through entire projects twice. It is better to open a file once and hand it to
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
-class BackgroundFileReaderClass : public mvceditor::ActionClass {
+class BackgroundFileReaderClass : public t4p::ActionClass {
 
 public:
 
@@ -84,10 +84,10 @@ public:
 	 * @param wxEvtHandler& handler this event handler will receive
 	 *        a EVENT_FILE_READ_COMPLETE event when the
 	 *        background thread has completed. Will also receive
-	 * 		  mvceditor::WORK_* events 
-	 * @see mvceditor::ThreadWithHeartbeatClass
+	 * 		  t4p::WORK_* events 
+	 * @see t4p::ThreadWithHeartbeatClass
 	 */
-	BackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Prepare the background thread to iterate through all
@@ -114,7 +114,7 @@ public:
 	 * @return bool doHidden if TRUE then hidden files will be walked as well.
 	 * @return bool true of the given path exists
 	 */
-	bool Init(std::vector<mvceditor::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
+	bool Init(std::vector<t4p::SourceClass> sources, DirectorySearchClass::Modes mode = DirectorySearchClass::RECURSIVE, bool doHiddenFiles = false);
 
 	/**
 	 * prepares the thread to iterate over the given set of files

@@ -24,13 +24,13 @@
  */
 #include <widgets/ProcessWithHeartbeatClass.h>
 
-extern const wxEventType mvceditor::EVENT_PROCESS_COMPLETE = wxNewEventType();
+extern const wxEventType t4p::EVENT_PROCESS_COMPLETE = wxNewEventType();
 
-extern const wxEventType mvceditor::EVENT_PROCESS_FAILED = wxNewEventType();
+extern const wxEventType t4p::EVENT_PROCESS_FAILED = wxNewEventType();
 
-extern const wxEventType mvceditor::EVENT_PROCESS_IN_PROGRESS = wxNewEventType();
+extern const wxEventType t4p::EVENT_PROCESS_IN_PROGRESS = wxNewEventType();
 
-mvceditor::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& handler)
+t4p::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& handler)
 	: wxEvtHandler()
 	, RunningProcesses()
 	, Timer()
@@ -39,7 +39,7 @@ mvceditor::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& ha
 	Timer.SetOwner(this);
 }
 
-mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
+t4p::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	Timer.Stop();
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.begin();
 	while (it != RunningProcesses.end()) {
@@ -51,7 +51,7 @@ mvceditor::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	}
 }
 
-bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int eventId, long& pid) {
+bool t4p::ProcessWithHeartbeatClass::Init(wxString command, int eventId, long& pid) {
 	wxProcess* newProcess = new wxProcess(this, eventId);
 	EventId = eventId;
 	newProcess->Redirect();
@@ -76,7 +76,7 @@ bool mvceditor::ProcessWithHeartbeatClass::Init(wxString command, int eventId, l
 	return 0 != pid;
 }
 
-bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
+bool t4p::ProcessWithHeartbeatClass::Stop(long pid) {
 	Timer.Stop();
 	bool stopped = false;	
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
@@ -100,14 +100,14 @@ bool mvceditor::ProcessWithHeartbeatClass::Stop(long pid) {
 	return stopped;
 }
 
-void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event) {
+void t4p::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event) {
 	Timer.Stop();
 	long pid = event.GetPid();
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 	if (event.GetExitCode() == 0 && it != RunningProcesses.end() && it->second) {
 		wxProcess* proc = it->second;
 		wxString output = GetProcessOutput(proc);
-		wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_COMPLETE);
+		wxCommandEvent completeEvent(t4p::EVENT_PROCESS_COMPLETE);
 		completeEvent.SetId(event.GetId());
 		completeEvent.SetString(output);
 		wxPostEvent(&Handler, completeEvent);
@@ -115,7 +115,7 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 	else if (it != RunningProcesses.end() && it->second) {
 		wxProcess* proc = it->second;
 		wxString output = GetProcessOutput(proc);
-		wxCommandEvent completeEvent(mvceditor::EVENT_PROCESS_FAILED);
+		wxCommandEvent completeEvent(t4p::EVENT_PROCESS_FAILED);
 		completeEvent.SetId(event.GetId());
 		completeEvent.SetString(output);
 		wxPostEvent(&Handler, completeEvent);
@@ -129,7 +129,7 @@ void mvceditor::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event)
 	}
 }
 
-wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const {
+wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const {
 	std::map<long, wxProcess*>::const_iterator it = RunningProcesses.find(pid);
 	wxString output;
 	if (it != RunningProcesses.end()) {
@@ -138,7 +138,7 @@ wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const 
 	return output;
 }
 
-wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const {
+wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const {
 	wxInputStream* stream = proc->GetInputStream();
 	wxString allOutput;
 	while (proc->IsInputAvailable()) {
@@ -157,12 +157,12 @@ wxString mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc)
 	return allOutput;
 }
 
-void mvceditor::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
-	wxCommandEvent intProgressEvent(mvceditor::EVENT_PROCESS_IN_PROGRESS, EventId);
+void t4p::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
+	wxCommandEvent intProgressEvent(t4p::EVENT_PROCESS_IN_PROGRESS, EventId);
 	wxPostEvent(&Handler, intProgressEvent);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ProcessWithHeartbeatClass, wxEvtHandler)
-	EVT_END_PROCESS(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnProcessEnded)	
-	EVT_TIMER(wxID_ANY, mvceditor::ProcessWithHeartbeatClass::OnTimer)
+BEGIN_EVENT_TABLE(t4p::ProcessWithHeartbeatClass, wxEvtHandler)
+	EVT_END_PROCESS(wxID_ANY, t4p::ProcessWithHeartbeatClass::OnProcessEnded)	
+	EVT_TIMER(wxID_ANY, t4p::ProcessWithHeartbeatClass::OnTimer)
 END_EVENT_TABLE()

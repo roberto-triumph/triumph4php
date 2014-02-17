@@ -39,12 +39,12 @@ class ActionTestFixtureClass : public wxEvtHandler {
 
 public:
 
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 
 	/**
 	 * Since ActionClass::Init() needs a GlobalsClass parameter
 	 */
-	mvceditor::GlobalsClass Globals;
+	t4p::GlobalsClass Globals;
 
 	ActionTestFixtureClass();
 

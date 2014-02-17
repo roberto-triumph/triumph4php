@@ -25,7 +25,7 @@
 #include <widgets/ComboBoxHistoryClass.h>
 
 
-mvceditor::ComboBoxHistoryClass::ComboBoxHistoryClass(wxComboBox* combo) 
+t4p::ComboBoxHistoryClass::ComboBoxHistoryClass(wxComboBox* combo) 
 	: wxEvtHandler()
 	, Items()
 	, Combo(combo) {
@@ -35,14 +35,14 @@ mvceditor::ComboBoxHistoryClass::ComboBoxHistoryClass(wxComboBox* combo)
 	}
 }
 
-mvceditor::ComboBoxHistoryClass::~ComboBoxHistoryClass() {
+t4p::ComboBoxHistoryClass::~ComboBoxHistoryClass() {
 	if (NULL != Combo) {
 		Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 		Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 	}
 }
 
-void mvceditor::ComboBoxHistoryClass::Attach(wxComboBox* combo) {
+void t4p::ComboBoxHistoryClass::Attach(wxComboBox* combo) {
 	Combo = combo;
 	Combo->Connect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 	Combo->Connect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
@@ -51,7 +51,7 @@ void mvceditor::ComboBoxHistoryClass::Attach(wxComboBox* combo) {
 	Combo->Append(Items);
 }
 
-void mvceditor::ComboBoxHistoryClass::Detach() {
+void t4p::ComboBoxHistoryClass::Detach() {
 	Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 	Combo->Disconnect(Combo->GetId(), wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ComboBoxHistoryClass::OnComboSelected), NULL, this);
 	
@@ -60,7 +60,7 @@ void mvceditor::ComboBoxHistoryClass::Detach() {
 	Combo = NULL;
 }
 
-void mvceditor::ComboBoxHistoryClass::Save() {
+void t4p::ComboBoxHistoryClass::Save() {
 	int MAX_ITEMS = 18;
 	wxString newValue = Combo->GetValue();
 	int index = Combo->FindString(newValue);
@@ -73,7 +73,7 @@ void mvceditor::ComboBoxHistoryClass::Save() {
 	}
 }
 
-void mvceditor::ComboBoxHistoryClass::OnComboSelected(wxCommandEvent& event) {
+void t4p::ComboBoxHistoryClass::OnComboSelected(wxCommandEvent& event) {
 	if (NULL != Combo) {
 		Save();
 	}

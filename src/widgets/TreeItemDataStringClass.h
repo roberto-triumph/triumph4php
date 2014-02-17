@@ -23,13 +23,13 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_TREEITEMDATASTRINGCLASS_H__
-#define __MVCEDITOR_TREEITEMDATASTRINGCLASS_H__
+#ifndef __T4P_TREEITEMDATASTRINGCLASS_H__
+#define __T4P_TREEITEMDATASTRINGCLASS_H__
 
 #include <wx/string.h>
 #include <wx/treectrl.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * small class to hold an arbritrary string on each

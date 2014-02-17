@@ -22,12 +22,12 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_DIRECTORY_H_
-#define __MVCEDITOR_DIRECTORY_H_
+#ifndef __T4P_DIRECTORY_H_
+#define __T4P_DIRECTORY_H_
 
 #include <wx/string.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Delete a directory and all of its sub-directories

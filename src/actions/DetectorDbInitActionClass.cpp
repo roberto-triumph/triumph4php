@@ -26,23 +26,23 @@
 #include <actions/DetectorDbInitActionClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::DetectorDbInitActionClass::DetectorDbInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::DetectorDbInitActionClass::DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerGlobalActionClass(runningThreads, eventId) {
 
 }
 
-void mvceditor::DetectorDbInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	SetStatus(_("Detector Db Init"));
 
 	// open the tag db
 	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), 
-		mvceditor::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
+		t4p::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
 	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
 	
 	// reload the detected database tags
 	
 	// first remove all detected connections that were previously detected
-	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	std::vector<t4p::DatabaseTagClass>::iterator info;
 	info = globals.DatabaseTags.begin();
 	while(info != globals.DatabaseTags.end()) {
 		if (info->IsDetected) {
@@ -56,11 +56,11 @@ void mvceditor::DetectorDbInitActionClass::Work(mvceditor::GlobalsClass &globals
 	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
 
 	// initialize the detected tag cache only the enabled projects
-	mvceditor::DatabaseTagFinderClass finder;
+	t4p::DatabaseTagFinderClass finder;
 	finder.InitSession(&globals.DetectorCacheSession);
 	
-	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
+	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
 	for (tag = detected.begin(); tag != detected.end(); ++tag) {
 		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
 			globals.DatabaseTags.push_back(*tag);
@@ -68,6 +68,6 @@ void mvceditor::DetectorDbInitActionClass::Work(mvceditor::GlobalsClass &globals
 	}
 }
 
-wxString mvceditor::DetectorDbInitActionClass::GetLabel() const {
+wxString t4p::DetectorDbInitActionClass::GetLabel() const {
 	return _("Database tags detector initialization");
 }

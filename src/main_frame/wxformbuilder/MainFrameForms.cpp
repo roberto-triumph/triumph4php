@@ -47,7 +47,7 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	wxBoxSizer* Sizer;
 	Sizer = new wxBoxSizer( wxVERTICAL );
 	
-	Notebook = new mvceditor::NotebookClass( this, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TAB_MOVE|wxAUI_NB_WINDOWLIST_BUTTON );
+	Notebook = new t4p::NotebookClass( this, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TAB_MOVE|wxAUI_NB_WINDOWLIST_BUTTON );
 	
 	Sizer->Add( Notebook, 1, wxEXPAND | wxALL, 5 );
 	

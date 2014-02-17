@@ -24,12 +24,12 @@
  */
 #include <globals/FileName.h>
 
-wxFileName mvceditor::FileNameCopy(const wxFileName& fileName) {
+wxFileName t4p::FileNameCopy(const wxFileName& fileName) {
 	wxFileName cpy(fileName.GetFullPath());
 	return cpy;
 }
 
- std::vector<wxFileName> mvceditor::DeepCopyFileNames(const std::vector<wxFileName>& fileNames) {
+ std::vector<wxFileName> t4p::DeepCopyFileNames(const std::vector<wxFileName>& fileNames) {
 	std::vector<wxFileName> cpy;
 	std::vector<wxFileName>::const_iterator filename;
 	for (filename = fileNames.begin(); filename != fileNames.end(); ++filename) {

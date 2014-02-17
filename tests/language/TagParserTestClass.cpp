@@ -34,7 +34,7 @@ class TagParserTestFixtureClass : public SqliteTestFixtureClass {
 
 public:
 
-	mvceditor::TagParserClass TagParser;
+	t4p::TagParserClass TagParser;
 
 	TagParserTestFixtureClass() 
 		: SqliteTestFixtureClass()
@@ -71,7 +71,7 @@ SUITE(TagParserTestClass) {
 
 TEST_FIXTURE(TagParserTestFixtureClass, WipeAll) {
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
-	AddFile(file1, mvceditor::CharToIcu(
+	AddFile(file1, t4p::CharToIcu(
 		"class User {}\n"
 		"class Admin {}\n"
 	));
@@ -93,12 +93,12 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectories) {
 
 	// create 2 files, each in different directories
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
-	AddFile(file1, mvceditor::CharToIcu(
+	AddFile(file1, t4p::CharToIcu(
 		"class User {}\n"
 	));
 
 	wxFileName file2 = TestFile(wxT("project2"), wxT("admin.php"));
-	AddFile(file2, mvceditor::CharToIcu(
+	AddFile(file2, t4p::CharToIcu(
 		"class Admin {}\n"
 	));
 	int count = RowCount("file_items");
@@ -124,12 +124,12 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectoriesWithSubDirectories) {
 
 	// create 2 files, each in different directories
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
-	AddFile(file1, mvceditor::CharToIcu(
+	AddFile(file1, t4p::CharToIcu(
 		"class User {}\n"
 	));
 
 	wxFileName file2 = TestFile(wxT("project2"), wxT("admin.php"));
-	AddFile(file2, mvceditor::CharToIcu(
+	AddFile(file2, t4p::CharToIcu(
 		"class Admin {}\n"
 	));
 	int count = RowCount("file_items");
@@ -155,12 +155,12 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectoriesWithSubDirectories) {
 
 TEST_FIXTURE(TagParserTestFixtureClass, RenameFile) {
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
-	AddFile(file1, mvceditor::CharToIcu(
+	AddFile(file1, t4p::CharToIcu(
 		"class User {}\n"
 		"class Admin {}\n"
 	));
 
-	std::string stdFullPath = mvceditor::WxToChar(file1.GetFullPath());
+	std::string stdFullPath = t4p::WxToChar(file1.GetFullPath());
 	int count = 0;
 	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 
 		soci::use(stdFullPath), soci::into(count);
@@ -169,7 +169,7 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameFile) {
 	wxFileName newFileName(file1.GetPath(), wxT("admin.php"));
 	TagParser.RenameFile(file1, newFileName);
 	
-	stdFullPath = mvceditor::WxToChar(newFileName.GetFullPath());
+	stdFullPath = t4p::WxToChar(newFileName.GetFullPath());
 	count = 0;
 	std::string newName;
 	Session << ("SELECT name FROM file_items WHERE full_path= ?"), 
@@ -179,7 +179,7 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameFile) {
 
 TEST_FIXTURE(TagParserTestFixtureClass, RenameDir) {
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
-	AddFile(file1, mvceditor::CharToIcu(
+	AddFile(file1, t4p::CharToIcu(
 		"class User {}\n"
 		"class Admin {}\n"
 	));
@@ -197,7 +197,7 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameDir) {
 	TagParser.RenameDir(oldDir, newDir);
 	
 	wxFileName newFileName(newDir.GetPath(), wxT("user.php"));
-	std::string stdFullPath = mvceditor::WxToChar(newFileName.GetFullPath());
+	std::string stdFullPath = t4p::WxToChar(newFileName.GetFullPath());
 
 	int count = 0;
 	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 

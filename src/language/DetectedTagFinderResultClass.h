@@ -23,15 +23,15 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_DETECTEDTAGFINDERCLASS_H__
-#define __MVCEDITOR_DETECTEDTAGFINDERCLASS_H__
+#ifndef __T4P_DETECTEDTAGFINDERCLASS_H__
+#define __T4P_DETECTEDTAGFINDERCLASS_H__
 
 #include <globals/Sqlite.h>
 #include <globals/TagClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
-class DetectedTagTotalCountResultClass : public mvceditor::SqliteResultClass {
+class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {
 
 public:
 
@@ -48,14 +48,14 @@ private:
 	int TotalCount;
 };
 
-class DetectedTagExactMemberResultClass : public mvceditor::SqliteResultClass {
+class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
 
 public:
 
 	/**
 	 * this object is the current row of the result.
 	 */
-	mvceditor::TagClass Tag;
+	t4p::TagClass Tag;
 
 	DetectedTagExactMemberResultClass();
 
@@ -93,7 +93,7 @@ protected:
 	bool Init(soci::statement* stmt);
 };
 
-class DetectedTagNearMatchMemberResultClass : public mvceditor::DetectedTagExactMemberResultClass {
+class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMemberResultClass {
 
 public:
 

@@ -30,7 +30,7 @@
 
 static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 
-mvceditor::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass() 
+t4p::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass() 
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -39,7 +39,7 @@ mvceditor::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass()
 
 }
 
-wxString mvceditor::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
+wxString t4p::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
 	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
@@ -49,7 +49,7 @@ wxString mvceditor::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
 	return cmdLine;
 }
 
-mvceditor::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: wxEvtHandler()
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
@@ -57,7 +57,7 @@ mvceditor::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(mvcedi
 
 }
 
-bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::DatabaseTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	if (globals.Environment.Php.NotInstalled()) {
 		return false;
 	}
@@ -67,8 +67,8 @@ bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& gl
 	}
 	std::vector<wxString> detectorScripts = DetectorScripts();
 
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	std::vector<wxString>::const_iterator scriptName;
 
 	// need to call each url detector once for each different source directory
@@ -78,9 +78,9 @@ bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& gl
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (source->Exists()) {
 					for (scriptName = detectorScripts.begin(); scriptName != detectorScripts.end(); ++scriptName) {
-						mvceditor::DatabaseTagDetectorParamsClass params;
+						t4p::DatabaseTagDetectorParamsClass params;
 						params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath.c_str();
-						params.PhpIncludePath.Assign(mvceditor::PhpDetectorsBaseAsset());
+						params.PhpIncludePath.Assign(t4p::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
 						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
@@ -99,24 +99,24 @@ bool mvceditor::DatabaseTagDetectorActionClass::Init(mvceditor::GlobalsClass& gl
 	return started;
 }
 
-bool mvceditor::DatabaseTagDetectorActionClass::DoAsync() {
+bool t4p::DatabaseTagDetectorActionClass::DoAsync() {
 	return false;
 }
 
-wxString mvceditor::DatabaseTagDetectorActionClass::GetLabel() const {
+wxString t4p::DatabaseTagDetectorActionClass::GetLabel() const {
 	return wxT("Database Detectors");
 }
 
-void mvceditor::DatabaseTagDetectorActionClass::BackgroundWork() {
+void t4p::DatabaseTagDetectorActionClass::BackgroundWork() {
 	// nothing is done in the background, we use ProcessWithHeartbeatClass
 	// here
 }
 
-bool mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
+bool t4p::DatabaseTagDetectorActionClass::NextDetection() {
 	if (ParamsQueue.empty()) {
 		return false;
 	}
-	mvceditor::DatabaseTagDetectorParamsClass params = ParamsQueue.front();
+	t4p::DatabaseTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
 	
 	wxArrayString dirs = params.SourceDir.GetDirs();
@@ -129,21 +129,21 @@ bool mvceditor::DatabaseTagDetectorActionClass::NextDetection() {
 	return Process.Init(cmdLine, ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
 }
 
-std::vector<wxString> mvceditor::DatabaseTagDetectorActionClass::DetectorScripts() {
+std::vector<wxString> t4p::DatabaseTagDetectorActionClass::DetectorScripts() {
 	std::vector<wxString> scripts;
-	mvceditor::RecursiveDirTraverserClass traverser(scripts);
+	t4p::RecursiveDirTraverserClass traverser(scripts);
 	wxDir globalDir;
-	if (globalDir.Open(mvceditor::DatabaseTagDetectorsGlobalAsset().GetFullPath())) {
+	if (globalDir.Open(t4p::DatabaseTagDetectorsGlobalAsset().GetFullPath())) {
 		globalDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	wxDir localDir;
-	if (localDir.Open(mvceditor::DatabaseTagDetectorsLocalAsset().GetFullPath())) {
+	if (localDir.Open(t4p::DatabaseTagDetectorsLocalAsset().GetFullPath())) {
 		localDir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 	}
 	return  scripts;
 }
 
-void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
+void t4p::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		SignalEnd();
 	}
@@ -152,14 +152,14 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete(wxCommandEvent
 	}
 }
 
-void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
+void t4p::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	wxString msg = event.GetString();
 	wxString extensionMissingErr = wxT("requires the PDO and pdo_sqlite PHP extensions.");
 	if (msg.Find(extensionMissingErr) != wxNOT_FOUND) {
-		mvceditor::EditorLogError(mvceditor::ERR_MISSING_PHP_EXTENSIONS, msg);
+		t4p::EditorLogError(t4p::ERR_MISSING_PHP_EXTENSIONS, msg);
 	}
 	else {
-		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, event.GetString());
+		t4p::EditorLogError(t4p::WARNING_OTHER, event.GetString());
 	}
 	if (ParamsQueue.empty()) {
 		SignalEnd();
@@ -169,7 +169,7 @@ void mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::DatabaseTagDetectorActionClass, wxEvtHandler) 
-	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::DatabaseTagDetectorActionClass::OnProcessComplete)
-	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::DatabaseTagDetectorActionClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(t4p::DatabaseTagDetectorActionClass, wxEvtHandler) 
+	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_COMPLETE, t4p::DatabaseTagDetectorActionClass::OnProcessComplete)
+	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_FAILED, t4p::DatabaseTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

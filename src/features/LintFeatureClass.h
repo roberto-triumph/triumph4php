@@ -36,7 +36,7 @@
 #include <language/PhpVariableLintClass.h>
 #include <language/PhpIdentifierLintClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration, defined below
 class LintFeatureClass;
@@ -87,14 +87,14 @@ public:
 typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClass&);
 
 #define EVT_LINT_ERROR(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_ERROR, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_LINT_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSummaryEventClass&);
 
 #define EVT_LINT_SUMMARY(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_LINT_SUMMARY, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_LINT_SUMMARY, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -132,11 +132,11 @@ public:
 
 	LintFeatureOptionsClass();
 
-	LintFeatureOptionsClass(const mvceditor::LintFeatureOptionsClass& src);
+	LintFeatureOptionsClass(const t4p::LintFeatureOptionsClass& src);
 
-	mvceditor::LintFeatureOptionsClass& operator=(const mvceditor::LintFeatureOptionsClass& src);
+	t4p::LintFeatureOptionsClass& operator=(const t4p::LintFeatureOptionsClass& src);
 
-	void Copy(const mvceditor::LintFeatureOptionsClass& src);
+	void Copy(const t4p::LintFeatureOptionsClass& src);
 };
 
 /** 
@@ -146,7 +146,7 @@ public:
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache, const mvceditor::LintFeatureOptionsClass& options);
+	ParserDirectoryWalkerClass(t4p::TagCacheClass& tagCache, const t4p::LintFeatureOptionsClass& options);
 	
 	/**
 	 * This is the method where the parsing will take place. Will return true
@@ -190,18 +190,18 @@ public:
 private:
 
 	// flags that control which checks to perform
-	mvceditor::LintFeatureOptionsClass Options;
+	t4p::LintFeatureOptionsClass Options;
 
 	// linters to perform different kinds of checks
 	pelet::ParserClass Parser;
-	mvceditor::PhpVariableLintOptionsClass VariableLinterOptions;
-	mvceditor::PhpVariableLintClass VariableLinter;
-	mvceditor::PhpIdentifierLintClass IdentifierLinter;
+	t4p::PhpVariableLintOptionsClass VariableLinterOptions;
+	t4p::PhpVariableLintClass VariableLinter;
+	t4p::PhpIdentifierLintClass IdentifierLinter;
 
 	// the results for each linter
 	pelet::LintResultsClass LastResults;
-	std::vector<mvceditor::PhpVariableLintResultClass> VariableResults;
-	std::vector<mvceditor::PhpIdentifierLintResultClass> IdentifierResults;
+	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
+	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
 	
 };
 
@@ -218,10 +218,10 @@ public:
 	 * 	      as well as WORK_* events
 	 * @param eventId the ID of the generated events
 	 * @param options flags to control how strict linter will be
-	 * @see mvceditor::ActionClass class
+	 * @see t4p::ActionClass class
 	 */
-	LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
-		const mvceditor::LintFeatureOptionsClass& options);
+	LintBackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId,
+		const t4p::LintFeatureOptionsClass& options);
 	
 	/**
 	 * prepare to lint a list of directories
@@ -231,7 +231,7 @@ public:
 	 * @param globals to know which PHP version to check against, and to get the location of the tag cache files
 	 * @return bool TRUE if sources is not empty
 	 */
-	bool InitDirectoryLint(std::vector<mvceditor::SourceClass> sources, mvceditor::GlobalsClass& globals);
+	bool InitDirectoryLint(std::vector<t4p::SourceClass> sources, t4p::GlobalsClass& globals);
 
 	/**
 	 * prepare to lint a list a single file
@@ -240,7 +240,7 @@ public:
 	 * @param globals nto know which PHP version to check against, and to get the location of the tag cache files
 	 * @return TRUE if the filename is OK (a valid file name, PHP extension)
 	 */
-	bool InitSingleFileLint(const wxFileName& fileName, mvceditor::GlobalsClass& globals);
+	bool InitSingleFileLint(const wxFileName& fileName, t4p::GlobalsClass& globals);
 
 	/**
 	 * Return a summary of the number of files that were lint'ed.
@@ -272,7 +272,7 @@ private:
 
 	// needed by PhpIdentifierLintClass in order to find
 	// function/class names
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
 };
@@ -284,7 +284,7 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, mvceditor::LintFeatureClass& feature);
+	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, t4p::LintFeatureClass& feature);
 	
 	/**
 	 * adds to the list box widget AND the global list
@@ -348,7 +348,7 @@ private:
 
 	NotebookClass* Notebook;
 
-	mvceditor::LintFeatureClass& Feature;
+	t4p::LintFeatureClass& Feature;
 
 	int TotalFiles;
 
@@ -365,7 +365,7 @@ class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
 
 public:
 
-	LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results);
+	LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results);
 
 private:
 
@@ -379,7 +379,7 @@ private:
 	 * to position the cursor at the spot of the error
 	 * this class will not own the pointer
 	 */
-	mvceditor::CodeControlClass* CodeControl;
+	t4p::CodeControlClass* CodeControl;
 
 	/**
 	 * the lint error to show
@@ -395,17 +395,17 @@ class LintFeatureClass : public FeatureClass {
 	
 public:
 	
-	mvceditor::LintFeatureOptionsClass Options;
+	t4p::LintFeatureOptionsClass Options;
 
 	/**
 	 * errors that have been encountered so far. there are 3 types
 	 * of errors because there are different type of linters.
 	 */
 	std::vector<pelet::LintResultsClass> LintErrors;
-	std::vector<mvceditor::PhpVariableLintResultClass> VariableResults;
-	std::vector<mvceditor::PhpIdentifierLintResultClass> IdentifierResults;
+	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
+	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
 
-	LintFeatureClass(mvceditor::AppClass& app);
+	LintFeatureClass(t4p::AppClass& app);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
@@ -429,19 +429,19 @@ private:
 
 	void OnPreviousLintError(wxCommandEvent& event);
 	
-	void OnLintError(mvceditor::LintResultsEventClass& event);
+	void OnLintError(t4p::LintResultsEventClass& event);
 
-	void OnLintErrorAfterSave(mvceditor::LintResultsEventClass& event);
+	void OnLintErrorAfterSave(t4p::LintResultsEventClass& event);
 
 	void OnLintFileComplete(wxCommandEvent& event);
 
-	void OnLintComplete(mvceditor::ActionEventClass& event);
+	void OnLintComplete(t4p::ActionEventClass& event);
 
-	void OnLintSummary(mvceditor::LintResultsSummaryEventClass& event);
+	void OnLintSummary(t4p::LintResultsSummaryEventClass& event);
 	
-	void OnLintProgress(mvceditor::ActionProgressEventClass& event);
+	void OnLintProgress(t4p::ActionProgressEventClass& event);
 	
-	void OnFileSaved(mvceditor::CodeControlEventClass& event);
+	void OnFileSaved(t4p::CodeControlEventClass& event);
 	
 	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
 

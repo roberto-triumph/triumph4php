@@ -49,20 +49,20 @@ static const int ID_DETECTOR_TREE_RENAME = wxNewId();
 static const int ID_DETECTOR_TREE_DELETE = wxNewId();
 
 
-mvceditor::DetectorClass::DetectorClass() {
+t4p::DetectorClass::DetectorClass() {
 
 }
 
-mvceditor::DetectorClass::~DetectorClass() {
+t4p::DetectorClass::~DetectorClass() {
 
 }
 
-mvceditor::UrlTagDetectorClass::UrlTagDetectorClass()  {
+t4p::UrlTagDetectorClass::UrlTagDetectorClass()  {
 
 }
 
-bool mvceditor::UrlTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
-	mvceditor::SourceClass source = project.Sources[0];
+bool t4p::UrlTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
+	t4p::SourceClass source = project.Sources[0];
 	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 	if (rootUrl.IsEmpty()) {
 		wxMessageBox(_("Cannot determine the root URL of the selected project. Please add a virtual host mapping for ") + source.RootDirectory.GetPath() +
@@ -72,15 +72,15 @@ bool mvceditor::UrlTagDetectorClass::CanTest(const mvceditor::GlobalsClass& glob
 	return true;
 }
 
-wxString mvceditor::UrlTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
-													  const mvceditor::ProjectClass& project,
+wxString t4p::UrlTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
-	mvceditor::SourceClass source = project.Sources[0];
+	t4p::SourceClass source = project.Sources[0];
 	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 
-	mvceditor::UrlTagDetectorParamsClass params;
+	t4p::UrlTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	params.RootUrl = rootUrl;
@@ -88,25 +88,25 @@ wxString mvceditor::UrlTagDetectorClass::TestCommandLine(const mvceditor::Global
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::UrlTagDetectorClass::LocalRootDir() {
-	return mvceditor::UrlTagDetectorsLocalAsset();
+wxFileName t4p::UrlTagDetectorClass::LocalRootDir() {
+	return t4p::UrlTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::UrlTagDetectorClass::GlobalRootDir() {
-	return mvceditor::UrlTagDetectorsGlobalAsset();
+wxFileName t4p::UrlTagDetectorClass::GlobalRootDir() {
+	return t4p::UrlTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::UrlTagDetectorClass::SkeletonFile() {
-	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+wxFileName t4p::UrlTagDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = t4p::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("UrlDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::UrlTagDetectorClass::Label() {
+wxString t4p::UrlTagDetectorClass::Label() {
 	return _("URL Detectors");
 }
 
-wxString mvceditor::UrlTagDetectorClass::HelpMessage() {
+wxString t4p::UrlTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"URL Detectors are PHP scripts that Triumph uses to find out "
 		"all of the valid URL routes for your projects.  \n"
@@ -116,22 +116,22 @@ wxString mvceditor::UrlTagDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass() 
+t4p::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass() 
 	: DetectorClass() {
 
 }
 
-bool  mvceditor::TemplateFileTagsDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool  t4p::TemplateFileTagsDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::TemplateFileTagsDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+wxString t4p::TemplateFileTagsDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 																const wxString& detectorScriptFullPath) {
-	mvceditor::TemplateFileTagsDetectorParamsClass params;
-	mvceditor::SourceClass source = project.Sources[0];
+	t4p::TemplateFileTagsDetectorParamsClass params;
+	t4p::SourceClass source = project.Sources[0];
 
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset().GetFullPath();
+	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset().GetFullPath();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	params.DetectorDbFileName = globals.DetectorCacheDbFileName;
@@ -139,25 +139,25 @@ wxString mvceditor::TemplateFileTagsDetectorClass::TestCommandLine(const mvcedit
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::TemplateFileTagsDetectorClass::LocalRootDir() {
-	return mvceditor::TemplateFileTagsDetectorsLocalAsset();
+wxFileName t4p::TemplateFileTagsDetectorClass::LocalRootDir() {
+	return t4p::TemplateFileTagsDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::TemplateFileTagsDetectorClass::GlobalRootDir() {
-	return mvceditor::TemplateFilesDetectorsGlobalAsset();
+wxFileName t4p::TemplateFileTagsDetectorClass::GlobalRootDir() {
+	return t4p::TemplateFilesDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::TemplateFileTagsDetectorClass::SkeletonFile() {
-	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+wxFileName t4p::TemplateFileTagsDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = t4p::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("TemplateFilesDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::TemplateFileTagsDetectorClass::Label() {
+wxString t4p::TemplateFileTagsDetectorClass::Label() {
 	return _("Template File Detectors");
 }
 
-wxString mvceditor::TemplateFileTagsDetectorClass::HelpMessage() {
+wxString t4p::TemplateFileTagsDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Template files detectors are PHP scripts that Triumph uses to find out "
 		"all of the 'view' files for your projects.  \n"
@@ -167,47 +167,47 @@ wxString mvceditor::TemplateFileTagsDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::TagDetectorClass::TagDetectorClass()  {
+t4p::TagDetectorClass::TagDetectorClass()  {
 
 }
 
-bool mvceditor::TagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool t4p::TagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::TagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
-													  const mvceditor::ProjectClass& project,
+wxString t4p::TagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
-	mvceditor::SourceClass source = project.Sources[0];
+	t4p::SourceClass source = project.Sources[0];
 	wxString rootUrl = globals.Environment.Apache.GetUrl(source.RootDirectory.GetPath());
 
-	mvceditor::TagDetectorParamsClass params;
+	t4p::TagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::TagDetectorClass::LocalRootDir() {
-	return mvceditor::TagDetectorsLocalAsset();
+wxFileName t4p::TagDetectorClass::LocalRootDir() {
+	return t4p::TagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::TagDetectorClass::GlobalRootDir() {
-	return mvceditor::TagDetectorsGlobalAsset();
+wxFileName t4p::TagDetectorClass::GlobalRootDir() {
+	return t4p::TagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::TagDetectorClass::SkeletonFile() {
-	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+wxFileName t4p::TagDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = t4p::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("TagDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::TagDetectorClass::Label() {
+wxString t4p::TagDetectorClass::Label() {
 	return _("Tag Detectors");
 }
 
-wxString mvceditor::TagDetectorClass::HelpMessage() {
+wxString t4p::TagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Tag Detectors are PHP scripts that Triumph uses to find out "
 		"any tags (methods, properties, or classes) that PHP frameworks dynamically create.  \n"
@@ -217,46 +217,46 @@ wxString mvceditor::TagDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::DatabaseTagDetectorClass::DatabaseTagDetectorClass()  {
+t4p::DatabaseTagDetectorClass::DatabaseTagDetectorClass()  {
 
 }
 
-bool mvceditor::DatabaseTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool t4p::DatabaseTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::DatabaseTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
-													  const mvceditor::ProjectClass& project,
+wxString t4p::DatabaseTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
-	mvceditor::SourceClass source = project.Sources[0];
+	t4p::SourceClass source = project.Sources[0];
 
-	mvceditor::DatabaseTagDetectorParamsClass params;
+	t4p::DatabaseTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::DatabaseTagDetectorClass::LocalRootDir() {
-	return mvceditor::DatabaseTagDetectorsLocalAsset();
+wxFileName t4p::DatabaseTagDetectorClass::LocalRootDir() {
+	return t4p::DatabaseTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::DatabaseTagDetectorClass::GlobalRootDir() {
-	return mvceditor::DatabaseTagDetectorsGlobalAsset();
+wxFileName t4p::DatabaseTagDetectorClass::GlobalRootDir() {
+	return t4p::DatabaseTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::DatabaseTagDetectorClass::SkeletonFile() {
-	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+wxFileName t4p::DatabaseTagDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = t4p::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("DatabaseDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::DatabaseTagDetectorClass::Label() {
+wxString t4p::DatabaseTagDetectorClass::Label() {
 	return _("Database Detectors");
 }
 
-wxString mvceditor::DatabaseTagDetectorClass::HelpMessage() {
+wxString t4p::DatabaseTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Database Detectors are PHP scripts that Triumph uses to find out "
 		"any database connections that PHP frameworks dynamically create.  \n"
@@ -266,47 +266,47 @@ wxString mvceditor::DatabaseTagDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::ConfigTagDetectorClass::ConfigTagDetectorClass()  {
+t4p::ConfigTagDetectorClass::ConfigTagDetectorClass()  {
 
 }
 
-bool mvceditor::ConfigTagDetectorClass::CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) {
+bool t4p::ConfigTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
 	return true;
 }
 
-wxString mvceditor::ConfigTagDetectorClass::TestCommandLine(const mvceditor::GlobalsClass& globals, 
-													  const mvceditor::ProjectClass& project,
+wxString t4p::ConfigTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	
-	mvceditor::SourceClass source = project.Sources[0];														  
+	t4p::SourceClass source = project.Sources[0];														  
 	
-	mvceditor::ConfigTagDetectorParamsClass params;
+	t4p::ConfigTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
-	params.PhpIncludePath = mvceditor::PhpDetectorsBaseAsset();
+	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
 	params.SourceDir = source.RootDirectory;
 	return params.BuildCmdLine();
 }
 
-wxFileName mvceditor::ConfigTagDetectorClass::LocalRootDir() {
-	return mvceditor::ConfigTagDetectorsLocalAsset();
+wxFileName t4p::ConfigTagDetectorClass::LocalRootDir() {
+	return t4p::ConfigTagDetectorsLocalAsset();
 }
 
-wxFileName mvceditor::ConfigTagDetectorClass::GlobalRootDir() {
-	return mvceditor::ConfigTagDetectorsGlobalAsset();
+wxFileName t4p::ConfigTagDetectorClass::GlobalRootDir() {
+	return t4p::ConfigTagDetectorsGlobalAsset();
 }
 
-wxFileName mvceditor::ConfigTagDetectorClass::SkeletonFile() {
-	wxFileName skeletonFile = mvceditor::SkeletonsBaseAsset();
+wxFileName t4p::ConfigTagDetectorClass::SkeletonFile() {
+	wxFileName skeletonFile = t4p::SkeletonsBaseAsset();
 	skeletonFile.Assign(skeletonFile.GetPath(), wxT("ConfigDetector.skeleton.php"));
 	return skeletonFile;
 }
 
-wxString mvceditor::ConfigTagDetectorClass::Label() {
+wxString t4p::ConfigTagDetectorClass::Label() {
 	return _("Config Detectors");
 }
 
-wxString mvceditor::ConfigTagDetectorClass::HelpMessage() {
+wxString t4p::ConfigTagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Config Detectors are PHP scripts that Triumph uses to find out "
 		"any config files that PHP frameworks use.  \n"
@@ -316,14 +316,14 @@ wxString mvceditor::ConfigTagDetectorClass::HelpMessage() {
 	return help;
 }
 
-mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree,
+t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree,
 															  wxButton* testButton,
 															  wxButton* addButton,
 															  wxButton* helpButton,
 															  wxChoice* projectChoice,
-															  mvceditor::DetectorClass* detector,
-															  mvceditor::GlobalsClass& globals, 
-															  mvceditor::EventSinkClass& eventSink,
+															  t4p::DetectorClass* detector,
+															  t4p::GlobalsClass& globals, 
+															  t4p::EventSinkClass& eventSink,
 															  const wxBitmap& rootImage)
 	: wxEvtHandler()
 	, ImageList(NULL)
@@ -348,16 +348,16 @@ mvceditor::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detect
 
 	ImageList = new wxImageList(16, 16);
 	ImageList->Add(rootImage, wxNullBitmap);
-	ImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
-	ImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
-	ImageList->Add(mvceditor::IconImageAsset(wxT("document-php")), wxNullBitmap);
+	ImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
+	ImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
+	ImageList->Add(t4p::IconImageAsset(wxT("document-php")), wxNullBitmap);
 
 	// this pointer will be managed by the tree control, since the tree control
 	// may use the pointer in the destructor.
 	DetectorTree->SetImageList(ImageList);
 }
 
-mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
+t4p::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
 	// Connect Events
 	TestButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
 	AddButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
@@ -369,7 +369,7 @@ mvceditor::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemRightClick), NULL, this);
 }
 
-void mvceditor::DetectorTreeHandlerClass::Init() {
+void t4p::DetectorTreeHandlerClass::Init() {
 	wxString globalRootDir = Detector->GlobalRootDir().GetFullPath();
 	wxString localRootDir = Detector->LocalRootDir().GetFullPath();
 	
@@ -388,10 +388,10 @@ void mvceditor::DetectorTreeHandlerClass::Init() {
 	DetectorTree->Thaw();
 }
 
-void mvceditor::DetectorTreeHandlerClass::UpdateProjects() {
+void t4p::DetectorTreeHandlerClass::UpdateProjects() {
 	wxArrayString projectLabels;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::ProjectClass> enabledProjects = Globals.AllEnabledProjects();
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::ProjectClass> enabledProjects = Globals.AllEnabledProjects();
 	for (project = enabledProjects.begin(); project != enabledProjects.end(); ++project) {
 		projectLabels.Add(project->Label);
 	}
@@ -402,7 +402,7 @@ void mvceditor::DetectorTreeHandlerClass::UpdateProjects() {
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir) {
+void t4p::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir) {
 	wxDir dir;
 	if (dir.Open(detectorRootDir)) {
 		wxString fileName;
@@ -425,21 +425,21 @@ void mvceditor::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRo
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId id = event.GetItem();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
-		mvceditor::OpenFileCommandEventClass openEvent(treeItemData->Str);
+		t4p::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = Detector->HelpMessage();
 	wxMessageBox(help, _("Help"), wxOK);
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 	wxString name = ::wxGetTextFromUser(_("Please enter a file name (no extension)"), _("Create a URL Detector"), wxEmptyString);
 	wxString forbidden = wxFileName::GetForbiddenChars();
 	if (name.find_first_of(forbidden, 0) != std::string::npos) {
@@ -473,7 +473,7 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 
 		// close file so that it can be opened later on by the app
 		file.Close();
-		mvceditor::OpenFileCommandEventClass openEvent(localDetectorScript.GetFullPath());
+		t4p::OpenFileCommandEventClass openEvent(localDetectorScript.GetFullPath());
 		EventSink.Publish(openEvent);
 
 		// add the tree node also
@@ -488,9 +488,9 @@ void mvceditor::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 	if (Globals.Environment.Php.NotInstalled()) {
-		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		t4p::EditorLogError(t4p::ERR_PHP_EXECUTABLE_NONE);
 		return;
 	}
 	
@@ -501,7 +501,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 		wxMessageBox(_("Please choose a project to test the detector on."));
 		return;
 	}
-	mvceditor::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];
+	t4p::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];
 	if (project.Sources.empty()) {
 		wxMessageBox(_("Selected project does not have any source directories. Please choose another project"));
 		return;
@@ -522,13 +522,13 @@ void mvceditor::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 		wxString cmdLine = Detector->TestCommandLine(Globals, project, detectorScriptFullPath);
 
 		// send the command line to a new app command event to start a process
-		wxCommandEvent runEvent(mvceditor::EVENT_CMD_RUN_COMMAND);
+		wxCommandEvent runEvent(t4p::EVENT_CMD_RUN_COMMAND);
 		runEvent.SetString(cmdLine);
 		EventSink.Publish(runEvent);
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
@@ -561,7 +561,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& even
 	event.Skip();
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
@@ -570,16 +570,16 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
-		mvceditor::OpenFileCommandEventClass openEvent(treeItemData->Str);
+		t4p::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
 	if (treeItemData) {
@@ -587,7 +587,7 @@ void mvceditor::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& e
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& event) {
 	wxTreeItemId treeItemId = DetectorTree->GetSelection();
 	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
 	if (data) {
@@ -598,7 +598,7 @@ void mvceditor::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& e
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& event) {
 
 	// only allow edited when detector is a "local" detector
 	wxTreeItemId i = event.GetItem();
@@ -619,7 +619,7 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& 
 	}
 }
 
-void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
+void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
 	wxString newName = event.GetLabel();
 	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
@@ -655,11 +655,11 @@ void mvceditor::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& ev
 	}
 }
 
-mvceditor::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink)
+t4p::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+														t4p::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("url-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("url-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -673,7 +673,7 @@ mvceditor::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::UrlTagDetectorPanelClass::~UrlTagDetectorPanelClass() {
+t4p::UrlTagDetectorPanelClass::~UrlTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -682,20 +682,20 @@ mvceditor::UrlTagDetectorPanelClass::~UrlTagDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::UrlTagDetectorPanelClass::Init() {
+void t4p::UrlTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::UrlTagDetectorPanelClass::UpdateProjects() {
+void t4p::UrlTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink,
-														mvceditor::RunningThreadsClass& runningThreads)
+t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+														t4p::EventSinkClass& eventSink,
+														t4p::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("template-file-detectors")))
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("template-file-detectors")))
 	, TestUrl()
 	, Globals(globals) 
 	, RunningThreads(runningThreads) {
@@ -712,7 +712,7 @@ mvceditor::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClas
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelClass() {
+t4p::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -721,23 +721,23 @@ mvceditor::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelCla
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::TemplateFileTagsDetectorPanelClass::Init() {
+void t4p::TemplateFileTagsDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::TemplateFileTagsDetectorPanelClass::UpdateProjects() {
+void t4p::TemplateFileTagsDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
+void t4p::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
 	TestUrl.Reset();
-	mvceditor::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, TestUrl);
+	t4p::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
-		mvceditor::CallStackActionClass* action = new mvceditor::CallStackActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
+		t4p::CallStackActionClass* action = new t4p::CallStackActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
 		action->SetCallStackStart(TestUrl.FileName,
-			mvceditor::WxToIcu(TestUrl.ClassName),
-			mvceditor::WxToIcu(TestUrl.MethodName),
+			t4p::WxToIcu(TestUrl.ClassName),
+			t4p::WxToIcu(TestUrl.MethodName),
 
 			// the selection index is the index of the enabled projects
 			Globals.DetectorCacheDbFileName
@@ -747,11 +747,11 @@ void mvceditor::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandE
 	}
 }
 
-mvceditor::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink)
+t4p::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+														t4p::EventSinkClass& eventSink)
 	: TagDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("tag-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("tag-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -765,7 +765,7 @@ mvceditor::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::TagDetectorPanelClass::~TagDetectorPanelClass() {
+t4p::TagDetectorPanelClass::~TagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -774,19 +774,19 @@ mvceditor::TagDetectorPanelClass::~TagDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::TagDetectorPanelClass::Init() {
+void t4p::TagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::TagDetectorPanelClass::UpdateProjects() {
+void t4p::TagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink)
+t4p::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+														t4p::EventSinkClass& eventSink)
 	: DatabaseDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("database-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("database-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -800,7 +800,7 @@ mvceditor::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::DatabaseTagDetectorPanelClass::~DatabaseTagDetectorPanelClass() {
+t4p::DatabaseTagDetectorPanelClass::~DatabaseTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -809,19 +809,19 @@ mvceditor::DatabaseTagDetectorPanelClass::~DatabaseTagDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::DatabaseTagDetectorPanelClass::Init() {
+void t4p::DatabaseTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::DatabaseTagDetectorPanelClass::UpdateProjects() {
+void t4p::DatabaseTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-														mvceditor::EventSinkClass& eventSink)
+t4p::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+														t4p::EventSinkClass& eventSink)
 	: ConfigDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, mvceditor::IconImageAsset(wxT("config-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("config-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -835,7 +835,7 @@ mvceditor::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* pa
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-mvceditor::ConfigTagDetectorPanelClass::~ConfigTagDetectorPanelClass() {
+t4p::ConfigTagDetectorPanelClass::~ConfigTagDetectorPanelClass() {
 	Disconnect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuOpenDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_RENAME, wxEVT_COMMAND_MENU_SELECTED, 
@@ -844,46 +844,46 @@ mvceditor::ConfigTagDetectorPanelClass::~ConfigTagDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
 }
 
-void mvceditor::ConfigTagDetectorPanelClass::Init() {
+void t4p::ConfigTagDetectorPanelClass::Init() {
 	Handler.Init();
 }
 
-void mvceditor::ConfigTagDetectorPanelClass::UpdateProjects() {
+void t4p::ConfigTagDetectorPanelClass::UpdateProjects() {
 	Handler.UpdateProjects();
 }
 
-mvceditor::DetectorFeatureClass::DetectorFeatureClass(mvceditor::AppClass &app)
+t4p::DetectorFeatureClass::DetectorFeatureClass(t4p::AppClass &app)
 	: FeatureClass(app) {
 
 }
 
-void mvceditor::DetectorFeatureClass::AddViewMenuItems(wxMenu* menu) {
-	menu->Append(mvceditor::MENU_DETECTORS + 0, _("View URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 1, _("View Template File Detectors"), _("View the Template File Detectors"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 2, _("View Tag Detectors"), _("View the Tag Detectors"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 3, _("View Database Detectors"), _("View the Database Detectors"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 4, _("View Config Detectors"), _("View the config Detectors"), wxITEM_NORMAL);
+void t4p::DetectorFeatureClass::AddViewMenuItems(wxMenu* menu) {
+	menu->Append(t4p::MENU_DETECTORS + 0, _("View URL Detectors"), _("View the URL Detectors"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 1, _("View Template File Detectors"), _("View the Template File Detectors"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 2, _("View Tag Detectors"), _("View the Tag Detectors"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 3, _("View Database Detectors"), _("View the Database Detectors"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 4, _("View Config Detectors"), _("View the config Detectors"), wxITEM_NORMAL);
 }
 
-void mvceditor::DetectorFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+void t4p::DetectorFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu();
-	menu->Append(mvceditor::MENU_DETECTORS + 5, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 6, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 7, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 8, _("Run Database Detection"), _("Run the Database Detectors against the current projects"), wxITEM_NORMAL);
-	menu->Append(mvceditor::MENU_DETECTORS + 9, _("Run Config Detection"), _("Run the Config Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 5, _("Run URL Detection"), _("Run the URL Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 6, _("Run Template File Detection"), _("Run the Template file Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 7, _("Run Tag Detection"), _("Run the Tag Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 8, _("Run Database Detection"), _("Run the Database Detectors against the current projects"), wxITEM_NORMAL);
+	menu->Append(t4p::MENU_DETECTORS + 9, _("Run Config Detection"), _("Run the Config Detectors against the current projects"), wxITEM_NORMAL);
 	menuBar->Append(menu, _("Detectors"));
 }
 
-void mvceditor::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::UrlTagDetectorPanelClass* panel = new mvceditor::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
+		t4p::UrlTagDetectorPanelClass* panel = new t4p::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap urlBitmap = mvceditor::IconImageAsset(wxT("url-detectors"));
+		wxBitmap urlBitmap = t4p::IconImageAsset(wxT("url-detectors"));
 		if (AddOutlineWindow(panel, _("URL Detectors"), urlBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -891,15 +891,15 @@ void mvceditor::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::TemplateFileTagsDetectorPanelClass* panel = new mvceditor::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
+		t4p::TemplateFileTagsDetectorPanelClass* panel = new t4p::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
-		wxBitmap templateFilesBitmap = mvceditor::IconImageAsset(wxT("template-file-detectors"));
+		wxBitmap templateFilesBitmap = t4p::IconImageAsset(wxT("template-file-detectors"));
 		if (AddOutlineWindow(panel, _("Template Files Detectors"), templateFilesBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -907,15 +907,15 @@ void mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::TagDetectorPanelClass* panel = new mvceditor::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL, 
+		t4p::TagDetectorPanelClass* panel = new t4p::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap tagBitmap = mvceditor::IconImageAsset(wxT("tag-detectors"));
+		wxBitmap tagBitmap = t4p::IconImageAsset(wxT("tag-detectors"));
 		if (AddOutlineWindow(panel, _("Tag Detectors"), tagBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -923,15 +923,15 @@ void mvceditor::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_DATABASE_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::DatabaseTagDetectorPanelClass* panel = new mvceditor::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
+		t4p::DatabaseTagDetectorPanelClass* panel = new t4p::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap databaseBitmap = mvceditor::IconImageAsset(wxT("database-detectors"));
+		wxBitmap databaseBitmap = t4p::IconImageAsset(wxT("database-detectors"));
 		if (AddOutlineWindow(panel, _("Database Detectors"), databaseBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -939,15 +939,15 @@ void mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		mvceditor::ConfigTagDetectorPanelClass* panel = new mvceditor::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
+		t4p::ConfigTagDetectorPanelClass* panel = new t4p::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap configBitmap = mvceditor::IconImageAsset(wxT("config-detectors"));
+		wxBitmap configBitmap = t4p::IconImageAsset(wxT("config-detectors"));
 		if (AddOutlineWindow(panel, _("Config Detectors"), configBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -955,119 +955,119 @@ void mvceditor::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& even
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::GlobalActionClass*> actions;
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::UrlTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
+		new t4p::UrlTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
 	);
 	App.Sequences.Build(actions);
 }
 
-void mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event) {
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::GlobalActionClass*> actions;
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
-	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
-	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
+	t4p::CallStackActionClass* callStackAction =  new t4p::CallStackActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
+	t4p::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	
 	if (!urlTag.Url.GetServer().IsEmpty() && urlTag.FileName.IsOk()
 		&& !urlTag.ClassName.IsEmpty() && !urlTag.MethodName.IsEmpty()) {
 		callStackAction->SetCallStackStart(urlTag.FileName,
-			mvceditor::WxToIcu(urlTag.ClassName),
-			mvceditor::WxToIcu(urlTag.MethodName),
+			t4p::WxToIcu(urlTag.ClassName),
+			t4p::WxToIcu(urlTag.MethodName),
 			App.Globals.DetectorCacheDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(
-			new mvceditor::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
+			new t4p::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 		);
 		App.Sequences.Build(actions);
 	}
 	else {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, 
 			_("Need to choose a URL to detect templates for. Template files feature depends on the URL detectors feature."));
 	}
 }
 
-void mvceditor::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::GlobalActionClass*> actions;
+void t4p::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::TagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR)
+		new t4p::TagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
 
-void mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::GlobalActionClass*> actions;
+void t4p::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& event) {
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::DatabaseTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR)
+		new t4p::DatabaseTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
 
-void mvceditor::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
-	std::vector<mvceditor::GlobalActionClass*> actions;
+void t4p::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new mvceditor::ConfigTagDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR)
+		new t4p::ConfigTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
 
-void mvceditor::DetectorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::UrlTagDetectorPanelClass* panel = (mvceditor::UrlTagDetectorPanelClass*) window;
+		t4p::UrlTagDetectorPanelClass* panel = (t4p::UrlTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_TEMPLATE_FILES_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::TemplateFileTagsDetectorPanelClass* panel = (mvceditor::TemplateFileTagsDetectorPanelClass*) window;
+		t4p::TemplateFileTagsDetectorPanelClass* panel = (t4p::TemplateFileTagsDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::TagDetectorPanelClass* panel = (mvceditor::TagDetectorPanelClass*) window;
+		t4p::TagDetectorPanelClass* panel = (t4p::TagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_DATABASE_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::DatabaseTagDetectorPanelClass* panel = (mvceditor::DatabaseTagDetectorPanelClass*) window;
+		t4p::DatabaseTagDetectorPanelClass* panel = (t4p::DatabaseTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 	window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
 	if (window) {
-		mvceditor::ConfigTagDetectorPanelClass* panel = (mvceditor::ConfigTagDetectorPanelClass*) window;
+		t4p::ConfigTagDetectorPanelClass* panel = (t4p::ConfigTagDetectorPanelClass*) window;
 		panel->UpdateProjects();
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::DetectorFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 0, mvceditor::DetectorFeatureClass::OnViewUrlDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 1, mvceditor::DetectorFeatureClass::OnViewTemplateFileDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 2, mvceditor::DetectorFeatureClass::OnViewTagDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 3, mvceditor::DetectorFeatureClass::OnViewDatabaseDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 4, mvceditor::DetectorFeatureClass::OnViewConfigDetectors)
+BEGIN_EVENT_TABLE(t4p::DetectorFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_DETECTORS + 0, t4p::DetectorFeatureClass::OnViewUrlDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 1, t4p::DetectorFeatureClass::OnViewTemplateFileDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 2, t4p::DetectorFeatureClass::OnViewTagDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 3, t4p::DetectorFeatureClass::OnViewDatabaseDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 4, t4p::DetectorFeatureClass::OnViewConfigDetectors)
 
-	EVT_MENU(mvceditor::MENU_DETECTORS + 5, mvceditor::DetectorFeatureClass::OnRunUrlDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 6, mvceditor::DetectorFeatureClass::OnRunTemplateFileDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 7, mvceditor::DetectorFeatureClass::OnRunTagDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 8, mvceditor::DetectorFeatureClass::OnRunDatabaseDetectors)
-	EVT_MENU(mvceditor::MENU_DETECTORS + 9, mvceditor::DetectorFeatureClass::OnRunConfigDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 5, t4p::DetectorFeatureClass::OnRunUrlDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 6, t4p::DetectorFeatureClass::OnRunTemplateFileDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 7, t4p::DetectorFeatureClass::OnRunTagDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 8, t4p::DetectorFeatureClass::OnRunDatabaseDetectors)
+	EVT_MENU(t4p::MENU_DETECTORS + 9, t4p::DetectorFeatureClass::OnRunConfigDetectors)
 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::DetectorFeatureClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::DetectorFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()

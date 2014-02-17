@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <search/DirectorySearchClass.h>
 #include <FileTestFixtureClass.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <algorithm>
 
@@ -71,7 +71,7 @@ public:
 	}
 
 	
-	mvceditor::DirectorySearchClass DirectorySearch;
+	t4p::DirectorySearchClass DirectorySearch;
 };
 
 class SourceFixtureClass {
@@ -93,11 +93,11 @@ public:
 		Source.SetExcludeWildcards(exclude);
 	}
 
-	mvceditor::SourceClass Source;
+	t4p::SourceClass Source;
 
 };
 
-class FileTestDirectoryWalker : public mvceditor::DirectoryWalkerClass {
+class FileTestDirectoryWalker : public t4p::DirectoryWalkerClass {
 
 public:
 
@@ -167,13 +167,13 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkWithMultipleSources) {
 	 */
 	CreateTestFiles();
 	FileTestDirectoryWalker walker;
-	std::vector<mvceditor::SourceClass> sources;
-	mvceditor::SourceClass src1;
+	std::vector<t4p::SourceClass> sources;
+	t4p::SourceClass src1;
 	src1.RootDirectory.AssignDir(TestProjectDir + wxT("folder_one"));
 	src1.SetIncludeWildcards(wxT("*"));
 	sources.push_back(src1);
 
-	mvceditor::SourceClass src2;
+	t4p::SourceClass src2;
 	src2.RootDirectory.AssignDir(TestProjectDir + wxT("folder_two"));
 	src2.SetIncludeWildcards(wxT("*"));
 	sources.push_back(src2);
@@ -204,7 +204,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkWithMultipleSources) {
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectoriesInPreciseMode) {
 	CreateTestFiles();
 	FileTestDirectoryWalker walker;
-	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE));
+	CHECK(DirectorySearch.Init(TestProjectDir, t4p::DirectorySearchClass::PRECISE));
 	CHECK_EQUAL(6, DirectorySearch.GetTotalFileCount());
 	while (DirectorySearch.More()) {
 		DirectorySearch.Walk(walker);
@@ -261,7 +261,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInRecursive) {
 	wxString hiddenFile3 = HideFile(TestProjectDir + wxT("folder_two") + wxFileName::GetPathSeparator() + wxT("file_two.php"));
 
 	FileTestDirectoryWalker walker;
-	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::RECURSIVE, true));
+	CHECK(DirectorySearch.Init(TestProjectDir, t4p::DirectorySearchClass::RECURSIVE, true));
 	while (DirectorySearch.More()) {
 		DirectorySearch.Walk(walker);
 	}
@@ -284,7 +284,7 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldMatchHiddenFilesInPreciseMode) 
 	wxString hiddenFile1 = HideFile(TestProjectDir + wxT("file_two.php"));
 	
 	FileTestDirectoryWalker walker;
-	CHECK(DirectorySearch.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE, true));
+	CHECK(DirectorySearch.Init(TestProjectDir, t4p::DirectorySearchClass::PRECISE, true));
 	while (DirectorySearch.More()) {
 		DirectorySearch.Walk(walker);
 	}
@@ -306,8 +306,8 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldSkipFileThatMatchExcludeWildcar
 	CreateTestFiles();
 
 	// hide all of the file_two.php
-	std::vector<mvceditor::SourceClass> sources;
-	mvceditor::SourceClass src;
+	std::vector<t4p::SourceClass> sources;
+	t4p::SourceClass src;
 	src.RootDirectory.Assign(TestProjectDir);
 	src.SetIncludeWildcards(wxT("*"));
 	src.SetExcludeWildcards(wxT("file_two.php"));

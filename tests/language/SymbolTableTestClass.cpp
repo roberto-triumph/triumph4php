@@ -32,7 +32,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <UnitTest++.h>
 
 UnicodeString CURSOR = UNICODE_STRING_SIMPLE("{CURSOR}");
@@ -75,7 +75,7 @@ public:
 		}
 	}
 
-	mvceditor::SymbolTableClass SymbolTable;
+	t4p::SymbolTableClass SymbolTable;
 	pelet::ScopeClass Scope;
 	pelet::VariableClass ParsedVariable;
 	std::vector<wxFileName> SourceDirs;
@@ -85,16 +85,16 @@ class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 
 public:
 
-	mvceditor::SymbolTableClass CompletionSymbolTable;
+	t4p::SymbolTableClass CompletionSymbolTable;
 	pelet::ScopeClass Scope;
 	pelet::VariableClass ParsedVariable;
 	std::vector<wxFileName> SourceDirs;
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<mvceditor::TagClass> ResourceMatches;
+	std::vector<t4p::TagClass> ResourceMatches;
 	bool DoDuckTyping;
 	bool DoFullyQualifiedMatchOnly;
-	mvceditor::SymbolTableMatchErrorClass Error;
+	t4p::SymbolTableMatchErrorClass Error;
 	std::vector<wxString> PhpExtensions;
 	std::vector<wxString> MiscExtensions;
 
@@ -118,7 +118,7 @@ public:
 		, MiscExtensions() {
 
 		GlobalSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*GlobalSession, mvceditor::ResourceSqlSchemaAsset());
+		CreateDatabase(*GlobalSession, t4p::ResourceSqlSchemaAsset());
 		TagFinderList.AdoptGlobalTag(GlobalSession, PhpExtensions, MiscExtensions, pelet::PHP_53);
 	}
 
@@ -180,7 +180,7 @@ class ScopeFinderTestClass {
 
 public:
 
-	mvceditor::ScopeFinderClass ScopeFinder;
+	t4p::ScopeFinderClass ScopeFinder;
 	pelet::ScopeClass Scope;
 
 	ScopeFinderTestClass() 
@@ -192,7 +192,7 @@ public:
 SUITE(SymbolTableTestClass) {
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"function work() {}\n"
 	);
@@ -205,7 +205,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithVariableName) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"$globalTwo = 2;\n"
@@ -220,7 +220,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithVariableName) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnly) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() { $globalTwo = 2; } \n"
@@ -236,7 +236,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnl
 TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
 
 	// completion matches should never return duplicates
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() { $globalTwo = 2; } \n"
@@ -251,7 +251,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariable) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		" function work() {  } \n"
@@ -266,7 +266,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariab
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -281,11 +281,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFinder) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$my = new MyClass;\n"
 	);
-	UnicodeString sourceCodeGlobal = mvceditor::CharToIcu(
+	UnicodeString sourceCodeGlobal = t4p::CharToIcu(
 		"<?php class MyClass { function workA() {} function workB() {} } \n"	
 	);
 	Init(sourceCode);
@@ -299,7 +299,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -314,7 +314,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithObjectWithoutMethodCall)
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} static function workB() {} } \n"
 	);
@@ -327,7 +327,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithStaticMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassConstantCall) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { const workA = 3; const workB = 4; } \n"
 		"$my = new MyClass(); \n"
@@ -349,7 +349,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassConstantCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} private function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -363,7 +363,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { var $time; function toString() {} }\n"
@@ -379,7 +379,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { /** @var OtherClass */ var $parent; function toString() {} }\n"
@@ -396,7 +396,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongPropertyChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { /** @return OtherClass */ function workA() {} } \n"
 		"class OtherClass { /** @return OtherClass */ function parent() {} }\n"
@@ -414,7 +414,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithLongMethodChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"/** @return OtherClass */ function workA() {} \n"
 		"class FirstClass { /** @return OtherClass */ function status() {} } \n"
@@ -432,7 +432,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class FirstClass { /** @return OtherClass */ function status() {} } \n"
 		"class OtherClass extends FirstClass { var $time; function status() { } }\n"
@@ -451,7 +451,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionChain) {
 
 	// variables created with a function should be resolved
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"/** @return OtherClass */ function workA() {} \n"
 		"class OtherClass { var $time;  /** @return FirstClass */ function toString() {} }\n"
@@ -469,7 +469,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionC
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodChain) {
 
 	// variables created with a function should be resolved
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class OtherClass { var $time;  /** @return OtherClass */ function parent() {} }\n"
 		"$my = new OtherClass();\n"
@@ -485,13 +485,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("MyCl"));
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, tags);
@@ -503,7 +503,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class My { function workA() {} function workB() {} } \n"
 		"function Mysql_query() {}"
@@ -511,7 +511,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	DoFullyQualifiedMatchOnly = true;
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("My"));
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, tags);
@@ -523,7 +523,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"function mysql_query() {} \n"
 		"class My { function workA() {} function workB() {} } \n"
@@ -531,7 +531,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(2, tags);
@@ -541,7 +541,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCompletion) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"class SecClass {}\n"
@@ -569,7 +569,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceNameCom
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"function work() {} \n"
@@ -589,7 +589,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAlias) 
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child { \n"
 		"class OtherClass {} \n"
@@ -607,7 +607,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic)
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporting) {
 	
 	// define namespaces and classes in a separate file
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace Second {\n"
 		"class MyClass { }\n"
@@ -619,7 +619,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
 	
 	// the code under test will import the namespaces
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"use First as F; \n"
 		"}"
@@ -642,13 +642,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInGlobalNamespace) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class OtherClass {} \n"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace Second; \n"
 		"class MyClass {}"
 	);
@@ -679,7 +679,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInDifferentNamespace) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child {\n"
 		"class OtherClass {} \n"
@@ -687,7 +687,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace Second { \n"
 		"class MyClass {}  \n"
 		"} \n"
@@ -706,13 +706,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunctionInGlobalNamespace) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"function work() {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -729,13 +729,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunc
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClassInSameNamespace) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"Class OtherClass {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -752,13 +752,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalClassIsNotImported) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class OtherClass {}"
 	);
 	Init(sourceCode);
 	
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
@@ -773,7 +773,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalC
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlobalClassImported) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class OtherClass {} \n"
 		"function work() {}"
@@ -799,14 +799,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	
 	// only doing light testing on ResourceMatches because the Matches* tests
 	// cover it already
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)2, tags.size());
@@ -822,14 +822,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndDuckTyping) {
 
 	// there was an overflow error in this scenario and it was causing a crash
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);
 	ToFunction(UNICODE_STRING_SIMPLE("unknown"));
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, true, false, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
@@ -839,7 +839,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 
 	// if we specify to not do duck typing then any variables that cannot be resolved should not 
 	// produce matches
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"/** no type here, should not work when duck typing flag is not set */\n"
@@ -848,7 +848,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, false, false, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
@@ -859,7 +859,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 
 	// if we specify to not do duck typing then any variables that cannot be resolved should not 
 	// produce matches
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"/** no type here, should still work when duck typing flag is set */\n"
@@ -868,7 +868,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, true, false, Error);
 	CHECK_VECTOR_SIZE(2, tags);
@@ -882,7 +882,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	CompletionSymbolTable.SetVersion(pelet::PHP_54);
 	TagFinderList.TagParser.SetVersion(pelet::PHP_54);
 
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"trait TraitClass { \n"
 		" function work() {}\n"
@@ -890,7 +890,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 	);
 	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
 
-	sourceCode = mvceditor::CharToIcu(
+	sourceCode = t4p::CharToIcu(
 		"namespace Second { \n"
 		"class MyClass {\n"
 		"	use \\TraitClass; \n"
@@ -914,18 +914,18 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 
 	// when a method could not be found make sure that the ErrorType
 	// and class name are properly set
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\MyClass"),  Error.ErrorClass);
 }
 
@@ -933,7 +933,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 
 	// when a method cannot be resolved make sure that the ErrorType
 	// and class name are properly set
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -941,11 +941,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB"), true, false);
 	ExpressionAppendChain(UNICODE_STRING_SIMPLE("prop"), false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR, Error.Type);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"),  Error.ErrorLexeme);
 }
 
@@ -953,18 +953,18 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 
 	// when a method is invoked on a primitive type make sure that the ErrorType
 	// and lexeme are properly set
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"$my = '124';\n"
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false, false);
-	std::vector<mvceditor::TagClass> tags;
+	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_EQUAL((size_t)0, tags.size());
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR, Error.Type);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$my"),  Error.ErrorLexeme);
 }
 
@@ -972,7 +972,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 
 	// when a method cannot be resolved but DuckTyping flag is set
 	// resource should be found
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function workA() {} function workB() {} } \n"
 		"function factory() {}\n"
@@ -997,11 +997,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 	 * code completion should recognize the inheritance chain, even though
 	 * the classes are stored in multiple tags finders
 	 */
-	UnicodeString sourceCodeParent = mvceditor::CharToIcu(
+	UnicodeString sourceCodeParent = t4p::CharToIcu(
 		"<?php\n"
 		"class MyBaseClass { function workBase() {}  } \n"
 	);
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass extends MyBaseClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
@@ -1020,9 +1020,9 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
-	NativeSession = new soci::session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	NativeSession = new soci::session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
 	TagFinderList.AdoptNativeTag(NativeSession);
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$pdo = new PDO;\n"
 	);
@@ -1039,11 +1039,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 	
 	// native tags should work even when source directories are defined
 	wxFileName sourceDir;
-	sourceDir.Assign(mvceditor::TagDetectorsGlobalAsset());
+	sourceDir.Assign(t4p::TagDetectorsGlobalAsset());
 	SourceDirs.push_back(sourceDir);
-	NativeSession = new soci::session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	NativeSession = new soci::session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
 	TagFinderList.AdoptNativeTag(NativeSession);
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$pdo = new PDO;\n"
 	);
@@ -1058,7 +1058,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	DetectedTagSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
-	CreateDatabase(*DetectedTagSession, mvceditor::DetectorSqlSchemaAsset());
+	CreateDatabase(*DetectedTagSession, t4p::DetectorSqlSchemaAsset());
 	TagFinderList.AdoptDetectorTag(DetectedTagSession);
 	std::string key = "CI_Controller::email", 
 		className = "CI_Controller", 
@@ -1070,14 +1070,14 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	int sourceId = 0;
 	
 	// create the source row
-	std::string stdDir = mvceditor::WxToChar("");
+	std::string stdDir = t4p::WxToChar("");
 	soci::statement sourceStmt = (DetectedTagSession->prepare << "INSERT INTO sources(directory) VALUES(?)",
 		soci::use(stdDir));
 	sourceStmt.execute(true);
 	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(sourceStmt.get_backend());
 	sourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
 		
-	int type = mvceditor::TagClass::METHOD;
+	int type = t4p::TagClass::METHOD;
 	std::string sql = "INSERT INTO detected_tags";
 	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, comment) ";
 	sql += "VALUES(?, ?, ?, ?, ?,?, ?, ?)";
@@ -1088,7 +1088,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	);
 	stmt.execute(true);
 
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class CI_Controller {}\n"
 		"$ci = new CI_Controller();\n"
@@ -1103,7 +1103,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalVar = 34; \n"
 		"/** This is the user class */\n"
@@ -1133,7 +1133,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindMethodScope) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass { function work() { } }\n"
 		"$globalVar = new MyClass(); \n"
@@ -1149,7 +1149,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindGlobalScopePastClass)
 
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalVar = 34; \n"
 		"function setName($anotherName, $defaultName = 'Guest') {\n"
@@ -1166,7 +1166,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldFindFunctionScope) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"function printUser(User $user) {\n"
@@ -1181,7 +1181,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedBlock) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMethod) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"class MyClass {\n"
@@ -1197,7 +1197,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClassMeth
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"function printUser(User $user) {\n"
 		"\t$someName = '';\n"
@@ -1213,7 +1213,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleTypeHinting) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$globalOne = 1;\n"
 		"function printUser(User $user) {\n"
@@ -1233,7 +1233,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleMultipleBlocks) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child {"
 		"	use ArrayObject, Exception; \n"
@@ -1255,7 +1255,7 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithMultipleNamespaces) {
 }
 
 TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
-	UnicodeString sourceCode = mvceditor::CharToIcu(
+	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child;"
 		"{CURSOR}"

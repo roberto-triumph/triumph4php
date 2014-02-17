@@ -30,7 +30,7 @@
 #include <wx/filename.h>
 #include <globals/CodeControlOptionsClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This is a class that will Triumph will use to manage keyboard shortcuts.  

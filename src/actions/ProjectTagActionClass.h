@@ -28,10 +28,10 @@
 #include <pelet/TokenClass.h>
 #include <vector>
 
-#ifndef __MVCEDITOR_RESOURCECACHEACTIONCLASS_H__
-#define __MVCEDITOR_RESOURCECACHEACTIONCLASS_H__
+#ifndef __T4P_RESOURCECACHEACTIONCLASS_H__
+#define __T4P_RESOURCECACHEACTIONCLASS_H__
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class will take care of iterating through all files in a project
@@ -48,7 +48,7 @@ public:
 	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all 
 	 * files have been iterated through.
 	 */
-	ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * prepare to iterate through all files of the given projects
@@ -59,14 +59,14 @@ public:
 	 * @param version the version of PHP to check against
 	 * @return bool false if none of the projects are enabled or none of the projects have a PHP source directory
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	/**
 	 * This method can be used to set the projects to be scanned.  By default, all of the projects in the
 	 * globals list are scanned.  Sometimes, like for example when a single project is edited, we dont want
 	 * to scan all of the projects since they have not been changed. This method must be called the Init method.
 	 */
-	void SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects);
+	void SetTouchedProjects(const std::vector<t4p::ProjectClass>& touchedProjects);
 
 	/**
 	 * Files will be parsed for resouces in a background thread.
@@ -80,7 +80,7 @@ private:
 	/**
 	 * Queue of projects to be indexed.
 	 */
-	std::vector<mvceditor::ProjectClass> Projects;
+	std::vector<t4p::ProjectClass> Projects;
 
 	/**
 	 * The object that will be used to traverse the file system.
@@ -90,7 +90,7 @@ private:
 	/**
 	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 
 	/**
 	 * TRUE if we should iterate though the touched projects and not all projects.
@@ -120,13 +120,13 @@ private:
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class ProjectTagInitActionClass : public mvceditor::InitializerGlobalActionClass {
+class ProjectTagInitActionClass : public t4p::InitializerGlobalActionClass {
 
 public:
 
-	ProjectTagInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	void Work(mvceditor::GlobalsClass& globals);
+	void Work(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 };
@@ -134,11 +134,11 @@ public:
 /**
  * this action will re-tag a single directory (and its subdirs) 
  */
-class ProjectTagDirectoryActionClass : public mvceditor::GlobalActionClass {
+class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	ProjectTagDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Set the directory to be parsed
@@ -155,7 +155,7 @@ public:
 	 * @return bool false if file given in DirToParse does not exist or if the directory is
 	 *        not inside any enabled projects
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 protected:
 
@@ -166,7 +166,7 @@ protected:
 	/**
 	 * the project in which the directory is located in
 	 */
-	mvceditor::ProjectClass Project;
+	t4p::ProjectClass Project;
 
 	/**
 	 * the directory to re-parse
@@ -176,17 +176,17 @@ protected:
 	/**
 	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 };
 
 /**
  * this action will re-tag a single file only
  */
-class ProjectTagSingleFileActionClass : public mvceditor::GlobalActionClass {
+class ProjectTagSingleFileActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	ProjectTagSingleFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * 
@@ -204,7 +204,7 @@ public:
 	 * @param globals to get the tag cache location
 	 * @return bool false if file given in FileToParse does not exist, or if file is not inside any enabled projects
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 
 protected:
@@ -216,7 +216,7 @@ protected:
 	/**
 	 * the project in which the file is located in
 	 */
-	mvceditor::ProjectClass Project;
+	t4p::ProjectClass Project;
 
 	/**
 	 * the file to re-parse
@@ -226,17 +226,17 @@ protected:
 	/**
 	 * This object will perform the parsing and storing of the tags
 	 */
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 };
 
 /**
  * this action will rename the file tag for a single file only
  */
-class ProjectTagSingleFileRenameActionClass : public mvceditor::GlobalActionClass {
+class ProjectTagSingleFileRenameActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	ProjectTagSingleFileRenameActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagSingleFileRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * 
@@ -250,7 +250,7 @@ public:
 	 * @param globals to get the tag cache location
 	 * @return bool false tag cache file does not exist
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 
 protected:
@@ -268,24 +268,24 @@ protected:
 	/**
 	 * This object will perform the tag updates
 	 */
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 
 	/**
 	 * the project, needed in case we need to parse the tags in the new file.
 	 * we need to parse the tags when a file is renamed from a non-php extension to
 	 * a php extension
 	 */
-	mvceditor::ProjectClass Project;
+	t4p::ProjectClass Project;
 };
 
 /**
  * this action will rename the file tag for an entire directory
  */
-class ProjectTagDirectoryRenameActionClass : public mvceditor::GlobalActionClass {
+class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	ProjectTagDirectoryRenameActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ProjectTagDirectoryRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * 
@@ -299,7 +299,7 @@ public:
 	 * @param globals to get the tag cache location
 	 * @return bool false tag cache file does not exist
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 
 protected:
@@ -317,7 +317,7 @@ protected:
 	/**
 	 * This object will perform the tag updates
 	 */
-	mvceditor::TagFinderListClass TagFinderList;
+	t4p::TagFinderListClass TagFinderList;
 };
 }
 

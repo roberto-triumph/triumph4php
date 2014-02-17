@@ -32,19 +32,19 @@
 static int ID_NEW_USER_DIALOG = wxNewId();
 static int ID_NEW_USER_TIMER = wxNewId();
 
-mvceditor::NewUserFeatureClass::NewUserFeatureClass(mvceditor::AppClass& app)
+t4p::NewUserFeatureClass::NewUserFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , Timer(this, ID_NEW_USER_TIMER) {
 }
 
-void mvceditor::NewUserFeatureClass::OnAppReady(wxCommandEvent &event) {
-	wxFileName settingsDir = mvceditor::SettingsDirAsset();
+void t4p::NewUserFeatureClass::OnAppReady(wxCommandEvent &event) {
+	wxFileName settingsDir = t4p::SettingsDirAsset();
 	if(!settingsDir.IsOk()) {
 		Timer.Start(1000, wxTIMER_ONE_SHOT);
 	}
 }
 
-void mvceditor::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
+void t4p::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxFileName settingsDir;
 	NewUserDialogClass dialog(GetMainWindow(), App.Globals, settingsDir);
 	dialog.ShowModal();
@@ -56,7 +56,7 @@ void mvceditor::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
 }
 
 
-mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::GlobalsClass &globals, wxFileName& configFileDir)
+t4p::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, t4p::GlobalsClass &globals, wxFileName& configFileDir)
 : NewUserDialogGeneratedClass(parent, ID_NEW_USER_DIALOG)
 , Globals(globals)
 , ConfigFileDir(configFileDir) {
@@ -84,12 +84,12 @@ mvceditor::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, mvceditor::G
 	TransferDataToWindow();
 }
 
-void mvceditor::NewUserDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::NewUserDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	SettingsDirectory->Enable(CustomDirectory->GetValue());
 	PhpExecutable->Enable(Installed->GetValue());
 }
 
-void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	if (Installed->GetValue()) {
 
@@ -160,11 +160,11 @@ void mvceditor::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::NewUserDialogClass, wxDialog)
-	EVT_UPDATE_UI(ID_NEW_USER_DIALOG, mvceditor::NewUserDialogClass::OnUpdateUi)
+BEGIN_EVENT_TABLE(t4p::NewUserDialogClass, wxDialog)
+	EVT_UPDATE_UI(ID_NEW_USER_DIALOG, t4p::NewUserDialogClass::OnUpdateUi)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::NewUserFeatureClass, mvceditor::FeatureClass)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::NewUserFeatureClass::OnAppReady)
-	EVT_TIMER(ID_NEW_USER_TIMER, mvceditor::NewUserFeatureClass::OnTimer)
+BEGIN_EVENT_TABLE(t4p::NewUserFeatureClass, t4p::FeatureClass)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::NewUserFeatureClass::OnAppReady)
+	EVT_TIMER(ID_NEW_USER_TIMER, t4p::NewUserFeatureClass::OnTimer)
 END_EVENT_TABLE()

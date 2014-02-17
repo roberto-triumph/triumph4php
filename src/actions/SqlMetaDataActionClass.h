@@ -22,14 +22,14 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_SQLMETADATAACTIONCLASS_H__
-#define __MVCEDITOR_SQLMETADATAACTIONCLASS_H__
+#ifndef __T4P_SQLMETADATAACTIONCLASS_H__
+#define __T4P_SQLMETADATAACTIONCLASS_H__
 
 #include <wx/event.h>
 #include <vector>
 #include <actions/GlobalActionClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This event is generated once all of the meta data has been
@@ -66,17 +66,17 @@ public:
 	 * @param runningThreads will get notified with EVENT_WORK_* events
 	 *        and the EVENT_SQL_META_DATA_COMPLETE event
 	 */
-	SqlMetaDataActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	SqlMetaDataActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * Initialize the connections to be scanned.  This needs to be done before
 	 * the thread is started (CreateSingleInstance).
 	 *
-	 * @see mvceditor::ThreadWithHearbeatClass
+	 * @see t4p::ThreadWithHearbeatClass
 	 * @param infos the connections to fetch info for.
 	 * @return bool TRUE if infos is non-empty
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	void BackgroundWork();
 
@@ -95,13 +95,13 @@ private:
 	wxFileName CacheDbFileName;
 };
 
-class SqlMetaDataInitActionClass : public mvceditor::InitializerGlobalActionClass {
+class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
 	
 public:
 
-	SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 	
-	void Work(mvceditor::GlobalsClass& globals);
+	void Work(t4p::GlobalsClass& globals);
 	
 protected:
 	
@@ -110,11 +110,11 @@ protected:
 
 }
 
-typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(mvceditor::SqlMetaDataEventClass&);
+typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEventClass&);
 
 
 #define EVT_SQL_META_DATA_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( SqlMetaDataEventClassFunction, & fn ), (wxObject *) NULL ),
 

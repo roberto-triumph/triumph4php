@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #ifndef __MVCEDITOR_DATABASETAGCLASS_H__
- #define __MVCEDITOR_DATABASETAGCLASS_H__
+ #ifndef __T4P_DATABASETAGCLASS_H__
+ #define __T4P_DATABASETAGCLASS_H__
  
  #include <unicode/unistr.h>
  #include <globals/Sqlite.h>
@@ -32,7 +32,7 @@
  #include <wx/thread.h>
  #include <wx/filename.h>
  
- namespace mvceditor {
+ namespace t4p {
 
  //defined below
  class SqlQueryClass;
@@ -115,18 +115,18 @@ public:
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	DatabaseTagClass(const mvceditor::DatabaseTagClass& other);
+	DatabaseTagClass(const t4p::DatabaseTagClass& other);
 	
 	/**
 	 * copy the attributes from src to this object.
 	 */
-	void Copy(const mvceditor::DatabaseTagClass& src);
+	void Copy(const t4p::DatabaseTagClass& src);
 	
 	/**
 	 * @return true if this info is the "equal to" another; equality is not
 	 * based on pointers it is based on host and database name
 	 */
-	bool SameAs(const mvceditor::DatabaseTagClass& other);
+	bool SameAs(const t4p::DatabaseTagClass& other);
 	
 	/**
 	 * @return UnicodeString a connection hash; a string that uniquely
@@ -165,7 +165,7 @@ public:
 	 * @param sqlString the SQL that was excuted
 	 * @param hasRows TRUE if the statement has results.
 	 */
-	void Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, const UnicodeString& sqlString,
+	void Init(t4p::SqlQueryClass& query, soci::session& session, soci::statement& stmt, const UnicodeString& sqlString,
 		bool hasRows);
 	
 	/**
@@ -281,7 +281,7 @@ class SqlQueryClass {
 	 * @param the connection ID, used to kill a running query
 	 */
 	void ConnectionIdentifier(soci::session& session, 
-		mvceditor::ConnectionIdentifierClass& connectionIdentifier);
+		t4p::ConnectionIdentifierClass& connectionIdentifier);
 
 	/**
 	 * kills the connection (stops any query). this method is useful when
@@ -290,7 +290,7 @@ class SqlQueryClass {
 	 * nice way and avoid using wxThread::Kill
 	 */
 	bool KillConnection(soci::session& session, 
-						  mvceditor::ConnectionIdentifierClass& connectionIdentifier, 
+						  t4p::ConnectionIdentifierClass& connectionIdentifier, 
 						  UnicodeString& error);
 	
 	/**
@@ -429,7 +429,7 @@ private:
 	unsigned long ConnectionId;
 };
 
-class DatabaseTagFinderClass : public mvceditor::SqliteFinderClass {
+class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 
@@ -438,7 +438,7 @@ public:
 	/**
 	 * @return all of the database tags in all of the attached databases
 	 */
-	std::vector<mvceditor::DatabaseTagClass> All(const std::vector<wxFileName>& sourceDirectories);
+	std::vector<t4p::DatabaseTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 
 };
 

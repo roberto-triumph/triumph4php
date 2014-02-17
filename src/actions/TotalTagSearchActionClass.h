@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__
-#define __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__
+#ifndef __T4P_TOTALTAGSEARCHACTIONCLASS_H__
+#define __T4P_TOTALTAGSEARCHACTIONCLASS_H__
 
 #include <wx/event.h>
 #include <actions/ActionClass.h>
@@ -34,7 +34,7 @@
 #include <unicode/unistr.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 	
 class TotalTagResultClass {
 	
@@ -52,28 +52,28 @@ public:
 	/**
 	 * will only be valid when this result is a file
 	 */
-	mvceditor::FileTagClass FileTag;
+	t4p::FileTagClass FileTag;
 	
 	/**
 	 * will only be valid when this result is a class, function, or method
 	 */
-	mvceditor::TagClass PhpTag;
+	t4p::TagClass PhpTag;
 	
 	/**
 	 * will only be valid when this result is a database table
 	 */
-	mvceditor::DatabaseTableTagClass TableTag;
+	t4p::DatabaseTableTagClass TableTag;
 	
 	Types Type;
 	
 	TotalTagResultClass();
-	TotalTagResultClass(const mvceditor::FileTagClass& file);
-	TotalTagResultClass(const mvceditor::TagClass& tag);
-	TotalTagResultClass(const mvceditor::DatabaseTableTagClass& table);
+	TotalTagResultClass(const t4p::FileTagClass& file);
+	TotalTagResultClass(const t4p::TagClass& tag);
+	TotalTagResultClass(const t4p::DatabaseTableTagClass& table);
 	
-	TotalTagResultClass(const mvceditor::TotalTagResultClass& src);
+	TotalTagResultClass(const t4p::TotalTagResultClass& src);
 		
-	void Copy(const mvceditor::TotalTagResultClass& src);
+	void Copy(const t4p::TotalTagResultClass& src);
 };
 	
 /**
@@ -97,10 +97,10 @@ class TotalTagSearchCompleteEventClass : public wxEvent {
     /**
      * Will contain all of the resulting tags.
      */
-	std::vector<mvceditor::TotalTagResultClass> Tags;
+	std::vector<t4p::TotalTagResultClass> Tags;
 
     TotalTagSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
-		int lineNumber, const std::vector<mvceditor::TotalTagResultClass>& tags);
+		int lineNumber, const std::vector<t4p::TotalTagResultClass>& tags);
     
     wxEvent* Clone() const;
 
@@ -111,16 +111,16 @@ extern const wxEventType EVENT_TOTAL_TAG_SEARCH_COMPLETE;
 typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagSearchCompleteEventClass&);
 
 #define EVENT_TOTAL_TAG_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TOTAL_TAG_SEARCH_COMPLETE, id, -1, \
+        DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TOTAL_TAG_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( TotalTagSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
 
-class TotalTagSearchActionClass : public mvceditor::ActionClass {
+class TotalTagSearchActionClass : public t4p::ActionClass {
 
 public:
 	
-	TotalTagSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TotalTagSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * set the search parameters.  this should be called before the action is
@@ -136,7 +136,7 @@ public:
 	 * @param search the search string, can be either file name, full path, or class names, function names
 	 * @param dirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
 	 */
-	void SetSearch(mvceditor::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
+	void SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
 
 	wxString GetLabel() const;
 
@@ -149,12 +149,12 @@ private:
 	/**
 	 * the thing to search in
 	 */
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 
 	/**
 	 * the thing to search for database table tags in
 	 */	
-	mvceditor::SqlResourceFinderClass SqlTagCache;
+	t4p::SqlResourceFinderClass SqlTagCache;
 
 	/**
 	 * the string to look for. could be a partial class name, file name, function name
@@ -175,4 +175,4 @@ private:
 
 }
 
-#endif // __MVCEDITOR_TOTALTAGSEARCHACTIONCLASS_H__
+#endif // __T4P_TOTALTAGSEARCHACTIONCLASS_H__

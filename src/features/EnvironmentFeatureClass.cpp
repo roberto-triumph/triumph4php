@@ -103,39 +103,39 @@ static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& colu
 	}
 }
 
-const wxEventType mvceditor::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 
-mvceditor::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(int eventId, const mvceditor::ApacheClass &apache)
-	: wxEvent(eventId, mvceditor::EVENT_APACHE_FILE_READ_COMPLETE)
+t4p::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(int eventId, const t4p::ApacheClass &apache)
+	: wxEvent(eventId, t4p::EVENT_APACHE_FILE_READ_COMPLETE)
 	, Apache(apache) {
 
 }
 
-wxEvent* mvceditor::ApacheFileReadCompleteEventClass::Clone() const {
-	mvceditor::ApacheFileReadCompleteEventClass* evt = new mvceditor::ApacheFileReadCompleteEventClass(GetId(), Apache);
+wxEvent* t4p::ApacheFileReadCompleteEventClass::Clone() const {
+	t4p::ApacheFileReadCompleteEventClass* evt = new t4p::ApacheFileReadCompleteEventClass(GetId(), Apache);
 	return evt;
 }
 
-mvceditor::ApacheFileReaderClass::ApacheFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ApacheFileReaderClass::ApacheFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : BackgroundFileReaderClass(runningThreads, eventId)
 	, ApacheResults() {
 }
 
-bool mvceditor::ApacheFileReaderClass::Init(const wxString& startDirectory) {
+bool t4p::ApacheFileReaderClass::Init(const wxString& startDirectory) {
 	ApacheResults.ManualConfiguration = false;
 	ApacheResults.ClearMappings();
 	return BackgroundFileReaderClass::Init(startDirectory);
 }
 
-wxString mvceditor::ApacheFileReaderClass::GetLabel() const {
+wxString t4p::ApacheFileReaderClass::GetLabel() const {
 	return wxT("Apache File Reader");
 }
 
-bool mvceditor::ApacheFileReaderClass::BackgroundFileMatch(const wxString& file) {
+bool t4p::ApacheFileReaderClass::BackgroundFileMatch(const wxString& file) {
 	return true;
 }
 
-bool mvceditor::ApacheFileReaderClass::BackgroundFileRead(mvceditor::DirectorySearchClass& search) {
+bool t4p::ApacheFileReaderClass::BackgroundFileRead(t4p::DirectorySearchClass& search) {
 	bool ret = false;
 	if (search.Walk(ApacheResults)) {
 		ret = true;
@@ -157,14 +157,14 @@ bool mvceditor::ApacheFileReaderClass::BackgroundFileRead(mvceditor::DirectorySe
 
 		// send the event once we have searched all files
 		if (found) {
-			mvceditor::ApacheFileReadCompleteEventClass evt(ID_APACHE_FILE_READER, ApacheResults);
+			t4p::ApacheFileReadCompleteEventClass evt(ID_APACHE_FILE_READER, ApacheResults);
 			PostEvent(evt);
 		}
 	}
 	return ret;
 }
 
-mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, mvceditor::RunningThreadsClass& runningThreads, EnvironmentClass& environment)
+t4p::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, t4p::RunningThreadsClass& runningThreads, EnvironmentClass& environment)
 	: ApacheEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment)
 	, RunningThreads(runningThreads)
@@ -185,14 +185,14 @@ mvceditor::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* pa
 	Populate();
 }
 
-mvceditor::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
+t4p::ApacheEnvironmentPanelClass::~ApacheEnvironmentPanelClass() {
 	if (RunningActionId > 0) {
 		RunningThreads.CancelAction(RunningActionId);
 	}
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 	wxString path = ApacheConfigurationDirectory->GetPath();
 	if (path.IsEmpty()) {
 		wxMessageBox(_("Please enter a configuration directory"));
@@ -203,7 +203,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
+		t4p::ApacheFileReaderClass* reader = new t4p::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
 			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
@@ -228,7 +228,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::Populate() {
+void t4p::ApacheEnvironmentPanelClass::Populate() {
 	wxString configFile = EditedApache.GetHttpdPath();
 	wxString results;
 
@@ -247,24 +247,24 @@ void mvceditor::ApacheEnvironmentPanelClass::Populate() {
 	}
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(mvceditor::ApacheFileReadCompleteEventClass& event) {
+void t4p::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event) {
 		
 	// copy the result apache object to overwrite what is shown in the dialog
 	EditedApache.Copy(event.Apache);
 	Populate();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
+void t4p::ApacheEnvironmentPanelClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	Gauge->Pulse();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+void t4p::ApacheEnvironmentPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 	Gauge->SetValue(0);
 	ScanButton->SetLabel(_("Scan For Configuration"));
 	RunningActionId = 0;
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
 		HelpText->Wrap(event.GetSize().GetX());
 		HelpText->GetContainingSizer()->Layout();
@@ -274,10 +274,10 @@ void mvceditor::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) {
 	wxFileName rootDirectory;
 	wxString hostName; 
-	mvceditor::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), hostName, rootDirectory);
+	t4p::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), hostName, rootDirectory);
 	if (wxOK == dialog.ShowModal()) {
 		ListCtrlAdd(VirtualHostList, rootDirectory.GetFullPath(), hostName);
 		VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
@@ -288,7 +288,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	bool enableButtons = Manual->GetValue();
 	RemoveButton->Enable(enableButtons);
 	EditButton->Enable(enableButtons);
@@ -300,7 +300,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) 
 	event.Skip();
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event) {
 	int selection = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < VirtualHostList->GetItemCount()) {
 		wxString oldRootDirectory,
@@ -308,7 +308,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event)
 		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selection);
 		wxString newHostName = oldHostName;
 		wxFileName newRootDirectory(oldRootDirectory);
-		mvceditor::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), newHostName, newRootDirectory);
+		t4p::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), newHostName, newRootDirectory);
 		if (wxOK == dialog.ShowModal()) {
 			ListCtrlEdit(VirtualHostList, newRootDirectory.GetFullPath(), newHostName, selection);
 			VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
@@ -321,7 +321,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& event) {
 	int selected = VirtualHostList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selected >= 0 && selected < VirtualHostList->GetItemCount()) {
 		wxString oldRootDirectory,
@@ -332,7 +332,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& even
 	}
 }
 
-bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
+bool t4p::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 	bool good = wxWindow::TransferDataFromWindow();
 	if (good) {
 		Environment.Apache = EditedApache;
@@ -340,14 +340,14 @@ bool mvceditor::ApacheEnvironmentPanelClass::TransferDataFromWindow() {
 	return good;
 }
 
-void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
+void t4p::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event) {
 	if (0 == RunningActionId) {
 		wxString path = ApacheConfigurationDirectory->GetPath();
 		wxChar ch = wxFileName::GetPathSeparator();
 		if (path[path.Length() - 1] != ch) {
 			path.Append(ch);
 		}
-		mvceditor::ApacheFileReaderClass* reader = new mvceditor::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
+		t4p::ApacheFileReaderClass* reader = new t4p::ApacheFileReaderClass(RunningThreads, ID_APACHE_FILE_READER);
 		if (reader->Init(path)) {
 			RunningActionId = RunningThreads.Queue(reader);
 			VirtualHostList->DeleteAllItems();
@@ -364,7 +364,7 @@ void mvceditor::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& 
 	}	
 }
 
-mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+t4p::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, t4p::EnvironmentClass& environment)
 	: PhpEnvironmentPanelGeneratedClass(parent)
 	, Environment(environment) {
 	PhpExecutable->SetValue(environment.Php.PhpExecutablePath);
@@ -383,7 +383,7 @@ mvceditor::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, 
 	PhpExecutableFile->Enable(environment.Php.Installed);
 }
 
-bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
+bool t4p::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 	bool good = true;
 
 	// php executable can be empty when user does not have php installed
@@ -424,16 +424,16 @@ bool mvceditor::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 }
 
 
-void mvceditor::PhpEnvironmentPanelClass::OnPhpFileChanged(wxFileDirPickerEvent& event) {
+void t4p::PhpEnvironmentPanelClass::OnPhpFileChanged(wxFileDirPickerEvent& event) {
 	PhpExecutable->SetValue(event.GetPath());
 }
 
-void mvceditor::PhpEnvironmentPanelClass::OnInstalledCheck(wxCommandEvent& event) {
+void t4p::PhpEnvironmentPanelClass::OnInstalledCheck(wxCommandEvent& event) {
 	PhpExecutable->Enable(event.IsChecked());
 	PhpExecutableFile->Enable(event.IsChecked());
 }
 
-void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
+void t4p::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
 		HelpText->Wrap(event.GetSize().GetX());
 		HelpText->GetContainingSizer()->Layout();
@@ -443,7 +443,7 @@ void mvceditor::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 	event.Skip();
 }
 
-mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, mvceditor::EnvironmentClass& environment)
+t4p::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, t4p::EnvironmentClass& environment)
 	: WebBrowserEditPanelGeneratedClass(parent)
 	, Environment(environment) 
 	, EditedWebBrowsers(environment.WebBrowsers) {
@@ -454,7 +454,7 @@ mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, 
 	// in case there are no configured browsers still properly show the columns 
 	BrowserList->SetColumnWidth(0, 250);
 	BrowserList->SetColumnWidth(1, 250);
-	std::vector<mvceditor::WebBrowserClass>::const_iterator it = EditedWebBrowsers.begin();
+	std::vector<t4p::WebBrowserClass>::const_iterator it = EditedWebBrowsers.begin();
 	for (; it != EditedWebBrowsers.end(); ++it) {
 		ListCtrlAdd(BrowserList, it->Name, it->FullPath.GetFullPath());
 	}
@@ -465,7 +465,7 @@ mvceditor::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, 
 	}
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
+void t4p::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
 	if (GetContainingSizer() && HelpText->GetContainingSizer()) {
 		HelpText->Wrap(event.GetSize().GetX());
 		HelpText->GetContainingSizer()->Layout();
@@ -475,9 +475,9 @@ void mvceditor::WebBrowserEditPanelClass::OnResize(wxSizeEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
-	mvceditor::WebBrowserClass newBrowser;
-	mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newBrowser);
+void t4p::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
+	t4p::WebBrowserClass newBrowser;
+	t4p::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, newBrowser);
 	if (wxOK == dialog.ShowModal()) {
 		ListCtrlAdd(BrowserList, newBrowser.Name, newBrowser.FullPath.GetFullPath());
 		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
@@ -488,14 +488,14 @@ void mvceditor::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& event) {
+void t4p::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& event) {
 
 	// could not get the list selection function to work on windows
 	// when the "edit" button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
 		int cur = 0;
-		for(std::vector<mvceditor::WebBrowserClass>::iterator it = EditedWebBrowsers.begin(); it != EditedWebBrowsers.end(); ++it) {
+		for(std::vector<t4p::WebBrowserClass>::iterator it = EditedWebBrowsers.begin(); it != EditedWebBrowsers.end(); ++it) {
 			if (cur == selection) {
 				EditedWebBrowsers.erase(it);
 				break;
@@ -509,14 +509,14 @@ void mvceditor::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEv
 	}
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
+void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
 
 	// could not get the list selection function to work on windows
 	// when the "edit" button is clicked
 	long selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < BrowserList->GetItemCount()) {
-		mvceditor::WebBrowserClass oldBrowser = EditedWebBrowsers[selection];
-		mvceditor::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, oldBrowser);
+		t4p::WebBrowserClass oldBrowser = EditedWebBrowsers[selection];
+		t4p::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, oldBrowser);
 		if (wxOK == dialog.ShowModal()) {
 			ListCtrlEdit(BrowserList, oldBrowser.Name, oldBrowser.FullPath.GetFullPath(), selection);
 			
@@ -532,7 +532,7 @@ void mvceditor::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEven
 	}
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
+void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 	
 	// could not get the list selection function to work on windows
 	// when the button is clicked
@@ -540,8 +540,8 @@ void mvceditor::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 	if (selection > 0 && selection < BrowserList->GetItemCount()) {
 
 		// the 'top' row will moved down one and the row at the selection will be moved up one
-		mvceditor::WebBrowserClass top =  EditedWebBrowsers[selection - 1];
-		mvceditor::WebBrowserClass selected =  EditedWebBrowsers[selection];
+		t4p::WebBrowserClass top =  EditedWebBrowsers[selection - 1];
+		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];
 		EditedWebBrowsers[selection - 1] = selected;
 		EditedWebBrowsers[selection] = top;
 		
@@ -557,7 +557,7 @@ void mvceditor::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
+void t4p::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 
 	// could not get the list selection function to work on windows
 	// when the button is clicked
@@ -565,8 +565,8 @@ void mvceditor::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 	if (selection >= 0 && selection < (BrowserList->GetItemCount() - 1)) {
 	
 		// the 'bottom' row will moved up one and the row at the selection will be moved down one
-		mvceditor::WebBrowserClass bottom =  EditedWebBrowsers[selection + 1];
-		mvceditor::WebBrowserClass selected =  EditedWebBrowsers[selection];
+		t4p::WebBrowserClass bottom =  EditedWebBrowsers[selection + 1];
+		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];
 		EditedWebBrowsers[selection + 1] = selected;
 		EditedWebBrowsers[selection] = bottom;
 
@@ -581,7 +581,7 @@ void mvceditor::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 	}
 }
 
-bool mvceditor::WebBrowserEditPanelClass::TransferDataFromWindow() {
+bool t4p::WebBrowserEditPanelClass::TransferDataFromWindow() {
 	bool good = wxWindow::TransferDataToWindow();
 	if (good) {
 		Environment.WebBrowsers = EditedWebBrowsers;
@@ -589,9 +589,9 @@ bool mvceditor::WebBrowserEditPanelClass::TransferDataFromWindow() {
 	return true;
 }
 
-mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
-																	std::vector<mvceditor::WebBrowserClass> existingBrowsers, 
-																	mvceditor::WebBrowserClass& oldBrowser)
+t4p::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
+																	std::vector<t4p::WebBrowserClass> existingBrowsers, 
+																	t4p::WebBrowserClass& oldBrowser)
 	: WebBrowserCreateDialogGeneratedClass(parent) 
 	, ExistingBrowsers(existingBrowsers)
 	, NewBrowser(oldBrowser)
@@ -602,7 +602,7 @@ mvceditor::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* pa
 	WebBrowserLabel->SetFocus();
 }
 
-void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate()) {
 		wxString newName = WebBrowserLabel->GetValue();
 		if (newName.IsEmpty()) {
@@ -613,7 +613,7 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 		// allow the user to use the same name if they did not change
 		// otherwise every time the user wants to edit a browser they would need to change the name
 		bool found = false;
-		for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = ExistingBrowsers.begin(); it != ExistingBrowsers.end(); ++it) {
+		for(std::vector<t4p::WebBrowserClass>::const_iterator it = ExistingBrowsers.begin(); it != ExistingBrowsers.end(); ++it) {
 			if (it->Name == newName) {
 				found = true;
 				break;
@@ -634,7 +634,7 @@ void mvceditor::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 	}	
 }
 
-mvceditor::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* parent, 
+t4p::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* parent, 
 		std::map<wxString, wxString> existingVirtualHosts, wxString& hostName, wxFileName& rootDirectory)
 	: VirtualHostCreateDialogGeneratedClass(parent)
 	, ExistingVirtualHosts(existingVirtualHosts)
@@ -645,7 +645,7 @@ mvceditor::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* 
 	RootDirectory->SetFocus();
 }
 
-void mvceditor::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate()) {
 		wxString newRootPath = RootDirectory->GetPath();
 		if (newRootPath.IsEmpty()) {
@@ -666,13 +666,13 @@ void mvceditor::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) 
 	}
 }
 
-mvceditor::EnvironmentFeatureClass::EnvironmentFeatureClass(mvceditor::AppClass& app)
+t4p::EnvironmentFeatureClass::EnvironmentFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
-void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get();
-	mvceditor::EnvironmentClass* environment = GetEnvironment();
+	t4p::EnvironmentClass* environment = GetEnvironment();
 	environment->SaveToConfig(config);
 	if (environment->Php.IsAuto && environment->Php.Installed) {
 		environment->Php.AutoDetermine();
@@ -683,18 +683,18 @@ void mvceditor::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& even
 	App.UpdateConfigModifiedTime();
 }
 
-void mvceditor::EnvironmentFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	parent->AddPage(new mvceditor::WebBrowserEditPanelClass(parent, *GetEnvironment()), _("Web Browsers"));	
-	parent->AddPage(new mvceditor::ApacheEnvironmentPanelClass(parent, App.RunningThreads, *GetEnvironment()), _("Apache"));
-	parent->AddPage(new mvceditor::PhpEnvironmentPanelClass(parent, *GetEnvironment()), _("PHP Executable"));
+void t4p::EnvironmentFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	parent->AddPage(new t4p::WebBrowserEditPanelClass(parent, *GetEnvironment()), _("Web Browsers"));	
+	parent->AddPage(new t4p::ApacheEnvironmentPanelClass(parent, App.RunningThreads, *GetEnvironment()), _("Apache"));
+	parent->AddPage(new t4p::PhpEnvironmentPanelClass(parent, *GetEnvironment()), _("PHP Executable"));
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
-	EVT_ACTION_PROGRESS(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionProgress)
-	EVT_APACHE_FILE_READ_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
-	EVT_ACTION_COMPLETE(ID_APACHE_FILE_READER, mvceditor::ApacheEnvironmentPanelClass::OnActionComplete)
+BEGIN_EVENT_TABLE(t4p::ApacheEnvironmentPanelClass, ApacheEnvironmentPanelGeneratedClass)
+	EVT_ACTION_PROGRESS(ID_APACHE_FILE_READER, t4p::ApacheEnvironmentPanelClass::OnActionProgress)
+	EVT_APACHE_FILE_READ_COMPLETE(ID_APACHE_FILE_READER, t4p::ApacheEnvironmentPanelClass::OnApacheFileReadComplete)
+	EVT_ACTION_COMPLETE(ID_APACHE_FILE_READER, t4p::ApacheEnvironmentPanelClass::OnActionComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::EnvironmentFeatureClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::EnvironmentFeatureClass::OnPreferencesSaved) 	
+BEGIN_EVENT_TABLE(t4p::EnvironmentFeatureClass, wxEvtHandler) 
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EnvironmentFeatureClass::OnPreferencesSaved) 	
 END_EVENT_TABLE()

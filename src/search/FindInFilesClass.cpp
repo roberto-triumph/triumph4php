@@ -32,7 +32,7 @@
 #include <wx/regex.h>
 #include <wx/filename.h>
 
-mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, mvceditor::FinderClass::Modes mode) 
+t4p::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, t4p::FinderClass::Modes mode) 
 	: Expression(expression)
 	, ReplaceExpression()
 	, Source()
@@ -48,7 +48,7 @@ mvceditor::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, m
 	, MatchLength(0) {
 }
 
-mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
+t4p::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
 	: Expression()
 	, ReplaceExpression()
 	, Source()
@@ -65,18 +65,18 @@ mvceditor::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFile
 	Copy(findInFiles);
 }
 
-mvceditor::FindInFilesClass::~FindInFilesClass() {
+t4p::FindInFilesClass::~FindInFilesClass() {
 	CleanupStreams();
 }
 
-bool mvceditor::FindInFilesClass::Prepare() {
+bool t4p::FindInFilesClass::Prepare() {
 	Finder.Expression = Expression;
 	Finder.Mode = Mode;
 	Finder.ReplaceExpression = ReplaceExpression;
 	return Finder.Prepare();
 }
 
-bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
+bool t4p::FindInFilesClass::Walk(const wxString& fileName) {
 	bool found = false;
 	LineNumber = 0;
 	LineOffset = 0;
@@ -97,7 +97,7 @@ bool mvceditor::FindInFilesClass::Walk(const wxString& fileName) {
 	return found;
 }
 
-bool mvceditor::FindInFilesClass::FindNext() {
+bool t4p::FindInFilesClass::FindNext() {
 	LineOffset = 0;
 	MatchLength = 0;
 	bool found = false;
@@ -124,42 +124,42 @@ bool mvceditor::FindInFilesClass::FindNext() {
 	return found;
 }
 
-int mvceditor::FindInFilesClass::GetCurrentLineNumber() const {
+int t4p::FindInFilesClass::GetCurrentLineNumber() const {
 	return LineNumber;
 }
 
-int mvceditor::FindInFilesClass::GetLineOffset() const {
+int t4p::FindInFilesClass::GetLineOffset() const {
 	return LineOffset;
 }
 
-int mvceditor::FindInFilesClass::GetFileOffset() const {
+int t4p::FindInFilesClass::GetFileOffset() const {
 	return FileOffset;
 }
 
-int mvceditor::FindInFilesClass::GetMatchLength() const {
+int t4p::FindInFilesClass::GetMatchLength() const {
 	return MatchLength;
 }
 
-UnicodeString mvceditor::FindInFilesClass::GetCurrentLine() const {
+UnicodeString t4p::FindInFilesClass::GetCurrentLine() const {
 	return CurrentLine;
 }
 
-bool mvceditor::FindInFilesClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
+bool t4p::FindInFilesClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
 	return Finder.GetLastReplacementText(text, replacementText);
 }
 
-int mvceditor::FindInFilesClass::ReplaceAllMatches(UnicodeString& text) const {
+int t4p::FindInFilesClass::ReplaceAllMatches(UnicodeString& text) const {
 	return Finder.ReplaceAllMatches(text);
 }
 
-int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileName) const {
+int t4p::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileName) const {
 	int matches = 0;
 	if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
 
 		// ATTN: problems here: this code will load entire file into memory not too efficient
 		// but the regular expression classes do not work with strings
 		UnicodeString fileContents;
-		mvceditor::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents);
+		t4p::FindInFilesClass::OpenErrors error = FileContents(fileName, fileContents);
 			if (NONE == error) {
 			matches += ReplaceAllMatches(fileContents);
 			UFILE* file = u_fopen(fileName.ToAscii(), "wb", NULL, NULL);
@@ -168,21 +168,21 @@ int mvceditor::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileNam
 				u_fclose(file);
 			}
 		}
-		else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-			mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, fileName);
+		else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
 		}
 	}
 	return matches;
 }
 
-void mvceditor::FindInFilesClass::CopyFinder(FinderClass& dest) {
+void t4p::FindInFilesClass::CopyFinder(FinderClass& dest) {
 	dest.Expression = Finder.Expression;
 	dest.ReplaceExpression = Finder.ReplaceExpression;
 	dest.Mode = Finder.Mode;
 	dest.Wrap = Finder.Wrap;
 }
 
-mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
+t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
 	OpenErrors error = NONE;
 	wxFFile fFile(fileName, wxT("rb"));
 	if (fFile.IsOpened()) {
@@ -237,12 +237,12 @@ mvceditor::FindInFilesClass::OpenErrors mvceditor::FindInFilesClass::FileContent
 	return error;
 }
 
-mvceditor::FindInFilesClass& mvceditor::FindInFilesClass::operator=(const FindInFilesClass& src) {
+t4p::FindInFilesClass& t4p::FindInFilesClass::operator=(const FindInFilesClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::FindInFilesClass::Copy(const FindInFilesClass& src) {
+void t4p::FindInFilesClass::Copy(const FindInFilesClass& src) {
 	CleanupStreams();
 
 	Expression = src.Expression;
@@ -259,7 +259,7 @@ void mvceditor::FindInFilesClass::Copy(const FindInFilesClass& src) {
 	MatchLength = 0;
 }
 
-void mvceditor::FindInFilesClass::CleanupStreams() {
+void t4p::FindInFilesClass::CleanupStreams() {
 	if (NULL != File) {
 		u_fclose(File);
 		File = NULL;

@@ -58,7 +58,7 @@ static const int ID_GRID_OPEN_IN_EDITOR = wxNewId();
  * @param grid the grid to put the results in. any previous grid values are cleared. this function will not own the pointer
  * @param results the results to fill. this function will not own the pointer
  */
-static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results) {
+static void FillGridWithResults(wxGrid* grid, t4p::SqlResultClass* results) {
 	std::vector<bool> autoSizeColumns;
 
 	// there may be many results; freeze the drawing until we fill in the grid
@@ -74,13 +74,13 @@ static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results
 		grid->AppendCols(1);
 		grid->SetColLabelValue(1, _("Error Message"));
 		grid->AppendRows(1);
-		grid->SetCellValue(0, 0, mvceditor::IcuToWx(results->Error));
+		grid->SetCellValue(0, 0, t4p::IcuToWx(results->Error));
 		autoSizeColumns.push_back(true);
 	}
 	if (results->HasRows) {
 		grid->AppendCols(results->ColumnNames.size());
 		for (size_t i = 0; i < results->ColumnNames.size(); i++) {
-			grid->SetColLabelValue(i, mvceditor::IcuToWx(results->ColumnNames[i]));
+			grid->SetColLabelValue(i, t4p::IcuToWx(results->ColumnNames[i]));
 			autoSizeColumns.push_back(true);
 		}
 		grid->SetDefaultCellOverflow(false);
@@ -88,7 +88,7 @@ static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results
 			grid->AppendRows(1);
 			std::vector<UnicodeString> columnValues =  results->StringResults[i];
 			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
-				grid->SetCellValue(rowNumber - 1, colNumber, mvceditor::IcuToWx(columnValues[colNumber]));
+				grid->SetCellValue(rowNumber - 1, colNumber, t4p::IcuToWx(columnValues[colNumber]));
 				if (columnValues[colNumber].length() > 50) {
 					autoSizeColumns[colNumber] = false; 
 				}
@@ -114,23 +114,23 @@ static void FillGridWithResults(wxGrid* grid, mvceditor::SqlResultClass* results
 	grid->EndBatch();
 }
 
-mvceditor::QueryCompleteEventClass::QueryCompleteEventClass(mvceditor::SqlResultClass* results, int eventId)
-: wxEvent(eventId, mvceditor::QUERY_COMPLETE_EVENT)
+t4p::QueryCompleteEventClass::QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId)
+: wxEvent(eventId, t4p::QUERY_COMPLETE_EVENT)
 , Results(results) {
 	
 }
 
-wxEvent* mvceditor::QueryCompleteEventClass::Clone() const {
-	return new mvceditor::QueryCompleteEventClass(Results, GetId());
+wxEvent* t4p::QueryCompleteEventClass::Clone() const {
+	return new t4p::QueryCompleteEventClass(Results, GetId());
 }
 
-mvceditor::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag)
+t4p::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag)
 : SqliteConnectionDialogGeneratedClass(parent, wxID_ANY)
 {
-	mvceditor::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
+	t4p::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
 	Label->SetValidator(labelValidator);
 	Label->SetName(wxT("label"));
-	mvceditor::FilePickerValidatorClass fileValidator(&tag.FileName);
+	t4p::FilePickerValidatorClass fileValidator(&tag.FileName);
 	File->SetValidator(fileValidator);
 	File->SetName(wxT("file"));
 	TransferDataToWindow();
@@ -143,8 +143,8 @@ mvceditor::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* pa
 	}
 }
 
-mvceditor::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag,
-		mvceditor::RunningThreadsClass& runningThreads)
+t4p::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag,
+		t4p::RunningThreadsClass& runningThreads)
 : MysqlConnectionDialogGeneratedClass(parent, wxID_ANY)
 , TestQuery()
 , RunningThreads(runningThreads)
@@ -152,19 +152,19 @@ mvceditor::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* pare
 , RunningActionId() {
 	RunningThreads.AddEventHandler(this);
 	
-	mvceditor::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
+	t4p::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
 	Label->SetValidator(labelValidator);
 	Label->SetName(wxT("label"));
-	mvceditor::UnicodeStringValidatorClass hostValidator(&tag.Host, false);
+	t4p::UnicodeStringValidatorClass hostValidator(&tag.Host, false);
 	Host->SetValidator(hostValidator);
 	Host->SetName(wxT("host"));
 	wxGenericValidator portValidator(&tag.Port);
 	Port->SetValidator(portValidator);
-	mvceditor::UnicodeStringValidatorClass schemaValidator(&tag.Schema, true);
+	t4p::UnicodeStringValidatorClass schemaValidator(&tag.Schema, true);
 	Database->SetValidator(schemaValidator);
-	mvceditor::UnicodeStringValidatorClass userValidator(&tag.User, true);
+	t4p::UnicodeStringValidatorClass userValidator(&tag.User, true);
 	User->SetValidator(userValidator);
-	mvceditor::UnicodeStringValidatorClass passwordValidator(&tag.Password, true);
+	t4p::UnicodeStringValidatorClass passwordValidator(&tag.Password, true);
 	Password->SetValidator(passwordValidator);
 	
 	TransferDataToWindow();
@@ -182,31 +182,31 @@ mvceditor::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* pare
 	}
 }
 
-mvceditor::MysqlConnectionDialogClass::~MysqlConnectionDialogClass() {
+t4p::MysqlConnectionDialogClass::~MysqlConnectionDialogClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::MysqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
+void t4p::MysqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 
 	// get the most up-to-date values that the user has input
 
-	TestQuery.DatabaseTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
-	TestQuery.DatabaseTag.Label = mvceditor::WxToIcu(Label->GetValue());
-	TestQuery.DatabaseTag.Host = mvceditor::WxToIcu(Host->GetValue());
+	TestQuery.DatabaseTag.Driver = t4p::DatabaseTagClass::MYSQL;
+	TestQuery.DatabaseTag.Label = t4p::WxToIcu(Label->GetValue());
+	TestQuery.DatabaseTag.Host = t4p::WxToIcu(Host->GetValue());
 	TestQuery.DatabaseTag.Port = Port->GetValue();
-	TestQuery.DatabaseTag.Schema = mvceditor::WxToIcu(Database->GetValue());
-	TestQuery.DatabaseTag.User = mvceditor::WxToIcu(User->GetValue());
-	TestQuery.DatabaseTag.Password = mvceditor::WxToIcu(Password->GetValue());
+	TestQuery.DatabaseTag.Schema = t4p::WxToIcu(Database->GetValue());
+	TestQuery.DatabaseTag.User = t4p::WxToIcu(User->GetValue());
+	TestQuery.DatabaseTag.Password = t4p::WxToIcu(Password->GetValue());
 	
 	wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
 	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
 	
-	mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_EDIT_TEST, ConnectionIdentifier);
+	t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_EDIT_TEST, ConnectionIdentifier);
 	thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
 	RunningThreads.Queue(thread);
 }
 
-void mvceditor::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
 	
 	// in case the test query is stuck, send a kill command to mysql
 	soci::session session;
@@ -219,12 +219,12 @@ void mvceditor::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event
 	event.Skip();
 }
 
-void mvceditor::MysqlConnectionDialogClass::ShowTestResults(mvceditor::QueryCompleteEventClass& event) {
-	mvceditor::SqlResultClass* result = event.Results;
-	wxString error = mvceditor::IcuToWx(result->Error);
+void t4p::MysqlConnectionDialogClass::ShowTestResults(t4p::QueryCompleteEventClass& event) {
+	t4p::SqlResultClass* result = event.Results;
+	wxString error = t4p::IcuToWx(result->Error);
 	bool success = result->Success;
 	
-	wxString creds = mvceditor::IcuToWx(TestQuery.DatabaseTag.User + 
+	wxString creds = t4p::IcuToWx(TestQuery.DatabaseTag.User + 
 			UNICODE_STRING_SIMPLE("@") +
 			TestQuery.DatabaseTag.Host);
 	
@@ -243,8 +243,8 @@ void mvceditor::MysqlConnectionDialogClass::ShowTestResults(mvceditor::QueryComp
 }
 
 
-mvceditor::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, 
-															  mvceditor::RunningThreadsClass& runningThreads)
+t4p::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags, 
+															  t4p::RunningThreadsClass& runningThreads)
 	: SqlConnectionListDialogGeneratedClass(parent, wxID_ANY) 
 	, DatabaseTags(dbTags)
 	, EditedDatabaseTags()
@@ -259,35 +259,35 @@ mvceditor::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* 
 	TransferDataToWindow();
 }
 
-mvceditor::SqlConnectionListDialogClass::~SqlConnectionListDialogClass() {
+t4p::SqlConnectionListDialogClass::~SqlConnectionListDialogClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnAddMysqlButton(wxCommandEvent& event) {
-	mvceditor::DatabaseTagClass newTag;
-	newTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
-	mvceditor::MysqlConnectionDialogClass mysqlDialog(this, newTag, RunningThreads);
+void t4p::SqlConnectionListDialogClass::OnAddMysqlButton(wxCommandEvent& event) {
+	t4p::DatabaseTagClass newTag;
+	newTag.Driver = t4p::DatabaseTagClass::MYSQL;
+	t4p::MysqlConnectionDialogClass mysqlDialog(this, newTag, RunningThreads);
 	if (mysqlDialog.ShowModal() == wxID_OK) {
 		Push(newTag);
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnAddSqliteButton(wxCommandEvent& event) {
-	mvceditor::DatabaseTagClass newTag;
-	newTag.Driver = mvceditor::DatabaseTagClass::SQLITE;
-	mvceditor::SqliteConnectionDialogClass sqliteDialog(this, newTag);
+void t4p::SqlConnectionListDialogClass::OnAddSqliteButton(wxCommandEvent& event) {
+	t4p::DatabaseTagClass newTag;
+	newTag.Driver = t4p::DatabaseTagClass::SQLITE;
+	t4p::SqliteConnectionDialogClass sqliteDialog(this, newTag);
 	if (sqliteDialog.ShowModal() == wxID_OK) {
 		Push(newTag);
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnCloneButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnCloneButton(wxCommandEvent& event) {
 	wxArrayInt toCloneIndexes;
 	if (List->GetSelections(toCloneIndexes)) {
 		for (size_t i = 0; i < toCloneIndexes.GetCount(); ++i) {
 			size_t indexToClone = toCloneIndexes[i];
 			
-			mvceditor::DatabaseTagClass clonedTag;
+			t4p::DatabaseTagClass clonedTag;
 			clonedTag.Copy(EditedDatabaseTags[indexToClone]);
 			
 			// clone == the user created it
@@ -300,10 +300,10 @@ void mvceditor::SqlConnectionListDialogClass::OnCloneButton(wxCommandEvent& even
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEvent& event) {
 	wxArrayInt toRemoveIndexes;
 	if (List->GetSelections(toRemoveIndexes)) {
-		std::vector<mvceditor::DatabaseTagClass> remaining;
+		std::vector<t4p::DatabaseTagClass> remaining;
 		for (size_t i = 0; i < EditedDatabaseTags.size(); ++i) {
 			
 			// dont allow the user to delete a detected connection
@@ -321,12 +321,12 @@ void mvceditor::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEv
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event) {
 	
 	// remove from the backing list
 	// but don't allow the user to delete a detected connection
-	std::vector<mvceditor::DatabaseTagClass> newList;
-	std::vector<mvceditor::DatabaseTagClass>::iterator tag;
+	std::vector<t4p::DatabaseTagClass> newList;
+	std::vector<t4p::DatabaseTagClass>::iterator tag;
 	for (tag = EditedDatabaseTags.begin(); tag != EditedDatabaseTags.end(); ++tag) {
 		if (tag->IsDetected) {
 			newList.push_back(*tag);
@@ -343,7 +343,7 @@ void mvceditor::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& 
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& event) {
 	size_t sel = event.GetInt();
 	bool b = List->IsChecked(sel);
 	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
@@ -351,31 +351,31 @@ void mvceditor::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
 	size_t sel = (size_t)event.GetSelection();
 	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
-		mvceditor::DatabaseTagClass editTag = EditedDatabaseTags[sel];
+		t4p::DatabaseTagClass editTag = EditedDatabaseTags[sel];
 		int res = 0;
-		if (mvceditor::DatabaseTagClass::MYSQL == editTag.Driver) {
-			mvceditor::MysqlConnectionDialogClass dialog(this, editTag, RunningThreads);
+		if (t4p::DatabaseTagClass::MYSQL == editTag.Driver) {
+			t4p::MysqlConnectionDialogClass dialog(this, editTag, RunningThreads);
 			res = dialog.ShowModal();
 		}
-		else if (mvceditor::DatabaseTagClass::SQLITE == editTag.Driver) {
-			mvceditor::SqliteConnectionDialogClass dialog(this, editTag);
+		else if (t4p::DatabaseTagClass::SQLITE == editTag.Driver) {
+			t4p::SqliteConnectionDialogClass dialog(this, editTag);
 			res = dialog.ShowModal();
 		}
 		if (wxID_OK == res) {
 			EditedDatabaseTags[sel] = editTag;
 			
 			// update the list label
-			List->SetString(sel, mvceditor::IcuToWx(editTag.Label));
+			List->SetString(sel, t4p::IcuToWx(editTag.Label));
 		}
 	}
 	
 }
 
-void mvceditor::SqlConnectionListDialogClass::Push(const mvceditor::DatabaseTagClass& newTag) {
-	wxString label = mvceditor::IcuToWx(newTag.Label);
+void t4p::SqlConnectionListDialogClass::Push(const t4p::DatabaseTagClass& newTag) {
+	wxString label = t4p::IcuToWx(newTag.Label);
 	if (newTag.IsDetected) {
 		label += _(" <Detected>");
 	}
@@ -385,7 +385,7 @@ void mvceditor::SqlConnectionListDialogClass::Push(const mvceditor::DatabaseTagC
 	List->Check(List->GetCount() - 1, newTag.IsEnabled);
 }
 	
-void mvceditor::SqlConnectionListDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
 		DatabaseTags.clear();
 		DatabaseTags.resize(EditedDatabaseTags.size());
@@ -394,7 +394,7 @@ void mvceditor::SqlConnectionListDialogClass::OnOkButton(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnCancelButton(wxCommandEvent& event) {
 	soci::session session;
 	UnicodeString error;
 	if (TestQuery.Connect(session, error)) {
@@ -405,7 +405,7 @@ void mvceditor::SqlConnectionListDialogClass::OnCancelButton(wxCommandEvent& eve
 	event.Skip();
 }
 
-void mvceditor::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEvent& event) {
+void t4p::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEvent& event) {
 	wxArrayInt toTestIndexes;
 	if (List->GetSelections(toTestIndexes) > 1) {
 		wxMessageBox(_("Select a single connection to test"), _("Error"), wxOK | wxCENTRE, this);
@@ -423,15 +423,15 @@ void mvceditor::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEven
 		// get the most up-to-date values that the user has input
 		TestQuery.DatabaseTag.Copy(EditedDatabaseTags[index]);
 
-		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_LIST_TEST, ConnectionIdentifier);
+		t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_LIST_TEST, ConnectionIdentifier);
 		thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
 		RunningThreads.Queue(thread);
 	}
 }
 
-void mvceditor::SqlConnectionListDialogClass::ShowTestResults(mvceditor::QueryCompleteEventClass& event) {
-	mvceditor::SqlResultClass* result = event.Results;
-	wxString error = mvceditor::IcuToWx(result->Error);
+void t4p::SqlConnectionListDialogClass::ShowTestResults(t4p::QueryCompleteEventClass& event) {
+	t4p::SqlResultClass* result = event.Results;
+	wxString error = t4p::IcuToWx(result->Error);
 	bool success = result->Success;
 	
 	wxString creds;
@@ -439,7 +439,7 @@ void mvceditor::SqlConnectionListDialogClass::ShowTestResults(mvceditor::QueryCo
 		creds = TestQuery.DatabaseTag.FileName.GetFullPath();
 	}
 	else {
-		creds = mvceditor::IcuToWx(TestQuery.DatabaseTag.User + 
+		creds = t4p::IcuToWx(TestQuery.DatabaseTag.User + 
 			UNICODE_STRING_SIMPLE("@") +
 			TestQuery.DatabaseTag.Host);
 	}
@@ -458,8 +458,8 @@ void mvceditor::SqlConnectionListDialogClass::ShowTestResults(mvceditor::QueryCo
 	delete result;
 }
 
-mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId,
-															mvceditor::ConnectionIdentifierClass& connectionIdentifier)
+t4p::MultipleSqlExecuteClass::MultipleSqlExecuteClass(t4p::RunningThreadsClass& runningThreads, int queryId,
+															t4p::ConnectionIdentifierClass& connectionIdentifier)
 	: ActionClass(runningThreads, queryId)
 	, SqlLexer() 
 	, Query()
@@ -468,11 +468,11 @@ mvceditor::MultipleSqlExecuteClass::MultipleSqlExecuteClass(mvceditor::RunningTh
 	, QueryId(queryId) {
 }
 
-wxString mvceditor::MultipleSqlExecuteClass::GetLabel() const {
+wxString t4p::MultipleSqlExecuteClass::GetLabel() const {
 	return wxT("SQL Execute");
 }
 
-void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
+void t4p::MultipleSqlExecuteClass::BackgroundWork() {
 	UnicodeString error;
 	UnicodeString query;
 	bool connected = Query.Connect(Session, error);
@@ -481,7 +481,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			wxLongLong start = wxGetLocalTimeMillis();
 
 			// create a new result on the heap; the event handler must delete it
-			mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass;
+			t4p::SqlResultClass* results = new t4p::SqlResultClass;
 			results->QueryTime = wxGetLocalTimeMillis() - start;
 			results->LineNumber = SqlLexer.GetLineNumber();
 			
@@ -492,7 +492,7 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 			// but dont post if the query was cancelled
 			// careful: leak will happen when panel is closed since event won't be handled
 			if (!IsCancelled()) {
-				mvceditor::QueryCompleteEventClass evt(results, QueryId);
+				t4p::QueryCompleteEventClass evt(results, QueryId);
 				PostEvent(evt);
 			}
 			else {
@@ -504,22 +504,22 @@ void mvceditor::MultipleSqlExecuteClass::BackgroundWork() {
 	else {
 
 		// signal a failed connection
-		mvceditor::SqlResultClass* results = new mvceditor::SqlResultClass;
+		t4p::SqlResultClass* results = new t4p::SqlResultClass;
 		results->LineNumber = SqlLexer.GetLineNumber();
 		results->Success = false;
 		results->HasRows = false;
 		results->Error = error;
-		mvceditor::QueryCompleteEventClass evt(results, QueryId);
+		t4p::QueryCompleteEventClass evt(results, QueryId);
 		PostEvent(evt);
 	}
 }
 
-void mvceditor::MultipleSqlExecuteClass::DoCancel() {
-	if (mvceditor::DatabaseTagClass::SQLITE == Query.DatabaseTag.Driver) {
+void t4p::MultipleSqlExecuteClass::DoCancel() {
+	if (t4p::DatabaseTagClass::SQLITE == Query.DatabaseTag.Driver) {
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(Session.get_backend());
 		sqlite_api::sqlite3_interrupt(backend->conn_);
 	}
-	if (mvceditor::DatabaseTagClass::MYSQL == Query.DatabaseTag.Driver) {
+	if (t4p::DatabaseTagClass::MYSQL == Query.DatabaseTag.Driver) {
 		// for stopping mysql queries, we
 		// send a KILL sql command instead of killing the
 		// thread; that way the thread can gracefully exit
@@ -533,28 +533,28 @@ void mvceditor::MultipleSqlExecuteClass::DoCancel() {
 		if (good) {
 			good = Query.KillConnection(session, ConnectionIdentifier, error);
 			if (!good) {
-				wxMessageBox(_("could not kill connection:") + mvceditor::IcuToWx(error));
+				wxMessageBox(_("could not kill connection:") + t4p::IcuToWx(error));
 			}
 		}
 		else {
-			wxMessageBox(_("could not connect:") + mvceditor::IcuToWx(error));
+			wxMessageBox(_("could not connect:") + t4p::IcuToWx(error));
 		}
 	}
 }
 
-bool mvceditor::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
+bool t4p::MultipleSqlExecuteClass::Init(const UnicodeString& sql, const SqlQueryClass& query) {
 	Query.DatabaseTag.Copy(query.DatabaseTag);
 	return SqlLexer.OpenString(sql);
 }
 
-void mvceditor::MultipleSqlExecuteClass::Close() {
+void t4p::MultipleSqlExecuteClass::Close() {
 	Session.close();
 	SqlLexer.Close();
 }
 
-mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
-		mvceditor::StatusBarWithGaugeClass* gauge, const mvceditor::SqlQueryClass& other,
-		mvceditor::SqlBrowserFeatureClass* feature) 
+t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
+		t4p::StatusBarWithGaugeClass* gauge, const t4p::SqlQueryClass& other,
+		t4p::SqlBrowserFeatureClass* feature) 
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, SelectedCol(-1)
 	, SelectedRow(-1)
@@ -576,16 +576,16 @@ mvceditor::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
 
-	RefreshButton->SetBitmap(mvceditor::IconImageAsset(wxT("outline-refresh")));
+	RefreshButton->SetBitmap(t4p::IconImageAsset(wxT("outline-refresh")));
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }
 
-mvceditor::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
+t4p::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
 	
 }
 
-bool mvceditor::SqlBrowserPanelClass::Check() {
+bool t4p::SqlBrowserPanelClass::Check() {
 	bool ret = CodeControl && Validate() && TransferDataFromWindow();
 	if (ret) {
 		LastQuery = CodeControl->GetSafeText();
@@ -595,7 +595,7 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 		
 		// make sure a connection has been chosen
 		size_t sel = (size_t)Connections->GetSelection();
-		std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+		std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 		if (sel >= 0 && sel < dbTags.size()) {
 			Query.DatabaseTag.Copy(dbTags[sel]);
 		}
@@ -606,13 +606,13 @@ bool mvceditor::SqlBrowserPanelClass::Check() {
 	return ret;
 }
 
-void mvceditor::SqlBrowserPanelClass::ExecuteCodeControl() {
+void t4p::SqlBrowserPanelClass::ExecuteCodeControl() {
 	if (Check() && 0 == RunningActionId) {
-		mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
+		t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(
 			Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
 		if (thread->Init(LastQuery, Query)) { 
 			RunningActionId = Feature->App.RunningThreads.Queue(thread);
-			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
 		else {
 			delete thread;
@@ -631,21 +631,21 @@ void mvceditor::SqlBrowserPanelClass::ExecuteCodeControl() {
 }
 
 
-void mvceditor::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const mvceditor::DatabaseTagClass& tag) {
-	LastQuery = mvceditor::WxToIcu(sql);
+void t4p::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const t4p::DatabaseTagClass& tag) {
+	LastQuery = t4p::WxToIcu(sql);
 	Query.DatabaseTag = tag;
 	for (unsigned int i = 0; i < Connections->GetCount(); ++i) {
-		if (Connections->GetString(i) == mvceditor::IcuToWx(tag.Label)) {
+		if (Connections->GetString(i) == t4p::IcuToWx(tag.Label)) {
 			Connections->SetSelection(i);
 			break;
 		}
 	}
 	RunningActionId = 0;
-	mvceditor::MultipleSqlExecuteClass* thread = new mvceditor::MultipleSqlExecuteClass(
+	t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(
 		Feature->App.RunningThreads, QueryId, ConnectionIdentifier);
 	if (thread->Init(LastQuery, Query)) { 
 		RunningActionId = Feature->App.RunningThreads.Queue(thread);
-		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
 	else {
 		delete thread;
@@ -653,11 +653,11 @@ void mvceditor::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const mv
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnRefreshButton(wxCommandEvent& event) {
-	ExecuteQuery(mvceditor::IcuToWx(LastQuery), Query.DatabaseTag);
+void t4p::SqlBrowserPanelClass::OnRefreshButton(wxCommandEvent& event) {
+	ExecuteQuery(t4p::IcuToWx(LastQuery), Query.DatabaseTag);
 }
 
-void mvceditor::SqlBrowserPanelClass::Stop() {
+void t4p::SqlBrowserPanelClass::Stop() {
 	if (RunningActionId > 0) {
 		Feature->App.RunningThreads.CancelAction(RunningActionId);
 		RunningActionId = 0;
@@ -665,9 +665,9 @@ void mvceditor::SqlBrowserPanelClass::Stop() {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnQueryComplete(mvceditor::QueryCompleteEventClass& event) {
+void t4p::SqlBrowserPanelClass::OnQueryComplete(t4p::QueryCompleteEventClass& event) {
 	if (event.GetId() == QueryId) {
-		mvceditor::SqlResultClass* result = event.Results;
+		t4p::SqlResultClass* result = event.Results;
 		Results.push_back(result);
 		
 		RowToSqlInsert.Columns = result->ColumnNames;
@@ -685,7 +685,7 @@ void mvceditor::SqlBrowserPanelClass::OnQueryComplete(mvceditor::QueryCompleteEv
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
+void t4p::SqlBrowserPanelClass::RenderAllResults() {
 	if (ResultsGrid->GetNumberCols()) {
 		ResultsGrid->DeleteCols(0, ResultsGrid->GetNumberCols());
 	}
@@ -705,7 +705,7 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 	}
 	
 	for (size_t i = 0; i < Results.size(); i++) {
-		mvceditor::SqlResultClass* results = Results[i];
+		t4p::SqlResultClass* results = Results[i];
 		UnicodeString error;
 		
 		// if only one query was executed: render the results in this panel
@@ -715,7 +715,7 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 			Fill(results);
 		}
 		else if (results->Success && results->HasRows && outputSummary) {
-			mvceditor::SqlBrowserPanelClass* newPanel = Feature->CreateResultsPanel(CodeControl);
+			t4p::SqlBrowserPanelClass* newPanel = Feature->CreateResultsPanel(CodeControl);
 			newPanel->Fill(results);
 		}
 		if (outputSummary) {
@@ -727,10 +727,10 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 					(results->QueryTime.ToLong() / 1000.00));
 			}
 			else {
-				msg = mvceditor::IcuToWx(results->Error);
+				msg = t4p::IcuToWx(results->Error);
 			}
 			int rowNumber = ResultsGrid->GetNumberRows();
-			wxString queryStart = mvceditor::IcuToWx(results->Query);
+			wxString queryStart = t4p::IcuToWx(results->Query);
 			ResultsGrid->AppendRows(1);
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), queryStart.Mid(0, 100)); 
@@ -739,7 +739,7 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 		if (!outputSummary && !results->Error.isEmpty()) {
 
 			// put error in the summary LABEL
-			UpdateLabels(mvceditor::IcuToWx(results->Error));
+			UpdateLabels(t4p::IcuToWx(results->Error));
 		}
 		else if (!outputSummary) {
 
@@ -757,11 +757,11 @@ void mvceditor::SqlBrowserPanelClass::RenderAllResults() {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
+void t4p::SqlBrowserPanelClass::Fill(t4p::SqlResultClass* results) {
 	FillGridWithResults(ResultsGrid, results);
 
 	if (!results->Success) {
-		UpdateLabels(mvceditor::IcuToWx(results->Error));
+		UpdateLabels(t4p::IcuToWx(results->Error));
 	}
 	else {
 		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), 
@@ -769,21 +769,21 @@ void mvceditor::SqlBrowserPanelClass::Fill(mvceditor::SqlResultClass* results) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
+void t4p::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 	ResultsLabel->SetLabel(result);
 	ResultsLabel->GetContainingSizer()->Layout();
 }
 
-void mvceditor::SqlBrowserPanelClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
+void t4p::SqlBrowserPanelClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	if (event.GetId() == QueryId) {
-		Gauge->IncrementGauge(ID_SQL_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE);
+		Gauge->IncrementGauge(ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 	}
 	else {
 		event.Skip();
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 	if (event.GetId() == QueryId) {
 		RenderAllResults();
 
@@ -801,38 +801,38 @@ void mvceditor::SqlBrowserPanelClass::OnActionComplete(mvceditor::ActionEventCla
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::SetCurrentInfo(const mvceditor::DatabaseTagClass& databaseTag) {
+void t4p::SqlBrowserPanelClass::SetCurrentInfo(const t4p::DatabaseTagClass& databaseTag) {
 	Query.DatabaseTag.Copy(databaseTag);
 	if (CodeControl) {
 		CodeControl->SetCurrentDbTag(databaseTag);
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::LinkToCodeControl(mvceditor::CodeControlClass* codeControl) {
+void t4p::SqlBrowserPanelClass::LinkToCodeControl(t4p::CodeControlClass* codeControl) {
 	CodeControl = codeControl;
 	
 	// set the current selected db tag, so that code completion works
 	size_t sel = (size_t)Connections->GetSelection();
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	if (sel >= 0 && sel < dbTags.size()) {
 		CodeControl->SetCurrentDbTag(dbTags[sel]);
 	}
 }
 
-bool mvceditor::SqlBrowserPanelClass::IsLinkedToCodeControl(mvceditor::CodeControlClass* codeControl) {
+bool t4p::SqlBrowserPanelClass::IsLinkedToCodeControl(t4p::CodeControlClass* codeControl) {
 	return CodeControl != NULL && codeControl == CodeControl;
 }
 
-void mvceditor::SqlBrowserPanelClass::UnlinkFromCodeControl() {
+void t4p::SqlBrowserPanelClass::UnlinkFromCodeControl() {
 	CodeControl = NULL;
 }
 
-void mvceditor::SqlBrowserPanelClass::FillConnectionList() {
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+void t4p::SqlBrowserPanelClass::FillConnectionList() {
+	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
 	Connections->Clear();
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	for (tag = dbTags.begin(); tag != dbTags.end(); ++tag) {
-		Connections->Append(mvceditor::IcuToWx(tag->Label));
+		Connections->Append(t4p::IcuToWx(tag->Label));
 	}
 	this->Layout();
 	if (!Connections->IsEmpty()) {
@@ -841,15 +841,15 @@ void mvceditor::SqlBrowserPanelClass::FillConnectionList() {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
 	size_t sel = (size_t)event.GetSelection();
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	if (sel >= 0 && sel < dbTags.size()) {
 		SetCurrentInfo(dbTags[sel]);
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
+void t4p::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
 	wxMenu menu;
 	wxMenuItem* item;
 	
@@ -867,7 +867,7 @@ void mvceditor::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
 	this->PopupMenu(&menu, event.GetPosition());
 }
 
-void mvceditor::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
@@ -875,7 +875,7 @@ void mvceditor::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
 		wxMessageBox(wxT("There are too many rows to copy to the clipboard"), wxT("Copy All Rows"));
 		return;
 	}
-	mvceditor::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
+	t4p::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
 	if (wxOK == copyDialog.ShowModal()) {
 		std::vector<wxString> values;
 		wxStringOutputStream ostream;
@@ -901,11 +901,11 @@ void mvceditor::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
-	mvceditor::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
+	t4p::SqlCopyDialogClass copyDialog(this, wxID_ANY, CopyOptions);
 	if (wxOK == copyDialog.ShowModal()) {
 		std::vector<wxString> values;
 		wxStringOutputStream ostream;
@@ -926,7 +926,7 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
@@ -937,16 +937,16 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 	RowToSqlInsert.CheckedValues.clear();
 	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
 		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
-		RowToSqlInsert.Values.push_back(mvceditor::WxToIcu(val));
+		RowToSqlInsert.Values.push_back(t4p::WxToIcu(val));
 	}
 	RowToSqlInsert.CheckedValues = RowToSqlInsert.Values;
 		
-	mvceditor::SqlCopyAsInsertDialogClass copyDialog(this, wxID_ANY, RowToSqlInsert);
+	t4p::SqlCopyAsInsertDialogClass copyDialog(this, wxID_ANY, RowToSqlInsert);
 	if (wxOK == copyDialog.ShowModal() && !RowToSqlInsert.CheckedColumns.empty() 
 			&& !RowToSqlInsert.CheckedValues.empty()) {
 		UnicodeString sql = RowToSqlInsert.CreateStatement(Query.DatabaseTag.Driver);
 		
-		wxString wxSql = mvceditor::IcuToWx(sql);
+		wxString wxSql = t4p::IcuToWx(sql);
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(wxSql));
 			wxTheClipboard->Close();
@@ -954,7 +954,7 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
@@ -962,15 +962,15 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 	RowToPhp.CheckedValues.clear();
 	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
 		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
-		RowToPhp.Values.push_back(mvceditor::WxToIcu(val));
+		RowToPhp.Values.push_back(t4p::WxToIcu(val));
 	}
 		
-	mvceditor::SqlCopyAsPhpDialogClass copyDialog(this, wxID_ANY, RowToPhp);
+	t4p::SqlCopyAsPhpDialogClass copyDialog(this, wxID_ANY, RowToPhp);
 	if (wxOK == copyDialog.ShowModal() && !RowToPhp.CheckedColumns.empty() 
 			&& !RowToPhp.CheckedValues.empty()) {
 		UnicodeString code = RowToPhp.CreatePhpArray();
 		
-		wxString wxCode = mvceditor::IcuToWx(code);
+		wxString wxCode = t4p::IcuToWx(code);
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(wxCode));
 			wxTheClipboard->Close();
@@ -978,7 +978,7 @@ void mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
@@ -991,7 +991,7 @@ void mvceditor::SqlBrowserPanelClass::OnCopyCellData(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
+void t4p::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
@@ -1001,43 +1001,43 @@ void mvceditor::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::SqlBrowserFeatureClass::SqlBrowserFeatureClass(mvceditor::AppClass& app) 
+t4p::SqlBrowserFeatureClass::SqlBrowserFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app) {
 }
 
-mvceditor::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
+t4p::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 }
 
-void mvceditor::SqlBrowserFeatureClass::DetectMetadata() {
+void t4p::SqlBrowserFeatureClass::DetectMetadata() {
 
 	// thread will be owned by SequenceClass
-	mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
-	std::vector<mvceditor::GlobalActionClass*> actions;
+	t4p::SqlMetaDataActionClass* thread = new t4p::SqlMetaDataActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA);
+	std::vector<t4p::GlobalActionClass*> actions;
 	actions.push_back(thread);
 	App.Sequences.Build(actions);
 }
 
-void mvceditor::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+void t4p::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* sqlMenu = new wxMenu();
-	sqlMenu->Append(mvceditor::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
+	sqlMenu->Append(t4p::MENU_SQL + 0, _("SQL Browser\tSHIFT+F9"), _("Open a window for SQL browsing"),
 		wxITEM_NORMAL);
-	sqlMenu->Append(mvceditor::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
+	sqlMenu->Append(t4p::MENU_SQL + 1, _("SQL Connections\tCTRL+F9"), _("Show & Pick The SQL Connections that this project uses"),
 		wxITEM_NORMAL);
-	sqlMenu->Append(mvceditor::MENU_SQL + 2, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
+	sqlMenu->Append(t4p::MENU_SQL + 2, _("Run Queries in SQL Browser\tF9"), _("Execute the query that is currently in the SQL Browser"),
 		wxITEM_NORMAL);
-	sqlMenu->Append(mvceditor::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
+	sqlMenu->Append(t4p::MENU_SQL + 3, _("Detect SQL Meta Data"), _("Detect SQL Meta data so that it is made available to code completion"),
 		wxITEM_NORMAL);
 	menuBar->Append(sqlMenu, _("SQL"));
 }
 
-void mvceditor::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("sql"));
-	toolBar->AddTool(mvceditor::MENU_SQL + 0, _("SQL Browser"), bmp, wxT("Open the SQL Browser"), wxITEM_NORMAL);
+void t4p::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	wxBitmap bmp = t4p::IconImageAsset(wxT("sql"));
+	toolBar->AddTool(t4p::MENU_SQL + 0, _("SQL Browser"), bmp, wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
-void  mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
+void  t4p::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	int num = 1;
-	mvceditor::NotebookClass* notebook = GetNotebook();
+	t4p::NotebookClass* notebook = GetNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); i++) {
 		wxString name = notebook->GetPageText(i);
 		if (name.EndsWith(wxT(".sql")) || name.Index(_("SQL Browser")) == 0) {
@@ -1045,29 +1045,29 @@ void  mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& e
 		}
 	}
 	
-	mvceditor::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), mvceditor::CodeControlClass::SQL);
+	t4p::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), t4p::CodeControlClass::SQL);
 	CreateResultsPanel(ctrl);
 	ctrl->SetFocus();
 }
 
-mvceditor::SqlBrowserPanelClass* mvceditor::SqlBrowserFeatureClass::CreateResultsPanel(mvceditor::CodeControlClass* codeControl) {
-	mvceditor::SqlQueryClass query;
-	mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+t4p::SqlBrowserPanelClass* t4p::SqlBrowserFeatureClass::CreateResultsPanel(t4p::CodeControlClass* codeControl) {
+	t4p::SqlQueryClass query;
+	t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
 		query, this);
-	mvceditor::NotebookClass* codeNotebook = GetNotebook();
+	t4p::NotebookClass* codeNotebook = GetNotebook();
 	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
 
 	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 	// are from this feature
-	wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("table"));
-	AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
+	wxBitmap tableBitmap = t4p::IconImageAsset(wxT("table"));
+	AddToolsWindow(sqlPanel, tabText, wxT("t4p::SqlBrowserPanelClass"), tableBitmap);
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
-	if (ctrl && ctrl->GetDocumentMode() == mvceditor::CodeControlClass::SQL) {
+void t4p::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
+	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
+	if (ctrl && ctrl->GetDocumentMode() == t4p::CodeControlClass::SQL) {
 		
 		// look for results panel that corresponds to the current code control
 		wxAuiNotebook* notebook = GetToolsNotebook();
@@ -1078,8 +1078,8 @@ void mvceditor::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
 			// only cast when we are sure of the type of window
 			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 			// methods
-			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
+			if (window->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)window;
 				if (panel->IsLinkedToCodeControl(ctrl)) {
 				
 					// we found the panel bring it to the forefront and run the query
@@ -1091,20 +1091,20 @@ void mvceditor::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
 			}
 		}
 		if (!found) {
-			mvceditor::SqlBrowserPanelClass* panel = CreateResultsPanel(ctrl);
+			t4p::SqlBrowserPanelClass* panel = CreateResultsPanel(ctrl);
 			panel->ExecuteCodeControl();
 		}
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& event) {
+void t4p::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 
 	// decided to always allow the user to edit the connection info in order to
 	// allow the user to create a new database from within the editor (the very 
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
-	mvceditor::SqlConnectionListDialogClass dialog(GetMainWindow(), App.Globals.DatabaseTags, App.RunningThreads);
+	t4p::SqlConnectionListDialogClass dialog(GetMainWindow(), App.Globals.DatabaseTags, App.RunningThreads);
 	if (dialog.ShowModal() == wxOK) {
 		
 		// if chosen connection changed need to update the code control so that it knows to use the new
@@ -1117,15 +1117,15 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 			// only cast when we are sure of the type of window
 			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 			// methods
-			if (window->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)window;
+			if (window->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)window;
 				panel->FillConnectionList();
 			}
 		}
 		SavePreferences();
 
 		// redetect the SQL meta data
-		mvceditor::SqlMetaDataActionClass* thread = new mvceditor::SqlMetaDataActionClass(App.RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA);
+		t4p::SqlMetaDataActionClass* thread = new t4p::SqlMetaDataActionClass(App.RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA);
 		if (thread->Init(App.Globals)) {
 			App.RunningThreads.Queue(thread);
 		}
@@ -1135,12 +1135,12 @@ void mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu(wxCommandEvent& even
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnSqlDetectMenu(wxCommandEvent& event) {
+void t4p::SqlBrowserFeatureClass::OnSqlDetectMenu(wxCommandEvent& event) {
 	DetectMetadata();
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+void t4p::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1149,8 +1149,8 @@ void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebo
 			// only cast when we are sure of the type of window
 			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 			// methods
-			if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+			if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
 				if (panel->IsLinkedToCodeControl(contentWindow)) {
 					
 					// we found the panel bring it to the forefront and run the query
@@ -1162,8 +1162,8 @@ void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebo
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
-	mvceditor::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+void t4p::SqlBrowserFeatureClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
+	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1172,8 +1172,8 @@ void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose(wxAuiNotebook
 			// only cast when we are sure of the type of window
 			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 			// methods
-			if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-				mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+			if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
 				if (panel->IsLinkedToCodeControl(contentWindow)) {
 					panel->UnlinkFromCodeControl();
 				}
@@ -1182,7 +1182,7 @@ void mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose(wxAuiNotebook
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& event) {
+void t4p::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int sel = event.GetSelection();
 	wxWindow* toolsWindow = notebook->GetPage(sel);
@@ -1190,8 +1190,8 @@ void mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEv
 	// only cast when we are sure of the type of window
 	// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 	// methods
-	if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-		mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+	if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+		t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
 
 		// the constructor added itself as an event handler
 		App.RunningThreads.RemoveEventHandler(panel);
@@ -1199,7 +1199,7 @@ void mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose(wxAuiNotebookEv
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
+void t4p::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		wxWindow* toolsWindow = notebook->GetPage(i);
@@ -1207,8 +1207,8 @@ void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 		// only cast when we are sure of the type of window
 		// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
 		// methods
-		if (toolsWindow->GetName() == wxT("mvceditor::SqlBrowserPanelClass")) {
-			mvceditor::SqlBrowserPanelClass* panel = (mvceditor::SqlBrowserPanelClass*)toolsWindow;
+		if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
+			t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
 
 			// the constructor added itself as an event handler
 			App.RunningThreads.RemoveEventHandler(panel);
@@ -1217,44 +1217,44 @@ void mvceditor::SqlBrowserFeatureClass::OnAppExit(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void t4p::SqlBrowserFeatureClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_SQL + 0] = wxT("SQL-Browser");
-	menuItemIds[mvceditor::MENU_SQL + 1] = wxT("SQL-Connections");
-	menuItemIds[mvceditor::MENU_SQL + 2] = wxT("SQL-Run Queries");
-	menuItemIds[mvceditor::MENU_SQL + 3] = wxT("SQL-Detect SQL Meta Data");
+	menuItemIds[t4p::MENU_SQL + 0] = wxT("SQL-Browser");
+	menuItemIds[t4p::MENU_SQL + 1] = wxT("SQL-Connections");
+	menuItemIds[t4p::MENU_SQL + 2] = wxT("SQL-Run Queries");
+	menuItemIds[t4p::MENU_SQL + 3] = wxT("SQL-Detect SQL Meta Data");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::SqlBrowserFeatureClass::AuiManagerUpdate() {
+void t4p::SqlBrowserFeatureClass::AuiManagerUpdate() {
 	AuiManager->Update();
 }
 
-void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 	App.Globals.DatabaseTags.clear();
 	wxString groupName;
 	long index = 0;
 	if (config->GetFirstGroup(groupName, index)) {
 		do {
 			if (groupName.Find(wxT("DatabaseInfo_")) == 0) {
-				mvceditor::DatabaseTagClass info;
-				info.Schema = mvceditor::WxToIcu(config->Read(groupName + wxT("/DatabaseName")));
+				t4p::DatabaseTagClass info;
+				info.Schema = t4p::WxToIcu(config->Read(groupName + wxT("/DatabaseName")));
 				wxString driverString = config->Read(groupName + wxT("/Driver"));
 				info.FileName.Assign(config->Read(groupName + wxT("/FileName")));
-				info.Host = mvceditor::WxToIcu(config->Read(groupName + wxT("/Host")));
+				info.Host = t4p::WxToIcu(config->Read(groupName + wxT("/Host")));
 				info.IsDetected = false;
-				info.Label = mvceditor::WxToIcu(config->Read(groupName + wxT("/Label")));
-				info.Password = mvceditor::WxToIcu(config->Read(groupName + wxT("/Password")));
+				info.Label = t4p::WxToIcu(config->Read(groupName + wxT("/Label")));
+				info.Password = t4p::WxToIcu(config->Read(groupName + wxT("/Password")));
 				config->Read(groupName + wxT("/Port"), &info.Port);
-				info.User = mvceditor::WxToIcu(config->Read(groupName + wxT("/User")));
+				info.User = t4p::WxToIcu(config->Read(groupName + wxT("/User")));
 				config->Read(groupName + wxT("/IsEnabled"), &info.IsEnabled);
 				
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
-					info.Driver = mvceditor::DatabaseTagClass::MYSQL;
+					info.Driver = t4p::DatabaseTagClass::MYSQL;
 					App.Globals.DatabaseTags.push_back(info);
 				}
 				else if (driverString.CmpNoCase(wxT("SQLITE")) == 0) {
-					info.Driver = mvceditor::DatabaseTagClass::SQLITE;
+					info.Driver = t4p::DatabaseTagClass::SQLITE;
 					App.Globals.DatabaseTags.push_back(info);
 				}
 			}
@@ -1262,7 +1262,7 @@ void mvceditor::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
+void t4p::SqlBrowserFeatureClass::SavePreferences() {
 	wxConfigBase* config = wxConfig::Get();
 
 	// delete any previous connections that are in the config
@@ -1285,21 +1285,21 @@ void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	for (size_t i = 0; i < App.Globals.DatabaseTags.size(); ++i) {
 		if (!App.Globals.DatabaseTags[i].IsDetected) {
 			config->SetPath(wxString::Format(wxT("/DatabaseInfo_%d"), saveIndex));
-			config->Write(wxT("DatabaseName"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Schema));
+			config->Write(wxT("DatabaseName"), t4p::IcuToWx(App.Globals.DatabaseTags[i].Schema));
 			wxString driverString;
-			if (mvceditor::DatabaseTagClass::MYSQL == App.Globals.DatabaseTags[i].Driver) {
+			if (t4p::DatabaseTagClass::MYSQL == App.Globals.DatabaseTags[i].Driver) {
 				driverString = wxT("MYSQL");
 			}
-			else if (mvceditor::DatabaseTagClass::SQLITE == App.Globals.DatabaseTags[i].Driver) {
+			else if (t4p::DatabaseTagClass::SQLITE == App.Globals.DatabaseTags[i].Driver) {
 				driverString = wxT("SQLITE");
 			}
 			config->Write(wxT("Driver"), driverString);
 			config->Write(wxT("FileName"), App.Globals.DatabaseTags[i].FileName.GetFullPath());
-			config->Write(wxT("Host"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Host));
-			config->Write(wxT("Label"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Label));
-			config->Write(wxT("Password"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].Password));
+			config->Write(wxT("Host"), t4p::IcuToWx(App.Globals.DatabaseTags[i].Host));
+			config->Write(wxT("Label"), t4p::IcuToWx(App.Globals.DatabaseTags[i].Label));
+			config->Write(wxT("Password"), t4p::IcuToWx(App.Globals.DatabaseTags[i].Password));
 			config->Write(wxT("Port"), App.Globals.DatabaseTags[i].Port);
-			config->Write(wxT("User"), mvceditor::IcuToWx(App.Globals.DatabaseTags[i].User));
+			config->Write(wxT("User"), t4p::IcuToWx(App.Globals.DatabaseTags[i].User));
 			config->Write(wxT("IsEnabled"), App.Globals.DatabaseTags[i].IsEnabled);
 			saveIndex++;
 		}
@@ -1312,14 +1312,14 @@ void mvceditor::SqlBrowserFeatureClass::SavePreferences() {
 	App.UpdateConfigModifiedTime();
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen(mvceditor::OpenDbTableCommandEventClass& event) {
+void t4p::SqlBrowserFeatureClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEventClass& event) {
 	
 	// find the connection to use by hash, 
-	mvceditor::DatabaseTagClass tag;
+	t4p::DatabaseTagClass tag;
 	bool found = App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
 	if (found) {
-		mvceditor::SqlQueryClass query;
-		mvceditor::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+		t4p::SqlQueryClass query;
+		t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
 			query, this);
 		
 		wxString tabText = event.DbTableName;
@@ -1327,40 +1327,40 @@ void mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen(mvceditor::OpenDbTabl
 
 		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 		// are from this feature
-		wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("table"));
-		AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::SqlBrowserPanelClass"), tableBitmap);
+		wxBitmap tableBitmap = t4p::IconImageAsset(wxT("table"));
+		AddToolsWindow(sqlPanel, tabText, wxT("t4p::SqlBrowserPanelClass"), tableBitmap);
 		sqlPanel->ExecuteQuery(sql, tag);
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
-	GetNotebook()->AddMvcEditorPage(mvceditor::CodeControlClass::SQL);
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
+	GetNotebook()->AddTriumphPage(t4p::CodeControlClass::SQL);
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 		ctrl->SetText(sql);
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::NewTextBuffer(const wxString& text) {
-	GetNotebook()->AddMvcEditorPage(mvceditor::CodeControlClass::TEXT);
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::SqlBrowserFeatureClass::NewTextBuffer(const wxString& text) {
+	GetNotebook()->AddTriumphPage(t4p::CodeControlClass::TEXT);
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 		ctrl->SetText(text);
 	}
 }
 
-void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event) {
+void t4p::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandEventClass& event) {
 	
 	// find the connection to use by hash, 
-	mvceditor::DatabaseTagClass tag;
+	t4p::DatabaseTagClass tag;
 	bool found = App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
 	if (found) {
 		
 		// if there is an existing table definition panel use that
 		wxWindow* win = wxWindow::FindWindowById(ID_PANEL_TABLE_DEFINITION, GetToolsNotebook());
-		mvceditor::TableDefinitionPanelClass* sqlPanel = NULL;
+		t4p::TableDefinitionPanelClass* sqlPanel = NULL;
 		if (win) {
-			sqlPanel = (mvceditor::TableDefinitionPanelClass*)win;
+			sqlPanel = (t4p::TableDefinitionPanelClass*)win;
 			SetFocusToToolsWindow(win);
 		}
 		else {
@@ -1369,14 +1369,14 @@ void mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(mvceditor::Open
 		
 			// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 			// are from this feature
-			wxBitmap tableBitmap = mvceditor::IconImageAsset(wxT("database-medium"));
-			AddToolsWindow(sqlPanel, tabText, wxT("mvceditor::TableDefinitionPanelClass"), tableBitmap);
+			wxBitmap tableBitmap = t4p::IconImageAsset(wxT("database-medium"));
+			AddToolsWindow(sqlPanel, tabText, wxT("t4p::TableDefinitionPanelClass"), tableBitmap);
 		}
 		sqlPanel->ShowTable(tag, event.DbTableName);
 	}
 }
 
-mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id, mvceditor::SqlBrowserFeatureClass& feature)
+t4p::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id, t4p::SqlBrowserFeatureClass& feature)
 : TableDefinitionPanelGeneratedClass(parent, id)
 , Feature(feature) 
 , RunningThreads()
@@ -1385,10 +1385,10 @@ mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent
 	Connections->Clear();
 	FillConnectionList();
 	RunningThreads.AddEventHandler(this);
-	RefreshButton->SetBitmap(mvceditor::IconImageAsset("outline-refresh"));
+	RefreshButton->SetBitmap(t4p::IconImageAsset("outline-refresh"));
 
-	DefinitionIndicesPanel = new mvceditor::DefinitionIndicesPanelClass(Notebook);
-	DefinitionColumnsPanel = new mvceditor::DefinitionColumnsPanelClass(Notebook);
+	DefinitionIndicesPanel = new t4p::DefinitionIndicesPanelClass(Notebook);
+	DefinitionColumnsPanel = new t4p::DefinitionColumnsPanelClass(Notebook);
 
 	Notebook->SetWindowStyle(wxAUI_NB_BOTTOM);
 	Notebook->AddPage(DefinitionColumnsPanel, _("Columns"));
@@ -1396,24 +1396,24 @@ mvceditor::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent
 	this->Layout();
 }
 
-mvceditor::TableDefinitionPanelClass::~TableDefinitionPanelClass() {
+t4p::TableDefinitionPanelClass::~TableDefinitionPanelClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::TableDefinitionPanelClass::FillConnectionList() {
+void t4p::TableDefinitionPanelClass::FillConnectionList() {
 	Connections->Clear();
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	for (size_t i = 0; i < dbTags.size(); ++i) {
-		Connections->Append(mvceditor::IcuToWx(dbTags[i].Label));
+		Connections->Append(t4p::IcuToWx(dbTags[i].Label));
 	}
 }
 
 
-void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTagClass& tag, const wxString& tableName) {
+void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag, const wxString& tableName) {
 	TableName->SetValue(tableName);
 	
 	// select the connection to the one to show
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	int indexToSelect = 0;
 	for (size_t i = 0; i < dbTags.size(); ++i) {
 		if (dbTags[i].ConnectionHash() == tag.ConnectionHash()) {
@@ -1424,38 +1424,38 @@ void mvceditor::TableDefinitionPanelClass::ShowTable(const mvceditor::DatabaseTa
 	}
 	
 	// trigger the description query
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	query.DatabaseTag = tag;
 	UnicodeString columnSql;
-	if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
-		columnSql = mvceditor::WxToIcu("DESC " + tableName);
+	if (t4p::DatabaseTagClass::MYSQL == tag.Driver) {
+		columnSql = t4p::WxToIcu("DESC " + tableName);
 	}
-	else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
-		columnSql = mvceditor::WxToIcu("PRAGMA table_info('" + tableName + "')");
+	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
+		columnSql = t4p::WxToIcu("PRAGMA table_info('" + tableName + "')");
 	}
-	mvceditor::MultipleSqlExecuteClass* sqlDefExecute = 
-		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
+	t4p::MultipleSqlExecuteClass* sqlDefExecute = 
+		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
 	if (sqlDefExecute->Init(columnSql, query)) {
 		RunningThreads.Queue(sqlDefExecute);
 	}
 	
 	UnicodeString indexSql;
-	if (mvceditor::DatabaseTagClass::MYSQL == tag.Driver) {
-		indexSql = mvceditor::WxToIcu("SHOW INDEX FROM " + tableName);
+	if (t4p::DatabaseTagClass::MYSQL == tag.Driver) {
+		indexSql = t4p::WxToIcu("SHOW INDEX FROM " + tableName);
 	}
-	else if (mvceditor::DatabaseTagClass::SQLITE == tag.Driver) {
-		indexSql = mvceditor::WxToIcu("PRAGMA index_list('" + tableName + "')");
+	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
+		indexSql = t4p::WxToIcu("PRAGMA index_list('" + tableName + "')");
 	}
-	mvceditor::MultipleSqlExecuteClass* sqlIndexExecute = 
-		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
+	t4p::MultipleSqlExecuteClass* sqlIndexExecute = 
+		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
 	if (sqlIndexExecute->Init(indexSql, query)) {
 		RunningThreads.Queue(sqlIndexExecute);
 	}
 }
 
-void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(mvceditor::QueryCompleteEventClass& event) {
+void t4p::TableDefinitionPanelClass::OnColumnSqlComplete(t4p::QueryCompleteEventClass& event) {
 	wxWindowUpdateLocker locker(this);
-	mvceditor::SqlResultClass* result = event.Results;
+	t4p::SqlResultClass* result = event.Results;
 	if (result) {
 		DefinitionColumnsPanel->Fill(result);
 		delete result;
@@ -1463,9 +1463,9 @@ void mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete(mvceditor::QueryC
 	this->Layout();
 }
 
-void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(mvceditor::QueryCompleteEventClass& event) {
+void t4p::TableDefinitionPanelClass::OnIndexSqlComplete(t4p::QueryCompleteEventClass& event) {
 	wxWindowUpdateLocker locker(this);
-	mvceditor::SqlResultClass* result = event.Results;
+	t4p::SqlResultClass* result = event.Results;
 	if (result) {
 		DefinitionIndicesPanel->Fill(result);
 		delete result;
@@ -1474,45 +1474,45 @@ void mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete(mvceditor::QueryCo
 }
 
 
-void mvceditor::TableDefinitionPanelClass::OnTableNameEnter(wxCommandEvent& event) {
+void t4p::TableDefinitionPanelClass::OnTableNameEnter(wxCommandEvent& event) {
 	
 	// select the connection to the one to show
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	size_t selectedIndex = Connections->GetSelection();
 	if (selectedIndex >= 0 && selectedIndex < dbTags.size()) {
-		mvceditor::DatabaseTagClass selectedTag = dbTags[selectedIndex];
+		t4p::DatabaseTagClass selectedTag = dbTags[selectedIndex];
 		ShowTable(selectedTag, TableName->GetValue());
 	}
 }
 
-void mvceditor::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
-	std::vector<mvceditor::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
+void t4p::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
+	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	size_t selectedIndex = Connections->GetSelection();
 	if (selectedIndex >= dbTags.size()) {
 		return;
 	}
-	mvceditor::DatabaseTagClass selectedTag = dbTags[selectedIndex];
+	t4p::DatabaseTagClass selectedTag = dbTags[selectedIndex];
 	
 	
 	UnicodeString createSql;
 	wxString tableName = TableName->GetValue();
-	if (mvceditor::DatabaseTagClass::MYSQL == selectedTag.Driver) {
-		createSql = mvceditor::WxToIcu("SHOW CREATE TABLE " + tableName);
+	if (t4p::DatabaseTagClass::MYSQL == selectedTag.Driver) {
+		createSql = t4p::WxToIcu("SHOW CREATE TABLE " + tableName);
 	}
-	else if (mvceditor::DatabaseTagClass::SQLITE == selectedTag.Driver) {
-		createSql = mvceditor::WxToIcu("SELECT sql FROM sqlite_master WHERE type='table' AND name= '" + tableName + "'");
+	else if (t4p::DatabaseTagClass::SQLITE == selectedTag.Driver) {
+		createSql = t4p::WxToIcu("SELECT sql FROM sqlite_master WHERE type='table' AND name= '" + tableName + "'");
 	}
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	query.DatabaseTag = selectedTag;
-	mvceditor::MultipleSqlExecuteClass* sqlCreateExecute = 
-		new mvceditor::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
+	t4p::MultipleSqlExecuteClass* sqlCreateExecute = 
+		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
 	if (sqlCreateExecute->Init(createSql, query)) {
 		RunningThreads.Queue(sqlCreateExecute);
 	}
 }
 
-void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(mvceditor::QueryCompleteEventClass& event) {
-	mvceditor::SqlResultClass* result = event.Results;
+void t4p::TableDefinitionPanelClass::OnCreateSqlComplete(t4p::QueryCompleteEventClass& event) {
+	t4p::SqlResultClass* result = event.Results;
 	if (!result) {
 		return;
 	}
@@ -1523,54 +1523,54 @@ void mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete(mvceditor::QueryC
 		
 		// mysql results
 		UnicodeString table = result->StringResults[0][1];
-		wxString sqlText = mvceditor::IcuToWx(table);
+		wxString sqlText = t4p::IcuToWx(table);
 		Feature.NewSqlBuffer(sqlText);
 	}
 	else if (!result->StringResults.empty() && result->StringResults[0].size() == 1) {
 		
 		// sqlite results
 		UnicodeString table = result->StringResults[0][0];
-		wxString sqlText = mvceditor::IcuToWx(table);
+		wxString sqlText = t4p::IcuToWx(table);
 		Feature.NewSqlBuffer(sqlText);
 	}
 	
 	delete result;
 }
 
-void mvceditor::TableDefinitionPanelClass::OnRefreshButton(wxCommandEvent& event) {
+void t4p::TableDefinitionPanelClass::OnRefreshButton(wxCommandEvent& event) {
 	OnTableNameEnter(event);
 }
 
-mvceditor::DefinitionIndicesPanelClass::DefinitionIndicesPanelClass(wxWindow* parent)
+t4p::DefinitionIndicesPanelClass::DefinitionIndicesPanelClass(wxWindow* parent)
 : DefinitionIndicesPanelGeneratedClass(parent, wxID_ANY) {
 	IndicesGrid->ClearGrid();
 
 }
 
-void mvceditor::DefinitionIndicesPanelClass::Fill(mvceditor::SqlResultClass* result) {
+void t4p::DefinitionIndicesPanelClass::Fill(t4p::SqlResultClass* result) {
 	IndicesGrid->ClearGrid();
 	FillGridWithResults(IndicesGrid, result);
 }
 
-mvceditor::DefinitionColumnsPanelClass::DefinitionColumnsPanelClass(wxWindow* parent)
+t4p::DefinitionColumnsPanelClass::DefinitionColumnsPanelClass(wxWindow* parent)
 : DefinitionColumnsPanelGeneratedClass(parent, wxID_ANY) {
 	ColumnsGrid->ClearGrid();
 }
 
-void mvceditor::DefinitionColumnsPanelClass::Fill(mvceditor::SqlResultClass* result) {
+void t4p::DefinitionColumnsPanelClass::Fill(t4p::SqlResultClass* result) {
 	ColumnsGrid->ClearGrid();
 	FillGridWithResults(ColumnsGrid, result);
 }
 
 
-mvceditor::SqlCopyOptionsClass::SqlCopyOptionsClass()
+t4p::SqlCopyOptionsClass::SqlCopyOptionsClass()
 : ColumnDelim(wxT(","))
 , ColumnEnclosure(wxT("\""))
 , RowDelim(wxT("\\n"))
 , NullFiller(wxT("")) {
 }
 
-mvceditor::SqlCopyOptionsClass::SqlCopyOptionsClass(const mvceditor::SqlCopyOptionsClass& src)
+t4p::SqlCopyOptionsClass::SqlCopyOptionsClass(const t4p::SqlCopyOptionsClass& src)
 : ColumnDelim(wxT(","))
 , ColumnEnclosure(wxT("\""))
 , RowDelim(wxT("\n"))
@@ -1578,19 +1578,19 @@ mvceditor::SqlCopyOptionsClass::SqlCopyOptionsClass(const mvceditor::SqlCopyOpti
 	Copy(src);
 }
 
-mvceditor::SqlCopyOptionsClass& mvceditor::SqlCopyOptionsClass::operator=(const mvceditor::SqlCopyOptionsClass& src) {
+t4p::SqlCopyOptionsClass& t4p::SqlCopyOptionsClass::operator=(const t4p::SqlCopyOptionsClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::SqlCopyOptionsClass::Copy(const mvceditor::SqlCopyOptionsClass& src) {
+void t4p::SqlCopyOptionsClass::Copy(const t4p::SqlCopyOptionsClass& src) {
 	ColumnDelim = src.ColumnDelim;
 	ColumnEnclosure = src.ColumnEnclosure;
 	RowDelim = src.RowDelim;
 	NullFiller = src.NullFiller;
 }
 
-void mvceditor::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutputStream& stream) {
+void t4p::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutputStream& stream) {
 	wxString trueColumnDelim;
 	if (ColumnDelim == wxT("\\t")) {
 		trueColumnDelim = wxT("\t");
@@ -1635,7 +1635,7 @@ void mvceditor::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxText
 	}
 }
 
-void mvceditor::SqlCopyOptionsClass::EndRow(wxTextOutputStream& stream) {
+void t4p::SqlCopyOptionsClass::EndRow(wxTextOutputStream& stream) {
 	wxString trueRowDelim;
 	if (RowDelim == wxT("\\t")) {
 		trueRowDelim = wxT("\t");
@@ -1652,7 +1652,7 @@ void mvceditor::SqlCopyOptionsClass::EndRow(wxTextOutputStream& stream) {
 	stream.WriteString(trueRowDelim);
 }
 
-mvceditor::SqlCopyDialogClass::SqlCopyDialogClass(wxWindow* parent, int id, mvceditor::SqlCopyOptionsClass& options)
+t4p::SqlCopyDialogClass::SqlCopyDialogClass(wxWindow* parent, int id, t4p::SqlCopyOptionsClass& options)
 : SqlCopyDialogGeneratedClass(parent, id)
 , EditedOptions(options) 
 , OriginalOptions(options) {
@@ -1671,30 +1671,30 @@ mvceditor::SqlCopyDialogClass::SqlCopyDialogClass(wxWindow* parent, int id, mvce
 }
 
 
-void mvceditor::SqlCopyDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::SqlCopyDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::SqlCopyDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::SqlCopyDialogClass::OnOkButton(wxCommandEvent& event) {
 	OriginalOptions = EditedOptions;
 	
 	EndModal(wxOK);
 }
 
 
-mvceditor::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
-	mvceditor::RowToSqlInsertClass& rowToSql)
+t4p::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
+	t4p::RowToSqlInsertClass& rowToSql)
 : SqlCopyAsInsertDialogGeneratedClass(parent, id)
 , EditedRowToSql(rowToSql)
 , RowToSql(rowToSql)
 , HasCheckedAll(false) {
 	
 	for (size_t i = 0; i < RowToSql.Columns.size(); ++i) {
-		Columns->Append(mvceditor::IcuToWx(RowToSql.Columns[i]));
+		Columns->Append(t4p::IcuToWx(RowToSql.Columns[i]));
 		Columns->Check(i);
 	}
 	
-	if (EditedRowToSql.LineMode == mvceditor::RowToSqlInsertClass::SINGLE_LINE) {
+	if (EditedRowToSql.LineMode == t4p::RowToSqlInsertClass::SINGLE_LINE) {
 		LineModeRadio->SetSelection(0);
 	}
 	else {
@@ -1702,18 +1702,18 @@ mvceditor::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* pare
 	}
 }
 
-void mvceditor::SqlCopyAsInsertDialogClass::OnCheckAll(wxCommandEvent& event) {
+void t4p::SqlCopyAsInsertDialogClass::OnCheckAll(wxCommandEvent& event) {
 	HasCheckedAll = !HasCheckedAll;
 	for (size_t i = 0; i < Columns->GetCount(); ++i) {
 		Columns->Check(i, HasCheckedAll);
 	}
 }
 
-void mvceditor::SqlCopyAsInsertDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::SqlCopyAsInsertDialogClass::OnCancelButton(wxCommandEvent& event) {
 	return EndModal(wxCANCEL);
 }
 
-void mvceditor::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	
 	EditedRowToSql.CheckedColumns.clear();
@@ -1728,10 +1728,10 @@ void mvceditor::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 	
 	if (LineModeRadio->GetSelection() == 0) {
-		EditedRowToSql.LineMode = mvceditor::RowToSqlInsertClass::SINGLE_LINE;
+		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::SINGLE_LINE;
 	}
 	else {
-		EditedRowToSql.LineMode = mvceditor::RowToSqlInsertClass::MULTI_LINE;
+		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::MULTI_LINE;
 	}
 	
 	RowToSql = EditedRowToSql;
@@ -1739,7 +1739,7 @@ void mvceditor::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 	return EndModal(wxOK);
 }
 
-mvceditor::RowToSqlInsertClass::RowToSqlInsertClass()
+t4p::RowToSqlInsertClass::RowToSqlInsertClass()
 : Values()
 , Columns()
 , TableName()
@@ -1749,7 +1749,7 @@ mvceditor::RowToSqlInsertClass::RowToSqlInsertClass()
 {
 }
 
-mvceditor::RowToSqlInsertClass::RowToSqlInsertClass(const mvceditor::RowToSqlInsertClass& src)
+t4p::RowToSqlInsertClass::RowToSqlInsertClass(const t4p::RowToSqlInsertClass& src)
 : Values()
 , Columns()
 , TableName()
@@ -1760,12 +1760,12 @@ mvceditor::RowToSqlInsertClass::RowToSqlInsertClass(const mvceditor::RowToSqlIns
 	Copy(src);
 }
 
-mvceditor::RowToSqlInsertClass& mvceditor::RowToSqlInsertClass::operator=(const mvceditor::RowToSqlInsertClass& src) {
+t4p::RowToSqlInsertClass& t4p::RowToSqlInsertClass::operator=(const t4p::RowToSqlInsertClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::RowToSqlInsertClass::Copy(const mvceditor::RowToSqlInsertClass& src) {
+void t4p::RowToSqlInsertClass::Copy(const t4p::RowToSqlInsertClass& src) {
 	Values = src.Values;
 	Columns = src.Columns;
 	TableName = src.TableName;
@@ -1774,15 +1774,15 @@ void mvceditor::RowToSqlInsertClass::Copy(const mvceditor::RowToSqlInsertClass& 
 	LineMode = src.LineMode;
 }
 
-UnicodeString mvceditor::RowToSqlInsertClass::CreateStatement(mvceditor::DatabaseTagClass::Drivers driver) const {
+UnicodeString t4p::RowToSqlInsertClass::CreateStatement(t4p::DatabaseTagClass::Drivers driver) const {
 	UnicodeString query;
 	
 	UnicodeString columnDelim;
 	switch (driver) {
-	case mvceditor::DatabaseTagClass::MYSQL:
+	case t4p::DatabaseTagClass::MYSQL:
 		columnDelim = '`';
 		break;
-	case mvceditor::DatabaseTagClass::SQLITE:
+	case t4p::DatabaseTagClass::SQLITE:
 		columnDelim = '"';
 		break;
 	}
@@ -1829,7 +1829,7 @@ UnicodeString mvceditor::RowToSqlInsertClass::CreateStatement(mvceditor::Databas
 }
 
 
-mvceditor::RowToPhpClass::RowToPhpClass()
+t4p::RowToPhpClass::RowToPhpClass()
 : Columns()
 , Values()
 , CheckedColumns()
@@ -1838,7 +1838,7 @@ mvceditor::RowToPhpClass::RowToPhpClass()
 , ArraySyntax(SYNTAX_KEYWORD) {
 }
 
-mvceditor::RowToPhpClass::RowToPhpClass(const mvceditor::RowToPhpClass& src)
+t4p::RowToPhpClass::RowToPhpClass(const t4p::RowToPhpClass& src)
 : Columns()
 , Values()
 , CheckedColumns()
@@ -1848,12 +1848,12 @@ mvceditor::RowToPhpClass::RowToPhpClass(const mvceditor::RowToPhpClass& src)
 	Copy(src);
 }
 
-mvceditor::RowToPhpClass& mvceditor::RowToPhpClass::operator=(const mvceditor::RowToPhpClass& src) {
+t4p::RowToPhpClass& t4p::RowToPhpClass::operator=(const t4p::RowToPhpClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::RowToPhpClass::Copy(const mvceditor::RowToPhpClass& src) {
+void t4p::RowToPhpClass::Copy(const t4p::RowToPhpClass& src) {
 	Columns = src.Columns;
 	Values = src.Values;
 	CheckedColumns = src.CheckedColumns;
@@ -1862,7 +1862,7 @@ void mvceditor::RowToPhpClass::Copy(const mvceditor::RowToPhpClass& src) {
 	ArraySyntax = src.ArraySyntax;
 }
 
-UnicodeString mvceditor::RowToPhpClass::CreatePhpArray() {
+UnicodeString t4p::RowToPhpClass::CreatePhpArray() {
 	UnicodeString code;
 	UnicodeString endCode;
 	if (SYNTAX_KEYWORD == ArraySyntax) {
@@ -1907,53 +1907,53 @@ UnicodeString mvceditor::RowToPhpClass::CreatePhpArray() {
 	return code;
 }
 
-mvceditor::SqlCopyAsPhpDialogClass::SqlCopyAsPhpDialogClass(wxWindow* parent, int id, mvceditor::RowToPhpClass& rowToPhp)
+t4p::SqlCopyAsPhpDialogClass::SqlCopyAsPhpDialogClass(wxWindow* parent, int id, t4p::RowToPhpClass& rowToPhp)
 : SqlCopyAsPhpDialogGeneratedClass(parent, id)
 , EditedRowToPhp(rowToPhp)
 , RowToPhp(rowToPhp) 
 , HasCheckedAll(false) {
 	
-	if (mvceditor::RowToPhpClass::SYNTAX_KEYWORD == rowToPhp.ArraySyntax) {
+	if (t4p::RowToPhpClass::SYNTAX_KEYWORD == rowToPhp.ArraySyntax) {
 		ArraySyntaxRadio->SetSelection(0);
 	}
 	else {
 		ArraySyntaxRadio->SetSelection(1);
 	}
-	if (mvceditor::RowToPhpClass::VALUES_ROW == rowToPhp.CopyValues) {
+	if (t4p::RowToPhpClass::VALUES_ROW == rowToPhp.CopyValues) {
 		CopyValues->SetSelection(0);
 	}
 	else {
 		CopyValues->SetSelection(1);
 	}
 	for(size_t i = 0; i < rowToPhp.Columns.size(); ++i) {
-		Columns->AppendString(mvceditor::IcuToWx(rowToPhp.Columns[i]));
+		Columns->AppendString(t4p::IcuToWx(rowToPhp.Columns[i]));
 		Columns->Check(i);
 	}
 }
 
-void mvceditor::SqlCopyAsPhpDialogClass::OnCheckAll(wxCommandEvent& event) {
+void t4p::SqlCopyAsPhpDialogClass::OnCheckAll(wxCommandEvent& event) {
 	HasCheckedAll = !HasCheckedAll;
 	for (size_t i = 0; i < Columns->GetCount(); ++i) {
 		Columns->Check(i, HasCheckedAll);
 	}
 }
 
-void mvceditor::SqlCopyAsPhpDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::SqlCopyAsPhpDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
-	if (mvceditor::RowToPhpClass::SYNTAX_KEYWORD == ArraySyntaxRadio->GetSelection()) {
-		EditedRowToPhp.ArraySyntax = mvceditor::RowToPhpClass::SYNTAX_KEYWORD;
+void t4p::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (t4p::RowToPhpClass::SYNTAX_KEYWORD == ArraySyntaxRadio->GetSelection()) {
+		EditedRowToPhp.ArraySyntax = t4p::RowToPhpClass::SYNTAX_KEYWORD;
 	}
 	else {
-		EditedRowToPhp.ArraySyntax = mvceditor::RowToPhpClass::SYNTAX_OPERATOR;
+		EditedRowToPhp.ArraySyntax = t4p::RowToPhpClass::SYNTAX_OPERATOR;
 	}
-	if (mvceditor::RowToPhpClass::VALUES_ROW == CopyValues->GetSelection()) {
-		EditedRowToPhp.CopyValues = mvceditor::RowToPhpClass::VALUES_ROW;
+	if (t4p::RowToPhpClass::VALUES_ROW == CopyValues->GetSelection()) {
+		EditedRowToPhp.CopyValues = t4p::RowToPhpClass::VALUES_ROW;
 	}
 	else {
-		EditedRowToPhp.CopyValues = mvceditor::RowToPhpClass::VALUES_EMPTY;
+		EditedRowToPhp.CopyValues = t4p::RowToPhpClass::VALUES_EMPTY;
 	}
 	
 	EditedRowToPhp.CheckedColumns.clear();
@@ -1973,43 +1973,43 @@ void mvceditor::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::SqlBrowserFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_SQL + 0, mvceditor::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
-	EVT_MENU(mvceditor::MENU_SQL + 1, mvceditor::SqlBrowserFeatureClass::OnSqlConnectionMenu)
-	EVT_MENU(mvceditor::MENU_SQL + 2, mvceditor::SqlBrowserFeatureClass::OnRun)
-	EVT_MENU(mvceditor::MENU_SQL + 3, mvceditor::SqlBrowserFeatureClass::OnSqlDetectMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnContentNotebookPageClose)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::SqlBrowserFeatureClass::OnAppExit)
-	EVT_APP_DB_TABLE_DATA_OPEN(mvceditor::SqlBrowserFeatureClass::OnCmdTableDataOpen)
-	EVT_APP_DB_TABLE_DEFINITION_OPEN(mvceditor::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen)
+BEGIN_EVENT_TABLE(t4p::SqlBrowserFeatureClass, wxEvtHandler)
+	EVT_MENU(t4p::MENU_SQL + 0, t4p::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
+	EVT_MENU(t4p::MENU_SQL + 1, t4p::SqlBrowserFeatureClass::OnSqlConnectionMenu)
+	EVT_MENU(t4p::MENU_SQL + 2, t4p::SqlBrowserFeatureClass::OnRun)
+	EVT_MENU(t4p::MENU_SQL + 3, t4p::SqlBrowserFeatureClass::OnSqlDetectMenu)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::SqlBrowserFeatureClass::OnContentNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, t4p::SqlBrowserFeatureClass::OnContentNotebookPageClose)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_TOOLS_NOTEBOOK, t4p::SqlBrowserFeatureClass::OnToolsNotebookPageClose)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::SqlBrowserFeatureClass::OnAppExit)
+	EVT_APP_DB_TABLE_DATA_OPEN(t4p::SqlBrowserFeatureClass::OnCmdTableDataOpen)
+	EVT_APP_DB_TABLE_DEFINITION_OPEN(t4p::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
-	EVT_QUERY_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnQueryComplete)
-	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionProgress)
-	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::SqlBrowserPanelClass::OnActionComplete)
-	EVT_MENU(ID_GRID_COPY_ALL, mvceditor::SqlBrowserPanelClass::OnCopyAllRows)
-	EVT_MENU(ID_GRID_COPY_ROW, mvceditor::SqlBrowserPanelClass::OnCopyRow)
-	EVT_MENU(ID_GRID_COPY_ROW_SQL, mvceditor::SqlBrowserPanelClass::OnCopyRowAsSql)
-	EVT_MENU(ID_GRID_COPY_ROW_PHP, mvceditor::SqlBrowserPanelClass::OnCopyRowAsPhp)
-	EVT_MENU(ID_GRID_COPY_CELL, mvceditor::SqlBrowserPanelClass::OnCopyCellData)
-	EVT_MENU(ID_GRID_OPEN_IN_EDITOR, mvceditor::SqlBrowserPanelClass::OnOpenInEditor)
+BEGIN_EVENT_TABLE(t4p::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
+	EVT_QUERY_COMPLETE(wxID_ANY, t4p::SqlBrowserPanelClass::OnQueryComplete)
+	EVT_ACTION_PROGRESS(wxID_ANY, t4p::SqlBrowserPanelClass::OnActionProgress)
+	EVT_ACTION_COMPLETE(wxID_ANY, t4p::SqlBrowserPanelClass::OnActionComplete)
+	EVT_MENU(ID_GRID_COPY_ALL, t4p::SqlBrowserPanelClass::OnCopyAllRows)
+	EVT_MENU(ID_GRID_COPY_ROW, t4p::SqlBrowserPanelClass::OnCopyRow)
+	EVT_MENU(ID_GRID_COPY_ROW_SQL, t4p::SqlBrowserPanelClass::OnCopyRowAsSql)
+	EVT_MENU(ID_GRID_COPY_ROW_PHP, t4p::SqlBrowserPanelClass::OnCopyRowAsPhp)
+	EVT_MENU(ID_GRID_COPY_CELL, t4p::SqlBrowserPanelClass::OnCopyCellData)
+	EVT_MENU(ID_GRID_OPEN_IN_EDITOR, t4p::SqlBrowserPanelClass::OnOpenInEditor)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::SqlConnectionListDialogClass, SqlConnectionListDialogGeneratedClass)
-	EVT_QUERY_COMPLETE(ID_SQL_LIST_TEST, mvceditor::SqlConnectionListDialogClass::ShowTestResults)
+BEGIN_EVENT_TABLE(t4p::SqlConnectionListDialogClass, SqlConnectionListDialogGeneratedClass)
+	EVT_QUERY_COMPLETE(ID_SQL_LIST_TEST, t4p::SqlConnectionListDialogClass::ShowTestResults)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
-	EVT_QUERY_COMPLETE(ID_SQL_EDIT_TEST, mvceditor::MysqlConnectionDialogClass::ShowTestResults)
+BEGIN_EVENT_TABLE(t4p::MysqlConnectionDialogClass, MysqlConnectionDialogGeneratedClass)
+	EVT_QUERY_COMPLETE(ID_SQL_EDIT_TEST, t4p::MysqlConnectionDialogClass::ShowTestResults)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::TableDefinitionPanelClass, TableDefinitionPanelGeneratedClass)
-	EVT_QUERY_COMPLETE(ID_SQL_TABLE_DEFINITION, mvceditor::TableDefinitionPanelClass::OnColumnSqlComplete)
-	EVT_QUERY_COMPLETE(ID_SQL_TABLE_INDICES, mvceditor::TableDefinitionPanelClass::OnIndexSqlComplete)
-	EVT_QUERY_COMPLETE(ID_SQL_TABLE_CREATE, mvceditor::TableDefinitionPanelClass::OnCreateSqlComplete)
+BEGIN_EVENT_TABLE(t4p::TableDefinitionPanelClass, TableDefinitionPanelGeneratedClass)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_DEFINITION, t4p::TableDefinitionPanelClass::OnColumnSqlComplete)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_INDICES, t4p::TableDefinitionPanelClass::OnIndexSqlComplete)
+	EVT_QUERY_COMPLETE(ID_SQL_TABLE_CREATE, t4p::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
 
 

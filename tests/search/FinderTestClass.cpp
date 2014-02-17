@@ -28,7 +28,7 @@
 #include <unicode/unistr.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
-UnicodeString CODE = mvceditor::CharToIcu(
+UnicodeString CODE = t4p::CharToIcu(
 	"<?php\n"
 	"/**\n"
 	" * function for computing area of circle\n"
@@ -48,7 +48,7 @@ SUITE(FinderTestClass) {
 	
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));
@@ -60,7 +60,7 @@ TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
 
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::CASE_INSENSITIVE);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::CASE_INSENSITIVE);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));
@@ -72,7 +72,7 @@ TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
 
 TEST(FindNextUsingExactModeShouldReturnInvalidIndexWhenNotFound) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	CHECK(finder.Prepare());
 	CHECK_EQUAL(false, finder.FindNext(CODE));
 	int32_t position, length;
@@ -81,7 +81,7 @@ TEST(FindNextUsingExactModeShouldReturnInvalidIndexWhenNotFound) {
 
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenUsingWrap) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	finder.Wrap = true;
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	int32_t start = CODE.length() - 2;
@@ -95,7 +95,7 @@ TEST(FindNextUsingExactModeShouldReturnValidIndexWhenUsingWrap) {
 
 TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearching) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI\\s*=\\s*\\d+\\.\\d+"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));
@@ -109,7 +109,7 @@ TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearching) {
 
 TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?i)\\$pi\\s*=\\s*\\d+\\.\\d+"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
 	CHECK(finder.FindNext(CODE));
@@ -121,21 +121,21 @@ TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearchingCaseIn
 
 TEST(FindNextUsingRegularExpressionModeShouldReturnFalseWhenRegularExpressionIsInvalid) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d+("));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK_EQUAL(false, finder.Prepare());
 	CHECK_EQUAL(false, finder.FindNext(CODE));
 }
 
 TEST(FindNextUsingRegularExpressionModeShouldReturnInvalidIndexWhenNotFound) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d{18}"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK(finder.Prepare());
 	CHECK_EQUAL(false, finder.FindNext(CODE));
 }
 
 TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^  \\$PI = 3\\.14; //constant $"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("  $PI"));
 	CHECK(finder.FindNext(CODE));
@@ -147,7 +147,7 @@ TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
 
 TEST(FindPreviousShouldSkipToFirstInstance) {
 	UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));	
-	mvceditor::FinderClass finder(toFind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(toFind, t4p::FinderClass::EXACT);
 	CHECK(finder.Prepare());
 
 	// find the 2nd instance of $MESSAGE
@@ -173,7 +173,7 @@ TEST(FindPreviousShouldSkipToFirstInstance) {
 
 TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
 	CHECK(finder.Prepare());
 	CHECK(finder.FindNext(CODE));
@@ -185,7 +185,7 @@ TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
 
 TEST(GetLastReplacementTextShouldReturnMatchedTextInRegularExpressionMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^\\s*\\$PI\\s*=\\s*3\\.14;\\s*//(.+)$"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /* $1 */");
 	CHECK(finder.Prepare());
 	CHECK(finder.FindNext(CODE));
@@ -197,7 +197,7 @@ TEST(GetLastReplacementTextShouldReturnMatchedTextInRegularExpressionMode) {
 
 TEST(GetLastReplacementTextShouldReturnFalseWhenTextDoesNotHaveAMatch) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
-	mvceditor::FinderClass finder(tofind);
+	t4p::FinderClass finder(tofind);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
 	CHECK(finder.Prepare());
 	CHECK(finder.FindNext(CODE));
@@ -211,7 +211,7 @@ TEST(GetLastReplacementTextShouldReturnFalseWhenTextDoesNotHaveAMatch) {
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$_PI");
 	CHECK(finder.Prepare());
 	UnicodeString newCode(CODE);
@@ -224,7 +224,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::EXACT);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
 	CHECK(finder.Prepare());
 	UnicodeString newCode(CODE);
@@ -236,7 +236,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement)
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$(PI)"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("\\$_$1");
 	CHECK(finder.Prepare());
 	UnicodeString newCode(CODE);
@@ -249,7 +249,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmptyReplacement) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	mvceditor::FinderClass finder(tofind, mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
 	CHECK(finder.Prepare());
 	UnicodeString newCode(CODE);
@@ -260,12 +260,12 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmpty
 }
 
 TEST(PrepareShouldReturnFalseWhenExpressionIsEmpty) {
-	mvceditor::FinderClass finder(UNICODE_STRING_SIMPLE(""),  mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(UNICODE_STRING_SIMPLE(""),  t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK_EQUAL(false, finder.Prepare());
 }
 
 TEST(PrepareShouldReturnTrueWhenExpressionAndReplaceExpressionAreValid) {
-	mvceditor::FinderClass finder(UNICODE_STRING_SIMPLE("(a)bc"),  mvceditor::FinderClass::REGULAR_EXPRESSION);
+	t4p::FinderClass finder(UNICODE_STRING_SIMPLE("(a)bc"),  t4p::FinderClass::REGULAR_EXPRESSION);
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$1bc");
 	CHECK(finder.Prepare());
 }

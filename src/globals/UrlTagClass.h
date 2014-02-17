@@ -22,14 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORURLRESOURCECLASS_H__
-#define __MVCEDITORURLRESOURCECLASS_H__
+#ifndef __T4P_URLRESOURCECLASS_H__
+#define __T4P_URLRESOURCECLASS_H__
 
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
 #include <globals/Sqlite.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * A small class to hold an application URL. We tie together a URL and its PHP source
@@ -75,19 +75,19 @@ public:
 	/**
 	 * @param src this item will be a deep copy of src
 	 */
-	UrlTagClass(const mvceditor::UrlTagClass& src);
+	UrlTagClass(const t4p::UrlTagClass& src);
 
 	/**
 	 * @param src item to copy from. after a call to this method, this item will have the
 	 * same properties as src. This is a deep copy
 	 */
-	void Copy(const mvceditor::UrlTagClass& src);
+	void Copy(const t4p::UrlTagClass& src);
 
 	/**
 	 * @param src item to copy from. after a call to this method, this item will have the
 	 * same properties as src. This is a deep copy
 	 */
-	mvceditor::UrlTagClass& operator=(const mvceditor::UrlTagClass& src);
+	t4p::UrlTagClass& operator=(const t4p::UrlTagClass& src);
 
 	void Reset();
 };
@@ -99,7 +99,7 @@ public:
  * The URLs here are a combination of detected URLs and URLs manually entered in by the user.
  * For a big application, there may be hundreds or thousands of these.
  */
-class UrlTagFinderClass : public mvceditor::SqliteFinderClass {
+class UrlTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 		

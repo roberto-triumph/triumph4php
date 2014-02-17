@@ -57,10 +57,10 @@ static wxFileName UserDir() {
 	return tempDir;
 }
 
-mvceditor::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir)
+t4p::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir)
 : SettingsDirectoryGeneratedPanelClass(parent, id) {
 
-	mvceditor::DirPickerValidatorClass validator(&settingsDir);
+	t4p::DirPickerValidatorClass validator(&settingsDir);
 	SettingsDirectory->SetValidator(validator);
 	SettingsDirectory->SetName(wxT("Settings directory"));
 
@@ -87,7 +87,7 @@ mvceditor::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* pa
 	}
 }
 
-void mvceditor::SettingsDirectoryPanelClass::OnUserDataDir(wxCommandEvent& event) {
+void t4p::SettingsDirectoryPanelClass::OnUserDataDir(wxCommandEvent& event) {
 	wxFileName userDir = UserDir();
 	SettingsDirectory->SetPath(userDir.GetPath());
 	SettingsDirectory->Enable(false);
@@ -100,7 +100,7 @@ void mvceditor::SettingsDirectoryPanelClass::OnUserDataDir(wxCommandEvent& event
 	}
 }
 
-void mvceditor::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
+void t4p::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
 	wxFileName appDir = AppDir();
 	SettingsDirectory->SetPath(appDir.GetPath());
 	SettingsDirectory->Enable(false);
@@ -113,7 +113,7 @@ void mvceditor::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::SettingsDirectoryPanelClass::OnCustomDir(wxCommandEvent& event) {
+void t4p::SettingsDirectoryPanelClass::OnCustomDir(wxCommandEvent& event) {
 	SettingsDirectory->SetPath(wxT(""));
 	SettingsDirectory->Enable(true);
 }

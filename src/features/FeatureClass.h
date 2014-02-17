@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORFEATURECLASS_H__
-#define __MVCEDITORFEATURECLASS_H__
+#ifndef __T4P_FEATURECLASS_H__
+#define __T4P_FEATURECLASS_H__
  
 #include <globals/EnvironmentClass.h>
 #include <globals/ProjectClass.h>
@@ -34,7 +34,7 @@
 #include <wx/propdlg.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 	
 // forward declaration to prevent #include of the AppClass
 class AppClass;
@@ -403,7 +403,7 @@ protected:
 	  * @param mode the document mode that the control will be editing
 	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
-	 CodeControlClass* CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const;
+	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::CodeControlClass::Mode mode) const;
 
 	/**
 	 * This is a helper method that will add each of the given menu items as a 

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef MVCEDITORCODECONTROLCLASS_H_
-#define MVCEDITORCODECONTROLCLASS_H_
+#ifndef __T4P_CODECONTROLCLASS_H_
+#define __T4P_CODECONTROLCLASS_H_
 
 #include <globals/CodeControlOptionsClass.h>
 #include <search/FinderClass.h>
@@ -39,7 +39,7 @@
 /**
  * The source code editor.
  */
-namespace mvceditor {
+namespace t4p {
 
 // some forward declarations to prevent re-compilation as much as possible
 // Since this file is included by many features whenever a change to any included header
@@ -141,7 +141,7 @@ public:
 	  * @param eventSink to send event to the application
 	 */
 	CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-		GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
+		GlobalsClass* globals, t4p::EventSinkClass& eventSink,
 	                 wxWindowID id, const wxPoint& position =
 	                     wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
 	                 const wxString& name = wxT("code"));
@@ -164,7 +164,7 @@ public:
 	 * lets avoid calls like this
 	 *
 	 * UnicodeString contents //....
-	 * wxStyledTextCtrl::SetText(mvceditor::IcuToWx(contents))
+	 * wxStyledTextCtrl::SetText(t4p::IcuToWx(contents))
 	 *
 	 * This method prevents going from 
 	 * UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
@@ -632,4 +632,4 @@ private:
 };
 
 }
-#endif /*MVCEDITORCODECONTROLCLASS_H_*/
+#endif /*__T4P_CODECONTROLCLASS_H_*/

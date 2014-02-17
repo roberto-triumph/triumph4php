@@ -22,24 +22,24 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
-#define __MVCEDITORRESOUCEWIPEACTIONCLASS_H__
+#ifndef __T4P_RESOUCEWIPEACTIONCLASS_H__
+#define __T4P_RESOUCEWIPEACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <wx/filename.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Class to 'wipe' tag databases (empty all of their contents)
  */
-class TagWipeActionClass : public mvceditor::GlobalActionClass {
+class TagWipeActionClass : public t4p::GlobalActionClass {
 	
 public:
 
-	TagWipeActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 	
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 	
@@ -61,13 +61,13 @@ private:
  * action to remove only tags from entire source directories from the tag
  * databases
  */
-class TagDeleteSourceActionClass : public mvceditor::GlobalActionClass {
+class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
 	
 public:
 
-	TagDeleteSourceActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& sourceDirsToDelete);
+	TagDeleteSourceActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& sourceDirsToDelete);
 	
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 	
@@ -94,13 +94,13 @@ private:
  * action to remove only tags from certain directories from the tag
  * databases
  */
-class TagDeleteDirectoryActionClass : public mvceditor::GlobalActionClass {
+class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
 	
 public:
 
-	TagDeleteDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
+	TagDeleteDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
 	
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 	
@@ -127,13 +127,13 @@ private:
  * action to remove only tags from certain files from the tag
  * databases
  */
-class TagDeleteFileActionClass : public mvceditor::GlobalActionClass {
+class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 	
 public:
 
-	TagDeleteFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& filesToDelete);
+	TagDeleteFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& filesToDelete);
 	
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 	

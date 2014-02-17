@@ -25,20 +25,20 @@
 #include <widgets/FileTypeImageList.h>
 #include <globals/Assets.h> 
  
-void mvceditor::FillWithFileType(wxImageList& imgList) {
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-php")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-sql")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-css")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-javascript")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-config")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-config")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-yaml")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-xml")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-ruby")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-lua")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-markdown")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-bash")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-diff")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-text")));
-	imgList.Add(mvceditor::IconImageAsset(wxT("document-blank")));
+void t4p::FillWithFileType(wxImageList& imgList) {
+	imgList.Add(t4p::IconImageAsset(wxT("document-php")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-sql")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-css")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-javascript")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-config")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-config")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-yaml")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-xml")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-ruby")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-lua")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-markdown")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-bash")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-diff")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-text")));
+	imgList.Add(t4p::IconImageAsset(wxT("document-blank")));
 }

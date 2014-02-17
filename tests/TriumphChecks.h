@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITORCHECKS_H__
-#define __MVCEDITORCHECKS_H__
+#ifndef __T4P_CHECKS_H__
+#define __T4P_CHECKS_H__
  
 /**
  * This is a "hard" check for vector size. Will check that the vetor is of the given

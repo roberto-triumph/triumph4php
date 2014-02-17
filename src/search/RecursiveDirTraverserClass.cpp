@@ -24,15 +24,15 @@
  */
 #include <search/RecursiveDirTraverserClass.h>
 
-mvceditor::RecursiveDirTraverserClass::RecursiveDirTraverserClass(std::vector<wxString>& fullPaths) 
+t4p::RecursiveDirTraverserClass::RecursiveDirTraverserClass(std::vector<wxString>& fullPaths) 
 	: FullPaths(fullPaths) {
 }
 
-wxDirTraverseResult mvceditor::RecursiveDirTraverserClass::OnFile(const wxString& filename) {
+wxDirTraverseResult t4p::RecursiveDirTraverserClass::OnFile(const wxString& filename) {
 	FullPaths.push_back(filename);
 	return wxDIR_CONTINUE;
 }
 
-wxDirTraverseResult mvceditor::RecursiveDirTraverserClass::OnDir(const wxString& WXUNUSED(dirname)) {
+wxDirTraverseResult t4p::RecursiveDirTraverserClass::OnDir(const wxString& WXUNUSED(dirname)) {
 	return wxDIR_CONTINUE;
 }

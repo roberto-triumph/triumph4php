@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_FILENAME_H__
-#define __MVCEDITOR_FILENAME_H__
+#ifndef __T4P_FILENAME_H__
+#define __T4P_FILENAME_H__
 
 #include <wx/filename.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Deep Copy a a wxFileName. This is not trivial since wxFileName's assignment performs shallow copies

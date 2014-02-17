@@ -32,7 +32,7 @@
 #include <stack>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 	
 /**
  * Classes that need to recurse through directories and search for files need to implement this interface. The walker
@@ -103,15 +103,15 @@ public:
 	/**
 	 * Needed overloads to make SourceClass usable in STL data structures
 	 */
-	SourceClass(const mvceditor::SourceClass& src);
-	SourceClass& operator=(const mvceditor::SourceClass& src);
+	SourceClass(const t4p::SourceClass& src);
+	SourceClass& operator=(const t4p::SourceClass& src);
 
 	/**
 	 * @param src object to copy from. after a call, this
 	 * object will have the same root directory, include and
 	 * exclude wildcards as src.
 	 */
-	void Copy(const mvceditor::SourceClass& src);
+	void Copy(const t4p::SourceClass& src);
 
 	/**
 	 * Remove all include wildcards. Removing all include wildcards
@@ -226,7 +226,7 @@ public:
  *  a and b have the same number of items
  *  each source a and b has the same root directory, include, and exclude wildcards
  */
-bool CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b);
+bool CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::vector<t4p::SourceClass>& b);
 
 /**
  * This class will iterate through directories, giving each file to a DirectoryWalker. The unique feature of this class is 
@@ -279,7 +279,7 @@ public:
 	 * @return bool doHidden if TRUE then hidden files will be walked as well.
 	 * @return bool true if ALL of the given path exists
 	 */
-	bool Init(const std::vector<mvceditor::SourceClass>& sources, Modes mode = RECURSIVE, bool doHidden = false);
+	bool Init(const std::vector<t4p::SourceClass>& sources, Modes mode = RECURSIVE, bool doHidden = false);
 	
 	/**
 	 * Passes the current file to the given walker and advances to the next file. Note that the files are not guaranteed to
@@ -347,7 +347,7 @@ private:
 	 * populates the files and directories stack.
 	 * @param walker to notify that a new source is being searched
 	 */
-	void EnumerateNextDir(mvceditor::DirectoryWalkerClass& walker);
+	void EnumerateNextDir(t4p::DirectoryWalkerClass& walker);
 	
 	/**
 	 * The files that the DirectoryWalker matched on
@@ -379,7 +379,7 @@ private:
 	/**
 	 * Stores the wildcards so that we ignore files 
 	 */
-	std::vector<mvceditor::SourceClass> Sources;
+	std::vector<t4p::SourceClass> Sources;
 	
 	/**
 	 * the total number of files that will be walked over.  This number will only be available if Init() method was

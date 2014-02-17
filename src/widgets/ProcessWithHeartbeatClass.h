@@ -30,13 +30,13 @@
 #include <wx/process.h>
 #include <map>
 
-namespace mvceditor {
+namespace t4p {
 
 	/**
 	 * This event will be generated when the external process has completed its job
 	 * **successfully** A process that has been killed will NOT generate this event.
 	 * event.GetString() will contain the entire process STDOUT and STDERR output; with
-	 * some caveats. see  mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
+	 * some caveats. see  t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
 	 */
 	extern const wxEventType EVENT_PROCESS_COMPLETE;
 
@@ -45,7 +45,7 @@ namespace mvceditor {
 	 * **successfully** but failed while executing (returned a non-zero exit code). A 
 	 * process that has been killed will NOT generate this event.
 	 * event.GetString() will contain the entire process STDOUT and STDERR output; with
-	 * some caveats. see  mvceditor::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
+	 * some caveats. see  t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
 	 */
 	extern const wxEventType EVENT_PROCESS_FAILED;
 

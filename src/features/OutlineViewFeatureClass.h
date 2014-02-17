@@ -32,7 +32,7 @@
 #include <wx/imaglist.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * grouping of a tag and its member tags.
@@ -43,13 +43,13 @@ public:
 
 	wxString Label;
 
-	std::map<wxString, std::vector<mvceditor::TagClass> > Tags;
+	std::map<wxString, std::vector<t4p::TagClass> > Tags;
 
 	OutlineSearchCompleteClass();
 
-	OutlineSearchCompleteClass(const mvceditor::OutlineSearchCompleteClass& src);
+	OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src);
 
-	void Copy(const mvceditor::OutlineSearchCompleteClass& src);
+	void Copy(const t4p::OutlineSearchCompleteClass& src);
 
 	bool IsLabelFileName() const;
 };
@@ -65,9 +65,9 @@ class OutlineSearchCompleteEventClass : public wxEvent {
         /**
          * Will contain all of the resulting tags.
          */
-        std::vector<mvceditor::OutlineSearchCompleteClass> Tags;
+        std::vector<t4p::OutlineSearchCompleteClass> Tags;
         
-        OutlineSearchCompleteEventClass(int eventId, const std::vector<mvceditor::OutlineSearchCompleteClass>& tags);
+        OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
         
         wxEvent* Clone() const;
         
@@ -78,7 +78,7 @@ extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
 typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSearchCompleteEventClass&);
 
 #define EVENT_OUTLINE_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_OUTLINE_SEARCH_COMPLETE, id, -1, \
+        DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_OUTLINE_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OutlineSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -86,11 +86,11 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
  * class that will execute a query against the tag cache in the background.
  * the results will be posted in an event.
  */
-class OutlineTagCacheSearchActionClass : public mvceditor::ActionClass {
+class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
 	
 public:
 
-	OutlineTagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * set the search parameters.  this should be called before the action is
@@ -99,7 +99,7 @@ public:
 	 * @param searches the search strings, can be either file names, full paths, or class names
 	 * @param globals to get the locations of the tag dbs
 	 */
-	void SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals);
+	void SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 
@@ -109,7 +109,7 @@ protected:
 
 private:
 
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 
 	std::vector<UnicodeString> SearchStrings;
 	
@@ -130,7 +130,7 @@ public:
 	/**
 	 * Creates a new OutlineViewFeature.
 	 */
-	OutlineViewFeatureClass(mvceditor::AppClass& app);
+	OutlineViewFeatureClass(t4p::AppClass& app);
 
 	/**
 	 * This feature will have a view menu entry
@@ -177,12 +177,12 @@ private:
 	 * This method will get called by the EVENT_APP_FILE_OPENED event is generated;
 	 * ie when parsing of the code in the active code control buffer has been completed.
 	 */
-	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
 	 * once tag searching finishes, update the tree control
 	 */
-	void OnTagSearchComplete(mvceditor::OutlineSearchCompleteEventClass& event);
+	void OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -213,7 +213,7 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * adds the given tags to the outline tree, under a node that has the name of the file
 	 * as its name
 	 */
-	void AddTagsToOutline(const std::vector<mvceditor::OutlineSearchCompleteClass>& tags);
+	void AddTagsToOutline(const std::vector<t4p::OutlineSearchCompleteClass>& tags);
 
 	 /**
 	  * @param fullPath file to remove from the outline tre
@@ -267,7 +267,7 @@ private:
 	/**
 	 * these are the things that have been outlined.
 	 */
-	std::vector<mvceditor::OutlineSearchCompleteClass> OutlinedTags;
+	std::vector<t4p::OutlineSearchCompleteClass> OutlinedTags;
 
 	/**
 	 * this pointer will be managed by the tree control, since the tree control
@@ -332,7 +332,7 @@ private:
 	 *
 	 * @param tags that the user chose
 	 */
-	void SearchTagsToOutline(const std::vector<mvceditor::TagClass>& tags);
+	void SearchTagsToOutline(const std::vector<t4p::TagClass>& tags);
 	
 	/**
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
@@ -345,7 +345,7 @@ private:
 	 * @param tagRoot the tree node to append to
 	 * @param classNameNode the name of the class the tag belongs to (can be empty)
 	 */
-	void TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
+	void TagToNode(const t4p::TagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
 
 	/**
 	 * @return the tree node for the given full path. search is done 
@@ -441,8 +441,8 @@ public:
 	 * @param feature to get the project list and to search for files
 	 * @param chosenTags the tags that the user chose will be filled in here
 	 */
-	FileSearchDialogClass(wxWindow* parent, mvceditor::OutlineViewFeatureClass& feature, 
-		std::vector<mvceditor::TagClass>& chosenTags);
+	FileSearchDialogClass(wxWindow* parent, t4p::OutlineViewFeatureClass& feature, 
+		std::vector<t4p::TagClass>& chosenTags);
 
 protected:
 
@@ -471,22 +471,22 @@ private:
 	/**
 	 * show the tags in the results list
 	 */
-	void ShowTags(const wxString& query, const std::vector<mvceditor::TagClass>& tags);
+	void ShowTags(const wxString& query, const std::vector<t4p::TagClass>& tags);
 
 	/**
 	 * to get the project list and perform tag search
 	 */
-	mvceditor::OutlineViewFeatureClass& Feature;
+	t4p::OutlineViewFeatureClass& Feature;
 
 	/**
 	 * the tags that the were the result of the preivous search
 	 */
-	std::vector<mvceditor::TagClass> MatchingTags;
+	std::vector<t4p::TagClass> MatchingTags;
 	
 	/**
 	 * the tags that the user chose
 	 */
-	std::vector<mvceditor::TagClass>& ChosenTags;
+	std::vector<t4p::TagClass>& ChosenTags;
 };
 
 }

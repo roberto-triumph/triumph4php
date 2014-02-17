@@ -25,7 +25,7 @@
 #include <main_frame/EditorBehaviorPanelClass.h>
 #include <wx/valgen.h>
 
-mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, mvceditor::CodeControlOptionsClass& options)
+t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
 	: EditorBehaviorPanelGeneratedClass(parent) {
 	wxGenericValidator enableCodeFoldingValidator(&options.EnableCodeFolding);
 	EnableCodeFolding->SetValidator(enableCodeFoldingValidator);
@@ -63,12 +63,12 @@ mvceditor::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, 
 	EnableCallTipOnMouseHover->SetValidator(callTipOnMouseHoverValidator);
 }
 
-void mvceditor::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {
+void t4p::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {
 	TabWidth->Enable(event.IsChecked());
 	SpacesPerIndent->Enable(!event.IsChecked());
 }
 
-bool mvceditor::EditorBehaviorPanelClass::TransferDataToWindow() {
+bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
 	if (wxWindow::TransferDataToWindow()) {
 		
 		// CodeControlOptionsClass disables right margin when RightMargin = 0
@@ -79,7 +79,7 @@ bool mvceditor::EditorBehaviorPanelClass::TransferDataToWindow() {
 	return false;
 }
 
-bool mvceditor::EditorBehaviorPanelClass::TransferDataFromWindow() {
+bool t4p::EditorBehaviorPanelClass::TransferDataFromWindow() {
 	
 	// CodeControlOptionsClass disables right margin when RightMargin = 0
 	if (!EnableRightMargin->IsChecked()) {
@@ -88,6 +88,6 @@ bool mvceditor::EditorBehaviorPanelClass::TransferDataFromWindow() {
 	return wxWindow::TransferDataFromWindow();
 }
 
-void mvceditor::EditorBehaviorPanelClass::OnCheckRightMargin(wxCommandEvent& event) {
+void t4p::EditorBehaviorPanelClass::OnCheckRightMargin(wxCommandEvent& event) {
 	RightMargin->Enable(event.IsChecked());
 }

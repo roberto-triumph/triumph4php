@@ -27,7 +27,7 @@
 
 #include <features/FeatureClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This is a feature that is designed to test the feature mechanism. 
@@ -37,7 +37,7 @@ namespace mvceditor {
 class TestFeatureClass : public FeatureClass {
 public:
 
-	TestFeatureClass(mvceditor::AppClass& app);
+	TestFeatureClass(t4p::AppClass& app);
 		
 	/**
 	 * This feature will have no Edit menu items

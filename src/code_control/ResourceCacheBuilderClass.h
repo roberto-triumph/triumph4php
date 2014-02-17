@@ -28,7 +28,7 @@
 #include <actions/ActionClass.h>
 #include <language/TagCacheClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration
 class GlobalsClass;
@@ -44,7 +44,7 @@ class GlobalsClass;
  *   only found in memory, it will be passed in the generated event EVENT_WORKING_CACHE_COMPLETE
  *
  */
-class WorkingCacheBuilderClass : public mvceditor::ActionClass {
+class WorkingCacheBuilderClass : public t4p::ActionClass {
 	
 public:
 
@@ -52,7 +52,7 @@ public:
 	 * @param runningThreads the object will get notified to EVENT_WORK* events with the given ID
 	 *        and the EVENT_WORKING_CACHE_COMPLETE.
 	 */
-	WorkingCacheBuilderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	WorkingCacheBuilderClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * Will parse the resources of the given text in a backgound thread and will
@@ -68,7 +68,7 @@ public:
 	 *       but it should be false if code is the same as the contents of the file (like for example when
 	 *       the file is opened).
 	 */
-	void Update(mvceditor::GlobalsClass& globals, const wxString& fileName, const wxString& fileIdentifier, 
+	void Update(t4p::GlobalsClass& globals, const wxString& fileName, const wxString& fileIdentifier, 
 		const UnicodeString& code, bool isNew, pelet::Versions version, bool doParseTags);
 
 	wxString GetLabel() const;

@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TemplateFileTagClass_H__
-#define __MVCEDITOR_TemplateFileTagClass_H__
+#ifndef __T4P_TemplateFileTagClass_H__
+#define __T4P_TemplateFileTagClass_H__
 
 #include <wx/string.h>
 #include <wx/filename.h>
 #include <soci/soci.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class represents a single "view" (template) file  that was detected by the 
@@ -53,11 +53,11 @@ public:
 
 	TemplateFileTagClass();
 
-	TemplateFileTagClass(const mvceditor::TemplateFileTagClass& src);
+	TemplateFileTagClass(const t4p::TemplateFileTagClass& src);
 
-	void Copy(const mvceditor::TemplateFileTagClass& src);
+	void Copy(const t4p::TemplateFileTagClass& src);
 
-	mvceditor::TemplateFileTagClass& operator=(const mvceditor::TemplateFileTagClass& src);
+	t4p::TemplateFileTagClass& operator=(const t4p::TemplateFileTagClass& src);
 
 	void Init(const wxString& fullPath, const std::vector<wxString>& variables);
 
@@ -83,7 +83,7 @@ public:
 	 * @return all of the templates that are in the detectors db file that was last
 	 *  initialized.
 	 */
-	std::vector<mvceditor::TemplateFileTagClass> All();
+	std::vector<t4p::TemplateFileTagClass> All();
 
 private:
 

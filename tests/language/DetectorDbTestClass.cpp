@@ -37,7 +37,7 @@ class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 public:
 
 	soci::session DetectorTagSession;
-	mvceditor::DetectorDbClass DetectorDb;
+	t4p::DetectorDbClass DetectorDb;
 	wxFileName Source1,
 		Source2;
 
@@ -49,7 +49,7 @@ public:
 		, Source2() {
 			
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(DetectorTagSession, mvceditor::DetectorSqlSchemaAsset());
+		CreateDatabase(DetectorTagSession, t4p::DetectorSqlSchemaAsset());
 		
 		DetectorDb.Init(&DetectorTagSession);
 		
@@ -126,7 +126,7 @@ public:
 	
 	int AddSource(const wxFileName& fileName) {
 		int sourceId = 0;
-		std::string stdDir = mvceditor::WxToChar(fileName.GetPathWithSep());
+		std::string stdDir = t4p::WxToChar(fileName.GetPathWithSep());
 		soci::statement stmt = (DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
 			soci::use(stdDir));
 		stmt.execute(true);

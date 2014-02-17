@@ -23,12 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_DATABASETABLETAGCLASS_H
-#define __MVCEDITOR_DATABASETABLETAGCLASS_H
+#ifndef __T4P_DATABASETABLETAGCLASS_H
+#define __T4P_DATABASETABLETAGCLASS_H
 
 #include <wx/string.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class represents a database table that exists in one of the
@@ -50,12 +50,12 @@ public:
 
 	DatabaseTableTagClass();
 	
-	DatabaseTableTagClass(const mvceditor::DatabaseTableTagClass& src);
+	DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src);
 	
-	void Copy(const mvceditor::DatabaseTableTagClass& src);
+	void Copy(const t4p::DatabaseTableTagClass& src);
 
 };
 
 }
 
-#endif // __MVCEDITOR_DATABASETABLETAGCLASS_H
+#endif // __T4P_DATABASETABLETAGCLASS_H

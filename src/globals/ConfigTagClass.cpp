@@ -26,43 +26,43 @@
 #include <globals/String.h>
 #include <globals/Errors.h>
 
-mvceditor::ConfigTagClass::ConfigTagClass() 
+t4p::ConfigTagClass::ConfigTagClass() 
 	: Label()
 	, ConfigFileName() {
 
 }	
 
-mvceditor::ConfigTagClass::ConfigTagClass(const mvceditor::ConfigTagClass& src)
+t4p::ConfigTagClass::ConfigTagClass(const t4p::ConfigTagClass& src)
 	: Label()
 	, ConfigFileName() {
 	Copy(src);
 }
 
-void mvceditor::ConfigTagClass::Copy(const mvceditor::ConfigTagClass& src) {
+void t4p::ConfigTagClass::Copy(const t4p::ConfigTagClass& src) {
 	
 	// make sure wxString copy in thread-safe manner
 	Label = src.Label.c_str();
 	ConfigFileName.Assign(src.ConfigFileName.GetFullPath().c_str());
 }
 
-mvceditor::ConfigTagClass& mvceditor::ConfigTagClass::operator=(const mvceditor::ConfigTagClass& src) {
+t4p::ConfigTagClass& t4p::ConfigTagClass::operator=(const t4p::ConfigTagClass& src) {
 	Copy(src);
 	return *this;
 }
 
-wxString mvceditor::ConfigTagClass::MenuLabel() const {
+wxString t4p::ConfigTagClass::MenuLabel() const {
 	wxString label(Label);
 	label.Replace(wxT("&"), wxT("&&"));
 	return label;
 }
 
-mvceditor::ConfigTagFinderClass::ConfigTagFinderClass()
+t4p::ConfigTagFinderClass::ConfigTagFinderClass()
 : SqliteFinderClass() {
 
 }
 
-std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
-	std::vector<mvceditor::ConfigTagClass> allConfigTags;
+std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
+	std::vector<t4p::ConfigTagClass> allConfigTags;
 	if (sourceDirectories.empty()) {
 		return allConfigTags;
 	}
@@ -74,7 +74,7 @@ std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All(cons
 	std::string sql = "SELECT label, full_path FROM config_tags JOIN sources ON(sources.source_id = config_tags.source_id) ";
 	sql += "WHERE directory IN(";
 	for (size_t i = 0; i < sourceDirectories.size(); ++i) {
-		stdSourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+		stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -94,18 +94,18 @@ std::vector<mvceditor::ConfigTagClass> mvceditor::ConfigTagFinderClass::All(cons
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
-				mvceditor::ConfigTagClass configTag;
-				configTag.Label = mvceditor::CharToWx(label.c_str());
-				configTag.ConfigFileName.Assign(mvceditor::CharToWx(fullPath.c_str()));
+				t4p::ConfigTagClass configTag;
+				configTag.Label = t4p::CharToWx(label.c_str());
+				configTag.ConfigFileName.Assign(t4p::CharToWx(fullPath.c_str()));
 
 				allConfigTags.push_back(configTag);
 
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
-		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
+		t4p::EditorLogError(t4p::WARNING_OTHER, msg);
 	}
 	return allConfigTags;
 }

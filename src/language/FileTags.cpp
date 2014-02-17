@@ -26,7 +26,7 @@
 #include <globals/String.h>
 #include <algorithm>
 
-std::vector<int> mvceditor::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
+std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
 	std::vector<int> fileTagIds;
 	if (dirs.empty()) {
 		return fileTagIds;
@@ -34,7 +34,7 @@ std::vector<int> mvceditor::FileTagIdsForDirs(soci::session& session, const std:
 	std::string sql = "";
 	for (size_t i = 0; i < dirs.size(); i++) {
 		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" + 
-			mvceditor::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
+			t4p::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
 		if (i < (dirs.size() - 1)) {
 			sql += " UNION ";
 		}
@@ -53,7 +53,7 @@ std::vector<int> mvceditor::FileTagIdsForDirs(soci::session& session, const std:
 		}
 	} catch (std::exception& e) {
 		error = true;
-		errorMsg = mvceditor::CharToWx(e.what());
+		errorMsg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, errorMsg);
 	}
 	std::sort(fileTagIds.begin(), fileTagIds.end());

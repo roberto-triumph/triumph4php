@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_FILETAGS_H__
-#define __MVCEDITOR_FILETAGS_H__
+#ifndef __T4P_FILETAGS_H__
+#define __T4P_FILETAGS_H__
  
 #include <wx/filename.h>
 #include <soci/soci.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 	/**
 	 * Get the file_item_id for all files that are in any of the given directories. Files

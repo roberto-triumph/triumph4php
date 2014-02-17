@@ -27,8 +27,8 @@
 #include <globals/Assets.h>
 #include <globals/GlobalsClass.h>
 
-mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
-															mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
+															t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCacheDbFileName()
 	, Code()
@@ -39,7 +39,7 @@ mvceditor::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	, DoParseTags(true) {
 }
 	
-void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& globals,
+void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 												 const wxString& fileName, 
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version,
@@ -55,7 +55,7 @@ void mvceditor::WorkingCacheBuilderClass::Update(mvceditor::GlobalsClass& global
 	DoParseTags = doParseTags;
 }
 
-void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
+void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 	if (!FileIdentifier.IsEmpty()) {
 		if (FileIsNew) {
 
@@ -67,14 +67,14 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 		// since this code is outside the mutex
 		// even if code is empty, lets create a working cache so that the 
 		// file is registered and code completion works
-		mvceditor::TagFinderListClass* tagFinderlist = new mvceditor::TagFinderListClass();
+		t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();
 		std::vector<wxString> phpFileExtensions;
 		wxFileName wxf(FileName);
 		phpFileExtensions.push_back(wxf.GetFullName());
 		std::vector<wxString> miscFileExtensions;
 		tagFinderlist->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 
-		mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass();
+		t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
 		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true);
 		bool good = workingCache->Update(Code);
 		if (good && !IsCancelled()) {
@@ -91,7 +91,7 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 			// otherwise we will delete a good symbol table, we want auto completion
 			// to work even if the code is broken
 			// PostEvent will set the correct event Id
-			mvceditor::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, workingCache);
+			t4p::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, workingCache);
 			PostEvent(evt);
 		}
 		else {
@@ -102,6 +102,6 @@ void mvceditor::WorkingCacheBuilderClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::WorkingCacheBuilderClass::GetLabel() const {
+wxString t4p::WorkingCacheBuilderClass::GetLabel() const {
 	return wxT("Working Tag Cache");
 }

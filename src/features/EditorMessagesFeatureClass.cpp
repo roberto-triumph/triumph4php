@@ -28,7 +28,7 @@
 
 static const int ID_DEBUG_WINDOW = wxNewId();
 
-mvceditor::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, int id)
+t4p::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, int id)
 	: EditorMessagesGeneratedPanelClass(parent, id) {
 	int rowCount = Grid->GetNumberRows();
 	Grid->DeleteRows(0, rowCount);
@@ -42,14 +42,14 @@ mvceditor::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, 
 	Grid->SetColLabelValue(3, _("Time"));
 }
 
-void mvceditor::EditorMessagesPanelClass::OnClearButton(wxCommandEvent& event) {
+void t4p::EditorMessagesPanelClass::OnClearButton(wxCommandEvent& event) {
 	int rowCount = Grid->GetNumberRows();
 	if (rowCount > 0) {
 		Grid->DeleteRows(0, rowCount);
 	}
 }
 
-void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
+void t4p::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 	
 	// put a bound on the number of messages to display
 	int maxRows = 1000;
@@ -60,7 +60,7 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 		fix,
 		levelString,
 		dateString;
-	mvceditor::EditorErrorFix(msg, error, fix);
+	t4p::EditorErrorFix(msg, error, fix);
 	switch (level) {
 	case wxLOG_Debug:
 		levelString = _("Debug");
@@ -101,28 +101,28 @@ void mvceditor::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxC
 }
 
 
-mvceditor::EditorMessagesFeatureClass::EditorMessagesFeatureClass(mvceditor::AppClass& app)
+t4p::EditorMessagesFeatureClass::EditorMessagesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
-void mvceditor::EditorMessagesFeatureClass::AddViewMenuItems(wxMenu *viewMenu) {
-	viewMenu->Append(mvceditor::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
+void t4p::EditorMessagesFeatureClass::AddViewMenuItems(wxMenu *viewMenu) {
+	viewMenu->Append(t4p::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
 		_("Editor Messages"));
 }
 
-void mvceditor::EditorMessagesFeatureClass::OnMenu(wxCommandEvent& event) {
+void t4p::EditorMessagesFeatureClass::OnMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
 	if (window) {
 		SetFocusToToolsWindow(window);
 	}
 	else {
-		wxWindow* panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
-		wxBitmap msgBitmap = mvceditor::IconImageAsset(wxT("editor-messages"));
+		wxWindow* panel = new t4p::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
+		wxBitmap msgBitmap = t4p::IconImageAsset(wxT("editor-messages"));
 		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);
 	}
 }
 
-void mvceditor::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
+void t4p::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 
 	// in MSW ignore log messages dealting with SetFocus() 
 	// If we don't ignore this, the app will stack overflow when the app is minized 
@@ -145,35 +145,35 @@ void mvceditor::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const w
 		return;
 	}
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
-	mvceditor::EditorMessagesPanelClass* panel = NULL;
+	t4p::EditorMessagesPanelClass* panel = NULL;
 	if (window) {
-		panel = (mvceditor::EditorMessagesPanelClass*)window;
+		panel = (t4p::EditorMessagesPanelClass*)window;
 		SetFocusToToolsWindow(window);
 	}
 	else {
-		panel = new mvceditor::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
-		wxBitmap msgBitmap = mvceditor::IconImageAsset(wxT("editor-messages"));
+		panel = new t4p::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
+		wxBitmap msgBitmap = t4p::IconImageAsset(wxT("editor-messages"));
 		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);
 	}
 	panel->AddMessage(level, msg, timestamp);
 }
 
-void mvceditor::EditorMessagesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::EditorMessagesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_EDITOR_MESSAGES] = wxT("Editor-Messages");
+	menuItemIds[t4p::MENU_EDITOR_MESSAGES] = wxT("Editor-Messages");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-mvceditor::EditorMessagesLoggerClass::EditorMessagesLoggerClass(mvceditor::EditorMessagesFeatureClass& feature)
+t4p::EditorMessagesLoggerClass::EditorMessagesLoggerClass(t4p::EditorMessagesFeatureClass& feature)
 	: wxLog()
 	, Feature(feature) {
 	SetLogLevel(wxLOG_Message);
 }
 
-void mvceditor::EditorMessagesLoggerClass::DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
+void t4p::EditorMessagesLoggerClass::DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
 	Feature.AddMessage(level, msg, info.timestamp);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::EditorMessagesFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_EDITOR_MESSAGES, mvceditor::EditorMessagesFeatureClass::OnMenu)
+BEGIN_EVENT_TABLE(t4p::EditorMessagesFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_EDITOR_MESSAGES, t4p::EditorMessagesFeatureClass::OnMenu)
 END_EVENT_TABLE()

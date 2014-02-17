@@ -22,19 +22,19 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRECENTFILESFEATURECLASS_H__
-#define __MVCEDITORRECENTFILESFEATURECLASS_H__
+#ifndef __T4P_RECENTFILESFEATURECLASS_H__
+#define __T4P_RECENTFILESFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <wx/docview.h>
 
-namespace mvceditor {
+namespace t4p {
 
 class RecentFilesFeatureClass : public FeatureClass {
 
 public:
 
-	RecentFilesFeatureClass(mvceditor::AppClass& app);
+	RecentFilesFeatureClass(t4p::AppClass& app);
 
 	void AddFileMenuItems(wxMenu* fileMenu);
 
@@ -63,7 +63,7 @@ private:
 	 * when a file has been opened, add it to the recent
 	 * list.
 	 */
-	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
 	 * when a file has been created, add it to the recent

@@ -22,23 +22,23 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CODECONTROLSTYLES_H
-#define __MVCEDITOR_CODECONTROLSTYLES_H
+#ifndef __T4P_CODECONTROLSTYLES_H
+#define __T4P_CODECONTROLSTYLES_H
 
 #include <globals/CodeControlOptionsClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Initializes the color schemes for the source code editor.
  * These are the hard-coded program defaults only.
  */
-void CodeControlStylesInit(mvceditor::CodeControlOptionsClass& options);
+void CodeControlStylesInit(t4p::CodeControlOptionsClass& options);
 
 /**
  * Set the color scheme to the default scheme
  */
-void CodeControlStylesSetTheme(mvceditor::CodeControlOptionsClass& options, const wxString& theme);
+void CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxString& theme);
 
 /**
  * @return all of the theme names

@@ -22,13 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CALLSTACKACTIONCLASS_H__
-#define __MVCEDITOR_CALLSTACKACTIONCLASS_H__
+#ifndef __T4P_CALLSTACKACTIONCLASS_H__
+#define __T4P_CALLSTACKACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <language/CallStackClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Generates the call stack file in a background thread. This class
@@ -37,20 +37,20 @@ namespace mvceditor {
  * EVENT_CALL_STACK_COMPLETE event as well
  * 
  */
-class CallStackActionClass : public mvceditor::GlobalActionClass {
+class CallStackActionClass : public t4p::GlobalActionClass {
 
 public:
 
 	/**
 	 * @param runningThreads will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
 	 */
-	CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 	
 	/**
 	 * The SetCallStackStart method needs to
 	 * be called before Init() so that we can know where to start iterating code from.
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 	
 	/**
 	 * The file, class, and method where to start the call stack recursion.
@@ -70,13 +70,13 @@ private:
 	 * This is used by the call stack class to find out the file name (full paths) of the
 	 * classes / methods.
 	 */
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 	
 	/**
 	 * Used to generate the call stack file (file of all function calls of a URL); call stack 
 	 * file is required by the ViewInfos detector
 	 */
-	mvceditor::CallStackClass CallStack;
+	t4p::CallStackClass CallStack;
 	
 	/**
 	 * The results of the call stack will be written to this file.

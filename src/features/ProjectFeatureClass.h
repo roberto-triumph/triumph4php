@@ -29,7 +29,7 @@
 #include <features/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // defined below
 class ProjectPreferencesPanelClass;
@@ -47,7 +47,7 @@ public:
 	/**
 	 * Create a new instance of ProjectFeatureClass.
 	 */
-	ProjectFeatureClass(mvceditor::AppClass& app);
+	ProjectFeatureClass(t4p::AppClass& app);
 	
 	~ProjectFeatureClass();
 
@@ -120,19 +120,19 @@ protected:
 	void OnSourcesListDoubleClick(wxCommandEvent& event);
 public:
 
-	ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project);
+	ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project);
 
 private:
 
 	/**
 	 * Reference that gets updated only when the user clicks OK
 	 */
-	mvceditor::ProjectClass& Project;
+	t4p::ProjectClass& Project;
 
 	/**
 	 * The project that the user edits
 	 */
-	mvceditor::ProjectClass EditedProject;
+	t4p::ProjectClass EditedProject;
 
 	/**
 	 * add the project sources to the list box.
@@ -152,19 +152,19 @@ protected:
 
 public:
 
-	ProjectSourceDialogClass(wxWindow* parent, mvceditor::SourceClass& source);
+	ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source);
 
 private:
 
 	/**
 	 * The source that will get updated when the user clicks OK
 	 */
-	mvceditor::SourceClass& Source;
+	t4p::SourceClass& Source;
 
 	/**
 	 * The source being edited by the user
 	 */
-	mvceditor::SourceClass EditedSource;
+	t4p::SourceClass EditedSource;
 };
 
 /**
@@ -198,33 +198,33 @@ public:
 	 *        include/exclude wildcards have been changed. This list also includes any completely
 	 *        new projects as well.
 	 */
-	ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects, 
-		std::vector<mvceditor::ProjectClass>& removedProjects,
-		std::vector<mvceditor::ProjectClass>& touchedProjects);
+	ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects, 
+		std::vector<t4p::ProjectClass>& removedProjects,
+		std::vector<t4p::ProjectClass>& touchedProjects);
 
 private:
 
 	/**
 	 * The list that will get updated once the user clicks OK
 	 */
-	std::vector<mvceditor::ProjectClass>& Projects;
+	std::vector<t4p::ProjectClass>& Projects;
 
 	/**
 	 * The projects being edited by the user.
 	 */
-	std::vector<mvceditor::ProjectClass> EditedProjects;
+	std::vector<t4p::ProjectClass> EditedProjects;
 
 	/**
 	 * The list of projects that the user has decided to remove. This list will
 	 * get populated only when the user clicks OK (and has removed a project)
 	 */
-	std::vector<mvceditor::ProjectClass>& RemovedProjects;
+	std::vector<t4p::ProjectClass>& RemovedProjects;
 
 	/**
 	 * The list of projects that the user has added/modified/removed source directories. This list will
 	 * get populated only when the user clicks OK (and has touched a project)
 	 */
-	std::vector<mvceditor::ProjectClass>& TouchedProjects;
+	std::vector<t4p::ProjectClass>& TouchedProjects;
 
 	/**
 	 * add the project labels to the check list box
@@ -236,7 +236,7 @@ private:
 	/**
 	 * @param project to add to both the edited data structure and the GUI list
 	 */
-	void AddProject(const mvceditor::ProjectClass& project);
+	void AddProject(const t4p::ProjectClass& project);
 
 };
 

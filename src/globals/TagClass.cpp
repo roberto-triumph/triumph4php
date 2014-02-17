@@ -25,7 +25,7 @@
 #include <globals/TagClass.h>
 
 
-mvceditor::TagClass::TagClass()
+t4p::TagClass::TagClass()
 	: Identifier()
 	, ClassName()
 	, NamespaceName()
@@ -47,7 +47,7 @@ mvceditor::TagClass::TagClass()
 		
 }
 
-mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
+t4p::TagClass::TagClass(const t4p::TagClass& src)
 	: Identifier()
 	, ClassName()
 	, NamespaceName()
@@ -69,11 +69,11 @@ mvceditor::TagClass::TagClass(const mvceditor::TagClass& src)
 	Copy(src);
 }
 
-void mvceditor::TagClass::operator=(const TagClass& src) {
+void t4p::TagClass::operator=(const TagClass& src) {
 	Copy(src);
 }
 
-void mvceditor::TagClass::Copy(const mvceditor::TagClass& src) {
+void t4p::TagClass::Copy(const t4p::TagClass& src) {
 	Identifier = src.Identifier;
 	ClassName = src.ClassName;
 	NamespaceName = src.NamespaceName;
@@ -96,19 +96,19 @@ void mvceditor::TagClass::Copy(const mvceditor::TagClass& src) {
 	FileIsNew = src.FileIsNew;
 }
 
-bool mvceditor::TagClass::operator<(const mvceditor::TagClass& a) const {
+bool t4p::TagClass::operator<(const t4p::TagClass& a) const {
 	return Key.caseCompare(a.Key, 0) < 0;
 }
 
-bool mvceditor::TagClass::operator==(const mvceditor::TagClass& a) const {
+bool t4p::TagClass::operator==(const t4p::TagClass& a) const {
 	return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
 } 
 
-bool mvceditor::TagClass::IsKeyEqualTo(const UnicodeString& key) const {
+bool t4p::TagClass::IsKeyEqualTo(const UnicodeString& key) const {
 	return Key.caseCompare(key, 0) == 0;
 }
 
-void mvceditor::TagClass::Clear() {
+void t4p::TagClass::Clear() {
 	Identifier.remove();
 	ClassName.remove();
 	NamespaceName.remove();
@@ -129,36 +129,36 @@ void mvceditor::TagClass::Clear() {
 	FileIsNew = false;
 }
 
-mvceditor::TagClass mvceditor::TagClass::MakeNamespace(const UnicodeString& namespaceName) {
-	mvceditor::TagClass namespaceItem;
-	namespaceItem.Type = mvceditor::TagClass::NAMESPACE;
+t4p::TagClass t4p::TagClass::MakeNamespace(const UnicodeString& namespaceName) {
+	t4p::TagClass namespaceItem;
+	namespaceItem.Type = t4p::TagClass::NAMESPACE;
 	namespaceItem.NamespaceName = namespaceName;
 	namespaceItem.Identifier = namespaceName;
 	namespaceItem.Key = namespaceName;
 	return namespaceItem;
 }
 
-wxFileName mvceditor::TagClass::FileName() const {
+wxFileName t4p::TagClass::FileName() const {
 	wxFileName fileName(FullPath);
 	return fileName;
 }
 
-wxString  mvceditor::TagClass::GetFullPath() const {
+wxString  t4p::TagClass::GetFullPath() const {
 	return FullPath;
 }
 
-void mvceditor::TagClass::SetFullPath(const wxString& fullPath) {
+void t4p::TagClass::SetFullPath(const wxString& fullPath) {
 	FullPath = fullPath;
 }
 
-bool mvceditor::TagClass::HasParameters() const {
+bool t4p::TagClass::HasParameters() const {
 
 	// watch out for default argument of "array()"
 	// look for the function name followed by parentheses
 	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
 }
 
-UnicodeString mvceditor::TagClass::FullyQualifiedClassName() const {
+UnicodeString t4p::TagClass::FullyQualifiedClassName() const {
 	UnicodeString qualifiedName = NamespaceName;
 	if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));
@@ -167,7 +167,7 @@ UnicodeString mvceditor::TagClass::FullyQualifiedClassName() const {
 	return qualifiedName;
 }
 
-mvceditor::TraitTagClass::TraitTagClass() 
+t4p::TraitTagClass::TraitTagClass() 
 	: TraitClassName()
 	, Aliased()
 	, InsteadOfs() 
@@ -175,7 +175,7 @@ mvceditor::TraitTagClass::TraitTagClass()
 		
 }
 
-mvceditor::FileTagClass::FileTagClass() 
+t4p::FileTagClass::FileTagClass() 
 	: FullPath()
 	, DateTime()
 	, FileId(0)
@@ -185,7 +185,7 @@ mvceditor::FileTagClass::FileTagClass()
 
 }
 
-bool mvceditor::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModifiedDateTime) const {
+bool t4p::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModifiedDateTime) const {
 	if (IsNew || !IsParsed) {
 		return true;
 	}
@@ -201,7 +201,7 @@ bool mvceditor::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModified
 	return modified;
 }
 
-void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, wxDateTime modTime, bool isParsed) {
+void t4p::FileTagClass::MakeNew(const wxFileName& fileName, wxDateTime modTime, bool isParsed) {
 	wxASSERT_MSG(modTime.IsValid(), _("file modification time is not valid"));
 	FullPath = fileName.GetFullPath();
 	DateTime = modTime;
@@ -210,7 +210,7 @@ void mvceditor::FileTagClass::MakeNew(const wxFileName& fileName, wxDateTime mod
 	IsNew = false;
 }
 
-wxString mvceditor::FileTagClass::Name() const {
+wxString t4p::FileTagClass::Name() const {
 	wxFileName fileName(FullPath);
 	return fileName.GetFullName();
 }

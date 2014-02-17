@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <globals/String.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <ActionTestFixtureClass.h>
 #include <DatabaseTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
@@ -41,8 +41,8 @@ class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass,
 
 public:
 
-	mvceditor::SqlMetaDataActionClass SqlMetaDataAction;
-	mvceditor::SqlResourceFinderClass Results;
+	t4p::SqlMetaDataActionClass SqlMetaDataAction;
+	t4p::SqlResourceFinderClass Results;
 
 	SqlMetaDataActionTestFixtureClass()
 		: ActionTestFixtureClass()
@@ -51,19 +51,19 @@ public:
 		, FileTestFixtureClass(wxT("metadata_fetch"))
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
 		, Results() {
-		mvceditor::DatabaseTagClass dbTag;
+		t4p::DatabaseTagClass dbTag;
 		dbTag.Schema = UNICODE_STRING_SIMPLE("metadata_fetch");
 
 		// user name, pwd are #defines come from the premake script premake_opts.lua
 		dbTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		dbTag.User = mvceditor::CharToIcu(UserName().c_str());
-		dbTag.Password = mvceditor::CharToIcu(Password().c_str());
+		dbTag.User = t4p::CharToIcu(UserName().c_str());
+		dbTag.Password = t4p::CharToIcu(Password().c_str());
 		Globals.DatabaseTags.push_back(dbTag);
 
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
-		Globals.ResourceCacheSession.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-		SqliteTestFixtureClass::CreateDatabase(Globals.ResourceCacheSession, mvceditor::ResourceSqlSchemaAsset());
+		Globals.ResourceCacheSession.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+		SqliteTestFixtureClass::CreateDatabase(Globals.ResourceCacheSession, t4p::ResourceSqlSchemaAsset());
 		Results.InitSession(&Globals.ResourceCacheSession);
 		CreateTable();
 	}
@@ -72,7 +72,7 @@ public:
 		CHECK(DatabaseTestFixtureClass::Exec("CREATE TABLE my_users (id INT, name VARCHAR(255) NOT NULL);"));
 	}
 
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event) {
+	void OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event) {
 	}
 
 	DECLARE_EVENT_TABLE()

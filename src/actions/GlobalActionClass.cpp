@@ -24,33 +24,33 @@
  */
 #include <actions/GlobalActionClass.h>
 
-mvceditor::GlobalActionClass::GlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::GlobalActionClass::GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) {
 
 }
 
-bool mvceditor::GlobalActionClass::DoAsync() {
+bool t4p::GlobalActionClass::DoAsync() {
 	return true;
 }
 
-mvceditor::InitializerGlobalActionClass::InitializerGlobalActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::InitializerGlobalActionClass::InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) {
 
 }
 
-bool mvceditor::InitializerGlobalActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::InitializerGlobalActionClass::Init(t4p::GlobalsClass& globals) {
 	Work(globals);
 	
-	mvceditor::ActionEventClass evt(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, wxT(""));
+	t4p::ActionEventClass evt(GetEventId(), t4p::EVENT_ACTION_COMPLETE, wxT(""));
 	PostEvent(evt);
 	return true;
 }
 
 
-bool mvceditor::InitializerGlobalActionClass::DoAsync() {
+bool t4p::InitializerGlobalActionClass::DoAsync() {
 	return false;
 }
 
-void mvceditor::InitializerGlobalActionClass::BackgroundWork() {
+void t4p::InitializerGlobalActionClass::BackgroundWork() {
 	
 }

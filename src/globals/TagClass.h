@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGCLASS_H__
-#define __MVCEDITOR_TAGCLASS_H__
+#ifndef __T4P_TAGCLASS_H__
+#define __T4P_TAGCLASS_H__
 
 #include <globals/String.h>
 #include <unicode/unistr.h>
@@ -32,7 +32,7 @@
 #include <wx/filename.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class represents each tag we have found in the user's source code.  
@@ -166,15 +166,15 @@ public:
 	int SourceId;
 	
 	TagClass();
-	TagClass(const mvceditor::TagClass& src);
+	TagClass(const t4p::TagClass& src);
 
-	static mvceditor::TagClass MakeNamespace(const UnicodeString& namespaceName);
+	static t4p::TagClass MakeNamespace(const UnicodeString& namespaceName);
 	
 	/**
 	 * Clones a TagClass
 	 */
 	void operator=(const TagClass& src);
-	void Copy(const mvceditor::TagClass& src);
+	void Copy(const t4p::TagClass& src);
 	
 	/**
 	 * Defined a comparison function so that sorting algorithms work for tag containers. A tag is "less"

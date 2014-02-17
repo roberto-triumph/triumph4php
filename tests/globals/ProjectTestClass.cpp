@@ -24,14 +24,14 @@
  */
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <globals/ProjectClass.h>
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
 
 public:
 
-	mvceditor::ProjectClass Project;
+	t4p::ProjectClass Project;
 
 	ProjectFixtureClass() 
 	: FileTestFixtureClass(wxT("project_test"))
@@ -46,7 +46,7 @@ public:
 	}
 
 	void AddSrc(const wxString& srcDir, wxString includeWildcards = wxT("*.*"), wxString excludeWildcards = wxEmptyString) {
-		mvceditor::SourceClass src;
+		t4p::SourceClass src;
 		src.RootDirectory.AssignDir(TestProjectDir + srcDir);
 		src.SetIncludeWildcards(includeWildcards);
 		src.SetExcludeWildcards(excludeWildcards);
@@ -61,7 +61,7 @@ TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
 	AddSrc(wxT("controllers"));
 	AddSrc(wxT("models"));
 
-	std::vector<mvceditor::SourceClass> sources = Project.Sources;
+	std::vector<t4p::SourceClass> sources = Project.Sources;
 	CHECK_VECTOR_SIZE(2, sources);
 
 	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), sources[0].RootDirectory.GetFullPath());
@@ -70,10 +70,10 @@ TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
 
 TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
 	AddSrc(wxT("controllers"), wxT("*.php"), wxT("cache.php"));
-	std::vector<mvceditor::SourceClass> sources = Project.AllPhpSources();
+	std::vector<t4p::SourceClass> sources = Project.AllPhpSources();
 	CHECK_VECTOR_SIZE(1, sources);
 
-	mvceditor::SourceClass actual = sources[0];
+	t4p::SourceClass actual = sources[0];
 	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
 	CHECK_EQUAL(wxT("cache.php"), actual.ExcludeWildcardsString());
 }
@@ -82,10 +82,10 @@ TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
 TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnExcludedWildcards) {
 	AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
 
-	std::vector<mvceditor::SourceClass> sources = Project.AllSources();
+	std::vector<t4p::SourceClass> sources = Project.AllSources();
 	CHECK_VECTOR_SIZE(1, sources);
 
-	mvceditor::SourceClass actual = sources[0];
+	t4p::SourceClass actual = sources[0];
 	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
 	CHECK_EQUAL(wxT("*.css;*.txt;*.php;*.sql"), actual.IncludeWildcardsString());
 	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());

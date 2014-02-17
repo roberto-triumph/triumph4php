@@ -33,7 +33,7 @@
 #include <string>
 #include <algorithm>
  
-mvceditor::DatabaseTagClass::DatabaseTagClass()
+t4p::DatabaseTagClass::DatabaseTagClass()
 	: Label()
 	, Host()
 	, User()
@@ -47,7 +47,7 @@ mvceditor::DatabaseTagClass::DatabaseTagClass()
 		
 }
 
-mvceditor::DatabaseTagClass::DatabaseTagClass(const mvceditor::DatabaseTagClass& other) 
+t4p::DatabaseTagClass::DatabaseTagClass(const t4p::DatabaseTagClass& other) 
 	: Label()
 	, Host()
 	, User()
@@ -61,7 +61,7 @@ mvceditor::DatabaseTagClass::DatabaseTagClass(const mvceditor::DatabaseTagClass&
 	Copy(other);
 }
 
-void mvceditor::DatabaseTagClass::Copy(const mvceditor::DatabaseTagClass& src) {
+void t4p::DatabaseTagClass::Copy(const t4p::DatabaseTagClass& src) {
 	Label = src.Label;
 	Host = src.Host;
 	User = src.User;
@@ -74,17 +74,17 @@ void mvceditor::DatabaseTagClass::Copy(const mvceditor::DatabaseTagClass& src) {
 	IsEnabled = src.IsEnabled;
 }
 
-bool mvceditor::DatabaseTagClass::SameAs(const mvceditor::DatabaseTagClass& other) {
+bool t4p::DatabaseTagClass::SameAs(const t4p::DatabaseTagClass& other) {
 	return Host.caseCompare(other.Host, 0) == 0 && Schema.caseCompare(other.Schema, 0) == 0;
 }
 
-UnicodeString mvceditor::DatabaseTagClass::ConnectionHash() const {
+UnicodeString t4p::DatabaseTagClass::ConnectionHash() const {
 	UnicodeString hash = Host + UNICODE_STRING_SIMPLE("--") + Schema + UNICODE_STRING_SIMPLE("---") +
-		mvceditor::WxToIcu(FileName.GetFullPath());
+		t4p::WxToIcu(FileName.GetFullPath());
 	return hash;
 }
 
-mvceditor::SqlResultClass::SqlResultClass() 
+t4p::SqlResultClass::SqlResultClass() 
 	: Error()
 	, Row()
 	, StringResults()
@@ -99,11 +99,11 @@ mvceditor::SqlResultClass::SqlResultClass()
 
 }
 
-mvceditor::SqlResultClass::~SqlResultClass() {
+t4p::SqlResultClass::~SqlResultClass() {
 	Close();
 }
 
-void mvceditor::SqlResultClass::Close() {
+void t4p::SqlResultClass::Close() {
 	ColumnNames.clear();
 	TableNames.clear();
 	StringResults.clear();
@@ -112,7 +112,7 @@ void mvceditor::SqlResultClass::Close() {
 	Success = false;
 }
 
-void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::session& session, soci::statement& stmt, 
+void t4p::SqlResultClass::Init(t4p::SqlQueryClass& query, soci::session& session, soci::statement& stmt, 
 									 const UnicodeString& sqlString, bool hasRows) {
 	ColumnNames.clear();
 	TableNames.clear();
@@ -144,19 +144,19 @@ void mvceditor::SqlResultClass::Init(mvceditor::SqlQueryClass& query, soci::sess
 	}
 }
 
-mvceditor::SqlQueryClass::SqlQueryClass()
+t4p::SqlQueryClass::SqlQueryClass()
 	: DatabaseTag() {
 }
 
-mvceditor::SqlQueryClass::SqlQueryClass(const mvceditor::SqlQueryClass& other) 
+t4p::SqlQueryClass::SqlQueryClass(const t4p::SqlQueryClass& other) 
 	: DatabaseTag(other.DatabaseTag) {
 }
 
-void mvceditor::SqlQueryClass::Copy(const mvceditor::SqlQueryClass& src) {
+void t4p::SqlQueryClass::Copy(const t4p::SqlQueryClass& src) {
 	DatabaseTag.Copy(src.DatabaseTag);
 }
 
-void mvceditor::SqlQueryClass::Close(soci::statement& stmt) {
+void t4p::SqlQueryClass::Close(soci::statement& stmt) {
 	try {
 		stmt.clean_up();
 	} catch (std::exception const& e) {
@@ -164,7 +164,7 @@ void mvceditor::SqlQueryClass::Close(soci::statement& stmt) {
 	}
 }
 
-void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& stmt) {
+void t4p::SqlQueryClass::Close(soci::session& session, soci::statement& stmt) {
 	try {
 		stmt.clean_up();
 		session.close();
@@ -173,32 +173,32 @@ void mvceditor::SqlQueryClass::Close(soci::session& session, soci::statement& st
 	}
 }
 
-bool mvceditor::SqlQueryClass::Connect(soci::session& session, UnicodeString& error) {
+bool t4p::SqlQueryClass::Connect(soci::session& session, UnicodeString& error) {
 		switch(DatabaseTag.Driver) {
-		case mvceditor::DatabaseTagClass::MYSQL:
+		case t4p::DatabaseTagClass::MYSQL:
 			return ConnectMysql(session, error);
-		case mvceditor::DatabaseTagClass::SQLITE:
+		case t4p::DatabaseTagClass::SQLITE:
 			return ConnectSqlite(session, error);
 		}
 		error = UNICODE_STRING_SIMPLE("bad driver");
 		return false;
 }
 	
-bool mvceditor::SqlQueryClass::ConnectSqlite(soci::session& session, UnicodeString& error) {
-		std::string stdDbName = mvceditor::WxToChar(DatabaseTag.FileName.GetFullPath());
+bool t4p::SqlQueryClass::ConnectSqlite(soci::session& session, UnicodeString& error) {
+		std::string stdDbName = t4p::WxToChar(DatabaseTag.FileName.GetFullPath());
 		bool success = false;
 		try {
 			session.open(*soci::factory_sqlite3(), stdDbName);
 			success = true;
 		} catch (soci::soci_error const& e) {
-			error = mvceditor::CharToIcu(e.what());
+			error = t4p::CharToIcu(e.what());
 		} catch (std::exception const& e) {
-			error = mvceditor::CharToIcu(e.what());
+			error = t4p::CharToIcu(e.what());
 		}
 		return success;
 }
 
-bool mvceditor::SqlQueryClass::ConnectMysql(soci::session& session, UnicodeString& error) {
+bool t4p::SqlQueryClass::ConnectMysql(soci::session& session, UnicodeString& error) {
 	bool success = false;
 	UnicodeString host = DatabaseTag.Host;
 	
@@ -229,16 +229,16 @@ bool mvceditor::SqlQueryClass::ConnectMysql(soci::session& session, UnicodeStrin
 	connString +=  UNICODE_STRING_SIMPLE("'");
 	
 	
-	std::string s = mvceditor::IcuToChar(connString);
+	std::string s = t4p::IcuToChar(connString);
 	try {
 		session.open(*soci::factory_mysql(), s.c_str());
 		success = true;
 	} catch (soci::mysql_soci_error const& e) {
 		success = false;
-		error = mvceditor::CharToIcu(e.what());	
+		error = t4p::CharToIcu(e.what());	
 	} catch (std::exception const& e) {
 		success = false;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 		if (host.caseCompare(UNICODE_STRING_SIMPLE("localhost"), 0) == 0) {
 			error += UNICODE_STRING_SIMPLE("localhost connections are routed to use TCP/IP. Is the server listening for TCP/IP connections?");
 		}
@@ -246,10 +246,10 @@ bool mvceditor::SqlQueryClass::ConnectMysql(soci::session& session, UnicodeStrin
 	return success;
 }
 
-bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlResultClass& results, const UnicodeString& query) {
+bool t4p::SqlQueryClass::Execute(soci::session& session, t4p::SqlResultClass& results, const UnicodeString& query) {
 	results.Success = false;
 	try {
-		std::string queryStd = mvceditor::IcuToChar(query);
+		std::string queryStd = t4p::IcuToChar(query);
 		soci::statement stmt = (session.prepare << queryStd, soci::into(results.Row));
 		
 		// dont pass TRUE to execute; it will fetch the first row and it makes it 
@@ -263,12 +263,12 @@ bool mvceditor::SqlQueryClass::Execute(soci::session& session, mvceditor::SqlRes
 		stmt.clean_up();
 	} catch (std::exception const& e) {
 		results.Success = false;
-		results.Error = mvceditor::CharToIcu(e.what());
+		results.Error = t4p::CharToIcu(e.what());
 	}
 	return results.Success;
 }
 
-bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& error) {
+bool t4p::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& error) {
 	bool success = false;
 	try {
 		stmt.execute(false);
@@ -279,23 +279,23 @@ bool mvceditor::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& err
 		
 	} catch (std::exception const& e) {
 		success = false;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 	}
 	return success;
 }
 
-bool mvceditor::SqlQueryClass::More(soci::statement& stmt, bool& hasError, UnicodeString& error) {
+bool t4p::SqlQueryClass::More(soci::statement& stmt, bool& hasError, UnicodeString& error) {
 	bool ret = false;
 	try {
 		ret = stmt.fetch() && stmt.got_data();
 	} catch (std::exception const& e) {
 		hasError = true;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 	}
 	return ret;
 }
 
-long long mvceditor::SqlQueryClass::GetAffectedRows(soci::statement& stmt) {
+long long t4p::SqlQueryClass::GetAffectedRows(soci::statement& stmt) {
 	long long rows = 0;
 	try {
 		rows = stmt.get_affected_rows();
@@ -305,24 +305,24 @@ long long mvceditor::SqlQueryClass::GetAffectedRows(soci::statement& stmt) {
 	return rows;
 }
 
-bool mvceditor::SqlQueryClass::ColumnNames(soci::row& row, std::vector<UnicodeString>& columnNames, UnicodeString& error) {
+bool t4p::SqlQueryClass::ColumnNames(soci::row& row, std::vector<UnicodeString>& columnNames, UnicodeString& error) {
 	bool data = false;
 	try {
 		for (size_t i = 0; i < row.size(); i++) {
 			soci::column_properties props = row.get_properties(i);
-			UnicodeString col = mvceditor::CharToIcu(props.get_name().c_str());
+			UnicodeString col = t4p::CharToIcu(props.get_name().c_str());
 			columnNames.push_back(col);
 		}
 		data = true;
 	}
 	catch (std::exception const& e) {
 		data = false;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 	}
 	return data;
 }
 
-bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statement& stmt, int columnCount, 
+bool t4p::SqlQueryClass::TableNames(soci::session& session, soci::statement& stmt, int columnCount, 
 	std::vector<UnicodeString>& tableNames, UnicodeString& error) {
 	bool data = false;
 	try {
@@ -336,7 +336,7 @@ bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statemen
 				MYSQL_FIELD* field = mysql_fetch_field(backend->result_);
 				const char* tbl = field->org_table;
 				
-				UnicodeString uniTable = mvceditor::CharToIcu(tbl);
+				UnicodeString uniTable = t4p::CharToIcu(tbl);
 				if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
 					tableNames.push_back(uniTable);
 				}
@@ -347,7 +347,7 @@ bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statemen
 			for (int i = 0; i < columnCount; ++i) {
 				const char* tbl = sqlite3_column_table_name(backend->stmt_, i);
 				if (tbl) {
-					UnicodeString uniTable = mvceditor::CharToIcu(tbl);
+					UnicodeString uniTable = t4p::CharToIcu(tbl);
 					if (std::find(tableNames.begin(), tableNames.end(), uniTable) == tableNames.end()) {
 						tableNames.push_back(uniTable);
 					}
@@ -358,12 +358,12 @@ bool mvceditor::SqlQueryClass::TableNames(soci::session& session, soci::statemen
 	}
 	catch (std::exception const& e) {
 		data = false;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 	}
 	return data;
 }
 
-bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& columnValues, std::vector<soci::indicator>& columnIndicators, UnicodeString& error) {
+bool t4p::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& columnValues, std::vector<soci::indicator>& columnIndicators, UnicodeString& error) {
 	bool data = false;
 	try {
 		for (size_t i = 0; i < row.size(); i++) {
@@ -406,7 +406,7 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 					}
 					break;
 				}
-				col = mvceditor::CharToIcu(out.str().c_str());
+				col = t4p::CharToIcu(out.str().c_str());
 			}
 			columnValues.push_back(col);
 		}
@@ -414,14 +414,14 @@ bool mvceditor::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString
 	}
 	catch (std::exception const& e) {
 		data = false;
-		error = mvceditor::CharToIcu(e.what());
+		error = t4p::CharToIcu(e.what());
 	}
 	return data;
 }
 
-void mvceditor::SqlQueryClass::ConnectionIdentifier(soci::session& session, mvceditor::ConnectionIdentifierClass& connectionIdentifier) {
+void t4p::SqlQueryClass::ConnectionIdentifier(soci::session& session, t4p::ConnectionIdentifierClass& connectionIdentifier) {
 	connectionIdentifier.Set(0);
-	if (mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
+	if (t4p::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
 		soci::mysql_session_backend* backend = static_cast<soci::mysql_session_backend*>(session.get_backend());
 		MYSQL* mysql = backend->conn_;
 		unsigned long id = mysql_thread_id(mysql);
@@ -429,12 +429,12 @@ void mvceditor::SqlQueryClass::ConnectionIdentifier(soci::session& session, mvce
 	}
 }
 
-bool mvceditor::SqlQueryClass::KillConnection(soci::session& session, 
-											  mvceditor::ConnectionIdentifierClass& connectionIdentifier, 
+bool t4p::SqlQueryClass::KillConnection(soci::session& session, 
+											  t4p::ConnectionIdentifierClass& connectionIdentifier, 
 											  UnicodeString& error) {
 	bool ret = false;
 	int id = connectionIdentifier.Get();
-	if (id > 0 && mvceditor::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
+	if (id > 0 && t4p::DatabaseTagClass::MYSQL == DatabaseTag.Driver) {
 		try {
 			std::ostringstream stream;
 			stream << "KILL " << connectionIdentifier.Get();
@@ -443,35 +443,35 @@ bool mvceditor::SqlQueryClass::KillConnection(soci::session& session,
 		} 
 		catch (std::exception const& e) {
 			ret = false;
-			error = mvceditor::CharToIcu(e.what());
+			error = t4p::CharToIcu(e.what());
 		}
 	}
 	return ret;
 }
 
-mvceditor::ConnectionIdentifierClass::ConnectionIdentifierClass() 
+t4p::ConnectionIdentifierClass::ConnectionIdentifierClass() 
 	: Mutex()
 	, ConnectionId(0) {
 }
 
-unsigned long mvceditor::ConnectionIdentifierClass::Get() {
+unsigned long t4p::ConnectionIdentifierClass::Get() {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
 	return ConnectionId;
 }
 
-void mvceditor::ConnectionIdentifierClass::Set(unsigned long id) {
+void t4p::ConnectionIdentifierClass::Set(unsigned long id) {
 	wxMutexLocker locker(Mutex);
 	wxASSERT(locker.IsOk());
 	ConnectionId = id;
 }
 
-mvceditor::DatabaseTagFinderClass::DatabaseTagFinderClass()
+t4p::DatabaseTagFinderClass::DatabaseTagFinderClass()
 	: SqliteFinderClass() {
 }
 
-std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
-	std::vector<mvceditor::DatabaseTagClass> allDbTags;
+std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
+	std::vector<t4p::DatabaseTagClass> allDbTags;
 	if (sourceDirectories.empty()) {
 		return allDbTags;
 	}
@@ -480,7 +480,7 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All(
 	sql += "FROM database_tags JOIN sources ON(sources.source_id = database_tags.source_id) ";
 	sql += "WHERE directory IN(";
 	for (size_t i = 0; i < sourceDirectories.size(); ++i) {
-		stdSourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+		stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -511,27 +511,27 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::DatabaseTagFinderClass::All(
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
-				mvceditor::DatabaseTagClass dbTag;
-				dbTag.Schema = mvceditor::CharToIcu(schema.c_str());
+				t4p::DatabaseTagClass dbTag;
+				dbTag.Schema = t4p::CharToIcu(schema.c_str());
 				if (driver == "MYSQL") {
-					dbTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+					dbTag.Driver = t4p::DatabaseTagClass::MYSQL;
 				}
-				dbTag.Host = mvceditor::CharToIcu(host.c_str());
+				dbTag.Host = t4p::CharToIcu(host.c_str());
 				dbTag.IsDetected = true;
 				dbTag.IsEnabled = true;
-				dbTag.Label = mvceditor::CharToIcu(label.c_str());
-				dbTag.Password = mvceditor::CharToIcu(password.c_str());
+				dbTag.Label = t4p::CharToIcu(label.c_str());
+				dbTag.Password = t4p::CharToIcu(password.c_str());
 				dbTag.Port = port;
-				dbTag.User = mvceditor::CharToIcu(user.c_str());
+				dbTag.User = t4p::CharToIcu(user.c_str());
 
 				allDbTags.push_back(dbTag);
 
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
-		mvceditor::EditorLogError(mvceditor::WARNING_OTHER, msg);
+		t4p::EditorLogError(t4p::WARNING_OTHER, msg);
 	}
 	return allDbTags;
 }

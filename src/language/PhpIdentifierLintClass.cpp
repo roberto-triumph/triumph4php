@@ -29,7 +29,7 @@
 #include <wx/ffile.h>
 #include <algorithm>
 
-static void AddMagicMethods(std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass>& methods) {
+static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
 
 	// magic methods, never unknown 
 	methods[UNICODE_STRING_SIMPLE("__construct")] = 1;
@@ -48,7 +48,7 @@ static void AddMagicMethods(std::map<UnicodeString, int, mvceditor::UnicodeStrin
 	methods[UNICODE_STRING_SIMPLE("__clone")] = 1;
 }
 
-mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
+t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 : Identifier()
 , File()
 , LineNumber(0)
@@ -57,7 +57,7 @@ mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 
 }
 
-mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const mvceditor::PhpIdentifierLintResultClass& src)
+t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const t4p::PhpIdentifierLintResultClass& src)
 : Identifier()
 , File()
 , LineNumber(0)
@@ -66,13 +66,13 @@ mvceditor::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const mvce
 	Copy(src);
 }
 
-mvceditor::PhpIdentifierLintResultClass& 
-mvceditor::PhpIdentifierLintResultClass::operator=(const mvceditor::PhpIdentifierLintResultClass& src) {
+t4p::PhpIdentifierLintResultClass& 
+t4p::PhpIdentifierLintResultClass::operator=(const t4p::PhpIdentifierLintResultClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::PhpIdentifierLintResultClass::Copy(const mvceditor::PhpIdentifierLintResultClass& src) {
+void t4p::PhpIdentifierLintResultClass::Copy(const t4p::PhpIdentifierLintResultClass& src) {
 	Identifier = src.Identifier;
 	File =  src.File;
 	LineNumber = src.LineNumber;
@@ -81,7 +81,7 @@ void mvceditor::PhpIdentifierLintResultClass::Copy(const mvceditor::PhpIdentifie
 }
 
 
-mvceditor::PhpIdentifierLintClass::PhpIdentifierLintClass(mvceditor::TagCacheClass& tagCache)
+t4p::PhpIdentifierLintClass::PhpIdentifierLintClass(t4p::TagCacheClass& tagCache)
 : ExpressionObserverClass()
 , Errors()
 , Parser() 
@@ -105,12 +105,12 @@ mvceditor::PhpIdentifierLintClass::PhpIdentifierLintClass(mvceditor::TagCacheCla
 	Parser.SetFunctionObserver(this);
 }
 
-void mvceditor::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
+void t4p::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-bool mvceditor::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName, 
-															std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
+bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName, 
+															std::vector<t4p::PhpIdentifierLintResultClass>& errors) {
 	Errors.clear();
 	FoundClasses.clear();
 	FoundMethods.clear();
@@ -129,19 +129,19 @@ bool mvceditor::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 	AddMagicMethods(FoundStaticMethods);
 	
 
-	File = mvceditor::WxToIcu(fileName.GetFullPath());
+	File = t4p::WxToIcu(fileName.GetFullPath());
 	pelet::LintResultsClass lintResult;
 
 	wxFFile file;
 	if (file.Open(fileName.GetFullPath(), wxT("rb"))) {
-		Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), lintResult);
+		Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName.GetFullPath()), lintResult);
 		errors = Errors;
 	}
 	return !errors.empty();
 }
 
-bool mvceditor::PhpIdentifierLintClass::ParseString(const UnicodeString& code, 
-															  std::vector<mvceditor::PhpIdentifierLintResultClass>& errors) {
+bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code, 
+															  std::vector<t4p::PhpIdentifierLintResultClass>& errors) {
 	
 	Errors.clear();
 	FoundClasses.clear();
@@ -169,7 +169,7 @@ bool mvceditor::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 	return !errors.empty();
 }
 
-void mvceditor::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& namespaceName, 
+void t4p::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& namespaceName, 
 													 const UnicodeString& variableName, 
 													 const UnicodeString& variableValue, 
 													 const UnicodeString& comment, 
@@ -177,52 +177,52 @@ void mvceditor::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeStri
 
 }
 
-void mvceditor::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	
 }
 
-void mvceditor::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
+void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
 											const UnicodeString& comment, const int lineNumber) {
 }
 
-void mvceditor::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
+void t4p::PhpIdentifierLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionVariableFound(pelet::VariableClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionVariableFound(pelet::VariableClass* expression) {
 	CheckVariable(expression);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
 	CheckExpression(&expression->Destination);
 	CheckExpression(expression->Expression);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
 	CheckExpression(&expression->Variable);
 	CheckExpression(expression->RightOperand);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
 	CheckExpression(expression->LeftOperand);
 	CheckExpression(expression->RightOperand);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
 	CheckExpression(expression->Operand);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
 	CheckVariable(&expression->Variable);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
 	CheckExpression(expression->Expression1);
 	CheckExpression(expression->Expression2);
 	if (expression->Expression3) {
@@ -230,12 +230,12 @@ void mvceditor::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::T
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 	
 	// nothing as scalars cannot be undefined
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
 	std::vector<pelet::ExpressionClass*>::const_iterator constructorArg = expression->CallArguments.begin();
 	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
 		CheckExpression(*constructorArg);
@@ -252,21 +252,21 @@ void mvceditor::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewIns
 	}
 } 
 
-void mvceditor::PhpIdentifierLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
+void t4p::PhpIdentifierLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
 	
 	// global statement only contain "simple" variables, ie no function/method calls
 }
 
-void mvceditor::PhpIdentifierLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
+void t4p::PhpIdentifierLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
 
 	// static statements only contain "simple" variables, ie no function/method calls
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
+void t4p::PhpIdentifierLintClass::ExpressionIncludeFound(pelet::IncludeExpressionClass* expr) {
 	CheckExpression(expr->Expression);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
+void t4p::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
 	
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
@@ -288,7 +288,7 @@ void mvceditor::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExp
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
 
 	// check any array accesses in the destination variables
 	// ie $user[$name]
@@ -300,7 +300,7 @@ void mvceditor::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::Ass
 	CheckExpression(expression->Expression);
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
 
 	// check any array accesses in the destination variables
 	// ie $user[$name]
@@ -309,11 +309,11 @@ void mvceditor::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpress
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::ExpressionEvalFound(pelet::EvalExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::ExpressionEvalFound(pelet::EvalExpressionClass* expression) {
 	CheckExpression(expression->Expression);
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) {
+void t4p::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	switch (expr->ExpressionType) {
 	case pelet::ExpressionClass::ARRAY:
 		CheckArrayDefinition((pelet::ArrayExpressionClass*)expr);
@@ -372,7 +372,7 @@ void mvceditor::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* 
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
+void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 	if (var->ChainList.empty()) {
 		return;
 	}
@@ -417,13 +417,13 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 			CheckExpression(var->ChainList[i].ArrayAccess);
 		}
 		else if (!prop.IsArrayAccess) {
-			std::vector<mvceditor::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
+			std::vector<t4p::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
 			if (tags.empty()) {
-				mvceditor::PhpIdentifierLintResultClass lintResult;
+				t4p::PhpIdentifierLintResultClass lintResult;
 				lintResult.File = File;
 				lintResult.LineNumber = var->LineNumber;
 				lintResult.Pos = var->Pos;
-				lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
+				lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
 				lintResult.Identifier = prop.Name;
 				Errors.push_back(lintResult);
 			}
@@ -432,7 +432,7 @@ void mvceditor::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var)
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckArrayDefinition(pelet::ArrayExpressionClass* expr) {
+void t4p::PhpIdentifierLintClass::CheckArrayDefinition(pelet::ArrayExpressionClass* expr) {
 	std::vector<pelet::ArrayPairExpressionClass*>::const_iterator it;
 	for (it = expr->ArrayPairs.begin(); it != expr->ArrayPairs.end(); ++it) {
 		pelet::ArrayPairExpressionClass* pair = *it;
@@ -443,7 +443,7 @@ void mvceditor::PhpIdentifierLintClass::CheckArrayDefinition(pelet::ArrayExpress
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var) {
+void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var) {
 
 	// we check to see if the function is a native function first
 	// native functions never have a namespace
@@ -467,7 +467,7 @@ void mvceditor::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariableP
 	}
 	else if (!unqualifiedName.isEmpty()) {
 		// not found in our little cache. lookup in the big cache
-		mvceditor::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
+		t4p::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
 		if (result && !result->Empty()) {
 			FoundFunctions[unqualifiedName] = 1;
 			isUnknown = false;
@@ -493,7 +493,7 @@ void mvceditor::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariableP
 		}
 		else {
 			// not found in our little cache. lookup in the big cache
-			std::vector<mvceditor::TagClass> tags = TagCache.ExactFunction(functionName);
+			std::vector<t4p::TagClass> tags = TagCache.ExactFunction(functionName);
 			if (!tags.empty()) {
 				FoundFunctions[functionName] = 1;
 				isUnknown = false;
@@ -505,17 +505,17 @@ void mvceditor::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariableP
 		}
 	}
 	if (isUnknown) {
-		mvceditor::PhpIdentifierLintResultClass lintResult;
+		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
 		lintResult.LineNumber = var->LineNumber;
 		lintResult.Pos = var->Pos;
-		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION;
 		lintResult.Identifier = functionName;
 		Errors.push_back(lintResult);
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var) {
+void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var) {
 
 	// magic methods, constructors are always put in the cache automatically above
 	// this same code will work for those also
@@ -535,7 +535,7 @@ void mvceditor::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePro
 		isUnknown = true;
 	}
 	else {
-		std::vector<mvceditor::TagClass> tags = TagCache.ExactMethod(methodProp.Name, methodProp.IsStatic);
+		std::vector<t4p::TagClass> tags = TagCache.ExactMethod(methodProp.Name, methodProp.IsStatic);
 		if (!tags.empty() && !methodProp.IsStatic) {
 			FoundMethods[methodProp.Name] = 1;
 			isUnknown = false;
@@ -555,17 +555,17 @@ void mvceditor::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePro
 	}
 
 	if (isUnknown) {
-		mvceditor::PhpIdentifierLintResultClass lintResult;
+		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
 		lintResult.LineNumber = var->LineNumber;
 		lintResult.Pos = var->Pos;
-		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_METHOD;
 		lintResult.Identifier = methodProp.Name;
 		Errors.push_back(lintResult);
 	}
 }
 
-void mvceditor::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
+void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
 	bool isUnknown = false;
 	
 	// check out little cache, different maps depending on static vs instances methods
@@ -582,7 +582,7 @@ void mvceditor::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariableP
 		isUnknown = true;
 	}
 	else {
-		std::vector<mvceditor::TagClass> tags = TagCache.ExactProperty(propertyProp.Name, propertyProp.IsStatic);
+		std::vector<t4p::TagClass> tags = TagCache.ExactProperty(propertyProp.Name, propertyProp.IsStatic);
 		if (!tags.empty() && !propertyProp.IsStatic) {
 			FoundProperties[propertyProp.Name] = 1;
 			isUnknown = false;
@@ -602,18 +602,18 @@ void mvceditor::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariableP
 	}
 
 	if (isUnknown) {
-		mvceditor::PhpIdentifierLintResultClass lintResult;
+		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
 		lintResult.LineNumber = var->LineNumber;
 		lintResult.Pos = var->Pos;
-		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
 		lintResult.Identifier = propertyProp.Name;
 		Errors.push_back(lintResult);
 	}
 }
 
 
-void mvceditor::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression) {
 	if (className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||
 		className.compare(UNICODE_STRING_SIMPLE("self")) == 0 ||
 		className.compare(UNICODE_STRING_SIMPLE("static")) == 0) {
@@ -627,7 +627,7 @@ void mvceditor::PhpIdentifierLintClass::CheckClassName(const UnicodeString& clas
 		isUnknown = true;
 	}
 	else {
-		std::vector<mvceditor::TagClass> tags = TagCache.ExactClass(className);
+		std::vector<t4p::TagClass> tags = TagCache.ExactClass(className);
 		if (tags.empty()) {
 			isUnknown = true;
 			NotFoundClasses[className] = 1;
@@ -637,11 +637,11 @@ void mvceditor::PhpIdentifierLintClass::CheckClassName(const UnicodeString& clas
 		}
 	}
 	if (isUnknown) {
-		mvceditor::PhpIdentifierLintResultClass lintResult;
+		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
 		lintResult.LineNumber = expression->LineNumber;
 		lintResult.Pos = expression->Pos;
-		lintResult.Type = mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
 		lintResult.Identifier = className;
 		Errors.push_back(lintResult);	
 	}

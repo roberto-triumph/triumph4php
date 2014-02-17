@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CACHEDBVERSIONACTIONCLASS_H__
-#define __MVCEDITOR_CACHEDBVERSIONACTIONCLASS_H__
+#ifndef __T4P_CACHEDBVERSIONACTIONCLASS_H__
+#define __T4P_CACHEDBVERSIONACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <soci/soci.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This action will check the tag cache DB for all projects to make sure
@@ -38,13 +38,13 @@ namespace mvceditor {
  * schema file.
  * The action will only check the db files for enabled projects.
  */
-class TagCacheDbVersionActionClass : public mvceditor::GlobalActionClass {
+class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	void BackgroundWork();
 
@@ -71,13 +71,13 @@ private:
  * schema file.
  * The action will only check the db files for enabled projects.
  */
-class DetectorCacheDbVersionActionClass : public mvceditor::GlobalActionClass {
+class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 
 public:
 
-	DetectorCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	void BackgroundWork();
 

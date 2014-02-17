@@ -29,19 +29,19 @@
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>
 
-mvceditor::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(mvceditor::AppClass& app)
+t4p::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::OnFileNew(mvceditor::CodeControlEventClass& event) {
+void t4p::SyntaxHighlightFeatureClass::OnFileNew(t4p::CodeControlEventClass& event) {
 	ApplyPreferences(event.GetCodeControl());
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::OnFileOpen(mvceditor::CodeControlEventClass& event) {
+void t4p::SyntaxHighlightFeatureClass::OnFileOpen(t4p::CodeControlEventClass& event) {
 	ApplyPreferences(event.GetCodeControl());
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctrl) {
 
 	// set the lexer before setting the keywords
 	ctrl->SetLexer(wxSTC_LEX_HTML);
@@ -53,7 +53,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctr
 	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
 	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
 	// and 5 is for SGML and DTD keywords
-	mvceditor::PhpDocumentClass doc(&App.Globals);
+	t4p::PhpDocumentClass doc(&App.Globals);
 	ctrl->SetKeyWords(0, doc.GetHtmlKeywords());
 	ctrl->SetKeyWords(1, doc.GetJavascriptKeywords());
 	ctrl->SetKeyWords(4, doc.GetPhpKeywords());
@@ -85,14 +85,14 @@ void mvceditor::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctr
 	ctrl->IndicatorSetForeground(CODE_CONTROL_INDICATOR_PHP_LINT, *wxRED);
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetSqlOptions(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetSqlOptions(wxStyledTextCtrl* ctrl) {
 	ctrl->SetLexer(wxSTC_LEX_SQL);
 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	ctrl->SetStyleBits(5);
 
-	mvceditor::DatabaseTagClass emptyTag;
-	mvceditor::SqlDocumentClass doc(&App.Globals, emptyTag);
+	t4p::DatabaseTagClass emptyTag;
+	t4p::SqlDocumentClass doc(&App.Globals, emptyTag);
 	ctrl->SetKeyWords(0, doc.GetMySqlKeywords());
 	ctrl->SetKeyWords(1, wxT(""));
 	ctrl->SetKeyWords(2, wxT(""));
@@ -107,7 +107,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetSqlOptions(wxStyledTextCtrl* ctr
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctrl) {
 	ctrl->SetLexer(wxSTC_LEX_CSS);
 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
@@ -117,7 +117,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctr
 	// keywords 0 => CSS 1 keywords
 	// keywords 1 => Pseudo classes
 	// keywords 2 => CSS 2 keywords but we will pass all keywords in 0
-	mvceditor::CssDocumentClass doc;
+	t4p::CssDocumentClass doc;
 	ctrl->SetKeyWords(0,  doc.GetCssKeywords());
 	ctrl->SetKeyWords(1,  doc.GetCssPseudoClasses());
 	ctrl->SetKeyWords(2, wxT(""));
@@ -130,7 +130,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctr
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl) {
 
 	// the CPP lexer is used to handle javascript
 	ctrl->SetLexer(wxSTC_LEX_CPP);
@@ -145,7 +145,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl
 	// keywords 3 => Global classes and typedefs
 	// keywords 4 => Preprocessor definitions
 
-	mvceditor::JsDocumentClass doc;
+	t4p::JsDocumentClass doc;
 	ctrl->SetKeyWords(0, doc.GetJsKeywords());
 	ctrl->SetKeyWords(1, wxT(""));
 	ctrl->SetKeyWords(2, wxT(""));
@@ -158,7 +158,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetPlainTextOptions(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetPlainTextOptions(wxStyledTextCtrl* ctrl) {
 
 	ctrl->SetLexer(wxSTC_LEX_NULL);
 
@@ -173,8 +173,8 @@ void mvceditor::SyntaxHighlightFeatureClass::SetPlainTextOptions(wxStyledTextCtr
 	ctrl->MarkerDefine(CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextCtrl* ctrl,
-        std::vector<mvceditor::StylePreferenceClass>& styles) {
+void t4p::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextCtrl* ctrl,
+        std::vector<t4p::StylePreferenceClass>& styles) {
 	if (App.Preferences.CodeControlOptions.IndentUsingTabs) {
 		ctrl->SetUseTabs(true);
 		ctrl->SetTabWidth(App.Preferences.CodeControlOptions.TabWidth);
@@ -202,7 +202,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextC
 
 	// caret, line, selection, margin colors
 	for (size_t i = 0; i < styles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = styles[i];
+		t4p::StylePreferenceClass pref = styles[i];
 		int style = pref.StcStyle;
 		switch (style) {
 			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
@@ -233,7 +233,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextC
 					ctrl->SetEdgeColour(pref.Color);
 				}
 				break;
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
 				// since we need to share one indicator with the matching word highlight
 				// and the parse errors indicators; we will set this setting when the
 				// user initiates the matching word feature
@@ -249,15 +249,15 @@ void mvceditor::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextC
 	SetLexerStyles(ctrl, styles);
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
-	mvceditor::NotebookClass* notebook = GetNotebook();
+void t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+	t4p::NotebookClass* notebook = GetNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
 		ApplyPreferences(ctrl);
 	}
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeControlClass* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl) {
 	if (App.Preferences.CodeControlOptions.EnableWordWrap) {
 		ctrl->SetWrapMode(wxSTC_WRAP_WORD);
 		ctrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
@@ -266,33 +266,33 @@ void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeCon
 		ctrl->SetWrapMode(wxSTC_WRAP_NONE);
 	}
 
-	if (mvceditor::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
+	if (t4p::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
 		SetPhpOptions(ctrl);
 	}
-	else if (mvceditor::CodeControlClass::CSS == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::CSS == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.CssStyles);
 		SetCssOptions(ctrl);
 	}
-	else if (mvceditor::CodeControlClass::SQL == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::SQL == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.SqlStyles);
 		SetSqlOptions(ctrl);
 	}
-	else if (mvceditor::CodeControlClass::JS == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::JS == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.JsStyles);
 		SetJsOptions(ctrl);
 	}
-	else if (mvceditor::CodeControlClass::CONFIG == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::CONFIG == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.ConfigStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
 	}
-	else if (mvceditor::CodeControlClass::CRONTAB == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::CRONTAB == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.CrontabStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
 	}
-	else if (mvceditor::CodeControlClass::YAML == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::YAML == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.YamlStyles);
 		SetPlainTextOptions(ctrl);
 
@@ -300,32 +300,32 @@ void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeCon
 		ctrl->SetUseTabs(false);
 		ctrl->SetLexer(wxSTC_LEX_YAML);
 	}
-	else if (mvceditor::CodeControlClass::XML == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::XML == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
 	}
-	else if (mvceditor::CodeControlClass::RUBY == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::RUBY == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.RubyStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
 	}
-	else if (mvceditor::CodeControlClass::LUA == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::LUA == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.LuaStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
 	}
-	else if (mvceditor::CodeControlClass::MARKDOWN == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::MARKDOWN == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.MarkdownStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
 	}
-	else if (mvceditor::CodeControlClass::BASH == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::BASH == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.BashStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
 	}
-	else if (mvceditor::CodeControlClass::DIFF == ctrl->GetDocumentMode()) {
+	else if (t4p::CodeControlClass::DIFF == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.DiffStyles);
 		SetPlainTextOptions(ctrl);
 		ctrl->SetLexer(wxSTC_LEX_DIFF);
@@ -345,7 +345,7 @@ void mvceditor::SyntaxHighlightFeatureClass::ApplyPreferences(mvceditor::CodeCon
 }
 
 
-void mvceditor::SyntaxHighlightFeatureClass::SetMargin(wxStyledTextCtrl* ctrl) {
+void t4p::SyntaxHighlightFeatureClass::SetMargin(wxStyledTextCtrl* ctrl) {
 	if (App.Preferences.CodeControlOptions.EnableLineNumbers) {
 		ctrl->SetMarginType(CodeControlOptionsClass::MARGIN_LINE_NUMBER, wxSTC_MARGIN_NUMBER);
 		ctrl->SetMarginWidth(CodeControlOptionsClass::MARGIN_LINE_NUMBER, ctrl->TextWidth(wxSTC_STYLE_LINENUMBER, wxT("_99999")));
@@ -374,10 +374,10 @@ void mvceditor::SyntaxHighlightFeatureClass::SetMargin(wxStyledTextCtrl* ctrl) {
 	}
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ctrl,
-        std::vector<mvceditor::StylePreferenceClass>& styles) {
+void t4p::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ctrl,
+        std::vector<t4p::StylePreferenceClass>& styles) {
 
-	mvceditor::StylePreferenceClass pref = App.Preferences.CodeControlOptions.FindByStcStyle(
+	t4p::StylePreferenceClass pref = App.Preferences.CodeControlOptions.FindByStcStyle(
 	        App.Preferences.CodeControlOptions.PhpStyles,
 	        wxSTC_HPHP_DEFAULT
 	                                       );
@@ -391,7 +391,7 @@ void mvceditor::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ct
 	ctrl->StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
 
 	for (size_t i = 0; i < styles.size(); ++i) {
-		mvceditor::StylePreferenceClass pref = styles[i];
+		t4p::StylePreferenceClass pref = styles[i];
 		int style = pref.StcStyle;
 		ctrl->StyleSetFont(style, pref.Font);
 		ctrl->StyleSetForeground(style, pref.Color);
@@ -403,25 +403,25 @@ void mvceditor::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ct
 	// the found match indicator style
 	pref = App.Preferences.CodeControlOptions.FindByStcStyle(
 	           styles,
-	           mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT
+	           t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT
 	       );
 	ctrl->IndicatorSetStyle(CODE_CONTROL_INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
 	ctrl->IndicatorSetForeground(CODE_CONTROL_INDICATOR_FIND, pref.Color);
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	mvceditor::EditColorsPanelClass* panel = new mvceditor::EditColorsPanelClass(parent, *this);
+void t4p::SyntaxHighlightFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	t4p::EditColorsPanelClass* panel = new t4p::EditColorsPanelClass(parent, *this);
 	parent->AddPage(panel, _("Styles && Colors"));
 }
 
-void mvceditor::SyntaxHighlightFeatureClass::OnAppReady(wxCommandEvent& event) {
+void t4p::SyntaxHighlightFeatureClass::OnAppReady(wxCommandEvent& event) {
 	
 	// load the images once at startup
-	SearchHitGoodBitmap = mvceditor::AutoCompleteImageAsset(wxT("magnifier"));
-	SearchHitBadBitmap = mvceditor::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
+	SearchHitGoodBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier"));
+	SearchHitBadBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
 }
 
-mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvceditor::SyntaxHighlightFeatureClass& feature)
+t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, t4p::SyntaxHighlightFeatureClass& feature)
 : SyntaxHighlightPanelGeneratedClass(parent)
 , CodeControlOptions(feature.App.Preferences.CodeControlOptions)
 , EditedCodeControlOptions(feature.App.Preferences.CodeControlOptions)
@@ -478,7 +478,7 @@ mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvcedito
 		Styles->Append(wxGetTranslation(name), &CodeControlOptions.DiffStyles[i]);
 	}
 	Styles->Select(0);
-	mvceditor::StylePreferenceClass firstPref = EditedCodeControlOptions.PhpStyles[0];
+	t4p::StylePreferenceClass firstPref = EditedCodeControlOptions.PhpStyles[0];
 	Font->SetSelectedFont(firstPref.Font);
 	ForegroundColor->SetColour(firstPref.Color);
 	BackgroundColor->SetColour(firstPref.BackgroundColor);
@@ -486,20 +486,20 @@ mvceditor::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, mvcedito
 	Italic->SetValue(firstPref.IsItalic);
 
 	Theme->Clear();
-	wxArrayString themes = mvceditor::CodeControlStylesGetThemes();
+	wxArrayString themes = t4p::CodeControlStylesGetThemes();
 	themes.Sort();
 	Theme->Append(themes);
 	PreviewNotebook->SetWindowStyle(wxAUI_NB_BOTTOM);
 	AddPreviews();
 }
 
-void mvceditor::EditColorsPanelClass::AddPreviews() {
-	CodeCtrl = new mvceditor::CodeControlClass(this,
+void t4p::EditColorsPanelClass::AddPreviews() {
+	CodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	CodeCtrl->SetDocumentMode(mvceditor::CodeControlClass::PHP);
+	CodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
 	PreviewNotebook->AddPage(CodeCtrl, _("PHP"));
-	wxString txt = mvceditor::CharToWx(
+	wxString txt = t4p::CharToWx(
 		"<?php\n"
 		"/**\n"
 		" * this is a class\n"
@@ -523,11 +523,11 @@ void mvceditor::EditColorsPanelClass::AddPreviews() {
 	CodeCtrl->SetText(txt);
 	Feature.ApplyPreferences(CodeCtrl);
 	
-	mvceditor::CodeControlClass* sql = new mvceditor::CodeControlClass(this,
+	t4p::CodeControlClass* sql = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	sql->SetDocumentMode(mvceditor::CodeControlClass::SQL);
-	txt =  mvceditor::CharToWx(
+	sql->SetDocumentMode(t4p::CodeControlClass::SQL);
+	txt =  t4p::CharToWx(
 		" -- table to store users\n"
 		"CREATE TABLE my_users(\n"
 		"	userId INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,\n"
@@ -539,11 +539,11 @@ void mvceditor::EditColorsPanelClass::AddPreviews() {
 	PreviewNotebook->AddPage(sql, _("SQL"));
 	Feature.ApplyPreferences(sql);
 	
-	mvceditor::CodeControlClass* css = new mvceditor::CodeControlClass(this,
+	t4p::CodeControlClass* css = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	css->SetDocumentMode(mvceditor::CodeControlClass::CSS);
-	txt =  mvceditor::CharToWx(
+	css->SetDocumentMode(t4p::CodeControlClass::CSS);
+	txt =  t4p::CharToWx(
 		" /* render users nicely */\n"
 		".user {\n"
 		"	font-weight: bold;\n"
@@ -554,11 +554,11 @@ void mvceditor::EditColorsPanelClass::AddPreviews() {
 	PreviewNotebook->AddPage(css, _("CSS"));
 	Feature.ApplyPreferences(css);
 	
-	mvceditor::CodeControlClass* js = new mvceditor::CodeControlClass(this,
+	t4p::CodeControlClass* js = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	js->SetDocumentMode(mvceditor::CodeControlClass::JS);
-	txt =  mvceditor::CharToWx(
+	js->SetDocumentMode(t4p::CodeControlClass::JS);
+	txt =  t4p::CharToWx(
 		" /* represents a logged-in user */\n"
 		"function myFunction() {\n"
 		"	var x = \"\"; \n"
@@ -574,17 +574,17 @@ void mvceditor::EditColorsPanelClass::AddPreviews() {
 	Feature.ApplyPreferences(js);
 }
 
-bool mvceditor::EditColorsPanelClass::TransferDataFromWindow() {
+bool t4p::EditColorsPanelClass::TransferDataFromWindow() {
 	CodeControlOptions = EditedCodeControlOptions;
 	return true;
 }
 
-void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
+void t4p::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 	int selected = event.GetSelection();
 	if (selected < 0) {
 		return;
 	}
-	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	t4p::StylePreferenceClass* pref = (t4p::StylePreferenceClass*)Styles->GetClientData(selected);
 	if (pref) {
 		Font->SetSelectedFont(pref->Font);
 		ForegroundColor->SetColour(pref->Color);
@@ -593,18 +593,18 @@ void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 		Italic->SetValue(pref->IsItalic);
 		int style = pref->StcStyle;
 		switch (style) {
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
 			case wxSTC_STYLE_INDENTGUIDE:
 				Font->Enable(false);
 				Bold->Enable(false);
 				Italic->Enable(false);
 				BackgroundColor->Enable(true);
 				break;
-			case mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
+			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
 				Font->Enable(false);
 				Bold->Enable(false);
 				Italic->Enable(false);
@@ -621,9 +621,9 @@ void mvceditor::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 }
 
 
-void mvceditor::EditColorsPanelClass::OnCheck(wxCommandEvent& event) {
+void t4p::EditColorsPanelClass::OnCheck(wxCommandEvent& event) {
 	int selected = Styles->GetSelection();
-	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	t4p::StylePreferenceClass* pref = (t4p::StylePreferenceClass*)Styles->GetClientData(selected);
 	if (pref) {
 		switch (event.GetId()) {
 			case ID_BOLD:
@@ -636,9 +636,9 @@ void mvceditor::EditColorsPanelClass::OnCheck(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event) {
+void t4p::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event) {
 	int selected = Styles->GetSelection();
-	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	t4p::StylePreferenceClass* pref = (t4p::StylePreferenceClass*)Styles->GetClientData(selected);
 	if (pref) {
 		switch (event.GetId()) {
 			case ID_FOREGROUND_COLOR:
@@ -653,9 +653,9 @@ void mvceditor::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event)
 	}
 }
 
-void mvceditor::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
+void t4p::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	int selected = Styles->GetSelection();
-	mvceditor::StylePreferenceClass* pref = (mvceditor::StylePreferenceClass*)Styles->GetClientData(selected);
+	t4p::StylePreferenceClass* pref = (t4p::StylePreferenceClass*)Styles->GetClientData(selected);
 	if (pref) {
 		wxFont font = event.GetFont();
 		pref->Font = font;
@@ -663,7 +663,7 @@ void mvceditor::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	}
 }
 
-void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
+void t4p::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 	wxCommandEvent listBoxEvent(wxEVT_COMMAND_LISTBOX_SELECTED, wxID_ANY);
 	int sel = Styles->GetSelection();
 	if (sel < 0) {
@@ -671,16 +671,16 @@ void mvceditor::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 	}
 	listBoxEvent.SetInt(sel);
 
-	mvceditor::CodeControlStylesSetTheme(EditedCodeControlOptions, Theme->GetStringSelection());
+	t4p::CodeControlStylesSetTheme(EditedCodeControlOptions, Theme->GetStringSelection());
 	wxPostEvent(this, listBoxEvent);
 
 	CodeCtrl->ApplyPreferences();
 }
 
-BEGIN_EVENT_TABLE(mvceditor::SyntaxHighlightFeatureClass, mvceditor::FeatureClass)
-	EVT_APP_FILE_NEW(mvceditor::SyntaxHighlightFeatureClass::OnFileNew)
-	EVT_APP_FILE_OPEN(mvceditor::SyntaxHighlightFeatureClass::OnFileOpen)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::SyntaxHighlightFeatureClass::OnAppReady)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::SyntaxHighlightFeatureClass::OnPreferencesSaved)
+BEGIN_EVENT_TABLE(t4p::SyntaxHighlightFeatureClass, t4p::FeatureClass)
+	EVT_APP_FILE_NEW(t4p::SyntaxHighlightFeatureClass::OnFileNew)
+	EVT_APP_FILE_OPEN(t4p::SyntaxHighlightFeatureClass::OnFileOpen)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::SyntaxHighlightFeatureClass::OnAppReady)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()
 

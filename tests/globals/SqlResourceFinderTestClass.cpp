@@ -29,7 +29,7 @@
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <unicode/ustdio.h>
 #include <wx/platinfo.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -48,20 +48,20 @@ public:
 		, Finder() {
 		soci::session& s = SqliteTestFixtureClass::Session;
 		Finder.InitSession(&s);
-		DatabaseTag.Driver = mvceditor::DatabaseTagClass::MYSQL;
+		DatabaseTag.Driver = t4p::DatabaseTagClass::MYSQL;
 		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 
 		// user name, pwd are #defines come from the premake script premake_opts.lua
 		DatabaseTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		DatabaseTag.User = mvceditor::CharToIcu(UserName().c_str());
-		DatabaseTag.Password = mvceditor::CharToIcu(Password().c_str());
+		DatabaseTag.User = t4p::CharToIcu(UserName().c_str());
+		DatabaseTag.Password = t4p::CharToIcu(Password().c_str());
 	}
 	
-	mvceditor::DatabaseTagClass DatabaseTag;
+	t4p::DatabaseTagClass DatabaseTag;
 	
-	mvceditor::SqlResourceFetchClass Fetcher;
+	t4p::SqlResourceFetchClass Fetcher;
 	
-	mvceditor::SqlResourceFinderClass Finder;
+	t4p::SqlResourceFinderClass Finder;
 };
 
 class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
@@ -83,10 +83,10 @@ public:
 		TouchTestDir();
 		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
 		TestSession.open(*soci::factory_sqlite3(), 
-			mvceditor::WxToChar(SqliteFile.GetFullPath())
+			t4p::WxToChar(SqliteFile.GetFullPath())
 		);
 					
-		DatabaseTag.Driver = mvceditor::DatabaseTagClass::SQLITE;
+		DatabaseTag.Driver = t4p::DatabaseTagClass::SQLITE;
 		DatabaseTag.FileName = SqliteFile;
 	}
 	
@@ -100,11 +100,11 @@ public:
 		return false;
 	}
 	
-	mvceditor::DatabaseTagClass DatabaseTag;
+	t4p::DatabaseTagClass DatabaseTag;
 	
-	mvceditor::SqlResourceFetchClass Fetcher;
+	t4p::SqlResourceFetchClass Fetcher;
 	
-	mvceditor::SqlResourceFinderClass Finder;
+	t4p::SqlResourceFinderClass Finder;
 	
 	wxFileName SqliteFile;
 	

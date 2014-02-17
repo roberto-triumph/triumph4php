@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GAUGEDIALOGCLASS_H__
-#define __MVCEDITOR_GAUGEDIALOGCLASS_H__
+#ifndef __T4P_GAUGEDIALOGCLASS_H__
+#define __T4P_GAUGEDIALOGCLASS_H__
 
 #include <widgets/wxformbuilder/GaugeDialogWidget.h>
 #include <wx/timer.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * A small dialog that contains a Gauge (progress bar) and a label. This dialog

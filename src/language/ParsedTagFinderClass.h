@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORPARSEDTAGFINDERCLASS_H__
-#define __MVCEDITORPARSEDTAGFINDERCLASS_H__
+#ifndef __T4P_PARSEDTAGFINDERCLASS_H__
+#define __T4P_PARSEDTAGFINDERCLASS_H__
 
 #include <globals/TagClass.h>
 #include <globals/Sqlite.h>
@@ -32,7 +32,7 @@
 #include <unicode/unistr.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration, defined below
 class TagResultClass;
@@ -148,7 +148,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* CreateExactResults() const;
+	t4p::TagResultClass* CreateExactResults() const;
 
 	/**
 	 * Looks for the tag, using a near-match logic. Logic is as follows:
@@ -187,7 +187,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* CreateNearMatchResults() const;
+	t4p::TagResultClass* CreateNearMatchResults() const;
 
 	/**
 	 * Create a query that will exact match on file names (name or full path)
@@ -195,7 +195,7 @@ public:
 	 * @return FileTagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::FileTagResultClass* CreateExactFileResults() const;
+	t4p::FileTagResultClass* CreateExactFileResults() const;
 
 	/**
 	 * Create a query that will match near files of the given input.
@@ -203,7 +203,7 @@ public:
 	 * @return FileTagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::FileTagResultClass* CreateNearMatchFileResults() const;
+	t4p::FileTagResultClass* CreateNearMatchFileResults() const;
 
 	/**
 	 * Returns the parsed class name
@@ -319,11 +319,11 @@ private:
 /**
  * The TagResult is used to loop through database rows of the tag table
  */
-class TagResultClass : public mvceditor::SqliteResultClass {
+class TagResultClass : public t4p::SqliteResultClass {
 
 public:
 
-	mvceditor::TagClass Tag;
+	t4p::TagClass Tag;
 
 	TagResultClass();
 
@@ -334,7 +334,7 @@ public:
 	bool Init(soci::statement* stmt);
 
 	// TODO: remove this method
-	std::vector<mvceditor::TagClass> Matches();
+	std::vector<t4p::TagClass> Matches();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -368,11 +368,11 @@ protected:
 		FileIsNewIndicator;
 };
 
-class FileTagResultClass : public mvceditor::SqliteResultClass {
+class FileTagResultClass : public t4p::SqliteResultClass {
 
 public:
 
-	mvceditor::FileTagClass FileTag;
+	t4p::FileTagClass FileTag;
 
 	FileTagResultClass();
 
@@ -390,8 +390,8 @@ public:
 	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
 	// TODO: remove this method
-	std::vector<mvceditor::FileTagClass> Matches();
-	std::vector<mvceditor::TagClass> MatchesAsTags();
+	std::vector<t4p::FileTagClass> Matches();
+	std::vector<t4p::TagClass> MatchesAsTags();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -436,11 +436,11 @@ private:
 	int IsNew;
 };
 
-class TraitTagResultClass : public mvceditor::SqliteResultClass {
+class TraitTagResultClass : public t4p::SqliteResultClass {
 
 public:
 
-	mvceditor::TraitTagClass TraitTag;
+	t4p::TraitTagClass TraitTag;
 
 	TraitTagResultClass();
 
@@ -460,7 +460,7 @@ public:
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
 	// TODO: remove this method
-	std::vector<mvceditor::TagClass> MatchesAsTags();
+	std::vector<t4p::TagClass> MatchesAsTags();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -502,7 +502,7 @@ private:
 	std::string InsteadOfs;
 };
 
-class ExactMemberTagResultClass : public mvceditor::TagResultClass {
+class ExactMemberTagResultClass : public t4p::TagResultClass {
 
 public:
 
@@ -521,7 +521,7 @@ protected:
 	std::vector<std::string> SourceDirs;
 };
 
-class NearMatchMemberTagResultClass : public mvceditor::ExactMemberTagResultClass {
+class NearMatchMemberTagResultClass : public t4p::ExactMemberTagResultClass {
 
 public:
 
@@ -562,7 +562,7 @@ private:
  * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
  * the specific error code from SQLite.
  */
-class ParsedTagFinderClass : public mvceditor::SqliteFinderClass {
+class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 	
@@ -576,7 +576,7 @@ public:
 	 * @return vector of tags all tags that were parsed from the given file that 
 	 *         are either a class, function, or define 
 	 */
-	std::vector<mvceditor::TagClass> ClassesFunctionsDefines(const wxString& fullPath);
+	std::vector<t4p::TagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 	/**
 	 * Looks for a class or file tag, using exact, case insensitive matching. 
@@ -587,7 +587,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<t4p::TagClass> ExactClassOrFile(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a class name using exact, case insensitive matching. Note that namespace
@@ -599,7 +599,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> ExactClass(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<t4p::TagClass> ExactClass(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a function name using exact, case insensitive matching. Note that namespace
@@ -611,7 +611,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> ExactFunction(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<t4p::TagClass> ExactFunction(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a method name using exact, case insensitive matching.  The method name
@@ -624,7 +624,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> ExactMethod(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic);
+	std::vector<t4p::TagClass> ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
 
 	/**
 	 * Looks for a property name using exact, case insensitive matching.  The property name
@@ -637,7 +637,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> ExactProperty(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic);
+	std::vector<t4p::TagClass> ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
 	
 	/**
 	 * Looks for the class or file tag, using a near-match logic. Logic is as follows:
@@ -661,7 +661,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<mvceditor::TagClass> NearMatchClassesOrFiles(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<t4p::TagClass> NearMatchClassesOrFiles(const t4p::TagSearchClass& tagSearch);
 	
 	/**
 	 * Get the parent class of a given tag. For example, let's say source code contained two classes: AdminClass and 
@@ -708,7 +708,7 @@ public:
 	 * @param int32_t length the length of the tag [in the text]
 	 * @return bool true if match was found in text
 	 */
-	static bool GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
+	static bool GetResourceMatchPosition(const t4p::TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
 
 	/**
 	 * retrieves a tag by its ID
@@ -717,7 +717,7 @@ public:
 	 * @param tag out parameter, will be filled in with the tag data
 	 * @return bool TRUE if the ID was found
 	 */
-	bool FindById(int id, mvceditor::TagClass& tag);
+	bool FindById(int id, t4p::TagClass& tag);
 	
 	/**
 	 * @param int fileTagId file to search for
@@ -749,7 +749,7 @@ public:
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.
 	 */
-	std::vector<mvceditor::TagClass> All();
+	std::vector<t4p::TagClass> All();
 
 	/**
 	 * check to see if this tag finder has the given file 
@@ -779,7 +779,7 @@ protected:
 	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
 	 * file before.
 	 */
-	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
+	bool FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag);
 
 private:
 		
@@ -793,7 +793,7 @@ private:
 	 * @param doDefines if TRUE define tags will be collected
 	 * @param doFunctions if TRUE function tags will be collected
 	 */
-	std::vector<mvceditor::TagClass> NearMatchNonMembers(const mvceditor::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
+	std::vector<t4p::TagClass> NearMatchNonMembers(const t4p::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
 	
 	/**
 	 * Collects all resources that are class methods / properties and match the given Resource search.
@@ -801,7 +801,7 @@ private:
 	 * 
 	 * @param tagSearch the name of resources to look for
 	 */
-	std::vector<mvceditor::TagClass> NearMatchMembers(const mvceditor::TagSearchClass& tagSearch);
+	std::vector<t4p::TagClass> NearMatchMembers(const t4p::TagSearchClass& tagSearch);
 			
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -816,7 +816,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is removed from the matches vector.
 	 */
-	void EnsureMatchesExist(std::vector<mvceditor::TagClass>& matches);
+	void EnsureMatchesExist(std::vector<t4p::TagClass>& matches);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 
@@ -837,4 +837,4 @@ private:
 };
 
 }
-#endif // __MVCEDITORRESOURCEFINDER_H__
+#endif // __T4P_RESOURCEFINDER_H__

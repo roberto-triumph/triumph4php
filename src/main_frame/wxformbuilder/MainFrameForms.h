@@ -10,7 +10,7 @@
 
 #include <wx/intl.h>
 
-namespace mvceditor{ class NotebookClass; }
+namespace t4p{ class NotebookClass; }
 
 #include <wx/gdicmn.h>
 #include <wx/aui/auibook.h>
@@ -99,7 +99,7 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_MENUITEMLICENSE,
 		};
 		
-		mvceditor::NotebookClass* Notebook;
+		t4p::NotebookClass* Notebook;
 		wxMenuBar* MenuBar;
 		wxMenu* FileMenu;
 		wxMenu* EditMenu;

@@ -22,15 +22,15 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORSEQUENCECLASS_H__
-#define __MVCEDITORSEQUENCECLASS_H__
+#ifndef __T4P_SEQUENCECLASS_H__
+#define __T4P_SEQUENCECLASS_H__
 
 #include <globals/GlobalsClass.h>
 #include <actions/GlobalActionClass.h>
 #include <wx/event.h>
 #include <queue>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * this event will be generated when a sequence has begun
@@ -60,14 +60,14 @@ public:
 	 * The global data structures; each action will read these as their
 	 * input
 	 */
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 
 	/**
 	 * This will be used by the actions to create background threads
 	 */
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 
-	SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads);
+	SequenceClass(t4p::GlobalsClass& globals, t4p::RunningThreadsClass& runningThreads);
 
 	~SequenceClass();
 
@@ -105,8 +105,8 @@ public:
 	 *         sequence running then we will not start another sequence as sequences deal with 
 	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	bool ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects,
-		const std::vector<mvceditor::ProjectClass>& removedProjects);
+	bool ProjectDefinitionsUpdated(const std::vector<t4p::ProjectClass>& touchedProjects,
+		const std::vector<t4p::ProjectClass>& removedProjects);
 
 	/**
 	 * Start the full tag cache rebuild sequence.  This will include
@@ -136,7 +136,7 @@ public:
 	 *        this class.
 	 * @return bool FALSE if there is a sequence already running.
 	 */
-	bool Build(std::vector<mvceditor::GlobalActionClass*> actions);
+	bool Build(std::vector<t4p::GlobalActionClass*> actions);
 
 	/**
 	 * @return bool TRUE if there is a sequence currently running.
@@ -157,7 +157,7 @@ protected:
 	 *        This means that the action must have been allocated in the 
 	 *        heap.
 	 */
-	void AddStep(mvceditor::GlobalActionClass* action);
+	void AddStep(t4p::GlobalActionClass* action);
 
 	/**
 	 * starts the sequence.
@@ -166,9 +166,9 @@ protected:
 
 private:
 
-	void OnActionComplete(mvceditor::ActionEventClass& event);
+	void OnActionComplete(t4p::ActionEventClass& event);
 
-	void OnActionProgress(mvceditor::ActionProgressEventClass& event);
+	void OnActionProgress(t4p::ActionProgressEventClass& event);
 
 	/**
 	 * start the next step in the sequence.
@@ -189,7 +189,7 @@ private:
 	 * These pointers are owned by this class, although that if an action
 	 * is run as a background thread the pointer will delete itself.
 	 */
-	std::queue<mvceditor::GlobalActionClass*> Steps;
+	std::queue<t4p::GlobalActionClass*> Steps;
 
 	/**
 	 * Flag that tells whether the sequence has been started but is not yet complete
@@ -206,19 +206,19 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
-class SequenceProgressEventClass : public mvceditor::ActionProgressEventClass {
+class SequenceProgressEventClass : public t4p::ActionProgressEventClass {
 
 public:
 
-	SequenceProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
+	SequenceProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
 
 	wxEvent* Clone() const;
 };
 
-typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(mvceditor::SequenceProgressEventClass&);
+typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(t4p::SequenceProgressEventClass&);
 
 #define EVT_SEQUENCE_PROGRESS(fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_SEQUENCE_PROGRESS, wxID_ANY, -1, \
+        DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SEQUENCE_PROGRESS, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( SequenceProgressEventClassFunction, & fn ), (wxObject *) NULL ),
 

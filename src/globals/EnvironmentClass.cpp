@@ -27,30 +27,30 @@
 #include <wx/confbase.h>
 #include <wx/utils.h>
 
-mvceditor::WebBrowserClass::WebBrowserClass() 
+t4p::WebBrowserClass::WebBrowserClass() 
 	: Name()
 	, FullPath() {
 
 }
 
-mvceditor::WebBrowserClass::WebBrowserClass(const mvceditor::WebBrowserClass& src) 
+t4p::WebBrowserClass::WebBrowserClass(const t4p::WebBrowserClass& src) 
 	: Name()
 	, FullPath() {
 	Copy(src);
 }
 
-mvceditor::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath) 
+t4p::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath) 
 	: Name(name.c_str())
 	, FullPath(fullPath) {
 
 }
 
-mvceditor::WebBrowserClass& mvceditor::WebBrowserClass::operator=(const mvceditor::WebBrowserClass& src) {
+t4p::WebBrowserClass& t4p::WebBrowserClass::operator=(const t4p::WebBrowserClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::WebBrowserClass::Copy(const mvceditor::WebBrowserClass& src) {
+void t4p::WebBrowserClass::Copy(const t4p::WebBrowserClass& src) {
 
 	// using c_str() to completely clone a wxString, as by default
 	// the assignment operator is a shallow copy
@@ -59,14 +59,14 @@ void mvceditor::WebBrowserClass::Copy(const mvceditor::WebBrowserClass& src) {
 	FullPath= src.FullPath;
 }
 
-mvceditor::PhpEnvironmentClass::PhpEnvironmentClass() 
+t4p::PhpEnvironmentClass::PhpEnvironmentClass() 
 	: PhpExecutablePath(wxT(""))
 	, Version(pelet::PHP_53) 
 	, IsAuto(true)
 	, Installed(false) {
 }
 
-mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src) 
+t4p::PhpEnvironmentClass::PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src) 
 	: PhpExecutablePath()
 	, Version(pelet::PHP_53)
 	, IsAuto(true) 
@@ -74,12 +74,12 @@ mvceditor::PhpEnvironmentClass::PhpEnvironmentClass(const mvceditor::PhpEnvironm
 	Copy(src);
 }
 
-mvceditor::PhpEnvironmentClass& mvceditor::PhpEnvironmentClass::operator=(const mvceditor::PhpEnvironmentClass& src) {
+t4p::PhpEnvironmentClass& t4p::PhpEnvironmentClass::operator=(const t4p::PhpEnvironmentClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::PhpEnvironmentClass::Init() {
+void t4p::PhpEnvironmentClass::Init() {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_UNIX_LINUX:
@@ -93,7 +93,7 @@ void mvceditor::PhpEnvironmentClass::Init() {
 	}
 }
 
-void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &src) {
+void t4p::PhpEnvironmentClass::Copy(const t4p::PhpEnvironmentClass &src) {
 
 	// using c_str() to completely clone a wxString, as by default
 	// the assignment operator is a shallow copy
@@ -104,7 +104,7 @@ void mvceditor::PhpEnvironmentClass::Copy(const mvceditor::PhpEnvironmentClass &
 	Installed = src.Installed;
 }
 
-void mvceditor::PhpEnvironmentClass::AutoDetermine() {
+void t4p::PhpEnvironmentClass::AutoDetermine() {
 	if (!IsAuto) {
 
 		// stick with the configured version
@@ -144,69 +144,69 @@ void mvceditor::PhpEnvironmentClass::AutoDetermine() {
 	}
 }
 
-bool mvceditor::PhpEnvironmentClass::NotInstalled() const {
+bool t4p::PhpEnvironmentClass::NotInstalled() const {
 	return !Installed || PhpExecutablePath.IsEmpty();
 }
 
-mvceditor::EnvironmentClass::EnvironmentClass()
+t4p::EnvironmentClass::EnvironmentClass()
 	: Apache()
 	, Php()
 	, WebBrowsers() {
 
 }
 
-void mvceditor::EnvironmentClass::Init() {
+void t4p::EnvironmentClass::Init() {
 	Php.Init();
 	AddDefaults();
 }
 
-mvceditor::EnvironmentClass::EnvironmentClass(const mvceditor::EnvironmentClass& src) 
+t4p::EnvironmentClass::EnvironmentClass(const t4p::EnvironmentClass& src) 
 	: Apache()
 	, Php()
 	, WebBrowsers() {
 	Copy(src);
 }
 
-mvceditor::EnvironmentClass::~EnvironmentClass() {
+t4p::EnvironmentClass::~EnvironmentClass() {
 }
 
-mvceditor::EnvironmentClass& mvceditor::EnvironmentClass::operator=(const mvceditor::EnvironmentClass &src) {
+t4p::EnvironmentClass& t4p::EnvironmentClass::operator=(const t4p::EnvironmentClass &src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::EnvironmentClass::Copy(const mvceditor::EnvironmentClass& src) {
+void t4p::EnvironmentClass::Copy(const t4p::EnvironmentClass& src) {
 	Apache = src.Apache;
 	Php = src.Php;
 	WebBrowsers = src.WebBrowsers;
 }
 
-void mvceditor::EnvironmentClass::AddDefaults() {
+void t4p::EnvironmentClass::AddDefaults() {
 	wxPlatformInfo info;
 	wxString userHome = wxGetUserHome();
 
 	// these are the default installation locations
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_UNIX_LINUX:
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/usr/bin/firefox"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/usr/bin/google-chrome"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/usr/bin/opera"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/usr/bin/firefox"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/usr/bin/google-chrome"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/usr/bin/opera"))));
 			break;
 		case wxOS_WINDOWS_NT:
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe"))));
 
 			// by default google installs itself in the user home
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Google Chrome"), wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Google Chrome"), wxFileName(userHome + wxT("\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
 			break;
 		default:
 			break;
 	}
 }
 
-void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
+void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	
 	int version = 0;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
@@ -250,7 +250,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 			key = groupName + wxT("/Path");
 			wxString browserPath = config->Read(key);
 			wxFileName browserFileName(browserPath);
-			WebBrowsers.push_back(mvceditor::WebBrowserClass(browserName, browserFileName));
+			WebBrowsers.push_back(t4p::WebBrowserClass(browserName, browserFileName));
 		}
 		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
 			
@@ -268,7 +268,7 @@ void mvceditor::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	config->SetPath(oldPath);
 }
 
-void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
+void t4p::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	int version = 0;
 	if (pelet::PHP_53 == Php.Version) {
 		version = 1;
@@ -284,7 +284,7 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;
-	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
+	for(std::vector<t4p::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
 		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
 		config->Write(key, it->Name);
 		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
@@ -304,18 +304,18 @@ void mvceditor::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	}
 }
 
-std::vector<wxString> mvceditor::EnvironmentClass::BrowserNames() const {
+std::vector<wxString> t4p::EnvironmentClass::BrowserNames() const {
 	std::vector<wxString> names;
-	std::vector<mvceditor::WebBrowserClass>::const_iterator browser;
+	std::vector<t4p::WebBrowserClass>::const_iterator browser;
 	for (browser = WebBrowsers.begin(); browser != WebBrowsers.end(); ++browser) {
 		names.push_back(browser->Name);
 	}
 	return names;
 }
 
-bool mvceditor::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
+bool t4p::EnvironmentClass::FindBrowserByName(const wxString& name, wxFileName& fileName) const {
 	bool found = false;
-	for(std::vector<mvceditor::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
+	for(std::vector<t4p::WebBrowserClass>::const_iterator it = WebBrowsers.begin(); it != WebBrowsers.end(); ++it) {
 		if (it->Name == name) {
 			found = true;
 			fileName = it->FullPath;

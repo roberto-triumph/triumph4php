@@ -51,19 +51,19 @@ static UnicodeString VariableName(const pelet::VariableClass& var) {
  * @param isParentCall if TRUE, then tag is visible if the tag is protected, or public
  * @return bool true if tag is visible
  */
-static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::VariableClass& originalParsedVariable,
+static bool IsResourceVisible(const t4p::TagClass& tag, const pelet::VariableClass& originalParsedVariable,
 		const pelet::ScopeClass& scope,
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
 	if (isStaticCall) {
 
 		// only static methods can be accessed with the '::' operator
-		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
+		passesStaticCheck = t4p::TagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
 	}
 	else {
 
 		// static methods can be accessed via the -> operator 
-		passesStaticCheck = mvceditor::TagClass::CLASS_CONSTANT != tag.Type;
+		passesStaticCheck = t4p::TagClass::CLASS_CONSTANT != tag.Type;
 	}
 
 	// $this => can access this tag's private, parent's protected/public, other public
@@ -89,7 +89,7 @@ static bool IsResourceVisible(const mvceditor::TagClass& tag, const pelet::Varia
 	bool passesNamespaceCheck = true;			
 	UnicodeString name = VariableName(originalParsedVariable);
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) 
-		&& mvceditor::TagClass::CLASS == tag.Type) {
+		&& t4p::TagClass::CLASS == tag.Type) {
 		
 		// if the tag is a global class and the current namespace is NOT the global namespace, 
 		// then the class cannot be accessed
@@ -171,24 +171,24 @@ static bool IsStaticVariable(const pelet::VariableClass& parsedVariable) {
  */
 static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope, 
 										 const std::vector<wxFileName>& sourceDirs,
-										 mvceditor::TagFinderListClass& tagFinderList,
+										 t4p::TagFinderListClass& tagFinderList,
 										 bool doDuckTyping,
-										 mvceditor::SymbolTableMatchErrorClass& error,
+										 t4p::SymbolTableMatchErrorClass& error,
 										 const UnicodeString& variable, 
-										 const std::vector<mvceditor::SymbolClass>& scopeSymbols,
-										 const mvceditor::SymbolTableClass& symbolTable) {
+										 const std::vector<t4p::SymbolClass>& scopeSymbols,
+										 const t4p::SymbolTableClass& symbolTable) {
 	UnicodeString type;
 	if (scopeSymbols.empty()) {
-		error.Type = mvceditor::SymbolTableMatchErrorClass::EMPTY_SYMBOL_TABLE;
+		error.Type = t4p::SymbolTableMatchErrorClass::EMPTY_SYMBOL_TABLE;
 		return type;
 	}
 	for (size_t i = 0; i < scopeSymbols.size(); ++i) {
-		mvceditor::SymbolClass symbol = scopeSymbols[i];
+		t4p::SymbolClass symbol = scopeSymbols[i];
 		if (variable == symbol.Variable) {
-			if (mvceditor::SymbolClass::SCALAR == symbol.Type) {
+			if (t4p::SymbolClass::SCALAR == symbol.Type) {
 				type = "primitive";
 			}
-			else if (mvceditor::SymbolClass::ARRAY == symbol.Type) {
+			else if (t4p::SymbolClass::ARRAY == symbol.Type) {
 				type = "array";
 			}
 			else if (!symbol.PhpDocType.isEmpty()) {
@@ -212,11 +212,11 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				pelet::VariableClass parsedVariable(peletScope);
 
 				parsedVariable.ChainList = symbol.ChainList;
-				std::vector<mvceditor::TagClass> resourceMatches;
+				std::vector<t4p::TagClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs,
 					tagFinderList, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
-					if (mvceditor::TagClass::CLASS == resourceMatches[0].Type) {
+					if (t4p::TagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
 					}
 					else {
@@ -245,11 +245,11 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsedVariable, 
 											  const pelet::ScopeClass& variableScope, 
 											  const std::vector<wxFileName>& sourceDirs,
-											  mvceditor::TagFinderListClass& tagFinderList,
+											  t4p::TagFinderListClass& tagFinderList,
 											  bool doDuckTyping,
-											  mvceditor::SymbolTableMatchErrorClass& error,
-											  const std::vector<mvceditor::SymbolClass>& scopeSymbols,
-											  const mvceditor::SymbolTableClass& symbolTable) {
+											  t4p::SymbolTableMatchErrorClass& error,
+											  const std::vector<t4p::SymbolClass>& scopeSymbols,
+											  const t4p::SymbolTableClass& symbolTable) {
 	UnicodeString start = VariableName(parsedVariable);
 	UnicodeString typeToLookup;
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
@@ -281,7 +281,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 
 		typeToLookup = tagFinderList.ParentClassName(scopeClass, 0);
 		if (typeToLookup.isEmpty()) {
-			error.Type = mvceditor::SymbolTableMatchErrorClass::PARENT_ERROR;
+			error.Type = t4p::SymbolTableMatchErrorClass::PARENT_ERROR;
 			error.ErrorLexeme = scopeClass;
 		}
 	}
@@ -314,28 +314,28 @@ static UnicodeString ScopeString(const UnicodeString& className, const UnicodeSt
 	return className + UNICODE_STRING_SIMPLE("::") + functionName;
 }
 
-mvceditor::SymbolTableMatchErrorClass::SymbolTableMatchErrorClass()
+t4p::SymbolTableMatchErrorClass::SymbolTableMatchErrorClass()
 	: ErrorLexeme()
 	, ErrorClass()
 	, Type(NONE) {
 }
 
-void mvceditor::SymbolTableMatchErrorClass::Clear() {
+void t4p::SymbolTableMatchErrorClass::Clear() {
 	Type = NONE;
 	ErrorLexeme.remove();
 	ErrorClass.remove();
 }
 
-bool mvceditor::SymbolTableMatchErrorClass::HasError() const {
+bool t4p::SymbolTableMatchErrorClass::HasError() const {
 	return Type != NONE;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
+void t4p::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
 	if (IsStaticVariable(parsedVariable)) {
-		Type = mvceditor::SymbolTableMatchErrorClass::STATIC_ERROR;
+		Type = t4p::SymbolTableMatchErrorClass::STATIC_ERROR;
 	}
 	else {
-		Type = mvceditor::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
+		Type = t4p::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
 	}
 	if (!parsedVariable.ChainList.empty()) {
 		ErrorLexeme = parsedVariable.ChainList.back().Name;
@@ -343,40 +343,40 @@ void mvceditor::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableCl
 	ErrorClass = className;	
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToTypeResolution(const UnicodeString& className, const UnicodeString& methodName) {
+void t4p::SymbolTableMatchErrorClass::ToTypeResolution(const UnicodeString& className, const UnicodeString& methodName) {
 	
 	// an error resolving one of the types in the ChainList (not necessarily the last item)
-	Type = mvceditor::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR;
+	Type = t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToArrayError(const UnicodeString& className, const UnicodeString& methodName) {
-	Type = mvceditor::SymbolTableMatchErrorClass::ARRAY_ERROR;
+void t4p::SymbolTableMatchErrorClass::ToArrayError(const UnicodeString& className, const UnicodeString& methodName) {
+	Type = t4p::SymbolTableMatchErrorClass::ARRAY_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToPrimitiveError(const UnicodeString& className, const UnicodeString& methodName) {
-	Type = mvceditor::SymbolTableMatchErrorClass::PRIMITIVE_ERROR;
+void t4p::SymbolTableMatchErrorClass::ToPrimitiveError(const UnicodeString& className, const UnicodeString& methodName) {
+	Type = t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR;
 	ErrorLexeme = methodName;
 	ErrorClass = className;
 }
 
-void mvceditor::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
+void t4p::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
 	if (!parsedVariable.ChainList.empty()) {
 		if (IsStaticVariable(parsedVariable)) {
-			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE;
+			Type = t4p::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE;
 		}
 		else {
-			Type = mvceditor::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
+			Type = t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
 		}
 		ErrorClass = className;
 		ErrorLexeme = parsedVariable.ChainList.back().Name;
 	}
 }
 
-mvceditor::SymbolTableClass::SymbolTableClass() 
+t4p::SymbolTableClass::SymbolTableClass() 
 	: Parser()
 	, Variables() {
 	Parser.SetClassObserver(this);
@@ -385,26 +385,26 @@ mvceditor::SymbolTableClass::SymbolTableClass()
 	Parser.SetVariableObserver(this);
 }
 
-void mvceditor::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
+void t4p::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 	const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
-	mvceditor::SymbolClass symbol(variableName, mvceditor::SymbolClass::SCALAR);
+	t4p::SymbolClass symbol(variableName, t4p::SymbolClass::SCALAR);
 	GetScope(UNICODE_STRING_SIMPLE(""), UNICODE_STRING_SIMPLE("")).push_back(symbol);
 }
 
-void mvceditor::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
+void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	
 	// this call will automatically create the predefined variables
 	GetScope(UNICODE_STRING_SIMPLE(""), functionName);
 }
 
-void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
+void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 	const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
-	std::vector<mvceditor::SymbolClass>& methodScope = GetScope(className, methodName);
+	std::vector<t4p::SymbolClass>& methodScope = GetScope(className, methodName);
 
 	// create the $this variable
-	mvceditor::SymbolClass variableSymbol(UNICODE_STRING_SIMPLE("$this"), mvceditor::SymbolClass::OBJECT);
+	t4p::SymbolClass variableSymbol(UNICODE_STRING_SIMPLE("$this"), t4p::SymbolClass::OBJECT);
 	pelet::VariablePropertyClass prop;
 
 	// qualify class with namespace if needed
@@ -420,7 +420,7 @@ void mvceditor::SymbolTableClass::MethodFound(const UnicodeString& namespaceName
 	methodScope.push_back(variableSymbol);
 }
 
-void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 	const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment) {
 
 	UnicodeString variableArrayAccessKey;
@@ -430,7 +430,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 
 	// ATTN: a single variable may have many assignments
 	// for now just take the first one
-	std::vector<mvceditor::SymbolClass>& symbols = GetScope(className, methodName);
+	std::vector<t4p::SymbolClass>& symbols = GetScope(className, methodName);
 	bool found = false;
 	for (size_t i = 0; i < symbols.size(); ++i) {
 		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0].Name) {
@@ -452,17 +452,17 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	std::vector<pelet::VariablePropertyClass> chainList;
 	if (!found && !variable.ChainList.empty()) {
 		UnicodeString name = variable.ChainList[0].Name;
-		mvceditor::SymbolClass::Types type;
+		t4p::SymbolClass::Types type;
 		std::vector<pelet::ArrayPairExpressionClass*> pairs;
 		std::vector<pelet::ArrayPairExpressionClass*>::const_iterator pair;
 		std::vector<UnicodeString> arrayKeys;
 		if (variableArrayAccessKey.isEmpty()) {
 			switch (expression->ExpressionType) {
 			case pelet::ExpressionClass::SCALAR:
-			type = mvceditor::SymbolClass::SCALAR;
+			type = t4p::SymbolClass::SCALAR;
 				break;
 			case pelet::ExpressionClass::ARRAY:
-				type = mvceditor::SymbolClass::ARRAY;
+				type = t4p::SymbolClass::ARRAY;
 				pairs = ((pelet::ArrayExpressionClass*)expression)->ArrayPairs;
 				for (pair = pairs.begin(); pair != pairs.end(); ++pair) {
 					if ((*pair)->Key && pelet::ExpressionClass::SCALAR == (*pair)->Key->ExpressionType) {
@@ -471,17 +471,17 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 				}
 				break;
 			case pelet::ExpressionClass::VARIABLE:
-				type = mvceditor::SymbolClass::OBJECT;
+				type = t4p::SymbolClass::OBJECT;
 				chainList = ((pelet::VariableClass*)expression)->ChainList;
 				break;
 			case pelet::ExpressionClass::NEW_CALL:
-				type = mvceditor::SymbolClass::OBJECT;
+				type = t4p::SymbolClass::OBJECT;
 				chainList.push_back(pelet::VariablePropertyClass());
 				chainList.back().Name = 
 					((pelet::NewInstanceExpressionClass*)expression)->ClassName;
 				break;
 			default:
-				type = mvceditor::SymbolClass::UNKNOWN;
+				type = t4p::SymbolClass::UNKNOWN;
 				break;
 			}
 		}
@@ -490,9 +490,9 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 			// in  PHP an array may be created by assigning
 			// an array key-value to a non-existant variable
 			arrayKeys.push_back(variableArrayAccessKey);
-			type = mvceditor::SymbolClass::ARRAY;
+			type = t4p::SymbolClass::ARRAY;
 		}
-		mvceditor::SymbolClass newSymbol(name, type);
+		t4p::SymbolClass newSymbol(name, type);
 		newSymbol.ChainList = chainList;
 		newSymbol.PhpDocType = variable.PhpDocType;
 		newSymbol.ArrayKeys = arrayKeys;
@@ -500,7 +500,7 @@ void mvceditor::SymbolTableClass::VariableFound(const UnicodeString& namespaceNa
 	}
 }
 
-void mvceditor::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
+void t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	Variables.clear();
 	
 	// for now ignore parse errors
@@ -508,31 +508,31 @@ void mvceditor::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	Parser.ScanString(code, results);
 }
 
-void mvceditor::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
+void t4p::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
 	Variables.clear();
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
 	if (wxFileName::FileExists(fileName)) {
 		wxFFile file(fileName, wxT("rb"));
-		Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName), results);
+		Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName), results);
 	}
 }
 
-void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass parsedVariable, 
+void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass parsedVariable, 
 															  const pelet::ScopeClass& variableScope,
 															  const std::vector<wxFileName>& sourceDirs,
-															  mvceditor::TagFinderListClass& tagFinderList,
+															  t4p::TagFinderListClass& tagFinderList,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
-															  std::vector<mvceditor::TagClass>& autoCompleteResourceList,
+															  std::vector<t4p::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
-															  mvceditor::SymbolTableMatchErrorClass& error) const {
+															  t4p::SymbolTableMatchErrorClass& error) const {
 	if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
 
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.
-		std::vector<mvceditor::SymbolClass> scopeSymbols;
-		std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, mvceditor::UnicodeStringComparatorClass>::const_iterator it;
+		std::vector<t4p::SymbolClass> scopeSymbols;
+		std::map<UnicodeString, std::vector<t4p::SymbolClass>, t4p::UnicodeStringComparatorClass>::const_iterator it;
 		it = Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
 		if (it != Variables.end()) {
 			scopeSymbols = it->second;
@@ -551,15 +551,15 @@ void mvceditor::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableCla
 	}	
 }
 
-void mvceditor::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable, 
+void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable, 
 												  const pelet::ScopeClass& variableScope, 
 												  const std::vector<wxFileName>& sourceDirs,
-												  mvceditor::TagFinderListClass& tagFinderList,
-												  std::vector<mvceditor::TagClass>& resourceMatches,
+												  t4p::TagFinderListClass& tagFinderList,
+												  std::vector<t4p::TagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
-												  mvceditor::SymbolTableMatchErrorClass& error) const {
-	std::vector<mvceditor::SymbolClass> scopeSymbols;
-	std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = 
+												  t4p::SymbolTableMatchErrorClass& error) const {
+	std::vector<t4p::SymbolClass> scopeSymbols;
+	std::map<UnicodeString, std::vector<t4p::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = 
 		Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
 	if (it != Variables.end()) {
 		scopeSymbols = it->second;
@@ -625,12 +625,12 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVar
 	bool isParentCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
 
 	if (!error.HasError()) {
-		mvceditor::TagSearchClass tagSearch(resourceToLookup);
+		t4p::TagSearchClass tagSearch(resourceToLookup);
 		tagSearch.SetParentClasses(tagFinderList.ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
 		tagSearch.SetTraits(tagFinderList.ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 		
 		// only do duck typing if needed. otherwise, make sure that we have a type match first.
-		std::vector<mvceditor::TagClass> matches;
+		std::vector<t4p::TagClass> matches;
 		if (doDuckTyping || !typeToLookup.isEmpty()) {
 			if (doFullyQualifiedMatchOnly) {
 				tagFinderList.ExactMatchesFromAll(tagSearch, matches, sourceDirs);
@@ -646,7 +646,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVar
 		// now we loop through the possbile matches and remove stuff that does not 
 		// make sense because of visibility rules
 		for (size_t i = 0; i < matches.size(); ++i) {
-			mvceditor::TagClass tag = matches[i];
+			t4p::TagClass tag = matches[i];
 			bool isVisible = IsResourceVisible(tag, originalVariable, variableScope, isStaticCall, isThisCall, isParentCall);
 			if (isVisible) {
 				UnresolveNamespaceAlias(originalVariable, variableScope, tag);
@@ -667,7 +667,7 @@ void mvceditor::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVar
 	}
 }
 
-std::vector<mvceditor::SymbolClass>& mvceditor::SymbolTableClass::GetScope(const UnicodeString& className, 
+std::vector<t4p::SymbolClass>& t4p::SymbolTableClass::GetScope(const UnicodeString& className, 
 		const UnicodeString& methodName) {
 	UnicodeString scopeString = ScopeString(className , methodName);
 	if (Variables[scopeString].empty()) {
@@ -676,14 +676,14 @@ std::vector<mvceditor::SymbolClass>& mvceditor::SymbolTableClass::GetScope(const
 	return Variables[scopeString];
 }
 
-void mvceditor::SymbolTableClass::Print() const {
+void t4p::SymbolTableClass::Print() const {
 	UFILE *out = u_finit(stdout, NULL, NULL);
-	for(std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
-		std::vector<mvceditor::SymbolClass> scopedSymbols = it->second;
+	for(std::map<UnicodeString, std::vector<t4p::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
+		std::vector<t4p::SymbolClass> scopedSymbols = it->second;
 		UnicodeString s = it->first;
 		u_fprintf(out, "Symbol Table For %S\n", s.getTerminatedBuffer());
 		for (size_t j = 0; j < scopedSymbols.size(); ++j) {
-			mvceditor::SymbolClass symbol = scopedSymbols[j];
+			t4p::SymbolClass symbol = scopedSymbols[j];
 			u_fprintf(out, "%d\t%S\t", (int)j, 
 				symbol.Variable.getTerminatedBuffer()); 
 			for (size_t k = 0; k < symbol.ChainList.size(); ++k) {
@@ -699,7 +699,7 @@ void mvceditor::SymbolTableClass::Print() const {
 	u_fclose(out);
 }
 
-void mvceditor::SymbolTableClass::CreatePredefinedVariables(std::vector<mvceditor::SymbolClass>& scope) {
+void t4p::SymbolTableClass::CreatePredefinedVariables(std::vector<t4p::SymbolClass>& scope) {
 	UnicodeString variables[] =  {
 		UNICODE_STRING_SIMPLE("$GLOBALS"),
 		UNICODE_STRING_SIMPLE("$_SERVER"),
@@ -717,12 +717,12 @@ void mvceditor::SymbolTableClass::CreatePredefinedVariables(std::vector<mvcedito
 		UNICODE_STRING_SIMPLE("$argv")
 	};
 	for (int i = 0; i < 14; ++i) {
-		mvceditor::SymbolClass variableSymbol(variables[i], mvceditor::SymbolClass::SCALAR);
+		t4p::SymbolClass variableSymbol(variables[i], t4p::SymbolClass::SCALAR);
 		scope.push_back(variableSymbol);
 	}
 }
 
-void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVariable, const pelet::ScopeClass& scope) const {
+void t4p::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVariable, const pelet::ScopeClass& scope) const {
 	
 	// aliases are only in the beginning of the expression
 	// for example, for the expression 
@@ -755,7 +755,7 @@ void mvceditor::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& pa
 	}
 }
 
-void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const {
+void t4p::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::TagClass& tag) const {
 	UnicodeString name = tag.Identifier;
 	
 	// leave variables and fully qualified names alone
@@ -784,11 +784,11 @@ void mvceditor::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableC
 	}
 }
 
-void mvceditor::SymbolTableClass::SetVersion(pelet::Versions version) {
+void t4p::SymbolTableClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-mvceditor::ScopeFinderClass::ScopeFinderClass() 
+t4p::ScopeFinderClass::ScopeFinderClass() 
 	: Scope()
 	, LastNamespace()
 	, Parser() {
@@ -797,11 +797,11 @@ mvceditor::ScopeFinderClass::ScopeFinderClass()
 	Parser.SetFunctionObserver(this);
 }
 
-void mvceditor::ScopeFinderClass::SetVersion(pelet::Versions version) {
+void t4p::ScopeFinderClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-void mvceditor::ScopeFinderClass::ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos) {
+void t4p::ScopeFinderClass::ClassEnd(const UnicodeString& namespaceName, const UnicodeString& className, int pos) {
 	if (pos >= PosToCheck) {
 		return;
 	}
@@ -809,7 +809,7 @@ void mvceditor::ScopeFinderClass::ClassEnd(const UnicodeString& namespaceName, c
 }
 
 
-void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString& namespaceName, int startingPos) {
+void t4p::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString& namespaceName, int startingPos) {
 	if (startingPos >= PosToCheck) {
 		return;
 	}
@@ -821,14 +821,14 @@ void mvceditor::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString&
 	}
 }
 
-void mvceditor::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+void t4p::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
 	if (startingPos >= PosToCheck) {
 		return;
 	}
 	Scope.AddNamespaceAlias(namespaceName, alias);
 }
 
-void mvceditor::ScopeFinderClass::MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+void t4p::ScopeFinderClass::MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		int startingPos, int endingPos) {
 	if (startingPos <= PosToCheck && PosToCheck <= endingPos) {
 		CheckLastNamespace(namespaceName);
@@ -837,7 +837,7 @@ void mvceditor::ScopeFinderClass::MethodScope(const UnicodeString& namespaceName
 	}
 }
 
-void mvceditor::ScopeFinderClass::FunctionScope(const UnicodeString& namespaceName, const UnicodeString& functionName, 
+void t4p::ScopeFinderClass::FunctionScope(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		int startingPos, int endingPos) {
 	if (startingPos <= PosToCheck && PosToCheck <= endingPos) {
 		CheckLastNamespace(namespaceName);
@@ -846,7 +846,7 @@ void mvceditor::ScopeFinderClass::FunctionScope(const UnicodeString& namespaceNa
 	}
 }
 
-void mvceditor::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos, pelet::ScopeClass& scope) {
+void t4p::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos, pelet::ScopeClass& scope) {
 	Scope.Clear();
 	LastNamespace.remove();
 	PosToCheck = pos;
@@ -861,7 +861,7 @@ void mvceditor::ScopeFinderClass::GetScopeString(const UnicodeString& code, int 
 	scope.Copy(Scope);
 }
 
-void mvceditor::ScopeFinderClass::CheckLastNamespace(const UnicodeString& namespaceName) {
+void t4p::ScopeFinderClass::CheckLastNamespace(const UnicodeString& namespaceName) {
 	if (LastNamespace.caseCompare(namespaceName, 0) != 0) {
 		
 		// cannot Clear() the scope result because it would delete the aliases, and the aliases
@@ -871,7 +871,7 @@ void mvceditor::ScopeFinderClass::CheckLastNamespace(const UnicodeString& namesp
 	}
 }
 
-mvceditor::SymbolClass::SymbolClass(const UnicodeString& variable, mvceditor::SymbolClass::Types type)
+t4p::SymbolClass::SymbolClass(const UnicodeString& variable, t4p::SymbolClass::Types type)
 	: Variable(variable)
 	, PhpDocType()
 	, ChainList()

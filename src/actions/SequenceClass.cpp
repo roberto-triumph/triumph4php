@@ -34,7 +34,7 @@
 #include <actions/DetectorDbInitActionClass.h>
 #include <globals/Errors.h>
 
-mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvceditor::RunningThreadsClass& runningThreads)
+t4p::SequenceClass::SequenceClass(t4p::GlobalsClass& globals, t4p::RunningThreadsClass& runningThreads)
 	: wxEvtHandler()
 	, Globals(globals)
 	, RunningThreads(runningThreads)
@@ -44,12 +44,12 @@ mvceditor::SequenceClass::SequenceClass(mvceditor::GlobalsClass& globals, mvcedi
 	RunningThreads.AddEventHandler(this);
 }
 
-mvceditor::SequenceClass::~SequenceClass() {
+t4p::SequenceClass::~SequenceClass() {
 	RunningThreads.RemoveEventHandler(this);
 	Stop();
 }
 
-void mvceditor::SequenceClass::Stop() {
+void t4p::SequenceClass::Stop() {
 	if (!Steps.empty()) {
 
 		// remove the step that just finished
@@ -70,12 +70,12 @@ void mvceditor::SequenceClass::Stop() {
 		Steps.pop();
 	}
 	IsRunning = false;
-	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+	wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
 	sequenceEvent.SetId(wxID_ANY);
 	RunningThreads.PostEvent(sequenceEvent);
 }
 
-bool mvceditor::SequenceClass::AppStart() {
+bool t4p::SequenceClass::AppStart() {
 	if (Running()) {
 		return false;
 	}
@@ -83,26 +83,26 @@ bool mvceditor::SequenceClass::AppStart() {
 
 	// before we do anything else, make sure that the cache files are the same version as the
 	// code expects them to be
-	AddStep(new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
-	AddStep(new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
+	AddStep(new t4p::TagCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
+	AddStep(new t4p::DetectorCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
 	
 	// open the detector tags db file
-	AddStep(new mvceditor::DetectorDbInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT));
+	AddStep(new t4p::DetectorDbInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT));
 
 	// this will load the cache from the hard disk
 	// load the cache from hard disk so that code completion and 
 	// tag searching is available immediately after the app starts
-	AddStep(new mvceditor::ProjectTagInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
+	AddStep(new t4p::ProjectTagInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
 	
 	// this will load the discovered the db schema info (tables, columns)
-	AddStep(new mvceditor::SqlMetaDataInitActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+	AddStep(new t4p::SqlMetaDataInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
 	Run();
 	return true;
 }
 
-bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvceditor::ProjectClass>& touchedProjects,
-	const std::vector<mvceditor::ProjectClass>& removedProjects) {
+bool t4p::SequenceClass::ProjectDefinitionsUpdated(const std::vector<t4p::ProjectClass>& touchedProjects,
+	const std::vector<t4p::ProjectClass>& removedProjects) {
 	if (Running()) {
 		return false;
 	}
@@ -116,8 +116,8 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 	// hence it won't remove items that don't need to be there
 	// don't wipe, just remove tags from touchedProjects
 	std::vector<wxFileName> sourceDirsToDelete;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 			sourceDirsToDelete.push_back(source->RootDirectory);
@@ -130,67 +130,67 @@ bool mvceditor::SequenceClass::ProjectDefinitionsUpdated(const std::vector<mvced
 			sourceDirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	AddStep(new mvceditor::TagDeleteSourceActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
+	AddStep(new t4p::TagDeleteSourceActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
 
 	// this will detect all of the config files for projects
-	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
+	AddStep(new t4p::ConfigTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
 
 	// this will attempt to detect new sql connections from the php detectors
 	// this can go here because it does not need the tag cache to be up-to-date
-	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
+	AddStep(new t4p::DatabaseTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
 	// this will update the tag cache by parsing newly modified files
-	mvceditor::ProjectTagActionClass* action = 
-		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+	t4p::ProjectTagActionClass* action = 
+		new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
 	action->SetTouchedProjects(touchedProjects);
 	AddStep(action);
 	
 	// this will discover the db schema info (tables, columns)
-	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+	AddStep(new t4p::SqlMetaDataActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
 	// this will detect the urls (entry points) that a project has
-	AddStep(new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR));
+	AddStep(new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR));
 
 	// this will discover any new detected tags 
-	AddStep(new mvceditor::TagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR));
+	AddStep(new t4p::TagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_DETECTOR));
 
 	Run();
 	return true;
 }
 
-bool mvceditor::SequenceClass::TagCacheWipeAndIndex() {
+bool t4p::SequenceClass::TagCacheWipeAndIndex() {
 	if (Running()) {
 		return false;
 	}
 	SourceCheck();
 
 	// this step will wipe the global cache from all projects
-	AddStep(new mvceditor::TagWipeActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE));
+	AddStep(new t4p::TagWipeActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE));
 	
 	// this will detect all of the config files for projects
-	AddStep(new mvceditor::ConfigTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
+	AddStep(new t4p::ConfigTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
 
 	// this will attempt to detect new sql connections from the php detectors
 	// this can go here because it does not need the tag cache to be up-to-date
-	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
+	AddStep(new t4p::DatabaseTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
 	// this will recurse though all directories and parse the source code
-	AddStep(new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST));
+	AddStep(new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST));
 
 	// this will detect the urls (entry points) that a project has
-	AddStep(new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR));
+	AddStep(new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR));
 
 	// this will discover any new detected tags 
-	AddStep(new mvceditor::TagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_DETECTOR));
+	AddStep(new t4p::TagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_DETECTOR));
 	
 	// this will discover the db schema info (tables, columns)
-	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+	AddStep(new t4p::SqlMetaDataActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
 	Run();
 	return true;
 }
 
-bool mvceditor::SequenceClass::Build(std::vector<mvceditor::GlobalActionClass*> actions) {
+bool t4p::SequenceClass::Build(std::vector<t4p::GlobalActionClass*> actions) {
 	if (Running()) {
 		return false;
 	}
@@ -202,34 +202,34 @@ bool mvceditor::SequenceClass::Build(std::vector<mvceditor::GlobalActionClass*> 
 	return true;
 }
 
-bool mvceditor::SequenceClass::DatabaseDetection() {
+bool t4p::SequenceClass::DatabaseDetection() {
 	if (Running()) {
 		return false;
 	}
 
 	// this will attempt to detect new sql connections from the php detectors
-	AddStep(new mvceditor::DatabaseTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
+	AddStep(new t4p::DatabaseTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
 	// this will discover the db schema info (tables, columns)
-	AddStep(new mvceditor::SqlMetaDataActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_SQL_METADATA));
+	AddStep(new t4p::SqlMetaDataActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
 	Run();
 	return true;
 }
 
-void mvceditor::SequenceClass::AddStep(mvceditor::GlobalActionClass* step) {
+void t4p::SequenceClass::AddStep(t4p::GlobalActionClass* step) {
 	Steps.push(step);
 }
 
-void mvceditor::SequenceClass::Run() {
-	wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_START);
+void t4p::SequenceClass::Run() {
+	wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_START);
 	RunningThreads.PostEvent(sequenceEvent);
 
 	IsRunning = false;
 	RunNextStep();
 }
 
-void mvceditor::SequenceClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+void t4p::SequenceClass::OnActionComplete(t4p::ActionEventClass& event) {
 	if (!Steps.empty()) {
 
 		// remove the step that just finished
@@ -247,13 +247,13 @@ void mvceditor::SequenceClass::OnActionComplete(mvceditor::ActionEventClass& eve
 		RunNextStep();
 	}
 	else {
-		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+		wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
 		sequenceEvent.SetId(wxID_ANY);
 		RunningThreads.PostEvent(sequenceEvent);
 	}
 }
 
-void mvceditor::SequenceClass::RunNextStep() {
+void t4p::SequenceClass::RunNextStep() {
 	if (Steps.empty()) {
 		return;
 	}
@@ -296,7 +296,7 @@ void mvceditor::SequenceClass::RunNextStep() {
 			// if there is no work to be done
 			isInit = Steps.front()->Init(Globals);
 			if (isInit) {
-				mvceditor::ActionClass* action = Steps.front();
+				t4p::ActionClass* action = Steps.front();
 				RunningThreads.Queue(action);
 
 				// now wait for the background thread to finish
@@ -319,33 +319,33 @@ void mvceditor::SequenceClass::RunNextStep() {
 		
 		// this can happen when the last step could not be 
 		// initialized; then no EVT_WORK_COMPLETE will be generated
-		wxCommandEvent sequenceEvent(mvceditor::EVENT_SEQUENCE_COMPLETE);
+		wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
 		sequenceEvent.SetId(wxID_ANY);
 		RunningThreads.PostEvent(sequenceEvent);
 	}
 }
 
-bool mvceditor::SequenceClass::Running() const {
+bool t4p::SequenceClass::Running() const {
 	return IsRunning;
 }
 
-void mvceditor::SequenceClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
+void t4p::SequenceClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	
 	// if there is an action that is running then send an in-progress event
 	// for it
-	mvceditor::SequenceProgressEventClass sequenceEvt(wxID_ANY, event.Mode, event.PercentComplete, event.Message);
+	t4p::SequenceProgressEventClass sequenceEvt(wxID_ANY, event.Mode, event.PercentComplete, event.Message);
 	RunningThreads.PostEvent(sequenceEvt);
 }
 
-void mvceditor::SequenceClass::SourceCheck() {
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+void t4p::SequenceClass::SourceCheck() {
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++ project) {
 		if (project->IsEnabled) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (!source->Exists()) {
-					mvceditor::EditorLogError(
-						mvceditor::ERR_INVALID_DIRECTORY, source->RootDirectory.GetPath()
+					t4p::EditorLogError(
+						t4p::ERR_INVALID_DIRECTORY, source->RootDirectory.GetPath()
 					);
 				}
 			}
@@ -353,49 +353,49 @@ void mvceditor::SequenceClass::SourceCheck() {
 	}
 }
 
-mvceditor::SequenceProgressEventClass::SequenceProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
+t4p::SequenceProgressEventClass::SequenceProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
 : ActionProgressEventClass(id, mode, percentComplete, msg) {
-	SetEventType(mvceditor::EVENT_SEQUENCE_PROGRESS);
+	SetEventType(t4p::EVENT_SEQUENCE_PROGRESS);
 }
 
-wxEvent* mvceditor::SequenceProgressEventClass::Clone() const {
-	return new mvceditor::SequenceProgressEventClass(GetId(), Mode, PercentComplete, Message);
+wxEvent* t4p::SequenceProgressEventClass::Clone() const {
+	return new t4p::SequenceProgressEventClass(GetId(), Mode, PercentComplete, Message);
 }
 
-const wxEventType mvceditor::EVENT_SEQUENCE_START = wxNewEventType();
-const wxEventType mvceditor::EVENT_SEQUENCE_PROGRESS = wxNewEventType();
-const wxEventType mvceditor::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_SEQUENCE_START = wxNewEventType();
+const wxEventType t4p::EVENT_SEQUENCE_PROGRESS = wxNewEventType();
+const wxEventType t4p::EVENT_SEQUENCE_COMPLETE = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::SequenceClass, wxEvtHandler)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT, mvceditor::SequenceClass::OnActionComplete)
+BEGIN_EVENT_TABLE(t4p::SequenceClass, wxEvtHandler)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_SQL_METADATA_INIT, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_SQL_METADATA, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_DETECTOR_INIT, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_DETECTOR, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_CALL_STACK, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, t4p::SequenceClass::OnActionComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT, t4p::SequenceClass::OnActionComplete)
 
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA_INIT, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_SQL_METADATA, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR_INIT, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CALL_STACK, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, mvceditor::SequenceClass::OnActionProgress)
-	EVT_ACTION_PROGRESS(mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT, mvceditor::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_SQL_METADATA_INIT, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_SQL_METADATA, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_DETECTOR_INIT, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_DETECTOR, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_CALL_STACK, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK, t4p::SequenceClass::OnActionProgress)
+	EVT_ACTION_PROGRESS(t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT, t4p::SequenceClass::OnActionProgress)
 END_EVENT_TABLE()

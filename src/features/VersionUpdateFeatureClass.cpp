@@ -34,8 +34,8 @@
 // these macros will expand a macro into its 
 // these are needed to expand the update host which
 // are given as macros by the premake script
-#define MVC_STR_EXPAND(s) #s
-#define MVC_STR(s) MVC_STR_EXPAND(s)
+#define T4P_STR_EXPAND(s) #s
+#define T4P_STR(s) T4P_STR_EXPAND(s)
 
 static int ID_VERSION_FEATURE_TIMER = wxNewId();
 static int ID_VERSION_DIALOG_TIMER = wxNewId();
@@ -55,26 +55,26 @@ static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* str
     return 0;
 }
 
-mvceditor::VersionUpdateFeatureClass::VersionUpdateFeatureClass(mvceditor::AppClass& app)
+t4p::VersionUpdateFeatureClass::VersionUpdateFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , NextCheckTime()
 , Timer(this, ID_VERSION_FEATURE_TIMER) {
 
 }
 
-void mvceditor::VersionUpdateFeatureClass::AddHelpMenuItems(wxMenu* helpMenu) {
-	helpMenu->Append(mvceditor::MENU_VERSION_UPDATE, _("Check for updates"),
+void t4p::VersionUpdateFeatureClass::AddHelpMenuItems(wxMenu* helpMenu) {
+	helpMenu->Append(t4p::MENU_VERSION_UPDATE, _("Check for updates"),
 		_("Check for new version of Triumph"), wxITEM_NORMAL);
 }
 
-void mvceditor::VersionUpdateFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void t4p::VersionUpdateFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 
-	VersionUpdatePreferencesPanelClass* panel = new mvceditor::VersionUpdatePreferencesPanelClass(
+	VersionUpdatePreferencesPanelClass* panel = new t4p::VersionUpdatePreferencesPanelClass(
 		parent, App.Preferences);
 	parent->AddPage(panel, _("Check for updates"));
 }
 
-void mvceditor::VersionUpdateFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::VersionUpdateFeatureClass::LoadPreferences(wxConfigBase* config) {
 	wxString readTime;
 	config->Read(wxT("VersionUpdates/NextCheckTime"), &readTime);
 	if (!NextCheckTime.ParseDateTime(readTime)) {
@@ -82,7 +82,7 @@ void mvceditor::VersionUpdateFeatureClass::LoadPreferences(wxConfigBase* config)
 	}
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
 	if (App.Preferences.CheckForUpdates) {
 		Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
 	}
@@ -92,7 +92,7 @@ void mvceditor::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
 	wxASSERT_MSG(good, _("curl did not initialize"));
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	if (App.Preferences.CheckForUpdates) {
 		if (!Timer.IsRunning()) {
 			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
@@ -103,7 +103,7 @@ void mvceditor::VersionUpdateFeatureClass::OnPreferencesSaved(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	if (App.Preferences.CheckForUpdates) {
 		if (!Timer.IsRunning()) {
 			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
@@ -114,21 +114,21 @@ void mvceditor::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated(wxComm
 	}
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnTimer(wxTimerEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnTimer(wxTimerEvent& event) {
 	
 	// is it time to check for a new version
 	wxDateTime now = wxDateTime::Now();
 	if (NextCheckTime.IsEarlierThan(now)) {
 		Timer.Stop();
 		wxString currentVersion = GetCurrentVersion();
-		mvceditor::VersionUpdateActionClass* action = new mvceditor::VersionUpdateActionClass(
+		t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
 			App.RunningThreads, ID_EVENT_VERSION_UPDATES, currentVersion
 		);
 		App.RunningThreads.Queue(action);
 	}
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	wxString nextVersion = event.GetString();
 	
 	wxString currentVersion = GetCurrentVersion();
@@ -154,7 +154,7 @@ void mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent&
 	// TODO: we should prevent config from being read
 	// before the user has chosen a settings dir, or
 	// provide a default settings dir
-	wxFileName settingsDir = mvceditor::SettingsDirAsset();
+	wxFileName settingsDir = t4p::SettingsDirAsset();
 	if (settingsDir.IsOk()) {
 		wxConfigBase* config = wxConfig::Get();
 	
@@ -165,21 +165,21 @@ void mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent&
 	Timer.Start(1000 * 20, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::VersionUpdateFeatureClass::OnHelpCheckForUpdates(wxCommandEvent& event) {
+void t4p::VersionUpdateFeatureClass::OnHelpCheckForUpdates(wxCommandEvent& event) {
 	wxString currentVersion  = GetCurrentVersion();
-	mvceditor::VersionUpdateDialogClass dialog(GetMainWindow(), 
+	t4p::VersionUpdateDialogClass dialog(GetMainWindow(), 
 			wxID_ANY, App.RunningThreads, currentVersion, false,
 			wxEmptyString);
 	dialog.ShowModal();
 }
 
-wxString mvceditor::VersionUpdateFeatureClass::GetCurrentVersion() const {
+wxString t4p::VersionUpdateFeatureClass::GetCurrentVersion() const {
 
 	// version info is stored in a file
 	// for releases, the distribution script will properly fill in the
 	// version number using git describe
 	wxString currentVersion;
-	wxFileName versionFileName = mvceditor::VersionFileAsset();
+	wxFileName versionFileName = t4p::VersionFileAsset();
 	wxFFile file(versionFileName.GetFullPath());
 	if (file.IsOpened()) {
 		file.ReadAll(&currentVersion);
@@ -188,16 +188,16 @@ wxString mvceditor::VersionUpdateFeatureClass::GetCurrentVersion() const {
 	return currentVersion;
 }
 
-mvceditor::VersionUpdatePreferencesPanelClass::VersionUpdatePreferencesPanelClass(wxWindow* parent,
-																				  mvceditor::PreferencesClass& preferences)
+t4p::VersionUpdatePreferencesPanelClass::VersionUpdatePreferencesPanelClass(wxWindow* parent,
+																				  t4p::PreferencesClass& preferences)
 : VersionUpdatePreferencesGeneratedPanelClass(parent, wxID_ANY) {
 	wxGenericValidator checkValidator(&preferences.CheckForUpdates);
 	CheckForUpdates->SetValidator(checkValidator);
 	TransferDataToWindow();
 }
 
-mvceditor::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id, 
-															  mvceditor::RunningThreadsClass& runningThreads,
+t4p::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id, 
+															  t4p::RunningThreadsClass& runningThreads,
 															  const wxString& currentVersion,
 															  bool showNewVersion,
 															  wxString newVersion) 
@@ -217,7 +217,7 @@ mvceditor::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, 
 	}
 }
 
-void mvceditor::VersionUpdateDialogClass::OnTimer(wxTimerEvent& event) {
+void t4p::VersionUpdateDialogClass::OnTimer(wxTimerEvent& event) {
 	if (!StartedCheck) {
 		Result->SetLabel(wxT("Checking for new version"));
 		ConnectToUpdateServer();
@@ -228,7 +228,7 @@ void mvceditor::VersionUpdateDialogClass::OnTimer(wxTimerEvent& event) {
 	}
 }
 
-void mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& event) {
+void t4p::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	Gauge->Show(false);
 	wxString newVersion = event.GetString();
 	int statusCode = event.GetInt();
@@ -247,25 +247,25 @@ void mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& 
 	Timer.Stop();
 }
 
-void mvceditor::VersionUpdateDialogClass::ConnectToUpdateServer() {	
-	mvceditor::VersionUpdateActionClass* action = new mvceditor::VersionUpdateActionClass(
+void t4p::VersionUpdateDialogClass::ConnectToUpdateServer() {	
+	t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
 		RunningThreads, ID_EVENT_VERSION_UPDATES_ON_DIALOG, CurrentVersion->GetLabel()
 	);
 	RunningThreads.Queue(action);
 }
 
-void mvceditor::VersionUpdateDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::VersionUpdateDialogClass::OnOkButton(wxCommandEvent& event) {
 	RunningThreads.RemoveEventHandler(this);
 	EndModal(wxOK);
 }
 
-mvceditor::VersionUpdateActionClass::VersionUpdateActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId, 
+t4p::VersionUpdateActionClass::VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, 
 															  const wxString& currentVersion)
 : ActionClass(runningThreads, eventId)
 , CurrentVersion(currentVersion.c_str()) {
 }
 
-void mvceditor::VersionUpdateActionClass::BackgroundWork() {
+void t4p::VersionUpdateActionClass::BackgroundWork() {
 	long statusCode = 0;
 	wxString newVersion = GetNewVersion(CurrentVersion, statusCode);
 	
@@ -275,17 +275,17 @@ void mvceditor::VersionUpdateActionClass::BackgroundWork() {
 	PostEvent(evt);
 }
 
-wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& currentVersion, long& statusCode) {
+wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVersion, long& statusCode) {
 
-	// MVCEDITOR_UPDATE_HOST is a define from the premake script
+	// T4P_UPDATE_HOST is a define from the premake script
 	// it will be different in debug vs release
-	const char* host = MVC_STR(MVCEDITOR_UPDATE_HOST);
+	const char* host = T4P_STR(T4P_UPDATE_HOST);
 	std::string fullUrl = "http://";
 	fullUrl += host;
 	fullUrl += "/updates.php";
 	
 	std::string data = "v=";
-	data += mvceditor::WxToChar(currentVersion);
+	data += t4p::WxToChar(currentVersion);
 	const char* buf = data.c_str();
 	const char* urlBuf = fullUrl.c_str();
 	
@@ -322,7 +322,7 @@ wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& curr
 			}
 		}
 		else {
-			newVersion = mvceditor::CharToWx(curl_easy_strerror(ret));
+			newVersion = t4p::CharToWx(curl_easy_strerror(ret));
 			
 		}
 	}
@@ -330,21 +330,21 @@ wxString mvceditor::VersionUpdateActionClass::GetNewVersion(const wxString& curr
 	return newVersion;
 }
 
-wxString mvceditor::VersionUpdateActionClass::GetLabel() const {
+wxString t4p::VersionUpdateActionClass::GetLabel() const {
 	return wxT("Version updates");
 }
 
-BEGIN_EVENT_TABLE(mvceditor::VersionUpdateFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_VERSION_UPDATE + 0, mvceditor::VersionUpdateFeatureClass::OnHelpCheckForUpdates)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::VersionUpdateFeatureClass::OnAppReady)
-	EVT_TIMER(ID_VERSION_FEATURE_TIMER, mvceditor::VersionUpdateFeatureClass::OnTimer)
-	EVT_COMMAND(ID_EVENT_VERSION_UPDATES, EVENT_VERSION_CHECK, mvceditor::VersionUpdateFeatureClass::OnUpdateCheckComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::VersionUpdateFeatureClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated)
+BEGIN_EVENT_TABLE(t4p::VersionUpdateFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_VERSION_UPDATE + 0, t4p::VersionUpdateFeatureClass::OnHelpCheckForUpdates)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::VersionUpdateFeatureClass::OnAppReady)
+	EVT_TIMER(ID_VERSION_FEATURE_TIMER, t4p::VersionUpdateFeatureClass::OnTimer)
+	EVT_COMMAND(ID_EVENT_VERSION_UPDATES, EVENT_VERSION_CHECK, t4p::VersionUpdateFeatureClass::OnUpdateCheckComplete)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::VersionUpdateFeatureClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated)
 END_EVENT_TABLE()
 
 
-BEGIN_EVENT_TABLE(mvceditor::VersionUpdateDialogClass, wxDialog)
-	EVT_TIMER(ID_VERSION_DIALOG_TIMER, mvceditor::VersionUpdateDialogClass::OnTimer)
-	EVT_COMMAND(ID_EVENT_VERSION_UPDATES_ON_DIALOG, EVENT_VERSION_CHECK, mvceditor::VersionUpdateDialogClass::OnUpdateCheckComplete)
+BEGIN_EVENT_TABLE(t4p::VersionUpdateDialogClass, wxDialog)
+	EVT_TIMER(ID_VERSION_DIALOG_TIMER, t4p::VersionUpdateDialogClass::OnTimer)
+	EVT_COMMAND(ID_EVENT_VERSION_UPDATES_ON_DIALOG, EVENT_VERSION_CHECK, t4p::VersionUpdateDialogClass::OnUpdateCheckComplete)
 END_EVENT_TABLE()

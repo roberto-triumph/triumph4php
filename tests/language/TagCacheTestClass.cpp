@@ -29,7 +29,7 @@
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -43,11 +43,11 @@ class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestF
 
 public:
 
-	mvceditor::TagCacheClass TagCache;
-	mvceditor::DirectorySearchClass Search;
+	t4p::TagCacheClass TagCache;
+	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
-	std::vector<mvceditor::TagClass> Matches;
+	std::vector<t4p::TagClass> Matches;
 	std::vector<wxFileName> SourceDirs;
 	soci::session* Session1;
 
@@ -69,25 +69,25 @@ public:
 			wxMkdir(TestProjectDir, 0777);
 		}
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
+		CreateDatabase(*Session1, t4p::ResourceSqlSchemaAsset());
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
 		std::vector<wxFileName> dirs;
-		mvceditor::TagResultClass* result = TagCache.NearMatchTags(search, dirs);
+		t4p::TagResultClass* result = TagCache.NearMatchTags(search, dirs);
 		Matches = result->Matches();
 		delete result;
 	}
 
-	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
-		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
+	t4p::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
+		t4p::WorkingCacheClass* cache = new t4p::WorkingCacheClass();
 		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
 		cache->Update(code);
 		return cache;
 	}
 
-	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
-		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
+	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		wxFileName srcDir;
@@ -115,7 +115,7 @@ class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass, Sql
 
 public:
 
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 	wxString GlobalFile;
 	wxString File1;
 	wxString File2;
@@ -129,9 +129,9 @@ public:
 	std::vector<wxFileName> SourceDirs;
 
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<mvceditor::TagClass> TagMatches;
-	mvceditor::SymbolTableMatchErrorClass Error;
-	mvceditor::DirectorySearchClass Search;
+	std::vector<t4p::TagClass> TagMatches;
+	t4p::SymbolTableMatchErrorClass Error;
+	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	soci::session* Session1;
@@ -163,7 +163,7 @@ public:
 		Scope.ClassName = UNICODE_STRING_SIMPLE("");
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
+		CreateDatabase(*Session1, t4p::ResourceSqlSchemaAsset());
 		
 		wxFileName srcDir;
 		srcDir.AssignDir(TestProjectDir + wxT("src"));
@@ -181,15 +181,15 @@ public:
 		ParsedVariable.ChainList.push_back(methodProp);
 	}
 
-	mvceditor::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
-		mvceditor::WorkingCacheClass* cache = new mvceditor::WorkingCacheClass();
+	t4p::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
+		t4p::WorkingCacheClass* cache = new t4p::WorkingCacheClass();
 		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
 		cache->Update(code);
 		return cache;
 	}
 
-	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
-		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
+	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		// must call init() here since we want to parse files from disk
@@ -203,8 +203,8 @@ class TagCacheSearchFixtureClass : public FileTestFixtureClass, public SqliteTes
 
 public:
 
-	mvceditor::TagCacheClass TagCache;
-	mvceditor::DirectorySearchClass Search;
+	t4p::TagCacheClass TagCache;
+	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 
@@ -222,11 +222,11 @@ public:
 		, Session1(NULL) {
 		PhpFileExtensions.push_back(wxT("*.php"));
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session1, mvceditor::ResourceSqlSchemaAsset());
+		CreateDatabase(*Session1, t4p::ResourceSqlSchemaAsset());
 	}
 
-	mvceditor::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
-		mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass();
+	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
+		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		// must call init() here since we want to parse files from disk
@@ -247,8 +247,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 	CreateFixtureFile(File1, code1);
 
-	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File2, Code2);
-	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
+	t4p::WorkingCacheClass* cache1 = CreateWorkingCache(File2, Code2);
+	t4p::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 	
 	CHECK(TagCache.RegisterWorking(File2, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -269,8 +269,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderLis
 	GlobalCode = wxT("<?php class ActionYou  { function w() {} }");
 	CreateFixtureFile(GlobalFile, GlobalCode);
 	
-	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
-	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
+	t4p::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
+	t4p::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 	
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -296,8 +296,8 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 
 	CreateFixtureFile(GlobalFile, GlobalCode);
 
-	mvceditor::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
-	mvceditor::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
+	t4p::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
+	t4p::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
 
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
@@ -311,7 +311,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 
 	// now update the code by creating a working version of the global code.
 	// ie. the user opening a file.
-	mvceditor::WorkingCacheClass* cache3 = CreateWorkingCache(GlobalFile, Code2);
+	t4p::WorkingCacheClass* cache3 = CreateWorkingCache(GlobalFile, Code2);
 	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
 	
 	TagMatches.clear();
@@ -325,12 +325,12 @@ TEST_FIXTURE(TagCacheSearchFixtureClass, ExactTags) {
 	CreateSubDirectory(wxT("src"));
 	CreateFixtureFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"), code);
 	
-	mvceditor::TagFinderListClass* cache = CreateTagFinderList(wxT("src"));
+	t4p::TagFinderListClass* cache = CreateTagFinderList(wxT("src"));
 	TagCache.RegisterGlobal(cache);
 	
 	// empty means search all dirs
 	std::vector<wxFileName> searchDirs;
-	mvceditor::TagResultClass* result = TagCache.ExactTags(UNICODE_STRING_SIMPLE("ActionYou"), searchDirs);
+	t4p::TagResultClass* result = TagCache.ExactTags(UNICODE_STRING_SIMPLE("ActionYou"), searchDirs);
 
 	CHECK(result);
 	if (!result) {

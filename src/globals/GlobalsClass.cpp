@@ -26,7 +26,7 @@
 #include <globals/Assets.h>
 
 
-mvceditor::GlobalsClass::GlobalsClass()
+t4p::GlobalsClass::GlobalsClass()
 	: Environment()
 	, TagCache()
 	, UrlTagFinder()
@@ -36,13 +36,13 @@ mvceditor::GlobalsClass::GlobalsClass()
 	, CurrentUrl() 
 	, ChosenBrowser()
 	, FileTypes()
-	, TagCacheDbFileName(mvceditor::TagCacheAsset())
-	, DetectorCacheDbFileName(mvceditor::DetectorCacheAsset()) 
+	, TagCacheDbFileName(t4p::TagCacheAsset())
+	, DetectorCacheDbFileName(t4p::DetectorCacheAsset()) 
 	, ResourceCacheSession()
 	, DetectorCacheSession() {
 }
 
-void mvceditor::GlobalsClass::Close() {
+void t4p::GlobalsClass::Close() {
 	TagCache.Clear();
 	UrlTagFinder.ClearSession();
 	SqlResourceFinder.ClearSession();
@@ -50,9 +50,9 @@ void mvceditor::GlobalsClass::Close() {
 	DetectorCacheSession.close();
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources() const {
-	std::vector<mvceditor::SourceClass> allSources;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
+std::vector<t4p::SourceClass> t4p::GlobalsClass::AllEnabledSources() const {
+	std::vector<t4p::SourceClass> allSources;
+	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
 			for (size_t j = 0; j < it->Sources.size(); ++j) {
@@ -63,23 +63,23 @@ std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledSources()
 	return allSources;
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::GlobalsClass::AllEnabledPhpSources() const {
-	std::vector<mvceditor::SourceClass> allSources;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+std::vector<t4p::SourceClass> t4p::GlobalsClass::AllEnabledPhpSources() const {
+	std::vector<t4p::SourceClass> allSources;
+	std::vector<t4p::ProjectClass>::const_iterator it;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
-			std::vector<mvceditor::SourceClass> phpSources = it->AllPhpSources();
+			std::vector<t4p::SourceClass> phpSources = it->AllPhpSources();
 			allSources.insert(allSources.end(), phpSources.begin(), phpSources.end());
 		}
 	}
 	return allSources;
 }
 
-std::vector<wxFileName> mvceditor::GlobalsClass::AllEnabledSourceDirectories() const {
+std::vector<wxFileName> t4p::GlobalsClass::AllEnabledSourceDirectories() const {
 	std::vector<wxFileName> allSourceDirectories;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::ProjectClass>::const_iterator it;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
 			for (src = it->Sources.begin(); src != it->Sources.end(); ++src) {
@@ -90,9 +90,9 @@ std::vector<wxFileName> mvceditor::GlobalsClass::AllEnabledSourceDirectories() c
 	return allSourceDirectories;
 }
 
-std::vector<mvceditor::ProjectClass> mvceditor::GlobalsClass::AllEnabledProjects() const {
-	std::vector<mvceditor::ProjectClass> enabledProjects;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
+std::vector<t4p::ProjectClass> t4p::GlobalsClass::AllEnabledProjects() const {
+	std::vector<t4p::ProjectClass> enabledProjects;
+	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
 			enabledProjects.push_back(*it);
@@ -101,27 +101,27 @@ std::vector<mvceditor::ProjectClass> mvceditor::GlobalsClass::AllEnabledProjects
 	return enabledProjects;
 }
 
-bool mvceditor::GlobalsClass::HasSources() const {
+bool t4p::GlobalsClass::HasSources() const {
 	bool hasSources = false;
 	for (size_t i = 0; i < Projects.size() && !hasSources; ++i) {
-		mvceditor::ProjectClass project = Projects[i];
+		t4p::ProjectClass project = Projects[i];
 		hasSources = project.IsEnabled && project.HasSources();
 	}
 	return hasSources;
 }
 
-bool mvceditor::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
+bool t4p::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool isPhp = false;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && !isPhp; ++it) {
 		isPhp = it->IsAPhpSourceFile(fullPath);
 	}
 	return isPhp;
 }
 
-wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
+wxString t4p::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
-	std::vector<mvceditor::ProjectClass>::const_iterator it;
+	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && relativeName.IsEmpty(); ++it) {
 		relativeName = it->RelativeFileName(fullPath);
 		if (!relativeName.IsEmpty()) {
@@ -131,8 +131,8 @@ wxString mvceditor::GlobalsClass::RelativeFileName(const wxString &fullPath, wxS
 	return relativeName;
 }
 
-void mvceditor::GlobalsClass::ClearDetectedInfos() {
-	std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin();
+void t4p::GlobalsClass::ClearDetectedInfos() {
+	std::vector<t4p::DatabaseTagClass>::iterator it = DatabaseTags.begin();
 	while(it != DatabaseTags.end()) {
 		if (it->IsDetected) {
 			it = DatabaseTags.erase(it);
@@ -143,7 +143,7 @@ void mvceditor::GlobalsClass::ClearDetectedInfos() {
 	}
 }
 
-void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &project) const {
+void t4p::GlobalsClass::AssignFileExtensions(t4p::ProjectClass &project) const {
 	project.PhpFileExtensions = FileTypes.GetPhpFileExtensions();
 	project.CssFileExtensions = FileTypes.GetCssFileExtensions();
 	project.SqlFileExtensions = FileTypes.GetSqlFileExtensions();
@@ -151,20 +151,20 @@ void mvceditor::GlobalsClass::AssignFileExtensions(mvceditor::ProjectClass &proj
 	project.JsFileExtensions = FileTypes.GetJsFileExtensions();
 }
 
-std::vector<mvceditor::TemplateFileTagClass> mvceditor::GlobalsClass::CurrentTemplates() const {
-	std::vector<mvceditor::TemplateFileTagClass> templates;
-	wxFileName detectorDbFileName = mvceditor::DetectorCacheAsset();
+std::vector<t4p::TemplateFileTagClass> t4p::GlobalsClass::CurrentTemplates() const {
+	std::vector<t4p::TemplateFileTagClass> templates;
+	wxFileName detectorDbFileName = t4p::DetectorCacheAsset();
 	if (detectorDbFileName.IsOk()) {
-		mvceditor::TemplateFileTagFinderClass fileTags;
+		t4p::TemplateFileTagFinderClass fileTags;
 		fileTags.Init(detectorDbFileName);
 		templates = fileTags.All();
 	}
 	return templates;
 }
 
-std::vector<mvceditor::DatabaseTagClass> mvceditor::GlobalsClass::AllEnabledDatabaseTags() const {
-	std::vector<mvceditor::DatabaseTagClass> enabled;
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+std::vector<t4p::DatabaseTagClass> t4p::GlobalsClass::AllEnabledDatabaseTags() const {
+	std::vector<t4p::DatabaseTagClass> enabled;
+	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
 	for (tag = DatabaseTags.begin(); tag != DatabaseTags.end(); ++tag) {
 		if (tag->IsEnabled) {
 			enabled.push_back(*tag);
@@ -173,10 +173,10 @@ std::vector<mvceditor::DatabaseTagClass> mvceditor::GlobalsClass::AllEnabledData
 	return enabled;
 }
 
-bool mvceditor::GlobalsClass::FindDatabaseTagByHash(const wxString& connectionHash, mvceditor::DatabaseTagClass& tag) const {
+bool t4p::GlobalsClass::FindDatabaseTagByHash(const wxString& connectionHash, t4p::DatabaseTagClass& tag) const {
 	bool found = false;
-	UnicodeString icuHash = mvceditor::WxToIcu(connectionHash);
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator t;
+	UnicodeString icuHash = t4p::WxToIcu(connectionHash);
+	std::vector<t4p::DatabaseTagClass>::const_iterator t;
 	for (t = DatabaseTags.begin(); t != DatabaseTags.end(); ++t) {
 		if (t->ConnectionHash() == icuHash) {
 			found = true;

@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORDETECTORFEATURECLASS_H__
-#define __MVCEDITORDETECTORFEATURECLASS_H__
+#ifndef __T4P_DETECTORFEATURECLASS_H__
+#define __T4P_DETECTORFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
 #include <features/wxformbuilder/DetectorFeatureForms.h>
 #include <wx/imaglist.h>
 
-namespace mvceditor {
+namespace t4p {
 
 class DetectorClass {
 
@@ -40,9 +40,9 @@ public:
 
 	virtual ~DetectorClass();
 
-	virtual bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project) = 0;
+	virtual bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) = 0;
 
-	virtual wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	virtual wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath) = 0;
 
 	virtual wxFileName LocalRootDir()  = 0;
@@ -57,14 +57,14 @@ public:
 
 };
 
-class UrlTagDetectorClass : public mvceditor::DetectorClass {
+class UrlTagDetectorClass : public t4p::DetectorClass {
 public:
 
 	UrlTagDetectorClass();
 
-	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
 	wxFileName LocalRootDir();
@@ -78,14 +78,14 @@ public:
 	wxString HelpMessage();
 };
 
-class TemplateFileTagsDetectorClass : public mvceditor::DetectorClass {
+class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
 public:
 
 	TemplateFileTagsDetectorClass();
 
-	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
 	wxFileName LocalRootDir();
@@ -99,14 +99,14 @@ public:
 	wxString HelpMessage();
 };
 
-class TagDetectorClass : public mvceditor::DetectorClass {
+class TagDetectorClass : public t4p::DetectorClass {
 public:
 
 	TagDetectorClass();
 
-	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
 	wxFileName LocalRootDir();
@@ -120,14 +120,14 @@ public:
 	wxString HelpMessage();
 };
 
-class DatabaseTagDetectorClass : public mvceditor::DetectorClass {
+class DatabaseTagDetectorClass : public t4p::DetectorClass {
 public:
 
 	DatabaseTagDetectorClass();
 
-	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
 	wxFileName LocalRootDir();
@@ -141,14 +141,14 @@ public:
 	wxString HelpMessage();
 };
 
-class ConfigTagDetectorClass : public mvceditor::DetectorClass {
+class ConfigTagDetectorClass : public t4p::DetectorClass {
 public:
 
 	ConfigTagDetectorClass();
 
-	bool CanTest(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project);
+	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
 
-	wxString TestCommandLine(const mvceditor::GlobalsClass& globals, const mvceditor::ProjectClass& project,
+	wxString TestCommandLine(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project,
 		const wxString& detectorScriptFullPath);
 
 	wxFileName LocalRootDir();
@@ -179,8 +179,8 @@ public:
 	 */
 	DetectorTreeHandlerClass(wxTreeCtrl* detectorTree, wxButton* testButton, wxButton* addButton,
 		wxButton* helpButton, wxChoice* projectChoice,
-		mvceditor::DetectorClass* detector,
-		mvceditor::GlobalsClass& globals, mvceditor::EventSinkClass& eventSink,
+		t4p::DetectorClass* detector,
+		t4p::GlobalsClass& globals, t4p::EventSinkClass& eventSink,
 		const wxBitmap& rootImage);
 
 	~DetectorTreeHandlerClass();
@@ -228,17 +228,17 @@ private:
 	wxButton* HelpButton;
 	wxChoice* ProjectChoice;
 
-	mvceditor::DetectorClass* Detector;
+	t4p::DetectorClass* Detector;
 
 	/**
 	 * to access the project list
 	 */
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 
 	/**
 	 * to send app commands to open and run a file
 	 */
-	mvceditor::EventSinkClass& EventSink;
+	t4p::EventSinkClass& EventSink;
 
 }; 
 
@@ -252,8 +252,8 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	UrlTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink);
+	UrlTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+		t4p::EventSinkClass& eventSink);
 
 	~UrlTagDetectorPanelClass();
 
@@ -271,9 +271,9 @@ public:
 
 private:
 
-	mvceditor::UrlTagDetectorClass Detector;
+	t4p::UrlTagDetectorClass Detector;
 
-	mvceditor::DetectorTreeHandlerClass Handler;
+	t4p::DetectorTreeHandlerClass Handler;
 };
 
 class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
@@ -287,8 +287,8 @@ public:
 	 * @param eventSink to send the app file and run commands
 	 * @param runningThreads  used to run the background processes.
 	 */
-	TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink, mvceditor::RunningThreadsClass& runningThreads);
+	TemplateFileTagsDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+		t4p::EventSinkClass& eventSink, t4p::RunningThreadsClass& runningThreads);
 
 	~TemplateFileTagsDetectorPanelClass();
 
@@ -310,21 +310,21 @@ protected:
 
 private:
 
-	mvceditor::TemplateFileTagsDetectorClass Detector;
+	t4p::TemplateFileTagsDetectorClass Detector;
 
-	mvceditor::DetectorTreeHandlerClass Handler;
+	t4p::DetectorTreeHandlerClass Handler;
 
 	/**
 	 * The URL to use for testing the detector
 	 */
-	mvceditor::UrlTagClass TestUrl;
+	t4p::UrlTagClass TestUrl;
 
 	/**
 	 * to access the url resource list
 	 */
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 };
 
 class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
@@ -337,8 +337,8 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	TagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink);
+	TagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+		t4p::EventSinkClass& eventSink);
 
 	~TagDetectorPanelClass();
 
@@ -360,9 +360,9 @@ protected:
 
 private:
 
-	mvceditor::TagDetectorClass Detector;
+	t4p::TagDetectorClass Detector;
 
-	mvceditor::DetectorTreeHandlerClass Handler;
+	t4p::DetectorTreeHandlerClass Handler;
 };
 
 class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
@@ -375,8 +375,8 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	DatabaseTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink);
+	DatabaseTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+		t4p::EventSinkClass& eventSink);
 
 	~DatabaseTagDetectorPanelClass();
 
@@ -394,9 +394,9 @@ public:
 
 private:
 
-	mvceditor::DatabaseTagDetectorClass Detector;
+	t4p::DatabaseTagDetectorClass Detector;
 
-	mvceditor::DetectorTreeHandlerClass Handler;
+	t4p::DetectorTreeHandlerClass Handler;
 };
 
 class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
@@ -409,8 +409,8 @@ public:
 	 * @param globals to access the projects list
 	 * @param eventSink to send the app file and run commands
 	 */
-	ConfigTagDetectorPanelClass(wxWindow* parent, int id, mvceditor::GlobalsClass& globals,
-		mvceditor::EventSinkClass& eventSink);
+	ConfigTagDetectorPanelClass(wxWindow* parent, int id, t4p::GlobalsClass& globals,
+		t4p::EventSinkClass& eventSink);
 
 	~ConfigTagDetectorPanelClass();
 
@@ -428,16 +428,16 @@ public:
 
 private:
 
-	mvceditor::ConfigTagDetectorClass Detector;
+	t4p::ConfigTagDetectorClass Detector;
 
-	mvceditor::DetectorTreeHandlerClass Handler;
+	t4p::DetectorTreeHandlerClass Handler;
 };
 
-class DetectorFeatureClass : public mvceditor::FeatureClass {
+class DetectorFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	DetectorFeatureClass(mvceditor::AppClass& app);
+	DetectorFeatureClass(t4p::AppClass& app);
 
 	void AddViewMenuItems(wxMenu* viewMenu);
 

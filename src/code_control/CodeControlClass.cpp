@@ -42,23 +42,23 @@
 // This causes problems when Scintilla is handling UTF-8 documents.
 // There is a method called GetSafeSubString() that will help you in this regard.
 
-const int mvceditor::CODE_CONTROL_LINT_RESULT_MARKER = 2;
-const int mvceditor::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
-const int mvceditor::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
-const int mvceditor::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
+const int t4p::CODE_CONTROL_LINT_RESULT_MARKER = 2;
+const int t4p::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
+const int t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
+const int t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
 
 // the indicator to show squiggly lines for lint errors
-const int mvceditor::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
+const int t4p::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
 
 // the indicator to show boxes around found words when user double clicks
 // on a word
-const int mvceditor::CODE_CONTROL_INDICATOR_FIND = 1;
+const int t4p::CODE_CONTROL_INDICATOR_FIND = 1;
 
 // start stealing styles from "asp javascript" we will never use those styles
-const int mvceditor::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
+const int t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
-mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
-											  mvceditor::GlobalsClass* globals, mvceditor::EventSinkClass& eventSink,
+t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
+											  t4p::GlobalsClass* globals, t4p::EventSinkClass& eventSink,
 			wxWindowID id, const wxPoint& position, const wxSize& size, long style,
 			const wxString& name)
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
@@ -81,11 +81,11 @@ mvceditor::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptio
 	ApplyPreferences();
 }
 
-mvceditor::CodeControlClass::~CodeControlClass() {
+t4p::CodeControlClass::~CodeControlClass() {
 	Document->DetachFromControl(this);
 	delete Document;
 }
-void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
+void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
 	SetUnicodeText(contents);
 	EmptyUndoBuffer();
 	SetSavePoint();
@@ -101,7 +101,7 @@ void mvceditor::CodeControlClass::TrackFile(const wxString& filename, UnicodeStr
 	Document->FileOpened(filename);
 }
 
-void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
+void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 
 	// lets avoid the IcuToWx to prevent going from 
 	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
@@ -127,42 +127,42 @@ void mvceditor::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 	delete[] dest;
 }
 
-void mvceditor::CodeControlClass::Revert() {
+void t4p::CodeControlClass::Revert() {
 	if (!IsNew()) {
 		LoadAndTrackFile(CurrentFilename);
 	}
 }
 
-void mvceditor::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
+void t4p::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 	UnicodeString contents;	
 
 	// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
-	mvceditor::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents);
-	if (error == mvceditor::FindInFilesClass::NONE) {
+	t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents);
+	if (error == t4p::FindInFilesClass::NONE) {
 		TrackFile(fileName, contents);
 	}
-	else if (error == mvceditor::FindInFilesClass::FILE_NOT_FOUND) {
-		mvceditor::EditorLogError(mvceditor::ERR_INVALID_FILE, fileName);
+	else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
+		t4p::EditorLogError(t4p::ERR_INVALID_FILE, fileName);
 	}
-	else if (mvceditor::FindInFilesClass::CHARSET_DETECTION == error) {
-		mvceditor::EditorLogError(mvceditor::ERR_CHARSET_DETECTION, fileName);
+	else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+		t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
 	}
 }
 
-void mvceditor::CodeControlClass::TreatAsNew() {
+void t4p::CodeControlClass::TreatAsNew() {
 	CurrentFilename = wxT("");
 	FileOpenedDateTime = wxDateTime::Now();
 }
 
-void mvceditor::CodeControlClass::UpdateOpenedDateTime(wxDateTime openedDateTime) {
+void t4p::CodeControlClass::UpdateOpenedDateTime(wxDateTime openedDateTime) {
 	FileOpenedDateTime = openedDateTime;
 }
 
-bool mvceditor::CodeControlClass::IsNew() const {
+bool t4p::CodeControlClass::IsNew() const {
 	return CurrentFilename.empty();
 }
 
-bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
+bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	bool saved = false;
 	if (CodeControlOptions.TrimTrailingSpaceBeforeSave) {
 		TrimTrailingSpaces();
@@ -196,15 +196,15 @@ bool mvceditor::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	return saved;
 }
 
-wxString mvceditor::CodeControlClass::GetFileName() const {
+wxString t4p::CodeControlClass::GetFileName() const {
 	return CurrentFilename;
 }
 
-wxDateTime mvceditor::CodeControlClass::GetFileOpenedDateTime() const {
+wxDateTime t4p::CodeControlClass::GetFileOpenedDateTime() const {
 	return FileOpenedDateTime;
 }
 
-void mvceditor::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
+void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
 	
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
@@ -213,20 +213,20 @@ void mvceditor::CodeControlClass::SetSelectionAndEnsureVisible(int start, int en
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 }
 
-void mvceditor::CodeControlClass::SetSelectionByCharacterPosition(int start, int end) {
+void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
 	
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
 	
-	int byteStart = mvceditor::CharToUtf8Pos(buf, documentLength, start);
-	int byteEnd = mvceditor::CharToUtf8Pos(buf, documentLength, end);
+	int byteStart = t4p::CharToUtf8Pos(buf, documentLength, start);
+	int byteEnd = t4p::CharToUtf8Pos(buf, documentLength, end);
 	SetSelection(byteStart, byteEnd);
 	delete[] buf;
 }
 
-void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
+void t4p::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
@@ -236,7 +236,7 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	wxWindow* window = GetGrandParent();
 	wxFrame* frame = wxDynamicCast(window, wxFrame);
 	if (frame) {
-		mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
+		t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
 		gauge->SetColumn0Text(wxT(""));
 	}
 
@@ -264,7 +264,7 @@ void mvceditor::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
+void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	int currentLine = GetCurrentLine();
 	
 	// ATTN: Change this if support for mac files with \r is needed
@@ -285,15 +285,15 @@ void mvceditor::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetTagsAtCurrentPosition() {
+std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtCurrentPosition() {
 	return Document->GetTagsAtCurrentPosition();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::CodeControlClass::GetTagsAtPosition(int pos) {
+std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtPosition(int pos) {
 	return Document->GetTagsAtPosition(pos);
 }
 
-void mvceditor::CodeControlClass::HandleAutoCompletion() {
+void t4p::CodeControlClass::HandleAutoCompletion() {
 	wxString completeStatus;
 	Document->HandleAutoCompletion(completeStatus);
 	if (!completeStatus.IsEmpty()) {
@@ -302,17 +302,17 @@ void mvceditor::CodeControlClass::HandleAutoCompletion() {
 		// show the auto complete message
 		wxFrame* frame = wxDynamicCast(window, wxFrame);
 		if (frame) {
-			mvceditor::StatusBarWithGaugeClass* gauge = (mvceditor::StatusBarWithGaugeClass*)frame->GetStatusBar();
+			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
 			gauge->SetColumn0Text(completeStatus);
 		}
 	}
 }
 
-void mvceditor::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
+void t4p::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 	Document->HandleCallTip(ch, force);
 }
 
-void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
+void t4p::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
@@ -322,7 +322,7 @@ void mvceditor::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
+void t4p::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
@@ -333,7 +333,7 @@ void mvceditor::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	}
 }
 
-void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
+void t4p::CodeControlClass::AutoDetectDocumentMode() {
 	wxString fileName = GetFileName();
 	if (Globals->FileTypes.HasAPhpExtension(fileName)) {
 		DocumentMode = PHP;
@@ -380,7 +380,7 @@ void mvceditor::CodeControlClass::AutoDetectDocumentMode() {
 	ApplyPreferences();
 }
 
-void mvceditor::CodeControlClass::ApplyPreferences() {
+void t4p::CodeControlClass::ApplyPreferences() {
 	if (Document) {
 		
 		// need this here so that any events are not propagated while the object is
@@ -389,29 +389,29 @@ void mvceditor::CodeControlClass::ApplyPreferences() {
 		delete Document;
 		Document = NULL;
 	}
-	if (mvceditor::CodeControlClass::SQL == DocumentMode) {
-		Document = new mvceditor::SqlDocumentClass(Globals, CurrentDbTag);
+	if (t4p::CodeControlClass::SQL == DocumentMode) {
+		Document = new t4p::SqlDocumentClass(Globals, CurrentDbTag);
 		Document->SetControl(this);
 	}
-	else if (mvceditor::CodeControlClass::PHP == DocumentMode) {
-		Document = new mvceditor::PhpDocumentClass(Globals);
+	else if (t4p::CodeControlClass::PHP == DocumentMode) {
+		Document = new t4p::PhpDocumentClass(Globals);
 		Document->SetControl(this);
 	}
-	else if (mvceditor::CodeControlClass::CSS == DocumentMode) {
-		Document = new mvceditor::CssDocumentClass();
+	else if (t4p::CodeControlClass::CSS == DocumentMode) {
+		Document = new t4p::CssDocumentClass();
 		Document->SetControl(this);
 	}
-	else if (mvceditor::CodeControlClass::JS == DocumentMode) {
-		Document = new mvceditor::JsDocumentClass();
+	else if (t4p::CodeControlClass::JS == DocumentMode) {
+		Document = new t4p::JsDocumentClass();
 		Document->SetControl(this);
 	}
 	else {
-		Document = new mvceditor::TextDocumentClass();
+		Document = new t4p::TextDocumentClass();
 		Document->SetControl(this);
 	}
 }
 
-UnicodeString mvceditor::CodeControlClass::WordAtCurrentPos() {
+UnicodeString t4p::CodeControlClass::WordAtCurrentPos() {
 	int pos = WordStartPosition(GetCurrentPos(), true);
 	int endPos = WordEndPosition(GetCurrentPos(), true);
 	
@@ -419,7 +419,7 @@ UnicodeString mvceditor::CodeControlClass::WordAtCurrentPos() {
 	return word;
 }
 
-void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
+void  t4p::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
@@ -433,7 +433,7 @@ void  mvceditor::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	EventSink.Publish(event);
 }
 
-void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
+void t4p::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 	wxWindow* frame = GetGrandParent();
 
 	// Let the frame handle it because we want features to have menu items
@@ -445,11 +445,11 @@ void mvceditor::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 	}
 }
 
-UnicodeString mvceditor::CodeControlClass::GetSafeText() {
+UnicodeString t4p::CodeControlClass::GetSafeText() {
 	return Document->GetSafeText();
 }
 
-void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
+void t4p::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	UndoHighlight();
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		CallTipCancel();
@@ -479,12 +479,12 @@ void mvceditor::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
+void t4p::CodeControlClass::OnLeftDown(wxMouseEvent& event) {
 	UndoHighlight();
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
+void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	int pos = CharPositionFromPointClose(event.GetX(), event.GetY());
 	if (pos < 0) {
 		event.Skip();
@@ -495,7 +495,7 @@ void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	
 	// enable doc text when user holds down ALT+SHIFT
 	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT)) {
-		wxCommandEvent altEvt(mvceditor::EVT_MOTION_ALT);
+		wxCommandEvent altEvt(t4p::EVT_MOTION_ALT);
 		altEvt.SetInt(pos);
 		altEvt.SetEventObject(this);
 		EventSink.Publish(altEvt);
@@ -514,7 +514,7 @@ void mvceditor::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::CodeControlClass::UndoHighlight() {
+void t4p::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
 	
 		// kill any current highlight searches
@@ -526,14 +526,14 @@ void mvceditor::CodeControlClass::UndoHighlight() {
 	}
 }
 
-void mvceditor::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
+void t4p::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
 	WordHighlightIsWordHighlighted = true;
 	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
 	SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
 	IndicatorFillRange(utf8Start, utf8Length);
 }
 
-void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
+void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
 	
 	// positions in scintilla are byte offsets. convert chars to bytes so we can mark
 	// the squigglies properly
@@ -548,7 +548,7 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 		
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);
-		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
+		byteNumber = t4p::CharToUtf8Pos(buf, documentLength, charNumber);
 		
 		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_PHP_LINT);
 		SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
@@ -561,14 +561,14 @@ void mvceditor::CodeControlClass::MarkLintError(const pelet::LintResultsClass& r
 	}
 	Colourise(0, -1);
 
-	wxString error = mvceditor::IcuToWx(result.Error);
+	wxString error = t4p::IcuToWx(result.Error);
 	error += wxString::Format(wxT(" on line %d, offset %d"), result.LineNumber, result.CharacterPosition);
 	AnnotationSetVisible(wxSTC_ANNOTATION_BOXED);
 	AnnotationSetText(result.LineNumber, error);
 	AnnotationSetStyle(result.LineNumber, CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION);
 }
 
-void mvceditor::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
+void t4p::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
 	
 	// positions in scintilla are byte offsets. convert chars to bytes so we can jump properly
 	int byteNumber = 0;
@@ -581,14 +581,14 @@ void mvceditor::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsC
 
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);
-		byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, charNumber);
+		byteNumber = t4p::CharToUtf8Pos(buf, documentLength, charNumber);
 		GotoPos(byteNumber);
 
 		delete[] buf;
 	}
 }
 
-void mvceditor::CodeControlClass::ClearLintErrors() {
+void t4p::CodeControlClass::ClearLintErrors() {
 	MarkerDeleteAll(CODE_CONTROL_LINT_RESULT_MARKER);
 	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_PHP_LINT);
 	SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
@@ -596,7 +596,7 @@ void mvceditor::CodeControlClass::ClearLintErrors() {
 	AnnotationClearAll();
 }
 
-void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
+void t4p::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
 	
 	// line is 1-based but wxSTC lines start at zero
 	if (goodHit) {
@@ -608,7 +608,7 @@ void mvceditor::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
 	HasSearchMarkers = true;
 }
 
-void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit) {
+void t4p::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit) {
 	MarkSearchHit(lineNumber, goodHit);
 	SetSelectionAndEnsureVisible(startPos, endPos);
 	
@@ -618,19 +618,19 @@ void mvceditor::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int start
 
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
-	byteNumber = mvceditor::CharToUtf8Pos(buf, documentLength, startPos);
+	byteNumber = t4p::CharToUtf8Pos(buf, documentLength, startPos);
 	GotoPos(byteNumber);
 
 	delete[] buf;
 }
 
-void mvceditor::CodeControlClass::ClearSearchMarkers() {
+void t4p::CodeControlClass::ClearSearchMarkers() {
 	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
 	MarkerDeleteAll(CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
 	HasSearchMarkers = false;
 }
 
-void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagClass& currentDbTag) {
+void t4p::CodeControlClass::SetCurrentDbTag(const t4p::DatabaseTagClass& currentDbTag) {
 	CurrentDbTag.Copy(currentDbTag);
 	
 	// if SQL document is active we need to change the currentInfo in that object
@@ -639,27 +639,27 @@ void mvceditor::CodeControlClass::SetCurrentDbTag(const mvceditor::DatabaseTagCl
 	ApplyPreferences();
 }
 
-void mvceditor::CodeControlClass::SetDocumentMode(Mode mode) {
+void t4p::CodeControlClass::SetDocumentMode(Mode mode) {
 	DocumentMode = mode;
 	ApplyPreferences();
 }
 
-mvceditor::CodeControlClass::Mode mvceditor::CodeControlClass::GetDocumentMode() {
+t4p::CodeControlClass::Mode t4p::CodeControlClass::GetDocumentMode() {
 	return DocumentMode;
 }
 
-int mvceditor::CodeControlClass::LineFromCharacter(int charPos) {
+int t4p::CodeControlClass::LineFromCharacter(int charPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
 	
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
-	int pos = mvceditor::CharToUtf8Pos(buf, documentLength, charPos);
+	int pos = t4p::CharToUtf8Pos(buf, documentLength, charPos);
 	delete[] buf;
 	return LineFromPosition(pos);
 }
 
-void mvceditor::CodeControlClass::SetAsHidden(bool isHidden) {
+void t4p::CodeControlClass::SetAsHidden(bool isHidden) {
 	IsHidden = isHidden;
 
 	// in case tool tip, auto complete lists that are currently active
@@ -671,7 +671,7 @@ void mvceditor::CodeControlClass::SetAsHidden(bool isHidden) {
 	}
 }
 
-void mvceditor::CodeControlClass::TrimTrailingSpaces() {
+void t4p::CodeControlClass::TrimTrailingSpaces() {
 	int maxLines = GetLineCount();
 	for (int line = 0; line < maxLines; line++) {
 		int lineStart = PositionFromLine(line);
@@ -690,7 +690,7 @@ void mvceditor::CodeControlClass::TrimTrailingSpaces() {
 	}
 }
 
-void mvceditor::CodeControlClass::RemoveTrailingBlankLines() {
+void t4p::CodeControlClass::RemoveTrailingBlankLines() {
 	if (DocumentMode != PHP) {
 		return;
 	}
@@ -745,7 +745,7 @@ void mvceditor::CodeControlClass::RemoveTrailingBlankLines() {
 	}
 }
 
-wxString mvceditor::CodeControlClass::GetIdString() const {
+wxString t4p::CodeControlClass::GetIdString() const {
 
 	// make sure string is unique across program instances
 	long pid = wxGetProcessId();
@@ -753,15 +753,15 @@ wxString mvceditor::CodeControlClass::GetIdString() const {
 	return idString;
 }
 
-void mvceditor::CodeControlClass::SetTouched(bool touched) {
+void t4p::CodeControlClass::SetTouched(bool touched) {
 	IsTouched = touched;
 }
 
-bool mvceditor::CodeControlClass::Touched() const {
+bool t4p::CodeControlClass::Touched() const {
 	return IsTouched;
 }
 
-void mvceditor::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
+void t4p::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
 	if (event.GetId() != GetId()) {
 		event.Skip();
 		return;
@@ -786,7 +786,7 @@ void mvceditor::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
 	HotspotTimer.Start(100, wxTIMER_ONE_SHOT);
 }
 
-void mvceditor::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
+void t4p::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
 	wxStyledTextEvent evt(wxEVT_STC_HOTSPOT_CLICK);
 	evt.SetId(GetId());
 	evt.SetEventObject(this);
@@ -794,19 +794,19 @@ void mvceditor::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
 	EventSink.Publish(evt);
 }
 
-const wxEventType mvceditor::EVT_MOTION_ALT = wxNewEventType();
+const wxEventType t4p::EVT_MOTION_ALT = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::CodeControlClass, wxStyledTextCtrl)
-	EVT_STC_MARGINCLICK(wxID_ANY, mvceditor::CodeControlClass::OnMarginClick)
-	EVT_STC_DOUBLECLICK(wxID_ANY, mvceditor::CodeControlClass::OnDoubleClick)
-	EVT_CONTEXT_MENU(mvceditor::CodeControlClass::OnContextMenu)
+BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
+	EVT_STC_MARGINCLICK(wxID_ANY, t4p::CodeControlClass::OnMarginClick)
+	EVT_STC_DOUBLECLICK(wxID_ANY, t4p::CodeControlClass::OnDoubleClick)
+	EVT_CONTEXT_MENU(t4p::CodeControlClass::OnContextMenu)
 
-	EVT_STC_CHARADDED(wxID_ANY, mvceditor::CodeControlClass::OnCharAdded)
-	EVT_STC_UPDATEUI(wxID_ANY, mvceditor::CodeControlClass::OnUpdateUi) 
+	EVT_STC_CHARADDED(wxID_ANY, t4p::CodeControlClass::OnCharAdded)
+	EVT_STC_UPDATEUI(wxID_ANY, t4p::CodeControlClass::OnUpdateUi) 
 
-	EVT_LEFT_DOWN(mvceditor::CodeControlClass::OnLeftDown)
-	EVT_KEY_DOWN(mvceditor::CodeControlClass::OnKeyDown)
-	EVT_MOTION(mvceditor::CodeControlClass::OnMotion)
-	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::CodeControlClass::OnHotspotClick)
-	EVT_TIMER(wxID_ANY, mvceditor::CodeControlClass::OnTimerComplete)
+	EVT_LEFT_DOWN(t4p::CodeControlClass::OnLeftDown)
+	EVT_KEY_DOWN(t4p::CodeControlClass::OnKeyDown)
+	EVT_MOTION(t4p::CodeControlClass::OnMotion)
+	EVT_STC_HOTSPOT_CLICK(wxID_ANY, t4p::CodeControlClass::OnHotspotClick)
+	EVT_TIMER(wxID_ANY, t4p::CodeControlClass::OnTimerComplete)
 END_EVENT_TABLE()

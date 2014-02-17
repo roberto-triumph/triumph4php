@@ -25,19 +25,19 @@
 #include <globals/Events.h>
 #include <algorithm>
 
-mvceditor::EventSinkClass::EventSinkClass() 
+t4p::EventSinkClass::EventSinkClass() 
 	: Handlers() {
 }
 
-void mvceditor::EventSinkClass::PushHandler(wxEvtHandler *handler) {
+void t4p::EventSinkClass::PushHandler(wxEvtHandler *handler) {
 	Handlers.push_back(handler);
 }
 
-void mvceditor::EventSinkClass::RemoveAllHandlers() {
+void t4p::EventSinkClass::RemoveAllHandlers() {
 	Handlers.clear();
 }
 
-void mvceditor::EventSinkClass::Publish(wxEvent& event) {
+void t4p::EventSinkClass::Publish(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
 		
 		// wont use wxPostEvent for now
@@ -47,51 +47,51 @@ void mvceditor::EventSinkClass::Publish(wxEvent& event) {
 	}
 }
 
-void mvceditor::EventSinkClass::Post(wxEvent& event) {
+void t4p::EventSinkClass::Post(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
 		wxPostEvent(Handlers[i], event);
 	}
 }
 
-mvceditor::CodeControlEventClass::CodeControlEventClass(wxEventType type, mvceditor::CodeControlClass* codeControl)
+t4p::CodeControlEventClass::CodeControlEventClass(wxEventType type, t4p::CodeControlClass* codeControl)
 	: wxEvent(wxID_ANY, type)
 	, CodeControl(codeControl) {
 
 }
 
-mvceditor::CodeControlClass* mvceditor::CodeControlEventClass::GetCodeControl() const {
+t4p::CodeControlClass* t4p::CodeControlEventClass::GetCodeControl() const {
 	return CodeControl;
 }
 
-wxEvent* mvceditor::CodeControlEventClass::Clone() const {
-	mvceditor::CodeControlEventClass* newEvt = new mvceditor::CodeControlEventClass(GetEventType(), CodeControl);
+wxEvent* t4p::CodeControlEventClass::Clone() const {
+	t4p::CodeControlEventClass* newEvt = new t4p::CodeControlEventClass(GetEventType(), CodeControl);
 	return newEvt;
 }
 
-mvceditor::RenameEventClass::RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath)
+t4p::RenameEventClass::RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath)
 : wxEvent(wxID_ANY, type)
 , OldPath()
 , NewPath() {
-	if (mvceditor::EVENT_APP_FILE_RENAMED == type) {
+	if (t4p::EVENT_APP_FILE_RENAMED == type) {
 		OldPath.Assign(oldPath);
 		NewPath.Assign(newPath);
 	}
-	else if (mvceditor::EVENT_APP_DIR_RENAMED == type) {
+	else if (t4p::EVENT_APP_DIR_RENAMED == type) {
 		OldPath.AssignDir(oldPath);
 		NewPath.AssignDir(newPath);
 	}
 }
 
-wxEvent* mvceditor::RenameEventClass::Clone() const {
-	if (mvceditor::EVENT_APP_DIR_RENAMED == GetEventType()) {
-		return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetPath(), OldPath.GetPath());
+wxEvent* t4p::RenameEventClass::Clone() const {
+	if (t4p::EVENT_APP_DIR_RENAMED == GetEventType()) {
+		return new t4p::RenameEventClass(GetEventType(), OldPath.GetPath(), OldPath.GetPath());
 	}
-	return new mvceditor::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
+	return new t4p::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
 }
 
-mvceditor::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, 
+t4p::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, 
 	int length, int lineNumber)
-: wxEvent(wxID_ANY, mvceditor::EVENT_CMD_FILE_OPEN) 
+: wxEvent(wxID_ANY, t4p::EVENT_CMD_FILE_OPEN) 
 , FullPath(fullPath.c_str())
 , StartingPos(startingPos)
 , Length(length) 
@@ -99,53 +99,53 @@ mvceditor::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& 
 	
 }
 
-wxEvent* mvceditor::OpenFileCommandEventClass::Clone() const {
-	return new mvceditor::OpenFileCommandEventClass(FullPath, StartingPos, Length, LineNumber);
+wxEvent* t4p::OpenFileCommandEventClass::Clone() const {
+	return new t4p::OpenFileCommandEventClass(FullPath, StartingPos, Length, LineNumber);
 }
 
 
-mvceditor::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, 
+t4p::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, 
 	const wxString& connectionHash)
 : wxEvent(wxID_ANY, type)
 , DbTableName(dbTable.c_str())
 , ConnectionHash(connectionHash.c_str()) {
 }
 
-wxEvent* mvceditor::OpenDbTableCommandEventClass::Clone() const {
-	mvceditor::OpenDbTableCommandEventClass* evt = new mvceditor::OpenDbTableCommandEventClass(
+wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
+	t4p::OpenDbTableCommandEventClass* evt = new t4p::OpenDbTableCommandEventClass(
 		GetEventType(), DbTableName, ConnectionHash);
 	return evt;
 }
 
 
-const wxEventType mvceditor::EVENT_APP_READY = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_EXIT = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_OPENED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_CREATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_NEW = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_SAVED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_CLOSED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_REVERTED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_DELETED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_FILE_RENAMED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_DIR_CREATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_DIR_DELETED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_DIR_RENAMED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_APP_PROJECT_CREATED = wxNewEventType();
-const wxEventType mvceditor::EVENT_CMD_FILE_OPEN = wxNewEventType();
-const wxEventType mvceditor::EVENT_CMD_RUN_COMMAND = wxNewEventType();
-const wxEventType mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
-const wxEventType mvceditor::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
+const wxEventType t4p::EVENT_APP_READY = wxNewEventType();
+const wxEventType t4p::EVENT_APP_EXIT = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_OPENED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_CREATED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_NEW = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_SAVED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_CLOSED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_REVERTED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_DELETED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_EXTERNALLY_CREATED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_RENAMED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_DIR_CREATED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_DIR_DELETED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_DIR_RENAMED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_PROJECT_CREATED = wxNewEventType();
+const wxEventType t4p::EVENT_CMD_FILE_OPEN = wxNewEventType();
+const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
+const wxEventType t4p::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
+const wxEventType t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
 
-const long mvceditor::ID_TOOLS_NOTEBOOK = 1003;
-const long mvceditor::ID_OUTLINE_NOTEBOOK = 1002;
+const long t4p::ID_TOOLS_NOTEBOOK = 1003;
+const long t4p::ID_OUTLINE_NOTEBOOK = 1002;
 
 /*
  *ATTN: this is hardcoded because of the way that the notebook is created
  * within the MainFrameForms (created by wxFormBuilder)
  */
-const long mvceditor::ID_CODE_NOTEBOOK = 1001;
+const long t4p::ID_CODE_NOTEBOOK = 1001;

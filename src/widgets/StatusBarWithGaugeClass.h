@@ -28,7 +28,7 @@
 #include <wx/wx.h>
 #include <map>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class allows the status bar to be populated with a gauge (progress bar).

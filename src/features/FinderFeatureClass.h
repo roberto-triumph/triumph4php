@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef MVCEDITORFINDERFEATURECLASS_H_
-#define MVCEDITORFINDERFEATURECLASS_H_
+#ifndef __T4P_FINDERFEATURECLASS_H_
+#define __T4P_FINDERFEATURECLASS_H_
 
 #include <features/wxformbuilder/FinderFeatureForms.h>
 #include <widgets/ComboBoxHistoryClass.h>
@@ -33,7 +33,7 @@
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This dialog allows the user to input text and search a file
@@ -73,7 +73,7 @@ public:
 	 *        delete the pointer, it is up to the caller.
 	 
 	 */
-	FinderPanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
+	FinderPanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
 
 	/**
 	 * The focus will  be set on the find text box.
@@ -139,7 +139,7 @@ private:
 	
 	/**
 	 * The source of text to search in
-	 * @var MvcEditorNotebookClass
+	 * @var t4p::NotebookClass
 	 */
 	NotebookClass* Notebook;
 	
@@ -207,7 +207,7 @@ public:
 	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
 	 *        delete the pointer, it is up to the caller.
 	 */
-	ReplacePanelClass(wxWindow* parent, int windowId, mvceditor::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
+	ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
 
 	/**
 	 * Enables/disables replace buttons
@@ -291,7 +291,7 @@ private:
 	
 	/**
 	 * The source of text to search in
-	 * @var MvcEditorNotebookClass
+	 * @var t4p::NotebookClass
 	 */
 	NotebookClass* Notebook;
 	
@@ -320,14 +320,14 @@ private:
  * An action that will perform a find on an entire set of text
  * and POST FinderHitEventClas for each found hit. 
  */
-class FinderActionClass : public mvceditor::ActionClass {
+class FinderActionClass : public t4p::ActionClass {
 	
 public:
 
 	/**
 	 * @param utf8buf this class will take ownership of this pointer
 	 */
-	FinderActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId,
+	FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const UnicodeString& search, char* utf8Buf, int bufLength);
 	
 protected:
@@ -341,7 +341,7 @@ protected:
 	/**
 	 * to perform the search
 	 */
-	mvceditor::FinderClass Finder;
+	t4p::FinderClass Finder;
 
 	/**
 	 *  unicode representation of ut8buf
@@ -388,10 +388,10 @@ public:
 
 extern const wxEventType EVENT_FINDER_ACTION;
 
-typedef void (wxEvtHandler::*FinderHitEventClassFunction)(mvceditor::FinderHitEventClass&);
+typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventClass&);
 
 #define EVT_FINDER(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FINDER_ACTION, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FINDER_ACTION, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( FinderHitEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -403,7 +403,7 @@ public:
 	/**
 	 * Constructor
  	 */
-	FinderFeatureClass(mvceditor::AppClass& app);
+	FinderFeatureClass(t4p::AppClass& app);
 	
 	/**
 	 * Add menu items to the edit menu for this feature.
@@ -421,8 +421,8 @@ private:
 	/**
 	 * will perform the searching
 	 */
-	mvceditor::FinderClass Finder;
-	mvceditor::FinderClass FinderReplace;
+	t4p::FinderClass Finder;
+	t4p::FinderClass FinderReplace;
 
 	/**
 	 * show the find dialog 
@@ -462,7 +462,7 @@ private:
 	/**
 	 * when a background search finds a hit we will highlight it
 	 */
-	void OnFinderHit(mvceditor::FinderHitEventClass& event);
+	void OnFinderHit(t4p::FinderHitEventClass& event);
 	
 	/**
 	 *  when the user double clicks on a word we will start a search
@@ -474,4 +474,4 @@ private:
 };
 
 }
-#endif /*MVCEDITORFINDERFEATURECLASS_H_*/
+#endif /*__T4P_FINDERFEATURECLASS_H_*/

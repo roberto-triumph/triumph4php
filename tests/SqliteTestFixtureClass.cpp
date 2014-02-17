@@ -36,14 +36,14 @@ SqliteTestFixtureClass::SqliteTestFixtureClass()
 	: Session()
 	, ConnectionString(":memory:") {
 	Session.open(*soci::factory_sqlite3(), ConnectionString);
-	CreateDatabase(Session, mvceditor::ResourceSqlSchemaAsset());
+	CreateDatabase(Session, t4p::ResourceSqlSchemaAsset());
 }
 
 void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFileName& sqlScriptFile) {
 	std::string schemaSql;
-	wxASSERT_MSG(sqlScriptFile == mvceditor::ResourceSqlSchemaAsset() || sqlScriptFile == mvceditor::DetectorSqlSchemaAsset(), 
+	wxASSERT_MSG(sqlScriptFile == t4p::ResourceSqlSchemaAsset() || sqlScriptFile == t4p::DetectorSqlSchemaAsset(), 
 		wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() from Assets.h"));
-	if (sqlScriptFile == mvceditor::ResourceSqlSchemaAsset()) {
+	if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
 		schemaSql = ResourceSchemaSql;
 	}
 	else {
@@ -58,12 +58,12 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		wxFFile ffile(sqlScriptFile.GetFullPath(), wxT("rb"));
 		wxString sql;
 		ffile.ReadAll(&sql);
-		if (sqlScriptFile == mvceditor::ResourceSqlSchemaAsset()) {
-			ResourceSchemaSql = mvceditor::WxToChar(sql);
+		if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
+			ResourceSchemaSql = t4p::WxToChar(sql);
 			schemaSql = ResourceSchemaSql;
 		}
 		else {
-			DetectorSchemaSql = mvceditor::WxToChar(sql);
+			DetectorSchemaSql = t4p::WxToChar(sql);
 			schemaSql = DetectorSchemaSql;
 		}
 	}
@@ -78,12 +78,12 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 
 		sqlite_api::sqlite3_exec(backend->conn_, schemaSql.c_str(), NULL, NULL, &errorMessage);
 		if (errorMessage) {
-			wxASSERT_MSG(strlen(errorMessage) == 0, mvceditor::CharToWx(errorMessage));
+			wxASSERT_MSG(strlen(errorMessage) == 0, t4p::CharToWx(errorMessage));
 			sqlite_api::sqlite3_free(errorMessage);
 		}
 	} catch (const std::exception& e) {
 		wxUnusedVar(e);
-		wxASSERT_MSG(false, mvceditor::CharToWx(e.what()));
+		wxASSERT_MSG(false, t4p::CharToWx(e.what()));
 	}
 }
 	

@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_FILEPICKERVALIDATORCLASS_H__
-#define __MVCEDITOR_FILEPICKERVALIDATORCLASS_H__
+#ifndef __T4P_FILEPICKERVALIDATORCLASS_H__
+#define __T4P_FILEPICKERVALIDATORCLASS_H__
 
 #include <wx/validate.h>
 #include <wx/filename.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class is used to transfer a value from a file picker control. Currently this validator

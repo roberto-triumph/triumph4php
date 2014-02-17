@@ -25,56 +25,56 @@
 #include <actions/FileModifiedCheckActionClass.h>
 #include <globals/FileName.h>
 
-mvceditor::FileModifiedTimeClass::FileModifiedTimeClass()
+t4p::FileModifiedTimeClass::FileModifiedTimeClass()
 : FileName()
 , ModifiedTime() {
 
 }
 	
-mvceditor::FileModifiedTimeClass::FileModifiedTimeClass(const mvceditor::FileModifiedTimeClass& src)
+t4p::FileModifiedTimeClass::FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src)
 : FileName()
 , ModifiedTime() {
 	Copy(src);
 }
 
-void mvceditor::FileModifiedTimeClass::Copy(const mvceditor::FileModifiedTimeClass& src) {	
+void t4p::FileModifiedTimeClass::Copy(const t4p::FileModifiedTimeClass& src) {	
 	
 	// make these copies thread-safe
-	FileName = mvceditor::FileNameCopy(src.FileName);
+	FileName = t4p::FileNameCopy(src.FileName);
 	ModifiedTime = src.ModifiedTime;
 }
 
-mvceditor::FilesModifiedEventClass::FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified, 
+t4p::FilesModifiedEventClass::FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified, 
 															const std::vector<wxDateTime>& modifiedTimes,
 															const std::vector<wxFileName>& deleted)
-: wxEvent(eventId, mvceditor::EVENT_FILES_EXTERNALLY_MODIFIED)
+: wxEvent(eventId, t4p::EVENT_FILES_EXTERNALLY_MODIFIED)
 , Modified()
 , ModifiedTimes()
 , Deleted() {
-	Modified = mvceditor::DeepCopyFileNames(modified);
+	Modified = t4p::DeepCopyFileNames(modified);
 	ModifiedTimes = modifiedTimes;
-	Deleted =  mvceditor::DeepCopyFileNames(deleted);
+	Deleted =  t4p::DeepCopyFileNames(deleted);
 }
 
-wxEvent* mvceditor::FilesModifiedEventClass::Clone() const {
-	return new mvceditor::FilesModifiedEventClass(GetId(), Modified, ModifiedTimes, Deleted);
+wxEvent* t4p::FilesModifiedEventClass::Clone() const {
+	return new t4p::FilesModifiedEventClass(GetId(), Modified, ModifiedTimes, Deleted);
 }
 
-mvceditor::FileModifiedCheckActionClass::FileModifiedCheckActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::FileModifiedCheckActionClass::FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId)
 , FilesToCheck() {
 
 }
 
-void mvceditor::FileModifiedCheckActionClass::SetFiles(const std::vector<mvceditor::FileModifiedTimeClass>& files) {
+void t4p::FileModifiedCheckActionClass::SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files) {
 	FilesToCheck = files;
 }
 
-void mvceditor::FileModifiedCheckActionClass::BackgroundWork() {
+void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 	std::vector<wxFileName> filesModified;
 	std::vector<wxDateTime> modifiedTimes;
 	std::vector<wxFileName> filesDeleted;
-	std::vector<mvceditor::FileModifiedTimeClass>::const_iterator file;
+	std::vector<t4p::FileModifiedTimeClass>::const_iterator file;
 	for (file = FilesToCheck.begin(); !IsCancelled() && file != FilesToCheck.end(); ++file) {
 		bool exists = file->FileName.FileExists();
 		wxDateTime modifiedDateTime;
@@ -92,13 +92,13 @@ void mvceditor::FileModifiedCheckActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 
 		// PostEvent() will set the correct id
-		mvceditor::FilesModifiedEventClass evt(wxID_ANY, filesModified, modifiedTimes, filesDeleted);
+		t4p::FilesModifiedEventClass evt(wxID_ANY, filesModified, modifiedTimes, filesDeleted);
 		PostEvent(evt);
 	}
 }
 
-wxString mvceditor::FileModifiedCheckActionClass::GetLabel() const {
+wxString t4p::FileModifiedCheckActionClass::GetLabel() const {
 	return wxT("Checking File Modifications");
 }
 
-const wxEventType mvceditor::EVENT_FILES_EXTERNALLY_MODIFIED = wxNewEventType();
+const wxEventType t4p::EVENT_FILES_EXTERNALLY_MODIFIED = wxNewEventType();

@@ -26,7 +26,7 @@
 #include <Triumph.h>
 #include <wx/artprov.h>
 
-mvceditor::FeatureClass::FeatureClass(mvceditor::AppClass& app)
+t4p::FeatureClass::FeatureClass(t4p::AppClass& app)
 	: App(app)
 	, AuiManager(NULL)	
 	, StatusBarWithGauge(NULL)
@@ -36,10 +36,10 @@ mvceditor::FeatureClass::FeatureClass(mvceditor::AppClass& app)
 	, MenuBar(NULL) {
 }
 
-mvceditor::FeatureClass::~FeatureClass() {
+t4p::FeatureClass::~FeatureClass() {
 }
 
-void mvceditor::FeatureClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+void t4p::FeatureClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
 	wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar) {
 	StatusBarWithGauge = statusBarWithGauge;
 	Notebook = notebook;
@@ -49,40 +49,40 @@ void mvceditor::FeatureClass::InitWindow(StatusBarWithGaugeClass* statusBarWithG
 	MenuBar = menuBar;
 }
 
-mvceditor::NotebookClass* mvceditor::FeatureClass::GetNotebook() const {
+t4p::NotebookClass* t4p::FeatureClass::GetNotebook() const {
 	return Notebook;
 }
 
-mvceditor::EnvironmentClass* mvceditor::FeatureClass::GetEnvironment() {
+t4p::EnvironmentClass* t4p::FeatureClass::GetEnvironment() {
 	return &App.Globals.Environment;
 }
 
-void mvceditor::FeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+void t4p::FeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
-void mvceditor::FeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
+void t4p::FeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
 }
 
-void mvceditor::FeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
+void t4p::FeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
 }
 
-void mvceditor::FeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+void t4p::FeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::FeatureClass::AddHelpMenuItems(wxMenu* editMenu) {
+void t4p::FeatureClass::AddHelpMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::FeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+void t4p::FeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
-void mvceditor::FeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+void t4p::FeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-void mvceditor::FeatureClass::AddKeyboardShortcuts(std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void t4p::FeatureClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {
 
 }
 
-bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName, const wxBitmap& bitmap) {
+bool t4p::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName, const wxBitmap& bitmap) {
 	if (!windowName.IsEmpty()) {
 		window->SetName(windowName);
 	}
@@ -96,7 +96,7 @@ bool mvceditor::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName,
 	return false;
 }
 
-bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap) {
+bool t4p::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap) {
 	if (OutlineNotebook->AddPage(window, name, true, bitmap)) {
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(OutlineNotebook).Show();
@@ -108,15 +108,15 @@ bool mvceditor::FeatureClass::AddOutlineWindow(wxWindow* window, wxString name, 
 	return false;
 }
 
-wxWindow* mvceditor::FeatureClass::FindToolsWindow(int windowId) const {
+wxWindow* t4p::FeatureClass::FindToolsWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetToolsNotebook());
 }
 
-wxWindow* mvceditor::FeatureClass::FindOutlineWindow(int windowId) const {
+wxWindow* t4p::FeatureClass::FindOutlineWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 }
 
-bool mvceditor::FeatureClass::IsToolsWindowSelected(int windowId) const {
+bool t4p::FeatureClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
@@ -129,7 +129,7 @@ bool mvceditor::FeatureClass::IsToolsWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
 
-bool mvceditor::FeatureClass::IsToolsWindowSelectedByName(const wxString& name) const {
+bool t4p::FeatureClass::IsToolsWindowSelectedByName(const wxString& name) const {
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
 		
@@ -144,7 +144,7 @@ bool mvceditor::FeatureClass::IsToolsWindowSelectedByName(const wxString& name) 
 	return false;
 }
 
-bool mvceditor::FeatureClass::IsOutlineWindowSelected(int windowId) const {
+bool t4p::FeatureClass::IsOutlineWindowSelected(int windowId) const {
 	
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
@@ -158,23 +158,23 @@ bool mvceditor::FeatureClass::IsOutlineWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
 
-mvceditor::CodeControlClass* mvceditor::FeatureClass::GetCurrentCodeControl() const {
+t4p::CodeControlClass* t4p::FeatureClass::GetCurrentCodeControl() const {
 	return Notebook->GetCurrentCodeControl();
 }
 
-wxAuiNotebook* mvceditor::FeatureClass::GetToolsNotebook() const {
+wxAuiNotebook* t4p::FeatureClass::GetToolsNotebook() const {
 	return ToolsNotebook;
 }
 
-wxAuiNotebook* mvceditor::FeatureClass::GetOutlineNotebook() const {
+wxAuiNotebook* t4p::FeatureClass::GetOutlineNotebook() const {
 	return OutlineNotebook;
 }
 
-mvceditor::StatusBarWithGaugeClass* mvceditor::FeatureClass::GetStatusBarWithGauge() const {
+t4p::StatusBarWithGaugeClass* t4p::FeatureClass::GetStatusBarWithGauge() const {
 	return StatusBarWithGauge;
 }
 
-void mvceditor::FeatureClass::SetFocusToToolsWindow(wxWindow* window) {
+void t4p::FeatureClass::SetFocusToToolsWindow(wxWindow* window) {
 	int index = ToolsNotebook->GetPageIndex(window);
 	if (index != wxNOT_FOUND) {
 		ToolsNotebook->SetSelection(index);
@@ -185,7 +185,7 @@ void mvceditor::FeatureClass::SetFocusToToolsWindow(wxWindow* window) {
 	}
 }
 
-void mvceditor::FeatureClass::SetFocusToOutlineWindow(wxWindow* window) {
+void t4p::FeatureClass::SetFocusToOutlineWindow(wxWindow* window) {
 	int index = OutlineNotebook->GetPageIndex(window);
 	if (index != wxNOT_FOUND) {
 		OutlineNotebook->SetSelection(index);
@@ -196,7 +196,7 @@ void mvceditor::FeatureClass::SetFocusToOutlineWindow(wxWindow* window) {
 	}
 }
 
-wxString mvceditor::FeatureClass::GetSelectedText() const {
+wxString t4p::FeatureClass::GetSelectedText() const {
 	CodeControlClass* page = GetCurrentCodeControl();
 	wxString selectedText;
 	if (page) {
@@ -205,37 +205,37 @@ wxString mvceditor::FeatureClass::GetSelectedText() const {
 	return selectedText;
 }
 
-void mvceditor::FeatureClass::AddWindows() {
+void t4p::FeatureClass::AddWindows() {
 }
 
-void mvceditor::FeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void t4p::FeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
-void mvceditor::FeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::FeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
-void mvceditor::FeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void t4p::FeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
-wxWindow* mvceditor::FeatureClass::GetMainWindow() const {
+wxWindow* t4p::FeatureClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-mvceditor::CodeControlClass* mvceditor::FeatureClass::CreateCodeControl(const wxString& tabName, mvceditor::CodeControlClass::Mode mode) const {
-	mvceditor::NotebookClass* notebook = GetNotebook();
-	notebook->AddMvcEditorPage(mode);
+t4p::CodeControlClass* t4p::FeatureClass::CreateCodeControl(const wxString& tabName, t4p::CodeControlClass::Mode mode) const {
+	t4p::NotebookClass* notebook = GetNotebook();
+	notebook->AddTriumphPage(mode);
 	if (!tabName.IsEmpty()) {
 		notebook->SetPageText(notebook->GetSelection(), tabName);
 	}
-	mvceditor::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
 	return ctrl;
 }
 
-void mvceditor::FeatureClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<mvceditor::DynamicCmdClass>& shortcuts) {
+void t4p::FeatureClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<t4p::DynamicCmdClass>& shortcuts) {
 	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
 		wxMenuItem* item = MenuBar->FindItem(it->first);
 		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
-		mvceditor::DynamicCmdClass cmd(item, it->second);
+		t4p::DynamicCmdClass cmd(item, it->second);
 		shortcuts.push_back(cmd);
 	}
 }

@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGPARSERCLASS_H__
-#define __MVCEDITOR_TAGPARSERCLASS_H__
+#ifndef __T4P_TAGPARSERCLASS_H__
+#define __T4P_TAGPARSERCLASS_H__
 
 #include <search/DirectorySearchClass.h>
 #include <globals/TagClass.h>
@@ -36,7 +36,7 @@
 #include <vector>
 #include <map>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * The TagParser is used to store parsed tags(classes, functions, methods, properties) into a
@@ -55,7 +55,7 @@ namespace mvceditor {
 class TagParserClass : public pelet::ClassObserverClass, 
 	public pelet::ClassMemberObserverClass, 
 	public pelet::FunctionObserverClass, 
-	public mvceditor::DirectoryWalkerClass {
+	public t4p::DirectoryWalkerClass {
 
 public:
 
@@ -343,7 +343,7 @@ private:
 	/**
 	 * Write the file item into the database. The item's FileId member will be set as well.
 	 */
-	void PersistFileTag(mvceditor::FileTagClass& fileTag);
+	void PersistFileTag(t4p::FileTagClass& fileTag);
 
 	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
@@ -354,14 +354,14 @@ private:
 	 * @return bool if TRUE it means that this ResourceFinder has encountered the given
 	 * file before.
 	 */
-	bool FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag);
+	bool FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag);
 
 	/**
 	 * add all of the given resources into the database.
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const mvceditor::TagClass& resource, int fileTagId);
+	void PersistResources(const t4p::TagClass& resource, int fileTagId);
 
 	/**
 	 * add all of the given trait resources into the database.
@@ -369,13 +369,13 @@ private:
 	 * @param int the file that the resources are located in
 	 */
 	void PersistTraits(
-		const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+		const std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
 		int fileTagId);
 
 	/**
 	 * @return all of the traits that any of the given classes use.
 	 */
-	std::vector<mvceditor::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
+	std::vector<t4p::TraitTagClass> FindTraitsByClassName(const std::vector<std::string>& keyStarts);
 
 	/**
 	 * check the database AND the current file's parsed cache to see if the namespace has been seen

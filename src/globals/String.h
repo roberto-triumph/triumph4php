@@ -22,15 +22,15 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORSTRING_H__
-#define __MVCEDITORSTRING_H__
+#ifndef __T4P_STRING_H__
+#define __T4P_STRING_H__
 
 #include <unicode/unistr.h>
 #include <wx/string.h>
 #include <vector>
 #include <map>
 
-namespace mvceditor {
+namespace t4p {
 	
 /**
  * Case-sensitive string comparator for use as STL Predicate

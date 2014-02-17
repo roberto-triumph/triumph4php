@@ -26,13 +26,13 @@
 #include <wx/filepicker.h>
 #include <wx/msgdlg.h>
 
-mvceditor::DirPickerValidatorClass::DirPickerValidatorClass(wxFileName* data)
+t4p::DirPickerValidatorClass::DirPickerValidatorClass(wxFileName* data)
 : wxValidator() 
 , Data(data) {
 
 }
 
-bool mvceditor::DirPickerValidatorClass::TransferToWindow() {
+bool t4p::DirPickerValidatorClass::TransferToWindow() {
 	bool ret = false;
 	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
 	if (ctrl) {
@@ -42,7 +42,7 @@ bool mvceditor::DirPickerValidatorClass::TransferToWindow() {
 	return ret;
 }
 
-bool mvceditor::DirPickerValidatorClass::TransferFromWindow() {
+bool t4p::DirPickerValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
 	if (ctrl) {
@@ -52,7 +52,7 @@ bool mvceditor::DirPickerValidatorClass::TransferFromWindow() {
 	return ret;
 }
 
-bool mvceditor::DirPickerValidatorClass::Validate(wxWindow* parent) {
+bool t4p::DirPickerValidatorClass::Validate(wxWindow* parent) {
 	bool ret = false;
 	wxDirPickerCtrl* ctrl = wxDynamicCast(GetWindow(), wxDirPickerCtrl);
 	if (ctrl) {
@@ -64,7 +64,7 @@ bool mvceditor::DirPickerValidatorClass::Validate(wxWindow* parent) {
 	return ret;
 }
 
-wxObject* mvceditor::DirPickerValidatorClass::Clone() const {
-	mvceditor::DirPickerValidatorClass* other = new mvceditor::DirPickerValidatorClass(Data);
+wxObject* t4p::DirPickerValidatorClass::Clone() const {
+	t4p::DirPickerValidatorClass* other = new t4p::DirPickerValidatorClass(Data);
 	return other;
 }

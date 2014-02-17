@@ -29,7 +29,7 @@
 SUITE(SqlLexicalAnalyzerTestClass) {
 	
 TEST(SingleQuery) {
-	mvceditor::SqlLexicalAnalyzerClass lexer;
+	t4p::SqlLexicalAnalyzerClass lexer;
 	UnicodeString query = UNICODE_STRING_SIMPLE("SELECT * FROM users;");
 	CHECK(lexer.OpenString(query));
 	UnicodeString extracted;
@@ -41,7 +41,7 @@ TEST(SingleQuery) {
 }
 
 TEST(MultipleQueries) {
-	mvceditor::SqlLexicalAnalyzerClass lexer;
+	t4p::SqlLexicalAnalyzerClass lexer;
 	UnicodeString expectedQuery1 = 
 		UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='my user';\n\nDELETE FROM users WHERE name='another'");
 	UnicodeString queries = expectedQuery1;
@@ -59,7 +59,7 @@ TEST(MultipleQueries) {
 }
 
 TEST(Comments) {
-	mvceditor::SqlLexicalAnalyzerClass lexer;
+	t4p::SqlLexicalAnalyzerClass lexer;
 	UnicodeString expectedQuery1 = 
 		UNICODE_STRING_SIMPLE("/* a ; comment */ -- another; \n #yet another; \n DELETE FROM users WHERE name='my user'");
 	UnicodeString queries = expectedQuery1;
@@ -71,7 +71,7 @@ TEST(Comments) {
 }
 
 TEST(StringWithSemicolons) {
-	mvceditor::SqlLexicalAnalyzerClass lexer;
+	t4p::SqlLexicalAnalyzerClass lexer;
 	UnicodeString expectedQuery1 = 
 		UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name=\"my;user\" or name = 'my;user'");
 	UnicodeString queries = expectedQuery1;

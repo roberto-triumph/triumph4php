@@ -52,10 +52,10 @@ class FindInFilesPreviewRenderer : public wxDataViewCustomRenderer {
 
 public:
 	
-	mvceditor::FindInFilesHitClass Hit;
+	t4p::FindInFilesHitClass Hit;
 	
 	FindInFilesPreviewRenderer()
-	: wxDataViewCustomRenderer(wxT("mvceditor::FindInFilesHitClass")) {
+	: wxDataViewCustomRenderer(wxT("t4p::FindInFilesHitClass")) {
 		
 	}
 	
@@ -128,9 +128,9 @@ public:
 	}
 };
 
-static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFilesHitClass>& allHits) {
+static std::vector<wxString> FilesFromHits(const std::vector<t4p::FindInFilesHitClass>& allHits) {
 	std::vector<wxString>  files;
-	std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
+	std::vector<t4p::FindInFilesHitClass>::const_iterator hit;
 	for (hit = allHits.begin(); hit != allHits.end(); ++hit) {
 		files.push_back(hit->FileName);
 	}
@@ -141,7 +141,7 @@ static std::vector<wxString> FilesFromHits(const std::vector<mvceditor::FindInFi
 	return files;
 }
 
-mvceditor::FindInFilesHitClass::FindInFilesHitClass()
+t4p::FindInFilesHitClass::FindInFilesHitClass()
 	: wxObject()
 	, FileName()
 	, Preview()
@@ -152,7 +152,7 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass()
 
 }
 
-mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, 
+t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, 
 	int lineNumber, int lineOffset, int fileOffset, int matchLength)
 	: wxObject()
 	// use c_str() to deep copy
@@ -165,7 +165,7 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, co
 
 }
 
-mvceditor::FindInFilesHitClass::FindInFilesHitClass(const mvceditor::FindInFilesHitClass& hit) 
+t4p::FindInFilesHitClass::FindInFilesHitClass(const t4p::FindInFilesHitClass& hit) 
 	: wxObject()
 	, FileName()
 	, Preview() 
@@ -176,19 +176,19 @@ mvceditor::FindInFilesHitClass::FindInFilesHitClass(const mvceditor::FindInFiles
 	Copy(hit);
 }
 
-mvceditor::FindInFilesHitClass& mvceditor::FindInFilesHitClass::operator=(const mvceditor::FindInFilesHitClass& hit) {
+t4p::FindInFilesHitClass& t4p::FindInFilesHitClass::operator=(const t4p::FindInFilesHitClass& hit) {
 	Copy(hit);
 	return *this;
 }
 
-bool mvceditor::FindInFilesHitClass::operator==(const mvceditor::FindInFilesHitClass& hit) {
+bool t4p::FindInFilesHitClass::operator==(const t4p::FindInFilesHitClass& hit) {
 	return FileName == hit.FileName 
 		&& LineNumber == hit.LineNumber
 		&& LineOffset == hit.LineOffset
 		&& FileOffset == hit.FileOffset;
 }
 
-void mvceditor::FindInFilesHitClass::Copy(const mvceditor::FindInFilesHitClass& hit) {
+void t4p::FindInFilesHitClass::Copy(const t4p::FindInFilesHitClass& hit) {
 	FileName = hit.FileName.c_str();
 	Preview = hit.Preview.c_str();
 	LineNumber = hit.LineNumber;
@@ -197,36 +197,36 @@ void mvceditor::FindInFilesHitClass::Copy(const mvceditor::FindInFilesHitClass& 
 	MatchLength = hit.MatchLength;
 }
 
-IMPLEMENT_DYNAMIC_CLASS(mvceditor::FindInFilesHitClass, wxObject)
-namespace mvceditor {
+IMPLEMENT_DYNAMIC_CLASS(t4p::FindInFilesHitClass, wxObject)
+namespace t4p {
 
 	IMPLEMENT_VARIANT_OBJECT(FindInFilesHitClass)
 
 }
 
 
-mvceditor::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<mvceditor::FindInFilesHitClass> &hits)
-	: wxEvent(eventId, mvceditor::EVENT_FIND_IN_FILES_FILE_HIT)
+t4p::FindInFilesHitEventClass::FindInFilesHitEventClass(int eventId, const std::vector<t4p::FindInFilesHitClass> &hits)
+	: wxEvent(eventId, t4p::EVENT_FIND_IN_FILES_FILE_HIT)
 	, Hits(hits) {
 }
 
-wxEvent* mvceditor::FindInFilesHitEventClass::Clone() const {
-	wxEvent* newEvt = new mvceditor::FindInFilesHitEventClass(GetId(), Hits);
+wxEvent* t4p::FindInFilesHitEventClass::Clone() const {
+	wxEvent* newEvt = new t4p::FindInFilesHitEventClass(GetId(), Hits);
 	return newEvt;
 }
 
-std::vector<mvceditor::FindInFilesHitClass> mvceditor::FindInFilesHitEventClass::GetHits() const {
+std::vector<t4p::FindInFilesHitClass> t4p::FindInFilesHitEventClass::GetHits() const {
 	return Hits;
 }
 
-mvceditor::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId) 
 	: BackgroundFileReaderClass(runningThreads, eventId) 
 	, FindInFiles()
 	, SkipFiles() {
 
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind( mvceditor::FindInFilesClass findInFiles, 
+bool t4p::FindInFilesBackgroundReaderClass::InitForFind( t4p::FindInFilesClass findInFiles, 
 															  bool doHiddenFiles,
 															  std::vector<wxString> skipFiles) {
 
@@ -235,12 +235,12 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForFind( mvceditor::FindIn
 	FindInFiles = findInFiles;
 	SkipFiles = skipFiles;
 
-	std::vector<mvceditor::SourceClass> sources;
+	std::vector<t4p::SourceClass> sources;
 	sources.push_back(FindInFiles.Source);
-	return Init(sources, mvceditor::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
+	return Init(sources, t4p::DirectorySearchClass::RECURSIVE, doHiddenFiles) && FindInFiles.Prepare();
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(mvceditor::FindInFilesClass findInFiles,
+bool t4p::FindInFilesBackgroundReaderClass::InitForReplace(t4p::FindInFilesClass findInFiles,
 																 const std::vector<wxString>& replaceFiles,
 																 std::vector<wxString> skipFiles) {
 	FindInFiles = findInFiles;
@@ -248,7 +248,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::InitForReplace(mvceditor::Find
 	return FindInFiles.Prepare() && InitMatched(replaceFiles);
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchClass& search) {
+bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchClass& search) {
 	bool found = false;
 	found = search.Walk(FindInFiles);
 	if (found) {
@@ -258,15 +258,15 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 		// DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
 		// file that was searched is to do the search
 		std::vector<wxString>::iterator it = find(SkipFiles.begin(), SkipFiles.end(), fileName);
-		std::vector<mvceditor::FindInFilesHitClass> hits;
+		std::vector<t4p::FindInFilesHitClass> hits;
 		if (it == SkipFiles.end()) {
 			bool destroy = IsCancelled();
 			do {
 				if (destroy) {
 					break;
 				}
-				mvceditor::FindInFilesHitClass hit(fileName, 
-					mvceditor::IcuToWx(FindInFiles.GetCurrentLine()), 
+				t4p::FindInFilesHitClass hit(fileName, 
+					t4p::IcuToWx(FindInFiles.GetCurrentLine()), 
 					FindInFiles.GetCurrentLineNumber(),
 					FindInFiles.GetLineOffset(),
 					FindInFiles.GetFileOffset(),
@@ -280,7 +280,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 
 				// PostEvent will change the ID of the event to the correct
 				// one
-				mvceditor::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);
+				t4p::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);
 				PostEvent(hitEvent);
 			}
 		}
@@ -288,7 +288,7 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySe
 	return found;
 }
 
-bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxString& file) {
+bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxString& file) {
 	wxString fileToReplace = file;
 	int matches = 0;
 
@@ -300,12 +300,12 @@ bool mvceditor::FindInFilesBackgroundReaderClass::BackgroundFileMatch(const wxSt
 	return matches > 0;
 }
 
-wxString mvceditor::FindInFilesBackgroundReaderClass::GetLabel() const {
+wxString t4p::FindInFilesBackgroundReaderClass::GetLabel() const {
 	return wxT("Find In Files");
 }
 
-mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
-		StatusBarWithGaugeClass* gauge, mvceditor::RunningThreadsClass& runningThreads)
+t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
+		StatusBarWithGaugeClass* gauge, t4p::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
 	, RunningThreads(runningThreads)
@@ -316,14 +316,14 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
 
-	ReplaceButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace")));
-	ReplaceAllInFileButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace-file")));
-	ReplaceInAllFilesButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("replace-all")));
-	PreviousHitButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("previous")));
-	NextHitButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("next")));
-	StopButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("stop")));
-	CopySelectedButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy")));
-	CopyAllButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("copy-all")));
+	ReplaceButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace")));
+	ReplaceAllInFileButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace-file")));
+	ReplaceInAllFilesButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace-all")));
+	PreviousHitButton->SetBitmapLabel(t4p::IconImageAsset(wxT("previous")));
+	NextHitButton->SetBitmapLabel(t4p::IconImageAsset(wxT("next")));
+	StopButton->SetBitmapLabel(t4p::IconImageAsset(wxT("stop")));
+	CopySelectedButton->SetBitmapLabel(t4p::IconImageAsset(wxT("copy")));
+	CopyAllButton->SetBitmapLabel(t4p::IconImageAsset(wxT("copy-all")));
 	
 	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT, 
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -333,10 +333,10 @@ mvceditor::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* 
 	FindInFilesPreviewRenderer* previewRenderer = new FindInFilesPreviewRenderer();
 	wxDataViewColumn* previewColumn = new wxDataViewColumn(_("Preview"),
 		previewRenderer, 2, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
-	ResultsList->AppendColumn(previewColumn, wxT("mvceditor::FindInFilesHitClass"));
+	ResultsList->AppendColumn(previewColumn, wxT("t4p::FindInFilesHitClass"));
 }
 
-mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
+t4p::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 
 	// make sure we kill any running searches
 	if (RunningActionId > 0) {
@@ -348,11 +348,11 @@ mvceditor::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 	RunningThreads.RemoveEventHandler(this);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, bool doHiddenFiles) {
+void t4p::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles, bool doHiddenFiles) {
 	FindInFiles.Copy(findInFiles);
 	MatchedFiles = 0;
-	ReplaceWithText->SetValue(mvceditor::IcuToWx(FindInFiles.ReplaceExpression));
-	RegexReplaceWithHelpButton->Enable(mvceditor::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode);
+	ReplaceWithText->SetValue(t4p::IcuToWx(FindInFiles.ReplaceExpression));
+	RegexReplaceWithHelpButton->Enable(t4p::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode);
 
 	// for now disallow another find when one is already active
 	if (RunningActionId > 0) {
@@ -360,8 +360,8 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 		return;
 	}
 	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
-	mvceditor::FindInFilesBackgroundReaderClass* reader = 
-		new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
+	t4p::FindInFilesBackgroundReaderClass* reader = 
+		new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
 		RunningActionId = RunningThreads.Queue(reader);
 		EnableButtons(true, false, false);
@@ -378,7 +378,7 @@ void mvceditor::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findI
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
+void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 	FinderClass finder;
 	FindInFiles.CopyFinder(finder);
 	if (FindInFiles.Prepare() && finder.Prepare()) {
@@ -394,7 +394,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 				int32_t next = 0;
 				int32_t charPos = 0,
 					length = 0;
-				std::vector<mvceditor::FindInFilesHitClass> hits;
+				std::vector<t4p::FindInFilesHitClass> hits;
 				while (finder.FindNext(text, next)) {
 					if (finder.GetLastMatch(charPos, length)) {
 						int lineNumber = codeControl->LineFromCharacter(charPos);
@@ -405,7 +405,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 
 						// lineNumber is zero-based but we want to display it as 1-based
 						lineNumber++;
-						mvceditor::FindInFilesHitClass hit(
+						t4p::FindInFilesHitClass hit(
 							fileName, lineText, lineNumber,
 							charPos - start, next, length);
 						hits.push_back(hit);
@@ -416,7 +416,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 					}
 				}
 				if (!hits.empty()) {
-					mvceditor::FindInFilesHitEventClass hitEvent(FindInFilesGaugeId, hits);
+					t4p::FindInFilesHitEventClass hitEvent(FindInFilesGaugeId, hits);
 					wxPostEvent(this, hitEvent);
 				}
 			}
@@ -424,7 +424,7 @@ void mvceditor::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
+void t4p::FindInFilesResultsPanelClass::ShowNextMatch() {
 	int selected = ResultsList->GetSelectedRow();
 	int next = 0;
 	if (selected >= 0 && selected < ((int)ResultsList->GetItemCount() - 1)) {
@@ -437,7 +437,7 @@ void mvceditor::FindInFilesResultsPanelClass::ShowNextMatch() {
 	ShowMatchAndEnsureVisible(next);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
+void t4p::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 	int selected = ResultsList->GetSelectedRow();
 	int next = 0;
 	if (selected > 0) {
@@ -451,11 +451,11 @@ void mvceditor::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 	ShowMatchAndEnsureVisible(next);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
 		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
 	}
-	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
+	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
@@ -467,7 +467,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 			length = 0;
 		FinderClass finder;
 		UnicodeString matchedText;
-		wxString replaceWithText = mvceditor::IcuToWx(FindInFiles.ReplaceExpression);
+		wxString replaceWithText = t4p::IcuToWx(FindInFiles.ReplaceExpression);
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
 			
@@ -486,11 +486,11 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
 		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
 	}
-	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
+	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
 	CodeControlClass* codeControl = 
 			Notebook->GetCodeControl(Notebook->GetSelection());	
@@ -508,7 +508,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommand
 	 }
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
 
 	// for now disallow another replace when one is already active
 	if (RunningActionId > 0) {
@@ -518,7 +518,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
 		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
 	}
-	FindInFiles.ReplaceExpression = mvceditor::WxToIcu(ReplaceWithText->GetValue());
+	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	if (FindInFiles.Prepare()) {
 		FinderClass finder;
 		FindInFiles.CopyFinder(finder);
@@ -537,8 +537,8 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 		}
 		
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
-		mvceditor::FindInFilesBackgroundReaderClass* reader = 
-			new mvceditor::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
+		t4p::FindInFilesBackgroundReaderClass* reader = 
+			new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
 		RunningActionId = RunningThreads.Queue(reader);
 		SetStatus(_("Find In Files In Progress"));
@@ -552,7 +552,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxComman
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& event) {
 	int matchedFilesSize = GetNumberOfMatchedFiles();
 	bool enableReplace = matchedFilesSize > 0;
 	bool enableCopy = matchedFilesSize > 0;
@@ -576,7 +576,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEve
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+void t4p::FindInFilesResultsPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
 
 		// event from another, concurrent find in files panel. let the other panel
@@ -587,8 +587,8 @@ void mvceditor::FindInFilesResultsPanelClass::OnActionComplete(mvceditor::Action
 	RunningActionId = 0;
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHitEventClass& event) {
-	std::vector<mvceditor::FindInFilesHitClass> hits = event.GetHits();
+void t4p::FindInFilesResultsPanelClass::OnFileHit(t4p::FindInFilesHitEventClass& event) {
+	std::vector<t4p::FindInFilesHitClass> hits = event.GetHits();
 	if (hits.empty()) {
 		return;
 	}
@@ -605,7 +605,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 		MatchedFiles++;
 
 		wxArrayString hitList;
-		std::vector<mvceditor::FindInFilesHitClass>::const_iterator hit;
+		std::vector<t4p::FindInFilesHitClass>::const_iterator hit;
 
 		// in MSW the list control does not render the \t use another delimiter
 		wxString format = wxT("%s\t:%d\t:%s");
@@ -625,11 +625,11 @@ void mvceditor::FindInFilesResultsPanelClass::OnFileHit(mvceditor::FindInFilesHi
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnStopButton(wxCommandEvent& event) {
 	Stop();
 }
 
-void mvceditor::FindInFilesResultsPanelClass::Stop() {
+void t4p::FindInFilesResultsPanelClass::Stop() {
 	RunningThreads.CancelAction(RunningActionId);
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (AllHits.size() >= MAX_HITS) {
@@ -642,12 +642,12 @@ void mvceditor::FindInFilesResultsPanelClass::Stop() {
 	EnableButtons(false, enableIterators, enableIterators);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 	int sel = ResultsList->GetSelectedRow();
 	ShowMatch(sel);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
+void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	if (i < 0 || i >= (int)AllHits.size()) {
 		return;
 	}
@@ -680,14 +680,14 @@ void mvceditor::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::ShowMatchAndEnsureVisible(int i) {
+void t4p::FindInFilesResultsPanelClass::ShowMatchAndEnsureVisible(int i) {
 	ShowMatch(i);
 	ResultsList->SelectRow(i);
 	wxDataViewItem item = ResultsList->GetCurrentItem();
 	ResultsList->EnsureVisible(item);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEvent& event) {
 	int selected = ResultsList->GetSelectedRow();
 	if (selected != wxNOT_FOUND) {
 		wxString selectedItems = ResultsList->GetTextValue(selected, 0) 
@@ -704,7 +704,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEven
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& event) {
 	if (ResultsList->GetItemCount() <= 0) {
 		return;
 	}
@@ -724,37 +724,37 @@ void mvceditor::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& ev
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnPreviousHitButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnPreviousHitButton(wxCommandEvent& event) {
 	ShowPreviousMatch();
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnNextHitButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnNextHitButton(wxCommandEvent& event) {
 	ShowNextMatch();
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	t4p::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
-void mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
 	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
-	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
+	t4p::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnKillFocusReplaceText(wxFocusEvent& event) {
 	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
 	event.Skip();
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnReplaceTextEnter(wxCommandEvent& event) {
+void t4p::FindInFilesResultsPanelClass::OnReplaceTextEnter(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
 		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
 	}
 }
 
-void mvceditor::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, bool enableReplaceButtons, bool enableCopyButtons) {
+void t4p::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, bool enableReplaceButtons, bool enableCopyButtons) {
 	StopButton->Enable(enableStopButton);
 	ReplaceButton->Enable(enableReplaceButtons);
 	ReplaceAllInFileButton->Enable(enableReplaceButtons);
@@ -763,7 +763,7 @@ void mvceditor::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButto
 	CopyAllButton->Enable(enableCopyButtons);
 }
 
-void mvceditor::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
+void t4p::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
 	
 	// label might grow/shrink according to new text, must
 	// tell the sizer to re-position the label correctly
@@ -771,14 +771,14 @@ void mvceditor::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
 	// the text change
 	wxString msg;
 	msg += _("Searched For: ");
-	msg += mvceditor::IcuToWx(FindInFiles.Expression);
-	if (mvceditor::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode) {
+	msg += t4p::IcuToWx(FindInFiles.Expression);
+	if (t4p::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode) {
 		msg += _(" (regex)");
 	}
-	else if (mvceditor::FinderClass::CASE_INSENSITIVE == FindInFiles.Mode) {
+	else if (t4p::FinderClass::CASE_INSENSITIVE == FindInFiles.Mode) {
 		msg += _(" (case)");
 	}
-	else if (mvceditor::FinderClass::EXACT == FindInFiles.Mode) {
+	else if (t4p::FinderClass::EXACT == FindInFiles.Mode) {
 		msg += _(" (exact)");
 	}
 
@@ -789,11 +789,11 @@ void mvceditor::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
 	this->Layout();
 }
 
-int mvceditor::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
+int t4p::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
 	return MatchedFiles;
 }
 
-void mvceditor::FindInFilesResultsPanelClass::OnActionProgress(mvceditor::ActionProgressEventClass& event) {
+void t4p::FindInFilesResultsPanelClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
 
 		// event from another, concurrent find in files panel. let the other panel
@@ -804,7 +804,7 @@ void mvceditor::FindInFilesResultsPanelClass::OnActionProgress(mvceditor::Action
 	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
 }
 
-mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvceditor::FindInFilesFeatureClass& feature)
+t4p::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, t4p::FindInFilesFeatureClass& feature)
 	: FindInFilesDialogGeneratedClass(parent, wxID_ANY)
 	, Feature(feature)
 	, CurrentInsertionPointFind(0)
@@ -818,9 +818,9 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	if (FilesFilter->GetCount() <= 0) {
 		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.FileTypes.PhpFileExtensionsString);
 	}
-	std::vector<mvceditor::SourceClass> sources = feature.App.Globals.AllEnabledSources();
+	std::vector<t4p::SourceClass> sources = feature.App.Globals.AllEnabledSources();
 	for (size_t i = 0; i < sources.size(); ++i) {
-		mvceditor::SourceClass src = sources[i];
+		t4p::SourceClass src = sources[i];
 		wxString fullPath = src.RootDirectory.GetFullPath();
 		if (Directory->FindString(fullPath, false) < 0) {
 			Directory->AppendString(fullPath);
@@ -843,7 +843,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	else if (Directory->GetCount() > 0) {
 		Directory->SetSelection(0);
 	}
-	mvceditor::RegularExpressionValidatorClass regExValidator(&Feature.PreviousFindInFiles.Expression, FinderMode);
+	t4p::RegularExpressionValidatorClass regExValidator(&Feature.PreviousFindInFiles.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
 	UnicodeStringValidatorClass replaceExpressionValidator(&Feature.PreviousFindInFiles.ReplaceExpression, true);
 	wxGenericValidator modeValidator(&Feature.PreviousFindInFiles.Mode);
@@ -856,7 +856,7 @@ mvceditor::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, mvce
 	FindText->SetFocus();
 }
 
-void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
 		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(FilesFilter->GetValue());
 		if (!Feature.PreviousFindInFiles.Prepare()) {
@@ -881,7 +881,7 @@ void mvceditor::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 	// need to do this to prevent crash on app exit
 	Feature.FindHistory.Detach();
@@ -891,7 +891,7 @@ void mvceditor::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxID_CANCEL);
 }
 
-void mvceditor::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event) {
+void t4p::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event) {
 	wxString path = event.GetPath();
 
 	// add the selected directory, but only if its not already in the list
@@ -905,7 +905,7 @@ void mvceditor::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event
 	}
 }
 
-void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
+void t4p::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 
 	// the event object is the control that has focus
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
@@ -919,17 +919,17 @@ void mvceditor::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::FindInFilesDialogClass::OnKillFocusFindText(wxFocusEvent& event) {
+void t4p::FindInFilesDialogClass::OnKillFocusFindText(wxFocusEvent& event) {
 	CurrentInsertionPointFind = FindText->GetInsertionPoint();
 	event.Skip();
 }
 
-void mvceditor::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& event) {
+void t4p::FindInFilesDialogClass::OnKillFocusReplaceText(wxFocusEvent& event) {
 	CurrentInsertionPointReplace = ReplaceWithText->GetInsertionPoint();
 	event.Skip();
 }
 
-mvceditor::FindInFilesFeatureClass::FindInFilesFeatureClass(mvceditor::AppClass& app)
+t4p::FindInFilesFeatureClass::FindInFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)
 	, FindHistory()
 	, ReplaceHistory()
@@ -940,40 +940,40 @@ mvceditor::FindInFilesFeatureClass::FindInFilesFeatureClass(mvceditor::AppClass&
 	, ResultsPanels() {
 }
 
-void mvceditor::FindInFilesFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
-	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"), 
+void t4p::FindInFilesFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
+	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"), 
 		_("Find an expression by searching entire directory contents"));
-	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"), 
+	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"), 
 		_("Move the cursor to the next Find In Files Match"));
-	searchMenu->Append(mvceditor::MENU_FIND_IN_FILES + 2, _("Previous Find In Files Match\tALT+SHIFT+F3"),
+	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 2, _("Previous Find In Files Match\tALT+SHIFT+F3"),
 		_("Move the cursor to the previous Find In Files Match"));
 }
 
-void mvceditor::FindInFilesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::FindInFilesFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
-	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 1] = wxT("Find-Find In Files Next Match");
-	menuItemIds[mvceditor::MENU_FIND_IN_FILES + 2] = wxT("Find-Find In Files Previous Match");
+	menuItemIds[t4p::MENU_FIND_IN_FILES + 0] = wxT("Find-Find In Files");
+	menuItemIds[t4p::MENU_FIND_IN_FILES + 1] = wxT("Find-Find In Files Next Match");
+	menuItemIds[t4p::MENU_FIND_IN_FILES + 2] = wxT("Find-Find In Files Previous Match");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event) {
+void t4p::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event) {
 
 	// prime finder with selected text
 	wxString selectedText = GetSelectedText();
 	if (!selectedText.empty()) {
-		PreviousFindInFiles.Expression = mvceditor::WxToIcu(selectedText);
+		PreviousFindInFiles.Expression = t4p::WxToIcu(selectedText);
 	}
 	FindInFilesDialogClass dialog(GetMainWindow(), *this);
 	if (dialog.ShowModal() == wxID_OK) {
-		mvceditor::FindInFilesResultsPanelClass* panel = new mvceditor::FindInFilesResultsPanelClass(GetToolsNotebook(), 
+		t4p::FindInFilesResultsPanelClass* panel = new t4p::FindInFilesResultsPanelClass(GetToolsNotebook(), 
 			GetNotebook(), GetStatusBarWithGauge(), App.RunningThreads);
 		wxBitmap findBitmap = wxNullBitmap;
 		if (PreviousFindInFiles.ReplaceExpression.isEmpty()) {
-			findBitmap = mvceditor::IconImageAsset(wxT("find-in-files"));
+			findBitmap = t4p::IconImageAsset(wxT("find-in-files"));
 		}
 		else {
-			findBitmap = mvceditor::IconImageAsset(wxT("replace-in-files"));
+			findBitmap = t4p::IconImageAsset(wxT("replace-in-files"));
 		}
 		
 		if(AddToolsWindow(panel, _("Find In Files Results"), wxEmptyString, findBitmap)) {
@@ -983,11 +983,11 @@ void mvceditor::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event
 	}
 }
 
-void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesNext(wxCommandEvent& event) {
+void t4p::FindInFilesFeatureClass::OnEditFindInFilesNext(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = notebook->GetSelection();
 	wxWindow* window = notebook->GetPage(selection);
-	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	std::vector<t4p::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
 	while (it != ResultsPanels.end()) {
 		if (*it == window) {
 			(*it)->ShowNextMatch();
@@ -999,11 +999,11 @@ void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesNext(wxCommandEvent& e
 	}
 }
 
-void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesPrevious(wxCommandEvent& event) {
+void t4p::FindInFilesFeatureClass::OnEditFindInFilesPrevious(wxCommandEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = notebook->GetSelection();
 	wxWindow* window = notebook->GetPage(selection);
-	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	std::vector<t4p::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
 	while (it != ResultsPanels.end()) {
 		if (*it == window) {
 			(*it)->ShowPreviousMatch();
@@ -1015,11 +1015,11 @@ void mvceditor::FindInFilesFeatureClass::OnEditFindInFilesPrevious(wxCommandEven
 	}
 }
 
-void mvceditor::FindInFilesFeatureClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::FindInFilesFeatureClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& event) {
 	int selection = event.GetSelection();
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	wxWindow* window = notebook->GetPage(selection);
-	std::vector<mvceditor::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
+	std::vector<t4p::FindInFilesResultsPanelClass*>::iterator it = ResultsPanels.begin();
 	while (it != ResultsPanels.end()) {
 		if (*it == window) {
 			(*it)->Stop();
@@ -1031,83 +1031,83 @@ void mvceditor::FindInFilesFeatureClass::OnToolsNotebookPageClosed(wxAuiNotebook
 	}
 }
 
-void mvceditor::FindInFilesDialogClass::OnRegExFindHelpButton(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
+	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
-void mvceditor::FindInFilesDialogClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
-	mvceditor::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
+	t4p::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
 	PopupMenu(&regExMenu);	
 }
 
-void mvceditor::FindInFilesDialogClass::InsertRegExSymbol(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::InsertRegExSymbol(wxCommandEvent& event) {
 	int id = event.GetId() - ID_REGEX_MENU_START;
-	mvceditor::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
+	t4p::AddSymbolToRegularExpression(FindText, id, CurrentInsertionPointFind);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 	event.Skip();
 }
 
-void mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
+void t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
 	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
-	mvceditor::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
+	t4p::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
+BEGIN_EVENT_TABLE(t4p::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
 	
 	// remove this handler; when searching many files the GUI is redrawn constantly and doesn't
 	// look smooth
-	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, mvceditor::FindInFilesResultsPanelClass::OnFileSearched)
-	EVT_FIND_IN_FILES_HITS(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnFileHit)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_FILE_READ_COMPLETE, mvceditor::FindInFilesResultsPanelClass::OnFindInFilesComplete)
-	EVT_ACTION_PROGRESS(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnActionProgress)
-	EVT_ACTION_COMPLETE(wxID_ANY, mvceditor::FindInFilesResultsPanelClass::OnActionComplete)
+	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, t4p::FindInFilesResultsPanelClass::OnFileSearched)
+	EVT_FIND_IN_FILES_HITS(wxID_ANY, t4p::FindInFilesResultsPanelClass::OnFileHit)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_FILE_READ_COMPLETE, t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete)
+	EVT_ACTION_PROGRESS(wxID_ANY, t4p::FindInFilesResultsPanelClass::OnActionProgress)
+	EVT_ACTION_COMPLETE(wxID_ANY, t4p::FindInFilesResultsPanelClass::OnActionComplete)
 
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	
-	EVT_DATAVIEW_ITEM_ACTIVATED(FindInFilesResultsPanelGeneratedClass::ID_RESULTS_LIST, mvceditor::FindInFilesResultsPanelClass::OnRowActivated)
+	EVT_DATAVIEW_ITEM_ACTIVATED(FindInFilesResultsPanelGeneratedClass::ID_RESULTS_LIST, t4p::FindInFilesResultsPanelClass::OnRowActivated)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::FindInFilesFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 0, mvceditor::FindInFilesFeatureClass::OnEditFindInFiles)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 1, mvceditor::FindInFilesFeatureClass::OnEditFindInFilesNext)
-	EVT_MENU(mvceditor::MENU_FIND_IN_FILES + 2, mvceditor::FindInFilesFeatureClass::OnEditFindInFilesPrevious)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::FindInFilesFeatureClass::OnToolsNotebookPageClosed)
+BEGIN_EVENT_TABLE(t4p::FindInFilesFeatureClass, wxEvtHandler)
+	EVT_MENU(t4p::MENU_FIND_IN_FILES + 0, t4p::FindInFilesFeatureClass::OnEditFindInFiles)
+	EVT_MENU(t4p::MENU_FIND_IN_FILES + 1, t4p::FindInFilesFeatureClass::OnEditFindInFilesNext)
+	EVT_MENU(t4p::MENU_FIND_IN_FILES + 2, t4p::FindInFilesFeatureClass::OnEditFindInFilesPrevious)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_TOOLS_NOTEBOOK, t4p::FindInFilesFeatureClass::OnToolsNotebookPageClosed)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, mvceditor::FindInFilesDialogClass::InsertReplaceRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_STRING, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
-	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, mvceditor::FindInFilesDialogClass::InsertRegExSymbol)
+BEGIN_EVENT_TABLE(t4p::FindInFilesDialogClass, FindInFilesDialogGeneratedClass)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_ONE, t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_TWO, t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_ONE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ZERO_OR_ONE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_EXACT, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_AT_LEAST, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_SEQUENCE_BETWEEN, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_BEGIN_OF_LINE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_END_OF_LINE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DIGIT, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_WHITE_SPACE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_ALPHANUMERIC, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_DECIMAL, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_WHITE_SPACE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_NOT_ALPHANUMERIC, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_CASE_SENSITIVE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_COMMENT, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_DOT_ALL, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_MULTI_LINE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_UWORD, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_STRING, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_VARIABLE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_NUMBER, t4p::FindInFilesDialogClass::InsertRegExSymbol)
+	EVT_MENU(ID_REGEX_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, t4p::FindInFilesDialogClass::InsertRegExSymbol)
 END_EVENT_TABLE()

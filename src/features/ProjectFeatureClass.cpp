@@ -37,20 +37,20 @@
 #include <wx/choicdlg.h>
 #include <algorithm>
 
-mvceditor::ProjectFeatureClass::ProjectFeatureClass(mvceditor::AppClass& app) 
+t4p::ProjectFeatureClass::ProjectFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app) {
 }
 
-mvceditor::ProjectFeatureClass::~ProjectFeatureClass() {
+t4p::ProjectFeatureClass::~ProjectFeatureClass() {
 }
 
-void mvceditor::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
-	fileMenu->Append(mvceditor::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
-	fileMenu->Append(mvceditor::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
+void t4p::ProjectFeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
+	fileMenu->Append(t4p::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
+	fileMenu->Append(t4p::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
 	
 }
 
-void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 	// config will leave the defaults alone if keys are not found in the config
 	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.FileTypes.PhpFileExtensionsString);
@@ -75,7 +75,7 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 	bool next = config->GetFirstGroup(key, index);
 	while (next) {
 		if (key.Find(wxT("Project_")) == 0) {
-			mvceditor::ProjectClass newProject;
+			t4p::ProjectClass newProject;
 			int sourcesCount = 0;
 
 			wxString keyLabel = wxString::Format(wxT("/Project_%d/Label"), projectIndex);
@@ -89,7 +89,7 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 				wxString keyInclude = wxString::Format(wxT("/Project_%d/Source_%d_IncludeWildcards"), projectIndex, j);
 				wxString keyExclude = wxString::Format(wxT("/Project_%d/Source_%d_ExcludeWildcards"), projectIndex, j);
 
-				mvceditor::SourceClass src;
+				t4p::SourceClass src;
 				wxString rootDir = config->Read(keyRootPath);
 				wxString includeWildcards = config->Read(keyInclude);
 				wxString excludeWildcards = config->Read(keyExclude);
@@ -111,7 +111,7 @@ void mvceditor::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 	}
 }
 
-void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/Project/PhpFileExtensions"), App.Globals.FileTypes.PhpFileExtensionsString);
 	config->Write(wxT("/Project/CssFileExtensions"), App.Globals.FileTypes.CssFileExtensionsString);
@@ -144,7 +144,7 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	}
 	
 	for (size_t i = 0; i < App.Globals.Projects.size(); ++i) {
-		mvceditor::ProjectClass project = App.Globals.Projects[i];
+		t4p::ProjectClass project = App.Globals.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%ld/Label"), i);
 		wxString keyEnabled = wxString::Format(wxT("/Project_%ld/IsEnabled"), i);
 		wxString keySourceCount = wxString::Format(wxT("/Project_%ld/SourceCount"), i);
@@ -152,7 +152,7 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		config->Write(keyEnabled, project.IsEnabled);
 		config->Write(keySourceCount, (int)project.Sources.size());
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
-			mvceditor::SourceClass source = project.Sources[j];			
+			t4p::SourceClass source = project.Sources[j];			
 			wxString keyRootPath = wxString::Format(wxT("/Project_%ld/Source_%ld_RootDirectory"), i, j);
 			wxString keyInclude = wxString::Format(wxT("/Project_%ld/Source_%ld_IncludeWildcards"), i, j);
 			wxString keyExclude = wxString::Format(wxT("/Project_%ld/Source_%ld_ExcludeWildcards"), i, j);			
@@ -163,18 +163,18 @@ void mvceditor::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	}
 
 	// also, update the projects to have new file extesions
-	std::vector<mvceditor::ProjectClass>::iterator project;
+	std::vector<t4p::ProjectClass>::iterator project;
 	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 		App.Globals.AssignFileExtensions(*project);
 	}
 }
 
-void mvceditor::ProjectFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void t4p::ProjectFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ProjectPreferencesPanelClass* panel = new ProjectPreferencesPanelClass(parent, *this);
 	parent->AddPage(panel, wxT("Project"));
 }
 
-void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
+void t4p::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 	
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
@@ -198,10 +198,10 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		App.RunningThreads.StopAll();
 	}
 
-	std::vector<mvceditor::ProjectClass> removedProjects, touchedProjects;
-	mvceditor::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects, touchedProjects);
+	std::vector<t4p::ProjectClass> removedProjects, touchedProjects;
+	t4p::ProjectListDialogClass dialog(GetMainWindow(), App.Globals.Projects, removedProjects, touchedProjects);
 	if (wxOK == dialog.ShowModal()) {
-		std::vector<mvceditor::ProjectClass>::iterator project;
+		std::vector<t4p::ProjectClass>::iterator project;
 
 		
 		// for new projects we need to fill in the file extensions
@@ -217,7 +217,7 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 			App.Globals.AssignFileExtensions(*project);
 		}
 
-		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+		wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 		App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
@@ -251,7 +251,7 @@ void mvceditor::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
+void t4p::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
 	
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
@@ -282,8 +282,8 @@ void mvceditor::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
 		rootPath.AssignDir(dir);
 		wxString projectName = rootPath.GetDirs().Last();
 
-		mvceditor::ProjectClass newProject;
-		mvceditor::SourceClass newSource;
+		t4p::ProjectClass newProject;
+		t4p::SourceClass newSource;
 		newSource.RootDirectory = rootPath;
 		newSource.SetIncludeWildcards(wxT("*.*"));
 		newProject.AddSource(newSource);
@@ -296,7 +296,7 @@ void mvceditor::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
 		// the rest of the app assumes they are already filled in
 		App.Globals.AssignFileExtensions(newProject);
 
-		wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+		wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 		App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
@@ -321,29 +321,29 @@ void mvceditor::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
 		if (wxYES == ret) {
 
 			// user does not want to re-tag newly enabled projects
-			std::vector<mvceditor::ProjectClass> empty;
-			std::vector<mvceditor::ProjectClass> touchedProjects;
+			std::vector<t4p::ProjectClass> empty;
+			std::vector<t4p::ProjectClass> touchedProjects;
 			touchedProjects.push_back(newProject);
 			App.Sequences.ProjectDefinitionsUpdated(touchedProjects, empty);
 		}
-		wxCommandEvent newProjectEvt(mvceditor::EVENT_APP_PROJECT_CREATED);
+		wxCommandEvent newProjectEvt(t4p::EVENT_APP_PROJECT_CREATED);
 		newProjectEvt.SetString(dir);
 		App.EventSink.Publish(newProjectEvt);
 	}
 }
 
-void mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
+void t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
 	
 	// start the sequence that will update all global data structures
 	// at this point, we dont know which projects need to be reparsed
 	// since another instance of triumph4php added them, it is assumed that 
 	// the other instance has parsed them and built the cache.  
 	// this instance will just load the cache into memory
-	std::vector<mvceditor::ProjectClass> touchedProjects, removedProjects;
+	std::vector<t4p::ProjectClass> touchedProjects, removedProjects;
 	App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
 }
 
-mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, mvceditor::ProjectFeatureClass &projectFeature) 
+t4p::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, t4p::ProjectFeatureClass &projectFeature) 
 : ProjectPreferencesGeneratedPanelClass(parent) {
 	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
@@ -390,7 +390,7 @@ mvceditor::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *
 	
 }
 
-mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, mvceditor::ProjectClass& project)
+t4p::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project)
 	: ProjectDefinitionDialogGeneratedClass(parent)
 	, Project(project)
 	, EditedProject(project) {
@@ -404,20 +404,20 @@ mvceditor::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* 
 	Label->SetFocus();
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
-	mvceditor::SourceClass newSrc;
-	mvceditor::ProjectSourceDialogClass dialog(this, newSrc);
+void t4p::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
+	t4p::SourceClass newSrc;
+	t4p::ProjectSourceDialogClass dialog(this, newSrc);
 	if (wxOK == dialog.ShowModal()) {
 		EditedProject.AddSource(newSrc);
 		SourcesList->Append(newSrc.RootDirectory.GetFullPath());
 	}
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event) {
+void t4p::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event) {
 	size_t selected = SourcesList->GetSelection();
 	if (selected >= 0 && selected < EditedProject.Sources.size()) {
-		mvceditor::SourceClass src = EditedProject.Sources[selected];
-		mvceditor::ProjectSourceDialogClass dialog(this, src);
+		t4p::SourceClass src = EditedProject.Sources[selected];
+		t4p::ProjectSourceDialogClass dialog(this, src);
 		if (wxOK == dialog.ShowModal()) {
 			SourcesList->SetString(selected, src.RootDirectory.GetFullPath());
 			EditedProject.Sources[selected] = src;
@@ -425,10 +425,10 @@ void mvceditor::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event
 	}
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& event) {
+void t4p::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& event) {
 	size_t selected = SourcesList->GetSelection();
 	if (selected >= 0 && selected < EditedProject.Sources.size()) {
-		mvceditor::SourceClass src = EditedProject.Sources[selected];
+		t4p::SourceClass src = EditedProject.Sources[selected];
 		wxString msg = _("Are you sure you wish to remove the source? ");
 		msg += src.RootDirectory.GetFullPath();
 		msg += wxT("\n");
@@ -443,7 +443,7 @@ void mvceditor::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::ProjectDefinitionDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	if (!EditedProject.HasSources()) {
 		wxMessageBox(_("Project must have at least one source directory"));
@@ -453,15 +453,15 @@ void mvceditor::ProjectDefinitionDialogClass::OnOkButton(wxCommandEvent& event) 
 	EndModal(wxOK);
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::ProjectDefinitionDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommandEvent& event) {
+void t4p::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommandEvent& event) {
 	size_t selected = event.GetSelection();
 	if (selected >= 0 && selected < EditedProject.Sources.size()) {
-		mvceditor::SourceClass src = EditedProject.Sources[selected];
-		mvceditor::ProjectSourceDialogClass dialog(this, src);
+		t4p::SourceClass src = EditedProject.Sources[selected];
+		t4p::ProjectSourceDialogClass dialog(this, src);
 		if (wxOK == dialog.ShowModal()) {
 			SourcesList->SetString(selected, src.RootDirectory.GetFullPath());
 			EditedProject.Sources[selected] = src;
@@ -470,13 +470,13 @@ void mvceditor::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommand
 	event.Skip();
 }
 
-void mvceditor::ProjectDefinitionDialogClass::Populate() {
+void t4p::ProjectDefinitionDialogClass::Populate() {
 	for (size_t i = 0; i < EditedProject.Sources.size(); ++i) {
 		SourcesList->Append(EditedProject.Sources[i].RootDirectory.GetFullPath());
 	}
 }
 
-mvceditor::ProjectSourceDialogClass::ProjectSourceDialogClass(wxWindow* parent, mvceditor::SourceClass& source)
+t4p::ProjectSourceDialogClass::ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source)
 	: ProjectSourceDialogGeneratedClass(parent)
 	, Source(source)
 	, EditedSource(source) {
@@ -490,7 +490,7 @@ mvceditor::ProjectSourceDialogClass::ProjectSourceDialogClass(wxWindow* parent, 
 	RootDirectory->SetFocus();
 }
 
-void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (IncludeWildcards->IsEmpty()) {
 		wxMessageBox(_("Include wildcards must not be empty."));
 		return;
@@ -506,13 +506,13 @@ void mvceditor::ProjectSourceDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::ProjectSourceDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<mvceditor::ProjectClass>& projects,
-														  std::vector<mvceditor::ProjectClass>& removedProjects,
-														  std::vector<mvceditor::ProjectClass>& touchedProjects)
+t4p::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects,
+														  std::vector<t4p::ProjectClass>& removedProjects,
+														  std::vector<t4p::ProjectClass>& touchedProjects)
 	: ProjectListDialogGeneratedClass(parent)
 	, Projects(projects)
 	, EditedProjects(projects)
@@ -527,7 +527,7 @@ mvceditor::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std:
 	this->Center(wxBOTH);
 }
 
-void mvceditor::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
 
 	// this will be a toggle button; if all items are checked then
 	// this button should de-check them
@@ -544,11 +544,11 @@ void mvceditor::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
 	if (selection >= 0 && selection < EditedProjects.size()) {
-		mvceditor::ProjectClass project = EditedProjects[selection];
-		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+		t4p::ProjectClass project = EditedProjects[selection];
+		t4p::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
 			wxString label = project.Label;
@@ -570,25 +570,25 @@ void mvceditor::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent
 	event.Skip();
 }
 
-void mvceditor::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
 	if (selection >= 0 && selection < EditedProjects.size()) {
-		mvceditor::ProjectClass project = EditedProjects[selection];
+		t4p::ProjectClass project = EditedProjects[selection];
 		project.IsEnabled = ProjectsList->IsChecked(selection);
 		EditedProjects[selection] = project;
 	}
 	event.Skip();
 }
 
-void mvceditor::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
-	mvceditor::ProjectClass project;
-	mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+void t4p::ProjectListDialogClass::OnAddButton(wxCommandEvent& event) {
+	t4p::ProjectClass project;
+	t4p::ProjectDefinitionDialogClass dialog(this, project);
 	if (wxOK == dialog.ShowModal()) {
 		AddProject(project);
 	}
 }
 
-void mvceditor::ProjectListDialogClass::AddProject(const mvceditor::ProjectClass& project) {
+void t4p::ProjectListDialogClass::AddProject(const t4p::ProjectClass& project) {
 	EditedProjects.push_back(project);
 	wxString label = project.Label;
 
@@ -602,7 +602,7 @@ void mvceditor::ProjectListDialogClass::AddProject(const mvceditor::ProjectClass
 	ProjectsList->Check(ProjectsList->GetCount() - 1, true);
 }
 
-void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 	wxArrayInt selections;
 	ProjectsList->GetSelections(selections);
 	if (selections.GetCount() > 0) {
@@ -610,7 +610,7 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		for (size_t i = 0 ; i <  selections.GetCount(); ++i) {
 			size_t selection = selections[i];
 			if (selection >= 0  && selection < EditedProjects.size()) {
-				mvceditor::ProjectClass project = EditedProjects[selection];
+				t4p::ProjectClass project = EditedProjects[selection];
 				projectLabels += project.Label;
 				projectLabels += wxT("\n");
 			}
@@ -625,7 +625,7 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		if (wxYES == response) {
 
 			// copy all the items that are NOT to be removed into a new vector
-			std::vector<mvceditor::ProjectClass> remainingProjects;
+			std::vector<t4p::ProjectClass> remainingProjects;
 			wxArrayString remainingLabels;
 
 			for (size_t i = 0; i < EditedProjects.size(); ++i) {
@@ -649,7 +649,7 @@ void mvceditor::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 	wxArrayInt selections;
 	ProjectsList->GetSelections(selections);
 	if (selections.GetCount() != 1) {
@@ -658,8 +658,8 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 	}
 	size_t selection = selections[0];
 	if (selection >= 0 && selection < EditedProjects.size()) {
-		mvceditor::ProjectClass project = EditedProjects[selection];
-		mvceditor::ProjectDefinitionDialogClass dialog(this, project);
+		t4p::ProjectClass project = EditedProjects[selection];
+		t4p::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
 			wxString label = project.Label;
@@ -680,13 +680,13 @@ void mvceditor::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 
 	// go thorough the edited projects and see which ones actually changed
 	// here, Projects is the original list and EditedProjects is the list that the
 	// user modified
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::ProjectClass>::iterator editedProject;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::ProjectClass>::iterator editedProject;
 	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
 
 		// if a project is disabled then we wont need to update the cache so we can
@@ -702,7 +702,7 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 		/// NOT changed
 		bool touched = true;
 		for (project = Projects.begin(); project != Projects.end(); ++project) {
-			bool isSame = mvceditor::CompareSourceLists(project->Sources, editedProject->Sources);
+			bool isSame = t4p::CompareSourceLists(project->Sources, editedProject->Sources);
 			bool hasBeenReEnabled = editedProject->IsEnabled && !project->IsEnabled;
 
 			// even if 2 projects are the same, if the project went from disabled to enabled
@@ -721,15 +721,15 @@ void mvceditor::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::ProjectListDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::ProjectListDialogClass::Populate() {
+void t4p::ProjectListDialogClass::Populate() {
 	ProjectsList->Clear();
 	wxPlatformInfo info = wxPlatformInfo::Get();
 	for (size_t i = 0; i < EditedProjects.size(); ++i) {
-		mvceditor::ProjectClass project = EditedProjects[i];
+		t4p::ProjectClass project = EditedProjects[i];
 		wxString label = project.Label;
 
 		// escape any ampersands in the label, list box needs them escaped
@@ -742,7 +742,7 @@ void mvceditor::ProjectListDialogClass::Populate() {
 	}
 }
 
-void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event) {
 	wxString rootDir = wxDirSelector(_("Choose the directory where your projects are located"), wxEmptyString,
 		wxDD_DIR_MUST_EXIST, wxDefaultPosition, this);
 	if (!rootDir.IsEmpty()) {
@@ -774,8 +774,8 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 				for (size_t i = 0; i < selections.size(); ++i) {
 					wxString chosenSubDir = subDirs[selections[i]];
 
-					mvceditor::ProjectClass project;
-					mvceditor::SourceClass newSrc;
+					t4p::ProjectClass project;
+					t4p::SourceClass newSrc;
 					newSrc.RootDirectory.AssignDir(rootDir);
 					newSrc.RootDirectory.AppendDir(chosenSubDir);
 					newSrc.SetIncludeWildcards(wxT("*.*"));
@@ -795,7 +795,7 @@ void mvceditor::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent&
 	}
 }
 
-void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"Add: Will show the new project dialog\n"
 		"Remove: Will remove the selected project\n"
@@ -806,7 +806,7 @@ void mvceditor::ProjectListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Defined Projects Help"), wxCENTRE, this);
 }
 
-mvceditor::MultipleSelectDialogClass::MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption,
+t4p::MultipleSelectDialogClass::MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption,
 																std::vector<wxString>& choices, std::vector<int>& selections)
 : MultipleSelectDialogGeneratedClass(parent, wxID_ANY, title)
 , Selections(selections) {
@@ -816,7 +816,7 @@ mvceditor::MultipleSelectDialogClass::MultipleSelectDialogClass(wxWindow* parent
 	}
 }
 
-void mvceditor::MultipleSelectDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::MultipleSelectDialogClass::OnOkButton(wxCommandEvent& event) {
 	for (size_t i = 0; i < Checklist->GetCount(); ++i) {
 		if (Checklist->IsChecked(i)) {
 			Selections.push_back(i);
@@ -825,14 +825,14 @@ void mvceditor::MultipleSelectDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::MultipleSelectDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::MultipleSelectDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::ProjectFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_PROJECT + 0, mvceditor::ProjectFeatureClass::OnProjectDefine)
-	EVT_MENU(mvceditor::MENU_PROJECT + 1, mvceditor::ProjectFeatureClass::OnCreateNewProject)
+BEGIN_EVENT_TABLE(t4p::ProjectFeatureClass, wxEvtHandler)
+	EVT_MENU(t4p::MENU_PROJECT + 0, t4p::ProjectFeatureClass::OnProjectDefine)
+	EVT_MENU(t4p::MENU_PROJECT + 1, t4p::ProjectFeatureClass::OnCreateNewProject)
 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ProjectFeatureClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ProjectFeatureClass::OnPreferencesExternallyUpdated)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::ProjectFeatureClass::OnPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated)
 END_EVENT_TABLE()

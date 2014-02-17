@@ -23,14 +23,13 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
  
-#ifndef __MVCEDITOR_FILETYPECLASS_H__
-#define __MVCEDITOR_FILETYPECLASS_H__
+#ifndef __T4P_FILETYPECLASS_H__
+#define __T4P_FILETYPECLASS_H__
 
 #include <wx/string.h>
 #include <vector>
 
-namespace mvceditor
-{
+namespace t4p {
 
 /**
  * This class holds the wildcards for all of the 
@@ -135,4 +134,4 @@ public:
 
 }
 
-#endif // __MVCEDITOR_FILETYPECLASS_H__
+#endif // __T4P_FILETYPECLASS_H__

@@ -23,14 +23,14 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_SQLITE_H__
-#define __MVCEDITOR_SQLITE_H__
+#ifndef __T4P_SQLITE_H__
+#define __T4P_SQLITE_H__
 
 #include <soci/soci.h>
 #include <wx/filename.h>
 #include <string>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * escape a value so that it is suitable for using in a LIKE SQL clause
@@ -203,7 +203,7 @@ public:
 	 * @param result contains the query to run and the parameters to bind
 	 * @return bool TRUE if the query was successfully run
 	 */
-	bool Exec(mvceditor::SqliteResultClass* result);
+	bool Exec(t4p::SqliteResultClass* result);
 
 protected:
 

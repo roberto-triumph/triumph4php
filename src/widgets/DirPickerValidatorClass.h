@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_DIRPICKERVALIDATORCLASS_H__
-#define __MVCEDITOR_DIRPICKERVALIDATORCLASS_H__
+#ifndef __T4P_DIRPICKERVALIDATORCLASS_H__
+#define __T4P_DIRPICKERVALIDATORCLASS_H__
 
 #include <wx/validate.h>
 #include <wx/filename.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class is used to transfer a value from a dir picker control. Currently this validator

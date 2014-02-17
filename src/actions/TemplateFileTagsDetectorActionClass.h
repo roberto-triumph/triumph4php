@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TEMPLATEFILESDETECTORACTIONCLASS_H__
-#define __MVCEDITOR_TEMPLATEFILESDETECTORACTIONCLASS_H__
+#ifndef __T4P_TEMPLATEFILESDETECTORACTIONCLASS_H__
+#define __T4P_TEMPLATEFILESDETECTORACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * the set of parameters that will be used for each 
@@ -43,7 +43,7 @@ public:
 
 	/**
 	 * location to the php executable (php.exe / php)
-	 * this is usually retrieved from mvceditor::EnvironmentClass
+	 * this is usually retrieved from t4p::EnvironmentClass
 	 */
 	wxString PhpExecutablePath;
 
@@ -101,16 +101,16 @@ public:
  * can be used to build the call stack. This means that the CallStackActionClass should be run immediately before
  * this action.
  */
-class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
+class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
 public:
 
-	TemplateFileTagsDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TemplateFileTagsDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * @return boolean false if php is not installed in the system
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	bool DoAsync();
 
@@ -123,13 +123,13 @@ private:
 	/**
 	 * used to run the external url detector PHP script
 	 */
-	mvceditor::ProcessWithHeartbeatClass Process;
+	t4p::ProcessWithHeartbeatClass Process;
 
 	/**
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::TemplateFileTagsDetectorParamsClass> ParamsQueue;
+	std::queue<t4p::TemplateFileTagsDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php url 

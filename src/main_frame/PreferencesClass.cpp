@@ -46,7 +46,7 @@
  */
 
 
-static int LoadKeyProfileBindings(std::vector<mvceditor::DynamicCmdClass>& dynamicCmds, wxConfigBase* config, const wxString& configKey) {
+static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds, wxConfigBase* config, const wxString& configKey) {
 	int total = 0;
 	config->SetPath(configKey);
 	wxString configName;
@@ -112,7 +112,7 @@ static int LoadKeyProfileBindings(std::vector<mvceditor::DynamicCmdClass>& dynam
  * @param config the stored config settings
  * @param configKey the name of the config group to load.
  */
-static bool LoadKeyProfile(std::vector<mvceditor::DynamicCmdClass>& dynamicCmds, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
+static bool LoadKeyProfile(std::vector<t4p::DynamicCmdClass>& dynamicCmds, wxKeyProfile& profile, wxConfigBase* config, const wxString& configKey) {
 	bool ret = false;
 	config->SetPath(configKey);        // enter into this group
     wxString name;
@@ -138,7 +138,7 @@ static bool LoadKeyProfile(std::vector<mvceditor::DynamicCmdClass>& dynamicCmds,
 	return ret;
 }
 
-static bool LoadKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
     config->SetPath(configKey);
 	int profileSelected = 0;
 
@@ -155,7 +155,7 @@ static bool LoadKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& default
 
 			// wxKeyProfileArray will cleanup this pointer in wxKeyProfileArray::Cleanup()
 			wxKeyProfile* profile = new wxKeyProfile();
-			std::vector<mvceditor::DynamicCmdClass> cmds(defaultShortcuts);
+			std::vector<t4p::DynamicCmdClass> cmds(defaultShortcuts);
 			status = LoadKeyProfile(cmds, *profile, config, configName);
 			if (status) {
 				for (size_t i = 0; i < cmds.size(); ++i) {
@@ -200,7 +200,7 @@ static bool LoadKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& default
  * @param config the shortcuts will be stored to the given config
  * @param configKey the shortcuts will be stored to the given config group
  */
-static bool SaveKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
 
 	// Example config file will look like this
 	// 
@@ -254,7 +254,7 @@ static bool SaveKeyProfileArray(std::vector<mvceditor::DynamicCmdClass>& default
 	return success;
 }
 
-mvceditor::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifier)
+t4p::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifier)
 	: MenuCmd(item, identifier, item->GetHelp())
 	, Identifier(identifier) {
 
@@ -269,27 +269,27 @@ mvceditor::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& id
 	}
 }
 
-void mvceditor::DynamicCmdClass::AddShortcut(const wxString& key) {
+void t4p::DynamicCmdClass::AddShortcut(const wxString& key) {
 	MenuCmd.AddShortcut(key);
 }
 
-wxCmd* mvceditor::DynamicCmdClass::CloneCommand() const {
+wxCmd* t4p::DynamicCmdClass::CloneCommand() const {
 	return MenuCmd.Clone();
 }
 
-void mvceditor::DynamicCmdClass::ClearShortcuts() {
+void t4p::DynamicCmdClass::ClearShortcuts() {
 	MenuCmd.RemoveAllShortcuts();
 }
 
-int mvceditor::DynamicCmdClass::GetId() const {
+int t4p::DynamicCmdClass::GetId() const {
 	return MenuCmd.GetId();
 }
 
-wxString mvceditor::DynamicCmdClass::GetIdentifier() const {
+wxString t4p::DynamicCmdClass::GetIdentifier() const {
 	return Identifier;
 }
 
-mvceditor::PreferencesClass::PreferencesClass()
+t4p::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
 	, KeyProfiles() 
 	, ApplicationFont()
@@ -297,7 +297,7 @@ mvceditor::PreferencesClass::PreferencesClass()
 	
 }
 
-void mvceditor::PreferencesClass::Init() {
+void t4p::PreferencesClass::Init() {
 	wxPlatformInfo info;
 	
 	ApplicationFont.SetFamily(wxFONTFAMILY_DEFAULT);
@@ -309,19 +309,19 @@ void mvceditor::PreferencesClass::Init() {
 	else {
 		ApplicationFont.SetPointSize(8);
 	}
-	mvceditor::CodeControlStylesInit(CodeControlOptions);
+	t4p::CodeControlStylesInit(CodeControlOptions);
 }
 
-mvceditor::PreferencesClass::~PreferencesClass() {
+t4p::PreferencesClass::~PreferencesClass() {
 	//KeyProfileArray destructor deletes the pointers
 }
 
-void mvceditor::PreferencesClass::ClearAllShortcuts() {
+void t4p::PreferencesClass::ClearAllShortcuts() {
 	KeyProfiles.Cleanup();
 	DefaultKeyboardShortcutCmds.clear();
 }
 
-void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
+void t4p::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	KeyProfiles.Cleanup();
 	CodeControlOptions.Load(config);
 	
@@ -347,7 +347,7 @@ void mvceditor::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	EnableSelectedProfile(frame);
 }
 
-void mvceditor::PreferencesClass::EnableSelectedProfile(wxWindow* window) {
+void t4p::PreferencesClass::EnableSelectedProfile(wxWindow* window) {
 	KeyProfiles.DetachAll();
 	KeyProfiles.GetSelProfile()->Enable(true);
 
@@ -358,7 +358,7 @@ void mvceditor::PreferencesClass::EnableSelectedProfile(wxWindow* window) {
 	KeyProfiles.GetSelProfile()->Attach(window);
 }
 
-void mvceditor::PreferencesClass::Save() {
+void t4p::PreferencesClass::Save() {
 	wxConfigBase* config = wxConfigBase::Get();
 	CodeControlOptions.Save(config);
 	config->Write(wxT("ApplicationFont"), ApplicationFont.GetNativeFontInfoDesc());
@@ -370,18 +370,18 @@ void mvceditor::PreferencesClass::Save() {
 	config->Flush();
 }
 
-void mvceditor::PreferencesClass::InitConfig() {
+void t4p::PreferencesClass::InitConfig() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
+	wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 	wxFileConfig* config = new wxFileConfig(wxT("triumph4php"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(config);
 	// this config will be automatically deleted by wxWidgets at the end
 }
 
-void mvceditor::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {
+void t4p::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {
 	
 	// save the settings dir in the bootstrap file
-	mvceditor::SetSettingsDirLocation(settingsDir);
+	t4p::SetSettingsDirLocation(settingsDir);
 	
 	// delete the old config and set the global config object
 	wxConfigBase* config = wxConfig::Get();

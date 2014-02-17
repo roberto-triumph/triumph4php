@@ -28,7 +28,7 @@
 #include <pelet/UCharBufferedFileClass.h>
 #include <unicode/unistr.h>
 
-namespace mvceditor {
+namespace t4p {
 	
 /**
  * Class that helps in breaking a long SQL string into tokens (and individual queries). Note that this is NOT a 

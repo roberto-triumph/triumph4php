@@ -35,43 +35,43 @@
 
 static const int ID_TEMPLATE_FILES_PANEL = wxNewId();
 
-mvceditor::TemplateFilesFeatureClass::TemplateFilesFeatureClass(mvceditor::AppClass& app) 
+t4p::TemplateFilesFeatureClass::TemplateFilesFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app) {
 }
 
-void mvceditor::TemplateFilesFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(mvceditor::MENU_TEMPLATE_FILES + 0, _("PHP Template Files"), 
+void t4p::TemplateFilesFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(t4p::MENU_TEMPLATE_FILES + 0, _("PHP Template Files"), 
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 
-void mvceditor::TemplateFilesFeatureClass::OnTemplateFilesMenu(wxCommandEvent& event) {
+void t4p::TemplateFilesFeatureClass::OnTemplateFilesMenu(wxCommandEvent& event) {
 	std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();
 	if (App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
 		ShowPanel();
 	}
 	else {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, 
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, 
 			_("Could not determine template files because no URLs were detected. Template files feature depends on the URL detectors feature."));
 	}
 }
 
-void mvceditor::TemplateFilesFeatureClass::ShowPanel() {
+void t4p::TemplateFilesFeatureClass::ShowPanel() {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_PANEL);
-	mvceditor::TemplateFilesPanelClass* templateFilesPanel = NULL;
+	t4p::TemplateFilesPanelClass* templateFilesPanel = NULL;
 	if (window) {
-		templateFilesPanel = wxDynamicCast(window, mvceditor::TemplateFilesPanelClass);
+		templateFilesPanel = wxDynamicCast(window, t4p::TemplateFilesPanelClass);
 		SetFocusToOutlineWindow(templateFilesPanel);
 	}
 	else {
-		templateFilesPanel = new mvceditor::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
-		wxBitmap templateFileBitmap = mvceditor::IconImageAsset(wxT("template-files"));
+		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
+		wxBitmap templateFileBitmap = t4p::IconImageAsset(wxT("template-files"));
 		AddOutlineWindow(templateFilesPanel, _("Templates"), templateFileBitmap);
 	}
 	templateFilesPanel->UpdateControllers();
 }
 
-wxString mvceditor::TemplateFilesFeatureClass::CurrentFile() {
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+wxString t4p::TemplateFilesFeatureClass::CurrentFile() {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	wxString fileName;
 	if (ctrl) {
 		fileName = ctrl->GetFileName();
@@ -79,76 +79,76 @@ wxString mvceditor::TemplateFilesFeatureClass::CurrentFile() {
 	return fileName;
 }
 
-void mvceditor::TemplateFilesFeatureClass::StartDetection() {	
+void t4p::TemplateFilesFeatureClass::StartDetection() {	
 	
 	// start the chain reaction
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
 	}
-	std::vector<mvceditor::GlobalActionClass*> actions;
+	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
-	mvceditor::CallStackActionClass* callStackAction =  new mvceditor::CallStackActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_CALL_STACK);
-	mvceditor::UrlTagClass urlTag = App.Globals.CurrentUrl;
+	t4p::CallStackActionClass* callStackAction =  new t4p::CallStackActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
+	t4p::UrlTagClass urlTag = App.Globals.CurrentUrl;
 	callStackAction->SetCallStackStart(urlTag.FileName,
-		mvceditor::WxToIcu(urlTag.ClassName),
-		mvceditor::WxToIcu(urlTag.MethodName),
+		t4p::WxToIcu(urlTag.ClassName),
+		t4p::WxToIcu(urlTag.MethodName),
 		App.Globals.DetectorCacheDbFileName);
 	actions.push_back(callStackAction);
 	actions.push_back(
-		new mvceditor::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
+		new t4p::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
 
-mvceditor::UrlTagFinderClass& mvceditor::TemplateFilesFeatureClass::Urls() {
+t4p::UrlTagFinderClass& t4p::TemplateFilesFeatureClass::Urls() {
 	return App.Globals.UrlTagFinder;
 }
 
-void mvceditor::TemplateFilesFeatureClass::OpenFile(wxString file) {
+void t4p::TemplateFilesFeatureClass::OpenFile(wxString file) {
 	wxFileName fileName(file);
 	if (fileName.IsOk()) {
-		mvceditor::OpenFileCommandEventClass openEvent(fileName.GetFullPath());
+		t4p::OpenFileCommandEventClass openEvent(fileName.GetFullPath());
 		App.EventSink.Publish(openEvent);
 	}
 }
 
-void mvceditor::TemplateFilesFeatureClass::SetCurrentUrl(mvceditor::UrlTagClass url) {
+void t4p::TemplateFilesFeatureClass::SetCurrentUrl(t4p::UrlTagClass url) {
 	App.Globals.CurrentUrl = url;
 }
 
-void mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete(mvceditor::ActionEventClass& event) {
+void t4p::TemplateFilesFeatureClass::OnTemplateDetectionComplete(t4p::ActionEventClass& event) {
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_PANEL);
-	mvceditor::TemplateFilesPanelClass* templateFilesPanel = NULL;
+	t4p::TemplateFilesPanelClass* templateFilesPanel = NULL;
 	if (window) {
-		templateFilesPanel = (mvceditor::TemplateFilesPanelClass*) window;
+		templateFilesPanel = (t4p::TemplateFilesPanelClass*) window;
 	}
 	else {
-		templateFilesPanel = new mvceditor::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
+		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
 		AddOutlineWindow(templateFilesPanel, _("Templates"));
 	}
 	templateFilesPanel->UpdateResults();
 }
 
-mvceditor::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, mvceditor::TemplateFilesFeatureClass& feature)
+t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, t4p::TemplateFilesFeatureClass& feature)
 	: TemplateFilesPanelGeneratedClass(parent, id)
 	, Feature(feature) 
 	, ImageList(16, 16) {
 	StatusLabel->SetLabel(_(""));
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("folder-horizontal-open")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("template-files")));
-	ImageList.Add(mvceditor::IconImageAsset(wxT("variable-template")));
+	ImageList.Add(t4p::IconImageAsset(wxT("folder-horizontal")));
+	ImageList.Add(t4p::IconImageAsset(wxT("folder-horizontal-open")));
+	ImageList.Add(t4p::IconImageAsset(wxT("template-files")));
+	ImageList.Add(t4p::IconImageAsset(wxT("variable-template")));
 	
 	// this class will own the imagelist
 	FileTree->SetImageList(&ImageList);
 	TemplateVariablesTree->SetImageList(&ImageList);
 }
 
-void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
+void t4p::TemplateFilesPanelClass::UpdateControllers() {
 	wxArrayString wxControllers;
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
 	std::vector<wxString> controllers = Feature.App.Globals.UrlTagFinder.AllControllerNames(sourceDirs);
@@ -160,8 +160,8 @@ void mvceditor::TemplateFilesPanelClass::UpdateControllers() {
 	Controller->Append(wxControllers);
 }
 
-void mvceditor::TemplateFilesPanelClass::UpdateResults() {		
-	std::vector<mvceditor::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
+void t4p::TemplateFilesPanelClass::UpdateResults() {		
+	std::vector<t4p::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
 	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), (int)currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
@@ -178,7 +178,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 			// show that the view file is missing
 			text = wxT("[X] ") + text;
 		}
-		mvceditor::TreeItemDataStringClass* data = new mvceditor::TreeItemDataStringClass(currentTemplates[i].FullPath);
+		t4p::TreeItemDataStringClass* data = new t4p::TreeItemDataStringClass(currentTemplates[i].FullPath);
 		FileTree->AppendItem(parent, text, IMAGE_TEMPLATE_FILE, -1, data);
 	}
 	FileTree->ExpandAll();
@@ -192,7 +192,7 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 	parent = TemplateVariablesTree->AddRoot(_("Template Variables"), IMAGE_TEMPLATE_FOLDER);
 	FileTree->SetItemImage(parent, IMAGE_TEMPLATE_FOLDER_OPEN, wxTreeItemIcon_Expanded);
 	for (size_t i = 0; i < currentTemplates.size(); ++i) {
-		mvceditor::TemplateFileTagClass templateFile = currentTemplates[i];
+		t4p::TemplateFileTagClass templateFile = currentTemplates[i];
 		wxString text = templateFile.FullPath;
 		wxString projectLabel;
 		
@@ -206,19 +206,19 @@ void mvceditor::TemplateFilesPanelClass::UpdateResults() {
 	TemplateVariablesTree->ExpandAll();
 }
 
-void mvceditor::TemplateFilesPanelClass::ClearResults() {
+void t4p::TemplateFilesPanelClass::ClearResults() {
 	StatusLabel->SetLabel(_(""));
 	Action->Clear();
 	FileTree->DeleteAllItems();
 }
 
-void mvceditor::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
+void t4p::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
 	wxString controller = Controller->GetStringSelection();
 	wxString action = Action->GetStringSelection();
 
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
-	mvceditor::UrlTagClass url;
-	std::vector<mvceditor::UrlTagClass>::iterator it;
+	t4p::UrlTagClass url;
+	std::vector<t4p::UrlTagClass>::iterator it;
 	bool found = Feature.App.Globals.UrlTagFinder.FindByClassMethod(controller, action, sourceDirs, url);
 	if (found) {
 		StatusLabel->SetLabel(_("Detecting"));
@@ -227,7 +227,7 @@ void mvceditor::TemplateFilesPanelClass::OnActionChoice(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TemplateFilesPanelClass::OnControllerChoice(wxCommandEvent &event) {
+void t4p::TemplateFilesPanelClass::OnControllerChoice(wxCommandEvent &event) {
 	ClearResults();
 	wxString controller = event.GetString();
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
@@ -237,7 +237,7 @@ void mvceditor::TemplateFilesPanelClass::OnControllerChoice(wxCommandEvent &even
 	}
 }
 
-void mvceditor::TemplateFilesPanelClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::TemplateFilesPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"The template files outline lets you see the template (\"view\" files) for a "
 		"specific controller. Choose a controller, then an action, and "
@@ -249,16 +249,16 @@ void mvceditor::TemplateFilesPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("View Files Help"), wxOK, this);
 }
 
-void mvceditor::TemplateFilesPanelClass::OnCurrentButton(wxCommandEvent &event) {
+void t4p::TemplateFilesPanelClass::OnCurrentButton(wxCommandEvent &event) {
 	ClearResults();
 	UpdateControllers();
 
 	wxString current = Feature.CurrentFile();
 	wxFileName currentFileName(current);
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
-	std::vector<mvceditor::UrlTagClass> urls;
+	std::vector<t4p::UrlTagClass> urls;
 	Feature.App.Globals.UrlTagFinder.FilterByFullPath(current, sourceDirs, urls);
-	std::vector<mvceditor::UrlTagClass>::iterator it;
+	std::vector<t4p::UrlTagClass>::iterator it;
 	wxArrayString controllers;
 	wxArrayString methods;
 	for (it = urls.begin(); it != urls.end(); ++it) {
@@ -271,11 +271,11 @@ void mvceditor::TemplateFilesPanelClass::OnCurrentButton(wxCommandEvent &event) 
 	Action->Append(methods);
 }
 
-void mvceditor::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+void t4p::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId item = event.GetItem();
 	wxString file = FileTree->GetItemText(item);
 	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0 && item != FileTree->GetRootItem()) {
-		mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)FileTree->GetItemData(item);
+		t4p::TreeItemDataStringClass* data = (t4p::TreeItemDataStringClass*)FileTree->GetItemData(item);
 		if (data) {
 			file =  data->Str;
 			Feature.OpenFile(file);
@@ -283,7 +283,7 @@ void mvceditor::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event)
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TemplateFilesFeatureClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_TEMPLATE_FILES + 0, mvceditor::TemplateFilesFeatureClass::OnTemplateFilesMenu)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, mvceditor::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
+BEGIN_EVENT_TABLE(t4p::TemplateFilesFeatureClass, wxEvtHandler) 
+	EVT_MENU(t4p::MENU_TEMPLATE_FILES + 0, t4p::TemplateFilesFeatureClass::OnTemplateFilesMenu)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, t4p::TemplateFilesFeatureClass::OnTemplateDetectionComplete)
 END_EVENT_TABLE()

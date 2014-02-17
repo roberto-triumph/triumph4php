@@ -28,23 +28,23 @@
 #include <soci.h>
 #include <algorithm>
 	
-mvceditor::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
+t4p::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {
 		
 }
 
-bool mvceditor::SqlResourceFetchClass::Fetch(const DatabaseTagClass& info, UnicodeString& error) {
+bool t4p::SqlResourceFetchClass::Fetch(const DatabaseTagClass& info, UnicodeString& error) {
 	switch(info.Driver) {
-	case mvceditor::DatabaseTagClass::MYSQL:
+	case t4p::DatabaseTagClass::MYSQL:
 		return FetchMysql(info, error);
-	case mvceditor::DatabaseTagClass::SQLITE:
+	case t4p::DatabaseTagClass::SQLITE:
 		return FetchSqlite(info, error);
 	}
 	error = UNICODE_STRING_SIMPLE("invalid driver");
 	return false;
 }
 
-bool mvceditor::SqlResourceFetchClass::Wipe() {
+bool t4p::SqlResourceFetchClass::Wipe() {
 	bool ret = false;
 	try {
 		Session.once << "DELETE FROM db_tables";
@@ -56,20 +56,20 @@ bool mvceditor::SqlResourceFetchClass::Wipe() {
 	return ret;
 }
 
-bool mvceditor::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, UnicodeString& error) {
+bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, UnicodeString& error) {
 	bool hasError = false;
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	query.DatabaseTag.Copy(info);
 	
 	// the local session connects to the db we want to extract the tables / columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
-		std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
+		std::string hash = t4p::IcuToChar(info.ConnectionHash());
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		try {
 			
-			std::string schema = mvceditor::IcuToChar(info.Schema);
+			std::string schema = t4p::IcuToChar(info.Schema);
 			std::string tableName;
 
 			// populate information_schema tables we want SQL code completion to work for the 
@@ -112,7 +112,7 @@ bool mvceditor::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, 
 		} 
 		catch (std::exception const& e) {
 			hasError = true;
-			error = mvceditor::CharToIcu(e.what());
+			error = t4p::CharToIcu(e.what());
 		}
 	}
 	else {
@@ -121,15 +121,15 @@ bool mvceditor::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, 
 	return !hasError;
 }
 
-bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, UnicodeString& error) {
+bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, UnicodeString& error) {
 	bool hasError = false;
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	query.DatabaseTag.Copy(info);
 	
 	// this local session connects to the db we want to fetch tables/columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
-		std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
+		std::string hash = t4p::IcuToChar(info.ConnectionHash());
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		
@@ -138,9 +138,9 @@ bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info,
 			// populate information_schema tables we want SQL code completion to work for the 
 			// information_schema tables / columns
 			wxString wxError;
-			if (!mvceditor::SqliteTables(session, tables, wxError)) {
+			if (!t4p::SqliteTables(session, tables, wxError)) {
 				hasError = true;
-				error = mvceditor::WxToIcu(wxError);
+				error = t4p::WxToIcu(wxError);
 			}
 			if (!hasError) {
 				for (size_t i = 0; i < tables.size(); ++i) {
@@ -183,7 +183,7 @@ bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info,
 		} 
 		catch (std::exception const& e) {
 			hasError = true;
-			error = mvceditor::CharToIcu(e.what());
+			error = t4p::CharToIcu(e.what());
 			puts(e.what());
 		}
 	}
@@ -194,7 +194,7 @@ bool mvceditor::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info,
 }
 
 
-bool mvceditor::SqlResourceFetchClass::StoreTables(const std::string& hash, const std::vector<std::string>& tables) {
+bool t4p::SqlResourceFetchClass::StoreTables(const std::string& hash, const std::vector<std::string>& tables) {
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO db_tables (";
 	sql += "connection_label, table_name";
@@ -221,7 +221,7 @@ bool mvceditor::SqlResourceFetchClass::StoreTables(const std::string& hash, cons
 	return ret;
 }
 
-bool mvceditor::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std::vector<std::string>& columns) {
+bool t4p::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std::vector<std::string>& columns) {
 	std::string sql;
 	sql += "INSERT OR IGNORE INTO db_columns (";
 	sql += "column_name, connection_label";
@@ -248,7 +248,7 @@ bool mvceditor::SqlResourceFetchClass::StoreColumns(const std::string& hash, con
 	return ret;
 }
 
-mvceditor::SqlResourceTableResultClass::SqlResourceTableResultClass()
+t4p::SqlResourceTableResultClass::SqlResourceTableResultClass()
  : SqliteResultClass()
  , TableName()
  , Connection() 
@@ -258,13 +258,13 @@ mvceditor::SqlResourceTableResultClass::SqlResourceTableResultClass()
 	 
  }
  
-void mvceditor::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
-	Lookup = mvceditor::WxToChar(lookup);
+void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
+	Lookup = t4p::WxToChar(lookup);
 	LookupEnd = Lookup + "zzzzzzz";
 	ConnectionHash = connectionHash;
 }
 
-bool mvceditor::SqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::SqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
 	
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
@@ -294,7 +294,7 @@ bool mvceditor::SqlResourceTableResultClass::Prepare(soci::session& session, boo
 	return Init(stmt);
 }
 
-bool mvceditor::SqlResourceTableResultClass::Init(soci::statement* stmt) {
+bool t4p::SqlResourceTableResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
@@ -303,17 +303,17 @@ bool mvceditor::SqlResourceTableResultClass::Init(soci::statement* stmt) {
 		
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-void mvceditor::SqlResourceTableResultClass::Next() {
+void t4p::SqlResourceTableResultClass::Next() {
 	Fetch();
 }
 
-mvceditor::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
+t4p::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
  : SqliteResultClass()
  , TableName()
  , Connection() 
@@ -322,12 +322,12 @@ mvceditor::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
 	 
  }
  
-void mvceditor::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
-	Lookup = mvceditor::WxToChar(lookup);
+void t4p::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
+	Lookup = t4p::WxToChar(lookup);
 	ConnectionHash = connectionHash;
 }
 
-bool mvceditor::ExactSqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::ExactSqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql = "SELECT table_name, connection_label ";
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name = ? ";
@@ -350,7 +350,7 @@ bool mvceditor::ExactSqlResourceTableResultClass::Prepare(soci::session& session
 	return Init(stmt);
 }
 
-bool mvceditor::ExactSqlResourceTableResultClass::Init(soci::statement* stmt) {
+bool t4p::ExactSqlResourceTableResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
@@ -359,17 +359,17 @@ bool mvceditor::ExactSqlResourceTableResultClass::Init(soci::statement* stmt) {
 		
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-void mvceditor::ExactSqlResourceTableResultClass::Next() {
+void t4p::ExactSqlResourceTableResultClass::Next() {
 	Fetch();
 }
 
-mvceditor::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
+t4p::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
 : SqliteResultClass()
 , ColumnName()
 , Lookup()
@@ -378,13 +378,13 @@ mvceditor::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
 	
 }
 
-void mvceditor::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
-	Lookup = mvceditor::WxToChar(lookup);
+void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
+	Lookup = t4p::WxToChar(lookup);
 	LookupEnd = Lookup + "zzzzzzz";
 	ConnectionHash = connectionHash;
 }
 
-bool mvceditor::SqlResourceColumnResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::SqlResourceColumnResultClass::Prepare(soci::session& session, bool doLimit) {
 	
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
@@ -408,7 +408,7 @@ bool mvceditor::SqlResourceColumnResultClass::Prepare(soci::session& session, bo
 	return Init(stmt);
 }
 
-bool mvceditor::SqlResourceColumnResultClass::Init(soci::statement* stmt) {
+bool t4p::SqlResourceColumnResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
@@ -416,49 +416,49 @@ bool mvceditor::SqlResourceColumnResultClass::Init(soci::statement* stmt) {
 		
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-void mvceditor::SqlResourceColumnResultClass::Next() {
+void t4p::SqlResourceColumnResultClass::Next() {
 	Fetch();
 }
 
-mvceditor::SqlResourceFinderClass::SqlResourceFinderClass() 
+t4p::SqlResourceFinderClass::SqlResourceFinderClass() 
 	: SqliteFinderClass() {
 		
 }
 
-std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindTables(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialTableName) {
+std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindTables(const t4p::DatabaseTagClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
-	std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
+	std::string hash = t4p::IcuToChar(info.ConnectionHash());
 	
-	mvceditor::SqlResourceTableResultClass tableLookup;
-	tableLookup.SetLookup(mvceditor::IcuToWx(partialTableName), hash);
+	t4p::SqlResourceTableResultClass tableLookup;
+	tableLookup.SetLookup(t4p::IcuToWx(partialTableName), hash);
 
 	// case insensitive is taken care of by SqlResourceClass
 	if (Exec(&tableLookup)) {
 		while (tableLookup.More()) {
-			ret.push_back(mvceditor::CharToIcu(tableLookup.TableName.c_str()));
+			ret.push_back(t4p::CharToIcu(tableLookup.TableName.c_str()));
 			tableLookup.Next();
 		}
 	}
 	return ret;
 }
 
-std::vector<UnicodeString> mvceditor::SqlResourceFinderClass::FindColumns(const mvceditor::DatabaseTagClass& info, const UnicodeString& partialColumnName) {
+std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindColumns(const t4p::DatabaseTagClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
-	std::string hash = mvceditor::IcuToChar(info.ConnectionHash());
+	std::string hash = t4p::IcuToChar(info.ConnectionHash());
 	
-	mvceditor::SqlResourceColumnResultClass columnLookup;
-	columnLookup.SetLookup(mvceditor::IcuToWx(partialColumnName), hash);
+	t4p::SqlResourceColumnResultClass columnLookup;
+	columnLookup.SetLookup(t4p::IcuToWx(partialColumnName), hash);
 
 	// case insensitive is taken care of by SqlResourceClass
 	if (Exec(&columnLookup)) {
 		while (columnLookup.More()) {
-			ret.push_back(mvceditor::CharToIcu(columnLookup.ColumnName.c_str()));
+			ret.push_back(t4p::CharToIcu(columnLookup.ColumnName.c_str()));
 			columnLookup.Next();
 		}
 	}

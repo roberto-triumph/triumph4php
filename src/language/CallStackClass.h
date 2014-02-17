@@ -33,8 +33,7 @@
 #include <vector>
 #include <queue>
 
-namespace mvceditor
-{
+namespace t4p {
 	
 /**
  * This is a representation of a single variable assignment.  A variable
@@ -406,11 +405,11 @@ private:
 		
 		wxFileName FileName;
 		
-		mvceditor::TagClass Resource;
+		t4p::TagClass Resource;
 		
 		std::vector<pelet::ExpressionClass> CallArguments;
 		
-		std::vector<mvceditor::SymbolClass> ScopeVariables;
+		std::vector<t4p::SymbolClass> ScopeVariables;
 	};
 	
 	/**
@@ -473,9 +472,9 @@ private:
 	void SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression);
 	
 	
-	void SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<mvceditor::VariableSymbolClass>& symbols);
+	void SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols);
 	
-	void SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<mvceditor::VariableSymbolClass>& symbols);
+	void SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<t4p::VariableSymbolClass>& symbols);
 	
 	/**
 	 * @return the name for a new template variable; the variable name will be unique for the current scope

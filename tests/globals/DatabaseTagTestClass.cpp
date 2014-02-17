@@ -26,7 +26,7 @@
 #include <DatabaseTestFixtureClass.h>
 #include <globals/DatabaseTagClass.h>
 #include <globals/String.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <soci.h>
 
 class DatabaseTagTestFixtureClass : public DatabaseTestFixtureClass {
@@ -36,11 +36,11 @@ public:
 		, DatabaseTag() {
 		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("database_tag");
 		DatabaseTag.Host = UNICODE_STRING_SIMPLE("127.0.0.1");
-		DatabaseTag.User = mvceditor::CharToIcu(UserName().c_str());
-		DatabaseTag.Password = mvceditor::CharToIcu(Password().c_str());
+		DatabaseTag.User = t4p::CharToIcu(UserName().c_str());
+		DatabaseTag.Password = t4p::CharToIcu(Password().c_str());
 	}
 	
-	mvceditor::DatabaseTagClass DatabaseTag;
+	t4p::DatabaseTagClass DatabaseTag;
 };
 
 SUITE(DatabaseTagClassTest) {
@@ -57,13 +57,13 @@ TEST_FIXTURE(DatabaseTagTestFixtureClass, ConnectQueryAndResults) {
 	Exec("COMMIT");
 	
 	soci::session session;
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	UnicodeString error;
 	
 	query.DatabaseTag.Copy(DatabaseTag);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
-	mvceditor::SqlResultClass results;
+	t4p::SqlResultClass results;
 	CHECK(query.Execute(session, results, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results.Error.length());
 	CHECK(results.Success);
@@ -93,13 +93,13 @@ TEST_FIXTURE(DatabaseTagTestFixtureClass, MultipleQueries) {
 	Exec("COMMIT");
 	
 	soci::session session;
-	mvceditor::SqlQueryClass query;
+	t4p::SqlQueryClass query;
 	UnicodeString error;
 	
 	query.DatabaseTag.Copy(DatabaseTag);
 	CHECK(query.Connect(session, error));
 	CHECK_EQUAL(0, error.length());
-	mvceditor::SqlResultClass results;
+	t4p::SqlResultClass results;
 	
 	CHECK(query.Execute(session, results, UNICODE_STRING_SIMPLE("DELETE FROM places;")));
 	CHECK_EQUAL(0, results.Error.length());
@@ -107,7 +107,7 @@ TEST_FIXTURE(DatabaseTagTestFixtureClass, MultipleQueries) {
 	CHECK_EQUAL(false, results.HasRows);
 	results.Close();
 	
-	mvceditor::SqlResultClass results2;
+	t4p::SqlResultClass results2;
 	CHECK(query.Execute(session, results2, UNICODE_STRING_SIMPLE("SELECT * FROM names ORDER BY id;")));
 	CHECK_EQUAL(0, results2.Error.length());
 	CHECK(results2.Success);
@@ -115,7 +115,7 @@ TEST_FIXTURE(DatabaseTagTestFixtureClass, MultipleQueries) {
 	CHECK_EQUAL(3, results2.AffectedRows);
 	results2.Close();
 	
-	mvceditor::SqlResultClass results3;
+	t4p::SqlResultClass results3;
 	CHECK(query.Execute(session, results3, UNICODE_STRING_SIMPLE("DELETE FROM names;")));
 	CHECK_EQUAL(0, results3.Error.length());
 	CHECK(results3.Success);

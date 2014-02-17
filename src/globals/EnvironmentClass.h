@@ -30,7 +30,7 @@
 #include <vector>
 #include <wx/config.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Holds the PHP binary location
@@ -68,19 +68,19 @@ public:
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	PhpEnvironmentClass(const mvceditor::PhpEnvironmentClass& src);
+	PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src);
 
 	/**
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	mvceditor::PhpEnvironmentClass& operator=(const mvceditor::PhpEnvironmentClass& src);
+	t4p::PhpEnvironmentClass& operator=(const t4p::PhpEnvironmentClass& src);
 
 	/**
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	void Copy(const mvceditor::PhpEnvironmentClass& src);
+	void Copy(const t4p::PhpEnvironmentClass& src);
 	
 	/**
 	 * assign defaults based on the current operating system
@@ -121,7 +121,7 @@ public:
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	WebBrowserClass(const mvceditor::WebBrowserClass& src);
+	WebBrowserClass(const t4p::WebBrowserClass& src);
 
 	WebBrowserClass(wxString name, wxFileName fullPath);
 
@@ -129,13 +129,13 @@ public:
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	mvceditor::WebBrowserClass& operator=(const mvceditor::WebBrowserClass& src);
+	t4p::WebBrowserClass& operator=(const t4p::WebBrowserClass& src);
 
 	/**
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	void Copy(const mvceditor::WebBrowserClass& src);
+	void Copy(const t4p::WebBrowserClass& src);
 };
 
 /**
@@ -153,13 +153,13 @@ public:
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	EnvironmentClass(const mvceditor::EnvironmentClass& src);
+	EnvironmentClass(const t4p::EnvironmentClass& src);
 
 	/**
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	mvceditor::EnvironmentClass& operator=(const mvceditor::EnvironmentClass& src);
+	t4p::EnvironmentClass& operator=(const t4p::EnvironmentClass& src);
 	
 	/**
 	 *  assigns default values based on the current operating system
@@ -170,7 +170,7 @@ public:
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	void Copy(const mvceditor::EnvironmentClass& src);
+	void Copy(const t4p::EnvironmentClass& src);
 	
 	ApacheClass Apache;
 	

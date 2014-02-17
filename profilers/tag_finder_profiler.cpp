@@ -73,7 +73,7 @@ void ProfileTagSearch();
 /** 
  * This class will help in parsing the large project
  */
-class ParserDirectoryWalkerClass : public mvceditor::DirectoryWalkerClass {
+class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
 public:
 
 	ParserDirectoryWalkerClass();
@@ -93,7 +93,7 @@ private:
 /** 
  * This class will help in linting a large project
  */
-class VariableLinterWalkerClass : public mvceditor::DirectoryWalkerClass {
+class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
 public:
 
 	VariableLinterWalkerClass();
@@ -106,8 +106,8 @@ public:
 	
 private:
 
-	mvceditor::PhpVariableLintOptionsClass Options;
-	mvceditor::PhpVariableLintClass Linter;
+	t4p::PhpVariableLintOptionsClass Options;
+	t4p::PhpVariableLintClass Linter;
 };
 
 
@@ -280,21 +280,21 @@ void ProfileTagParserOnLargeProject() {
 	// initialize the sqlite db
 	soci::session session;
 	try {
-		session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
+		session.open(*soci::factory_sqlite3(), t4p::WxToChar(DbFileName));
 		wxString error;
-		if (!mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error)) {
+		if (!t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error)) {
 			wxASSERT_MSG(false, error);
 		}
 	} catch(std::exception const& e) {
 		session.close();
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 
-	mvceditor::TagParserClass tagParser;
-	mvceditor::ParsedTagFinderClass tagFinder;
+	t4p::TagParserClass tagParser;
+	t4p::ParsedTagFinderClass tagFinder;
 
-	mvceditor::DirectorySearchClass search;
+	t4p::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {
 		printf("Nor running ProfileResourceFinderOnLargeProject because file was not found: %s", 
@@ -314,17 +314,17 @@ void ProfileTagParserOnLargeProject() {
 }
 
 void ProfileTagSearch() {
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(DbFileName));
-	mvceditor::ParsedTagFinderClass tagFinder;
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(DbFileName));
+	t4p::ParsedTagFinderClass tagFinder;
 	tagFinder.InitSession(&session);
 	wxLongLong time;
 	size_t found = 0;
 
 	time = wxGetLocalTimeMillis();
 	
-	std::vector<mvceditor::TagClass> matches;
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
-	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	std::vector<t4p::TagClass> matches;
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
+	t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	tagFinder.Exec(result);
 	found = 0;
 	while (result->More()) {
@@ -347,11 +347,11 @@ ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		if (file.Find(wxT("FlattenExceptionTest.php")) != wxNOT_FOUND) {
-			printf("file= %s\n", mvceditor::WxToChar(file).c_str());
+			printf("file= %s\n", t4p::WxToChar(file).c_str());
 		}
 		pelet::LintResultsClass error;
 		wxFFile ffile(file);
-		UnicodeString uniFile = mvceditor::WxToIcu(file);
+		UnicodeString uniFile = t4p::WxToIcu(file);
 		if (Parser.LintFile(ffile.fp(), uniFile, error)) {
 			WithNoErrors++;
 		}
@@ -369,7 +369,7 @@ bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 
 void ProfileParserOnLargeProject() {
 	printf("*******\n");
-	mvceditor::DirectorySearchClass search;
+	t4p::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
 		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
@@ -400,7 +400,7 @@ VariableLinterWalkerClass::VariableLinterWalkerClass()
 
 bool VariableLinterWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
-		std::vector<mvceditor::PhpVariableLintResultClass> results;
+		std::vector<t4p::PhpVariableLintResultClass> results;
 		std::string stdFile(file.ToAscii());
 		if (Linter.ParseFile(wxFileName(file), results)) {
 			UFILE *out = u_finit(stdout, NULL, NULL);
@@ -424,7 +424,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 
 void ProfileVariableLintOnLargeProject() {
 	printf("*******\n");
-	mvceditor::DirectorySearchClass search;
+	t4p::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
 		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 

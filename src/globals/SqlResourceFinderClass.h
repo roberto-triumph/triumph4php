@@ -30,7 +30,7 @@
  #include <vector>
  #include <map>
  
-namespace mvceditor {
+namespace t4p {
 
 /**
  * class that will open a connection to a database, get all of the tables
@@ -93,7 +93,7 @@ private:
 /**
  * Performs a prefix lookup on table names 
  */
-class SqlResourceTableResultClass : public mvceditor::SqliteResultClass {
+class SqlResourceTableResultClass : public t4p::SqliteResultClass {
 public:
 
 	/**
@@ -142,7 +142,7 @@ private:
 /**
  * Performs an exact match lookup on table names 
  */
-class ExactSqlResourceTableResultClass : public mvceditor::SqliteResultClass {
+class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
 public:
 
 	/**
@@ -189,7 +189,7 @@ private:
 /**
  * Performs a prefix lookup on column names 
  */
-class SqlResourceColumnResultClass : public mvceditor::SqliteResultClass {
+class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
 public:
 	
 	/**
@@ -235,7 +235,7 @@ private:
  * resources sqlite db to get all of the sql metadata
  * for the database connections that the user configured
  */
-class SqlResourceFinderClass : public mvceditor::SqliteFinderClass {
+class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 	
 public:
 

@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CONFIGFILESFEATURECLASS_H__
-#define __MVCEDITOR_CONFIGFILESFEATURECLASS_H__
+#ifndef __T4P_CONFIGFILESFEATURECLASS_H__
+#define __T4P_CONFIGFILESFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <globals/ConfigTagClass.h>
 #include <actions/ActionClass.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This feature will take all of the detected config files and
@@ -38,11 +38,11 @@ namespace mvceditor {
  * The config files are detected with the help of ConfigTagDetectorActionClass
  * and are read with the help of ConfigTagFinderClass.
  */
-class ConfigFilesFeatureClass : public mvceditor::FeatureClass {
+class ConfigFilesFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	ConfigFilesFeatureClass(mvceditor::AppClass& app);
+	ConfigFilesFeatureClass(t4p::AppClass& app);
 
 	void AddNewMenu(wxMenuBar* menuBar);
 
@@ -54,7 +54,7 @@ private:
 	 */
 	struct ConfigPair {
 		wxString ProjectLabel;
-		std::vector<mvceditor::ConfigTagClass> ConfigTags;
+		std::vector<t4p::ConfigTagClass> ConfigTags;
 	};
 
 	std::vector<ConfigPair> ConfigPairs;
@@ -64,7 +64,7 @@ private:
 	 * assign them a menu ID (the index into this vector will be used
 	 * as the menu ID).
 	 */
-	std::vector<mvceditor::ConfigTagClass> ConfigTags;
+	std::vector<t4p::ConfigTagClass> ConfigTags;
 
 	/**
 	 * we will attach this to the menu bar; it will be
@@ -81,7 +81,7 @@ private:
 	 * when the config detectors have finished running, load all of the
 	 * projects' config files and build the menu.
 	 */
-	void OnConfigFilesDetected(mvceditor::ActionEventClass& event);
+	void OnConfigFilesDetected(t4p::ActionEventClass& event);
 
 	/**
 	 * When a menu item is selected; open the corresponding config
@@ -94,12 +94,12 @@ private:
 	 * files that has been changed.  If, so the trigger database
 	 * detection
 	 */
-	void OnFileSaved(mvceditor::CodeControlEventClass& event);
+	void OnFileSaved(t4p::CodeControlEventClass& event);
 
 	/**
 	 * when the detector cache has been loaded rebuild the menu
 	 */
-	void OnDetectorDbInitComplete(mvceditor::ActionEventClass& event);
+	void OnDetectorDbInitComplete(t4p::ActionEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };

@@ -22,13 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef MVCEDITORFINDERCLASS_H_
-#define MVCEDITORFINDERCLASS_H_
+#ifndef __T4P_FINDERCLASS_H_
+#define __T4P_FINDERCLASS_H_
 
 #include <unicode/unistr.h>
 #include <unicode/regex.h>
 
-namespace mvceditor {
+namespace t4p {
 	
 /**
  * This class can be used to search for a subset of text within a given 
@@ -281,4 +281,4 @@ private:
 };
 
 }
-#endif /*MVCEDITORFINDERCLASS_H_*/
+#endif /*__T4P_FINDERCLASS_H_*/

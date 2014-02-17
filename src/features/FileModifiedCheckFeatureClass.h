@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_FILEMODIFIEDCHECKFEATURECLASS_H__
-#define __MVCEDITOR_FILEMODIFIEDCHECKFEATURECLASS_H__
+#ifndef __T4P_FILEMODIFIEDCHECKFEATURECLASS_H__
+#define __T4P_FILEMODIFIEDCHECKFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
 #include <wx/fswatcher.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration, defined below
 class VolumeListEventClass;
@@ -46,11 +46,11 @@ class VolumeListEventClass;
  * when a file that is not part of a project is opened. We also use polling
  * when a file that is not in a network drive is opened.
  */
-class FileModifiedCheckFeatureClass : public mvceditor::FeatureClass {
+class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	FileModifiedCheckFeatureClass(mvceditor::AppClass& app);
+	FileModifiedCheckFeatureClass(t4p::AppClass& app);
 
 
 private:
@@ -69,13 +69,13 @@ private:
 	 * In case the file that was opened is not part of a project
 	 * OR it is in a network drive, create a watch for it
 	 */
-	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
 	 * In case the file that was closed and is not part of a project
 	 * OR it is in a network drive, remove the watch we created for it
 	 */
-	void OnAppFileClosed(mvceditor::CodeControlEventClass& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * when the timer is up then handle the files that the fs watcher notified us 
@@ -98,22 +98,22 @@ private:
 	 * special handling for files that are open. For open files that were externally modified
 	 * we will prompt the user to take action
 	 */
-	void HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+	void HandleOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
 	/**
 	 * special handling for files that are not open.
 	 */
-	void HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+	void HandleNonOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
 	/**
 	 * prompt the user to reload modified files
 	 */
-	void FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt);
+	void FilesModifiedPrompt(std::map<wxString, t4p::CodeControlClass*>& filesToPrompt);
 
 	/**
 	 * prompt the user to save the deleted files
 	 */
-	void FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
+	void FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
 
 	/**
 	 * when a file has been externally modified / added / deleted we need to
@@ -142,13 +142,13 @@ private:
 	 * are in network drives, we will not add them to the watch, as watches on network
 	 * directories fail to notify of file changes inside of sub-directories.
 	 */
-	void OnVolumeListComplete(mvceditor::VolumeListEventClass& event);
+	void OnVolumeListComplete(t4p::VolumeListEventClass& event);
 	
 	/**
 	 * when the file modified times have been queried, prompt the user
 	 * if the files have been modified externally
 	 */
-	void OnFileExternallyModifiedCheck(mvceditor::FilesModifiedEventClass& event);
+	void OnFileExternallyModifiedCheck(t4p::FilesModifiedEventClass& event);
 	
 	/**
 	 * when a file has been saved, we set the JustSaved flag
@@ -159,7 +159,7 @@ private:
 	 * the change, so we dont have to  prompt them about
 	 * the file modification.
 	 */
-	void OnFileSaved(mvceditor::CodeControlEventClass& event);
+	void OnFileSaved(t4p::CodeControlEventClass& event);
 
 	/**
 	 * timer that we will use to see if file system watcher events have been captured. in this timer's
@@ -283,13 +283,13 @@ private:
  * file changes in network drives don't work properly when
  * watching entire directory structures).
  *
- * This action generates event of type mvceditor::EVENT_ACTION_VOLUME_LIST
+ * This action generates event of type t4p::EVENT_ACTION_VOLUME_LIST
  */
-class VolumeListActionClass : public mvceditor::ActionClass {
+class VolumeListActionClass : public t4p::ActionClass {
 
 public:
 
-	VolumeListActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 protected:
 
@@ -305,7 +305,7 @@ extern const wxEventType EVENT_ACTION_VOLUME_LIST;
 typedef void (wxEvtHandler::*VolumeListEventClassFunction)(VolumeListEventClass&);
 
 #define EVT_ACTION_VOLUME_LIST(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_ACTION_VOLUME_LIST, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_ACTION_VOLUME_LIST, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( VolumeListEventClassFunction, & fn ), (wxObject *) NULL ),
 

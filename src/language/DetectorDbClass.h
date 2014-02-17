@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_DETECTORDBCLASS_H__
-#define __MVCEDITOR_DETECTORDBCLASS_H__
+#ifndef __T4P_DETECTORDBCLASS_H__
+#define __T4P_DETECTORDBCLASS_H__
 
 #include <soci/soci.h>
 #include <globals/Sqlite.h>
 #include <wx/filename.h>
 
-namespace mvceditor {
+namespace t4p {
 	
 /**
  * This class performs write operations on the detector tags

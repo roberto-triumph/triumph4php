@@ -36,8 +36,8 @@ public:
 	wxString HttpdFile;
 	wxString ConfigSubDirectory;
 	wxString VirtualHostFile;
-	mvceditor::DirectorySearchClass Search;
-	mvceditor::ApacheClass Apache;
+	t4p::DirectorySearchClass Search;
+	t4p::ApacheClass Apache;
 
 	ApacheTestClass() 
 		: FileTestFixtureClass(wxT("apache_test")) 
@@ -59,7 +59,7 @@ public:
 	 * apache config files in that directory (and recurses sub-directories too).
 	 */
 	void Walk() {
-		Search.Init(TestProjectDir, mvceditor::DirectorySearchClass::PRECISE);
+		Search.Init(TestProjectDir, t4p::DirectorySearchClass::PRECISE);
 		while (Search.More()) {
 			Search.Walk(Apache);
 		}

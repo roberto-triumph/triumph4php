@@ -55,13 +55,13 @@ static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_NAME = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_TYPE = wxNewId();
 
-const wxEventType mvceditor::EVENT_OUTLINE_SEARCH_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_OUTLINE_SEARCH_COMPLETE = wxNewEventType();
 
-static bool SortTagsByName(const mvceditor::TagClass& a, const mvceditor::TagClass& b) {
+static bool SortTagsByName(const t4p::TagClass& a, const t4p::TagClass& b) {
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
 }
 
-static bool SortTagsByTypeAndName(const mvceditor::TagClass& a, const mvceditor::TagClass& b) {
+static bool SortTagsByTypeAndName(const t4p::TagClass& a, const t4p::TagClass& b) {
 	if (a.Type < b.Type) {
 		return true;
 	}
@@ -71,7 +71,7 @@ static bool SortTagsByTypeAndName(const mvceditor::TagClass& a, const mvceditor:
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
 }
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * class to hold a tag ID for each item in the outline tree.
@@ -91,40 +91,40 @@ public:
 };
 }
 
-mvceditor::OutlineSearchCompleteClass::OutlineSearchCompleteClass()
+t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass()
 	: Label()
 	, Tags() {
 
 }
 
 
-mvceditor::OutlineSearchCompleteClass::OutlineSearchCompleteClass(const mvceditor::OutlineSearchCompleteClass& src)
+t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src)
 	: Label()
 	, Tags() {
 	Copy(src);
 }
 
-void mvceditor::OutlineSearchCompleteClass::Copy(const mvceditor::OutlineSearchCompleteClass& src) {
+void t4p::OutlineSearchCompleteClass::Copy(const t4p::OutlineSearchCompleteClass& src) {
 	Label = src.Label;
 	Tags = src.Tags;
 }
 
-bool mvceditor::OutlineSearchCompleteClass::IsLabelFileName() const {
+bool t4p::OutlineSearchCompleteClass::IsLabelFileName() const {
 	return Label.Find(wxT(".")) != wxNOT_FOUND;
 }
 
-mvceditor::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventId, 
-																	const std::vector<mvceditor::OutlineSearchCompleteClass>& tags)
-	: wxEvent(eventId, mvceditor::EVENT_OUTLINE_SEARCH_COMPLETE)
+t4p::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventId, 
+																	const std::vector<t4p::OutlineSearchCompleteClass>& tags)
+	: wxEvent(eventId, t4p::EVENT_OUTLINE_SEARCH_COMPLETE)
 	, Tags(tags) {
 
 }
 
-wxEvent* mvceditor::OutlineSearchCompleteEventClass::Clone() const {
-	return new mvceditor::OutlineSearchCompleteEventClass(GetId(), Tags);
+wxEvent* t4p::OutlineSearchCompleteEventClass::Clone() const {
+	return new t4p::OutlineSearchCompleteEventClass(GetId(), Tags);
 }
 
-mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads,
+t4p::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads,
 																int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
@@ -133,19 +133,19 @@ mvceditor::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(mv
 
 }
 
-void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, mvceditor::GlobalsClass& globals) {
+void t4p::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals) {
 	SearchStrings = searches;
-	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
+	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
 	cache->InitGlobalTag(globals.TagCacheDbFileName, 
 		globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
-	cache->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	cache->InitNativeTag(t4p::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
 	
 	EnabledSourceDirs.clear();
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
@@ -156,26 +156,26 @@ void mvceditor::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<Un
 	}
 }
 
-void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
-	std::vector<mvceditor::OutlineSearchCompleteClass> topLevelTags;
+void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
+	std::vector<t4p::OutlineSearchCompleteClass> topLevelTags;
 	if (!IsCancelled()) {
 		std::vector<UnicodeString>::const_iterator search;
 		for (search = SearchStrings.begin(); !IsCancelled() && search != SearchStrings.end(); ++search) {
-			std::vector<mvceditor::TagClass> tags;
-			std::vector<mvceditor::TagClass>::const_iterator tag;
+			std::vector<t4p::TagClass> tags;
+			std::vector<t4p::TagClass>::const_iterator tag;
 			OutlineSearchCompleteClass tagSearchComplete;
-			tagSearchComplete.Label = mvceditor::IcuToWx(*search);
+			tagSearchComplete.Label = t4p::IcuToWx(*search);
 			if (search->indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
 				
 				// searching for all tags in the file
-				tags = TagCache.AllClassesFunctionsDefines(mvceditor::IcuToWx(*search));
+				tags = TagCache.AllClassesFunctionsDefines(t4p::IcuToWx(*search));
 				
 				// now for each class, collect all methods/properties for any class.
 				for (tag = tags.begin(); tag != tags.end(); ++tag) {
-					if (tag->Type == mvceditor::TagClass::CLASS) {
-						wxString classLabel = mvceditor::IcuToWx(tag->Identifier);
+					if (tag->Type == t4p::TagClass::CLASS) {
+						wxString classLabel = t4p::IcuToWx(tag->Identifier);
 						if (!tag->NamespaceName.isEmpty()) {
-							classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
+							classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);
 						}
 						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
 					}
@@ -187,7 +187,7 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 			else {
 				
 				// searching for all members in a class name
-				mvceditor::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
+				t4p::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
 				if (results) {
 					tags = results->Matches();
 					delete results;
@@ -196,12 +196,12 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				if (!tags.empty()) {
 					tag = tags.begin();
 				}
-				wxString classLabel = mvceditor::IcuToWx(tag->Identifier);
+				wxString classLabel = t4p::IcuToWx(tag->Identifier);
 				if (classLabel.Contains(wxT("\\"))) {
 					classLabel = classLabel.AfterLast(wxT('\\'));
 				}
 				if (!tag->NamespaceName.isEmpty()) {
-					classLabel += wxT(": ") + mvceditor::IcuToWx(tag->NamespaceName);
+					classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);
 				}
 				tagSearchComplete.Label = classLabel;
 				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
@@ -212,30 +212,30 @@ void mvceditor::OutlineTagCacheSearchActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 
 		// PostEvent will set the correct event ID
-		mvceditor::OutlineSearchCompleteEventClass evt(wxID_ANY, topLevelTags);
+		t4p::OutlineSearchCompleteEventClass evt(wxID_ANY, topLevelTags);
 		PostEvent(evt);	
 	}
 }
-wxString mvceditor::OutlineTagCacheSearchActionClass::GetLabel() const {
+wxString t4p::OutlineTagCacheSearchActionClass::GetLabel() const {
 	return wxT("Tag Cache Search");
 }
 
-mvceditor::OutlineViewFeatureClass::OutlineViewFeatureClass(mvceditor::AppClass& app)
+t4p::OutlineViewFeatureClass::OutlineViewFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
-void mvceditor::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(mvceditor::MENU_OUTLINE, _("Outline Current File\tSHIFT+F2"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
+void t4p::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(t4p::MENU_OUTLINE, _("Outline Current File\tSHIFT+F2"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
-void mvceditor::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
+	menuItemIds[t4p::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::OutlineViewFeatureClass::JumpToResource(int tagId) {
-	mvceditor::TagClass tag;
+void t4p::OutlineViewFeatureClass::JumpToResource(int tagId) {
+	t4p::TagClass tag;
 	bool found = App.Globals.TagCache.FindById(tagId, tag);
 	if (found) {
 		GetNotebook()->LoadPage(tag.GetFullPath());
@@ -243,7 +243,7 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(int tagId) {
 		if (codeControl) {
 			int32_t position, 
 				length;
-			bool found = mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
+			bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
 			if (found) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 			}
@@ -252,13 +252,13 @@ void mvceditor::OutlineViewFeatureClass::JumpToResource(int tagId) {
 	}
 }
 
-void mvceditor::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
-	mvceditor::OutlineTagCacheSearchActionClass* action = new mvceditor::OutlineTagCacheSearchActionClass(App.RunningThreads, wxID_ANY);
+void t4p::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
+	t4p::OutlineTagCacheSearchActionClass* action = new t4p::OutlineTagCacheSearchActionClass(App.RunningThreads, wxID_ANY);
 	action->SetSearch(searchStrings, App.Globals);
 	App.RunningThreads.Queue(action);
 }
 
-void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
+void t4p::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 	
 	// create / open the outline window
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
@@ -269,24 +269,24 @@ void mvceditor::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 
 	}
 	else {
-		mvceditor::NotebookClass* notebook = GetNotebook();
+		t4p::NotebookClass* notebook = GetNotebook();
 		if (notebook != NULL) {
 			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
-			wxBitmap outlineBitmap = mvceditor::IconImageAsset(wxT("outline"));
+			wxBitmap outlineBitmap = t4p::IconImageAsset(wxT("outline"));
 			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
 		}
 	}
 
 	// get all classes / functions for the active file
-	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 		std::vector<UnicodeString> searchStrings;
-		searchStrings.push_back(mvceditor::WxToIcu(codeCtrl->GetFileName()));
+		searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
 		StartTagSearch(searchStrings);
 	}
 }
 
-void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
@@ -296,17 +296,17 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNoteb
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 
-		mvceditor::CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(event.GetSelection());
+		t4p::CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(event.GetSelection());
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<UnicodeString> searchStrings;
-			searchStrings.push_back(mvceditor::WxToIcu(codeCtrl->GetFileName()));
+			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
 			StartTagSearch(searchStrings);
 		}
 	}
 	event.Skip();
 }
 
-void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
@@ -319,19 +319,19 @@ void mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebo
 	event.Skip();
 }
 
-void mvceditor::OutlineViewFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
+void t4p::OutlineViewFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	if (window != NULL) {
 		wxString fileName = event.GetCodeControl()->GetFileName();
 		std::vector<UnicodeString> searchStrings;
-		searchStrings.push_back(mvceditor::WxToIcu(fileName));
+		searchStrings.push_back(t4p::WxToIcu(fileName));
 		StartTagSearch(searchStrings);
 	}
 }
 
-void mvceditor::OutlineViewFeatureClass::OnTagSearchComplete(mvceditor::OutlineSearchCompleteEventClass& event) {
+void t4p::OutlineViewFeatureClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event) {
 
 	//if the outline window is open, update the tree
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
@@ -342,7 +342,7 @@ void mvceditor::OutlineViewFeatureClass::OnTagSearchComplete(mvceditor::OutlineS
 	}
 }
 
-mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
+t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
 		NotebookClass* notebook)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
 	, OutlinedTags()
@@ -359,31 +359,31 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	, SortByType(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	SyncButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
-	AddButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-add")));
-	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
-	SortButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("sort")));
+	SyncButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-refresh")));
+	AddButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-add")));
+	FilterButton->SetBitmapLabel(t4p::IconImageAsset(wxT("filter")));
+	SortButton->SetBitmapLabel(t4p::IconImageAsset(wxT("sort")));
 
 	SetStatus(_(""));
 	
 	ImageList = new wxImageList(16, 16);
-	ImageList->Add(mvceditor::IconImageAsset(wxT("outline")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("document-php")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("class")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("method-public")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("method-protected")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("method-private")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("method-inherited")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("property-public")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("property-protected")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("property-private")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("property-inherited")));
+	ImageList->Add(t4p::IconImageAsset(wxT("outline")));
+	ImageList->Add(t4p::IconImageAsset(wxT("document-php")));
+	ImageList->Add(t4p::IconImageAsset(wxT("class")));
+	ImageList->Add(t4p::IconImageAsset(wxT("method-public")));
+	ImageList->Add(t4p::IconImageAsset(wxT("method-protected")));
+	ImageList->Add(t4p::IconImageAsset(wxT("method-private")));
+	ImageList->Add(t4p::IconImageAsset(wxT("method-inherited")));
+	ImageList->Add(t4p::IconImageAsset(wxT("property-public")));
+	ImageList->Add(t4p::IconImageAsset(wxT("property-protected")));
+	ImageList->Add(t4p::IconImageAsset(wxT("property-private")));
+	ImageList->Add(t4p::IconImageAsset(wxT("property-inherited")));
 
-	ImageList->Add(mvceditor::IconImageAsset(wxT("define")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("class-constant")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("namespace")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("function")));
-	ImageList->Add(mvceditor::IconImageAsset(wxT("variable-template")));
+	ImageList->Add(t4p::IconImageAsset(wxT("define")));
+	ImageList->Add(t4p::IconImageAsset(wxT("class-constant")));
+	ImageList->Add(t4p::IconImageAsset(wxT("namespace")));
+	ImageList->Add(t4p::IconImageAsset(wxT("function")));
+	ImageList->Add(t4p::IconImageAsset(wxT("variable-template")));
 
 	// let the tree control managet the image list
 	// since it may need to use it in the destructor
@@ -392,14 +392,14 @@ mvceditor::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int wi
 	Tree->SetIndent(10);
 }
 
-void mvceditor::OutlineViewPanelClass::SetStatus(const wxString& status) {
+void t4p::OutlineViewPanelClass::SetStatus(const wxString& status) {
 	StatusLabel->SetLabel(status);
 }
 
-void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvceditor::OutlineSearchCompleteClass>& tags) {
+void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::OutlineSearchCompleteClass>& tags) {
 	size_t oldSize = OutlinedTags.size();
 	OutlinedTags.insert(OutlinedTags.end(), tags.begin(), tags.end());
-	std::vector<mvceditor::OutlineSearchCompleteClass>::iterator searchTag;
+	std::vector<t4p::OutlineSearchCompleteClass>::iterator searchTag;
 	Tree->Freeze();
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (!rootId.IsOk()) {
@@ -418,10 +418,10 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 		// when search is a filename, the label is a full path to a file
 		if (fileId.IsOk() && searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
-			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new mvceditor::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label)); 
 		}
 		else if (searchTag->IsLabelFileName()) {
-			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new mvceditor::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label)); 
 		}
 		else if (fileId.IsOk() && !searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
@@ -431,8 +431,8 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
 		}
 
-		std::map<wxString, std::vector<mvceditor::TagClass> >::iterator mapTag; 		
-		std::vector<mvceditor::TagClass>::const_iterator memberTag;
+		std::map<wxString, std::vector<t4p::TagClass> >::iterator mapTag; 		
+		std::vector<t4p::TagClass>::const_iterator memberTag;
 		for (mapTag = searchTag->Tags.begin(); mapTag != searchTag->Tags.end(); ++mapTag) {
 			wxTreeItemId parent;
 			if (mapTag->first.IsEmpty()) {
@@ -450,7 +450,7 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 			
 			// display all tags for this class or the class's base classes
 			for (memberTag = mapTag->second.begin(); memberTag !=  mapTag->second.end(); ++memberTag) {					
-				TagToNode(*memberTag, parent, mvceditor::WxToIcu(mapTag->first));
+				TagToNode(*memberTag, parent, t4p::WxToIcu(mapTag->first));
 			}
 		}
 		Tree->SelectItem(fileId);
@@ -459,12 +459,12 @@ void mvceditor::OutlineViewPanelClass::AddTagsToOutline(const std::vector<mvcedi
 	Tree->Thaw();
 }
 
-void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
+void t4p::OutlineViewPanelClass::TagToNode(const t4p::TagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
 
 	// for now never show dynamic resources since there is no way we can know where the source for them is.
 	int type = tag.Type;
-	UnicodeString className = mvceditor::WxToIcu(Tree->GetItemText(treeId));
-	wxString label = mvceditor::IcuToWx(tag.Identifier);
+	UnicodeString className = t4p::WxToIcu(Tree->GetItemText(treeId));
+	wxString label = t4p::IcuToWx(tag.Identifier);
 
 	// if the flag to show only public members is on, then do not show private or protected tags
 	bool passesAccessCheck = !ShowPublicOnly || (!tag.IsPrivate && !tag.IsProtected);
@@ -480,16 +480,16 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		// make sure that the inheritance check passes too
 		passesAccessCheck = passesAccessCheck && !isInheritedTag;
 	}
-	if (mvceditor::TagClass::DEFINE == type && !tag.IsDynamic) {
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+	if (t4p::TagClass::DEFINE == type && !tag.IsDynamic) {
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (mvceditor::TagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
-		label = mvceditor::IcuToWx(tag.Identifier);
+	else if (t4p::TagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
+		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
-			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
 		if (!tag.ReturnType.isEmpty()) {
-			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			wxString returnType = t4p::IcuToWx(tag.ReturnType);
 			label = label + wxT(" [") + returnType + wxT("]");
 		}
 		int image = IMAGE_OUTLINE_PROPERTY_PUBLIC;
@@ -502,12 +502,12 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_PROPERTY_PRIVATE;
 		}
-		Tree->AppendItem(treeId, label, image, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+		Tree->AppendItem(treeId, label, image, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (mvceditor::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
-		label = mvceditor::IcuToWx(tag.Identifier);
+	else if (t4p::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
+		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
-			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
 
 		// check to see if we have args. if so, add an ellipsis to show that there are things hidden
@@ -519,7 +519,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			label += wxT("(...)");
 		}
 		if (!tag.ReturnType.isEmpty()) {
-			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			wxString returnType = t4p::IcuToWx(tag.ReturnType);
 			label += wxT(" [") + returnType + wxT("]");
 		}
 		int image = IMAGE_OUTLINE_METHOD_PUBLIC;
@@ -532,7 +532,7 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 		else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_METHOD_PRIVATE;
 		}
-		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, new t4p::IdTreeItemDataClass(tag.Id));
 		if (ShowFunctionArgs) {
 
 			// add the function args under the method name
@@ -541,38 +541,38 @@ void mvceditor::OutlineViewPanelClass::TagToNode(const mvceditor::TagClass& tag,
 			if (argsStart > 0 && argsEnd > 0) {
 				UnicodeString sig(tag.Signature, argsStart + 1, argsEnd - argsStart - 1);
 				
-				wxStringTokenizer tok(mvceditor::IcuToWx(sig), wxT(","));
+				wxStringTokenizer tok(t4p::IcuToWx(sig), wxT(","));
 				while (tok.HasMoreTokens()) {
-					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT, -1, new t4p::IdTreeItemDataClass(tag.Id));
 				}
 			}
 		}
 	}
-	else if (mvceditor::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
+	else if (t4p::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
 		if (tag.ClassName != className) {
-			label = mvceditor::IcuToWx(tag.ClassName) + wxT("::") + label;
+			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (mvceditor::TagClass::FUNCTION == type && !tag.IsDynamic) {
+	else if (t4p::TagClass::FUNCTION == type && !tag.IsDynamic) {
 		UnicodeString res = tag.Identifier;
-		wxString label = mvceditor::IcuToWx(res);
+		wxString label = t4p::IcuToWx(res);
 
 		// add the function signature to the label
 		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
 		if (sigIndex >= 0) {
 			UnicodeString sig(tag.Signature, sigIndex + 9);
-			label = mvceditor::IcuToWx(sig);
+			label = t4p::IcuToWx(sig);
 		}
 		if (!tag.ReturnType.isEmpty()) {
-			wxString returnType = mvceditor::IcuToWx(tag.ReturnType);
+			wxString returnType = t4p::IcuToWx(tag.ReturnType);
 			label += wxT(" [") + returnType + wxT("]");
 		}
-		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION, -1, new mvceditor::IdTreeItemDataClass(tag.Id));
+		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_FUNCTION, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"The outline tab allows you to see a skeleton of a file or members of a class.\n\n"
 		"1. The tree pane lists all of the files that are currently being edited.\n"
@@ -592,28 +592,28 @@ void mvceditor::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Outline Help"), wxOK, this);
 }
 
-void mvceditor::OutlineViewPanelClass::OnAddButton(wxCommandEvent& event) {
-	std::vector<mvceditor::TagClass> tags;
-	mvceditor::FileSearchDialogClass dialog(this->GetParent(), *Feature, tags);
+void t4p::OutlineViewPanelClass::OnAddButton(wxCommandEvent& event) {
+	std::vector<t4p::TagClass> tags;
+	t4p::FileSearchDialogClass dialog(this->GetParent(), *Feature, tags);
 	if (dialog.ShowModal() == wxOK) {
 		SearchTagsToOutline(tags);
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
 	OutlinedTags.clear();
 	Tree->DeleteAllItems();
 	std::vector<UnicodeString> searchStrings;
 	for (size_t i = 0; i < Notebook->GetPageCount(); i++) {
-		mvceditor::CodeControlClass* codeCtrl = Notebook->GetCodeControl(i);
+		t4p::CodeControlClass* codeCtrl = Notebook->GetCodeControl(i);
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
-			searchStrings.push_back(mvceditor::WxToIcu(codeCtrl->GetFileName()));
+			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
 		}
 	}
 	Feature->StartTagSearch(searchStrings);
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 
 	// the method name is the leaf node, the class name is the parent of the activated node
 	wxTreeItemId item = event.GetItem();
@@ -624,7 +624,7 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		event.Skip();
 		return;
 	}
-	mvceditor::IdTreeItemDataClass* idItemData = (mvceditor::IdTreeItemDataClass*)Tree->GetItemData(item);
+	t4p::IdTreeItemDataClass* idItemData = (t4p::IdTreeItemDataClass*)Tree->GetItemData(item);
 	if (!idItemData) {
 		event.Skip();
 		return;
@@ -632,18 +632,18 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	Feature->JumpToResource(idItemData->Id);
 }
 
-void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvceditor::TagClass>& tags) {
+void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::TagClass>& tags) {
 
 	// each tag could be a file or a class tag. 
 	//if its a class tag, get all of members for the class
-	std::vector<mvceditor::TagClass>::const_iterator chosenTag;
+	std::vector<t4p::TagClass>::const_iterator chosenTag;
 	std::vector<UnicodeString> searchStrings;
 		
 	for (chosenTag = tags.begin(); chosenTag != tags.end(); ++chosenTag) {
 		if (chosenTag->Identifier.indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
 			
 			// user chose a file: get all classes / functions for that file
-			searchStrings.push_back(mvceditor::WxToIcu(chosenTag->FullPath));		
+			searchStrings.push_back(t4p::WxToIcu(chosenTag->FullPath));		
 		}
 		else {
 
@@ -654,7 +654,7 @@ void mvceditor::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<mvc
 	Feature->StartTagSearch(searchStrings);
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
 	
 	// show the delete menu only on the first level items
 	wxTreeItemId itemId = event.GetItem();
@@ -704,7 +704,7 @@ void mvceditor::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) 
 }
 
 
-void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
+void t4p::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 	wxPoint pos = event.GetPosition();
 	wxHitTest test = FilterButton->HitTest(pos);
 	if (test== wxHT_WINDOW_INSIDE) {
@@ -739,7 +739,7 @@ void mvceditor::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
+void t4p::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
 	wxPoint pos = event.GetPosition();
 	wxHitTest test = SortButton->HitTest(pos);
 	if (test== wxHT_WINDOW_INSIDE) {
@@ -762,19 +762,19 @@ void mvceditor::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
 	
 	// only allow deletion on the first level items
 	wxTreeItemId rootId = Tree->GetRootItem();
 	wxTreeItemId itemId = Tree->GetSelection();
 	if (itemId.IsOk() && rootId == Tree->GetItemParent(itemId)) {
-		mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(itemId);
+		t4p::TreeItemDataStringClass* data = (t4p::TreeItemDataStringClass*)Tree->GetItemData(itemId);
 		wxString label = Tree->GetItemText(itemId);
 		if (data) {
 			wxString fullPath = data->Str;
 
 			// remove the file from the outlined tags list
-			std::vector<mvceditor::OutlineSearchCompleteClass>::iterator it = OutlinedTags.begin();
+			std::vector<t4p::OutlineSearchCompleteClass>::iterator it = OutlinedTags.begin();
 			while(it != OutlinedTags.end()) {
 				if (it->Label == label)  {
 					it = OutlinedTags.erase(it);
@@ -788,14 +788,14 @@ void mvceditor::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeMenuCollapse(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeMenuCollapse(wxCommandEvent& event) {
 	wxTreeItemId itemId = Tree->GetSelection();
 	if (itemId.IsOk()) {
 		Tree->Collapse(itemId);
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeMenuCollapseAll(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeMenuCollapseAll(wxCommandEvent& event) {
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (rootId.IsOk()) {
 		Tree->CollapseAllChildren(rootId);
@@ -803,50 +803,50 @@ void mvceditor::OutlineViewPanelClass::OnTreeMenuCollapseAll(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::OnTreeMenuExpandAll(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnTreeMenuExpandAll(wxCommandEvent& event) {
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (rootId.IsOk()) {
 		Tree->ExpandAllChildren(rootId);
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::RedrawOutline() {
-	std::vector<mvceditor::OutlineSearchCompleteClass> tags = OutlinedTags;
+void t4p::OutlineViewPanelClass::RedrawOutline() {
+	std::vector<t4p::OutlineSearchCompleteClass> tags = OutlinedTags;
 	OutlinedTags.clear(); // AddFileToOutline will add the given tags to this list
 	AddTagsToOutline(tags);		
 }
 
-void mvceditor::OutlineViewPanelClass::OnMethodsClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnMethodsClick(wxCommandEvent& event) {
 	ShowMethods = !ShowMethods;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnPropertiesClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnPropertiesClick(wxCommandEvent& event) {
 	ShowProperties = !ShowProperties;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnConstantsClick(wxCommandEvent& event) {
 	ShowConstants = !ShowConstants;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnInheritedClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnInheritedClick(wxCommandEvent& event) {
 	ShowInherited = !ShowInherited;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnPublicOnlyClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnPublicOnlyClick(wxCommandEvent& event) {
 	ShowPublicOnly = !ShowPublicOnly;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnFunctionArgsClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnFunctionArgsClick(wxCommandEvent& event) {
 	ShowFunctionArgs = !ShowFunctionArgs;
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnSortByTypeClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnSortByTypeClick(wxCommandEvent& event) {
 	SortByType = !SortByType;
 	if (SortByType) {
 		SortByName = false;
@@ -854,7 +854,7 @@ void mvceditor::OutlineViewPanelClass::OnSortByTypeClick(wxCommandEvent& event) 
 	RedrawOutline();
 }
 
-void mvceditor::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) {
+void t4p::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) {
 	SortByName = !SortByName;
 	if (SortByName) {
 		SortByType = false;
@@ -862,7 +862,7 @@ void mvceditor::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) 
 	RedrawOutline();
 }
 
-mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvceditor::OutlineViewFeatureClass& feature, std::vector<mvceditor::TagClass>& chosenTags)
+t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::OutlineViewFeatureClass& feature, std::vector<t4p::TagClass>& chosenTags)
 	: FileSearchDialogGeneratedClass(parent)
 	, Feature(feature)
 	, MatchingTags()
@@ -871,7 +871,7 @@ mvceditor::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, mvcedi
 	Init();
 }
 
-void mvceditor::FileSearchDialogClass::Init() {
+void t4p::FileSearchDialogClass::Init() {
 	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
 	for (size_t i = 0; i < Feature.App.Globals.Projects.size(); ++i) {
 		if (Feature.App.Globals.Projects[i].IsEnabled) {
@@ -884,45 +884,45 @@ void mvceditor::FileSearchDialogClass::Init() {
 	ProjectChoice->Select(0);
 }
 
-void mvceditor::FileSearchDialogClass::Search() {
+void t4p::FileSearchDialogClass::Search() {
 	wxString search = SearchText->GetValue();
 	if (search.Length() < 2) {
 		return;
 	}
-	std::vector<mvceditor::ProjectClass*> projects;
+	std::vector<t4p::ProjectClass*> projects;
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
 	if (!showAllProjects) {
-		projects.push_back((mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
+		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
 	}
 	else {
 
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
-			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
+			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));
 		}
 	}
 	if (search.Length() == 2) {
-		MatchingTags = Feature.App.Globals.TagCache.ExactClassOrFile(mvceditor::WxToIcu(search));
+		MatchingTags = Feature.App.Globals.TagCache.ExactClassOrFile(t4p::WxToIcu(search));
 	}
 	else {
-		MatchingTags = Feature.App.Globals.TagCache.NearMatchClassesOrFiles(mvceditor::WxToIcu(search));
+		MatchingTags = Feature.App.Globals.TagCache.NearMatchClassesOrFiles(t4p::WxToIcu(search));
 	}
 
 	// no need to show jump to results for native functions
-	mvceditor::TagListRemoveNativeMatches(MatchingTags);
-	mvceditor::TagListKeepMatchesFromProjects(MatchingTags, projects);
+	t4p::TagListRemoveNativeMatches(MatchingTags);
+	t4p::TagListKeepMatchesFromProjects(MatchingTags, projects);
 	ShowTags(search, MatchingTags);
 }
 
-void mvceditor::FileSearchDialogClass::OnSearchText(wxCommandEvent& event) {
+void t4p::FileSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	Search();
 }
 
-void mvceditor::FileSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
+void t4p::FileSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	Search();
 }
 
-void mvceditor::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
+void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
@@ -952,7 +952,7 @@ void mvceditor::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::FileSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+void t4p::FileSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenTags.clear();
 	size_t selection = event.GetSelection();
@@ -965,7 +965,7 @@ void mvceditor::FileSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& 
 	EndModal(wxOK);
 }
 
-void mvceditor::FileSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
+void t4p::FileSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_RETURN) {
 		wxCommandEvent cmdEvt;
 		OnSearchEnter(cmdEvt);
@@ -975,14 +975,14 @@ void mvceditor::FileSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& fullPath) {
+void t4p::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& fullPath) {
 	wxTreeItemId fileId = FindFileNode(fullPath);
 	if (fileId.IsOk()) {
 		wxString label = Tree->GetItemText(fileId);
 		Tree->Delete(fileId);
 
 		// remove the file from the outlined tags list
-		std::vector<mvceditor::OutlineSearchCompleteClass>::iterator it = OutlinedTags.begin();
+		std::vector<t4p::OutlineSearchCompleteClass>::iterator it = OutlinedTags.begin();
 		
 		while(it != OutlinedTags.end()) {
 			if (it->Label == label)  {
@@ -995,14 +995,14 @@ void mvceditor::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& ful
 	}
 }
 
-wxTreeItemId mvceditor::OutlineViewPanelClass::FindFileNode(const wxString& fullPath) {
+wxTreeItemId t4p::OutlineViewPanelClass::FindFileNode(const wxString& fullPath) {
 	wxTreeItemId treeIndex, fileId;
 	wxTreeItemId rootId = Tree->GetRootItem();
 	if (rootId.IsOk()) {
 		wxTreeItemIdValue treeCookie;
 		treeIndex = Tree->GetFirstChild(rootId, treeCookie);
 		while (treeIndex.IsOk()) {
-			mvceditor::TreeItemDataStringClass* data = (mvceditor::TreeItemDataStringClass*)Tree->GetItemData(treeIndex);
+			t4p::TreeItemDataStringClass* data = (t4p::TreeItemDataStringClass*)Tree->GetItemData(treeIndex);
 			if (data && data->Str == fullPath) {
 				fileId = treeIndex;
 				break;
@@ -1013,16 +1013,16 @@ wxTreeItemId mvceditor::OutlineViewPanelClass::FindFileNode(const wxString& full
 	return fileId;
 }
 
-void mvceditor::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
+void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std::vector<t4p::TagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
 	}
 	MatchesList->Clear();
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
-	mvceditor::ProjectClass* selectedProject = NULL;
+	t4p::ProjectClass* selectedProject = NULL;
 	if (!showAllProjects) {
-		selectedProject = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
+		selectedProject = (t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
 	}
 	
 	// dont show the project path to the user
@@ -1037,19 +1037,19 @@ void mvceditor::FileSearchDialogClass::ShowTags(const wxString& finderQuery, con
 			projectLabel = selectedProject->Label;
 		}
 		wxString matchLabel;
-		mvceditor::TagClass match = allMatches[i];
-		if (mvceditor::TagClass::MEMBER == match.Type || mvceditor::TagClass::METHOD == match.Type ||
-			mvceditor::TagClass::CLASS_CONSTANT == match.Type) {
-			matchLabel += mvceditor::IcuToWx(match.ClassName);
+		t4p::TagClass match = allMatches[i];
+		if (t4p::TagClass::MEMBER == match.Type || t4p::TagClass::METHOD == match.Type ||
+			t4p::TagClass::CLASS_CONSTANT == match.Type) {
+			matchLabel += t4p::IcuToWx(match.ClassName);
 			matchLabel += wxT("::");
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
-		else if (mvceditor::TagClass::CLASS == match.Type || mvceditor::TagClass::FUNCTION == match.Type
-			|| mvceditor::TagClass::DEFINE == match.Type) {
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+		else if (t4p::TagClass::CLASS == match.Type || t4p::TagClass::FUNCTION == match.Type
+			|| t4p::TagClass::DEFINE == match.Type) {
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		else {
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		matchLabel += wxT(" - ");
 		matchLabel += relativeName;
@@ -1062,7 +1062,7 @@ void mvceditor::FileSearchDialogClass::ShowTags(const wxString& finderQuery, con
 	MatchesLabel->SetLabel(wxString::Format(_("Found %ld files. Please choose file(s) to open."), allMatches.size()));
 }
 
-void mvceditor::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchingTags.size() == 1) {
 
 		// if there is only match, just take the user to it
@@ -1103,30 +1103,30 @@ void mvceditor::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 }
 
 
-void mvceditor::FileSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::FileSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	OnSearchEnter(event);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::OutlineViewFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_OUTLINE, mvceditor::OutlineViewFeatureClass::OnOutlineMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(mvceditor::ID_CODE_NOTEBOOK, mvceditor::OutlineViewFeatureClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_CODE_NOTEBOOK, 
-		mvceditor::OutlineViewFeatureClass::OnContentNotebookPageClosed)
-	EVT_APP_FILE_OPEN(mvceditor::OutlineViewFeatureClass::OnAppFileOpened)
-	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, mvceditor::OutlineViewFeatureClass::OnTagSearchComplete)
+BEGIN_EVENT_TABLE(t4p::OutlineViewFeatureClass, wxEvtHandler)
+	EVT_MENU(t4p::MENU_OUTLINE, t4p::OutlineViewFeatureClass::OnOutlineMenu)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::OutlineViewFeatureClass::OnContentNotebookPageChanged)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, 
+		t4p::OutlineViewFeatureClass::OnContentNotebookPageClosed)
+	EVT_APP_FILE_OPEN(t4p::OutlineViewFeatureClass::OnAppFileOpened)
+	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, t4p::OutlineViewFeatureClass::OnTagSearchComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::OutlineViewPanelClass, OutlineViewGeneratedPanelClass)
-	EVT_MENU(ID_OUTLINE_MENU_DELETE, mvceditor::OutlineViewPanelClass::OnTreeMenuDelete)
-	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE, mvceditor::OutlineViewPanelClass::OnTreeMenuCollapse)
-	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE_ALL, mvceditor::OutlineViewPanelClass::OnTreeMenuCollapseAll)
-	EVT_MENU(ID_OUTLINE_MENU_EXPAND_ALL, mvceditor::OutlineViewPanelClass::OnTreeMenuExpandAll)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, mvceditor::OutlineViewPanelClass::OnMethodsClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, mvceditor::OutlineViewPanelClass::OnPropertiesClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, mvceditor::OutlineViewPanelClass::OnConstantsClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_INHERITED, mvceditor::OutlineViewPanelClass::OnInheritedClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, mvceditor::OutlineViewPanelClass::OnPublicOnlyClick)
-	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, mvceditor::OutlineViewPanelClass::OnFunctionArgsClick)
-	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_NAME, mvceditor::OutlineViewPanelClass::OnSortByNameClick)
-	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_TYPE, mvceditor::OutlineViewPanelClass::OnSortByTypeClick)
+BEGIN_EVENT_TABLE(t4p::OutlineViewPanelClass, OutlineViewGeneratedPanelClass)
+	EVT_MENU(ID_OUTLINE_MENU_DELETE, t4p::OutlineViewPanelClass::OnTreeMenuDelete)
+	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE, t4p::OutlineViewPanelClass::OnTreeMenuCollapse)
+	EVT_MENU(ID_OUTLINE_MENU_COLLAPSE_ALL, t4p::OutlineViewPanelClass::OnTreeMenuCollapseAll)
+	EVT_MENU(ID_OUTLINE_MENU_EXPAND_ALL, t4p::OutlineViewPanelClass::OnTreeMenuExpandAll)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_METHODS, t4p::OutlineViewPanelClass::OnMethodsClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, t4p::OutlineViewPanelClass::OnPropertiesClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, t4p::OutlineViewPanelClass::OnConstantsClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_INHERITED, t4p::OutlineViewPanelClass::OnInheritedClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_PUBLIC_ONLY, t4p::OutlineViewPanelClass::OnPublicOnlyClick)
+	EVT_MENU(ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS, t4p::OutlineViewPanelClass::OnFunctionArgsClick)
+	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_NAME, t4p::OutlineViewPanelClass::OnSortByNameClick)
+	EVT_MENU(ID_OUTLINE_MENU_SORT_BY_TYPE, t4p::OutlineViewPanelClass::OnSortByTypeClick)
 END_EVENT_TABLE()

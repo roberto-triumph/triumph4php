@@ -27,7 +27,7 @@
 #include <wx/utils.h>
 #include <wx/filename.h>
 
-bool mvceditor::RecursiveRmDir(wxString path) {
+bool t4p::RecursiveRmDir(wxString path) {
 	wxDir dir(path);
 	wxString name;
 	bool next = dir.GetFirst(&name, wxEmptyString, wxDIR_FILES | wxDIR_DIRS | wxDIR_HIDDEN);

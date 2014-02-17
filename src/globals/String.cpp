@@ -26,17 +26,17 @@
 #include <unicode/ustring.h>
 #include <unicode/ucnv.h>
 
-bool mvceditor::UnicodeStringComparatorClass::operator()(const UnicodeString& str1, const UnicodeString& str2) const {
+bool t4p::UnicodeStringComparatorClass::operator()(const UnicodeString& str1, const UnicodeString& str2) const {
 	return (str1.compare(str2) < (int8_t)0) ? true : false;
 }
 
-bool mvceditor::CaseStartsWith(UnicodeString haystack, UnicodeString needle) {
+bool t4p::CaseStartsWith(UnicodeString haystack, UnicodeString needle) {
 	haystack.toLower();
 	needle.toLower();
 	return haystack.startsWith(needle) ? true : false;
 }
 
-wxString mvceditor::IcuToWx(const UnicodeString& icu) {
+wxString t4p::IcuToWx(const UnicodeString& icu) {
 	wxString wx;
 	UErrorCode status = U_ZERO_ERROR;
 	int32_t rawLength;
@@ -54,7 +54,7 @@ wxString mvceditor::IcuToWx(const UnicodeString& icu) {
 	return wx;
 }
 
-UnicodeString mvceditor::WxToIcu(wxString wx) {
+UnicodeString t4p::WxToIcu(wxString wx) {
 	int charCount = wx.length();
 	UErrorCode status = U_ZERO_ERROR;
 	UnicodeString uni;
@@ -76,7 +76,7 @@ UnicodeString mvceditor::WxToIcu(wxString wx) {
 	return uni;
 }
 
-UnicodeString mvceditor::CharToIcu(const char* source) {
+UnicodeString t4p::CharToIcu(const char* source) {
 	int charCount = strlen(source);
 	UErrorCode status = U_ZERO_ERROR;
 	UnicodeString uni;
@@ -94,7 +94,7 @@ UnicodeString mvceditor::CharToIcu(const char* source) {
 	return uni;
 }
 
-std::string mvceditor::IcuToChar(const UnicodeString& source) {
+std::string t4p::IcuToChar(const UnicodeString& source) {
 	std::string ret;
 	UErrorCode status = U_ZERO_ERROR;
 	int32_t rawLength;
@@ -112,7 +112,7 @@ std::string mvceditor::IcuToChar(const UnicodeString& source) {
 	return ret;
 }
 
-int mvceditor::Utf8PosToChar(const char* bytes, int bytesLength, int bytePos) {
+int t4p::Utf8PosToChar(const char* bytes, int bytesLength, int bytePos) {
 	int charCount = 0;
 	if (bytePos < bytesLength) {
 		UChar c = 0;
@@ -132,13 +132,13 @@ int mvceditor::Utf8PosToChar(const char* bytes, int bytesLength, int bytePos) {
 	return charCount;
 }
 
-int mvceditor::CharToUtf8Pos(const char* bytes, int bytesLength, int charPos) {
+int t4p::CharToUtf8Pos(const char* bytes, int bytesLength, int charPos) {
 	int bytePos = 0;
 	U8_FWD_N(bytes, bytePos, bytesLength, charPos);
 	return bytePos;
 }
 
-int32_t mvceditor::FindPrevious(const UnicodeString& text, const UnicodeString& expression, int start) {
+int32_t t4p::FindPrevious(const UnicodeString& text, const UnicodeString& expression, int start) {
 	int32_t textIndex = start < 0 ? text.length() : start;
 	int32_t expressionIndex;
 	int32_t expressionLength = expression.length();
@@ -162,7 +162,7 @@ int32_t mvceditor::FindPrevious(const UnicodeString& text, const UnicodeString& 
  * conversion from wxString to C++ string. This should only be used
  * when source is known to be an ascii string.
  */
-std::string mvceditor::WxToChar(const wxString& source) {
+std::string t4p::WxToChar(const wxString& source) {
 	std::string s = source.ToStdString();
 	return s;
 }
@@ -170,19 +170,19 @@ std::string mvceditor::WxToChar(const wxString& source) {
 /**
  * conversion from wxString to C++ string
  */
-wxString mvceditor::CharToWx(const char* source) {
+wxString t4p::CharToWx(const char* source) {
 	wxString wx(source, wxConvUTF8);
 	return wx;
 }
 
-void mvceditor::DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src) {
+void t4p::DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src) {
 	dest.clear();
 	for (std::vector<wxString>::const_iterator s = src.begin(); s != src.end(); ++s) {
 		dest.push_back(s->c_str());
 	}
 }
 
-void mvceditor::DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src) {
+void t4p::DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src) {
 	dest.clear();
 	for (std::map<wxString, wxString>::const_iterator s = src.begin(); s != src.end(); ++s) {
 		dest[s->first.c_str()] = s->second.c_str();

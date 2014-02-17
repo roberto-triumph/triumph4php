@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <ActionTestFixtureClass.h>
 #include <FileTestFixtureClass.h>
 #include <actions/ProjectTagActionClass.h>
@@ -49,7 +49,7 @@ public:
 	 * the object under test. we will assert that the object generates
 	 * events.
 	 */
-	mvceditor::ProjectTagActionClass ProjectTagAction;
+	t4p::ProjectTagActionClass ProjectTagAction;
 
 	/**
 	 * connection to the tag db.
@@ -59,7 +59,7 @@ public:
 	/**
 	 * will use this to lookup tags once parsing is complete
 	 */
-	mvceditor::ParsedTagFinderClass Finder;
+	t4p::ParsedTagFinderClass Finder;
 
 	ProjectTagActionTestClass() 
 		: ActionTestFixtureClass()
@@ -69,9 +69,9 @@ public:
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
 		CreateProject(AbsoluteDir(wxT("src_project_1")));
-		Session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+		Session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 		wxString error;
-		bool init = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
+		bool init = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
 		wxUnusedVar(init);
 		wxASSERT_MSG(init, error);
 		Finder.InitSession(&Session);
@@ -95,8 +95,8 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 
 	ProjectTagAction.BackgroundWork();
 
-	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
-	mvceditor::TagResultClass* results = search.CreateExactResults();
+	t4p::TagSearchClass search(UNICODE_STRING_SIMPLE("User"));
+	t4p::TagResultClass* results = search.CreateExactResults();
 	CHECK(Finder.Exec(results));
 	results->Next();
 	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
@@ -123,14 +123,14 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 
 	ProjectTagAction.BackgroundWork();
 
-	mvceditor::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
-	mvceditor::TagResultClass* results = searchFirst.CreateExactResults();
+	t4p::TagSearchClass searchFirst(UNICODE_STRING_SIMPLE("User"));
+	t4p::TagResultClass* results = searchFirst.CreateExactResults();
 	CHECK(Finder.Exec(results));
 	results->Next();
 	CHECK_UNISTR_EQUALS("User", results->Tag.ClassName);
 	delete results;
 
-	mvceditor::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
+	t4p::TagSearchClass searchSecond(UNICODE_STRING_SIMPLE("Role"));
 	
 	results = searchSecond.CreateExactResults();
 	CHECK(Finder.Exec(results));

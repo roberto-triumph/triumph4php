@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGCACHESEARCHACTIONCLASS_H__
-#define __MVCEDITOR_TAGCACHESEARCHACTIONCLASS_H__
+#ifndef __T4P_TAGCACHESEARCHACTIONCLASS_H__
+#define __T4P_TAGCACHESEARCHACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
 #include <globals/GlobalsClass.h>
@@ -32,7 +32,7 @@
 #include <wx/string.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * event that is generated when a tag query is completed.  this event
@@ -50,10 +50,10 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
     /**
      * Will contain all of the resulting tags.
      */
-	std::vector<mvceditor::TagClass> Tags;
+	std::vector<t4p::TagClass> Tags;
 
     TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
-		const std::vector<mvceditor::TagClass>& tags);
+		const std::vector<t4p::TagClass>& tags);
     
     wxEvent* Clone() const;
 
@@ -64,7 +64,7 @@ extern const wxEventType EVENT_TAG_CACHE_SEARCH_COMPLETE;
 typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheSearchCompleteEventClass&);
 
 #define EVENT_TAG_CACHE_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_CACHE_SEARCH_COMPLETE, id, -1, \
+        DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( TagCacheSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -73,11 +73,11 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
  * class that will execute a query against the tag cache in the background.
  * the results will be posted in an event of type EVENT_TAG_CACHE_SEARCH_COMPLETE.
  */
-class TagCacheSearchActionClass : public mvceditor::ActionClass {
+class TagCacheSearchActionClass : public t4p::ActionClass {
 	
 public:
 
-	TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * set the search parameters.  this should be called before the action is
@@ -93,7 +93,7 @@ public:
 	 * @param search the search string, can be either file name, full path, or class names, function names
 	 * @param dirs directories to restrict matching tags in. If empty, then the entire cache will be searched.
 	 */
-	void SetSearch(mvceditor::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
+	void SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs);
 
 	wxString GetLabel() const;
 
@@ -106,7 +106,7 @@ private:
 	/**
 	 * the thing to search in
 	 */
-	mvceditor::TagCacheClass TagCache;
+	t4p::TagCacheClass TagCache;
 
 	/**
 	 * the string to look for. could be a partial class name, file name, function name

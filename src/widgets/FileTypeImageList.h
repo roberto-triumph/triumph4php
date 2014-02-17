@@ -23,12 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_FILETYPEIMAGELIST_H__
-#define __MVCEDITOR_FILETYPEIMAGELIST_H__
+#ifndef __T4P_FILETYPEIMAGELIST_H__
+#define __T4P_FILETYPEIMAGELIST_H__
 
 #include <wx/imaglist.h>
 
-namespace mvceditor {
+namespace t4p {
 	
 enum Images {
 	IMGLIST_PHP,

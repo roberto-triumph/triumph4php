@@ -34,7 +34,7 @@
 #include <unicode/unistr.h>
 #include <unicode/ustdio.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class can be used to search for a subset of text in multiple files of a given directory.  The find logic

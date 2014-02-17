@@ -24,7 +24,7 @@
  */
 #include <widgets/TreeItemDataStringClass.h>
 
-mvceditor::TreeItemDataStringClass::TreeItemDataStringClass(const wxString& str) 
+t4p::TreeItemDataStringClass::TreeItemDataStringClass(const wxString& str) 
 	: wxTreeItemData() 
 	, Str(str) {
 	

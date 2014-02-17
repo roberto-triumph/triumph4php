@@ -25,13 +25,13 @@
 
 #include <language/DetectedTagFinderResultClass.h>
 
-mvceditor::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
+t4p::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
 : SqliteResultClass() 
 , TotalCount(0) {
 
 }
 
-bool mvceditor::DetectedTagTotalCountResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::DetectedTagTotalCountResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT COUNT(*) FROM detected_tags";
 
@@ -43,22 +43,22 @@ bool mvceditor::DetectedTagTotalCountResultClass::Prepare(soci::session& session
 		stmt.execute(true);
 		ret = true;
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
-void mvceditor::DetectedTagTotalCountResultClass::Next() {
+void t4p::DetectedTagTotalCountResultClass::Next() {
 	// nothing since there is only one row in the result
 }
 
-int mvceditor::DetectedTagTotalCountResultClass::GetTotalCount() const {
+int t4p::DetectedTagTotalCountResultClass::GetTotalCount() const {
 	return TotalCount;
 }
 
-mvceditor::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
+t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
 : SqliteResultClass() 
 , Tag()
 , Keys()
@@ -72,12 +72,12 @@ mvceditor::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass(
 , ReturnType()
 , NamespaceName()
 , Comment() {
-	TagTypes.push_back(mvceditor::TagClass::MEMBER);
-	TagTypes.push_back(mvceditor::TagClass::METHOD);
-	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::TagClass::MEMBER);
+	TagTypes.push_back(t4p::TagClass::METHOD);
+	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
 }
 
-bool mvceditor::DetectedTagExactMemberResultClass::Init(soci::statement* stmt) {
+bool t4p::DetectedTagExactMemberResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
@@ -91,20 +91,20 @@ bool mvceditor::DetectedTagExactMemberResultClass::Init(soci::statement* stmt) {
 
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-void mvceditor::DetectedTagExactMemberResultClass::Next() {
-	Tag.Key = mvceditor::CharToIcu(Key.c_str());
-	Tag.Type = (mvceditor::TagClass::Types)Type;
-	Tag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
-	Tag.Identifier = mvceditor::CharToIcu(Identifier.c_str());
-	Tag.ReturnType = mvceditor::CharToIcu(ReturnType.c_str());
-	Tag.NamespaceName = mvceditor::CharToIcu(NamespaceName.c_str());
-	Tag.Comment = mvceditor::CharToIcu(Comment.c_str());
+void t4p::DetectedTagExactMemberResultClass::Next() {
+	Tag.Key = t4p::CharToIcu(Key.c_str());
+	Tag.Type = (t4p::TagClass::Types)Type;
+	Tag.ClassName = t4p::CharToIcu(ClassName.c_str());
+	Tag.Identifier = t4p::CharToIcu(Identifier.c_str());
+	Tag.ReturnType = t4p::CharToIcu(ReturnType.c_str());
+	Tag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
+	Tag.Comment = t4p::CharToIcu(Comment.c_str());
 	Tag.IsPrivate = false;
 	Tag.IsProtected = false;
 	Tag.IsStatic = false;
@@ -112,19 +112,19 @@ void mvceditor::DetectedTagExactMemberResultClass::Next() {
 	Fetch();
 }
 
-void mvceditor::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString &memberName,
+void t4p::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString &memberName,
 		const std::vector<wxFileName>& sourceDirectories) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
-		Keys.push_back(mvceditor::IcuToChar(key));
+		Keys.push_back(t4p::IcuToChar(key));
 	}
 	for (size_t i = 0; i < sourceDirectories.size(); i++) {
-		SourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+		SourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 	}
 }
 
-bool mvceditor::DetectedTagExactMemberResultClass::Prepare(soci::session &session, bool doLimit) {
+bool t4p::DetectedTagExactMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
@@ -168,29 +168,29 @@ bool mvceditor::DetectedTagExactMemberResultClass::Prepare(soci::session &sessio
 	return Init(stmt);
 }
 
-mvceditor::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass() 
+t4p::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass() 
 : DetectedTagExactMemberResultClass()
 , KeyUpper() {
 
 }
 
-void mvceditor::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+void t4p::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 		const std::vector<wxFileName>& sourceDirectories) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
 
 		// put the key in two times so that we can buld a BETWEEN expression to emulate a LIKE
-		Keys.push_back(mvceditor::IcuToChar(key));
-		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
+		Keys.push_back(t4p::IcuToChar(key));
+		Keys.push_back(t4p::IcuToChar(key) + "zzzzzzzzzz");
 	}
 	ClassCount = classNames.size();
 	for (size_t i = 0; i < sourceDirectories.size(); i++) {
-		SourceDirectories.push_back(mvceditor::WxToChar(sourceDirectories[i].GetPathWithSep()));
+		SourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 	}
 }
 
-bool mvceditor::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session, bool doLimit) {
+bool t4p::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";

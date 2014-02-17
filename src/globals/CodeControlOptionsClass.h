@@ -31,7 +31,7 @@
 #ifndef __CODECONTROLLASS_H___
 #define __CODECONTROLLASS_H___
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * A class that holds the editor styles for syntax highlighting
@@ -65,16 +65,16 @@ public:
 	
 	StylePreferenceClass();
 
-	StylePreferenceClass(const mvceditor::StylePreferenceClass& src);
+	StylePreferenceClass(const t4p::StylePreferenceClass& src);
 
-	mvceditor::StylePreferenceClass& operator=(const mvceditor::StylePreferenceClass& src);
+	t4p::StylePreferenceClass& operator=(const t4p::StylePreferenceClass& src);
 	
 	/**
 	 * Copy the properties from src to this object.
 	 * After a call to this method; src and this will have the same values
 	 * for each of the properties.
 	 */
-	void Copy(const mvceditor::StylePreferenceClass& src);
+	void Copy(const t4p::StylePreferenceClass& src);
 	
 	/**
 	 * Give a name to this style and set the constant that it
@@ -227,16 +227,16 @@ public:
 
 	CodeControlOptionsClass();
 
-	CodeControlOptionsClass(const mvceditor::CodeControlOptionsClass& src);
+	CodeControlOptionsClass(const t4p::CodeControlOptionsClass& src);
 
-	mvceditor::CodeControlOptionsClass& operator=(const mvceditor::CodeControlOptionsClass& src);
+	t4p::CodeControlOptionsClass& operator=(const t4p::CodeControlOptionsClass& src);
 
-	void Copy(const mvceditor::CodeControlOptionsClass& src);
+	void Copy(const t4p::CodeControlOptionsClass& src);
 	
 	/**
 	 * @return concatenation of all styles for all languages
 	 */
-	std::vector<mvceditor::StylePreferenceClass> AllStyles() const;
+	std::vector<t4p::StylePreferenceClass> AllStyles() const;
 	
 	/**
 	 * Load state from persistent storage

@@ -26,23 +26,23 @@
 #include <globals/Errors.h>
 #include <globals/String.h>
 
-mvceditor::DetectorDbClass::DetectorDbClass() 
+t4p::DetectorDbClass::DetectorDbClass() 
 : Session(NULL) {
 	
 }
 
-void mvceditor::DetectorDbClass::Init(soci::session* session) {
+void t4p::DetectorDbClass::Init(soci::session* session) {
 	Session = session;
 }
 
-void mvceditor::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
+void t4p::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
 	wxASSERT_MSG(Session, wxT("session must be initialized"));
 	if (!Session) {
 		return;
 	}
 	try {
 		int sourceId = 0;
-		std::string stdSourceDir = mvceditor::WxToChar(sourceDir.GetPathWithSep());
+		std::string stdSourceDir = t4p::WxToChar(sourceDir.GetPathWithSep());
 		soci::statement stmt = (Session->prepare << "SELECT source_id FROM sources WHERE directory = ?",
 			soci::into(sourceId), soci::use(stdSourceDir));
 		stmt.execute(true);
@@ -57,11 +57,11 @@ void mvceditor::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
 		Session->once << "DELETE FROM sources WHERE source_id = ? ", soci::use(sourceId);
 		
 	} catch (std::exception& e) {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, wxString::FromAscii(e.what()));
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, wxString::FromAscii(e.what()));
 	}
 }
 
-void mvceditor::DetectorDbClass::Wipe() {
+void t4p::DetectorDbClass::Wipe() {
 	wxASSERT_MSG(Session, wxT("session must be initialized"));
 	if (!Session) {
 		return;
@@ -75,7 +75,7 @@ void mvceditor::DetectorDbClass::Wipe() {
 		Session->once << "DELETE FROM url_tags";
 		Session->once << "DELETE FROM sources";
 	} catch (std::exception& e) {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, wxString::FromAscii(e.what()));
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, wxString::FromAscii(e.what()));
 	}
 }
 

@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_PHPIDENTIFIERLINTCLASS_H__
-#define __MVCEDITOR_PHPIDENTIFIERLINTCLASS_H__
+#ifndef __T4P_PHPIDENTIFIERLINTCLASS_H__
+#define __T4P_PHPIDENTIFIERLINTCLASS_H__
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
 #include <globals/String.h>
 #include <wx/filename.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration
 class TagCacheClass;
@@ -77,11 +77,11 @@ public:
 
 	PhpIdentifierLintResultClass();
 
-	PhpIdentifierLintResultClass(const mvceditor::PhpIdentifierLintResultClass& src);
+	PhpIdentifierLintResultClass(const t4p::PhpIdentifierLintResultClass& src);
 
-	mvceditor::PhpIdentifierLintResultClass& operator=(const mvceditor::PhpIdentifierLintResultClass& src);
+	t4p::PhpIdentifierLintResultClass& operator=(const t4p::PhpIdentifierLintResultClass& src);
 
-	void Copy(const mvceditor::PhpIdentifierLintResultClass& src);
+	void Copy(const t4p::PhpIdentifierLintResultClass& src);
 };
 
 /**
@@ -98,7 +98,7 @@ class PhpIdentifierLintClass :
 
 public:
 
-	PhpIdentifierLintClass(mvceditor::TagCacheClass& tagCache);
+	PhpIdentifierLintClass(t4p::TagCacheClass& tagCache);
 
 	/**
 	 * Set the version that the PHP parser should use. This method should be
@@ -112,7 +112,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one unknown identifier
 	 */
-	bool ParseFile(const wxFileName& fileName, std::vector<mvceditor::PhpIdentifierLintResultClass>& errors);
+	bool ParseFile(const wxFileName& fileName, std::vector<t4p::PhpIdentifierLintResultClass>& errors);
 
 	/**
 	 * @param code the string to parse and report errors on
@@ -120,7 +120,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
-	bool ParseString(const UnicodeString& code, std::vector<mvceditor::PhpIdentifierLintResultClass>& errors);
+	bool ParseString(const UnicodeString& code, std::vector<t4p::PhpIdentifierLintResultClass>& errors);
 
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
@@ -174,7 +174,7 @@ private:
 	/**
 	 * errors found so far
 	 */
-	std::vector<mvceditor::PhpIdentifierLintResultClass> Errors;
+	std::vector<t4p::PhpIdentifierLintResultClass> Errors;
 
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods
@@ -191,13 +191,13 @@ private:
 	/**
 	 * used to lookup classes, functions, methods
 	 */
-	mvceditor::TagCacheClass& TagCache;
+	t4p::TagCacheClass& TagCache;
 
 	/**
 	 * caching results of methods and function lookups, will 
 	 * only hit the tag cache once per file per method/function
 	 */
-	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> 
+	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass> 
 		FoundClasses,
 		FoundMethods,
 		FoundProperties,

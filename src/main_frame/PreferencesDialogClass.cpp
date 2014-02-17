@@ -33,9 +33,9 @@
 #include <map>
 #include <vector>
 
-mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, 
-														  mvceditor::GlobalsClass& globals,
-														  mvceditor::PreferencesClass& preferences,
+t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, 
+														  t4p::GlobalsClass& globals,
+														  t4p::PreferencesClass& preferences,
 														  wxFileName& settingsDir,
 														  bool& changedSettingsDir, bool& needsRetag)
 		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
@@ -59,18 +59,18 @@ mvceditor::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 	KeyboardShortcutsPanel->AddDynamicCmds(Preferences.DefaultKeyboardShortcutCmds);
 	notebook->AddPage(KeyboardShortcutsPanel, _("Keyboard Shortcuts"));
 
-	mvceditor::SettingsDirectoryPanelClass* settingsPanel =  new mvceditor::SettingsDirectoryPanelClass(
+	t4p::SettingsDirectoryPanelClass* settingsPanel =  new t4p::SettingsDirectoryPanelClass(
 		notebook, wxID_ANY, settingsDir
 	);
 	notebook->AddPage(settingsPanel, _("Settings Directory"));
 }
 
-void mvceditor::PreferencesDialogClass::Prepare() {
+void t4p::PreferencesDialogClass::Prepare() {
 	GetBookCtrl()->InitDialog();
 	LayoutDialog();
 }
 
-void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxBookCtrlBase* book = GetBookCtrl();
 	ChangedSettingsDir = false;
 	NeedsRetag = false;
@@ -102,12 +102,12 @@ void mvceditor::PreferencesDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 
-mvceditor::KeyboardShortcutsPanelClass::KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position,
+t4p::KeyboardShortcutsPanelClass::KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position,
 																	wxSize size, long style)
 	: wxKeyConfigPanel(parent, id, position, size, style) {
 }
 
-void mvceditor::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<mvceditor::DynamicCmdClass>& cmds) {
+void t4p::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<t4p::DynamicCmdClass>& cmds) {
 
 	// add the dynamic commands in the tree control; this code assumes that the command
 	// identifier is delimited with dashes; and the identifier will always contain
@@ -151,6 +151,6 @@ void mvceditor::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<mv
 	m_pCommandsTree->Expand(root);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::PreferencesDialogClass, wxDialog) 
-	EVT_BUTTON(wxID_OK, mvceditor::PreferencesDialogClass::OnOkButton) 	
+BEGIN_EVENT_TABLE(t4p::PreferencesDialogClass, wxDialog) 
+	EVT_BUTTON(wxID_OK, t4p::PreferencesDialogClass::OnOkButton) 	
 END_EVENT_TABLE()

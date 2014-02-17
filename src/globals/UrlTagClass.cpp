@@ -29,7 +29,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/ffile.h>
 
-mvceditor::UrlTagClass::UrlTagClass()
+t4p::UrlTagClass::UrlTagClass()
  : Url()
  , FileName()
  , ClassName()
@@ -37,14 +37,14 @@ mvceditor::UrlTagClass::UrlTagClass()
 
  }
 
-mvceditor::UrlTagClass::UrlTagClass(wxString uri) 
+t4p::UrlTagClass::UrlTagClass(wxString uri) 
 	: Url(uri)
 	, FileName()
 	, ClassName()
 	, MethodName() {
 }
 
-mvceditor::UrlTagClass::UrlTagClass(const mvceditor::UrlTagClass& src)
+t4p::UrlTagClass::UrlTagClass(const t4p::UrlTagClass& src)
 	: Url()	
 	, FileName()
 	, ClassName()
@@ -52,36 +52,36 @@ mvceditor::UrlTagClass::UrlTagClass(const mvceditor::UrlTagClass& src)
 	Copy(src);
  }
 
-void mvceditor::UrlTagClass::Reset() {
+void t4p::UrlTagClass::Reset() {
 	Url.Create(wxT(""));
 	FileName.Clear();
 	ClassName.Clear();
 	MethodName.Clear();
 }
 
-mvceditor::UrlTagClass& mvceditor::UrlTagClass::operator=(const mvceditor::UrlTagClass& src) {
+t4p::UrlTagClass& t4p::UrlTagClass::operator=(const t4p::UrlTagClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::UrlTagClass::Copy(const mvceditor::UrlTagClass& src) {
+void t4p::UrlTagClass::Copy(const t4p::UrlTagClass& src) {
 	Url = src.Url;
 	FileName = src.FileName;
 	ClassName = src.ClassName.c_str();
 	MethodName = src.MethodName.c_str();
 }
 
-mvceditor::UrlTagFinderClass::UrlTagFinderClass()
+t4p::UrlTagFinderClass::UrlTagFinderClass()
 	: SqliteFinderClass() {
 		
 }
 
-bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, mvceditor::UrlTagClass& urlTag) {
+bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
 	bool ret = false;
 	if (!Session || sourceDirs.empty()) {
 		return ret;
 	}
-	std::string stdUrlWhere = mvceditor::WxToChar(url.BuildURI());
+	std::string stdUrlWhere = t4p::WxToChar(url.BuildURI());
 	std::string stdUrl;
 	std::string stdFullPath;
 	std::string stdClassName;
@@ -91,7 +91,7 @@ bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector
 	sql += "WHERE  url = ? AND directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -112,27 +112,27 @@ bool mvceditor::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector
 		stmt.exchange(soci::into(stdMethodName));
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
-			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+			urlTag.Url.Create(t4p::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(t4p::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = t4p::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = t4p::CharToWx(stdMethodName.c_str());
 			ret = true;
 		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
-bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, mvceditor::UrlTagClass& urlTag) {
+bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
 	bool ret = false;
 	if (!Session || sourceDirs.empty()) {
 		return ret;
 	}
-	std::string stdClassNameWhere = mvceditor::WxToChar(className);
-	std::string stdMethodNameWhere = mvceditor::WxToChar(methodName);
+	std::string stdClassNameWhere = t4p::WxToChar(className);
+	std::string stdMethodNameWhere = t4p::WxToChar(methodName);
 
 	std::string stdUrl;
 	std::string stdFullPath;
@@ -143,7 +143,7 @@ bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, 
 	sql += "WHERE class_name = ? AND method_name = ? AND directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -165,26 +165,26 @@ bool mvceditor::UrlTagFinderClass::FindByClassMethod(const wxString& className, 
 		}
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
-			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+			urlTag.Url.Create(t4p::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(t4p::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = t4p::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = t4p::CharToWx(stdMethodName.c_str());
 			ret = true;
 		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
-bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags) {
+bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
 	if (!Session) {
 		return ret;
 	}
-	std::string stdFullPathWhere = mvceditor::WxToChar(fullPath);
+	std::string stdFullPathWhere = t4p::WxToChar(fullPath);
 	
 	std::string stdUrl;
 	std::string stdFullPath;
@@ -195,7 +195,7 @@ bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, co
 	sql += "WHERE full_path = ? AND directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -216,33 +216,33 @@ bool mvceditor::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, co
 		}
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
-			mvceditor::UrlTagClass urlTag;
-			urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-			urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-			urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-			urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+			t4p::UrlTagClass urlTag;
+			urlTag.Url.Create(t4p::CharToWx(stdUrl.c_str()));
+			urlTag.FileName.Assign(t4p::CharToWx(stdFullPath.c_str()));
+			urlTag.ClassName = t4p::CharToWx(stdClassName.c_str());
+			urlTag.MethodName = t4p::CharToWx(stdMethodName.c_str());
 
 			urlTags.push_back(urlTag);
 			ret = true;
 		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
 }
 
-void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs) {
+void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs) {
 	if (!Session || sourceDirs.empty()) {
 		return;
 	}
-	std::string stdUrl = mvceditor::WxToChar(url.BuildURI());
+	std::string stdUrl = t4p::WxToChar(url.BuildURI());
 	try {
 		std::vector<std::string> stdSourceDirs;
 		std::string sql = "DELETE FROM url_tags WHERE url = ? AND source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
 		for (size_t i = 0; i < sourceDirs.size(); ++ i) {
-			stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";
 			}
@@ -261,12 +261,12 @@ void mvceditor::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector
 		
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 }
 
-void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& matchedUrls) {
+void t4p::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& matchedUrls) {
 	if (!Session) {
 		return;
 	}
@@ -274,8 +274,8 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std:
 	std::string stdFullPath;
 	std::string stdClassName;
 	std::string stdMethodName;
-	std::string stdFilter = mvceditor::WxToChar(filter);
-	std::string escaped = mvceditor::SqliteSqlLikeEscape(stdFilter, '^');
+	std::string stdFilter = t4p::WxToChar(filter);
+	std::string escaped = t4p::SqliteSqlLikeEscape(stdFilter, '^');
 
 	// hmmm... query might not be optimal for 1000s of urls
 	// not sure if the number of urls will go into the 1000s
@@ -284,7 +284,7 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std:
 	sql += "WHERE url LIKE '%" + escaped + "%' ESCAPE '^'  AND directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -305,11 +305,11 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std:
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
-				mvceditor::UrlTagClass urlTag;
-				urlTag.Url.Create(mvceditor::CharToWx(stdUrl.c_str()));
-				urlTag.FileName.Assign(mvceditor::CharToWx(stdFullPath.c_str()));
-				urlTag.ClassName = mvceditor::CharToWx(stdClassName.c_str());
-				urlTag.MethodName = mvceditor::CharToWx(stdMethodName.c_str());
+				t4p::UrlTagClass urlTag;
+				urlTag.Url.Create(t4p::CharToWx(stdUrl.c_str()));
+				urlTag.FileName.Assign(t4p::CharToWx(stdFullPath.c_str()));
+				urlTag.ClassName = t4p::CharToWx(stdClassName.c_str());
+				urlTag.MethodName = t4p::CharToWx(stdMethodName.c_str());
 
 				matchedUrls.push_back(urlTag);
 			} while (stmt.fetch());
@@ -317,12 +317,12 @@ void mvceditor::UrlTagFinderClass::FilterUrls(const wxString& filter, const std:
 	}
 	catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 }
 
-void mvceditor::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
+void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 	if (!Session || sourceDirs.empty()) {
 		return;
 	}
@@ -330,7 +330,7 @@ void mvceditor::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDir
 		std::vector<std::string> stdSourceDirs;
 		std::string sql = "DELETE FROM url_tags WHERE source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
 		for (size_t i = 0; i < sourceDirs.size(); ++ i) {
-			stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";
 			}
@@ -347,12 +347,12 @@ void mvceditor::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDir
 		stmt.execute(true);
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 }
 
-int mvceditor::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
+int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 	int totalCount = 0;
 	if (!Session || sourceDirs.empty()) {
 		return totalCount;
@@ -363,7 +363,7 @@ int mvceditor::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDir
 	sql += "WHERE directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -384,13 +384,13 @@ int mvceditor::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDir
 		totalCount += dbCount;
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return totalCount;
 }
 
-std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames(const std::vector<wxFileName>& sourceDirs) {
+std::vector<wxString> t4p::UrlTagFinderClass::AllControllerNames(const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> controllerNames;
 	if (!Session || sourceDirs.empty()) {
 		return controllerNames;
@@ -401,7 +401,7 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames(const std
 	sql += "WHERE directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -419,11 +419,11 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames(const std
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
-				controllerNames.push_back(mvceditor::CharToWx(controller.c_str()));
+				controllerNames.push_back(t4p::CharToWx(controller.c_str()));
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(e);
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
@@ -431,19 +431,19 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllControllerNames(const std
 	return controllerNames;
 }
 
-std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs) {
+std::vector<wxString> t4p::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> methodNames;
 	if (!Session || sourceDirs.empty()) {
 		return methodNames;
 	}
 	std::string methodName;
-	std::string controllerWhere = mvceditor::WxToChar(controllerClassName);
+	std::string controllerWhere = t4p::WxToChar(controllerClassName);
 	std::string sql = "SELECT DISTINCT method_name ";
 	sql += "FROM url_tags LEFT JOIN sources ON sources.source_id = url_tags.source_id ";
 	sql += "WHERE class_name  = ? AND directory IN(";
 	std::vector<std::string> stdSourceDirs;
 	for (size_t i = 0; i < sourceDirs.size(); ++i) {
-		stdSourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
 		}
@@ -463,11 +463,11 @@ std::vector<wxString> mvceditor::UrlTagFinderClass::AllMethodNames(const wxStrin
 		stmt.define_and_bind();
 		if (stmt.execute(true)) {
 			do {
-				methodNames.push_back(mvceditor::CharToWx(methodName.c_str()));
+				methodNames.push_back(t4p::CharToWx(methodName.c_str()));
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(e);
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);

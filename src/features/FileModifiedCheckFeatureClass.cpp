@@ -54,7 +54,7 @@ static int ID_FILE_MODIFIED_ACTION = wxNewId();
  * @param collapsedDis the directories in paths
  * @param collapsedFiles the files in paths (except files in any of collapsedDirs)
  */
-static void CollapseDirsFiles(mvceditor::TagCacheClass& tagCache, std::map<wxString, int>& paths, std::map<wxString, int>& collapsedDirs, std::map<wxString, int>& collapsedFiles) {
+static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, int>& paths, std::map<wxString, int>& collapsedDirs, std::map<wxString, int>& collapsedFiles) {
 	std::map<wxString, int>::iterator mapIt;
 	std::vector<wxString> sortedPaths;
 	for (mapIt = paths.begin(); mapIt != paths.end(); ++mapIt) {
@@ -113,8 +113,8 @@ static void CollapseDirsFiles(mvceditor::TagCacheClass& tagCache, std::map<wxStr
  * @return map of the code controls that have opened files (as opposed to new files being edited)
  *         key is the full path of the file being edited, value is the code control itself
  */
-static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::NotebookClass* notebook) {
-	std::map<wxString, mvceditor::CodeControlClass*> openedFiles;
+static std::map<wxString, t4p::CodeControlClass*> OpenedFiles(t4p::NotebookClass* notebook) {
+	std::map<wxString, t4p::CodeControlClass*> openedFiles;
 	if (!notebook) {
 		return openedFiles;
 	}
@@ -125,7 +125,7 @@ static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::N
 		// be checked
 		// no need to check new files as they are not yet in the file system
 		for (size_t i = 0; i < size; ++i) {
-			mvceditor::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+			t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
 			if (ctrl && !ctrl->IsNew()) {
 				openedFiles[ctrl->GetFileName()] = ctrl;
 			}
@@ -134,7 +134,7 @@ static std::map<wxString, mvceditor::CodeControlClass*> OpenedFiles(mvceditor::N
 	return openedFiles;
 }
 
-mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvceditor::AppClass& app)
+t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , PollTimer(this, ID_FILE_MODIFIED_POLL)
@@ -159,11 +159,11 @@ mvceditor::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(mvcedito
 	LastWatcherEventTime = wxDateTime::Now();
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
 #ifdef __WXMSW__
 	
 	// on windows, we check for network drives
-	mvceditor::VolumeListActionClass* volumeAction = new mvceditor::VolumeListActionClass(App.RunningThreads, wxID_ANY);
+	t4p::VolumeListActionClass* volumeAction = new t4p::VolumeListActionClass(App.RunningThreads, wxID_ANY);
 	App.RunningThreads.Queue(volumeAction);
 #else
 
@@ -174,7 +174,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event)
 	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
 	Timer.Stop();
 	PollTimer.Stop();
 
@@ -186,15 +186,15 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
+void t4p::FileModifiedCheckFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	wxString fullPath = event.GetCodeControl()->GetFileName();
 	bool isInSources = false;
 	bool doAddWatch = false;
 
 	// In case the file that was opened is not part of a project, we want to setup a 
 	// watch for it.
-	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledSources();
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::SourceClass> sources = App.Globals.AllEnabledSources();
+	std::vector<t4p::SourceClass>::const_iterator src;
 	for (src = sources.begin(); src != sources.end(); ++src) {
 		if (src->IsInRootDirectory(fullPath)) {
 			isInSources = true;
@@ -220,8 +220,8 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened(mvceditor::CodeCo
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClass& event) {
-	mvceditor::CodeControlClass* ctrl = event.GetCodeControl();
+void t4p::FileModifiedCheckFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* ctrl = event.GetCodeControl();
 	if (!ctrl) {
 		return;
 	}
@@ -237,7 +237,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed(mvceditor::CodeCo
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	
 	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
 	// watches.
@@ -252,13 +252,13 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved(wxCommandEvent
 	StartWatch();
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::StartWatch() {
+void t4p::FileModifiedCheckFeatureClass::StartWatch() {
 	IsWatchError = false;
 	FsWatcher = new wxFileSystemWatcher();
 	FsWatcher->SetOwner(this);
 
-	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::SourceClass> sources = App.Globals.AllEnabledPhpSources();
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
 		wxFileName sourceDir = source->RootDirectory;
 
@@ -282,13 +282,13 @@ void mvceditor::FileModifiedCheckFeatureClass::StartWatch() {
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete(mvceditor::VolumeListEventClass& event) {
+void t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete(t4p::VolumeListEventClass& event) {
 	AllVolumes = event.AllVolumes;
 	NetworkVolumes = event.NetworkVolumes;
 	StartWatch();
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxDateTime now = wxDateTime::Now();
 	wxTimeSpan span = now.Subtract(LastWatcherEventTime);
 	if (span.GetSeconds() <= 1) {
@@ -363,7 +363,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 		}
 	}
 	
-	std::map<wxString, mvceditor::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
+	std::map<wxString, t4p::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
 
 	HandleOpenedFiles(openedFiles, pathsRenamed);
 	HandleNonOpenedFiles(openedFiles, pathsRenamed);
@@ -381,12 +381,12 @@ void mvceditor::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	Timer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
+void t4p::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
 
 	// if the file that was modified is one of the opened files, we need to prompt the user
 	// to see if they want to reload the new version
 	std::map<wxString, int>::const_iterator f;
-	std::map<wxString, mvceditor::CodeControlClass*> filesToPrompt;
+	std::map<wxString, t4p::CodeControlClass*> filesToPrompt;
 	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
 		wxString fullPath = f->first;
 		wxFileName fileName(fullPath);
@@ -417,7 +417,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 	// since we collapse files in the event that a dir is deleted, we need to 
 	// check to see if the opened file exists in a deleted directory
 	if (!DirsExternallyDeleted.empty()) {
-		std::map<wxString, mvceditor::CodeControlClass*>::iterator openedFile;
+		std::map<wxString, t4p::CodeControlClass*>::iterator openedFile;
 		for (openedFile = openedFiles.begin(); openedFile != openedFiles.end(); ++openedFile) {	
 			wxFileName parentDir;
 			parentDir.AssignDir(wxFileName(openedFile->first).GetPath());
@@ -440,7 +440,7 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 
 	// check for renames; an opened file rename will be handled as a deletion for now
 	std::map<wxString, wxString>::iterator renamed;
-	std::map<wxString, mvceditor::CodeControlClass*> openedFilesRenamed;
+	std::map<wxString, t4p::CodeControlClass*> openedFilesRenamed;
 	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
 		wxString renamedFrom = renamed->first;
 		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
@@ -464,21 +464,21 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxStri
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
+void t4p::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
 	std::map<wxString, int>::iterator f;
 	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
 		wxString fullPath = f->first;
 		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
 		if (!isOpened) {
 			// file is not open. notify the app that a file was externally modified
-			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
+			wxCommandEvent modifiedEvt(t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
 			modifiedEvt.SetString(fullPath);
 			App.EventSink.Publish(modifiedEvt);
 		}
 	}
 	for (f = FilesExternallyCreated.begin(); f != FilesExternallyCreated.end(); ++f) {
 		wxString fullPath = f->first;
-		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED);
+		wxCommandEvent modifiedEvt(t4p::EVENT_APP_FILE_EXTERNALLY_CREATED);
 		modifiedEvt.SetString(fullPath);
 		App.EventSink.Publish(modifiedEvt);
 	}
@@ -488,18 +488,18 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxS
 		if (!isOpened) {
 
 			// file is not open. notify the app that a file was externally deleted
-			wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_FILE_DELETED);
+			wxCommandEvent modifiedEvt(t4p::EVENT_APP_FILE_DELETED);
 			modifiedEvt.SetString(fullPath);
 			App.EventSink.Publish(modifiedEvt);
 		}
 	}
 	for (f = DirsExternallyCreated.begin(); f != DirsExternallyCreated.end(); ++f) {
-		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_CREATED);
+		wxCommandEvent modifiedEvt(t4p::EVENT_APP_DIR_CREATED);
 		modifiedEvt.SetString(f->first);
 		App.EventSink.Publish(modifiedEvt);
 	}
 	for (f = DirsExternallyDeleted.begin(); f != DirsExternallyDeleted.end(); ++f) {
-		wxCommandEvent modifiedEvt(mvceditor::EVENT_APP_DIR_DELETED);
+		wxCommandEvent modifiedEvt(t4p::EVENT_APP_DIR_DELETED);
 		modifiedEvt.SetString(f->first);
 		App.EventSink.Publish(modifiedEvt);
 	}
@@ -508,22 +508,22 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxS
 		
 		// figure out if we renamed a file or a dir
 		if (wxFileName::DirExists(pair->second)) {
-			mvceditor::RenameEventClass renameEvt(mvceditor::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
+			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
 			App.EventSink.Publish(renameEvt);
 		}
 		else {
-			mvceditor::RenameEventClass renameEvt(mvceditor::EVENT_APP_FILE_RENAMED, pair->first, pair->second);
+			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_FILE_RENAMED, pair->first, pair->second);
 			App.EventSink.Publish(renameEvt);
 		}
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& filesToPrompt) {
+void t4p::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, t4p::CodeControlClass*>& filesToPrompt) {
 	if (filesToPrompt.empty()) {
 		return;
 	}
 	wxArrayString choices;
-	std::map<wxString, mvceditor::CodeControlClass*>::iterator it;
+	std::map<wxString, t4p::CodeControlClass*>::iterator it;
 	for (it = filesToPrompt.begin(); it != filesToPrompt.end(); ++it) {
 		choices.Add(it->first);
 	}
@@ -551,7 +551,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 			filesToPrompt[fileName]->Revert();
 
 			// need to notify the app that the file was reloaded
-			wxCommandEvent reloadEvt(mvceditor::EVENT_APP_FILE_REVERTED);
+			wxCommandEvent reloadEvt(t4p::EVENT_APP_FILE_REVERTED);
 			reloadEvt.SetString(fileName);
 			App.EventSink.Publish(reloadEvt);
 			revertedFiles.push_back(fileName);
@@ -569,7 +569,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxSt
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, mvceditor::CodeControlClass*>& openedFiles, 
+void t4p::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, 
 																  std::map<wxString, int>& deletedFiles) {
 	std::map<wxString, int>::const_iterator file;
 	wxString files;
@@ -579,13 +579,13 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxStr
 
 		// find the control for the file
 		if (openedFiles.end() != openedFiles.find(fullPath)) {
-			mvceditor::CodeControlClass* ctrl = openedFiles[fullPath];
+			t4p::CodeControlClass* ctrl = openedFiles[fullPath];
 			ctrl->TreatAsNew();
 			files += fullPath + wxT("\n");
 			deletingOpened = true;
 		}
 		// send the deleted file event to the app
-		wxCommandEvent deleteEvt(mvceditor::EVENT_APP_FILE_DELETED);
+		wxCommandEvent deleteEvt(t4p::EVENT_APP_FILE_DELETED);
 		deleteEvt.SetString(fullPath);
 		App.EventSink.Publish(deleteEvt);
 	}
@@ -601,7 +601,7 @@ void mvceditor::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxStr
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 	LastWatcherEventTime = wxDateTime::Now();
 	wxString path = event.GetPath().GetFullPath();
 	wxFileName fileName = event.GetPath();
@@ -632,7 +632,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher(wxFileSystemWatcherEv
 	}
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
+void t4p::FileModifiedCheckFeatureClass::HandleWatchError() {
 	if (FsWatcher) {
 		FsWatcher->SetOwner(NULL);
 		delete FsWatcher;
@@ -642,8 +642,8 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
 	wxString dirsDeleted;
 
 	// check to see if the error was due to a watched directory being deleted
-	std::vector<mvceditor::SourceClass> sources = App.Globals.AllEnabledPhpSources();
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::SourceClass> sources = App.Globals.AllEnabledPhpSources();
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (source = sources.begin(); source != sources.end(); ++source) {
 		if (!source->RootDirectory.DirExists()) {
 			dirsDeleted += source->RootDirectory.GetPath() + wxT("\n");
@@ -664,11 +664,11 @@ void mvceditor::FileModifiedCheckFeatureClass::HandleWatchError() {
 	StartWatch();
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
 	if (FilesToPoll.empty()) {
 		return;
 	}
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl) {
 		return;
 	}
@@ -691,10 +691,10 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 	
 	PollTimer.Stop();
 	
-	mvceditor::FileModifiedCheckActionClass* action = new mvceditor::FileModifiedCheckActionClass
+	t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass
 		(App.RunningThreads, ID_FILE_MODIFIED_ACTION);
-	std::vector<mvceditor::FileModifiedTimeClass> filesToCheck;
-	mvceditor::FileModifiedTimeClass fileToCheck;
+	std::vector<t4p::FileModifiedTimeClass> filesToCheck;
+	t4p::FileModifiedTimeClass fileToCheck;
 	fileToCheck.FileName = ctrlFileName;
 	fileToCheck.ModifiedTime = ctrl->GetFileOpenedDateTime(); 
 	filesToCheck.push_back(fileToCheck);
@@ -710,7 +710,7 @@ void mvceditor::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) 
 	App.RunningThreads.Queue(action);
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(mvceditor::FilesModifiedEventClass& event) {
+void t4p::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(t4p::FilesModifiedEventClass& event) {
 	if (JustSaved) {
 		
 		// ignoring results, file has just been saved
@@ -757,14 +757,14 @@ void mvceditor::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(mvc
 	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
+void t4p::FileModifiedCheckFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	JustSaved = true;
 }
 
-void mvceditor::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName& fileName, bool isFileDeleted) {
-	std::map<wxString, mvceditor::CodeControlClass*> codeControls;
+void t4p::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName& fileName, bool isFileDeleted) {
+	std::map<wxString, t4p::CodeControlClass*> codeControls;
 	std::map<wxString, int> filesToPrompt;
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!isFileDeleted && ctrl) {
 
 		// group the modified file with its code control. then we will prompt the user
@@ -781,11 +781,11 @@ void mvceditor::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFi
 	}
 }
 
-mvceditor::VolumeListActionClass::VolumeListActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::VolumeListActionClass::VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId) {
 }
 
-void mvceditor::VolumeListActionClass::BackgroundWork() {
+void t4p::VolumeListActionClass::BackgroundWork() {
 #ifdef __WXMSW__
 
 	wxArrayString allVols = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
@@ -800,48 +800,48 @@ void mvceditor::VolumeListActionClass::BackgroundWork() {
 			networkVolumes.push_back(allVols[i]);
 		}
 	}
-	mvceditor::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
+	t4p::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
 	PostEvent(evt);
 #endif
 }
 
-void mvceditor::VolumeListActionClass::DoCancel() {
+void t4p::VolumeListActionClass::DoCancel() {
 #ifdef __WXMSW__
 	wxFSVolume::CancelSearch();
 #endif
 }
 
-wxString mvceditor::VolumeListActionClass::GetLabel() const {
+wxString t4p::VolumeListActionClass::GetLabel() const {
 	return wxT("Volume List");
 }
 
-mvceditor::VolumeListEventClass::VolumeListEventClass(int id, 
+t4p::VolumeListEventClass::VolumeListEventClass(int id, 
 													  const std::vector<wxString>& allVolumes, 
 													  const std::vector<wxString>& networkVolumes)
-: wxEvent(id, mvceditor::EVENT_ACTION_VOLUME_LIST)
+: wxEvent(id, t4p::EVENT_ACTION_VOLUME_LIST)
 , AllVolumes()
 , NetworkVolumes() {
-	mvceditor::DeepCopy(AllVolumes, allVolumes);
-	mvceditor::DeepCopy(NetworkVolumes, networkVolumes);
+	t4p::DeepCopy(AllVolumes, allVolumes);
+	t4p::DeepCopy(NetworkVolumes, networkVolumes);
 }	
 
 
-wxEvent* mvceditor::VolumeListEventClass::Clone() const {
-	return new mvceditor::VolumeListEventClass(GetId(), AllVolumes, NetworkVolumes);
+wxEvent* t4p::VolumeListEventClass::Clone() const {
+	return new t4p::VolumeListEventClass(GetId(), AllVolumes, NetworkVolumes);
 }
 
-const wxEventType mvceditor::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
+const wxEventType t4p::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::FileModifiedCheckFeatureClass, mvceditor::FeatureClass)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_READY, mvceditor::FileModifiedCheckFeatureClass::OnAppReady)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::FileModifiedCheckFeatureClass::OnAppExit)
-	EVT_APP_FILE_OPEN(mvceditor::FileModifiedCheckFeatureClass::OnAppFileOpened)
-	EVT_APP_FILE_CLOSED(mvceditor::FileModifiedCheckFeatureClass::OnAppFileClosed)
-	EVT_TIMER(ID_FILE_MODIFIED_CHECK, mvceditor::FileModifiedCheckFeatureClass::OnTimer)
-	EVT_TIMER(ID_FILE_MODIFIED_POLL, mvceditor::FileModifiedCheckFeatureClass::OnPollTimer)
-	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_ACTION, mvceditor::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck)
-	EVT_FSWATCHER(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnFsWatcher)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::FileModifiedCheckFeatureClass::OnPreferencesSaved)
-	EVT_ACTION_VOLUME_LIST(wxID_ANY, mvceditor::FileModifiedCheckFeatureClass::OnVolumeListComplete)
-	EVT_APP_FILE_SAVED(mvceditor::FileModifiedCheckFeatureClass::OnFileSaved)
+BEGIN_EVENT_TABLE(t4p::FileModifiedCheckFeatureClass, t4p::FeatureClass)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::FileModifiedCheckFeatureClass::OnAppReady)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::FileModifiedCheckFeatureClass::OnAppExit)
+	EVT_APP_FILE_OPEN(t4p::FileModifiedCheckFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_CLOSED(t4p::FileModifiedCheckFeatureClass::OnAppFileClosed)
+	EVT_TIMER(ID_FILE_MODIFIED_CHECK, t4p::FileModifiedCheckFeatureClass::OnTimer)
+	EVT_TIMER(ID_FILE_MODIFIED_POLL, t4p::FileModifiedCheckFeatureClass::OnPollTimer)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_ACTION, t4p::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck)
+	EVT_FSWATCHER(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnFsWatcher)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::FileModifiedCheckFeatureClass::OnPreferencesSaved)
+	EVT_ACTION_VOLUME_LIST(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete)
+	EVT_APP_FILE_SAVED(t4p::FileModifiedCheckFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

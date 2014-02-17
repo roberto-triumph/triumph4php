@@ -63,13 +63,13 @@ static wxFileName AssetRootDir() {
     return assetRoot;
 }
 
-wxFileName mvceditor::NativeFunctionsAsset() {
+wxFileName t4p::NativeFunctionsAsset() {
 	wxFileName asset = AssetRootDir();
 	wxFileName dbFile(asset.GetPath(), wxT("php.db"));
 	return dbFile;
 }
 
-wxFileName mvceditor::ResourceSqlSchemaAsset() {
+wxFileName t4p::ResourceSqlSchemaAsset() {
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("sql"));
 	
@@ -77,7 +77,7 @@ wxFileName mvceditor::ResourceSqlSchemaAsset() {
 	return sqlFile;
 }
 
-wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
+wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	
 	}
@@ -92,7 +92,7 @@ wxBitmap mvceditor::AutoCompleteImageAsset(wxString imageName) {
 	return bitmap;
 }
 
-wxBitmap mvceditor::IconImageAsset(wxString imageName) {
+wxBitmap t4p::IconImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
 		wxImage::AddHandler(new wxPNGHandler());
 	}
@@ -107,7 +107,7 @@ wxBitmap mvceditor::IconImageAsset(wxString imageName) {
 	return bitmap;
 }
 
-wxFileName mvceditor::PhpDetectorsBaseAsset() {
+wxFileName t4p::PhpDetectorsBaseAsset() {
     wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("php_detectors"));
 	
@@ -116,7 +116,7 @@ wxFileName mvceditor::PhpDetectorsBaseAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
+wxFileName t4p::UrlTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("url_detectors"));
@@ -126,9 +126,9 @@ wxFileName mvceditor::UrlTagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
+wxFileName t4p::UrlTagDetectorsLocalAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName configDir = t4p::ConfigDirAsset();
 	configDir.AppendDir(wxT("url_detectors"));
 	if (!configDir.DirExists()) {
 		wxMkdir(configDir.GetPath(), 0777);
@@ -136,7 +136,7 @@ wxFileName mvceditor::UrlTagDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
+wxFileName t4p::TemplateFilesDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("template_files_detectors"));
@@ -146,9 +146,9 @@ wxFileName mvceditor::TemplateFilesDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::TemplateFileTagsDetectorsLocalAsset() {
+wxFileName t4p::TemplateFileTagsDetectorsLocalAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName configDir = t4p::ConfigDirAsset();
 	configDir.AppendDir(wxT("template_files_detectors"));
 	if (!configDir.DirExists()) {
 		wxMkdir(configDir.GetPath(), 0777);
@@ -156,9 +156,9 @@ wxFileName mvceditor::TemplateFileTagsDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::TagDetectorsLocalAsset() {
+wxFileName t4p::TagDetectorsLocalAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName configDir = t4p::ConfigDirAsset();
 	configDir.AppendDir(wxT("tag_detectors"));
 	if (!configDir.DirExists()) {
 		wxMkdir(configDir.GetPath(), 0777);
@@ -166,7 +166,7 @@ wxFileName mvceditor::TagDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::TagDetectorsGlobalAsset() {
+wxFileName t4p::TagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("tag_detectors"));
@@ -176,9 +176,9 @@ wxFileName mvceditor::TagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
+wxFileName t4p::DatabaseTagDetectorsLocalAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName configDir = t4p::ConfigDirAsset();
 	configDir.AppendDir(wxT("database_detectors"));
 	if (!configDir.DirExists()) {
 		wxMkdir(configDir.GetPath(), 0777);
@@ -186,7 +186,7 @@ wxFileName mvceditor::DatabaseTagDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
+wxFileName t4p::DatabaseTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("database_detectors"));
@@ -196,9 +196,9 @@ wxFileName mvceditor::DatabaseTagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
+wxFileName t4p::ConfigTagDetectorsLocalAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+	wxFileName configDir = t4p::ConfigDirAsset();
 	configDir.AppendDir(wxT("config_detectors"));
 	if (!configDir.DirExists()) {
 		wxMkdir(configDir.GetPath(), 0777);
@@ -206,7 +206,7 @@ wxFileName mvceditor::ConfigTagDetectorsLocalAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
+wxFileName t4p::ConfigTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("config_detectors"));
@@ -216,7 +216,7 @@ wxFileName mvceditor::ConfigTagDetectorsGlobalAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::TempDirAsset() {
+wxFileName t4p::TempDirAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
 	tempDir.AssignDir(paths.GetTempDir());
@@ -227,12 +227,12 @@ wxFileName mvceditor::TempDirAsset() {
 	return tempDir;
 }
 
-wxFileName mvceditor::ConfigDirAsset() {
+wxFileName t4p::ConfigDirAsset() {
 
 	// the config dir is in the bootstrap file
 	// the bootstrap file could be located in the same dir as the executable
 	// or in the user data directory
-	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
+	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
 	wxFileConfig config(wxT("bootstrap"), wxEmptyString, 
 		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString configDirString;
@@ -247,7 +247,7 @@ wxFileName mvceditor::ConfigDirAsset() {
 	return configDir;
 }
 
-wxFileName mvceditor::BootstrapConfigFileAsset() {
+wxFileName t4p::BootstrapConfigFileAsset() {
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName bootstrapConfigFile;
 
@@ -264,10 +264,10 @@ wxFileName mvceditor::BootstrapConfigFileAsset() {
 }
 
 
-wxFileName mvceditor::SettingsDirAsset() {
+wxFileName t4p::SettingsDirAsset() {
 	
 	// get the location of the settings dir from the bootstrap file
-	wxFileName bootstrapConfigFile = mvceditor::BootstrapConfigFileAsset();
+	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
 	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
 	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
 		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
@@ -278,7 +278,7 @@ wxFileName mvceditor::SettingsDirAsset() {
 	return settingsDir;
 }
 
-void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
+void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
 	wxFileName bootstrapConfigFile;
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName executableDir(paths.GetExecutablePath());
@@ -303,7 +303,7 @@ void mvceditor::SetSettingsDirLocation(const wxFileName& settingsDir) {
 	bootstrapConfig.Flush();
 }
 
-wxFileName mvceditor::DetectorSqlSchemaAsset() {
+wxFileName t4p::DetectorSqlSchemaAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("sql"));
 	
@@ -311,7 +311,7 @@ wxFileName mvceditor::DetectorSqlSchemaAsset() {
 	return sqlFile;
 }
 
-wxFileName mvceditor::SkeletonsBaseAsset() {
+wxFileName t4p::SkeletonsBaseAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("skeletons"));
 	
@@ -320,25 +320,25 @@ wxFileName mvceditor::SkeletonsBaseAsset() {
 	return scriptsFileName;
 }
 
-wxFileName mvceditor::TagCacheAsset() {
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+wxFileName t4p::TagCacheAsset() {
+	wxFileName configDir = t4p::ConfigDirAsset();
 	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("tags.db"));
 	return tagCacheFileName;
 }
 
-wxFileName mvceditor::TagCacheWorkingAsset() {
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+wxFileName t4p::TagCacheWorkingAsset() {
+	wxFileName configDir = t4p::ConfigDirAsset();
 	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("working_tags.db"));
 	return tagCacheFileName;
 }
 
-wxFileName mvceditor::DetectorCacheAsset() {
-	wxFileName configDir = mvceditor::ConfigDirAsset();
+wxFileName t4p::DetectorCacheAsset() {
+	wxFileName configDir = t4p::ConfigDirAsset();
 	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("detectors.db"));
 	return tagCacheFileName;
 }
 
-wxFileName mvceditor::VersionFileAsset() {
+wxFileName t4p::VersionFileAsset() {
 	wxFileName asset = AssetRootDir();
 	wxFileName versionFile(asset.GetPath(), wxT("version.txt"));
 	return versionFile;

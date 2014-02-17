@@ -39,14 +39,14 @@ static const int SCHEMA_VERSION_TAGS = 7;
  */
 static const int SCHEMA_VERSION_DETECTOR = 6;
 
-mvceditor::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
 	, TagDbs() 
 	, Session() {
 
 }
 
-bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::TagCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache Check"));
 
 	// don't think wxFileName copy constructor is a deep clone
@@ -56,21 +56,21 @@ bool mvceditor::TagCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& glob
 	return true;
 }
 
-void mvceditor::TagCacheDbVersionActionClass::BackgroundWork() {
+void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator filename;
 	for (filename = TagDbs.begin(); filename != TagDbs.end() && !IsCancelled(); ++filename) {
 		try {
 			
 			// if file does not exist create it
 			
-			std::string stdFilename = mvceditor::WxToChar(filename->GetFullPath());
+			std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
 			Session.open(*soci::factory_sqlite3(), stdFilename);
-			int versionNumber = mvceditor::SqliteSchemaVersion(Session);
+			int versionNumber = t4p::SqliteSchemaVersion(Session);
 			if (versionNumber != SCHEMA_VERSION_TAGS) {
 				wxString error;
-				bool good = mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), Session, error);
+				bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
 				if (!good) {
-					mvceditor::EditorLogError(mvceditor::WARNING_OTHER, error);
+					t4p::EditorLogError(t4p::WARNING_OTHER, error);
 				}
 			}
 			Session.close();
@@ -82,18 +82,18 @@ void mvceditor::TagCacheDbVersionActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::TagCacheDbVersionActionClass::GetLabel() const {
+wxString t4p::TagCacheDbVersionActionClass::GetLabel() const {
 	return _("Tag Cache Version Check");
 }
 
-mvceditor::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
 	, DetectorDbs() 
 	, Session() {
 
 }
 
-bool mvceditor::DetectorCacheDbVersionActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::DetectorCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("Detector Cache Check"));
 
 	// don't think wxFileName copy constructor is a deep clone
@@ -103,20 +103,20 @@ bool mvceditor::DetectorCacheDbVersionActionClass::Init(mvceditor::GlobalsClass&
 	return true;
 }
 
-void mvceditor::DetectorCacheDbVersionActionClass::BackgroundWork() {
+void t4p::DetectorCacheDbVersionActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator filename;
 	for (filename = DetectorDbs.begin(); filename != DetectorDbs.end() && !IsCancelled(); ++filename) {
 		try {
 
 			// if file does not exist create it
-			std::string stdFilename = mvceditor::WxToChar(filename->GetFullPath());
+			std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
 			Session.open(*soci::factory_sqlite3(), stdFilename);
-			int versionNumber = mvceditor::SqliteSchemaVersion(Session);
+			int versionNumber = t4p::SqliteSchemaVersion(Session);
 			if (versionNumber != SCHEMA_VERSION_DETECTOR) {
 				wxString error;
-				bool good = mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), Session, error);
+				bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
 				if (!good) {
-					mvceditor::EditorLogError(mvceditor::WARNING_OTHER, error);
+					t4p::EditorLogError(t4p::WARNING_OTHER, error);
 				}
 			}
 			Session.close();
@@ -128,7 +128,7 @@ void mvceditor::DetectorCacheDbVersionActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::DetectorCacheDbVersionActionClass::GetLabel() const {
+wxString t4p::DetectorCacheDbVersionActionClass::GetLabel() const {
 	return _("Detector Cache Version Check");
 }
 

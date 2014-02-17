@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_EXPLORERFEATURECLASS_H__
-#define __MVCEDITOR_EXPLORERFEATURECLASS_H__
+#ifndef __T4P_EXPLORERFEATURECLASS_H__
+#define __T4P_EXPLORERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/ExplorerFeatureForms.h>
@@ -32,7 +32,7 @@
 #include <wx/fswatcher.h>
 #include <widgets/FileTypeImageList.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration, defined below
 class ExplorerEventClass;
@@ -42,7 +42,7 @@ class ExplorerModifyEventClass;
  * for all defined projects.  Additionally, it can display folders
  * and files for any path in the file system.
  */
-class ExplorerFeatureClass : public mvceditor::FeatureClass {
+class ExplorerFeatureClass : public t4p::FeatureClass {
 
 public:
 	
@@ -56,7 +56,7 @@ public:
 	 */
 	wxFileName ShellExecutable;
 
-	ExplorerFeatureClass(mvceditor::AppClass& app);
+	ExplorerFeatureClass(t4p::AppClass& app);
 
 	/**
 	 * Add menu items to the view menu
@@ -95,7 +95,7 @@ private:
 	 * when the explorer action has finished fetching the files,
 	 * display them. this handler will refresh both the left and right panels.
 	 */
-	void OnExplorerListComplete(mvceditor::ExplorerEventClass& event);
+	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
 	
 	/**
 	 * when the explorer tool button is clicked show any open projects
@@ -128,14 +128,14 @@ private:
 	/**
 	 * the source directories shown in the project menu
 	 */
-	std::vector<mvceditor::SourceClass> SourceDirs;
+	std::vector<t4p::SourceClass> SourceDirs;
 
 	DECLARE_EVENT_TABLE()
 };
 
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 public:
-	ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);
+	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);
 	~ModalExplorerPanelClass();
 
 	void RefreshDir(const wxFileName& dir);
@@ -174,13 +174,13 @@ private:
 	/**
 	 * to get projects list and tag cache
 	 */
-	mvceditor::ExplorerFeatureClass& Feature;
+	t4p::ExplorerFeatureClass& Feature;
 	
 	/**
 	 * this object gets its own background thread to
 	 * read directories in the background
 	 */
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 
 	/**
 	 * the currently selected filter menu item
@@ -188,7 +188,7 @@ private:
 	int FilterChoice;
 
 	enum ListImages {
-		LIST_FOLDER = mvceditor::IMGLIST_NONE + 1,
+		LIST_FOLDER = t4p::IMGLIST_NONE + 1,
 		LIST_PARENT_FOLDER
 	};
 
@@ -210,7 +210,7 @@ private:
 	void OnListMenuCreateDirectory(wxCommandEvent& event);
 	void OnListMenuShell(wxCommandEvent& event);
 	void OnListMenuFileManager(wxCommandEvent& event);
-	void OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass& event);
+	void OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event);
 	void OnListKeyDown(wxKeyEvent& event);
 
 	// event handler for the combo box
@@ -243,10 +243,10 @@ private:
 
 extern const wxEventType EVENT_EXPLORER;
 
-typedef void (wxEvtHandler::*ExplorerEventClassFunction)(mvceditor::ExplorerEventClass&);
+typedef void (wxEvtHandler::*ExplorerEventClassFunction)(t4p::ExplorerEventClass&);
 
 #define EVT_EXPLORER_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_EXPLORER, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_EXPLORER, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ExplorerEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -300,10 +300,10 @@ public:
  * this action list files by reading the file system. the main point of this
  * action is to get files that we have not indexed yet for whatever reason.
  */
-class ExplorerFileSystemActionClass : public mvceditor::ActionClass {
+class ExplorerFileSystemActionClass : public t4p::ActionClass {
 
 public:
-	ExplorerFileSystemActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ExplorerFileSystemActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * starts an action to read the files from the given directory.
@@ -341,7 +341,7 @@ private:
  *
  * The action will post EVENT_EXPLORER_MODIFY events
  */
-class ExplorerModifyActionClass : public mvceditor::ActionClass {
+class ExplorerModifyActionClass : public t4p::ActionClass {
 
 public:
 
@@ -351,7 +351,7 @@ public:
 		RENAME_FILE
 	};
 
-	ExplorerModifyActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ExplorerModifyActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * @param dirs the directories to be deleted (recursively)
@@ -399,10 +399,10 @@ protected:
 
 extern const wxEventType EVENT_EXPLORER_MODIFY;
 
-typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(mvceditor::ExplorerModifyEventClass&);
+typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(t4p::ExplorerModifyEventClass&);
 
 #define EVT_EXPLORER_MODIFY_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_EXPLORER_MODIFY, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_EXPLORER_MODIFY, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( ExplorerModifyEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -447,7 +447,7 @@ public:
 	/**
 	 * the type of modification to perform
 	 */
-	mvceditor::ExplorerModifyActionClass::Actions Action;
+	t4p::ExplorerModifyActionClass::Actions Action;
 
 	/**
 	 * TRUE if the delete/rename was successful.
@@ -483,11 +483,11 @@ class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
 
 public:
 
-	ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature);	
+	ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);	
 
 private:
 
-	mvceditor::ExplorerFeatureClass& Feature;
+	t4p::ExplorerFeatureClass& Feature;
 };
 
 }

@@ -30,7 +30,7 @@
 #include <algorithm>
 
 
-std::string mvceditor::SqliteSqlLikeEscape(const std::string& value, char e) {
+std::string t4p::SqliteSqlLikeEscape(const std::string& value, char e) {
 	std::string escaped;
 	for (size_t i = 0; i < value.size(); i++) {
 		char c = value[i];
@@ -42,7 +42,7 @@ std::string mvceditor::SqliteSqlLikeEscape(const std::string& value, char e) {
 	return escaped;
 }
 
-bool mvceditor::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& session, wxString& error) {
+bool t4p::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& session, wxString& error) {
 	bool ret = false;
 
 	// make sure that the sql script exists before we delete anything
@@ -50,7 +50,7 @@ bool mvceditor::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::sessi
 
 	// get all of the tables in the db
 	std::vector<std::string> tableNames;
-	ret = mvceditor::SqliteTables(session, tableNames, error);
+	ret = t4p::SqliteTables(session, tableNames, error);
 	if (!ret) {
 		return ret;
 	}
@@ -65,27 +65,27 @@ bool mvceditor::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::sessi
 		wxFFile ffile(sqlScriptFileName.GetFullPath());
 		wxString sql;
 		ffile.ReadAll(&sql);
-		std::string stdSql = mvceditor::WxToChar(sql);
+		std::string stdSql = t4p::WxToChar(sql);
 
 		// get the 'raw' connection because it can handle multiple statements at once
 		char *errorMessage = NULL;
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
 		sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
 		if (errorMessage) {
-			error = mvceditor::CharToWx(errorMessage);
+			error = t4p::CharToWx(errorMessage);
 			sqlite_api::sqlite3_free(errorMessage);
 		}
 		else {
 			ret = true;
 		}
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-bool mvceditor::SqliteTables(soci::session& session, std::vector<std::string>& tableNames, wxString& error) {
+bool t4p::SqliteTables(soci::session& session, std::vector<std::string>& tableNames, wxString& error) {
 	bool ret = false;
 	try {	
 		std::string tableName;
@@ -100,14 +100,14 @@ bool mvceditor::SqliteTables(soci::session& session, std::vector<std::string>& t
 		}
 		ret = true;
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxUnusedVar(e);
 		wxASSERT_MSG(ret, error);
 	}
 	return ret;
 }
 
-int mvceditor::SqliteSchemaVersion(soci::session& session) {
+int t4p::SqliteSchemaVersion(soci::session& session) {
 	int versionNumber = 0;
 	try {
 
@@ -126,7 +126,7 @@ int mvceditor::SqliteSchemaVersion(soci::session& session) {
 	return versionNumber;
 }
 
-void mvceditor::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
+void t4p::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
 
 	// get the 'raw' sqlite connection
 	soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
@@ -134,50 +134,50 @@ void mvceditor::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
 }
 
 
-mvceditor::SqliteFinderClass::SqliteFinderClass() {
+t4p::SqliteFinderClass::SqliteFinderClass() {
 	Session = NULL;
 }
 
-mvceditor::SqliteFinderClass::~SqliteFinderClass() {
+t4p::SqliteFinderClass::~SqliteFinderClass() {
 }
 
-void mvceditor::SqliteFinderClass::InitSession(soci::session* session) {
+void t4p::SqliteFinderClass::InitSession(soci::session* session) {
 	Session = session;
 }
 
-void mvceditor::SqliteFinderClass::ClearSession() {
+void t4p::SqliteFinderClass::ClearSession() {
 	Session = NULL;
 }
 
-bool mvceditor::SqliteFinderClass::Exec(mvceditor::SqliteResultClass* result) {
+bool t4p::SqliteFinderClass::Exec(t4p::SqliteResultClass* result) {
 	bool ret = result->Prepare(*Session, true);
 	return ret;
 }
 
-bool mvceditor::SqliteFinderClass::IsInit() const {
+bool t4p::SqliteFinderClass::IsInit() const {
 	return NULL != Session;
 }
 
-mvceditor::SqliteResultClass::SqliteResultClass() 
+t4p::SqliteResultClass::SqliteResultClass() 
 : IsEmpty(true) {
 	Stmt = NULL;
 }
 
-mvceditor::SqliteResultClass::~SqliteResultClass() {
+t4p::SqliteResultClass::~SqliteResultClass() {
 	if (Stmt) {
 		delete Stmt;
 	}
 }	
 
-bool mvceditor::SqliteResultClass::Empty() const {
+bool t4p::SqliteResultClass::Empty() const {
 	return IsEmpty;
 }
 
-bool mvceditor::SqliteResultClass::More() const {
+bool t4p::SqliteResultClass::More() const {
 	return !IsEmpty && NULL != Stmt;
 }
 
-bool mvceditor::SqliteResultClass::Fetch() {
+bool t4p::SqliteResultClass::Fetch() {
 	if (!Stmt) {
 		return false;
 	}
@@ -189,7 +189,7 @@ bool mvceditor::SqliteResultClass::Fetch() {
 	return more;
 }
 
-bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
+bool t4p::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
 	Stmt = stmt;
 	IsEmpty = true;
 	try {
@@ -204,7 +204,7 @@ bool mvceditor::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxStrin
 			Stmt = NULL;
 		}
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what()); 
+		error = t4p::CharToWx(e.what()); 
 		wxASSERT_MSG(false, error);
 		delete Stmt;
 		Stmt = NULL;

@@ -35,14 +35,14 @@ class MyApp : public wxApp {
 public:
 	virtual bool OnInit();
 
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 };
 
 static int ActionCount = 0;
 
 class MyFrame: public wxFrame {
 public:
-	MyFrame(mvceditor::RunningThreadsClass& runningThreads);
+	MyFrame(t4p::RunningThreadsClass& runningThreads);
 private:
 	void AddMenu();
 	void OnExit(wxCommandEvent& event);
@@ -50,20 +50,20 @@ private:
 	void OnStartNewThread(wxCommandEvent& event);
 	void OnStopThread(wxCommandEvent& event);
 	void OnStopAllThread(wxCommandEvent& event);
-	void OnThreadRunning(mvceditor::ActionEventClass& event);
-	void OnThreadComplete(mvceditor::ActionEventClass& event);
+	void OnThreadRunning(t4p::ActionEventClass& event);
+	void OnThreadComplete(t4p::ActionEventClass& event);
 
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 	wxTextCtrl* Text;
 	wxThreadIdType RunningActionId;
 
 	DECLARE_EVENT_TABLE()
 };
 
-class MyAction : public mvceditor::ActionClass {
+class MyAction : public t4p::ActionClass {
 
 public:
-	MyAction(mvceditor::RunningThreadsClass& runningThreads, int eventId, wxString label);
+	MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label);
 	wxString GetLabel() const;
 protected:
 	void BackgroundWork();
@@ -73,7 +73,7 @@ protected:
 
 const wxEventType EVENT_RUNNING = wxNewEventType();
 
-typedef void (wxEvtHandler::*ActionEventClassFunction)(mvceditor::ActionEventClass&);
+typedef void (wxEvtHandler::*ActionEventClassFunction)(t4p::ActionEventClass&);
 
 #define EVT_MY_ACTION(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(EVENT_RUNNING, id, -1, \
@@ -97,7 +97,7 @@ bool MyApp::OnInit() {
 	return true;
 }
 
-MyFrame::MyFrame(mvceditor::RunningThreadsClass& runningThreads) :
+MyFrame::MyFrame(t4p::RunningThreadsClass& runningThreads) :
 	wxFrame(NULL, wxID_ANY, wxT("running threads tutorial"), wxDefaultPosition, 
 			wxSize(640, 480)) 
 	, RunningThreads(runningThreads) 
@@ -155,8 +155,8 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 	event.Skip();
 }
 
-MyAction::MyAction(mvceditor::RunningThreadsClass& runningThreads, int eventId, wxString label)
-	: mvceditor::ActionClass(runningThreads, eventId) 
+MyAction::MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label)
+	: t4p::ActionClass(runningThreads, eventId) 
 	, Label(label) {
 
 }
@@ -164,7 +164,7 @@ MyAction::MyAction(mvceditor::RunningThreadsClass& runningThreads, int eventId, 
 void MyAction::BackgroundWork() {
 	while (!IsCancelled()) {
 		wxString msg = wxString::Format(_("%s is running...\n"), (const char*)Label.c_str()); 
-		mvceditor::ActionEventClass evt(ID_THREAD, EVENT_RUNNING, msg);
+		t4p::ActionEventClass evt(ID_THREAD, EVENT_RUNNING, msg);
 		PostEvent(evt);
 		wxThread::Sleep(2000);
 	}
@@ -173,11 +173,11 @@ wxString MyAction::GetLabel() const {
 	return Label;
 }
 
-void MyFrame::OnThreadRunning(mvceditor::ActionEventClass& event) {
+void MyFrame::OnThreadRunning(t4p::ActionEventClass& event) {
 	Text->AppendText(event.Message);
 }
 
-void MyFrame::OnThreadComplete(mvceditor::ActionEventClass& event) {
+void MyFrame::OnThreadComplete(t4p::ActionEventClass& event) {
 	Text->AppendText(event.Message);
 	Text->AppendText(wxT("Work complete\n"));
 	RunningActionId = 0;

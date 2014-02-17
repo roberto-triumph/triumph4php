@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TAGLIST_H__
-#define __MVCEDITOR_TAGLIST_H__
+#ifndef __T4P_TAGLIST_H__
+#define __T4P_TAGLIST_H__
 
 #include <globals/TagClass.h>
 #include <language/ParsedTagFinderClass.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration
 class ProjectClass;
@@ -40,7 +40,7 @@ class ProjectClass;
  *
  * @param matches any native matches from this given vector will be removed
  */
-void TagListRemoveNativeMatches(std::vector<mvceditor::TagClass>& matches);
+void TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches);
 
 /**
  * Filter the given matches by only the matches that belong to the given projects.
@@ -49,7 +49,7 @@ void TagListRemoveNativeMatches(std::vector<mvceditor::TagClass>& matches);
  * @param projects matches from these projects will be kept; all others will be erased.
  *        this method will not own the project pointers
  */
-void TagListKeepMatchesFromProjects(std::vector<mvceditor::TagClass>& matches, std::vector<mvceditor::ProjectClass*> projects);
+void TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, std::vector<t4p::ProjectClass*> projects);
 
 
 }

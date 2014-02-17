@@ -24,17 +24,17 @@
  */
 #include <widgets/StatusBarWithGaugeClass.h>
 
-mvceditor::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, int id)
+t4p::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, int id)
            : wxStatusBar(parent, id, wxST_SIZEGRIP | wxFULL_REPAINT_ON_RESIZE)
 			, Gauges()
 			, GaugeTitles() {
 }
 
-bool mvceditor::StatusBarWithGaugeClass::HasGauge(int id) const {
+bool t4p::StatusBarWithGaugeClass::HasGauge(int id) const {
 	return Gauges.count(id) > 0;
 }
 
-void mvceditor::StatusBarWithGaugeClass::AddGauge(const wxString& title, int id, int maxValue, int flags) {
+void t4p::StatusBarWithGaugeClass::AddGauge(const wxString& title, int id, int maxValue, int flags) {
 	wxString msg = wxString::Format(wxT("There is already another gauge with ID =%d; gauge name=%s"), id, title.c_str());
 	wxUnusedVar(msg);
 	wxASSERT_MSG(Gauges.count(id) == 0, msg);
@@ -47,7 +47,7 @@ void mvceditor::StatusBarWithGaugeClass::AddGauge(const wxString& title, int id,
 	RedrawGauges();
 }
 
-void mvceditor::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
+void t4p::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
 	if (Gauges.count(id) > 0) {
 		wxGauge* gauge = Gauges[id];
 		if (update != INDETERMINATE_MODE) {
@@ -59,7 +59,7 @@ void mvceditor::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int range) {
+void t4p::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int range) {
 	if (Gauges.count(id) > 0) {
 		wxGauge* gauge = Gauges[id];
 		if (INDETERMINATE_MODE == mode) {
@@ -75,7 +75,7 @@ void mvceditor::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value,
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
+void t4p::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
 	if (Gauges.count(id) > 0) {
 		wxGauge* gauge = Gauges[id];
 		if (increment != INDETERMINATE_MODE) {
@@ -87,7 +87,7 @@ void mvceditor::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const wxString& title, int increment) {
+void t4p::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const wxString& title, int increment) {
 	if (Gauges.count(id) > 0) {
 		GaugeTitles[id] = title;
 		RedrawGauges();
@@ -102,14 +102,14 @@ void mvceditor::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const w
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::RenameGauge(int id, const wxString& title) {
+void t4p::StatusBarWithGaugeClass::RenameGauge(int id, const wxString& title) {
 	if (Gauges.count(id) > 0) {
 		GaugeTitles[id] = title;
 		RedrawGauges();
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::StopGauge(int id) {
+void t4p::StatusBarWithGaugeClass::StopGauge(int id) {
 	if (Gauges.count(id) > 0) {
 		wxGauge* gauge = Gauges[id];
 		RemoveChild(gauge);
@@ -121,12 +121,12 @@ void mvceditor::StatusBarWithGaugeClass::StopGauge(int id) {
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
+void t4p::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
 	RedrawGauges();
     event.Skip();
 }
 
-void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
+void t4p::StatusBarWithGaugeClass::RedrawGauges() {
 
 	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself), 
 	// plus the leftmost default status bar columns (for the menu help and other messages)
@@ -158,7 +158,7 @@ void mvceditor::StatusBarWithGaugeClass::RedrawGauges() {
 	delete[] widths;
 }
 
-void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
+void t4p::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 	
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(0);
@@ -170,7 +170,7 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 	}
 }
 
-void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
+void t4p::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
 	
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(1);
@@ -182,6 +182,6 @@ void mvceditor::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::StatusBarWithGaugeClass, wxStatusBar)
-    EVT_SIZE(mvceditor::StatusBarWithGaugeClass::OnSize)
+BEGIN_EVENT_TABLE(t4p::StatusBarWithGaugeClass, wxStatusBar)
+    EVT_SIZE(t4p::StatusBarWithGaugeClass::OnSize)
 END_EVENT_TABLE()

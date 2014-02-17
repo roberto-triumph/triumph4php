@@ -31,7 +31,7 @@
 #include <wx/menu.h>
 #include <unicode/unistr.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class is used to validate that a finder has a correctly formed regular expression

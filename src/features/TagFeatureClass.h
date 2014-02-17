@@ -36,14 +36,14 @@
 #include <wx/string.h>
 #include <queue>
 
-namespace mvceditor {
+namespace t4p {
 
 
 class TagFeatureClass : public FeatureClass {
 
 public:
 	
-	TagFeatureClass(mvceditor::AppClass& app);
+	TagFeatureClass(t4p::AppClass& app);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
 
@@ -67,7 +67,7 @@ private:
 
 	void OnProjectsUpdated(wxCommandEvent& event);
 
-	void OnAppFileClosed(mvceditor::CodeControlEventClass& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 	
@@ -111,26 +111,26 @@ private:
 	 * @param version the version of PHP to check against
 	 * @return bool false file does not exist
 	 */
-	bool InitForFile(const mvceditor::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
+	bool InitForFile(const t4p::ProjectClass& project, const wxString& fullPath, pelet::Versions version);
 	
 	/**
 	 * This method will get called by the WorkingCacheBuilderClass when parsing of the
 	 * code in this control has been completed.
 	 */
-	void OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event);
+	void OnWorkingCacheComplete(t4p::WorkingCacheCompleteEventClass& event);
 
 	/**
 	 * after the file was parsed re-start the timer.  this gets called always, where as
 	 * OnWorkingCacheComplete does not get called when the file contains invalid syntax (no
 	 * symbol table could be created)
 	 */
-	void OnActionComplete(mvceditor::ActionEventClass& event);
+	void OnActionComplete(t4p::ActionEventClass& event);
 
 	/**
 	 * This method will start re-parsing the document in the background. this will allow the 
 	 * code completion to be up-to-date after a file is *opened*
 	 */
-	void OnAppFileOpened(mvceditor::CodeControlEventClass& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
 	 * This method will start re-parsing the document in the background. this will allow the 
@@ -149,7 +149,7 @@ private:
 	/**
 	 * when a file is renamed then update the tag cache
 	 */
-	void OnAppFileRenamed(mvceditor::RenameEventClass& event);
+	void OnAppFileRenamed(t4p::RenameEventClass& event);
 
 	/**
 	 * if a file is modified externally re-tag it
@@ -169,13 +169,13 @@ private:
 	/**
 	 * when a dir is renamed then update the tag cache
 	 */
-	void OnAppDirRenamed(mvceditor::RenameEventClass& event);
+	void OnAppDirRenamed(t4p::RenameEventClass& event);
 
 	/**
 	 * when the tag cache has been searched, display the matching tags in the dialog so that
 	 * the user can choose which to open
 	 */
-	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+	void OnTagCacheSearchComplete(t4p::TagCacheSearchCompleteEventClass& event);
 
 	/**
 	 * when the user clicks on a editor hyperlink, take them to the matches php tag.
@@ -211,7 +211,7 @@ private:
 	 * A more prominent status bar that indicated progress
 	 * this dialog will only be alive while project is being indexed
 	 */
-	mvceditor::GaugeDialogClass* IndexingDialog;
+	t4p::GaugeDialogClass* IndexingDialog;
 
 	/**
 	 * cache will be considered stale at app start. once all projects have
@@ -240,8 +240,8 @@ public:
 	 * @param chosenResources out parameter, the list of resources that the user chose
 	 */
 	TagSearchDialogClass(wxWindow* parent, 
-		mvceditor::GlobalsClass& globals, wxString cacheStatus, wxString& term, 
-		std::vector<mvceditor::TagClass>& chosenResources);
+		t4p::GlobalsClass& globals, wxString cacheStatus, wxString& term, 
+		std::vector<t4p::TagClass>& chosenResources);
 	
 	~TagSearchDialogClass();
 
@@ -249,7 +249,7 @@ public:
 	 * @param text to place in the search text
 	 * @param matches to place in the results list
 	 */
-	void Prepopulate(const wxString& text, const std::vector<mvceditor::TagClass>& matches);
+	void Prepopulate(const wxString& text, const std::vector<t4p::TagClass>& matches);
 
 protected:
 
@@ -288,7 +288,7 @@ private:
 	/**
 	 * Handle the results of the tag lookups.
 	 */
-	void ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& matches);
+	void ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::TagClass>& matches);
 
 	/**
 	 * *STARTS* a search for a file that matches the given text. 
@@ -306,7 +306,7 @@ private:
 	 * @see ParsedTagFinderClass::CollectNearMacthResources
 	 * @see ParsedTagFinderClass::CollectFullyQualifiedResources
 	 */
-	void SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects);
+	void SearchForResources(const wxString& text, std::vector<t4p::ProjectClass*> projects);
 
 	/**
 	 * when the timer completes, perform the search
@@ -317,30 +317,30 @@ private:
 	 * when the tag cache has been searched, display the matching tags in the dialog so that
 	 * the user can choose which to open
 	 */
-	void OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass& event);
+	void OnTagCacheSearchComplete(t4p::TagCacheSearchCompleteEventClass& event);
 
 	/**
 	 * use our own thread to handle search for tag results in the backgroudn
 	 */
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 
 	/**
 	 * The tag feature reference.  The dialog will use this reference to actually perform the search.
 	 * 
 	 * @var TagFeatureClass
 	 */
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 
 	/**
 	 * List that will get populated with the files to be opened. These are the
 	 * files that the user selects.
 	 */
-	std::vector<mvceditor::TagClass>& ChosenResources;
+	std::vector<t4p::TagClass>& ChosenResources;
 
 	/**
 	 * results of the most recent search
 	 */
-	std::vector<mvceditor::TagClass> MatchedResources;
+	std::vector<t4p::TagClass> MatchedResources;
 
 	/**
 	 * we use a timer to see when the user has stopped typing. on a keypress,

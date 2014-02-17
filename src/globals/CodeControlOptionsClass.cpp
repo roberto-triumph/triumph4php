@@ -26,7 +26,7 @@
 #include <wx/platinfo.h>
 #include <wx/utils.h>
 
-mvceditor::CodeControlOptionsClass::CodeControlOptionsClass() 
+t4p::CodeControlOptionsClass::CodeControlOptionsClass() 
 : PhpStyles() 
 , SqlStyles()
 , CssStyles()
@@ -59,16 +59,16 @@ mvceditor::CodeControlOptionsClass::CodeControlOptionsClass()
 
 }
 
-mvceditor::CodeControlOptionsClass::CodeControlOptionsClass(const mvceditor::CodeControlOptionsClass& src) {
+t4p::CodeControlOptionsClass::CodeControlOptionsClass(const t4p::CodeControlOptionsClass& src) {
 	Copy(src);
 }
 
-mvceditor::CodeControlOptionsClass& mvceditor::CodeControlOptionsClass::operator=(const mvceditor::CodeControlOptionsClass& src) {
+t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::CodeControlOptionsClass::Copy(const mvceditor::CodeControlOptionsClass& src) {
+void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src) {
 	PhpStyles = src.PhpStyles; 
 	SqlStyles = src.SqlStyles;
 	CssStyles = src.CssStyles;
@@ -101,7 +101,7 @@ void mvceditor::CodeControlOptionsClass::Copy(const mvceditor::CodeControlOption
 	EnableCallTipsOnMouseHover = src.EnableCallTipsOnMouseHover;
 }
 
-mvceditor::StylePreferenceClass& mvceditor::CodeControlOptionsClass::FindByStcStyle(std::vector<mvceditor::StylePreferenceClass>& styles, int stcStyle) const {
+t4p::StylePreferenceClass& t4p::CodeControlOptionsClass::FindByStcStyle(std::vector<t4p::StylePreferenceClass>& styles, int stcStyle) const {
 	for (size_t i = 0; i < styles.size(); ++i) {
 		if (styles[i].StcStyle == stcStyle) {
 			return styles[i];
@@ -110,8 +110,8 @@ mvceditor::StylePreferenceClass& mvceditor::CodeControlOptionsClass::FindByStcSt
 	return styles[0];
 }
 
-std::vector<mvceditor::StylePreferenceClass> mvceditor::CodeControlOptionsClass::AllStyles() const {
-	std::vector<mvceditor::StylePreferenceClass> all;
+std::vector<t4p::StylePreferenceClass> t4p::CodeControlOptionsClass::AllStyles() const {
+	std::vector<t4p::StylePreferenceClass> all;
 	
 	all.insert(all.end(), PhpStyles.begin(), PhpStyles.end());
 	all.insert(all.end(), SqlStyles.begin(), SqlStyles.end());
@@ -129,7 +129,7 @@ std::vector<mvceditor::StylePreferenceClass> mvceditor::CodeControlOptionsClass:
 	return all;
 }
 
-void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
+void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/SpacesPerIndent"), &SpacesPerIndent);
 	config->Read(wxT("EditorBehavior/TabWidth"), &TabWidth);
 	config->Read(wxT("EditorBehavior/RightMargin"), &RightMargin);
@@ -147,13 +147,13 @@ void mvceditor::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
 	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
 	
-	std::vector<mvceditor::StylePreferenceClass> allStyles = AllStyles();
+	std::vector<t4p::StylePreferenceClass> allStyles = AllStyles();
 	for (size_t i = 0; i < allStyles.size(); ++i) {
 		allStyles[i].Read(config);
 	}
 }
 	 
-void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
+void t4p::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/SpacesPerIndent"), SpacesPerIndent);
 	config->Write(wxT("EditorBehavior/TabWidth"), TabWidth);
 	config->Write(wxT("EditorBehavior/RightMargin"), RightMargin);
@@ -171,13 +171,13 @@ void mvceditor::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), RemoveTrailingBlankLinesBeforeSave);
 	config->Write(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), EnableCallTipsOnMouseHover);
 	
-	std::vector<mvceditor::StylePreferenceClass> allStyles = AllStyles();
+	std::vector<t4p::StylePreferenceClass> allStyles = AllStyles();
 	for (size_t i = 0; i < allStyles.size(); ++i) {
 		allStyles[i].Write(config);
 	}
 }
 
-mvceditor::StylePreferenceClass::StylePreferenceClass() 
+t4p::StylePreferenceClass::StylePreferenceClass() 
 : Font()
 , Color()
 , BackgroundColor()
@@ -188,7 +188,7 @@ mvceditor::StylePreferenceClass::StylePreferenceClass()
 		
 }
 
-mvceditor::StylePreferenceClass::StylePreferenceClass(const mvceditor::StylePreferenceClass& src)
+t4p::StylePreferenceClass::StylePreferenceClass(const t4p::StylePreferenceClass& src)
 : Font()
 , Color()
 , BackgroundColor()
@@ -199,12 +199,12 @@ mvceditor::StylePreferenceClass::StylePreferenceClass(const mvceditor::StylePref
 	Copy(src);
 }
 
-mvceditor::StylePreferenceClass& mvceditor::StylePreferenceClass::operator=(const mvceditor::StylePreferenceClass& src) {
+t4p::StylePreferenceClass& t4p::StylePreferenceClass::operator=(const t4p::StylePreferenceClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::StylePreferenceClass::Copy(const mvceditor::StylePreferenceClass& src) {
+void t4p::StylePreferenceClass::Copy(const t4p::StylePreferenceClass& src) {
 	Font = src.Font;
 	Color = src.Color;
 	BackgroundColor = src.BackgroundColor;
@@ -214,7 +214,7 @@ void mvceditor::StylePreferenceClass::Copy(const mvceditor::StylePreferenceClass
 	Name = src.Name;
 }
 
-bool mvceditor::StylePreferenceClass::Read(wxConfigBase* config) {
+bool t4p::StylePreferenceClass::Read(wxConfigBase* config) {
 	wxString fontString;
 	bool ret = true;
 	wxString name = wxString::FromAscii(Name);
@@ -234,7 +234,7 @@ bool mvceditor::StylePreferenceClass::Read(wxConfigBase* config) {
 	return ret;
 }
 
-bool mvceditor::StylePreferenceClass::Write(wxConfigBase* config) {
+bool t4p::StylePreferenceClass::Write(wxConfigBase* config) {
 	bool ret = true;
 	wxString name = wxString::FromAscii(Name);
 	name.Replace(wxT(" "), wxT("_"));
@@ -248,7 +248,7 @@ bool mvceditor::StylePreferenceClass::Write(wxConfigBase* config) {
 	return ret;
 }
 
-void mvceditor::StylePreferenceClass::Control(int stcStyle, const char* name) {
+void t4p::StylePreferenceClass::Control(int stcStyle, const char* name) {
 	Name = name;
 	StcStyle = stcStyle;
 }

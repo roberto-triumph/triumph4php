@@ -39,7 +39,7 @@ static wxString Join(const std::vector<wxString>& list, const wxString& separato
 }
 
 
-mvceditor::ProjectClass::ProjectClass()
+t4p::ProjectClass::ProjectClass()
 	: Label()
 	, Sources()
 	, PhpFileExtensions()
@@ -50,7 +50,7 @@ mvceditor::ProjectClass::ProjectClass()
 	, IsEnabled(true) {
 }
 
-mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
+t4p::ProjectClass::ProjectClass(const t4p::ProjectClass& project)
 	: Label(project.Label)
 	, Sources(project.Sources)
 	, PhpFileExtensions(project.PhpFileExtensions)
@@ -61,7 +61,7 @@ mvceditor::ProjectClass::ProjectClass(const mvceditor::ProjectClass& project)
 	, IsEnabled(project.IsEnabled) {
 }
 
-void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) {
+void t4p::ProjectClass::operator=(const t4p::ProjectClass& project) {
 	Label = project.Label;
 	Sources = project.Sources;
 	IsEnabled = project.IsEnabled;
@@ -72,21 +72,21 @@ void mvceditor::ProjectClass::operator=(const mvceditor::ProjectClass& project) 
 	MiscFileExtensions = project.MiscFileExtensions;
 }
 
-void mvceditor::ProjectClass::AddSource(const mvceditor::SourceClass& src) { 
+void t4p::ProjectClass::AddSource(const t4p::SourceClass& src) { 
 	Sources.push_back(src);
 }
 
-void mvceditor::ProjectClass::ClearSources() {
+void t4p::ProjectClass::ClearSources() {
 	Sources.clear();
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() const {
+std::vector<t4p::SourceClass> t4p::ProjectClass::AllPhpSources() const {
 	wxString phpExtensionsString = Join(PhpFileExtensions, wxT(";"));
 	
-	std::vector<mvceditor::SourceClass>::const_iterator src;
-	std::vector<mvceditor::SourceClass> phpSources;
+	std::vector<t4p::SourceClass>::const_iterator src;
+	std::vector<t4p::SourceClass> phpSources;
 	for (src = Sources.begin(); src != Sources.end(); ++src) {
-		mvceditor::SourceClass phpSrc;
+		t4p::SourceClass phpSrc;
 		phpSrc.RootDirectory = src->RootDirectory;
 		phpSrc.SetIncludeWildcards(phpExtensionsString);
 		phpSrc.SetExcludeWildcards(src->ExcludeWildcardsString());
@@ -95,7 +95,7 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllPhpSources() con
 	return phpSources;
 }
 
-std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const {
+std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources() const {
 	
 	// get all extensions we know about
 	std::vector<wxString> allExtensions;
@@ -107,10 +107,10 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const 
 	wxString allExtensionsString = Join(allExtensions, wxT(";"));
 
 	// make the new sources to return
-	std::vector<mvceditor::SourceClass>::const_iterator src;
-	std::vector<mvceditor::SourceClass> allSources;
+	std::vector<t4p::SourceClass>::const_iterator src;
+	std::vector<t4p::SourceClass> allSources;
 	for (src = Sources.begin(); src != Sources.end(); ++src) {
-		mvceditor::SourceClass allSrc;
+		t4p::SourceClass allSrc;
 		allSrc.RootDirectory = src->RootDirectory;
 		allSrc.SetIncludeWildcards(allExtensionsString);
 		allSrc.SetExcludeWildcards(src->ExcludeWildcardsString());
@@ -119,26 +119,26 @@ std::vector<mvceditor::SourceClass> mvceditor::ProjectClass::AllSources() const 
 	return allSources;
 }
 
-bool mvceditor::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
+bool t4p::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool matches = false;
 	
 	// a file is considered a PHP file if its in a source directory and it matches
 	// the PHP file extensions
-	std::vector<mvceditor::SourceClass> phpSources = AllPhpSources();
+	std::vector<t4p::SourceClass> phpSources = AllPhpSources();
 	for (size_t i = 0; i < phpSources.size() && !matches; ++i) {
 		matches = phpSources[i].Contains(fullPath);
 	}
 	return matches;
 }
 
-bool mvceditor::ProjectClass::IsASourceFile(const wxString& fullPath) const {
+bool t4p::ProjectClass::IsASourceFile(const wxString& fullPath) const {
 	bool matches = false;
 
 	// first do a directory check  only. since AllSources() clones the 
 	// Sources list; it can be expensive due to regex re-compilation of the
 	// wildcards. for performance, we make sure that the file in question
 	// is definitely in the sources before we copy the sources list
-	std::vector<mvceditor::SourceClass>::const_iterator source;
+	std::vector<t4p::SourceClass>::const_iterator source;
 	for (source = Sources.begin(); source < Sources.end() && !matches; ++source) {
 		matches = source->IsInRootDirectory(fullPath);
 	}
@@ -162,11 +162,11 @@ bool mvceditor::ProjectClass::IsASourceFile(const wxString& fullPath) const {
 	return matches;
 }
 
-bool mvceditor::ProjectClass::HasSources() const {
+bool t4p::ProjectClass::HasSources() const {
 	return !Sources.empty();
 }
 
-wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) const {
+wxString t4p::ProjectClass::RelativeFileName(const wxString& fullPath) const {
 	wxString relativeName;
 	for (size_t i = 0; i < Sources.size(); ++i) {
 		wxString root = Sources[i].RootDirectory.GetFullPath();
@@ -178,7 +178,7 @@ wxString mvceditor::ProjectClass::RelativeFileName(const wxString& fullPath) con
 	return relativeName;
 }
 
-std::vector<wxString> mvceditor::ProjectClass::GetNonPhpExtensions() const {
+std::vector<wxString> t4p::ProjectClass::GetNonPhpExtensions() const {
 	std::vector<wxString> allExtensions;
 	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
 	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());

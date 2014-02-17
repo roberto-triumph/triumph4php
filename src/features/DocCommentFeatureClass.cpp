@@ -11,7 +11,7 @@
  * Also, any HTML entities are handled (converted to its ascii equivalent)
  */
 static wxString NiceDocText(const UnicodeString& comment) {
-	wxString wxComment = mvceditor::IcuToWx(comment);
+	wxString wxComment = t4p::IcuToWx(comment);
 	wxComment = wxComment.Trim();
 
 	// remove the beginning and ending '/*' and '*/'
@@ -104,18 +104,18 @@ static bool CodeControlHasDocComment(wxWindow* parent) {
 	return NULL != wxWindow::FindWindowByName(wxT("DocComment"), parent);
 }
 
-mvceditor::DocCommentFeatureClass::DocCommentFeatureClass(mvceditor::AppClass& app) 
+t4p::DocCommentFeatureClass::DocCommentFeatureClass(t4p::AppClass& app) 
 : FeatureClass(app) {
 
 }
 
-void mvceditor::DocCommentFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(mvceditor::MENU_DOC_COMMENT + 0, _("Show Doc Comment"), 
+void t4p::DocCommentFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+	editMenu->Append(t4p::MENU_DOC_COMMENT + 0, _("Show Doc Comment"), 
 		_("Show PHP Doc comment of the symbol located at the current position"), wxITEM_NORMAL);
 }
 
-void mvceditor::DocCommentFeatureClass::OnShowDocComment(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::DocCommentFeatureClass::OnShowDocComment(wxCommandEvent& event) {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 
 		// only show a DocComment if there isn't another DocComment shown on this code control
@@ -125,11 +125,11 @@ void mvceditor::DocCommentFeatureClass::OnShowDocComment(wxCommandEvent& event) 
 	}
 }
 
-void mvceditor::DocCommentFeatureClass::OnMotionAlt(wxCommandEvent& event) {
+void t4p::DocCommentFeatureClass::OnMotionAlt(wxCommandEvent& event) {
 	if (!App.Preferences.CodeControlOptions.EnableCallTipsOnMouseHover) {
 		return;
 	}
-	mvceditor::CodeControlClass* ctrl = (mvceditor::CodeControlClass*)event.GetEventObject();
+	t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
 	if (ctrl) {
 
 		// only show a DocComment if there isn't another DocComment shown on this code control
@@ -142,9 +142,9 @@ void mvceditor::DocCommentFeatureClass::OnMotionAlt(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::DocCommentFeatureClass::ShowDocComment(mvceditor::CodeControlClass* ctrl, int pos) {
+void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, int pos) {
 	int documentMode = ctrl->GetDocumentMode();
-	if (documentMode != mvceditor::CodeControlClass::PHP) {
+	if (documentMode != t4p::CodeControlClass::PHP) {
 		return;
 	}
 	
@@ -153,45 +153,45 @@ void mvceditor::DocCommentFeatureClass::ShowDocComment(mvceditor::CodeControlCla
 	// to get
 	int endPos = ctrl->WordEndPosition(pos, true);
 	pos = ctrl->WordStartPosition(pos, true);
-	std::vector<mvceditor::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
+	std::vector<t4p::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
 	wxString msg;
 	bool hasMatches = false;
 	bool hasContent = false;
-	mvceditor::TagClass tag;
+	t4p::TagClass tag;
 	if (!matches.empty()) {
 		tag = matches[0];
 		hasMatches = true;
-		if (tag.Type == mvceditor::TagClass::FUNCTION) {
-			msg = mvceditor::IcuToWx(tag.Identifier);
+		if (tag.Type == t4p::TagClass::FUNCTION) {
+			msg = t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
-			msg += mvceditor::IcuToWx(tag.Signature);
+			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
 		}
-		else if (tag.Type == mvceditor::TagClass::METHOD) {
-			msg = mvceditor::IcuToWx(tag.ClassName);
+		else if (tag.Type == t4p::TagClass::METHOD) {
+			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
-			msg += mvceditor::IcuToWx(tag.Identifier);
+			msg += t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
-			msg += mvceditor::IcuToWx(tag.Signature);
+			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
 		}
-		else if (tag.Type == mvceditor::TagClass::MEMBER || tag.Type == mvceditor::TagClass::CLASS_CONSTANT) {
-			msg = mvceditor::IcuToWx(tag.ClassName);
+		else if (tag.Type == t4p::TagClass::MEMBER || tag.Type == t4p::TagClass::CLASS_CONSTANT) {
+			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
-			msg += mvceditor::IcuToWx(tag.Identifier);
+			msg += t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
-			msg += mvceditor::IcuToWx(tag.Signature);
+			msg += t4p::IcuToWx(tag.Signature);
 			if (!tag.ReturnType.isEmpty()) {
 				msg += wxT(" [ ");
-				msg += mvceditor::IcuToWx(tag.ReturnType);
+				msg += t4p::IcuToWx(tag.ReturnType);
 				msg += wxT(" ]");	
 			}
 			hasContent = !tag.ReturnType.isEmpty();
 		}
 		else {
-			msg = mvceditor::IcuToWx(tag.Identifier);
+			msg = t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
-			msg += mvceditor::IcuToWx(tag.Signature);
+			msg += t4p::IcuToWx(tag.Signature);
 		}
 		if (!tag.Comment.isEmpty()) {
 			msg += wxT("\n\n");
@@ -202,7 +202,7 @@ void mvceditor::DocCommentFeatureClass::ShowDocComment(mvceditor::CodeControlCla
 		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No match for %s"), ctrl->GetTextRange(pos, endPos).c_str()));
 	}
 	else if (!hasContent) {
-		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No content for %s"), mvceditor::IcuToWx(tag.Key).c_str()));
+		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No content for %s"), t4p::IcuToWx(tag.Key).c_str()));
 	}
 	else {
 
@@ -210,7 +210,7 @@ void mvceditor::DocCommentFeatureClass::ShowDocComment(mvceditor::CodeControlCla
 		// not drawn while its being moved into place
 		ctrl->Freeze();
 		wxPoint point = ctrl->PointFromPosition(pos);
-		mvceditor::DocCommentPanelClass* panel = new mvceditor::DocCommentPanelClass(ctrl);
+		t4p::DocCommentPanelClass* panel = new t4p::DocCommentPanelClass(ctrl);
 		panel->SetPosition(point);
 		panel->SetText(msg);
 		panel->SetFocus();
@@ -219,35 +219,35 @@ void mvceditor::DocCommentFeatureClass::ShowDocComment(mvceditor::CodeControlCla
 }
 
 
-mvceditor::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent) 
+t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent) 
 : DocCommentPanelGeneratedClass(parent) {
 	SetName(wxT("DocComment"));
 }
 
-void mvceditor::DocCommentPanelClass::SetText(const wxString& text) {
+void t4p::DocCommentPanelClass::SetText(const wxString& text) {
 	Text->SetValue(text);
 }
 
-void mvceditor::DocCommentPanelClass::OnClose(wxHyperlinkEvent& event) {
-	CallAfter(&mvceditor::DocCommentPanelClass::DoDestroy);
+void t4p::DocCommentPanelClass::OnClose(wxHyperlinkEvent& event) {
+	CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
 }
 
-void mvceditor::DocCommentPanelClass::OnKeyDown(wxKeyEvent& event) {
+void t4p::DocCommentPanelClass::OnKeyDown(wxKeyEvent& event) {
 
 	// ESC == close the panel
 	if (event.GetKeyCode() == WXK_ESCAPE) {
-		CallAfter(&mvceditor::DocCommentPanelClass::DoDestroy);
+		CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
 		return;
 	}
 	event.Skip();
 }
 
-void mvceditor::DocCommentPanelClass::DoDestroy() {
+void t4p::DocCommentPanelClass::DoDestroy() {
 	this->Destroy();
 }
 
 
-BEGIN_EVENT_TABLE(mvceditor::DocCommentFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_DOC_COMMENT + 0, mvceditor::DocCommentFeatureClass::OnShowDocComment)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVT_MOTION_ALT, mvceditor::DocCommentFeatureClass::OnMotionAlt)
+BEGIN_EVENT_TABLE(t4p::DocCommentFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_DOC_COMMENT + 0, t4p::DocCommentFeatureClass::OnShowDocComment)
+	EVT_COMMAND(wxID_ANY, t4p::EVT_MOTION_ALT, t4p::DocCommentFeatureClass::OnMotionAlt)
 END_EVENT_TABLE()

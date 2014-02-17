@@ -29,25 +29,25 @@
 
 int ID_GO_BUTTON = wxNewId();
 
-void mvceditor::TestFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+void t4p::TestFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-void mvceditor::TestFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+void t4p::TestFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 }
 
-void mvceditor::TestFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+void t4p::TestFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
 	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
 }
 
-void mvceditor::TestFeatureClass::AddWindows() {
+void t4p::TestFeatureClass::AddWindows() {
 }
 
-void mvceditor::TestFeatureClass::Go(wxCommandEvent& event) {
+void t4p::TestFeatureClass::Go(wxCommandEvent& event) {
 	//wxMessageBox(wxT("Clicked the GO! button"));
 	wxString file = wxT("/home/roberto/workspace/sample_php_project/high_ascii.php");
 	
-	mvceditor::FindInFilesClass findInFiles;
+	t4p::FindInFilesClass findInFiles;
 	
 	UnicodeString str;
 	UFILE* f = u_fopen(file.ToAscii(), "r", NULL, NULL);
@@ -57,16 +57,16 @@ void mvceditor::TestFeatureClass::Go(wxCommandEvent& event) {
 		u_fclose(f);
 	}
 	GetNotebook()->LoadPage(file);
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-		codeControl->SetText(mvceditor::IcuToWx(str));
+		codeControl->SetText(t4p::IcuToWx(str));
 	}
 }
 
-mvceditor::TestFeatureClass::TestFeatureClass(mvceditor::AppClass& app)
+t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TestFeatureClass, wxEvtHandler)
+BEGIN_EVENT_TABLE(t4p::TestFeatureClass, wxEvtHandler)
 	EVT_MENU(ID_GO_BUTTON, TestFeatureClass::Go)
 END_EVENT_TABLE()

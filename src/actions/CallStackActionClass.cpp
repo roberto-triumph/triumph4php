@@ -5,7 +5,7 @@
 #include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::CallStackActionClass::CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
 	, TagCache()
 	, CallStack(TagCache)
@@ -17,11 +17,11 @@ mvceditor::CallStackActionClass::CallStackActionClass(mvceditor::RunningThreadsC
 		
 }
 
-wxString mvceditor::CallStackActionClass::GetLabel() const {
+wxString t4p::CallStackActionClass::GetLabel() const {
 	return wxT("Call stack generation");
 }
 
-bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::CallStackActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("Call Stack Gen"));
 	bool ret = false;
 	Version = globals.Environment.Php.Version;
@@ -29,19 +29,19 @@ bool mvceditor::CallStackActionClass::Init(mvceditor::GlobalsClass& globals) {
 
 	// register the project tag DB file now so that it is available for code completion
 	// the tag cache will own these pointers
-	mvceditor::TagFinderListClass* projectCache = new mvceditor::TagFinderListClass;
+	t4p::TagFinderListClass* projectCache = new t4p::TagFinderListClass;
 	projectCache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, Version);
 
 	// initialize the detected tag cache too so that more methods can be resolved
 	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(projectCache);
 	ret = true;
-	SetStatus(_("Call Stack Gen ") + mvceditor::IcuToWx(StartClassName) + wxT("::") + 
-		mvceditor::IcuToWx(StartMethodName));
+	SetStatus(_("Call Stack Gen ") + t4p::IcuToWx(StartClassName) + wxT("::") + 
+		t4p::IcuToWx(StartMethodName));
 	return ret;
 }
 
-bool mvceditor::CallStackActionClass::SetCallStackStart(const wxFileName& startFileName, const UnicodeString& className, 
+bool t4p::CallStackActionClass::SetCallStackStart(const wxFileName& startFileName, const UnicodeString& className, 
 														const UnicodeString& methodName, const wxFileName& detectorDbFileName) {
 
 	// make sure to set these BEFORE calling CreateSingleInstance
@@ -53,22 +53,22 @@ bool mvceditor::CallStackActionClass::SetCallStackStart(const wxFileName& startF
 	return StartFileName.FileExists();
 }
 
-void mvceditor::CallStackActionClass::BackgroundWork() {
-	mvceditor::CallStackClass::Errors lastError = mvceditor::CallStackClass::NONE;
+void t4p::CallStackActionClass::BackgroundWork() {
+	t4p::CallStackClass::Errors lastError = t4p::CallStackClass::NONE;
 	
 	// build the call stack then save it to a temp file
 	if (CallStack.Build(StartFileName, StartClassName, StartMethodName, Version, lastError)) {
 		if (!DetectorDbFileName.IsOk()) {
-			mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
+			t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
 		}
 		else {
-			std::string stdDbName = mvceditor::WxToChar(DetectorDbFileName.GetFullPath());
+			std::string stdDbName = t4p::WxToChar(DetectorDbFileName.GetFullPath());
 
 			// we should be able to open this since it has been created by
 			// the DetectorCacheDbVersionActionClass
 			soci::session session(*soci::factory_sqlite3(), stdDbName);
 			if (!CallStack.Persist(session)) {
-				mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
+				t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
 			}
 		}
 	}

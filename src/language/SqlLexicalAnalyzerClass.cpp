@@ -31,23 +31,23 @@
 
 #define SQL_LEXICAL_ANALYZER_SET_CONDITION(c) CurrentCondition = c
 
-mvceditor::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
+t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
 	: Buffer()
 	, QueryStartLineNumber(0)
 	, CurrentCondition(SQL_ANY) {
 
 }
 
-void mvceditor::SqlLexicalAnalyzerClass::Close() {
+void t4p::SqlLexicalAnalyzerClass::Close() {
 	Buffer.Close();
 }
 
-bool mvceditor::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
+bool t4p::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
 	QueryStartLineNumber = 1;
 	return Buffer.OpenString(queries);
 }
 
-bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
+bool t4p::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	Buffer.MarkTokenStart();
 	query.remove();
 	QueryStartLineNumber = Buffer.GetLineNumber();
@@ -69,13 +69,13 @@ bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	return contents;
 }
 
-int mvceditor::SqlLexicalAnalyzerClass::GetLineNumber() const {
+int t4p::SqlLexicalAnalyzerClass::GetLineNumber() const {
 	return QueryStartLineNumber;
 }
 
-int mvceditor::SqlLexicalAnalyzerClass::NextToken() {
+int t4p::SqlLexicalAnalyzerClass::NextToken() {
 	if (Buffer.HasReachedEnd()) {
-		return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF;
+		return t4p::SqlLexicalAnalyzerClass::SQL_EOF;
 	}
 
 sql_lexical_analyzer_next:
@@ -113,7 +113,7 @@ sql_lexical_analyzer_ANY:
 		}
 sql_lexical_analyzer_2:
 		++Buffer.Current;
-		{ return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+		{ return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 sql_lexical_analyzer_4:
 		++Buffer.Current;
 		{ CurrentCondition = SQL_DOUBLE_QUOTE_STRING; goto sql_lexical_analyzer_next; }
@@ -152,7 +152,7 @@ sql_lexical_analyzer_16:
 		{  goto sql_lexical_analyzer_next; }
 sql_lexical_analyzer_18:
 		++Buffer.Current;
-		{  return mvceditor::SqlLexicalAnalyzerClass::SEMICOLON; }
+		{  return t4p::SqlLexicalAnalyzerClass::SEMICOLON; }
 sql_lexical_analyzer_20:
 		yych = *++Buffer.Current;
 		goto sql_lexical_analyzer_9;
@@ -178,7 +178,7 @@ sql_lexical_analyzer_BLOCK_COMMENT:
 		}
 sql_lexical_analyzer_28:
 		++Buffer.Current;
-		{ return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+		{ return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 sql_lexical_analyzer_30:
 		++Buffer.Current;
 sql_lexical_analyzer_31:
@@ -221,7 +221,7 @@ sql_lexical_analyzer_DOUBLE_QUOTE_STRING:
 		}
 sql_lexical_analyzer_41:
 		++Buffer.Current;
-		{ return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+		{ return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 sql_lexical_analyzer_43:
 		++Buffer.Current;
 		switch ((yych = *Buffer.Current)) {
@@ -264,7 +264,7 @@ sql_lexical_analyzer_LINE_COMMENT:
 		}
 sql_lexical_analyzer_56:
 		++Buffer.Current;
-		{ return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+		{ return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 sql_lexical_analyzer_58:
 		++Buffer.Current;
 sql_lexical_analyzer_59:
@@ -296,7 +296,7 @@ sql_lexical_analyzer_SINGLE_QUOTE_STRING:
 		}
 sql_lexical_analyzer_66:
 		++Buffer.Current;
-		{ return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+		{ return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 sql_lexical_analyzer_68:
 		++Buffer.Current;
 		switch ((yych = *Buffer.Current)) {

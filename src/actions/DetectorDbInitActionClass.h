@@ -23,12 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
-#define __MVCEDITOR_DETECTORDBINITACTIONCLASS_H__
+#ifndef __T4P_DETECTORDBINITACTIONCLASS_H__
+#define __T4P_DETECTORDBINITACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
  
-namespace mvceditor {
+namespace t4p {
 
 
 /**
@@ -37,13 +37,13 @@ namespace mvceditor {
  * it will be primed with the existing cache file which may be
  * stale. 
  */
-class DetectorDbInitActionClass : public mvceditor::InitializerGlobalActionClass {
+class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
 
 public:
 
-	DetectorDbInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-	void Work(mvceditor::GlobalsClass& globals);
+	void Work(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 };

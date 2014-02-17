@@ -32,43 +32,43 @@
 static int ID_DIALOG_TIMER = wxNewId();
 static int ID_TAG_SEARCH = wxNewId();
 
-mvceditor::TotalSearchFeatureClass::TotalSearchFeatureClass(mvceditor::AppClass& app)
+t4p::TotalSearchFeatureClass::TotalSearchFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 
 }
 
 
-void mvceditor::TotalSearchFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
-	searchMenu->Append(mvceditor::MENU_TOTAL_SEARCH + 0,
+void t4p::TotalSearchFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
+	searchMenu->Append(t4p::MENU_TOTAL_SEARCH + 0,
 		_("Total Search\tCTRL+R"), _("Search for project resources"), wxITEM_NORMAL);
 }
 
-void mvceditor::TotalSearchFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::TotalSearchFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_TOTAL_SEARCH + 0] = wxT("Resource-Search For Resource ...");
+	menuItemIds[t4p::MENU_TOTAL_SEARCH + 0] = wxT("Resource-Search For Resource ...");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
-	std::vector<mvceditor::TotalTagResultClass> selectedTags;
+void t4p::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
+	std::vector<t4p::TotalTagResultClass> selectedTags;
 	int lineNumber = 0;
-	mvceditor::TotalSearchDialogClass dialog(GetMainWindow(), *this, selectedTags, lineNumber);
+	t4p::TotalSearchDialogClass dialog(GetMainWindow(), *this, selectedTags, lineNumber);
 	if (wxOK == dialog.ShowModal() && !selectedTags.empty()) {
 		for (size_t i = 0; i < selectedTags.size(); ++i) {
-			mvceditor::TotalTagResultClass result = selectedTags[i];
+			t4p::TotalTagResultClass result = selectedTags[i];
 			switch (result.Type) {
-			case mvceditor::TotalTagResultClass::FILE_TAG:
+			case t4p::TotalTagResultClass::FILE_TAG:
 				OpenFileTag(result.FileTag, lineNumber);
 				break;
-			case mvceditor::TotalTagResultClass::TABLE_DATA_TAG:
+			case t4p::TotalTagResultClass::TABLE_DATA_TAG:
 				OpenDbData(result.TableTag);
 				break;
-			case mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG:
+			case t4p::TotalTagResultClass::TABLE_DEFINITION_TAG:
 				OpenDbTable(result.TableTag);
 				break;
-			case mvceditor::TotalTagResultClass::CLASS_TAG:
-			case mvceditor::TotalTagResultClass::FUNCTION_TAG:
-			case mvceditor::TotalTagResultClass::METHOD_TAG:
+			case t4p::TotalTagResultClass::CLASS_TAG:
+			case t4p::TotalTagResultClass::FUNCTION_TAG:
+			case t4p::TotalTagResultClass::METHOD_TAG:
 				OpenPhpTag(result.PhpTag);
 				break;
 			}
@@ -76,44 +76,44 @@ void mvceditor::TotalSearchFeatureClass::OnTotalSearch(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TotalSearchFeatureClass::OpenFileTag(const mvceditor::FileTagClass& fileTag, int lineNumber) {
-	mvceditor::OpenFileCommandEventClass cmd(fileTag.FullPath, -1, -1, lineNumber);
+void t4p::TotalSearchFeatureClass::OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber) {
+	t4p::OpenFileCommandEventClass cmd(fileTag.FullPath, -1, -1, lineNumber);
 	App.EventSink.Post(cmd);
 }
 
-void mvceditor::TotalSearchFeatureClass::OpenPhpTag(const mvceditor::TagClass& tag) {
+void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::TagClass& tag) {
 	UnicodeString content;
-	mvceditor::FindInFilesClass::FileContents(tag.FullPath, content);
+	t4p::FindInFilesClass::FileContents(tag.FullPath, content);
 	int32_t position, 
 			length;
-	bool found = mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);
+	bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);
 	
 	if (found) {
-		mvceditor::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
+		t4p::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
 		App.EventSink.Publish(cmd);
 	}
 	else {
-		mvceditor::OpenFileCommandEventClass cmd(tag.FullPath);
+		t4p::OpenFileCommandEventClass cmd(tag.FullPath);
 		App.EventSink.Publish(cmd);
 	}
 }
 
-void mvceditor::TotalSearchFeatureClass::OpenDbTable(const mvceditor::DatabaseTableTagClass& tableTag) {
-	mvceditor::OpenDbTableCommandEventClass cmd(
-		mvceditor::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, tableTag.TableName, tableTag.ConnectionHash
+void t4p::TotalSearchFeatureClass::OpenDbTable(const t4p::DatabaseTableTagClass& tableTag) {
+	t4p::OpenDbTableCommandEventClass cmd(
+		t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, tableTag.TableName, tableTag.ConnectionHash
 	);
 	App.EventSink.Publish(cmd);
 }
 
-void mvceditor::TotalSearchFeatureClass::OpenDbData(const mvceditor::DatabaseTableTagClass& tableTag) {
-	mvceditor::OpenDbTableCommandEventClass cmd(
-		mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN, tableTag.TableName, tableTag.ConnectionHash
+void t4p::TotalSearchFeatureClass::OpenDbData(const t4p::DatabaseTableTagClass& tableTag) {
+	t4p::OpenDbTableCommandEventClass cmd(
+		t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, tableTag.TableName, tableTag.ConnectionHash
 	);
 	App.EventSink.Publish(cmd);
 }
 
-mvceditor::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, mvceditor::TotalSearchFeatureClass& feature,
-	std::vector<mvceditor::TotalTagResultClass>& selectedTags, int& lineNumber)
+t4p::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
+	std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber)
 : TotalSearchDialogGeneratedClass(parent, wxID_ANY)
 , Feature(feature)
 , LastSearch()
@@ -134,13 +134,13 @@ mvceditor::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, mvce
 	UpdateCacheStatus();
 }
 
-void mvceditor::TotalSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::TotalSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
 	RunningThreads.Shutdown();
 	RunningThreads.RemoveEventHandler(this);
 	EndModal(wxID_CANCEL);
 }
 
-void mvceditor::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
 		"user.php\n"
@@ -166,7 +166,7 @@ void mvceditor::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Resource Search Help"), wxOK, this);
 }
 
-void mvceditor::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
+void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	unsigned int nextIndex = MatchesList->GetSelection();
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_RETURN) {
@@ -186,19 +186,19 @@ void mvceditor::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) 
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+void t4p::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	unsigned int selected = event.GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	
 	// open all checked tags
 	for (unsigned int i = 0; i < MatchesList->GetCount(); ++i) {
 		if (MatchesList->IsChecked(i)) {
-			mvceditor::TotalTagResultClass tag = Results[i];
+			t4p::TotalTagResultClass tag = Results[i];
 			SelectedTags.push_back(tag);
 		}
 	}
@@ -207,14 +207,14 @@ void mvceditor::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::TotalSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+void t4p::TotalSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	unsigned int selected = MatchesList->GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
+void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	unsigned int currentIndex = MatchesList->GetSelection();
 	unsigned int nextIndex = currentIndex;
 	bool skip = true;
@@ -240,7 +240,7 @@ void mvceditor::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
+void t4p::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 	UpdateCacheStatus();
 
 	// don't want to query the cache while the cache is being 
@@ -259,56 +259,56 @@ void mvceditor::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 		Timer.Stop();
 		LastSearch = text;
 		
-		mvceditor::TotalTagSearchActionClass* action =  
-			new mvceditor::TotalTagSearchActionClass(RunningThreads, ID_TAG_SEARCH);
+		t4p::TotalTagSearchActionClass* action =  
+			new t4p::TotalTagSearchActionClass(RunningThreads, ID_TAG_SEARCH);
 		action->SetSearch(Feature.App.Globals, text, Feature.App.Globals.AllEnabledSourceDirectories());
 		RunningThreads.Queue(action);
 	}
 }
 
-void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event) {
+void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEventClass& event) {
 	MatchesList->Clear();
 	Results = event.Tags;
 	LineNumber = event.LineNumber;
 	
-	std::vector<mvceditor::TotalTagResultClass>::const_iterator tag;
+	std::vector<t4p::TotalTagResultClass>::const_iterator tag;
 	for (tag = Results.begin(); tag != Results.end(); ++tag) {
 		wxString value;
 		wxString desc;
-		if (mvceditor::TotalTagResultClass::CLASS_TAG == tag->Type) {
-			value = mvceditor::IcuToWx(tag->PhpTag.ClassName);
+		if (t4p::TotalTagResultClass::CLASS_TAG == tag->Type) {
+			value = t4p::IcuToWx(tag->PhpTag.ClassName);
 			desc = tag->PhpTag.FullPath;
 		}
-		else if (mvceditor::TotalTagResultClass::FILE_TAG == tag->Type) {
+		else if (t4p::TotalTagResultClass::FILE_TAG == tag->Type) {
 			value = tag->FileTag.Name();
 			desc = tag->FileTag.FullPath;
 		}
-		else if (mvceditor::TotalTagResultClass::FUNCTION_TAG == tag->Type) {
-			value = mvceditor::IcuToWx(tag->PhpTag.Identifier);
+		else if (t4p::TotalTagResultClass::FUNCTION_TAG == tag->Type) {
+			value = t4p::IcuToWx(tag->PhpTag.Identifier);
 			desc = tag->PhpTag.FullPath;
 		}
-		else if (mvceditor::TotalTagResultClass::METHOD_TAG == tag->Type) {
-			value = mvceditor::IcuToWx(tag->PhpTag.ClassName) + 
-				wxT("::") + mvceditor::IcuToWx(tag->PhpTag.Identifier);
+		else if (t4p::TotalTagResultClass::METHOD_TAG == tag->Type) {
+			value = t4p::IcuToWx(tag->PhpTag.ClassName) + 
+				wxT("::") + t4p::IcuToWx(tag->PhpTag.Identifier);
 			desc = tag->PhpTag.FullPath;
 		}
-		else if (mvceditor::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
-			mvceditor::DatabaseTagClass dbTag;
+		else if (t4p::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
+			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
 			desc = _("Database Table Data for ") 
 				+ tag->TableTag.TableName 
 				+ _(" in connection ") 
-				+ mvceditor::IcuToWx(dbTag.Label);
+				+ t4p::IcuToWx(dbTag.Label);
 		}
-		else if (mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
-			mvceditor::DatabaseTagClass dbTag;
+		else if (t4p::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
+			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
 			desc = _("Database Table Definition for ") 
 				+ tag->TableTag.TableName 
 				+ _(" in connection ") 
-				+ mvceditor::IcuToWx(dbTag.Label);
+				+ t4p::IcuToWx(dbTag.Label);
 		}
 		
 		MatchesList->Append(value + wxT(" - ") + desc);
@@ -328,11 +328,11 @@ void mvceditor::TotalSearchDialogClass::OnSearchComplete(mvceditor::TotalTagSear
 	Timer.Start(300, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
+void t4p::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 	if (selected < 0 || selected >= Results.size()) {
 		return;
 	}
-	mvceditor::TotalTagResultClass tag = Results[selected];
+	t4p::TotalTagResultClass tag = Results[selected];
 	SelectedTags.push_back(tag);
 	
 	RunningThreads.Shutdown();
@@ -340,7 +340,7 @@ void mvceditor::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 	EndModal(wxOK);
 }
 
-void mvceditor::TotalSearchDialogClass::UpdateCacheStatus() {
+void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 	if (Feature.App.Sequences.Running()) {
 
 		// only update the label when there is a change in 
@@ -373,11 +373,11 @@ void mvceditor::TotalSearchDialogClass::UpdateCacheStatus() {
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TotalSearchFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_TOTAL_SEARCH + 0, mvceditor::TotalSearchFeatureClass::OnTotalSearch)
+BEGIN_EVENT_TABLE(t4p::TotalSearchFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_TOTAL_SEARCH + 0, t4p::TotalSearchFeatureClass::OnTotalSearch)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::TotalSearchDialogClass, TotalSearchDialogGeneratedClass)
-	EVT_TIMER(ID_DIALOG_TIMER, mvceditor::TotalSearchDialogClass::OnTimer)
-	EVENT_TOTAL_TAG_SEARCH_COMPLETE(ID_TAG_SEARCH, mvceditor::TotalSearchDialogClass::OnSearchComplete)
+BEGIN_EVENT_TABLE(t4p::TotalSearchDialogClass, TotalSearchDialogGeneratedClass)
+	EVT_TIMER(ID_DIALOG_TIMER, t4p::TotalSearchDialogClass::OnTimer)
+	EVENT_TOTAL_TAG_SEARCH_COMPLETE(ID_TAG_SEARCH, t4p::TotalSearchDialogClass::OnSearchComplete)
 END_EVENT_TABLE()

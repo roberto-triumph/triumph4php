@@ -26,18 +26,18 @@
 #include <globals/DatabaseTableTagClass.h>
 
 
-mvceditor::DatabaseTableTagClass::DatabaseTableTagClass()
+t4p::DatabaseTableTagClass::DatabaseTableTagClass()
 : TableName()
 , ConnectionHash() {
 }
 
-mvceditor::DatabaseTableTagClass::DatabaseTableTagClass(const mvceditor::DatabaseTableTagClass& src) 
+t4p::DatabaseTableTagClass::DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src) 
 : TableName()
 , ConnectionHash() {
 	Copy(src);
 }
 
-void mvceditor::DatabaseTableTagClass::Copy(const mvceditor::DatabaseTableTagClass& src) {
+void t4p::DatabaseTableTagClass::Copy(const t4p::DatabaseTableTagClass& src) {
 	
 	// want copies to be thread safe
 	TableName = src.TableName.c_str();

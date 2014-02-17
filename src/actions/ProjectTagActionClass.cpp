@@ -27,7 +27,7 @@
 #include <search/RecursiveDirTraverserClass.h>
 #include <globals/Assets.h>
 
-mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId) 
+t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId) 
 	: GlobalActionClass(runningThreads, eventId)
 	, Projects()
 	, DirectorySearch()
@@ -37,14 +37,14 @@ mvceditor::ProjectTagActionClass::ProjectTagActionClass(mvceditor::RunningThread
 	, FilesTotal(0) {
 }
 
-void mvceditor::ProjectTagActionClass::SetTouchedProjects(const std::vector<mvceditor::ProjectClass>& touchedProjects) {
+void t4p::ProjectTagActionClass::SetTouchedProjects(const std::vector<t4p::ProjectClass>& touchedProjects) {
 	DoTouchedProjects = true;
 	Projects = touchedProjects;
 }
 
-bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ProjectTagActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache"));
-	SetProgressMode(mvceditor::ActionClass::DETERMINATE);
+	SetProgressMode(t4p::ActionClass::DETERMINATE);
 	
 	// ATTN: assumes that all projects have the same extension
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
@@ -52,7 +52,7 @@ bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 	// if we were not given projects, scan all of them
 	if (!DoTouchedProjects) {
 		Projects.clear();
-		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		std::vector<t4p::ProjectClass>::const_iterator project;
 		for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 			if (project->IsEnabled && !project->AllPhpSources().empty()) {
 				Projects.push_back(*project);
@@ -63,13 +63,13 @@ bool mvceditor::ProjectTagActionClass::Init(mvceditor::GlobalsClass& globals) {
 }
 
 
-void mvceditor::ProjectTagActionClass::BackgroundWork() {
+void t4p::ProjectTagActionClass::BackgroundWork() {
 	for (size_t i = 0; !IsCancelled() && i < Projects.size(); ++i) {
 		FilesCompleted = 0;
 		FilesTotal = 0;
 
-		mvceditor::ProjectClass project = Projects[i];
-		if (DirectorySearch.Init(project.AllSources(), mvceditor::DirectorySearchClass::PRECISE)) {
+		t4p::ProjectClass project = Projects[i];
+		if (DirectorySearch.Init(project.AllSources(), t4p::DirectorySearchClass::PRECISE)) {
 			FilesTotal = DirectorySearch.GetTotalFileCount();
 			SetStatus(_("Tag Cache / ") + project.Label);			
 			IterateDirectory();
@@ -77,7 +77,7 @@ void mvceditor::ProjectTagActionClass::BackgroundWork() {
 	}
 }
 
-void mvceditor::ProjectTagActionClass::IterateDirectory() {
+void t4p::ProjectTagActionClass::IterateDirectory() {
 	
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
@@ -104,29 +104,29 @@ void mvceditor::ProjectTagActionClass::IterateDirectory() {
 			if (!IsCancelled()) {
 
 				// eventId will be set by the PostEvent method
-				mvceditor::TagFinderListCompleteEventClass evt(wxID_ANY);
+				t4p::TagFinderListCompleteEventClass evt(wxID_ANY);
 				PostEvent(evt);
 			}
 		}
 	}
 }
 
-wxString mvceditor::ProjectTagActionClass::GetLabel() const {
+wxString t4p::ProjectTagActionClass::GetLabel() const {
 	return _("Project Resource Parsing");
 }
 
-mvceditor::ProjectTagInitActionClass::ProjectTagInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ProjectTagInitActionClass::ProjectTagInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerGlobalActionClass(runningThreads, eventId) {
 
 }
 
 
 
-wxString mvceditor::ProjectTagInitActionClass::GetLabel() const {
+wxString t4p::ProjectTagInitActionClass::GetLabel() const {
 	return _("Project tags initialization");
 }
 
-void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals) {
+void t4p::ProjectTagInitActionClass::Work(t4p::GlobalsClass &globals) {
 	SetStatus(_("Tag Cache Init"));
 
 	// need to clear the entire cache, then add only the newly enabled projects
@@ -139,14 +139,14 @@ void mvceditor::ProjectTagInitActionClass::Work(mvceditor::GlobalsClass &globals
 	// even though we know it is stale. The user is notified that the
 	// cache is stale and may not have all of the results
 	// the tag cache will own these pointers
-	mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
-	tagFinderList->InitNativeTag(mvceditor::NativeFunctionsAsset());
+	t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
+	tagFinderList->InitNativeTag(t4p::NativeFunctionsAsset());
 	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, version);
 	tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
 	globals.TagCache.RegisterGlobal(tagFinderList);
 }
 
-mvceditor::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
 	, Project()
 	, Dir() 
@@ -154,16 +154,16 @@ mvceditor::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(mvcedi
 
 }
 
-void mvceditor::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
+void t4p::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
 	Dir.AssignDir(path.c_str());
 }
 
-bool mvceditor::ProjectTagDirectoryActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
 
 	// get the project that the directory is in
 	// TODO: what if the directory is in more than 1 project?
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	bool isDirFromProject = false;
 	Dir.Normalize();
 	wxString dirWithSep = Dir.GetPathWithSep();
@@ -185,14 +185,14 @@ bool mvceditor::ProjectTagDirectoryActionClass::Init(mvceditor::GlobalsClass& gl
 	return isDirFromProject; 
 }
 
-void mvceditor::ProjectTagDirectoryActionClass::BackgroundWork() {
+void t4p::ProjectTagDirectoryActionClass::BackgroundWork() {
 	SetStatus(_("Tag Cache Re-tag"));
 	if (!Dir.DirExists()) {
 		return;
 	}
 	Dir.Normalize();
 	wxString dirWithSep = Dir.GetPathWithSep();
-	std::vector<mvceditor::SourceClass>::iterator src;
+	std::vector<t4p::SourceClass>::iterator src;
 	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
 		if (src->IsInRootDirectory(dirWithSep)) {
 
@@ -201,7 +201,7 @@ void mvceditor::ProjectTagDirectoryActionClass::BackgroundWork() {
 			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
 			
 			std::vector<wxString> fullPaths;
-			mvceditor::RecursiveDirTraverserClass traverser(fullPaths);
+			t4p::RecursiveDirTraverserClass traverser(fullPaths);
 			wxDir dir;
 			if (dir.Open(Dir.GetFullPath())) {
 				dir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
@@ -215,11 +215,11 @@ void mvceditor::ProjectTagDirectoryActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::ProjectTagDirectoryActionClass::GetLabel() const {
+wxString t4p::ProjectTagDirectoryActionClass::GetLabel() const {
 	return wxT("Tag Cache Directory");
 }
 
-mvceditor::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) 
 	, Project()
 	, FileName() 
@@ -227,15 +227,15 @@ mvceditor::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(mvce
 
 }
 
-void mvceditor::ProjectTagSingleFileActionClass::SetFileToParse(const wxString& fullPath) {
+void t4p::ProjectTagSingleFileActionClass::SetFileToParse(const wxString& fullPath) {
 	FileName.Assign(fullPath.c_str());
 }
 
-bool mvceditor::ProjectTagSingleFileActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 
 	// get the project that the file is in
 	// TODO: what if the file is in more than 1 project?
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
+	std::vector<t4p::ProjectClass>::const_iterator project;
 	bool isFileFromProject = false;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
 		if (project->IsEnabled && project->IsAPhpSourceFile(FileName.GetFullPath())) {
@@ -252,12 +252,12 @@ bool mvceditor::ProjectTagSingleFileActionClass::Init(mvceditor::GlobalsClass& g
 	return isFileFromProject; 
 }
 
-void mvceditor::ProjectTagSingleFileActionClass::BackgroundWork() {
+void t4p::ProjectTagSingleFileActionClass::BackgroundWork() {
 	SetStatus(_("Tag Cache Re-tag"));
 	if (!FileName.FileExists()) {
 		return;
 	}
-	std::vector<mvceditor::SourceClass>::iterator src;
+	std::vector<t4p::SourceClass>::iterator src;
 	wxString fullPath = FileName.GetFullPath();
 	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
 		if (src->Contains(fullPath)) {
@@ -272,11 +272,11 @@ void mvceditor::ProjectTagSingleFileActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::ProjectTagSingleFileActionClass::GetLabel() const {
+wxString t4p::ProjectTagSingleFileActionClass::GetLabel() const {
 	return wxT("Tag Cache Single File");
 }
 
-mvceditor::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActionClass(mvceditor::RunningThreadsClass& runningThreads,
+t4p::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActionClass(t4p::RunningThreadsClass& runningThreads,
 																						int eventId)
 : GlobalActionClass(runningThreads, eventId)
 , OldFileName()
@@ -286,16 +286,16 @@ mvceditor::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActi
 
 }
 
-void mvceditor::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
+void t4p::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
 	OldFileName.Assign(oldPath);
 	NewFileName.Assign(newPath);
 }
 
-bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ProjectTagSingleFileRenameActionClass::Init(t4p::GlobalsClass& globals) {
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
 		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	wxString path = OldFileName.GetFullPath();
 	bool found = false;
 	for (project = globals.Projects.begin(); !found && project != globals.Projects.end(); ++project) {
@@ -312,7 +312,7 @@ bool mvceditor::ProjectTagSingleFileRenameActionClass::Init(mvceditor::GlobalsCl
 	return TagFinderList.IsTagFinderInit;
 }
 
-void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
+void t4p::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 
 	// checking to see if this rename was an actual permanent rename as opposed to
 	// file shuffling by apps.
@@ -333,7 +333,7 @@ void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 		// php extension
 		// this specific sequence is needed so that the source_id
 		// is set properly in the database
-		std::vector<mvceditor::SourceClass>::iterator src;
+		std::vector<t4p::SourceClass>::iterator src;
 		for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
 			wxString newFullPath = NewFileName.GetFullPath();
 			if (src->Contains(newFullPath)) {
@@ -345,11 +345,11 @@ void mvceditor::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 	}
 }
 
-wxString mvceditor::ProjectTagSingleFileRenameActionClass::GetLabel() const {
+wxString t4p::ProjectTagSingleFileRenameActionClass::GetLabel() const {
 	return wxT("Project Tag File Rename");
 }
 
-mvceditor::ProjectTagDirectoryRenameActionClass::ProjectTagDirectoryRenameActionClass(mvceditor::RunningThreadsClass& runningThreads,
+t4p::ProjectTagDirectoryRenameActionClass::ProjectTagDirectoryRenameActionClass(t4p::RunningThreadsClass& runningThreads,
 																						int eventId)
 : GlobalActionClass(runningThreads, eventId)
 , OldDirectory()
@@ -358,21 +358,21 @@ mvceditor::ProjectTagDirectoryRenameActionClass::ProjectTagDirectoryRenameAction
 
 }
 
-void mvceditor::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
+void t4p::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
 	OldDirectory.AssignDir(oldPath);
 	NewDirectory.AssignDir(newPath);
 }
 
-bool mvceditor::ProjectTagDirectoryRenameActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::ProjectTagDirectoryRenameActionClass::Init(t4p::GlobalsClass& globals) {
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
 		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 	return TagFinderList.IsTagFinderInit;
 }
 
-void mvceditor::ProjectTagDirectoryRenameActionClass::BackgroundWork() {
+void t4p::ProjectTagDirectoryRenameActionClass::BackgroundWork() {
 	TagFinderList.TagParser.RenameDir(OldDirectory, NewDirectory);
 }
 
-wxString mvceditor::ProjectTagDirectoryRenameActionClass::GetLabel() const {
+wxString t4p::ProjectTagDirectoryRenameActionClass::GetLabel() const {
 	return wxT("Project Tag Directory Rename");
 }

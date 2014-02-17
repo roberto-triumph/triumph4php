@@ -27,48 +27,48 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-const wxEventType mvceditor::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
 
-mvceditor::SqlMetaDataEventClass::SqlMetaDataEventClass(int eventId,
+t4p::SqlMetaDataEventClass::SqlMetaDataEventClass(int eventId,
 														const std::vector<UnicodeString>& errors) 
-	: wxEvent(eventId, mvceditor::EVENT_SQL_META_DATA_COMPLETE)
+	: wxEvent(eventId, t4p::EVENT_SQL_META_DATA_COMPLETE)
 	, Errors(errors) {
 }
 
-wxEvent* mvceditor::SqlMetaDataEventClass::Clone() const {
-	mvceditor::SqlMetaDataEventClass* evt = new 
-		mvceditor::SqlMetaDataEventClass(GetId(), Errors);
+wxEvent* t4p::SqlMetaDataEventClass::Clone() const {
+	t4p::SqlMetaDataEventClass* evt = new 
+		t4p::SqlMetaDataEventClass(GetId(), Errors);
 	return evt;
 }
 
-mvceditor::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : InitializerGlobalActionClass(runningThreads, eventId) {
 		
 }
 
-void mvceditor::SqlMetaDataInitActionClass::Work(mvceditor::GlobalsClass& globals) {
+void t4p::SqlMetaDataInitActionClass::Work(t4p::GlobalsClass& globals) {
 	
 	// prime the sql resource finder
 	globals.ResourceCacheSession.open(
 		*soci::factory_sqlite3(),
-		mvceditor::WxToChar(globals.TagCacheDbFileName.GetFullPath())
+		t4p::WxToChar(globals.TagCacheDbFileName.GetFullPath())
 	);
 	globals.SqlResourceFinder.InitSession(&globals.ResourceCacheSession);
 }
 
-wxString mvceditor::SqlMetaDataInitActionClass::GetLabel() const {
+wxString t4p::SqlMetaDataInitActionClass::GetLabel() const {
 	return wxT("SQL Metadata Init");
 }
 
 
-mvceditor::SqlMetaDataActionClass::SqlMetaDataActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::SqlMetaDataActionClass::SqlMetaDataActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
 	, DatabaseTags() 
 	, CacheDbFileName() {
 		
 }
 
-bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
+bool t4p::SqlMetaDataActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("SQL Meta"));
 	
 	DatabaseTags = globals.DatabaseTags;
@@ -81,7 +81,7 @@ bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	// before the SequenceClass EVENT_WORK_COMPLETE handler.
 	
 	// first remove all detected connections that were previously detected
-	std::vector<mvceditor::DatabaseTagClass>::iterator info;
+	std::vector<t4p::DatabaseTagClass>::iterator info;
 	info = DatabaseTags.begin();
 	while(info != DatabaseTags.end()) {
 		if (info->IsDetected) {
@@ -95,11 +95,11 @@ bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
 
 	// initialize the detected tag cache only the enabled projects
-	mvceditor::DatabaseTagFinderClass finder;
+	t4p::DatabaseTagFinderClass finder;
 	finder.InitSession(&globals.DetectorCacheSession);
 	
-	std::vector<mvceditor::DatabaseTagClass> detected = finder.All(sourceDirectories);
-	std::vector<mvceditor::DatabaseTagClass>::const_iterator tag;
+	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
+	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
 	for (tag = detected.begin(); tag != detected.end(); ++tag) {
 		if (!tag->Host.isEmpty() && !tag->Schema.isEmpty()) {
 			DatabaseTags.push_back(*tag);
@@ -112,16 +112,16 @@ bool mvceditor::SqlMetaDataActionClass::Init(mvceditor::GlobalsClass& globals) {
 	return !DatabaseTags.empty();
 }
 
-void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
+void t4p::SqlMetaDataActionClass::BackgroundWork() {
 	std::vector<UnicodeString> errors;
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(CacheDbFileName.GetFullPath()));
-	mvceditor::SqlResourceFetchClass fetcher(session);
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(CacheDbFileName.GetFullPath()));
+	t4p::SqlResourceFetchClass fetcher(session);
 	
 	fetcher.Wipe();
-	for (std::vector<mvceditor::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
+	for (std::vector<t4p::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
-				wxString wxLabel = _("SQL Meta / ") ; //mvceditor::IcuToWx(it->Label);
+				wxString wxLabel = _("SQL Meta / ") ; //t4p::IcuToWx(it->Label);
 				SetStatus(wxLabel);
 				UnicodeString error;
 				if (!fetcher.Fetch(*it, error)) {
@@ -136,11 +136,11 @@ void mvceditor::SqlMetaDataActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 
 		// PostEvent() will set the correct event Id
-		mvceditor::SqlMetaDataEventClass evt(wxID_ANY, errors);
+		t4p::SqlMetaDataEventClass evt(wxID_ANY, errors);
 		PostEvent(evt);
 	}
 }
 
-wxString mvceditor::SqlMetaDataActionClass::GetLabel() const {
+wxString t4p::SqlMetaDataActionClass::GetLabel() const {
 	return _("SQL metadata detection");
 }

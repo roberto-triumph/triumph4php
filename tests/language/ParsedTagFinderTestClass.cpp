@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <language/TagParserClass.h>
 #include <language/ParsedTagFinderClass.h>
 #include <globals/String.h>
@@ -78,8 +78,8 @@ public:
 	}
 
 	void NearMatchTags(const UnicodeString& search, bool doCollectFileNames = false) {
-		mvceditor::TagSearchClass tagSearch(search);
-		mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+		t4p::TagSearchClass tagSearch(search);
+		t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 		ParsedTagFinder.Exec(result);
 		Matches.clear();
 		while (result->More()) {
@@ -90,8 +90,8 @@ public:
 	}
 
 	void ExactMatchTags(const UnicodeString& search) {
-		mvceditor::TagSearchClass tagSearch(search);
-		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+		t4p::TagSearchClass tagSearch(search);
+		t4p::TagResultClass* result = tagSearch.CreateExactResults();
 		ParsedTagFinder.Exec(result);
 		Matches.clear();
 		while (result->More()) {
@@ -102,18 +102,18 @@ public:
 	}
 
 	void NearMatchFileTags(const UnicodeString& search) {
-		mvceditor::TagSearchClass tagSearch(search);
-		mvceditor::FileTagResultClass* result = tagSearch.CreateNearMatchFileResults();
+		t4p::TagSearchClass tagSearch(search);
+		t4p::FileTagResultClass* result = tagSearch.CreateNearMatchFileResults();
 		ParsedTagFinder.Exec(result);
 		FileMatches = result->Matches();
 		delete result;
 	}
 
-	mvceditor::TagParserClass TagParser;
-	mvceditor::ParsedTagFinderClass ParsedTagFinder;
+	t4p::TagParserClass TagParser;
+	t4p::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<mvceditor::TagClass> Matches;
-	std::vector<mvceditor::FileTagClass> FileMatches;
+	std::vector<t4p::TagClass> Matches;
+	std::vector<t4p::FileTagClass> FileMatches;
 };
 
 /**
@@ -145,20 +145,20 @@ public:
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
-		mvceditor::TagSearchClass tagSearch(search);
-		mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+		t4p::TagSearchClass tagSearch(search);
+		t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 		ParsedTagFinder.Exec(result);
 		Matches = result->Matches();
 		delete result;
 	}
 
 	void NearMatchClassesOrFiles(const UnicodeString& search) {
-		mvceditor::TagSearchClass tagSearch(search);
+		t4p::TagSearchClass tagSearch(search);
 		Matches = ParsedTagFinder.NearMatchClassesOrFiles(tagSearch);
 	}
 
-	void ExactMatchTags(const mvceditor::TagSearchClass& tagSearch) {
-		mvceditor::TagResultClass* result = tagSearch.CreateExactResults();
+	void ExactMatchTags(const t4p::TagSearchClass& tagSearch) {
+		t4p::TagResultClass* result = tagSearch.CreateExactResults();
 		Matches.clear();
 		ParsedTagFinder.Exec(result);
 		while (result->More()) {
@@ -169,21 +169,21 @@ public:
 	}
 
 	void ExactMatchTags(const UnicodeString& search) {
-		mvceditor::TagSearchClass tagSearch(search);
+		t4p::TagSearchClass tagSearch(search);
 		ExactMatchTags(tagSearch);
 	}
 
-	mvceditor::TagParserClass TagParser;
-	mvceditor::ParsedTagFinderClass ParsedTagFinder;
+	t4p::TagParserClass TagParser;
+	t4p::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<mvceditor::TagClass> Matches;
+	std::vector<t4p::TagClass> Matches;
 };
 
 class TagSearchTestClass {
 
 public:
 
-	mvceditor::TagSearchClass* TagSearch;
+	t4p::TagSearchClass* TagSearch;
 
 	TagSearchTestClass()
 		: TagSearch(NULL) {
@@ -197,7 +197,7 @@ public:
 	}
 
 	void Make(const char* query) {
-		TagSearch = new mvceditor::TagSearchClass(mvceditor::CharToIcu(query));
+		TagSearch = new t4p::TagSearchClass(t4p::CharToIcu(query));
 	}
 
 };
@@ -224,7 +224,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchFileTagsShouldFindFileWhenFi
 		"?>\n"
 	));
 	Parse(TestProjectDir + TestFile);
-	NearMatchFileTags(mvceditor::WxToIcu(TestFile));
+	NearMatchFileTags(t4p::WxToIcu(TestFile));
 	CHECK_VECTOR_SIZE(1, FileMatches);
 	CHECK_EQUAL(TestProjectDir + TestFile, FileMatches[0].FullPath);
 }
@@ -244,7 +244,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNa
 	));
 	Parse(TestProjectDir + TestFile);
 	Parse(TestProjectDir + miscFile);
-	NearMatchFileTags(mvceditor::WxToIcu(miscFile));
+	NearMatchFileTags(t4p::WxToIcu(miscFile));
 	
 	CHECK_VECTOR_SIZE(1, FileMatches);
 	CHECK_EQUAL(TestProjectDir + miscFile, FileMatches[0].FullPath);
@@ -273,7 +273,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenFil
 	Parse(TestProjectDir + TestFile);
 	NearMatchFileTags(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_VECTOR_SIZE(0, FileMatches);
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("test.php:100"));
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("test.php:100"));
 	CHECK_EQUAL(100, tagSearch.GetLineNumber());
 }
 
@@ -327,7 +327,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchFileTagsShouldFindFileWhenFi
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameMatches) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
 		"class UserClass {\n"
@@ -341,16 +341,16 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", tag);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
 	CHECK_UNISTR_EQUALS("class UserClass", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** this is my class */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::CLASS, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::CLASS, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenClassNameDoesNotMatch) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -365,7 +365,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenC
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameIsNotTheExactSame) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserAdmin {\n"
 		"\tprivate $name;"
@@ -381,7 +381,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameHasAnExtends) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class User extends Human {\n"
 		"\tprivate $name;"
@@ -396,7 +396,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameAndMethodNameMatch) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -410,17 +410,17 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", tag);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), tag.NamespaceName);
 	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
 	CHECK_UNISTR_EQUALS("string public function getName()", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** returns the name @return string */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::METHOD, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::METHOD, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -439,7 +439,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenClassNameMatchesButMethodNameDoesNot) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -454,7 +454,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenC
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenMethodNameMatchesButClassIsNotGiven) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -474,7 +474,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindTwoFilesWhen
 	wxString testFile = wxT("test.php");
 	wxString testFile2 = wxT("test2.php");
 	TestFile = testFile;
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -485,7 +485,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindTwoFilesWhen
 		"?>\n"
 	));	
 	TestFile = testFile2;
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -534,7 +534,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenItH
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhenFunctionNameMatches) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -550,16 +550,16 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhen
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
 	CHECK_UNISTR_EQUALS("void", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::FUNCTION, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::FUNCTION, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassesAndFunctions) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -585,7 +585,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassMembers) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\t/** the user name @var string */\n"
@@ -598,17 +598,17 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "name", tag);
 	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the user name @var string */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::MEMBER, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::MEMBER, tag.Type);
 }
 
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassConstant) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\t/** the max constant @var int */\n"
@@ -621,16 +621,16 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::MAX"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "MAX", tag);
 	CHECK_UNISTR_EQUALS("int", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::MAX"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::CLASS_CONSTANT, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::CLASS_CONSTANT, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDefines) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"/** the max constant @var int */\n"
 		"define('MAX_ITEMS', 1);\n"
@@ -638,19 +638,19 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDe
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("MAX_ITEMS", tag.Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
 	CHECK_UNISTR_EQUALS("1", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
-	CHECK_EQUAL(mvceditor::TagClass::DEFINE, tag.Type);
+	CHECK_EQUAL(t4p::TagClass::DEFINE, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -675,7 +675,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -697,7 +697,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatchesForClassMethodsWithNoClassName) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -719,7 +719,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNativeFunctions) {
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
 	ParsedTagFinder.InitSession(&session);
 
 	NearMatchTags(UNICODE_STRING_SIMPLE("array_key"));
@@ -770,7 +770,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsi
 		"?>\n"
 	);
 	Prep(code);
-	UnicodeString uniCode  = mvceditor::CharToIcu(
+	UnicodeString uniCode  = t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -796,7 +796,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsi
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		
 		// this simulates the user writing a completely new file that has yet to be saved.
 		"<?php\n"
@@ -817,7 +817,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenU
 		"}\n"		
 		"?>\n"
 	));	
-	UnicodeString uniCode  = mvceditor::CharToIcu(
+	UnicodeString uniCode  = t4p::CharToIcu(
 		"<?php\n"
 		"function printUser($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"
@@ -832,7 +832,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenU
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectAllMethodsWhenClassIsNotGiven) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -868,7 +868,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
 	
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -880,7 +880,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 	));
 	Parse(TestProjectDir + TestFile);
 	TestFile = wxT("model") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -891,7 +891,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 		"?>\n"
 	));
 	Parse(TestProjectDir + TestFile);
-	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+	t4p::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
 	wxFileName modelDir;
 	modelDir.AssignDir(TestProjectDir);
@@ -899,7 +899,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 	dirs.push_back(modelDir);
 	search.SetSourceDirs(dirs);
 
-	mvceditor::TagResultClass* result = search.CreateNearMatchResults();
+	t4p::TagResultClass* result = search.CreateNearMatchResults();
 	ParsedTagFinder.Exec(result);
 	Matches = result->Matches();
 	delete result;
@@ -909,7 +909,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotCollectParentClassesWhenInheritedClassNameIsGiven) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -936,7 +936,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotCollectParent
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesShouldCollectBoth) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -974,7 +974,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedF
 	CreateSubDirectory(wxT("admin"));
 
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -989,7 +989,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedF
 	Parse(TestProjectDir + TestFile);
 
 	TestFile = wxT("admin") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserAdminClass extends SuperUserClass {\n"
 		"\tfunction deleteUser(User $user) {\n"
@@ -998,7 +998,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedF
 		"?>\n"
 	));
 	Parse(TestProjectDir + TestFile);
-	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("user"));
+	t4p::TagSearchClass search(UNICODE_STRING_SIMPLE("user"));
 	
 	std::vector<wxFileName> dirs;
 	wxFileName adminDir;
@@ -1015,7 +1015,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedF
 
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNameMatches) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1035,7 +1035,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 		
 	// the name of the class and the name of the property are the same
 	// the method under test should know the difference and only return the class tag
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $SetClass;\n"
@@ -1057,14 +1057,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
-	CHECK_EQUAL(mvceditor::TagClass::CLASS, Matches[0].Type);
+	CHECK_EQUAL(t4p::TagClass::CLASS, Matches[0].Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrectClassMethod) {
 	
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1087,7 +1087,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrec
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldNotFindFileWhenClassNameDoesNotMatch) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1140,8 +1140,8 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 	CHECK_VECTOR_SIZE(1, Matches);
 
 	// make sure that file lookups work as well
-	mvceditor::TagSearchClass tagFileSearch(UNICODE_STRING_SIMPLE("test.php"));
-	mvceditor::FileTagResultClass* fileResult = tagFileSearch.CreateNearMatchFileResults();
+	t4p::TagSearchClass tagFileSearch(UNICODE_STRING_SIMPLE("test.php"));
+	t4p::FileTagResultClass* fileResult = tagFileSearch.CreateNearMatchFileResults();
 	ParsedTagFinder.Exec(fileResult);
 	FileMatches = fileResult->Matches();
 	CHECK_VECTOR_SIZE(1, FileMatches);
@@ -1178,7 +1178,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForConstructors) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1201,12 +1201,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForCon
 	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::__construct"));
 	 
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprotected $name;\n"
@@ -1223,14 +1223,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 		"}\n"
 		"?>\n"
 	));
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass::name"));
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("AdminClass::name"));
 	std::vector<UnicodeString> parents;
 	parents.push_back(UNICODE_STRING_SIMPLE("UserClass"));
 	tagSearch.SetParentClasses(parents);
 	ExactMatchTags(tagSearch);
 	
 	CHECK_VECTOR_SIZE(1, Matches);
-	mvceditor::TagClass tag = Matches[0];
+	t4p::TagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
@@ -1242,7 +1242,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	CreateSubDirectory(wxT("model"));
 	
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -1255,7 +1255,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	Parse(TestProjectDir + TestFile);
 
 	TestFile = wxT("model") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;\n"
@@ -1267,7 +1267,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	));
 	Parse(TestProjectDir + TestFile);
 
-	mvceditor::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
+	t4p::TagSearchClass search(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
 	wxFileName modelDir;
 	modelDir.AssignDir(TestProjectDir);
@@ -1275,7 +1275,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	dirs.push_back(modelDir);
 	search.SetSourceDirs(dirs);
 
-	mvceditor::TagResultClass* tagResult = search.CreateExactResults();
+	t4p::TagResultClass* tagResult = search.CreateExactResults();
 	ParsedTagFinder.Exec(tagResult);
 	Matches = tagResult->Matches();
 
@@ -1287,7 +1287,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1296,7 +1296,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 		"\t}\n"
 		"}\n"
 	));	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
@@ -1313,7 +1313,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 	CreateSubDirectory(wxT("admin"));
 	
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1325,7 +1325,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 	Parse(TestProjectDir + TestFile);
 
 	TestFile = wxT("admin") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	Prep(mvceditor::CharToWx(
+	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1336,7 +1336,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 	));	
 	Parse(TestProjectDir + TestFile);
 
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	std::vector<wxFileName> dirs;
 	wxFileName adminDir;
 	adminDir.AssignDir(TestProjectDir);
@@ -1350,7 +1350,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1370,7 +1370,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClassForDeepHierarchy) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1390,7 +1390,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnP
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassWithInterfaces) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1411,7 +1411,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassWithInterface
 
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldReturnValidPositionsForClassMethodFunctionAndMember) {
-	 UnicodeString icuCode = mvceditor::CharToIcu(
+	 UnicodeString icuCode = t4p::CharToIcu(
 		"<?php\n"
 		"class UserClass {\n"
 		"\tprivate $name;"
@@ -1429,7 +1429,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
-	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(6, pos);
 	CHECK_EQUAL(16, length);
 	
@@ -1437,7 +1437,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	NearMatchTags(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
-	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function getName()")), (int32_t)pos);
 	CHECK_EQUAL(17, length);
 	
@@ -1445,7 +1445,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "name", Matches[0]);
-	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("private $name")), (int32_t)pos);
 	CHECK_EQUAL(14, length);
 	
@@ -1453,13 +1453,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
-	CHECK(mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
+	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function printUser")), (int32_t)pos);
 	CHECK_EQUAL(19, length);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1476,7 +1476,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces)
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesShouldNotFindDuplicates) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1487,7 +1487,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 		"?>\n"
 	));
 	TestFile = wxT("test_2.php");
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class TwoClass {\n"
@@ -1501,7 +1501,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 
-	std::vector<mvceditor::TagClass> all = ParsedTagFinder.All();
+	std::vector<t4p::TagClass> all = ParsedTagFinder.All();
 
 	//  6 tags total
 	// namespace First\\Child 
@@ -1514,7 +1514,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"class MyClass {\n"
 		"	function work() {} \n"
@@ -1535,7 +1535,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) 
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaces) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1559,7 +1559,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaces) {
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesAndFunctions) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child; \n"
 		"class MyClass {\n"
@@ -1584,7 +1584,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedC
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedClassesShouldIgnoreOtherNamespaces) {
-	 Prep(mvceditor::CharToIcu(
+	 Prep(t4p::CharToIcu(
 		"<?php\n"
 		"namespace First\\Child { \n"
 		"class MyClass { }\n"
@@ -1601,7 +1601,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedC
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMembers) {
 	TagParser.SetVersion(pelet::PHP_54);
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "
@@ -1612,14 +1612,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 		"}"
 	));
 	
-	mvceditor::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
+	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
 	
 	// tell the tag finder to look for traits
 	std::vector<UnicodeString> traits;
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
 	tagSearch.SetTraits(traits);
 
-	mvceditor::TagResultClass* result = tagSearch.CreateNearMatchResults();
+	t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	ParsedTagFinder.Exec(result);
 	Matches = result->Matches();
 	delete result;
@@ -1631,7 +1631,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 	TagParser.SetVersion(pelet::PHP_54); 
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "
@@ -1650,7 +1650,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 	std::vector<wxFileName> sourceDirs;
 	classNames.push_back(UNICODE_STRING_SIMPLE("ezcReflectionMethod"));
 
-	mvceditor::TraitTagResultClass result;
+	t4p::TraitTagResultClass result;
 	result.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
 	ParsedTagFinder.Exec(&result);
 	Matches = result.MatchesAsTags();
@@ -1663,7 +1663,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
 	TagParser.SetVersion(pelet::PHP_54); 
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
 		"} "
@@ -1692,7 +1692,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 	CHECK(ParsedTagFinder.IsFileCacheEmpty());
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(mvceditor::NativeFunctionsAsset().GetFullPath()));;
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));;
 	ParsedTagFinder.InitSession(&session);
 	
 	// still empty
@@ -1705,7 +1705,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturn
 	// create 2 files that way we can test that each file will only get its own
 	// tags
 	TestFile = wxT("test.php");
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"define('USER_MAX', 2000);\n"
 		"class UserClass {\n"
@@ -1720,7 +1720,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturn
 	));	
 	
 	TestFile = wxT("tan.php");
-		Prep(mvceditor::CharToIcu(
+		Prep(t4p::CharToIcu(
 		"<?php\n"
 		"define('TAN_MAX', 2000);\n"
 		"class TanClass {\n"
@@ -1806,7 +1806,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDir) {
 	wxFileName fileName(paths.GetUserDataDir(), wxT("test.php"));
 	TestFile = fileName.GetFullPath();
 
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
 		"class UserClass {\n"
@@ -1823,7 +1823,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDirShouldNotBeFound) {
 	wxFileName fileName(paths.GetUserDataDir(), wxT("test.php"));
 	TestFile = fileName.GetFullPath();
 
-	Prep(mvceditor::CharToIcu(
+	Prep(t4p::CharToIcu(
 		"<?php\n"
 		"/** this is my class */\n"
 		"class UserClass {\n"

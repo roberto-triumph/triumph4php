@@ -52,14 +52,14 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
+std::vector<t4p::TagClass> AllResources(soci::session& session) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) ";
 	sql += " ORDER BY key";
 	
-	std::vector<mvceditor::TagClass> matches;
+	std::vector<t4p::TagClass> matches;
 	int fileTagId;
 	int sourceId;
 	std::string key;
@@ -89,20 +89,20 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 		);
 		if (stmt.execute(true)) {
 			do {
-				mvceditor::TagClass tag;
+				t4p::TagClass tag;
 				if (soci::i_ok == fileTagIdIndicator) {
 					tag.FileTagId = fileTagId;
 				}
-				tag.Key = mvceditor::CharToIcu(key.c_str());
-				tag.Identifier = mvceditor::CharToIcu(identifier.c_str());
-				tag.ClassName = mvceditor::CharToIcu(className.c_str());
-				tag.Type = (mvceditor::TagClass::Types)type;
-				tag.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-				tag.Signature = mvceditor::CharToIcu(signature.c_str());
-				tag.ReturnType = mvceditor::CharToIcu(returnType.c_str());
-				tag.Comment = mvceditor::CharToIcu(comment.c_str());
+				tag.Key = t4p::CharToIcu(key.c_str());
+				tag.Identifier = t4p::CharToIcu(identifier.c_str());
+				tag.ClassName = t4p::CharToIcu(className.c_str());
+				tag.Type = (t4p::TagClass::Types)type;
+				tag.NamespaceName = t4p::CharToIcu(namespaceName.c_str());
+				tag.Signature = t4p::CharToIcu(signature.c_str());
+				tag.ReturnType = t4p::CharToIcu(returnType.c_str());
+				tag.Comment = t4p::CharToIcu(comment.c_str());
 				if (soci::i_ok == fullPathIndicator) {
-					tag.SetFullPath(mvceditor::CharToWx(fullPath.c_str()));
+					tag.SetFullPath(t4p::CharToWx(fullPath.c_str()));
 				}
 				tag.IsProtected = isProtected != 0;
 				tag.IsPrivate = isPrivate != 0;
@@ -124,13 +124,13 @@ std::vector<mvceditor::TagClass> AllResources(soci::session& session) {
 			
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}
 	return matches;
 }
 
-mvceditor::TagParserClass::TagParserClass()
+t4p::TagParserClass::TagParserClass()
 	: PhpFileExtensions()
 	, MiscFileExtensions()
 	, NamespaceCache()
@@ -147,20 +147,20 @@ mvceditor::TagParserClass::TagParserClass()
 	Parser.SetFunctionObserver(this);
 }
 
-mvceditor::TagParserClass::~TagParserClass() {
+t4p::TagParserClass::~TagParserClass() {
 	Close();
 }
 
-void mvceditor::TagParserClass::SetVersion(pelet::Versions version) {
+void t4p::TagParserClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-void mvceditor::TagParserClass::Init(soci::session* session) {
+void t4p::TagParserClass::Init(soci::session* session) {
 	Session = session;
 	IsCacheInitialized = true;
 }
 
-void mvceditor::TagParserClass::Close() {
+void t4p::TagParserClass::Close() {
 	Session = NULL;
 	if (Transaction) {
 		Transaction->rollback();
@@ -173,7 +173,7 @@ void mvceditor::TagParserClass::Close() {
 	}
 }
 
-void mvceditor::TagParserClass::BeginSearch(const wxString& fullPath) {
+void t4p::TagParserClass::BeginSearch(const wxString& fullPath) {
 
 	// make sure we always insert with the trailing directory separator
 	// to be consistent
@@ -184,7 +184,7 @@ void mvceditor::TagParserClass::BeginSearch(const wxString& fullPath) {
 	// get (or create) the source ID
 	try {
 		CurrentSourceId = 0;
-		std::string stdFullPath = mvceditor::WxToChar(dir.GetPathWithSep());
+		std::string stdFullPath = t4p::WxToChar(dir.GetPathWithSep());
 		soci::statement stmt = (Session->prepare << 
 			"SELECT source_id FROM sources WHERE directory = ?", 
 			soci::into(CurrentSourceId), soci::use(stdFullPath)
@@ -209,7 +209,7 @@ void mvceditor::TagParserClass::BeginSearch(const wxString& fullPath) {
 	}
 }
 
-void mvceditor::TagParserClass::BeginTransaction() {
+void t4p::TagParserClass::BeginTransaction() {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -243,7 +243,7 @@ void mvceditor::TagParserClass::BeginTransaction() {
 		
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 		if (InsertStmt) {
@@ -253,14 +253,14 @@ void mvceditor::TagParserClass::BeginTransaction() {
 	}
 }
 
-void mvceditor::TagParserClass::EndSearch() {
+void t4p::TagParserClass::EndSearch() {
 	try {
 		Transaction->commit();
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
@@ -274,7 +274,7 @@ void mvceditor::TagParserClass::EndSearch() {
 	TraitCache.clear();	
 }
 
-bool mvceditor::TagParserClass::Walk(const wxString& fileName) {
+bool t4p::TagParserClass::Walk(const wxString& fileName) {
 	bool matchedFilter = false;
 	wxFileName file(fileName);
 	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
@@ -319,12 +319,12 @@ bool mvceditor::TagParserClass::Walk(const wxString& fileName) {
 	return false;
 }
 
-void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
+void t4p::TagParserClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
 	CurrentSourceId = 0;
 	BeginTransaction();
 
 	// remove all previous cached resources
-	mvceditor::FileTagClass fileTag;
+	t4p::FileTagClass fileTag;
 	bool foundFile = FindFileTagByFullPathExact(fullPath, fileTag);
 	if (foundFile) {
 		std::vector<int> fileTagIdsToRemove;
@@ -354,7 +354,7 @@ void mvceditor::TagParserClass::BuildResourceCacheForFile(const wxString& fullPa
 	EndSearch();
 }
 
-void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
+void t4p::TagParserClass::BuildResourceCache(const wxString& fullPath, bool parseClasses) {
 	wxFileName fileName(fullPath);
 	wxDateTime fileLastModifiedDateTime = fileName.GetModificationTime();
 
@@ -367,7 +367,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 	
 	// have we looked at this file yet or is cache out of date? if not, then build the cache.
 	bool cached = false;
-	mvceditor::FileTagClass fileTag;
+	t4p::FileTagClass fileTag;
 	bool foundFile = FindFileTagByFullPathExact(fullPath, fileTag);
 	if (foundFile) {
 		bool needsToBeParsed = fileTag.NeedsToBeParsed(fileLastModifiedDateTime);
@@ -398,7 +398,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 			wxFFile file;
 			if (file.Open(fullPath, wxT("rb"))) {
 				CurrentFileTagId = fileTag.FileId;
-				Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fullPath), lintResults);
+				Parser.ScanFile(file.fp(), t4p::WxToIcu(fullPath), lintResults);
 		
 				PersistTraits(TraitCache, fileTag.FileId);
 			}
@@ -416,7 +416,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 					
 					// ATTN: at some point bubble these exceptions up?
 					// to avoid unreferenced local variable warnings in MSVC
-					wxString msg = mvceditor::CharToWx(e.what());
+					wxString msg = t4p::CharToWx(e.what());
 					wxUnusedVar(msg);
 					wxASSERT_MSG(false, msg);
 				}
@@ -427,7 +427,7 @@ void mvceditor::TagParserClass::BuildResourceCache(const wxString& fullPath, boo
 	}
 }
 
-void mvceditor::TagParserClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
+void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
 		const UnicodeString& comment, const int lineNumber) {
 	TagClass classItem;
 	classItem.Identifier = className;
@@ -444,7 +444,7 @@ void mvceditor::TagParserClass::ClassFound(const UnicodeString& namespaceName, c
 	if (IsNewNamespace(namespaceName)) {
 
 		// a tag for the namespace itself
-		mvceditor::TagClass namespaceItem = mvceditor::TagClass::MakeNamespace(namespaceName);
+		t4p::TagClass namespaceItem = t4p::TagClass::MakeNamespace(namespaceName);
 		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 
@@ -453,7 +453,7 @@ void mvceditor::TagParserClass::ClassFound(const UnicodeString& namespaceName, c
 	PersistResources(classItem, CurrentFileTagId);
 }
 
-void mvceditor::TagParserClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+void t4p::TagParserClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
 	
 	// the trait has already been put in the cache; we just need to update it
@@ -465,7 +465,7 @@ void mvceditor::TagParserClass::TraitAliasFound(const UnicodeString& namespaceNa
 	mapKey += traitUsedClassName;
 	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
-	std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::iterator it;
+	std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::iterator it;
 	it = TraitCache.find(mapKey);
 	if (!it->second.empty()) {
 		it->second.front().Aliased.push_back(alias);
@@ -473,7 +473,7 @@ void mvceditor::TagParserClass::TraitAliasFound(const UnicodeString& namespaceNa
 	}
 }
 
-void mvceditor::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
+void t4p::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
 	
 	// the trait has already been put in the cache; we just need to update it
@@ -486,7 +486,7 @@ void mvceditor::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespa
 	mapKey += traitUsedClassName;
 	
 	// this code assumes that TraitUseFound() is called before TraitAliasFound()
-	std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::iterator it;
+	std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::iterator it;
 	it = TraitCache.find(mapKey);
 	if (!it->second.empty()) {
 
@@ -495,10 +495,10 @@ void mvceditor::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespa
 	}
 }
 
-void mvceditor::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 												const UnicodeString& fullyQualifiedTraitName) {
 	
-	mvceditor::TraitTagClass newTraitTag;
+	t4p::TraitTagClass newTraitTag;
 	newTraitTag.ClassName = className;
 	newTraitTag.NamespaceName = namespaceName;
 
@@ -542,7 +542,7 @@ void mvceditor::TagParserClass::TraitUseFound(const UnicodeString& namespaceName
 	}
 }
 
-void mvceditor::TagParserClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
+void t4p::TagParserClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	TagClass defineItem;
 	defineItem.Identifier = variableName;
@@ -559,7 +559,7 @@ void mvceditor::TagParserClass::DefineDeclarationFound(const UnicodeString& name
 	PersistResources(defineItem, CurrentFileTagId);
 }
 
-void mvceditor::TagParserClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+void t4p::TagParserClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	TagClass item;
@@ -599,7 +599,7 @@ void mvceditor::TagParserClass::MethodFound(const UnicodeString& namespaceName, 
 	PersistResources(item, CurrentFileTagId);
 }
 
-void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
+void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
                                         const UnicodeString& propertyType, const UnicodeString& comment, 
 										pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic,
 										const int lineNumber) {
@@ -644,7 +644,7 @@ void mvceditor::TagParserClass::PropertyFound(const UnicodeString& namespaceName
 	PersistResources(item, CurrentFileTagId);
 }
 
-void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
+void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
 	TagClass item;
 	item.Identifier = functionName;
@@ -658,7 +658,7 @@ void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName
 	PersistResources(item, CurrentFileTagId);
 		
 	if (IsNewNamespace(namespaceName)) {
-		mvceditor::TagClass namespaceItem = mvceditor::TagClass::MakeNamespace(namespaceName);
+		t4p::TagClass namespaceItem = t4p::TagClass::MakeNamespace(namespaceName);
 		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 		
@@ -668,10 +668,10 @@ void mvceditor::TagParserClass::FunctionFound(const UnicodeString& namespaceName
 	PersistResources(item, CurrentFileTagId);
 }
 
-bool mvceditor::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
+bool t4p::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
 	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
-	std::string nm = mvceditor::IcuToChar(namespaceName);
-	int type = mvceditor::TagClass::NAMESPACE;
+	std::string nm = t4p::IcuToChar(namespaceName);
+	int type = t4p::TagClass::NAMESPACE;
 	int count = 0;
 	bool isNew = false;
 	try {
@@ -694,7 +694,7 @@ bool mvceditor::TagParserClass::IsNewNamespace(const UnicodeString& namespaceNam
 	return isNew;
 }
 
-void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>& fileTagIds, bool removeFileTag) {
+void t4p::TagParserClass::RemovePersistedResources(const std::vector<int>& fileTagIds, bool removeFileTag) {
 	if (!IsCacheInitialized || fileTagIds.empty()) {
 		return;
 	}
@@ -724,15 +724,15 @@ void mvceditor::TagParserClass::RemovePersistedResources(const std::vector<int>&
 	}
 }
 
-void mvceditor::TagParserClass::Print() {
+void t4p::TagParserClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
-	std::vector<mvceditor::TagClass> matches = AllResources(*Session);
+	std::vector<t4p::TagClass> matches = AllResources(*Session);
 	u_fprintf(out, "resource count=%d\n", matches.size());
-	for (std::vector<mvceditor::TagClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
+	for (std::vector<t4p::TagClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 		switch (it->Type) {
-			case mvceditor::TagClass::CLASS :
-			case mvceditor::TagClass::DEFINE :
-			case mvceditor::TagClass::FUNCTION :
+			case t4p::TagClass::CLASS :
+			case t4p::TagClass::DEFINE :
+			case t4p::TagClass::FUNCTION :
 
 				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d FileID=%d SourceID=%d\n",
 					it->Key.length(), it->Key.getBuffer(),
@@ -741,9 +741,9 @@ void mvceditor::TagParserClass::Print() {
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
 					it->Type, it->FileTagId, it->SourceId);
 				break;
-			case mvceditor::TagClass::CLASS_CONSTANT :
-			case mvceditor::TagClass::MEMBER :
-			case mvceditor::TagClass::METHOD :
+			case t4p::TagClass::CLASS_CONSTANT :
+			case t4p::TagClass::MEMBER :
+			case t4p::TagClass::METHOD :
 				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
@@ -751,7 +751,7 @@ void mvceditor::TagParserClass::Print() {
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
 					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type, it->FileTagId, it->SourceId);
 				break;
-			case mvceditor::TagClass::NAMESPACE :
+			case t4p::TagClass::NAMESPACE :
 				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
@@ -761,12 +761,12 @@ void mvceditor::TagParserClass::Print() {
 				break;
 		}
 	}
-	for (std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
+	for (std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
 		u_fprintf(out, "TRAITS USED BY: %.*S\n",
 			it->first.length(), it->first.getBuffer());
-		std::vector<mvceditor::TraitTagClass> traits =  it->second;
+		std::vector<t4p::TraitTagClass> traits =  it->second;
 		for (size_t j = 0; j < traits.size(); ++j) {
-			mvceditor::TraitTagClass trait = traits[j];
+			t4p::TraitTagClass trait = traits[j];
 			u_fprintf(out, "\tTRAIT NAME=%.*S\n",
 				trait.TraitClassName.length(), trait.TraitClassName.getBuffer());
 			for (size_t k = 0; k < trait.Aliased.size(); k++) {
@@ -782,12 +782,12 @@ void mvceditor::TagParserClass::Print() {
 }
 
 
-void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag) {
+void t4p::TagParserClass::PersistFileTag(t4p::FileTagClass& fileTag) {
 	if (!IsCacheInitialized) {
 		return;
 	}
-	std::string fullPath = mvceditor::WxToChar(fileTag.FullPath);
-	std::string name = mvceditor::WxToChar(fileTag.Name());
+	std::string fullPath = t4p::WxToChar(fileTag.FullPath);
+	std::string name = t4p::WxToChar(fileTag.Name());
 	std::tm tm;
 	int isParsed = fileTag.IsParsed ? 1 : 0;
 	int isNew = fileTag.IsNew ? 1 : 0;
@@ -822,7 +822,7 @@ void mvceditor::TagParserClass::PersistFileTag(mvceditor::FileTagClass& fileTag)
 	}
 }
 
-bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
+bool t4p::TagParserClass::FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag) {
 	if (!IsCacheInitialized) {
 		return false;
 	}
@@ -833,7 +833,7 @@ bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullP
 	int isNew;
 	bool foundFile = false;
 
-	std::string query = mvceditor::WxToChar(fullPath);
+	std::string query = t4p::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, source_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
 		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
@@ -857,7 +857,7 @@ bool mvceditor::TagParserClass::FindFileTagByFullPathExact(const wxString& fullP
 	return foundFile;
 }
 
-void mvceditor::TagParserClass::WipeAll() {
+void t4p::TagParserClass::WipeAll() {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -876,7 +876,7 @@ void mvceditor::TagParserClass::WipeAll() {
 	}
 }
 
-void mvceditor::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
+void t4p::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -886,7 +886,7 @@ void mvceditor::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 
 			// get the source ID to be deleted
 			int sourceId = 0;
-			std::string stdSourceDir = mvceditor::WxToChar(sourceDir.GetPathWithSep());
+			std::string stdSourceDir = t4p::WxToChar(sourceDir.GetPathWithSep());
 			
 			std::string sql = "SELECT source_id FROM sources WHERE directory = ?";
 			soci::statement stmt = (Session->prepare << sql, soci::into(sourceId), soci::use(stdSourceDir));
@@ -914,7 +914,7 @@ void mvceditor::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 	}
 }
 
-void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>& dirs) {
+void t4p::TagParserClass::DeleteDirectories(const std::vector<wxFileName>& dirs) {
 	NamespaceCache.clear();
 	TraitCache.clear();
 
@@ -922,7 +922,7 @@ void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>&
 		try {
 			bool error = false;
 			wxString errorMsg;
-			std::vector<int> fileTagIds = mvceditor::FileTagIdsForDirs(*Session, dirs, error, errorMsg);
+			std::vector<int> fileTagIds = t4p::FileTagIdsForDirs(*Session, dirs, error, errorMsg);
 			wxASSERT_MSG(!error, errorMsg);
 			if (!fileTagIds.empty()) {
 				std::ostringstream stream;
@@ -953,8 +953,8 @@ void mvceditor::TagParserClass::DeleteDirectories(const std::vector<wxFileName>&
 	}
 }
 
-void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
-	mvceditor::FileTagClass fileTag;
+void t4p::TagParserClass::DeleteFromFile(const wxString& fullPath) {
+	t4p::FileTagClass fileTag;
 	if (FindFileTagByFullPathExact(fullPath, fileTag)) {
 		std::vector<int> fileTagIdsToRemove;
 		fileTagIdsToRemove.push_back(fileTag.FileId);
@@ -962,7 +962,7 @@ void mvceditor::TagParserClass::DeleteFromFile(const wxString& fullPath) {
 	}
 }
 
-void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& resource, int fileTagId) {
+void t4p::TagParserClass::PersistResources(const t4p::TagClass& resource, int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
 	}
@@ -972,14 +972,14 @@ void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& reso
 	try {
 		FileTagId = fileTagId;
 
-		Key = mvceditor::IcuToChar(resource.Key);
-		Identifier = mvceditor::IcuToChar(resource.Identifier);
-		ClassName = mvceditor::IcuToChar(resource.ClassName);
+		Key = t4p::IcuToChar(resource.Key);
+		Identifier = t4p::IcuToChar(resource.Identifier);
+		ClassName = t4p::IcuToChar(resource.ClassName);
 		Type = resource.Type;
-		NamespaceName = mvceditor::IcuToChar(resource.NamespaceName);
-		Signature = mvceditor::IcuToChar(resource.Signature);
-		ReturnType = mvceditor::IcuToChar(resource.ReturnType);
-		Comment = mvceditor::IcuToChar(resource.Comment);
+		NamespaceName = t4p::IcuToChar(resource.NamespaceName);
+		Signature = t4p::IcuToChar(resource.Signature);
+		ReturnType = t4p::IcuToChar(resource.ReturnType);
+		Comment = t4p::IcuToChar(resource.Comment);
 		IsProtected = resource.IsProtected;
 		IsPrivate = resource.IsPrivate;
 		IsStatic = resource.IsStatic;
@@ -995,8 +995,8 @@ void mvceditor::TagParserClass::PersistResources(const mvceditor::TagClass& reso
 	}
 }
 
-void mvceditor::TagParserClass::PersistTraits(
-	const std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
+void t4p::TagParserClass::PersistTraits(
+	const std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>& traitMap,
 	int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
@@ -1020,18 +1020,18 @@ void mvceditor::TagParserClass::PersistTraits(
 			soci::use(key), soci::use(fileTagId), soci::use(CurrentSourceId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
 			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
 		);
-		std::map<UnicodeString, std::vector<mvceditor::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
+		std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
 		for (it = traitMap.begin(); it != traitMap.end(); ++it) {
-			std::vector<mvceditor::TraitTagClass>::const_iterator trait;
+			std::vector<t4p::TraitTagClass>::const_iterator trait;
 			for (trait = it->second.begin(); trait != it->second.end(); ++trait) {
-				key = mvceditor::IcuToChar(trait->Key);
-				className = mvceditor::IcuToChar(trait->ClassName);
-				namespaceName = mvceditor::IcuToChar(trait->NamespaceName);
-				traitClassName = mvceditor::IcuToChar(trait->TraitClassName);
-				traitNamespaceName = mvceditor::IcuToChar(trait->TraitNamespaceName);
+				key = t4p::IcuToChar(trait->Key);
+				className = t4p::IcuToChar(trait->ClassName);
+				namespaceName = t4p::IcuToChar(trait->NamespaceName);
+				traitClassName = t4p::IcuToChar(trait->TraitClassName);
+				traitNamespaceName = t4p::IcuToChar(trait->TraitNamespaceName);
 				aliases = "";
 				for (std::vector<UnicodeString>::const_iterator alias = trait->Aliased.begin(); alias != trait->Aliased.end(); ++alias) {
-					aliases += mvceditor::IcuToChar(*alias);
+					aliases += t4p::IcuToChar(*alias);
 					aliases += ",";
 				}
 				if (!aliases.empty()) {
@@ -1039,7 +1039,7 @@ void mvceditor::TagParserClass::PersistTraits(
 				}
 				insteadOfs = "";
 				for (std::vector<UnicodeString>::const_iterator instead = trait->InsteadOfs.begin(); instead != trait->InsteadOfs.end(); ++instead) {
-					insteadOfs += mvceditor::IcuToChar(*instead);
+					insteadOfs += t4p::IcuToChar(*instead);
 					insteadOfs += ",";
 				}
 				if (!insteadOfs.empty()) {
@@ -1052,13 +1052,13 @@ void mvceditor::TagParserClass::PersistTraits(
 			
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 }
 
-std::vector<mvceditor::TraitTagClass> mvceditor::TagParserClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
+std::vector<t4p::TraitTagClass> t4p::TagParserClass::FindTraitsByClassName(const std::vector<std::string>& keyStarts) {
 	std::string join = "";
 	for (size_t i = 0; i < keyStarts.size(); ++i) {
 		join += "'";
@@ -1078,7 +1078,7 @@ std::vector<mvceditor::TraitTagClass> mvceditor::TagParserClass::FindTraitsByCla
 	std::string traitNamespaceName;
 	std::string aliases;
 	std::string insteadOfs;
-	std::vector<mvceditor::TraitTagClass> matches;
+	std::vector<t4p::TraitTagClass> matches;
 	try {
 		soci::statement stmt = (Session->prepare << sql,
 			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
@@ -1086,31 +1086,31 @@ std::vector<mvceditor::TraitTagClass> mvceditor::TagParserClass::FindTraitsByCla
 		);
 		if (stmt.execute(true)) {
 			do {
-				mvceditor::TraitTagClass trait;
-				trait.Key = mvceditor::CharToIcu(key.c_str());
-				trait.ClassName = mvceditor::CharToIcu(className.c_str());
-				trait.NamespaceName = mvceditor::CharToIcu(namespaceName.c_str());
-				trait.TraitClassName = mvceditor::CharToIcu(traitClassName.c_str());
-				trait.TraitNamespaceName = mvceditor::CharToIcu(traitNamespaceName.c_str());
+				t4p::TraitTagClass trait;
+				trait.Key = t4p::CharToIcu(key.c_str());
+				trait.ClassName = t4p::CharToIcu(className.c_str());
+				trait.NamespaceName = t4p::CharToIcu(namespaceName.c_str());
+				trait.TraitClassName = t4p::CharToIcu(traitClassName.c_str());
+				trait.TraitNamespaceName = t4p::CharToIcu(traitNamespaceName.c_str());
 				
 				size_t start = 0;
 				size_t found = aliases.find_first_of(",");
 				while (found != std::string::npos) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));	
+					trait.Aliased.push_back(t4p::CharToIcu(aliases.substr(start, found).c_str()));	
 					start = found++;
 				}
 				if (!aliases.empty()) {
-					trait.Aliased.push_back(mvceditor::CharToIcu(aliases.substr(start, found).c_str()));
+					trait.Aliased.push_back(t4p::CharToIcu(aliases.substr(start, found).c_str()));
 				}
 
 				start = 0;
 				found = insteadOfs.find_first_of(",");
 				while (found != std::string::npos) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));	
+					trait.InsteadOfs.push_back(t4p::CharToIcu(insteadOfs.substr(start, found).c_str()));	
 					start = found++;
 				}
 				if (!insteadOfs.empty()) {
-					trait.InsteadOfs.push_back(mvceditor::CharToIcu(insteadOfs.substr(start, found).c_str()));
+					trait.InsteadOfs.push_back(t4p::CharToIcu(insteadOfs.substr(start, found).c_str()));
 				}
 
 				matches.push_back(trait);
@@ -1125,11 +1125,11 @@ std::vector<mvceditor::TraitTagClass> mvceditor::TagParserClass::FindTraitsByCla
 	return matches;
 }
 
-void mvceditor::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFileName& newFile) {
+void t4p::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFileName& newFile) {
 	try {
-		std::string stdOldPath = mvceditor::WxToChar(oldFile.GetFullPath());
-		std::string stdNewPath = mvceditor::WxToChar(newFile.GetFullPath());
-		std::string stdNewName = mvceditor::WxToChar(newFile.GetFullName());
+		std::string stdOldPath = t4p::WxToChar(oldFile.GetFullPath());
+		std::string stdNewPath = t4p::WxToChar(newFile.GetFullPath());
+		std::string stdNewName = t4p::WxToChar(newFile.GetFullName());
 		std::string sql = "UPDATE file_items SET full_path = ?, name = ? WHERE full_path = ?";
 		soci::statement stmt = (Session->prepare << sql,
 			soci::use(stdNewPath), soci::use(stdNewName), soci::use(stdOldPath)
@@ -1143,11 +1143,11 @@ void mvceditor::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFi
 	}
 }
 
-void mvceditor::TagParserClass::RenameDir(const wxFileName& oldDir, const wxFileName& newDir) {
+void t4p::TagParserClass::RenameDir(const wxFileName& oldDir, const wxFileName& newDir) {
 	try {
-		std::string stdOldPath = mvceditor::WxToChar(oldDir.GetPathWithSep());
+		std::string stdOldPath = t4p::WxToChar(oldDir.GetPathWithSep());
 		std::string stdOldPathLike = stdOldPath + "%";
-		std::string stdNewPath = mvceditor::WxToChar(newDir.GetPathWithSep());
+		std::string stdNewPath = t4p::WxToChar(newDir.GetPathWithSep());
 		std::string sql = "UPDATE file_items SET full_path = REPLACE(full_path, ?, ?) WHERE full_path LIKE ?";
 		soci::statement stmt = (Session->prepare << sql,
 			soci::use(stdOldPath), soci::use(stdNewPath), soci::use(stdOldPathLike)

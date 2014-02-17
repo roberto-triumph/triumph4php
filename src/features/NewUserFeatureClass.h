@@ -22,19 +22,19 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_NEWUSERFEATURECLASS_H_
-#define __MVCEDITOR_NEWUSERFEATURECLASS_H_
+#ifndef __T4P_NEWUSERFEATURECLASS_H_
+#define __T4P_NEWUSERFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/NewUserFeatureForms.h>
 
-namespace mvceditor  {
+namespace t4p {
 
-class NewUserFeatureClass : public mvceditor::FeatureClass {
+class NewUserFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	NewUserFeatureClass(mvceditor::AppClass& app);
+	NewUserFeatureClass(t4p::AppClass& app);
 
 private:
 
@@ -57,7 +57,7 @@ class NewUserDialogClass : public NewUserDialogGeneratedClass {
 
 public:
 
-	NewUserDialogClass(wxWindow* parent, mvceditor::GlobalsClass& globals, wxFileName& configFileDir);
+	NewUserDialogClass(wxWindow* parent, t4p::GlobalsClass& globals, wxFileName& configFileDir);
 
 private:
 
@@ -65,7 +65,7 @@ private:
 
 	void OnOkButton(wxCommandEvent& event);
 
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 
 	wxFileName& ConfigFileDir;
 

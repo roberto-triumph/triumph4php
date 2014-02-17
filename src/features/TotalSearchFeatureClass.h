@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_TOTALSEARCHFEATURECLASS_H__
-#define __MVCEDITOR_TOTALSEARCHFEATURECLASS_H__
+#ifndef __T4P_TOTALSEARCHFEATURECLASS_H__
+#define __T4P_TOTALSEARCHFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/TotalSearchFeatureForms.h>
@@ -31,7 +31,7 @@
 #include <actions/ActionClass.h>
 #include <wx/timer.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This feature allows the user to search for any PHP class,
@@ -39,11 +39,11 @@ namespace mvceditor {
  * The class will search most of the tables in the tag cache
  * schema.
  */
-class TotalSearchFeatureClass : public mvceditor::FeatureClass {
+class TotalSearchFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	TotalSearchFeatureClass(mvceditor::AppClass& app);
+	TotalSearchFeatureClass(t4p::AppClass& app);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
 	
@@ -53,13 +53,13 @@ private:
 
 	void OnTotalSearch(wxCommandEvent& event);
 	
-	void OpenFileTag(const mvceditor::FileTagClass& fileTag, int lineNumber);
+	void OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber);
 	
-	void OpenPhpTag(const mvceditor::TagClass& tag);
+	void OpenPhpTag(const t4p::TagClass& tag);
 	
-	void OpenDbTable(const mvceditor::DatabaseTableTagClass& tableTag);
+	void OpenDbTable(const t4p::DatabaseTableTagClass& tableTag);
 	
-	void OpenDbData(const mvceditor::DatabaseTableTagClass& tableTag);
+	void OpenDbData(const t4p::DatabaseTableTagClass& tableTag);
 
 	DECLARE_EVENT_TABLE()
 };
@@ -74,8 +74,8 @@ class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 
 public:
 
-	TotalSearchDialogClass(wxWindow* parent, mvceditor::TotalSearchFeatureClass& feature,
-		std::vector<mvceditor::TotalTagResultClass>& selectedTags, int& lineNumber);
+	TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
+		std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
 
 private:
 	
@@ -86,7 +86,7 @@ private:
 	void OnOkButton(wxCommandEvent& event);
 	void OnSearchEnter(wxCommandEvent& event);
 	void OnSearchKeyDown(wxKeyEvent& event);
-	void OnSearchComplete(mvceditor::TotalTagSearchCompleteEventClass& event);
+	void OnSearchComplete(t4p::TotalTagSearchCompleteEventClass& event);
 
 	/**
 	 * update the cache status label and internal flags
@@ -97,7 +97,7 @@ private:
 	
 	void ChooseSelectedAndEnd(size_t selected);
 	
-	mvceditor::TotalSearchFeatureClass& Feature;
+	t4p::TotalSearchFeatureClass& Feature;
 	
 	/**
 	 * The item last searched; we wont attempt to search
@@ -117,17 +117,17 @@ private:
 	 * that way the user does not feel a slowdown while
 	 * typing in thq query
 	 */
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 	
 	/**
 	 * results from the last compeleted search 
 	 */
-	std::vector<mvceditor::TotalTagResultClass> Results;
+	std::vector<t4p::TotalTagResultClass> Results;
 	
 	/**
 	 * The tags that were selected by the user
 	 */
-	std::vector<mvceditor::TotalTagResultClass>& SelectedTags;
+	std::vector<t4p::TotalTagResultClass>& SelectedTags;
 	
 	/**
 	 * the line number to jump to (given by the user)

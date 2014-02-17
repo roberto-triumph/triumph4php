@@ -29,7 +29,7 @@
 #include <features/wxformbuilder/EditorMessagesFeatureForms.h>
 #include <wx/log.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class will display a grid containing all of the 
@@ -62,7 +62,7 @@ class EditorMessagesFeatureClass : public FeatureClass, wxLog {
 
 public:
 
-	EditorMessagesFeatureClass(mvceditor::AppClass& app);
+	EditorMessagesFeatureClass(t4p::AppClass& app);
 
 	void AddViewMenuItems(wxMenu* toolsMenu);
 

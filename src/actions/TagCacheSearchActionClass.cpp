@@ -28,19 +28,19 @@
 #include <language/TagFinderList.h>
 #include <globals/TagList.h>
 
-mvceditor::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
+t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
 																	const UnicodeString& searchString,
-																	const std::vector<mvceditor::TagClass>& tags)
-	: wxEvent(eventId, mvceditor::EVENT_TAG_CACHE_SEARCH_COMPLETE)
+																	const std::vector<t4p::TagClass>& tags)
+	: wxEvent(eventId, t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE)
 	, SearchString(searchString) 
 	, Tags(tags) {
 }
 
-wxEvent* mvceditor::TagCacheSearchCompleteEventClass::Clone() const {
-	return new mvceditor::TagCacheSearchCompleteEventClass(GetId(), SearchString, Tags);
+wxEvent* t4p::TagCacheSearchCompleteEventClass::Clone() const {
+	return new t4p::TagCacheSearchCompleteEventClass(GetId(), SearchString, Tags);
 }
 
-mvceditor::TagCacheSearchActionClass::TagCacheSearchActionClass(mvceditor::RunningThreadsClass& runningThreads,
+t4p::TagCacheSearchActionClass::TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads,
 																int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
@@ -49,13 +49,13 @@ mvceditor::TagCacheSearchActionClass::TagCacheSearchActionClass(mvceditor::Runni
 
 }
 
-void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
+void t4p::TagCacheSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
 
 	// deep copy the string, wxString not thread safe
-	SearchString = mvceditor::WxToIcu(search);
-	SearchDirs = mvceditor::DeepCopyFileNames(dirs);
+	SearchString = t4p::WxToIcu(search);
+	SearchDirs = t4p::DeepCopyFileNames(dirs);
 
-	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
+	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
 
 	// only need to initialize the global tag cache, will not show native tags 
 	// because there is no file that needs to be opened
@@ -65,22 +65,22 @@ void mvceditor::TagCacheSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 	TagCache.RegisterGlobal(cache);
 }
 
-void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
+void t4p::TagCacheSearchActionClass::BackgroundWork() {
 	bool exactOnly = SearchString.length() <= 2;
 	if (IsCancelled()) {
 		return;
 	}
-	std::vector<mvceditor::TagClass> matches;
+	std::vector<t4p::TagClass> matches;
 
 	// do exact match first, if that succeeds then don't bother doing near matches
-	mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
+	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
 	matches = results->Matches();
 	if (matches.empty() && !exactOnly) {
 		delete results;
 		results = TagCache.NearMatchTags(SearchString, SearchDirs);
 		matches = results->Matches();
 		if (matches.empty()) {
-			mvceditor::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
+			t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
 			matches = fileTagResults->MatchesAsTags();
 			if (matches.empty()) {
 				delete fileTagResults;
@@ -94,12 +94,12 @@ void mvceditor::TagCacheSearchActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 
 		// PostEvent will set the correct event ID
-		mvceditor::TagCacheSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
+		t4p::TagCacheSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
 		PostEvent(evt);
 	}
 }
-wxString mvceditor::TagCacheSearchActionClass::GetLabel() const {
+wxString t4p::TagCacheSearchActionClass::GetLabel() const {
 	return wxT("Tag Cache Search");
 }
 
-const wxEventType mvceditor::EVENT_TAG_CACHE_SEARCH_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE = wxNewEventType();

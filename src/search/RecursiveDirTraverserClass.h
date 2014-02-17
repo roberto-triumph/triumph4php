@@ -22,13 +22,13 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_RECURSIVEDIRTRAVERSERCLASS_H__
-#define __MVCEDITOR_RECURSIVEDIRTRAVERSERCLASS_H__
+#ifndef __T4P_RECURSIVEDIRTRAVERSERCLASS_H__
+#define __T4P_RECURSIVEDIRTRAVERSERCLASS_H__
 
 #include <wx/dir.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Implement a traverser stores each file name that is traversed. Stores full paths. 

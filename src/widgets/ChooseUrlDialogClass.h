@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CHOOSEURLDIALOGCLASS_H__
-#define __MVCEDITOR_CHOOSEURLDIALOGCLASS_H__
+#ifndef __T4P_CHOOSEURLDIALOGCLASS_H__
+#define __T4P_CHOOSEURLDIALOGCLASS_H__
 
 #include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
 #include <globals/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <wx/wx.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Small dialog that allows the user to choose a URL to run. Url list
@@ -41,7 +41,7 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 public:
 
 	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls, 
-		const std::vector<mvceditor::ProjectClass>& projects,
+		const std::vector<t4p::ProjectClass>& projects,
 		UrlTagClass& chosenUrl);
 	
 protected:
@@ -88,7 +88,7 @@ private:
 	 *
 	 * @return the urls that match filter. 
 	 */
-	std::vector<mvceditor::UrlTagClass> GetFilteredUrls(const wxString& filter);
+	std::vector<t4p::UrlTagClass> GetFilteredUrls(const wxString& filter);
 
 	/**
 	 * Get the matching urls. a matching url is one that starts with the 
@@ -98,13 +98,13 @@ private:
 	 *
 	 * @return the urls that match filter and the project. 
 	 */
-	std::vector<mvceditor::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project);
+	std::vector<t4p::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, const t4p::ProjectClass& project);
 
 	/**
 	 * fills the url list box with the given urls. any previously existing urls in the 
 	 * list box are removed.
 	 */
-	void FillUrlList(const std::vector<mvceditor::UrlTagClass>& urls);
+	void FillUrlList(const std::vector<t4p::UrlTagClass>& urls);
 
 	/**
 	 * @return list of source directories 
@@ -127,7 +127,7 @@ private:
 	 * The defined projects. Will use them to allow the user to filter URLs
 	 * by project
 	 */
-	std::vector<mvceditor::ProjectClass> Projects;
+	std::vector<t4p::ProjectClass> Projects;
 };
 
 }

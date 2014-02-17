@@ -61,7 +61,7 @@ static bool HasExtension(const wxString& fullPath, const wxString& extensionsStr
 	return found;
 }
 	
-mvceditor::FileTypeClass::FileTypeClass()
+t4p::FileTypeClass::FileTypeClass()
 : PhpFileExtensionsString(wxT("*.php"))
 , CssFileExtensionsString(wxT("*.css"))
 , SqlFileExtensionsString(wxT("*.sql"))
@@ -79,59 +79,59 @@ mvceditor::FileTypeClass::FileTypeClass()
 {
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetPhpFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetPhpFileExtensions() const {
 	return Explode(PhpFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetCssFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetCssFileExtensions() const {
 	return Explode(CssFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetSqlFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetSqlFileExtensions() const {
 	return Explode(SqlFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetJsFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetJsFileExtensions() const {
 	return Explode(JsFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetConfigFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetConfigFileExtensions() const {
 	return Explode(ConfigFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetCrontabFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetCrontabFileExtensions() const {
 	return Explode(CrontabFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetYamlFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetYamlFileExtensions() const {
 	return Explode(YamlFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetRubyFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetRubyFileExtensions() const {
 	return Explode(RubyFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetLuaFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetLuaFileExtensions() const {
 	return Explode(LuaFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetMarkdownFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetMarkdownFileExtensions() const {
 	return Explode(MarkdownFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetBashFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetBashFileExtensions() const {
 	return Explode(BashFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetDiffFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetDiffFileExtensions() const {
 	return Explode(DiffFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetMiscFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetMiscFileExtensions() const {
 	return Explode(MiscFileExtensionsString);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetNonPhpFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetNonPhpFileExtensions() const {
 	wxString allNotPhpWildcards;
 	allNotPhpWildcards += CssFileExtensionsString;
 	allNotPhpWildcards += wxT(";") + SqlFileExtensionsString;
@@ -149,11 +149,11 @@ std::vector<wxString> mvceditor::FileTypeClass::GetNonPhpFileExtensions() const 
 	return Explode(allNotPhpWildcards);
 }
 
-std::vector<wxString> mvceditor::FileTypeClass::GetAllSourceFileExtensions() const {
+std::vector<wxString> t4p::FileTypeClass::GetAllSourceFileExtensions() const {
 	return Explode(GetAllSourceFileExtensionsString());
 }
 
-wxString mvceditor::FileTypeClass::GetAllSourceFileExtensionsString() const {
+wxString t4p::FileTypeClass::GetAllSourceFileExtensionsString() const {
 	wxString allWildcards;
 	allWildcards += PhpFileExtensionsString;
 	allWildcards += wxT(";") + CssFileExtensionsString;
@@ -172,59 +172,59 @@ wxString mvceditor::FileTypeClass::GetAllSourceFileExtensionsString() const {
 	return allWildcards;
 }
 
-bool mvceditor::FileTypeClass::HasAPhpExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAPhpExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, PhpFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasABashExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasABashExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, BashFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAConfigExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAConfigExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, ConfigFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasACrontabExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasACrontabExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, CrontabFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasACssExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasACssExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, CssFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasADiffExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasADiffExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, DiffFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAJsExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAJsExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, JsFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasALuaExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasALuaExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, LuaFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAMarkdownExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAMarkdownExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, MarkdownFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAMiscExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAMiscExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, MiscFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasARubyExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasARubyExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, RubyFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasASqlExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasASqlExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, SqlFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAXmlExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAXmlExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, XmlFileExtensionsString);
 }
 
-bool mvceditor::FileTypeClass::HasAYamlExtension(const wxString& fullPath) const {
+bool t4p::FileTypeClass::HasAYamlExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, YamlFileExtensionsString);
 }
 

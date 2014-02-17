@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_SYNTAXHIGHLIGHTFEATURECLASS_H__
-#define __MVCEDITOR_SYNTAXHIGHLIGHTFEATURECLASS_H__
+#ifndef __T4P_SYNTAXHIGHLIGHTFEATURECLASS_H__
+#define __T4P_SYNTAXHIGHLIGHTFEATURECLASS_H__
 
 #include <globals/Events.h>
 #include <features/FeatureClass.h>
@@ -32,7 +32,7 @@
 #include <globals/CodeControlOptionsClass.h>
 #include <globals/GlobalsClass.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration - defined below
 class SyntaxHighlightFeatureClass;
@@ -53,22 +53,22 @@ protected:
 public:
 	/** Constructor */
 	EditColorsPanelClass(wxWindow* parent,
-	                     mvceditor::SyntaxHighlightFeatureClass& feature);
+	                     t4p::SyntaxHighlightFeatureClass& feature);
 
 	bool TransferDataFromWindow();
 private:
 
-	mvceditor::CodeControlOptionsClass& CodeControlOptions;
+	t4p::CodeControlOptionsClass& CodeControlOptions;
 
-	mvceditor::CodeControlOptionsClass EditedCodeControlOptions;
+	t4p::CodeControlOptionsClass EditedCodeControlOptions;
 
-	mvceditor::CodeControlClass* CodeCtrl;
+	t4p::CodeControlClass* CodeCtrl;
 
-	mvceditor::GlobalsClass Globals;
+	t4p::GlobalsClass Globals;
 
-	mvceditor::EventSinkClass EventSink;
+	t4p::EventSinkClass EventSink;
 
-	mvceditor::SyntaxHighlightFeatureClass& Feature;
+	t4p::SyntaxHighlightFeatureClass& Feature;
 	
 	void AddPreviews();
 };
@@ -81,16 +81,16 @@ private:
  * sets the appropriate colors based on file type. It will
  * also set colors for the code control margins
  */
-class SyntaxHighlightFeatureClass : public mvceditor::FeatureClass {
+class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
 
 public:
-	SyntaxHighlightFeatureClass(mvceditor::AppClass& app);
+	SyntaxHighlightFeatureClass(t4p::AppClass& app);
 	
 	/**
 	 * Determine the correct styles to use based on the
 	 * code control's document mode
 	 */
-	void ApplyPreferences(mvceditor::CodeControlClass* ctrl);
+	void ApplyPreferences(t4p::CodeControlClass* ctrl);
 
 private:
 
@@ -98,8 +98,8 @@ private:
 	 * when a file is opened or created, we will
 	 * set the colors on the Scintilla code control
 	 */
-	void OnFileNew(mvceditor::CodeControlEventClass& event);
-	void OnFileOpen(mvceditor::CodeControlEventClass& event);
+	void OnFileNew(t4p::CodeControlEventClass& event);
+	void OnFileOpen(t4p::CodeControlEventClass& event);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
@@ -123,13 +123,13 @@ private:
 	/**
 	 * set the colors for all lexer styles
 	 */
-	void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<mvceditor::StylePreferenceClass>& styles);
+	void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles);
 
 	/**
 	 * Set the font, EOL, tab options of the source control
 	 * Set generic defaults for plain text editing.
 	 */
-	void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<mvceditor::StylePreferenceClass>& styles);
+	void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles);
 
 	/**
 	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
@@ -173,4 +173,4 @@ private:
 
 }
 
-#endif // __MVCEDITOR_SYNTAXHIGHLIGHTFEATURECLASS_H__
+#endif // __T4P_SYNTAXHIGHLIGHTFEATURECLASS_H__

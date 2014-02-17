@@ -33,8 +33,8 @@
  * This is a fxture class that can be used for unit tests that need to have database
  * calls. This class will connect to the database and create a test database upon
  * object creation.
- * Note that the user/password credentials come from a set of macros (MVCEDITOR_DB_PASSWORD 
- * and MVCEDITOR_DB_USER.
+ * Note that the user/password credentials come from a set of macros (T4P_DB_PASSWORD 
+ * and T4P_DB_USER.
  */
 class DatabaseTestFixtureClass {
 
@@ -75,12 +75,12 @@ public:
 	bool Exec(const std::string& query);
 
 	/**
-	 * Returns the user name, as configured by the MVCEDITOR_DB_USER macro
+	 * Returns the user name, as configured by the T4P_DB_USER macro
 	 */
 	std::string UserName() const;
 
 	/**
-	 * Returns the user name, as configured by the MVCEDITOR_DB_PASSWORD macro
+	 * Returns the user name, as configured by the T4P_DB_PASSWORD macro
 	 */
 	std::string Password() const;
 	

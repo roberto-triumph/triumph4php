@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORRESOURCECACHECLASS_H__
-#define __MVCEDITORRESOURCECACHECLASS_H__
+#ifndef __T4P_RESOURCECACHECLASS_H__
+#define __T4P_RESOURCECACHECLASS_H__
 
 #include <search/DirectorySearchClass.h>
 #include <language/TagParserClass.h>
@@ -34,7 +34,7 @@
 #include <wx/thread.h>
 #include <wx/event.h>
  
-namespace mvceditor {
+namespace t4p {
 
 // forward declarations
 class DetectedTagNearMatchMemberResultClass;
@@ -59,7 +59,7 @@ public:
 	 * The object that keeps track of variable types; we only need
 	 * to keep track of variable types for opened files.
 	 */
-	mvceditor::SymbolTableClass SymbolTable;
+	t4p::SymbolTableClass SymbolTable;
 
 	/**
 	 * The full path to the file being parsed. This may be the empty string
@@ -146,7 +146,7 @@ public:
 	 * @return bool TRUE if fileName was not previously registered
 	 * only a unique fileName can be registered 
 	 */
-	bool RegisterWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache);
+	bool RegisterWorking(const wxString& fileName, t4p::WorkingCacheClass* cache);
 
 	/**
 	 * Updates the working cache for a given file. Cache should be updated often 
@@ -158,7 +158,7 @@ public:
 	 * @param cache the new cache for the file. In this method, this object will ALWAYS take
 	 *        ownership of the cache, unlike RegisterWorking() method
 	 */
-	bool ReplaceWorking(const wxString& fileName, mvceditor::WorkingCacheClass* cache);
+	bool ReplaceWorking(const wxString& fileName, t4p::WorkingCacheClass* cache);
 	
 	/**
 	 * Cleans up the tag finder from the given file. This should be called whenever
@@ -175,14 +175,14 @@ public:
 	 * 
 	 * @param tagFinderList this class will own the pointer
 	 */
-	void RegisterGlobal(mvceditor::TagFinderListClass* tagFinderList);
+	void RegisterGlobal(t4p::TagFinderListClass* tagFinderList);
 
 	/**
 	 * Set the global cache using the default settings (from Asset). After a call
 	 * to this method, the cache is available for use by 
 	 * the ExpressionCompletionMatches and ResourceMatches methods
 	 */
-	void RegisterDefault(mvceditor::GlobalsClass& globals);
+	void RegisterDefault(t4p::GlobalsClass& globals);
 	
 	/**
 	 * Searches the parsed tag finder
@@ -192,7 +192,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
+	t4p::TagResultClass* ExactTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 
 	/**
 	 * Searches the native tag finder
@@ -201,7 +201,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* ExactNativeTags(const UnicodeString& search);
+	t4p::TagResultClass* ExactNativeTags(const UnicodeString& search);
 
 	/**
 	 * Searches the detected tag finder
@@ -211,7 +211,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::DetectedTagExactMemberResultClass* ExactDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
+	t4p::DetectedTagExactMemberResultClass* ExactDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
 	
 	/**
 	 * Searches the tag cache using near-match logic
@@ -221,7 +221,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+	t4p::TagResultClass* NearMatchTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Searches the detected tag cache using near-match logic
@@ -231,7 +231,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::DetectedTagNearMatchMemberResultClass* NearMatchDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+	t4p::DetectedTagNearMatchMemberResultClass* NearMatchDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Searches the native tag cache using near-match logic
@@ -240,7 +240,7 @@ public:
 	 * @return TagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::TagResultClass* NearMatchNativeTags(const UnicodeString& search);
+	t4p::TagResultClass* NearMatchNativeTags(const UnicodeString& search);
 
 	/**
 	 * Searches the tag cache for filenames using exact-match logic on file names or full paths
@@ -250,7 +250,7 @@ public:
 	 * @return FiileTagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::FileTagResultClass* ExactFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+	t4p::FileTagResultClass* ExactFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Searches the tag cache for filenames using near-match logic
@@ -260,34 +260,34 @@ public:
 	 * @return FiileTagResultClass to iterate through the results of the query. The
 	 *          returned pointer must be deleted by the caller.
 	 */
-	mvceditor::FileTagResultClass* NearMatchFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
+	t4p::FileTagResultClass* NearMatchFileTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactClassOrFile
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes 
+	 * @return std::vector<t4p::TagClass> matched resources. will be either files or classes 
 	 */
-	std::vector<mvceditor::TagClass> ExactClassOrFile(const UnicodeString& search);
+	std::vector<t4p::TagClass> ExactClassOrFile(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactClass
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be class tags only
+	 * @return std::vector<t4p::TagClass> matched resources. will be class tags only
 	 */
-	std::vector<mvceditor::TagClass> ExactClass(const UnicodeString& search);
+	std::vector<t4p::TagClass> ExactClass(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactFunction
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be function tags only
+	 * @return std::vector<t4p::TagClass> matched resources. will be function tags only
 	 */
-	std::vector<mvceditor::TagClass> ExactFunction(const UnicodeString& search);
+	std::vector<t4p::TagClass> ExactFunction(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -295,9 +295,9 @@ public:
 	 * on each tag finder). Note that matching methods from all classes are returned
 	 * @param search string to search for
 	 * @param onlyStatic if TRUE, then only static methods will be returned
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be method tags only
+	 * @return std::vector<t4p::TagClass> matched resources. will be method tags only
 	 */
-	std::vector<mvceditor::TagClass> ExactMethod(const UnicodeString& search, bool onlyStatic);
+	std::vector<t4p::TagClass> ExactMethod(const UnicodeString& search, bool onlyStatic);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -305,9 +305,9 @@ public:
 	 * on each tag finder). Note that matching properties/constants from all classes are returned.
 	 * @param search string to search for
 	 * @param onlyStatic if TRUE, then only static properties and constants will be returned
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be function tags only
+	 * @return std::vector<t4p::TagClass> matched resources. will be function tags only
 	 */
-	std::vector<mvceditor::TagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
+	std::vector<t4p::TagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -315,9 +315,9 @@ public:
 	 * on each tag finder).
 	 *
 	 * @param string to search for
-	 * @return std::vector<mvceditor::TagClass> matched resources. will be either files or classes
+	 * @return std::vector<t4p::TagClass> matched resources. will be either files or classes
 	 */
-	std::vector<mvceditor::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
+	std::vector<t4p::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
 
 	/**
 	 * gets all tags for a single class
@@ -330,7 +330,7 @@ public:
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<mvceditor::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs);
+	std::vector<t4p::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including
@@ -340,7 +340,7 @@ public:
 	 * @return vector of tags; 
 	 *         all classes, functions or define's in the give file
 	 */
-	std::vector<mvceditor::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
+	std::vector<t4p::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed variable.
@@ -429,7 +429,7 @@ public:
 	 * @param tag out parameter, will be filled in with the tag data
 	 * @return bool TRUE if the ID was found
 	 */
-	bool FindById(int id, mvceditor::TagClass& tag);
+	bool FindById(int id, t4p::TagClass& tag);
 
 	/**
 	 * @param fullPath filename to delete tags that were found in filename.
@@ -461,19 +461,19 @@ private:
 	 * 
 	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
-	std::vector<mvceditor::ParsedTagFinderClass*> AllFinders();
+	std::vector<t4p::ParsedTagFinderClass*> AllFinders();
 	
 	/**
 	 * These are the tag finders from the ALL projects and native functions; it may include stale resources
 	 * This class will own the pointer and will delete them when appropriate.
 	 */
-	mvceditor::TagFinderListClass* TagFinderList;
+	t4p::TagFinderListClass* TagFinderList;
 	
 	/**
 	 * To calculate variable type information
 	 * This class will own these pointers and will delete them when appropriate.
 	 */
-	std::map<wxString, mvceditor::WorkingCacheClass*> WorkingCaches;
+	std::map<wxString, t4p::WorkingCacheClass*> WorkingCaches;
 };
 
 /**
@@ -495,7 +495,7 @@ public:
 	/**
 	 * This will be owned by the event handler
 	 */
-	mvceditor::WorkingCacheClass* WorkingCache;
+	t4p::WorkingCacheClass* WorkingCache;
 
 	/**
 	 * @param evetId the event ID
@@ -507,7 +507,7 @@ public:
 	 *        this pointer will be owned by the event handler.
 	 */
 	WorkingCacheCompleteEventClass(int eventId, 
-		const wxString& fileName, const wxString& fileIdentifier, mvceditor::WorkingCacheClass* workingCache);
+		const wxString& fileName, const wxString& fileIdentifier, t4p::WorkingCacheClass* workingCache);
 
 	wxEvent* Clone() const;
 
@@ -538,24 +538,24 @@ public:
 
 }
 
-typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(mvceditor::WorkingCacheCompleteEventClass&);
+typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(t4p::WorkingCacheCompleteEventClass&);
 
 #define EVT_WORKING_CACHE_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
-typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(mvceditor::TagFinderListCompleteEventClass&);
+typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(t4p::TagFinderListCompleteEventClass&);
 
 #define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
-typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(mvceditor::TagFinderListCompleteEventClass&);
+typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(t4p::TagFinderListCompleteEventClass&);
 
 #define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 

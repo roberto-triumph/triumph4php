@@ -22,12 +22,12 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITORERRORS_H__
-#define __MVCEDITORERRORS_H__
+#ifndef __T4P_ERRORS_H__
+#define __T4P_ERRORS_H__
 
 #include <wx/string.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * These are errors from the editor itself; not the app that the editor is

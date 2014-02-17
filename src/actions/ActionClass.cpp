@@ -26,7 +26,7 @@
 #include <wx/intl.h>
 #include <algorithm>
 	
-mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ActionClass::ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: RunningThreads(runningThreads)
 	, EventId(eventId)
 	, ActionId(0)
@@ -36,11 +36,11 @@ mvceditor::ActionClass::ActionClass(mvceditor::RunningThreadsClass& runningThrea
 	, PercentComplete(0) {
 }
 
-mvceditor::ActionClass::~ActionClass() {
+t4p::ActionClass::~ActionClass() {
 
 }
 
-void mvceditor::ActionClass::Cancel() {
+void t4p::ActionClass::Cancel() {
 	{
 	wxMutexLocker locker(Mutex);
 	Cancelled = true;
@@ -48,69 +48,69 @@ void mvceditor::ActionClass::Cancel() {
 	DoCancel();
 }
 
-bool mvceditor::ActionClass::IsCancelled() {
+bool t4p::ActionClass::IsCancelled() {
 	wxMutexLocker locker(Mutex);
 	return Cancelled;
 }
 
-void mvceditor::ActionClass::SetStatus(const wxString& status) {
-	mvceditor::ActionProgressEventClass evt(wxID_ANY, GetProgressMode(), GetPercentComplete(), status);
+void t4p::ActionClass::SetStatus(const wxString& status) {
+	t4p::ActionProgressEventClass evt(wxID_ANY, GetProgressMode(), GetPercentComplete(), status);
 	PostEvent(evt);
 }
 
-int mvceditor::ActionClass::GetEventId() const {
+int t4p::ActionClass::GetEventId() const {
 	return EventId;
 }
 
-void mvceditor::ActionClass::SetActionId(int actionId) {
+void t4p::ActionClass::SetActionId(int actionId) {
 	wxMutexLocker locker(Mutex);
 	ActionId = actionId;
 }
 
-int mvceditor::ActionClass::GetActionId() {
+int t4p::ActionClass::GetActionId() {
 	wxMutexLocker locker(Mutex);
 	return ActionId;
 }
 
-void mvceditor::ActionClass::PostEvent(wxEvent& event) {
+void t4p::ActionClass::PostEvent(wxEvent& event) {
 	event.SetId(EventId);
 	RunningThreads.PostEvent(event);
 }
 
-void mvceditor::ActionClass::DoCancel() {
+void t4p::ActionClass::DoCancel() {
 }
 
 
-void mvceditor::ActionClass::SetProgressMode(mvceditor::ActionClass::ProgressMode mode) {
+void t4p::ActionClass::SetProgressMode(t4p::ActionClass::ProgressMode mode) {
 	wxMutexLocker locker(Mutex);
 	Mode = mode;
 }
 
-mvceditor::ActionClass::ProgressMode mvceditor::ActionClass::GetProgressMode() {
+t4p::ActionClass::ProgressMode t4p::ActionClass::GetProgressMode() {
 	wxMutexLocker locker(Mutex);
 	return Mode;
 }
 
-void mvceditor::ActionClass::SetPercentComplete(int percentComplete) {
+void t4p::ActionClass::SetPercentComplete(int percentComplete) {
 	wxMutexLocker locker(Mutex);
 	PercentComplete = percentComplete;
 }
 
-int mvceditor::ActionClass::GetPercentComplete() {
+int t4p::ActionClass::GetPercentComplete() {
 	wxMutexLocker locker(Mutex);
 	return PercentComplete;
 }
 
 
-void mvceditor::ActionClass::SignalEnd() {
+void t4p::ActionClass::SignalEnd() {
 	wxString msg = wxString::Format(wxT("Action \"%s\" stopped...\n"), (const char*)GetLabel().c_str());
-	mvceditor::ActionEventClass evt(GetEventId(), mvceditor::EVENT_ACTION_COMPLETE, msg);
+	t4p::ActionEventClass evt(GetEventId(), t4p::EVENT_ACTION_COMPLETE, msg);
 	PostEvent(evt);
 }
 
-mvceditor::ThreadActionClass::ThreadActionClass(std::queue<mvceditor::ActionClass*>& actions, wxMutex& actionsMutex, 
+t4p::ThreadActionClass::ThreadActionClass(std::queue<t4p::ActionClass*>& actions, wxMutex& actionsMutex, 
 												wxSemaphore& finishSemaphore,
-												mvceditor::ThreadCleanupClass* threadCleanup)
+												t4p::ThreadCleanupClass* threadCleanup)
 	: wxThread(wxTHREAD_DETACHED) 
 	, Actions(actions)
 	, ActionsMutex(actionsMutex) 
@@ -121,36 +121,36 @@ mvceditor::ThreadActionClass::ThreadActionClass(std::queue<mvceditor::ActionClas
 
 }
 
-void mvceditor::ThreadActionClass::CancelRunningActionIf(int actionId) {
+void t4p::ThreadActionClass::CancelRunningActionIf(int actionId) {
 	wxMutexLocker locker(RunningActionMutex);
 	if (RunningAction && RunningAction->GetActionId() == actionId) {
 		RunningAction->Cancel();
 	}
 }
 
-void mvceditor::ThreadActionClass::CancelRunningAction() {
+void t4p::ThreadActionClass::CancelRunningAction() {
 	wxMutexLocker locker(RunningActionMutex);
 	if (RunningAction) {
 		RunningAction->Cancel();
 	}
 }
 
-void mvceditor::ThreadActionClass::PostProgressEvent() {
+void t4p::ThreadActionClass::PostProgressEvent() {
 	wxMutexLocker locker(RunningActionMutex);
 	if (RunningAction) {
 		int eventId = RunningAction->GetEventId();
-		mvceditor::ActionProgressEventClass evt(eventId, RunningAction->GetProgressMode(), RunningAction->GetPercentComplete(), wxT(""));
+		t4p::ActionProgressEventClass evt(eventId, RunningAction->GetProgressMode(), RunningAction->GetPercentComplete(), wxT(""));
 		RunningAction->PostEvent(evt);	
 	}
 }
 
-void* mvceditor::ThreadActionClass::Entry() {
+void* t4p::ThreadActionClass::Entry() {
 	while (!TestDestroy()) {
-		mvceditor::ActionClass* action = NextAction();
+		t4p::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
 			
 			// signal the start of this action
-			mvceditor::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
+			t4p::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
 			action->PostEvent(evt);
 
 			action->BackgroundWork();
@@ -186,8 +186,8 @@ void* mvceditor::ThreadActionClass::Entry() {
 	return 0;
 }
 
-mvceditor::ActionClass* mvceditor::ThreadActionClass::NextAction() {
-	mvceditor::ActionClass* action = NULL;
+t4p::ActionClass* t4p::ThreadActionClass::NextAction() {
+	t4p::ActionClass* action = NULL;
 	wxMutexLocker locker(ActionsMutex);
 	if (!Actions.empty()) {
 		action = Actions.front();
@@ -201,14 +201,14 @@ mvceditor::ActionClass* mvceditor::ThreadActionClass::NextAction() {
 	return action;
 }
 
-void mvceditor::ThreadActionClass::ActionComplete(mvceditor::ActionClass* action) {
+void t4p::ThreadActionClass::ActionComplete(t4p::ActionClass* action) {
 	action->SignalEnd();
 	wxMutexLocker actionLocker(RunningActionMutex);
 	delete action;
 	RunningAction = NULL;	
 }
 
-void mvceditor::ThreadActionClass::CleanupAllActions() {
+void t4p::ThreadActionClass::CleanupAllActions() {
 	wxMutexLocker locker(ActionsMutex);
 	while (!Actions.empty()) {
 		delete Actions.front();
@@ -216,7 +216,7 @@ void mvceditor::ThreadActionClass::CleanupAllActions() {
 	}
 }
   
-mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
+t4p::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	: wxEvtHandler()
 	, Actions()
 	, ActionMutex()
@@ -234,7 +234,7 @@ mvceditor::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	SetMaxThreads(wxThread::GetCPUCount());
 }
 
-mvceditor::RunningThreadsClass::~RunningThreadsClass() {
+t4p::RunningThreadsClass::~RunningThreadsClass() {
 	Shutdown();
 	delete Semaphore;
 	if (ThreadCleanup) {
@@ -242,7 +242,7 @@ mvceditor::RunningThreadsClass::~RunningThreadsClass() {
 	}
 }
 
-void mvceditor::RunningThreadsClass::SetMaxThreads(int maxThreads) {
+void t4p::RunningThreadsClass::SetMaxThreads(int maxThreads) {
 	if (maxThreads <= 0) {
 		maxThreads = wxThread::GetCPUCount();
 	}
@@ -256,7 +256,7 @@ void mvceditor::RunningThreadsClass::SetMaxThreads(int maxThreads) {
 	Semaphore = new wxSemaphore(0, MaxThreads);
 }
   
-int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
+int t4p::RunningThreadsClass::Queue(t4p::ActionClass* action) {
 	if (IsShutdown) {
 		delete action;
 		wxASSERT_MSG(IsShutdown, _("Cannot queue items when the running threads has been shutdown"));
@@ -283,7 +283,7 @@ int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
 			if (ThreadCleanup) {
 				cleanup = ThreadCleanup->Clone();
 			}
-			mvceditor::ThreadActionClass* thread = new mvceditor::ThreadActionClass(
+			t4p::ThreadActionClass* thread = new t4p::ThreadActionClass(
 				Actions, ActionMutex, *Semaphore, 
 				
 				// each thread gets its own instance, so that we dont have to worry about
@@ -301,7 +301,7 @@ int mvceditor::RunningThreadsClass::Queue(mvceditor::ActionClass* action) {
 	return actionId;
 }
 
-void mvceditor::RunningThreadsClass::CancelAction(int actionId) {
+void t4p::RunningThreadsClass::CancelAction(int actionId) {
 
 	// this is an important lock because it ensures that
 	// the front action is not deleted while we try to call Cancel on it
@@ -315,8 +315,8 @@ void mvceditor::RunningThreadsClass::CancelAction(int actionId) {
 
 	// the threads in the queue are not yet running, so we can just
 	// remove them from the queue
-	std::queue<mvceditor::ActionClass*> checked;
-	mvceditor::ActionClass* action;
+	std::queue<t4p::ActionClass*> checked;
+	t4p::ActionClass* action;
 	while (!Actions.empty()) {
 		action = Actions.front();
 		if (action->GetActionId() != actionId) {
@@ -343,13 +343,13 @@ void mvceditor::RunningThreadsClass::CancelAction(int actionId) {
 	// the thread dies.  we cannot delete it here because the thread
 	// is still running and delete it will cause crashes (invalid memory
 	// accesses)	
-	std::vector<mvceditor::ThreadActionClass*>::iterator thread;
+	std::vector<t4p::ThreadActionClass*>::iterator thread;
 	for (thread = ThreadActions.begin(); thread != ThreadActions.end(); ++thread) {
 		(*thread)->CancelRunningActionIf(actionId);
 	}
 }
 
-void mvceditor::RunningThreadsClass::StopAll() {
+void t4p::RunningThreadsClass::StopAll() {
 
 	// stop the timer, the in progress handler will want
 	// to lock the action mutex
@@ -370,7 +370,7 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	}
 
 	// if there are running actions stop then signal them to stop
-	std::vector<mvceditor::ThreadActionClass*>::iterator thread;
+	std::vector<t4p::ThreadActionClass*>::iterator thread;
 	for (thread = ThreadActions.begin(); thread != ThreadActions.end(); ++thread) {
 		(*thread)->CancelRunningAction();
 	}
@@ -391,18 +391,18 @@ void mvceditor::RunningThreadsClass::StopAll() {
 	ThreadActions.clear();
 }
 
-void mvceditor::RunningThreadsClass::Shutdown() {
+void t4p::RunningThreadsClass::Shutdown() {
 	IsShutdown = true;
 	StopAll();
 }
 
-void mvceditor::RunningThreadsClass::AddEventHandler(wxEvtHandler *handler) {
+void t4p::RunningThreadsClass::AddEventHandler(wxEvtHandler *handler) {
 	wxMutexLocker locker(HandlerMutex);
 	wxASSERT(locker.IsOk());
 	Handlers.push_back(handler);
 }
 
-void mvceditor::RunningThreadsClass::RemoveEventHandler(wxEvtHandler *handler) {
+void t4p::RunningThreadsClass::RemoveEventHandler(wxEvtHandler *handler) {
 	wxMutexLocker locker(HandlerMutex);
 	wxASSERT(locker.IsOk());
 	std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
@@ -411,7 +411,7 @@ void mvceditor::RunningThreadsClass::RemoveEventHandler(wxEvtHandler *handler) {
 	}
 }
 
-void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
+void t4p::RunningThreadsClass::PostEvent(wxEvent& event) {
 	wxMutexLocker locker(HandlerMutex);
 	wxASSERT(locker.IsOk());
 	std::vector<wxEvtHandler*>::iterator it;
@@ -425,7 +425,7 @@ void mvceditor::RunningThreadsClass::PostEvent(wxEvent& event) {
 	}
 }
 
-void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
+void t4p::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 
 	// if there is an action that is running then send an in-progress event
 	// for it
@@ -434,23 +434,23 @@ void mvceditor::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
 	}
 }
 
-void mvceditor::RunningThreadsClass::SetThreadCleanup(mvceditor::ThreadCleanupClass* threadCleanup) {
+void t4p::RunningThreadsClass::SetThreadCleanup(t4p::ThreadCleanupClass* threadCleanup) {
 	ThreadCleanup = threadCleanup;
 }
 
-mvceditor::ActionEventClass::ActionEventClass(int id, wxEventType type, const wxString& msg) 
+t4p::ActionEventClass::ActionEventClass(int id, wxEventType type, const wxString& msg) 
 : wxEvent(id, type)
 , Message() {
 	Message.append(msg);
 }
 
-wxEvent* mvceditor::ActionEventClass::Clone() const {
-	mvceditor::ActionEventClass* clone = new mvceditor::ActionEventClass(GetId(), GetEventType(), Message);
+wxEvent* t4p::ActionEventClass::Clone() const {
+	t4p::ActionEventClass* clone = new t4p::ActionEventClass(GetId(), GetEventType(), Message);
 	return clone;
 }
 
-mvceditor::ActionProgressEventClass::ActionProgressEventClass(int id, mvceditor::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
-: wxEvent(id, mvceditor::EVENT_ACTION_PROGRESS)
+t4p::ActionProgressEventClass::ActionProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
+: wxEvent(id, t4p::EVENT_ACTION_PROGRESS)
 , Mode(mode)
 , PercentComplete(percentComplete) 
 
@@ -459,14 +459,14 @@ mvceditor::ActionProgressEventClass::ActionProgressEventClass(int id, mvceditor:
 
 }
 
-wxEvent* mvceditor::ActionProgressEventClass::Clone() const {
-	return new mvceditor::ActionProgressEventClass(GetId(), Mode, PercentComplete, Message);
+wxEvent* t4p::ActionProgressEventClass::Clone() const {
+	return new t4p::ActionProgressEventClass(GetId(), Mode, PercentComplete, Message);
 }
 
-const wxEventType mvceditor::EVENT_ACTION_PROGRESS = wxNewEventType();
-const wxEventType mvceditor::EVENT_ACTION_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_ACTION_PROGRESS = wxNewEventType();
+const wxEventType t4p::EVENT_ACTION_COMPLETE = wxNewEventType();
 
 
-BEGIN_EVENT_TABLE(mvceditor::RunningThreadsClass, wxEvtHandler)
-	EVT_TIMER(wxID_ANY, mvceditor::RunningThreadsClass::OnTimer)
+BEGIN_EVENT_TABLE(t4p::RunningThreadsClass, wxEvtHandler)
+	EVT_TIMER(wxID_ANY, t4p::RunningThreadsClass::OnTimer)
 END_EVENT_TABLE()

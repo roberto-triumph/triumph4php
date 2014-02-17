@@ -31,7 +31,7 @@
 #include <actions/ActionClass.h>
 #include <wx/imaglist.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This is a class that will show the user any view files that are
@@ -45,13 +45,13 @@ namespace mvceditor {
  * After all of this, it will populate a window with the template files
  * for the URL that the user has selected.
  */
-class TemplateFilesFeatureClass : public mvceditor::FeatureClass {
+class TemplateFilesFeatureClass : public t4p::FeatureClass {
 	
 public:
 	
-	TemplateFilesFeatureClass(mvceditor::AppClass& app);
+	TemplateFilesFeatureClass(t4p::AppClass& app);
 
-	void SetCurrentUrl(mvceditor::UrlTagClass url);
+	void SetCurrentUrl(t4p::UrlTagClass url);
 	
 	void AddViewMenuItems(wxMenu* viewMenu);
 
@@ -85,7 +85,7 @@ private:
 	/**
 	 * when the template file detection process completes update the variable tree
 	 */
-	void OnTemplateDetectionComplete(mvceditor::ActionEventClass& event);
+	void OnTemplateDetectionComplete(t4p::ActionEventClass& event);
 		
 	void ShowPanel();
 	

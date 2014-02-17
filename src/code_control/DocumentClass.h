@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_DOCUMENTCLASS_H__
-#define __MVCEDITOR_DOCUMENTCLASS_H__
+#ifndef __T4P_DOCUMENTCLASS_H__
+#define __T4P_DOCUMENTCLASS_H__
 
 #include <globals/ProjectClass.h>
 #include <pelet/LexicalAnalyzerClass.h>
@@ -36,7 +36,7 @@
 #include <wx/stc/stc.h>
 #include <unicode/unistr.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration; prevent recursive dependencies
 class CodeControlClass;
@@ -178,7 +178,7 @@ public:
 	 * @param globals This class will NOT own this pointer. Caller must manage (delete) it.
 	 *   globals helps with autocompletion
 	 */
-	PhpDocumentClass(mvceditor::GlobalsClass* globals);
+	PhpDocumentClass(t4p::GlobalsClass* globals);
 
 	~PhpDocumentClass();
 
@@ -333,7 +333,7 @@ private:
 	 * The resources that are shown in the code completion list. Keeping these around
 	 * so that we can append the '(' for method calls.
 	 */
-	std::vector<mvceditor::TagClass> AutoCompletionResourceMatches;
+	std::vector<t4p::TagClass> AutoCompletionResourceMatches;
 
 	/**
 	 * To access any global structures: the tag cache, template variables

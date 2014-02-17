@@ -22,15 +22,15 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_GLOBALSCHANGECLASS_H__
-#define __MVCEDITOR_GLOBALSCHANGECLASS_H__
+#ifndef __T4P_GLOBALSCHANGECLASS_H__
+#define __T4P_GLOBALSCHANGECLASS_H__
 
 #include <globals/GlobalsClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <wx/event.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Class responsible for capturing all events that modify the global
@@ -42,19 +42,19 @@ class GlobalsChangeHandlerClass : public wxEvtHandler {
 
 public:
 
-	GlobalsChangeHandlerClass(mvceditor::GlobalsClass& globals);
+	GlobalsChangeHandlerClass(t4p::GlobalsClass& globals);
 
 private:
 
-	mvceditor::GlobalsClass& Globals;
+	t4p::GlobalsClass& Globals;
 	
-	void OnSqlMetaDataComplete(mvceditor::SqlMetaDataEventClass& event);
+	void OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event);
 
 	/**
 	 * when the php database detectors have completed, put all of the detected database
 	 * tags in the globals list.
 	 */
-	void OnDatabaseTagsComplete(mvceditor::ActionEventClass& event);
+	void OnDatabaseTagsComplete(t4p::ActionEventClass& event);
 	
 	DECLARE_EVENT_TABLE()
 

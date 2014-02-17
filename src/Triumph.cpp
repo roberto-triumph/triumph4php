@@ -55,7 +55,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
-IMPLEMENT_APP(mvceditor::AppClass)
+IMPLEMENT_APP(t4p::AppClass)
 
 /**
  * class that will cleanup mysql thread data.  we will give an instance
@@ -63,9 +63,9 @@ IMPLEMENT_APP(mvceditor::AppClass)
  * The mysql driver allocates data per thread; we need to clean it up
  * when the thread dies.
  */
-namespace mvceditor {
+namespace t4p {
 
-class MysqlThreadCleanupClass : public mvceditor::ThreadCleanupClass {
+class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 
 public:
 
@@ -77,7 +77,7 @@ public:
 	
 	}
 
-	mvceditor::ThreadCleanupClass* Clone() {
+	t4p::ThreadCleanupClass* Clone() {
 		return new MysqlThreadCleanupClass();
 	}
 };
@@ -86,7 +86,7 @@ public:
 
 static int ID_EVENT_CONFIG_FILE_CHECK = wxNewId();
 
-mvceditor::AppClass::AppClass()
+t4p::AppClass::AppClass()
 	: wxApp()
 	, Globals()
 	, RunningThreads()
@@ -106,16 +106,16 @@ mvceditor::AppClass::AppClass()
 /**
  * when app starts, create the new app frame
  */
-bool mvceditor::AppClass::OnInit() {
+bool t4p::AppClass::OnInit() {
 	
 	// 1 ==> to make sure any queued items are done one at a time
 	SqliteRunningThreads.SetMaxThreads(1);
 	
-	RunningThreads.SetThreadCleanup(new mvceditor::MysqlThreadCleanupClass);
+	RunningThreads.SetThreadCleanup(new t4p::MysqlThreadCleanupClass);
 	
 	// not really needed since we will use this running threads for sqlite actions only,
 	// but just in case
-	SqliteRunningThreads.SetThreadCleanup(new mvceditor::MysqlThreadCleanupClass);
+	SqliteRunningThreads.SetThreadCleanup(new t4p::MysqlThreadCleanupClass);
 	Globals.Environment.Init();
 	Preferences.Init();
 	SqliteRunningThreads.AddEventHandler(&GlobalsChangeHandler);
@@ -138,7 +138,7 @@ bool mvceditor::AppClass::OnInit() {
 	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	MainFrame = new mvceditor::MainFrameClass(Features, *this, Preferences);
+	MainFrame = new t4p::MainFrameClass(Features, *this, Preferences);
 	FeatureWindows();
 	LoadPreferences();
 	MainFrame->AuiManagerUpdate();
@@ -155,14 +155,14 @@ bool mvceditor::AppClass::OnInit() {
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
-		wxLog::SetActiveTarget(new mvceditor::EditorMessagesLoggerClass(*EditorMessagesFeature));
+		wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*EditorMessagesFeature));
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
 	}
 	return false;
 }
 
-mvceditor::AppClass::~AppClass() {
+t4p::AppClass::~AppClass() {
 	Timer.Stop();
 	RunningThreads.RemoveEventHandler(&GlobalsChangeHandler);
 	RunningThreads.RemoveEventHandler(&Timer);
@@ -180,7 +180,7 @@ mvceditor::AppClass::~AppClass() {
 }
 
 
-bool mvceditor::AppClass::CommandLine() {
+bool t4p::AppClass::CommandLine() {
 	bool ret = true;
 	wxCmdLineEntryDesc description[3];
 	description[0].description = "File name to open on startup";
@@ -219,7 +219,7 @@ bool mvceditor::AppClass::CommandLine() {
 	return ret;
 }
 
-void mvceditor::AppClass::CreateFeatures() {
+void t4p::AppClass::CreateFeatures() {
 	FeatureClass* feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FinderFeatureClass(*this);
@@ -240,7 +240,7 @@ void mvceditor::AppClass::CreateFeatures() {
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
 
-	EditorMessagesFeature = new mvceditor::EditorMessagesFeatureClass(*this);
+	EditorMessagesFeature = new t4p::EditorMessagesFeatureClass(*this);
 	Features.push_back(EditorMessagesFeature);
 
 	feature = new RunBrowserFeatureClass(*this);
@@ -281,14 +281,14 @@ void mvceditor::AppClass::CreateFeatures() {
 	}
 }
 
-void mvceditor::AppClass::FeatureWindows() {
+void t4p::AppClass::FeatureWindows() {
 	for (size_t i = 0; i < Features.size(); ++i) {
 		MainFrame->LoadFeature(Features[i]);
 	}
 	MainFrame->RealizeToolbar();
 }
 
-void mvceditor::AppClass::DeleteFeatures() {
+void t4p::AppClass::DeleteFeatures() {
 	for (size_t i = 0; i < Features.size(); ++i) {
 		RunningThreads.RemoveEventHandler(Features[i]);
 		SqliteRunningThreads.RemoveEventHandler(Features[i]);
@@ -306,7 +306,7 @@ void mvceditor::AppClass::DeleteFeatures() {
 	EditorMessagesFeature = NULL;
 }
 
-void mvceditor::AppClass::LoadPreferences() {
+void t4p::AppClass::LoadPreferences() {
 
 	// load any settings from .INI files
 	PreferencesClass::InitConfig();
@@ -321,7 +321,7 @@ void mvceditor::AppClass::LoadPreferences() {
 	Preferences.Load(config, MainFrame);
 }
 
-void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedDirectory) {
+void t4p::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedDirectory) {
 	if (changedDirectory) {
 
 		// write the location of the settings dir to the bootstrap file
@@ -331,8 +331,8 @@ void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool ch
 		Globals.Close();
 
 		// read the config; it now point to the newly chosen dir
-		Globals.TagCacheDbFileName = mvceditor::TagCacheAsset();
-		Globals.DetectorCacheDbFileName = mvceditor::DetectorCacheAsset();
+		Globals.TagCacheDbFileName = t4p::TagCacheAsset();
+		Globals.DetectorCacheDbFileName = t4p::DetectorCacheAsset();
 
 		// perform the app start sequence, which will open the tag caches
 		Sequences.AppStart();
@@ -341,7 +341,7 @@ void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool ch
 	Preferences.Save();
 
 	// tell each feature to save their own config 
-	wxCommandEvent evt(mvceditor::EVENT_APP_PREFERENCES_SAVED);
+	wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 	EventSink.Publish(evt);
 
 	// sine the event handlers have updated the config; lets persist the changes
@@ -352,50 +352,50 @@ void mvceditor::AppClass::SavePreferences(const wxFileName& settingsDir, bool ch
 	UpdateConfigModifiedTime();
 }
 
-void mvceditor::AppClass::StopConfigModifiedCheck() {
+void t4p::AppClass::StopConfigModifiedCheck() {
 	Timer.Stop();	
 }
 
-void mvceditor::AppClass::UpdateConfigModifiedTime() {
-	wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
+void t4p::AppClass::UpdateConfigModifiedTime() {
+	wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 	if (configFileName.FileExists()) {
 		ConfigLastModified = configFileName.GetModificationTime();
 	}
 	Timer.Start();
 }
 
-mvceditor::AppTimerClass::AppTimerClass(mvceditor::AppClass& app)
+t4p::AppTimerClass::AppTimerClass(t4p::AppClass& app)
 	: wxTimer()
 	, App(app) {
 	SetOwner(this, ID_EVENT_CONFIG_FILE_CHECK);
 }
 
-void mvceditor::AppTimerClass::Notify() {
+void t4p::AppTimerClass::Notify() {
 	
 	// tell all features that the app is ready to use
 	// the features will do / should do  their grunt
 	// work in their event handler
 	if (!App.IsAppReady) {
 		App.IsAppReady = true;
-		wxFileName settingsDir = mvceditor::SettingsDirAsset();
-		wxCommandEvent evt(mvceditor::EVENT_APP_READY);
+		wxFileName settingsDir = t4p::SettingsDirAsset();
+		wxCommandEvent evt(t4p::EVENT_APP_READY);
 		App.EventSink.Publish(evt);
 
 		if (settingsDir.IsOk()) {
 			App.Sequences.AppStart();
 		}
-		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
+		wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 		if (configFileName.FileExists()) {
 			App.ConfigLastModified = configFileName.GetModificationTime();
 		}
 	}
 	else {
-		wxFileName configFileName(mvceditor::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
+		wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 		if (configFileName.FileExists()) {
-			mvceditor::FileModifiedCheckActionClass* action = 
-				new mvceditor::FileModifiedCheckActionClass(App.RunningThreads, ID_EVENT_CONFIG_FILE_CHECK);
-			std::vector<mvceditor::FileModifiedTimeClass> fileMods;
-			mvceditor::FileModifiedTimeClass fileMod;
+			t4p::FileModifiedCheckActionClass* action = 
+				new t4p::FileModifiedCheckActionClass(App.RunningThreads, ID_EVENT_CONFIG_FILE_CHECK);
+			std::vector<t4p::FileModifiedTimeClass> fileMods;
+			t4p::FileModifiedTimeClass fileMod;
 			fileMod.FileName = configFileName;
 			fileMod.ModifiedTime = App.ConfigLastModified;
 			fileMods.push_back(fileMod);
@@ -406,7 +406,7 @@ void mvceditor::AppTimerClass::Notify() {
 	}
 }
 
-void mvceditor::AppTimerClass::OnConfigFileModified(mvceditor::FilesModifiedEventClass& event) {
+void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& event) {
 
 	// stop the timer so that we dont show this prompt multiple times
 	App.Timer.Stop();
@@ -439,6 +439,6 @@ void mvceditor::AppTimerClass::OnConfigFileModified(mvceditor::FilesModifiedEven
 	App.Timer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
-BEGIN_EVENT_TABLE(mvceditor::AppTimerClass, wxTimer)
-	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_EVENT_CONFIG_FILE_CHECK, mvceditor::AppTimerClass::OnConfigFileModified)
+BEGIN_EVENT_TABLE(t4p::AppTimerClass, wxTimer)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_EVENT_CONFIG_FILE_CHECK, t4p::AppTimerClass::OnConfigFileModified)
 END_EVENT_TABLE()

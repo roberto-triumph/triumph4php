@@ -65,11 +65,11 @@ int main() {
 void ProfileFindInFilesExactMode() {
 	printf("*******\n");
 	wxLongLong time = wxGetLocalTimeMillis();
-	mvceditor::DirectorySearchClass directorySearch;
+	t4p::DirectorySearchClass directorySearch;
 	if (directorySearch.Init(DirName)) {
-		mvceditor::FindInFilesClass findInFiles;
+		t4p::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
-		findInFiles.Mode = mvceditor::FinderClass::EXACT;
+		findInFiles.Mode = t4p::FinderClass::EXACT;
 		if(findInFiles.Prepare()) {		
 			while (directorySearch.More()) {
 				directorySearch.Walk(findInFiles);
@@ -93,16 +93,16 @@ void ProfileFindInFilesExactMode() {
 void ProfileFindInFilesCodeMode() {
 	printf("*******\n");
 	wxLongLong time = wxGetLocalTimeMillis();
-	mvceditor::DirectorySearchClass directorySearch;
-	mvceditor::SourceClass src;
+	t4p::DirectorySearchClass directorySearch;
+	t4p::SourceClass src;
 	src.RootDirectory.AssignDir(DirName);
 	src.SetIncludeWildcards(wxT("*.php"));
-	std::vector<mvceditor::SourceClass> sources;
+	std::vector<t4p::SourceClass> sources;
 	sources.push_back(src);
 	if (directorySearch.Init(sources)) {
-		mvceditor::FindInFilesClass findInFiles;
+		t4p::FindInFilesClass findInFiles;
 		findInFiles.Expression = UNICODE_STRING_SIMPLE("class Db");
-		findInFiles.Mode = mvceditor::FinderClass::EXACT;
+		findInFiles.Mode = t4p::FinderClass::EXACT;
 		if(findInFiles.Prepare()) {		
 			while (directorySearch.More()) {
 				directorySearch.Walk(findInFiles);

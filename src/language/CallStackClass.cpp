@@ -31,8 +31,8 @@
 #include <globals/Sqlite.h>
 #include <wx/ffile.h>
 
-mvceditor::VariableSymbolClass::VariableSymbolClass() 
-	: Type(mvceditor::VariableSymbolClass::SCALAR)
+t4p::VariableSymbolClass::VariableSymbolClass() 
+	: Type(t4p::VariableSymbolClass::SCALAR)
 	, DestinationVariable()
 	, ScalarValue()
 	, ArrayKey()
@@ -45,69 +45,69 @@ mvceditor::VariableSymbolClass::VariableSymbolClass()
 		
 }
 
-void mvceditor::VariableSymbolClass::ToScalar(const UnicodeString& variableName, const UnicodeString& scalar) {
-	Type = mvceditor::VariableSymbolClass::SCALAR;
+void t4p::VariableSymbolClass::ToScalar(const UnicodeString& variableName, const UnicodeString& scalar) {
+	Type = t4p::VariableSymbolClass::SCALAR;
 	DestinationVariable = variableName;
 	ScalarValue = scalar;
 }
 
-void mvceditor::VariableSymbolClass::ToArray(const UnicodeString& variableName) {
-	Type = mvceditor::VariableSymbolClass::ARRAY;
+void t4p::VariableSymbolClass::ToArray(const UnicodeString& variableName) {
+	Type = t4p::VariableSymbolClass::ARRAY;
 	DestinationVariable = variableName;
 }
 
-void mvceditor::VariableSymbolClass::ToArrayKey(const UnicodeString& variableName, const UnicodeString& keyName) {
-	Type = mvceditor::VariableSymbolClass::ARRAY_KEY;
+void t4p::VariableSymbolClass::ToArrayKey(const UnicodeString& variableName, const UnicodeString& keyName) {
+	Type = t4p::VariableSymbolClass::ARRAY_KEY;
 	DestinationVariable = variableName;
 	ArrayKey = keyName;
 }
 
-void mvceditor::VariableSymbolClass::ToNewObject(const UnicodeString& variableName, const UnicodeString& className) {
-	Type = mvceditor::VariableSymbolClass::NEW_OBJECT;
+void t4p::VariableSymbolClass::ToNewObject(const UnicodeString& variableName, const UnicodeString& className) {
+	Type = t4p::VariableSymbolClass::NEW_OBJECT;
 	DestinationVariable = variableName;
 	ClassName = className;
 }
 
-void mvceditor::VariableSymbolClass::ToAssignment(const UnicodeString& variableName, const UnicodeString& sourceVariableName) {
-	Type = mvceditor::VariableSymbolClass::ASSIGN;
+void t4p::VariableSymbolClass::ToAssignment(const UnicodeString& variableName, const UnicodeString& sourceVariableName) {
+	Type = t4p::VariableSymbolClass::ASSIGN;
 	DestinationVariable = variableName;
 	SourceVariable = sourceVariableName;
 }
 
-void mvceditor::VariableSymbolClass::ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName) {
-	Type = mvceditor::VariableSymbolClass::PROPERTY;
+void t4p::VariableSymbolClass::ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName) {
+	Type = t4p::VariableSymbolClass::PROPERTY;
 	DestinationVariable = variableName;
 	ObjectName = objectName;
 	PropertyName = propertyName;
 }
 
-void mvceditor::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments) {
-	Type = mvceditor::VariableSymbolClass::METHOD_CALL;
+void t4p::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments) {
+	Type = t4p::VariableSymbolClass::METHOD_CALL;
 	DestinationVariable = variableName;
 	ObjectName = objectName;
 	MethodName = methodName;
 	FunctionArguments = arguments;
 }
 
-void mvceditor::VariableSymbolClass::ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments) {
-	Type = mvceditor::VariableSymbolClass::FUNCTION_CALL;
+void t4p::VariableSymbolClass::ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments) {
+	Type = t4p::VariableSymbolClass::FUNCTION_CALL;
 	DestinationVariable = variableName;
 	FunctionName = functionName;
 	FunctionArguments = arguments;
 }
 
-void mvceditor::VariableSymbolClass::ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName) {
-	Type = mvceditor::VariableSymbolClass::BEGIN_METHOD;
+void t4p::VariableSymbolClass::ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName) {
+	Type = t4p::VariableSymbolClass::BEGIN_METHOD;
 	ClassName = className;
 	MethodName = methodName;
 }
 
-void mvceditor::VariableSymbolClass::ToBeginFunction(const UnicodeString& functionName) {
-	Type = mvceditor::VariableSymbolClass::FUNCTION_CALL;
+void t4p::VariableSymbolClass::ToBeginFunction(const UnicodeString& functionName) {
+	Type = t4p::VariableSymbolClass::FUNCTION_CALL;
 	FunctionName = functionName;
 }
 
-std::string mvceditor::VariableSymbolClass::ToString() const {
+std::string t4p::VariableSymbolClass::ToString() const {
 	UnicodeString line;
 	switch (Type) {
 	case ARRAY:
@@ -171,11 +171,11 @@ std::string mvceditor::VariableSymbolClass::ToString() const {
 		line += FunctionName;
 		break;
 	}	
-	std::string stdLine = mvceditor::IcuToChar(line);
+	std::string stdLine = t4p::IcuToChar(line);
 	return stdLine;
 }
 
-std::string mvceditor::VariableSymbolClass::TypeString() const {
+std::string t4p::VariableSymbolClass::TypeString() const {
 	std::string line;
 	switch (Type) {
 	case ARRAY:
@@ -212,7 +212,7 @@ std::string mvceditor::VariableSymbolClass::TypeString() const {
 	return line;
 }
 
-mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
+t4p::CallStackClass::CallStackClass(t4p::TagCacheClass& tagCache)
 	: Variables()
 	, LintResults()
 	, MatchError()
@@ -231,7 +231,7 @@ mvceditor::CallStackClass::CallStackClass(mvceditor::TagCacheClass& tagCache)
 	Parser.SetExpressionObserver(this);
 }
 
-void mvceditor::CallStackClass::Clear() {
+void t4p::CallStackClass::Clear() {
 	Variables.clear();
 	LintResults.Clear();
 	MatchError.Clear();
@@ -246,11 +246,11 @@ void mvceditor::CallStackClass::Clear() {
 	FoundScope = false;
 }
 
-bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
-		pelet::Versions version, mvceditor::CallStackClass::Errors& error) {
+bool t4p::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
+		pelet::Versions version, t4p::CallStackClass::Errors& error) {
 	Clear();
-	mvceditor::TagClass nextResource;
-	nextResource.Type = mvceditor::TagClass::METHOD;
+	t4p::TagClass nextResource;
+	nextResource.Type = t4p::TagClass::METHOD;
 	nextResource.ClassName = className;
 	nextResource.Identifier = methodName;
 
@@ -261,7 +261,7 @@ bool mvceditor::CallStackClass::Build(const wxFileName& fileName, const UnicodeS
 	return Recurse(version, error);
 }
 
-bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::CallStackClass::Errors& error) {
+bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::Errors& error) {
 
 	// base case: no more functions to parse
 	if (ResourcesRemaining.empty()) {
@@ -289,14 +289,14 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 
 	// need to create the symbols for the file if the cache does not have them yet; symbols allow us to know the variable
 	// types
-	mvceditor::WorkingCacheClass* workingCache = new mvceditor::WorkingCacheClass;
+	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass;
 
 	// here file identifier == file name because file name exists and is unique
 	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true);
 	bool newlyRegistered = TagCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));
-	bool ret = Parser.ScanFile(file.fp(), mvceditor::WxToIcu(fileName.GetFullPath()), LintResults);
+	bool ret = Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName.GetFullPath()), LintResults);
 	file.Close();
 	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
 	ParsedMethods[key] = true;
@@ -353,7 +353,7 @@ bool mvceditor::CallStackClass::Recurse(pelet::Versions version, mvceditor::Call
 
 }
 
-bool mvceditor::CallStackClass::Persist(soci::session& session) {
+bool t4p::CallStackClass::Persist(soci::session& session) {
 	wxString error;
 	bool good = false;
 	try {		
@@ -371,7 +371,7 @@ bool mvceditor::CallStackClass::Persist(soci::session& session) {
 			"INSERT INTO call_stacks(step_number, step_type, expression, source_id) VALUES (?, ?, ?, ?)",
 			soci::use(stepNumber), soci::use(stepType), soci::use(expression), soci::use(sourceId)
 		);
-		for (std::vector<mvceditor::VariableSymbolClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
+		for (std::vector<t4p::VariableSymbolClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
 			stepType = it->TypeString();
 			expression = it->ToString();
 			stmt.execute(true);
@@ -381,14 +381,14 @@ bool mvceditor::CallStackClass::Persist(soci::session& session) {
 		good = true;
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		good = false;
 		wxASSERT_MSG(good, error);
 	}
 	return good;
 }
 
-bool mvceditor::CallStackClass::InDesiredScope() const {
+bool t4p::CallStackClass::InDesiredScope() const {
 	if (ResourcesRemaining.empty()) {
 		return false;
 	}
@@ -399,7 +399,7 @@ bool mvceditor::CallStackClass::InDesiredScope() const {
 	return item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod;
 }
 
-void mvceditor::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expression) {
+void t4p::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expression) {
 	
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -409,7 +409,7 @@ void mvceditor::CallStackClass::ExpressionVariableFound(pelet::VariableClass* ex
 	SymbolFromExpression(expression, Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
 	
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -421,7 +421,7 @@ void mvceditor::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpre
 	//SymbolFromExpression(expression->Expression, Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
+void t4p::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
 	
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -431,7 +431,7 @@ void mvceditor::CallStackClass::ExpressionAssignmentCompoundFound(pelet::Assignm
 	SymbolsFromVariable(expression->Variable, expression->RightOperand);
 }
 
-void mvceditor::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
+void t4p::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -442,7 +442,7 @@ void mvceditor::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOper
 	SymbolFromExpression(expression->RightOperand, Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
+void t4p::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -452,7 +452,7 @@ void mvceditor::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperat
 	SymbolFromExpression(expression->Operand, Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
+void t4p::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -462,7 +462,7 @@ void mvceditor::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::Una
 	SymbolFromExpression(&(expression->Variable), Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
+void t4p::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -476,7 +476,7 @@ void mvceditor::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOp
 	}
 }
 
-void mvceditor::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
+void t4p::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -486,7 +486,7 @@ void mvceditor::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionCla
 	SymbolFromExpression(expression, Variables);
 }
 
-void mvceditor::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
+void t4p::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
 
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
@@ -496,8 +496,8 @@ void mvceditor::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExp
 	SymbolFromExpression(expression, Variables);
 }
 
-void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression) {
-	mvceditor::VariableSymbolClass expressionResultSymbol;
+void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression) {
+	t4p::VariableSymbolClass expressionResultSymbol;
 	
 	// follow associativity, do the right hand side first
 	size_t oldSize = Variables.size();
@@ -521,7 +521,7 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 		// seen; need to look for this case also
 		// ie.  $arr[] = 'name';  
 		// as the array initialization for $arr
-		std::vector<mvceditor::VariableSymbolClass>::iterator var;
+		std::vector<t4p::VariableSymbolClass>::iterator var;
 		bool foundIndex = false;
 		bool foundVariable = false;
 		for (var = Variables.begin(); var != Variables.end(); ++var) {
@@ -533,12 +533,12 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 			}
 		}
 		if (!foundVariable) {
-			mvceditor::VariableSymbolClass arrayVariableSymbol;
+			t4p::VariableSymbolClass arrayVariableSymbol;
 			arrayVariableSymbol.ToArray(variable.ChainList[0].Name);
 			Variables.push_back(arrayVariableSymbol);
 		}
 		if (!foundIndex) {
-			mvceditor::VariableSymbolClass arrayVariableKeySymbol;
+			t4p::VariableSymbolClass arrayVariableKeySymbol;
 			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, arrayKey);
 			Variables.push_back(arrayVariableKeySymbol);
 		}
@@ -562,13 +562,13 @@ void mvceditor::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& 
 		
 		// now assign the right side of the expression to the left side of the
 		// expression
-		mvceditor::VariableSymbolClass assignSymbol;
+		t4p::VariableSymbolClass assignSymbol;
 		assignSymbol.ToAssignment(destinationVariable, expressionResultSymbol.DestinationVariable);
 		Variables.push_back(assignSymbol);
 	}
 }
 
-void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<mvceditor::VariableSymbolClass>& symbols) {
+void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols) {
 	
 	// recurse down the arguments first
 	std::vector<UnicodeString> argumentVariables;
@@ -594,7 +594,7 @@ void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& 
 	
 	// now the symbol for this property
 	UnicodeString tempVarName = NewTempVariable();
-	mvceditor::VariableSymbolClass symbol;
+	t4p::VariableSymbolClass symbol;
 	if (property.IsFunction) {
 		symbol.ToMethodCall(tempVarName, objectName, property.Name, argumentVariables);
 		symbols.push_back(symbol);
@@ -625,16 +625,16 @@ void mvceditor::CallStackClass::SymbolFromVariableProperty(const UnicodeString& 
 	*/
 }
 
-void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<mvceditor::VariableSymbolClass>& symbols) {	
+void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<t4p::VariableSymbolClass>& symbols) {	
 	if (pelet::ExpressionClass::SCALAR == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
-		mvceditor::VariableSymbolClass scalarSymbol;
+		t4p::VariableSymbolClass scalarSymbol;
 		scalarSymbol.ToScalar(tempVarName, ((pelet::ScalarExpressionClass*)expression)->Value);
 		symbols.push_back(scalarSymbol);
 	}
 	else if (pelet::ExpressionClass::ARRAY == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
-		mvceditor::VariableSymbolClass arraySymbol;
+		t4p::VariableSymbolClass arraySymbol;
 		arraySymbol.ToArray(tempVarName);
 		symbols.push_back(arraySymbol);
 
@@ -649,14 +649,14 @@ void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* exp
 		}
 
 		for (std::vector<UnicodeString>::const_iterator key = arrayKeys.begin(); key != arrayKeys.end(); ++key) {
-			mvceditor::VariableSymbolClass keySymbol;
+			t4p::VariableSymbolClass keySymbol;
 			keySymbol.ToArrayKey(tempVarName, *key);
 			symbols.push_back(keySymbol);
 		}
 	}
 	else if (pelet::ExpressionClass::NEW_CALL == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
-		mvceditor::VariableSymbolClass newSymbol;
+		t4p::VariableSymbolClass newSymbol;
 		newSymbol.ToNewObject(tempVarName, ((pelet::NewInstanceExpressionClass*)expression)->ClassName);
 		symbols.push_back(newSymbol);
 	}
@@ -679,13 +679,13 @@ void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* exp
 			
 			// variable for the function result
 			UnicodeString tempVarName = NewTempVariable();
-			mvceditor::VariableSymbolClass functionSymbol;
+			t4p::VariableSymbolClass functionSymbol;
 			functionSymbol.ToFunctionCall(tempVarName, varExpression->ChainList[0].Name, argumentVariables);
 		}
 		else if (!varExpression->ChainList.empty()) {
 		
 			// add the variable to the list only if we have not added it yet
-			std::vector<mvceditor::VariableSymbolClass>::iterator var;
+			std::vector<t4p::VariableSymbolClass>::iterator var;
 			bool found = false;
 			for (var = symbols.begin(); var != symbols.end(); ++var) {
 				if (var->DestinationVariable == varExpression->ChainList[0].Name) {
@@ -694,7 +694,7 @@ void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* exp
 				}
 			}
 			if (!found) {
-				mvceditor::VariableSymbolClass varSymbol;
+				t4p::VariableSymbolClass varSymbol;
 				varSymbol.ToAssignment(varExpression->ChainList[0].Name, UNICODE_STRING_SIMPLE(""));
 				symbols.push_back(varSymbol);
 			}
@@ -717,7 +717,7 @@ void mvceditor::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* exp
 	}
 }
 
-UnicodeString mvceditor::CallStackClass::NewTempVariable() {
+UnicodeString t4p::CallStackClass::NewTempVariable() {
 	UnicodeString newName;
 	
 	// 11 == length of "$@tmp" + a 5 digit number + NUL should be big enough
@@ -729,7 +729,7 @@ UnicodeString mvceditor::CallStackClass::NewTempVariable() {
 	return newName;
 }
 
-void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
+void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
         const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility,
         bool isStatic, const int lineNumber) {
 	CurrentClass = className;
@@ -748,13 +748,13 @@ void mvceditor::CallStackClass::MethodFound(const UnicodeString& namespaceName, 
 	if (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod) {
 		FoundScope = true;
 		
-		mvceditor::VariableSymbolClass beginScope;
+		t4p::VariableSymbolClass beginScope;
 		beginScope.ToBeginMethod(className, methodName);
 		Variables.push_back(beginScope);
 	}
 }
 
-void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
+void t4p::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
         const UnicodeString& comment, const int lineNumber) {
 	CurrentClass.remove();
 	CurrentMethod.remove();
@@ -771,7 +771,7 @@ void mvceditor::CallStackClass::FunctionFound(const UnicodeString& namespaceName
 	// and we dont want to flag this as an error
 	if (item.Resource.Identifier == CurrentFunction) {
 		FoundScope = true;
-		mvceditor::VariableSymbolClass beginScope;
+		t4p::VariableSymbolClass beginScope;
 		beginScope.ToBeginFunction(functionName);
 		Variables.push_back(beginScope);
 	}

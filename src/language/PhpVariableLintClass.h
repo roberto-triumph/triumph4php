@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_UNINITIALIZEDVARIABLEOBSERVERCLASS_H__
-#define __MVCEDITOR_UNINITIALIZEDVARIABLEOBSERVERCLASS_H__
+#ifndef __T4P_UNINITIALIZEDVARIABLEOBSERVERCLASS_H__
+#define __T4P_UNINITIALIZEDVARIABLEOBSERVERCLASS_H__
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
 #include <wx/filename.h>
 #include <globals/String.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * name and position of an uninitialized variable
@@ -71,11 +71,11 @@ public:
 
 	PhpVariableLintResultClass();
 
-	PhpVariableLintResultClass(const mvceditor::PhpVariableLintResultClass& src);
+	PhpVariableLintResultClass(const t4p::PhpVariableLintResultClass& src);
 
-	mvceditor::PhpVariableLintResultClass& operator=(const mvceditor::PhpVariableLintResultClass& src);
+	t4p::PhpVariableLintResultClass& operator=(const t4p::PhpVariableLintResultClass& src);
 
-	void Copy(const mvceditor::PhpVariableLintResultClass& src);
+	void Copy(const t4p::PhpVariableLintResultClass& src);
 };
 
 /**
@@ -100,11 +100,11 @@ public:
 
 	PhpVariableLintOptionsClass();
 	
-	PhpVariableLintOptionsClass(const mvceditor::PhpVariableLintOptionsClass& src);
+	PhpVariableLintOptionsClass(const t4p::PhpVariableLintOptionsClass& src);
 
-	PhpVariableLintOptionsClass& operator=(const mvceditor::PhpVariableLintOptionsClass& src);
+	PhpVariableLintOptionsClass& operator=(const t4p::PhpVariableLintOptionsClass& src);
 
-	void Copy (const mvceditor::PhpVariableLintOptionsClass& src);
+	void Copy (const t4p::PhpVariableLintOptionsClass& src);
 	
 };
 
@@ -128,7 +128,7 @@ public:
 	 * Set the version that the PHP parser should use. This method should be
 	 * called BEFORE parsing a file / string
 	 */
-	void SetOptions(const mvceditor::PhpVariableLintOptionsClass& options);
+	void SetOptions(const t4p::PhpVariableLintOptionsClass& options);
 
 	/**
 	 * @param fileName the file to parse and report errors on.
@@ -136,7 +136,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
-	bool ParseFile(const wxFileName& fileName, std::vector<mvceditor::PhpVariableLintResultClass>& errors);
+	bool ParseFile(const wxFileName& fileName, std::vector<t4p::PhpVariableLintResultClass>& errors);
 
 	/**
 	 * @param code the string to parse and report errors on
@@ -144,7 +144,7 @@ public:
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
-	bool ParseString(const UnicodeString& code, std::vector<mvceditor::PhpVariableLintResultClass>& errors);
+	bool ParseString(const UnicodeString& code, std::vector<t4p::PhpVariableLintResultClass>& errors);
 
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
@@ -196,12 +196,12 @@ private:
 	/**
 	 * errors found so far
 	 */
-	std::vector<mvceditor::PhpVariableLintResultClass> Errors;
+	std::vector<t4p::PhpVariableLintResultClass> Errors;
 
 	/**
 	 * variables found in the current scope
 	 */
-	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> ScopeVariables;
+	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass> ScopeVariables;
 
 	/**
 	 * variables already defined when parsing this file. The 
@@ -209,7 +209,7 @@ private:
 	 * other variables we know exist when the parsed file
 	 * is included.
 	 */
-	std::map<UnicodeString, int, mvceditor::UnicodeStringComparatorClass> PredefinedVariables;
+	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass> PredefinedVariables;
 	
 	/**
 	 * flag that will be set when the extract function was called.
@@ -238,7 +238,7 @@ private:
 	 */
 	pelet::ParserClass Parser;
 
-	mvceditor::PhpVariableLintOptionsClass Options;
+	t4p::PhpVariableLintOptionsClass Options;
 
 	/**
 	 * the file being currently parsed. empty string if a string of

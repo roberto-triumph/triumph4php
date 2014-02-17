@@ -31,7 +31,7 @@
 // the FeatureClass MenuIds enum
 static size_t MAX_CONFIG_MENU_ITEMS = 100;
 
-mvceditor::ConfigFilesFeatureClass::ConfigFilesFeatureClass(mvceditor::AppClass& app)
+t4p::ConfigFilesFeatureClass::ConfigFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) 
 	, ConfigPairs()
 	, ConfigTags()
@@ -39,7 +39,7 @@ mvceditor::ConfigFilesFeatureClass::ConfigFilesFeatureClass(mvceditor::AppClass&
 
 }
 
-void mvceditor::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+void t4p::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	ConfigMenu = new wxMenu();
 	menuBar->Append(ConfigMenu, _("Project Configs"));
 
@@ -48,14 +48,14 @@ void mvceditor::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	// the detected config files
 }
 
-void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
+void t4p::ConfigFilesFeatureClass::RebuildMenu() {
 	ConfigPairs.clear();
 	ConfigTags.clear();
 
 	// get the menus; need to keep them in memory
 	// because we use the index to know which menu was selected
-	std::vector<mvceditor::ConfigTagClass> allConfigTags;
-	mvceditor::ConfigTagFinderClass finder;
+	std::vector<t4p::ConfigTagClass> allConfigTags;
+	t4p::ConfigTagFinderClass finder;
 	if (App.Globals.DetectorCacheDbFileName.IsOk()) {
 		finder.InitSession(&App.Globals.DetectorCacheSession);
 		std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();
@@ -65,12 +65,12 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 
 		// doing 2 for-loops because we need the index into ConfigTags to line up
 		// with the way we create the menu items
-		std::vector<mvceditor::ProjectClass>::const_iterator project;
+		std::vector<t4p::ProjectClass>::const_iterator project;
 		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 			if (project->IsEnabled) {
 				ConfigPair pair;
 				pair.ProjectLabel = project->Label;
-				std::vector<mvceditor::ConfigTagClass>::const_iterator configTag;
+				std::vector<t4p::ConfigTagClass>::const_iterator configTag;
 				for (configTag = allConfigTags.begin(); configTag != allConfigTags.end(); ++configTag) {
 					wxString fullPath = configTag->ConfigFileName.GetFullPath();
 					if (project->IsASourceFile(fullPath)) {
@@ -90,14 +90,14 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 		ConfigMenu->Destroy(ConfigMenu->FindItemByPosition(0)->GetId());
 	}
 	std::vector<ConfigPair>::const_iterator configPair;
-	std::vector<mvceditor::ConfigTagClass>::const_iterator config;
+	std::vector<t4p::ConfigTagClass>::const_iterator config;
 	size_t i = 0;
 
 	// make sure to not make more menu items than are allowed.
 	for (configPair = ConfigPairs.begin(); configPair != ConfigPairs.end() && i < MAX_CONFIG_MENU_ITEMS; ++configPair) {
 		wxMenu* submenu = new wxMenu();
 		for (config = configPair->ConfigTags.begin(); config != configPair->ConfigTags.end(); ++config) {
-			submenu->Append(mvceditor::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
+			submenu->Append(t4p::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
 			i++;
 			if (i >= MAX_CONFIG_MENU_ITEMS) {
 				break;
@@ -109,25 +109,25 @@ void mvceditor::ConfigFilesFeatureClass::RebuildMenu() {
 	}
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnDetectorDbInitComplete(mvceditor::ActionEventClass& event) {
+void t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete(t4p::ActionEventClass& event) {
 	RebuildMenu();
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected(mvceditor::ActionEventClass& event) {
+void t4p::ConfigFilesFeatureClass::OnConfigFilesDetected(t4p::ActionEventClass& event) {
 	RebuildMenu();
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
-	size_t index = event.GetId() - mvceditor::CONFIG_DETECTORS;
+void t4p::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
+	size_t index = event.GetId() - t4p::CONFIG_DETECTORS;
 	if (index >= 0 && index < MAX_CONFIG_MENU_ITEMS && index < ConfigTags.size()) {
 		wxFileName fileName = ConfigTags[index].ConfigFileName;
-		mvceditor::OpenFileCommandEventClass cmd(fileName.GetFullPath());
+		t4p::OpenFileCommandEventClass cmd(fileName.GetFullPath());
 		App.EventSink.Publish(cmd);
 	}
 }
 
-void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
-	std::vector<mvceditor::ConfigTagClass>::const_iterator configTag;
+void t4p::ConfigFilesFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
+	std::vector<t4p::ConfigTagClass>::const_iterator configTag;
 	bool isConfigFileSaved = false;
 	wxString fileSaved = event.GetCodeControl()->GetFileName();
 	for (configTag = ConfigTags.begin(); configTag != ConfigTags.end(); ++configTag) {
@@ -142,9 +142,9 @@ void mvceditor::ConfigFilesFeatureClass::OnFileSaved(mvceditor::CodeControlEvent
 }
 
 
-BEGIN_EVENT_TABLE(mvceditor::ConfigFilesFeatureClass, mvceditor::FeatureClass) 
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_DETECTOR_DB_INIT,  mvceditor::ConfigFilesFeatureClass::OnDetectorDbInitComplete)
-	EVT_ACTION_COMPLETE(mvceditor::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, mvceditor::ConfigFilesFeatureClass::OnConfigFilesDetected)
-	EVT_MENU_RANGE(mvceditor::CONFIG_DETECTORS, mvceditor::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, mvceditor::ConfigFilesFeatureClass::OnConfigMenuItem)
-	EVT_APP_FILE_SAVED(mvceditor::ConfigFilesFeatureClass::OnFileSaved)
+BEGIN_EVENT_TABLE(t4p::ConfigFilesFeatureClass, t4p::FeatureClass) 
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT,  t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete)
+	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, t4p::ConfigFilesFeatureClass::OnConfigFilesDetected)
+	EVT_MENU_RANGE(t4p::CONFIG_DETECTORS, t4p::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, t4p::ConfigFilesFeatureClass::OnConfigMenuItem)
+	EVT_APP_FILE_SAVED(t4p::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

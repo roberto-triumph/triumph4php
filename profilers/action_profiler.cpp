@@ -70,17 +70,17 @@ public:
 	/**
 	 * used to keep track of running threads
 	 */
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 
 	/**
 	 * used to keep track of running threads
 	 */
-	mvceditor::GlobalsClass Globals;
+	t4p::GlobalsClass Globals;
 	
 	/**
 	 * the sequence being tested
 	 */
-	mvceditor::SequenceClass Sequence;
+	t4p::SequenceClass Sequence;
 
 };
 
@@ -100,7 +100,7 @@ private:
 	void OnActionInProgress(wxCommandEvent& event);
 	void OnClose(wxCloseEvent& event);
 	void OnSequenceComplete(wxCommandEvent& event);
-	void OnTagFinderListComplete(mvceditor::TagFinderListCompleteEventClass& event);
+	void OnTagFinderListComplete(t4p::TagFinderListCompleteEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };
@@ -132,18 +132,18 @@ void MyApp::Stop() {
 }
 
 void MyApp::BuildSequence() {
-	std::vector<mvceditor::GlobalActionClass*> actions;
+	std::vector<t4p::GlobalActionClass*> actions;
 	actions.push_back(
-		new mvceditor::TagCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK)
+		new t4p::TagCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK)
 	);
 	actions.push_back(
-		new mvceditor::DetectorCacheDbVersionActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK)
+		new t4p::DetectorCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK)
 	);
 	actions.push_back(
-		new mvceditor::ProjectTagActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST)
+		new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST)
 	);
 	actions.push_back(
-		new mvceditor::UrlTagDetectorActionClass(RunningThreads, mvceditor::ID_EVENT_ACTION_URL_TAG_DETECTOR)
+		new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR)
 	);
 	Sequence.Build(actions);
 }
@@ -182,10 +182,10 @@ void MyApp::BuildGlobals() {
 }
 
 void MyApp::CreateProject(wxString projectName, wxString rootDir) {
-        mvceditor::ProjectClass project1;
+        t4p::ProjectClass project1;
         project1.Label = projectName;
         project1.IsEnabled = true;
-        mvceditor::SourceClass src1;
+        t4p::SourceClass src1;
         src1.RootDirectory.AssignDir(rootDir);
         src1.SetIncludeWildcards(wxT("*.php"));
         project1.AddSource(src1);
@@ -238,7 +238,7 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 	event.Skip();
 }
 
-void MyFrame::OnTagFinderListComplete(mvceditor::TagFinderListCompleteEventClass& event) {
+void MyFrame::OnTagFinderListComplete(t4p::TagFinderListCompleteEventClass& event) {
 	Log(_("global cache completed."));
 }
 
@@ -252,6 +252,6 @@ void MyFrame::OnSequenceComplete(wxCommandEvent& event) {
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame) 
 	EVT_CLOSE(MyFrame::OnClose)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
-	EVT_TAG_FINDER_LIST_COMPLETE(mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
+	EVT_TAG_FINDER_LIST_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)
 END_EVENT_TABLE()

@@ -42,14 +42,14 @@ void ActionTestFixtureClass::InitTagCache(const wxString& cacheDir) {
 }
 
 void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir) {
-	mvceditor::ProjectClass project;
+	t4p::ProjectClass project;
 	
 	int projectNum = Globals.Projects.size() + 1;
 	project.Label = wxString::Format(wxT("project %d"), projectNum);
 	project.IsEnabled = true;
 	
 
-	mvceditor::SourceClass srcProject;
+	t4p::SourceClass srcProject;
 	srcProject.RootDirectory.Assign(sourceDir);
 	project.AddSource(srcProject);
 	project.PhpFileExtensions.push_back(wxT("*.php"));

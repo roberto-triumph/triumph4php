@@ -33,7 +33,7 @@
 #include <vector>
 #include <memory>
 
-namespace mvceditor {
+namespace t4p {
 
 class RunBrowserFeatureClass : public FeatureClass {
 
@@ -48,7 +48,7 @@ public:
 	 */
 	std::vector<UrlTagClass> RecentUrls;
 
-	RunBrowserFeatureClass(mvceditor::AppClass& app);
+	RunBrowserFeatureClass(t4p::AppClass& app);
 	
 	void AddWindows();
 	
@@ -65,7 +65,7 @@ private:
 	 * we set a dirty flag so that we can re-run url detection
 	 * when the user clicks on the Search For Urls button
 	 */
-	void OnFileSaved(mvceditor::CodeControlEventClass& event);
+	void OnFileSaved(t4p::CodeControlEventClass& event);
 
 	/**
 	 * run the chosen URL in (an external) web browser 
@@ -97,7 +97,7 @@ private:
 	 * click, then when url detection is complete we will show
 	 * the user the ChooseUrlDialog
 	 */
-	void OnUrlDetectionComplete(mvceditor::ActionEventClass& event);
+	void OnUrlDetectionComplete(t4p::ActionEventClass& event);
 		
 	/**
 	 * A popup menu to show the currently configured browsers. The same popup menu will be
@@ -116,7 +116,7 @@ private:
 	 * dialog is shown so that the user has more feedback that just the bottom 
 	 * progress bar in the status bar.
 	 */
-	mvceditor::GaugeDialogClass* GaugeDialog;
+	t4p::GaugeDialogClass* GaugeDialog;
 
 	wxMenuItem* RunInBrowser;
 	

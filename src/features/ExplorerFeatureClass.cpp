@@ -82,7 +82,7 @@ static bool DirNameCmp(const wxFileName& a, const wxFileName& b) {
 	return aName.compare(bName) < 0;
 }
 
-mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app) 
+t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
@@ -101,20 +101,20 @@ mvceditor::ExplorerFeatureClass::ExplorerFeatureClass(mvceditor::AppClass& app)
 	}
 }
 
-void mvceditor::ExplorerFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(mvceditor::MENU_EXPLORER + 1, _("Explore Open File\tCTRL+ALT+E"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
-	viewMenu->Append(mvceditor::MENU_EXPLORER + 2, _("Explore Sources\tCTRL+SHIFT+E"), _("Open An explorer window"), wxITEM_NORMAL);
+void t4p::ExplorerFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(t4p::MENU_EXPLORER + 1, _("Explore Open File\tCTRL+ALT+E"), _("Open An explorer window in the currently opened file"), wxITEM_NORMAL);
+	viewMenu->Append(t4p::MENU_EXPLORER + 2, _("Explore Sources\tCTRL+SHIFT+E"), _("Open An explorer window"), wxITEM_NORMAL);
 }
 
 
-void mvceditor::ExplorerFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::ExplorerFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_EXPLORER + 1] = wxT("Project-Explore File");
-	menuItemIds[mvceditor::MENU_EXPLORER + 2] = wxT("Project-Explore Sources");
+	menuItemIds[t4p::MENU_EXPLORER + 1] = wxT("Project-Explore File");
+	menuItemIds[t4p::MENU_EXPLORER + 2] = wxT("Project-Explore Sources");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::ExplorerFeatureClass::AddWindows() {
+void t4p::ExplorerFeatureClass::AddWindows() {
 	ExplorerToolBar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
@@ -122,13 +122,13 @@ void mvceditor::ExplorerFeatureClass::AddWindows() {
 	ExplorerToolBar->SetFont(App.Preferences.ApplicationFont);
     ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
     
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("explore"));
-	wxBitmap bmpOpen = mvceditor::IconImageAsset(wxT("explore-open-document"));
+	wxBitmap bmp = t4p::IconImageAsset(wxT("explore"));
+	wxBitmap bmpOpen = t4p::IconImageAsset(wxT("explore-open-document"));
 	
 	
-	ExplorerToolBar->AddTool(mvceditor::MENU_EXPLORER + 1, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
-	ExplorerToolBar->AddTool(mvceditor::MENU_EXPLORER + 2, _("Explore Projects"), bmp, _("Open An explorer window in the Project Root"));
-	ExplorerToolBar->SetToolDropDown(mvceditor::MENU_EXPLORER + 2, true);
+	ExplorerToolBar->AddTool(t4p::MENU_EXPLORER + 1, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
+	ExplorerToolBar->AddTool(t4p::MENU_EXPLORER + 2, _("Explore Projects"), bmp, _("Open An explorer window in the Project Root"));
+	ExplorerToolBar->SetToolDropDown(t4p::MENU_EXPLORER + 2, true);
 	ExplorerToolBar->SetOverflowVisible(false);
     ExplorerToolBar->Realize();
 
@@ -140,7 +140,7 @@ void mvceditor::ExplorerFeatureClass::AddWindows() {
 	);
 }
 
-void mvceditor::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
+void t4p::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
 	wxString s;
 	config->Read(wxT("/Explorer/FileManagerExecutable"), &s);
 	FileManagerExecutable.Assign(s);
@@ -149,25 +149,25 @@ void mvceditor::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
 	ShellExecutable.Assign(s);
 }
 
-void mvceditor::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void t4p::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	ExplorerOptionsPanelClass* panel = new ExplorerOptionsPanelClass(parent, wxID_ANY, *this);
 	parent->AddPage(panel, wxT("Explorer"));
 }
 
-void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
+void t4p::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
+	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
 	
 	// show the selected project
-	size_t index = event.GetId() - mvceditor::MENU_EXPLORER - 3;
+	size_t index = event.GetId() - t4p::MENU_EXPLORER - 3;
 	if (index >= 0 && index < SourceDirs.size()) {
 		panel->RefreshDir(SourceDirs[index].RootDirectory);
 	}
@@ -186,18 +186,18 @@ void mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& even
 	}
 }
 
-void mvceditor::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
+void t4p::ExplorerFeatureClass::OnProjectExplore(wxCommandEvent& event) {
 	SourceDirs = App.Globals.AllEnabledSources();
 	wxCommandEvent cmdEvt;
 	if (SourceDirs.size() == 1) {
 	
 		// only 1 source dir, just open it now
-		cmdEvt.SetId(mvceditor::MENU_EXPLORER + 3);
+		cmdEvt.SetId(t4p::MENU_EXPLORER + 3);
 	}
 	OnExplorerProjectMenu(cmdEvt);
 }
 
-void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
+void t4p::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
 	if (!event.IsDropDownClicked()) {
 		return;
 	}
@@ -209,7 +209,7 @@ void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& 
 	// create the popup menu that contains all the available browser names
 	wxMenu projectMenu;
 	for (size_t index = 0; index < SourceDirs.size(); ++index) {
-		projectMenu.Append(mvceditor::MENU_EXPLORER + 3 + index, SourceDirs[index].RootDirectory.GetDirs().Last());
+		projectMenu.Append(t4p::MENU_EXPLORER + 3 + index, SourceDirs[index].RootDirectory.GetDirs().Last());
 	}
 	
 	// line up our menu with the button
@@ -222,8 +222,8 @@ void mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown(wxAuiToolBarEvent& 
 	ExplorerToolBar->SetToolSticky(event.GetId(), false);
 }
 
-void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+void t4p::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	if (!codeCtrl) {
 		return;
 	}
@@ -232,13 +232,13 @@ void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& e
 		return;
 	}
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
+	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
 	wxFileName fileName(openFile);
@@ -247,22 +247,22 @@ void mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& e
 	panel->RefreshDir(dir);
 }
 
-void mvceditor::ExplorerFeatureClass::OnExplorerListComplete(mvceditor::ExplorerEventClass& event) {
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
+void t4p::ExplorerFeatureClass::OnExplorerListComplete(t4p::ExplorerEventClass& event) {
+	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	if (window) {
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel = (t4p::ModalExplorerPanelClass*)window;
 		panel->ShowDir(event.Dir, event.Files, event.SubDirs, event.TotalFiles, event.TotalSubDirs);
 	}
 }
 
-void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& event) {
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
+void t4p::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& event) {
+	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	if (window) {
 		std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();	
 	
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel = (t4p::ModalExplorerPanelClass*)window;
 		panel->FillSourcesList(sourceDirs);
 	}
 
@@ -271,15 +271,15 @@ void mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& even
 	config->Write(wxT("/Explorer/ShellExecutable"), ShellExecutable.GetFullPath());
 }
 
-void mvceditor::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
-	mvceditor::ModalExplorerPanelClass* panel = NULL;
+void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
+	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	if (!window) {	
-		panel =  new mvceditor::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
-		panel = (mvceditor::ModalExplorerPanelClass*)window;
+		panel = (t4p::ModalExplorerPanelClass*)window;
 	}
 	wxString dir = event.GetString();
 	wxFileName projectDir;
@@ -287,7 +287,7 @@ void mvceditor::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event)
 	panel->RefreshDir(projectDir);
 }
 
-mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
+t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
 , FilesImageList(NULL)
@@ -298,18 +298,18 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 , FilterChoice(ID_FILTER_ALL) {
 	FilesImageList = new wxImageList(16, 16);
 	
-	mvceditor::FillWithFileType(*FilesImageList);
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
-	FilesImageList->Add(mvceditor::IconImageAsset(wxT("arrow-up")));
+	t4p::FillWithFileType(*FilesImageList);
+	FilesImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")));
+	FilesImageList->Add(t4p::IconImageAsset(wxT("arrow-up")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
 	SourcesImageList = new wxImageList(16, 16);
-	SourcesImageList->Add(mvceditor::IconImageAsset(wxT("folder-horizontal")));
+	SourcesImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")));
 	SourcesList->AssignImageList(SourcesImageList, wxIMAGE_LIST_SMALL);
 
-	FilterButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("filter")));
-	ParentButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("arrow-up")));
-	RefreshButton->SetBitmapLabel(mvceditor::IconImageAsset(wxT("outline-refresh")));
+	FilterButton->SetBitmapLabel(t4p::IconImageAsset(wxT("filter")));
+	ParentButton->SetBitmapLabel(t4p::IconImageAsset(wxT("arrow-up")));
+	RefreshButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-refresh")));
 
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
@@ -319,7 +319,7 @@ mvceditor::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, in
 	FillSourcesList(sourceDirs);
 }
 
-mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
+t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 	RunningThreads.RemoveEventHandler(this);
 	RunningThreads.RemoveEventHandler(&Feature);
 	RunningThreads.Shutdown();
@@ -328,26 +328,26 @@ mvceditor::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
+void t4p::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 	ListLabel->SetLabel(wxT(""));
-	mvceditor::ExplorerFileSystemActionClass* action = new mvceditor::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_LIST_ACTION);
+	t4p::ExplorerFileSystemActionClass* action = new t4p::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_LIST_ACTION);
 
 	// when user choose ALL show hidden files too
 	action->Directory(dir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
 	RunningThreads.Queue(action);
 }
 
-void mvceditor::ModalExplorerPanelClass::OnRefreshClick(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnRefreshClick(wxCommandEvent& event) {
 	RefreshDir(CurrentListDir);
 }
 
-void mvceditor::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {
 	wxFileName nextDir;
 	nextDir.AssignDir(Directory->GetValue());
 	RefreshDir(nextDir);
 }
 
-void mvceditor::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& event) {
 	wxFileName curDir;
 	curDir.AssignDir(Directory->GetValue());
 	if (!curDir.IsOk()) {
@@ -363,7 +363,7 @@ void mvceditor::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
 	wxString text = event.GetText();
 	wxFileName nextDir;
 	if (text == wxT("..")) {
@@ -384,7 +384,7 @@ void mvceditor::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event)
 	}	
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
 	long index = event.GetIndex();
 	if (index != wxNOT_FOUND) {
 		wxMenu menu;
@@ -402,7 +402,7 @@ void mvceditor::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event
 	event.Skip();
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 
 	// if the right mouse button was clicked on an item let the context menu handler
 	// handle this event
@@ -428,7 +428,7 @@ void mvceditor::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 	this->PopupMenu(&menu, event.GetPosition());
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 	int code = event.GetKeyCode();
 	wxCommandEvent evt;
 	if (WXK_DELETE == code) {
@@ -457,7 +457,7 @@ void mvceditor::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
+void t4p::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
 												 int totalFiles, int totalSubDirs) {
 	bool changedDir = CurrentListDir != currentDir;
 	CurrentListDir = currentDir;
@@ -484,7 +484,7 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	}
 
 	// add all sub-directories
-	std::vector<mvceditor::ProjectClass>::const_iterator p;
+	std::vector<t4p::ProjectClass>::const_iterator p;
 	std::vector<wxFileName>::const_iterator dir;
 	for (dir = dirs.begin(); dir != dirs.end(); ++dir) {
 		wxListItem column1;
@@ -547,68 +547,68 @@ void mvceditor::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, c
 	}
 }
 
-bool mvceditor::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
+bool t4p::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 
 	
 	// ideally we dont need to query the file system, but cant seem to get the 
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = CurrentListDir.GetPathWithSep() + text;
 	if (wxFileName::FileExists(fullPath)) {
-		mvceditor::OpenFileCommandEventClass evt(fullPath);
+		t4p::OpenFileCommandEventClass evt(fullPath);
 		Feature.App.EventSink.Publish(evt);
 		return true;
 	}
 	return false;
 }
 
-int mvceditor::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
+int t4p::ModalExplorerPanelClass::ListImageId(const wxFileName& fileName) {
 	wxString fullPath = fileName.GetFullPath();
 	if (Feature.App.Globals.FileTypes.HasAPhpExtension(fullPath)) {
-		return mvceditor::IMGLIST_PHP;
+		return t4p::IMGLIST_PHP;
 	}
 	if (Feature.App.Globals.FileTypes.HasASqlExtension(fullPath)) {
-		return mvceditor::IMGLIST_SQL;
+		return t4p::IMGLIST_SQL;
 	} 
 	if (Feature.App.Globals.FileTypes.HasACssExtension(fullPath)) {
-		return mvceditor::IMGLIST_CSS;
+		return t4p::IMGLIST_CSS;
 	}
 	if (Feature.App.Globals.FileTypes.HasAJsExtension(fullPath)) {
-		return mvceditor::IMGLIST_JS;
+		return t4p::IMGLIST_JS;
 	}
 	if (Feature.App.Globals.FileTypes.HasAConfigExtension(fullPath)) {
-		return mvceditor::IMGLIST_CONFIG;
+		return t4p::IMGLIST_CONFIG;
 	}
 	if (Feature.App.Globals.FileTypes.HasACrontabExtension(fullPath)) {
-		return mvceditor::IMGLIST_CRONTAB;
+		return t4p::IMGLIST_CRONTAB;
 	} 
 	if (Feature.App.Globals.FileTypes.HasAYamlExtension(fullPath)) {
-		return mvceditor::IMGLIST_YAML;
+		return t4p::IMGLIST_YAML;
 	}
 	if (Feature.App.Globals.FileTypes.HasAXmlExtension(fullPath)) {
-		return mvceditor::IMGLIST_XML;
+		return t4p::IMGLIST_XML;
 	}
 	if (Feature.App.Globals.FileTypes.HasARubyExtension(fullPath)) {
-		return mvceditor::IMGLIST_RUBY;
+		return t4p::IMGLIST_RUBY;
 	}
 	if (Feature.App.Globals.FileTypes.HasALuaExtension(fullPath)) {
-		return mvceditor::IMGLIST_LUA;
+		return t4p::IMGLIST_LUA;
 	}
 	if (Feature.App.Globals.FileTypes.HasAMarkdownExtension(fullPath)) {
-		return mvceditor::IMGLIST_MARKDOWN;
+		return t4p::IMGLIST_MARKDOWN;
 	} 
 	if (Feature.App.Globals.FileTypes.HasABashExtension(fullPath)) {
-		return mvceditor::IMGLIST_BASH;
+		return t4p::IMGLIST_BASH;
 	}
 	if (Feature.App.Globals.FileTypes.HasADiffExtension(fullPath)) {
-		return mvceditor::IMGLIST_DIFF;
+		return t4p::IMGLIST_DIFF;
 	}
 	if (Feature.App.Globals.FileTypes.HasAMiscExtension(fullPath)) {
-		return mvceditor::IMGLIST_MISC;
+		return t4p::IMGLIST_MISC;
 	}
-	return mvceditor::IMGLIST_NONE;
+	return t4p::IMGLIST_NONE;
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (index != -1) {
@@ -618,7 +618,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 		// item image to tell if selected item is a dir or not
 		wxString fullPath = CurrentListDir.GetPathWithSep() + name;
 		if (wxFileName::FileExists(fullPath)) {
-			mvceditor::OpenFileCommandEventClass evt(fullPath);
+			t4p::OpenFileCommandEventClass evt(fullPath);
 			Feature.App.EventSink.Publish(evt);
 		}
 		else if (wxFileName::DirExists(fullPath)) {
@@ -635,7 +635,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 
@@ -645,7 +645,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	std::vector<wxFileName> dirs;
@@ -690,13 +690,13 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuDelete(wxCommandEvent& event)
 	if (doDelete) {
 
 		// perform the deletion in the background
-		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
+		t4p::ExplorerModifyActionClass* action = new t4p::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
 		action->SetFilesToRemove(dirs, files);
 		RunningThreads.Queue(action);
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& event) {
 	wxString ext;
 	std::vector<wxString> extensions;
 	wxString dialogTitle;
@@ -778,7 +778,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 		List->InsertItem(column1);
 
 		// open the new file
-		mvceditor::OpenFileCommandEventClass evt(newFileName.GetFullPath());
+		t4p::OpenFileCommandEventClass evt(newFileName.GetFullPath());
 		Feature.App.EventSink.Publish(evt);
 	}
 	else {
@@ -786,7 +786,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEvent& event) {
 	wxString newName = ::wxGetTextFromUser(_("Please enter a directory name"), _("Create New Directory"), wxT(""));
 	wxString forbidden = wxFileName::GetForbiddenChars();
 	if (newName.find_first_of(forbidden, 0) != std::string::npos) {
@@ -820,7 +820,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory(wxCommandEven
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) {
 	wxString cmd = Feature.ShellExecutable.GetFullPath();
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
@@ -829,7 +829,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuShell(wxCommandEvent& event) 
 	wxExecute(cmd, wxEXEC_ASYNC);
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListMenuFileManager(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListMenuFileManager(wxCommandEvent& event) {
 	wxString cmd = Feature.FileManagerExecutable.GetFullPath();
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
@@ -838,7 +838,7 @@ void mvceditor::ModalExplorerPanelClass::OnListMenuFileManager(wxCommandEvent& e
 	wxExecute(cmd, wxEXEC_ASYNC);	
 }
 
-void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
+void t4p::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
 	
 	// ideally we dont need to query the file system, but cant seem to get the 
 	// item image to tell if selected item is a dir or not
@@ -860,7 +860,7 @@ void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) 
 		wxFileName sourceFile(CurrentListDir.GetPath(), name);
 		wxFileName destFile(CurrentListDir.GetPath(), newName);
 
-		mvceditor::ExplorerModifyActionClass* action = new mvceditor::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
+		t4p::ExplorerModifyActionClass* action = new t4p::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
 		action->SetFileToRename(sourceFile, newName);
 		RunningThreads.Queue(action);		
 	}
@@ -869,7 +869,7 @@ void mvceditor::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) 
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::ExplorerModifyEventClass &event) {
+void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyEventClass &event) {
 	if (CurrentListDir.GetPath() != event.GetParentDir().GetPath()) {
 
 		// user is looking at another dir. no need to update the list items
@@ -877,7 +877,7 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 	}
 
 	wxWindowUpdateLocker updateLocker(this);
-	if (mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS == event.Action) {
+	if (t4p::ExplorerModifyActionClass::DELETE_FILES_DIRS == event.Action) {
 		std::vector<wxFileName>::iterator f;
 
 		// find the directories that were deleted and remove them from the list control
@@ -916,7 +916,7 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 			wxMessageBox(msg, _("Delete"));
 		}
 	}
-	else if (mvceditor::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
+	else if (t4p::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
 		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
@@ -940,7 +940,7 @@ void mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete(mvceditor::Exp
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
+void t4p::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 	wxPoint point = event.GetPosition();
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
 		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
@@ -985,7 +985,7 @@ void mvceditor::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& ev
 	event.Skip();
 }
 
-std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions() {
+std::vector<wxString> t4p::ModalExplorerPanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
@@ -1007,14 +1007,14 @@ std::vector<wxString> mvceditor::ModalExplorerPanelClass::FilterFileExtensions()
 	return extensions;
 }
 
-void mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck(wxCommandEvent& event) {
+void t4p::ModalExplorerPanelClass::OnFilterMenuCheck(wxCommandEvent& event) {
 	FilterChoice = event.GetId();
 	wxFileName dir;
 	dir.AssignDir(Directory->GetValue());
 	RefreshDir(dir);
 }
 
-void mvceditor::ModalExplorerPanelClass::OnSourceActivated(wxListEvent& event) {
+void t4p::ModalExplorerPanelClass::OnSourceActivated(wxListEvent& event) {
 	long selection = event.GetIndex();
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
 	if (selection >= 0 && selection < (long)sourceDirs.size()) {
@@ -1022,7 +1022,7 @@ void mvceditor::ModalExplorerPanelClass::OnSourceActivated(wxListEvent& event) {
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName> &sourceDirs) {
+void t4p::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName> &sourceDirs) {
 	SourcesList->DeleteAllItems();
 	std::vector<wxFileName>::const_iterator dir;
 	for (dir = sourceDirs.begin(); dir != sourceDirs.end(); ++dir) {
@@ -1046,14 +1046,14 @@ void mvceditor::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFil
 	}
 }
 
-void mvceditor::ModalExplorerPanelClass::FocusOnSourcesList() {
+void t4p::ModalExplorerPanelClass::FocusOnSourcesList() {
 	if (SourcesList->GetItemCount()) {
 		SourcesList->SetItemState(0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	SourcesList->SetFocus();
 }
 
-void mvceditor::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
+void t4p::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 	wxFileName modFile = event.GetNewPath();
 	if (modFile.GetPathWithSep() != CurrentListDir.GetPathWithSep()) {
 
@@ -1088,10 +1088,10 @@ void mvceditor::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& e
 	}
 }
 
-mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
+t4p::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
 												  const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles,
 												  int totalSubDirs)
-: wxEvent(eventId, mvceditor::EVENT_EXPLORER)
+: wxEvent(eventId, t4p::EVENT_EXPLORER)
 , Dir()
 , Files()
 , SubDirs()
@@ -1100,18 +1100,18 @@ mvceditor::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName&
 , TotalSubDirs(totalSubDirs) {
 	
 	// clone filenames they contain wxStrings; no thread-safe
-	Dir = mvceditor::FileNameCopy(dir);
-	Files = mvceditor::DeepCopyFileNames(files);
-	SubDirs = mvceditor::DeepCopyFileNames(subDirs);
+	Dir = t4p::FileNameCopy(dir);
+	Files = t4p::DeepCopyFileNames(files);
+	SubDirs = t4p::DeepCopyFileNames(subDirs);
 	Error = Error.c_str();
 }
 
-wxEvent* mvceditor::ExplorerEventClass::Clone() const {
-	mvceditor::ExplorerEventClass* event = new mvceditor::ExplorerEventClass(GetId(), Dir, Files, SubDirs, Error, TotalFiles, TotalSubDirs);
+wxEvent* t4p::ExplorerEventClass::Clone() const {
+	t4p::ExplorerEventClass* event = new t4p::ExplorerEventClass(GetId(), Dir, Files, SubDirs, Error, TotalFiles, TotalSubDirs);
 	return event;
 }
 
-mvceditor::ExplorerFileSystemActionClass::ExplorerFileSystemActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::ExplorerFileSystemActionClass::ExplorerFileSystemActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId) 
 , Dir()
 , Extensions()
@@ -1119,18 +1119,18 @@ mvceditor::ExplorerFileSystemActionClass::ExplorerFileSystemActionClass(mvcedito
 
 }
 
-wxString mvceditor::ExplorerFileSystemActionClass::GetLabel() const {
+wxString t4p::ExplorerFileSystemActionClass::GetLabel() const {
 	return wxT("Explorer");
 }
 
-void mvceditor::ExplorerFileSystemActionClass::Directory(const wxFileName& dir, const std::vector<wxString>& extensions, bool doHidden) {
-	Dir = mvceditor::FileNameCopy(dir);
+void t4p::ExplorerFileSystemActionClass::Directory(const wxFileName& dir, const std::vector<wxString>& extensions, bool doHidden) {
+	Dir = t4p::FileNameCopy(dir);
 	Extensions.clear(); 
-	mvceditor::DeepCopy(Extensions, extensions);
+	t4p::DeepCopy(Extensions, extensions);
 	DoHidden = doHidden;
 }
 
-void mvceditor::ExplorerFileSystemActionClass::BackgroundWork() {
+void t4p::ExplorerFileSystemActionClass::BackgroundWork() {
 	std::vector<wxFileName> files;
 	std::vector<wxFileName> subDirs;
 	wxString error;
@@ -1186,12 +1186,12 @@ void mvceditor::ExplorerFileSystemActionClass::BackgroundWork() {
 		std::sort(subDirs.begin(), subDirs.end(), DirNameCmp);
 
 		// PostEvent() will set the correct ID
-		mvceditor::ExplorerEventClass evt(wxID_ANY, Dir, files, subDirs, error, totalFiles, totalSubDirs);
+		t4p::ExplorerEventClass evt(wxID_ANY, Dir, files, subDirs, error, totalFiles, totalSubDirs);
 		PostEvent(evt);
 	}
 }
 
-bool mvceditor::ExplorerFileSystemActionClass::MatchesWildcards(const wxString& fileName) {
+bool t4p::ExplorerFileSystemActionClass::MatchesWildcards(const wxString& fileName) {
 	if (Extensions.empty()) {
 		return true;
 	}
@@ -1203,7 +1203,7 @@ bool mvceditor::ExplorerFileSystemActionClass::MatchesWildcards(const wxString& 
 	return false;
 }
 
-mvceditor::ExplorerModifyActionClass::ExplorerModifyActionClass(mvceditor::RunningThreadsClass& runningThreads,
+t4p::ExplorerModifyActionClass::ExplorerModifyActionClass(t4p::RunningThreadsClass& runningThreads,
 																int eventId)
 : ActionClass(runningThreads, eventId) 
 , Action(NONE)
@@ -1213,15 +1213,15 @@ mvceditor::ExplorerModifyActionClass::ExplorerModifyActionClass(mvceditor::Runni
 , NewName() {
 }
 
-void mvceditor::ExplorerModifyActionClass::SetFilesToRemove(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files) {
+void t4p::ExplorerModifyActionClass::SetFilesToRemove(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files) {
 	Action = DELETE_FILES_DIRS;
 
 	// make sure to clone
-	Dirs = mvceditor::DeepCopyFileNames(dirs);
-	Files = mvceditor::DeepCopyFileNames(files);
+	Dirs = t4p::DeepCopyFileNames(dirs);
+	Files = t4p::DeepCopyFileNames(files);
 }
 
-void mvceditor::ExplorerModifyActionClass::SetFileToRename(const wxFileName& file, const wxString& newName) {
+void t4p::ExplorerModifyActionClass::SetFileToRename(const wxFileName& file, const wxString& newName) {
 	Action = RENAME_FILE;
 
 	// make sure to clone
@@ -1229,7 +1229,7 @@ void mvceditor::ExplorerModifyActionClass::SetFileToRename(const wxFileName& fil
 	NewName = newName.c_str();
 }
 
-void mvceditor::ExplorerModifyActionClass::BackgroundWork() {
+void t4p::ExplorerModifyActionClass::BackgroundWork() {
 	wxFileName parentDir;
 	wxString name;
 	bool totalSuccess = true;
@@ -1237,10 +1237,10 @@ void mvceditor::ExplorerModifyActionClass::BackgroundWork() {
 	std::vector<wxFileName> dirsNotDeleted;
 	std::vector<wxFileName> filesDeleted;
 	std::vector<wxFileName> filesNotDeleted;
-	if (mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS == Action) {
+	if (t4p::ExplorerModifyActionClass::DELETE_FILES_DIRS == Action) {
 		std::vector<wxFileName>::iterator d;
 		for (d = Dirs.begin(); d != Dirs.end(); ++d) {
-			bool success = mvceditor::RecursiveRmDir(d->GetPath());
+			bool success = t4p::RecursiveRmDir(d->GetPath());
 			if (success) {
 				wxFileName wxFileName;
 				wxFileName.AssignDir(d->GetPath());
@@ -1266,61 +1266,61 @@ void mvceditor::ExplorerModifyActionClass::BackgroundWork() {
 			}
 			totalSuccess &= success;
 		}
-		mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
+		t4p::ExplorerModifyEventClass modEvent(GetEventId(), 
 			dirsDeleted, filesDeleted, dirsNotDeleted, filesNotDeleted, totalSuccess);
 		PostEvent(modEvent);
 	}
-	else if (mvceditor::ExplorerModifyActionClass::RENAME_FILE == Action) {
+	else if (t4p::ExplorerModifyActionClass::RENAME_FILE == Action) {
 		wxFileName destFile(OldFile.GetPath(), NewName);
 		bool success = wxRenameFile(OldFile.GetFullPath(), destFile.GetFullPath(), false);
 
-		mvceditor::ExplorerModifyEventClass modEvent(GetEventId(), 
+		t4p::ExplorerModifyEventClass modEvent(GetEventId(), 
 			OldFile, NewName, success);
 		PostEvent(modEvent);
 	}
 }
-wxString mvceditor::ExplorerModifyActionClass::GetLabel() const {
+wxString t4p::ExplorerModifyActionClass::GetLabel() const {
 	return wxT("File System Modification");
 }
 
-mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &oldFile, 
+t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &oldFile, 
 															  const wxString &newName, bool success) 
-: wxEvent(eventId, mvceditor::EVENT_EXPLORER_MODIFY)
+: wxEvent(eventId, t4p::EVENT_EXPLORER_MODIFY)
 , OldFile(oldFile.GetFullPath())
 , NewName(newName.c_str())
 , DirsDeleted()
 , FilesDeleted()
 , DirsNotDeleted()
 , FilesNotDeleted()
-, Action(mvceditor::ExplorerModifyActionClass::RENAME_FILE)
+, Action(t4p::ExplorerModifyActionClass::RENAME_FILE)
 , Success(success)
 {
 
 }
 
-mvceditor::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, 
+t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, 
 															  const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted,
 															  const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted,
 															  bool success)
-: wxEvent(eventId, mvceditor::EVENT_EXPLORER_MODIFY)
+: wxEvent(eventId, t4p::EVENT_EXPLORER_MODIFY)
 , OldFile()
 , NewName()
 , DirsDeleted()
 , FilesDeleted()
 , DirsNotDeleted()
 , FilesNotDeleted()
-, Action(mvceditor::ExplorerModifyActionClass::DELETE_FILES_DIRS)
+, Action(t4p::ExplorerModifyActionClass::DELETE_FILES_DIRS)
 , Success(success)
 {
-	DirsDeleted = mvceditor::DeepCopyFileNames(dirsDeleted);
-	DirsNotDeleted = mvceditor::DeepCopyFileNames(dirsNotDeleted);
-	FilesDeleted = mvceditor::DeepCopyFileNames(filesDeleted);
-	FilesNotDeleted = mvceditor::DeepCopyFileNames(filesNotDeleted);
+	DirsDeleted = t4p::DeepCopyFileNames(dirsDeleted);
+	DirsNotDeleted = t4p::DeepCopyFileNames(dirsNotDeleted);
+	FilesDeleted = t4p::DeepCopyFileNames(filesDeleted);
+	FilesNotDeleted = t4p::DeepCopyFileNames(filesNotDeleted);
 }
 
-wxFileName mvceditor::ExplorerModifyEventClass::GetParentDir() const {
+wxFileName t4p::ExplorerModifyEventClass::GetParentDir() const {
 	wxFileName parentDir;
-	if (Action == mvceditor::ExplorerModifyActionClass::RENAME_FILE) {
+	if (Action == t4p::ExplorerModifyActionClass::RENAME_FILE) {
 		parentDir.AssignDir(OldFile.GetPath());
 		return parentDir;
 	}
@@ -1345,62 +1345,62 @@ wxFileName mvceditor::ExplorerModifyEventClass::GetParentDir() const {
 	return parentDir;
 }
 
-wxEvent* mvceditor::ExplorerModifyEventClass::Clone() const {
-	if (Action == mvceditor::ExplorerModifyActionClass::RENAME_FILE) {
-		return new mvceditor::ExplorerModifyEventClass(
+wxEvent* t4p::ExplorerModifyEventClass::Clone() const {
+	if (Action == t4p::ExplorerModifyActionClass::RENAME_FILE) {
+		return new t4p::ExplorerModifyEventClass(
 			GetId(), OldFile, NewName, Success
 		);
 	}
-	return new mvceditor::ExplorerModifyEventClass(
+	return new t4p::ExplorerModifyEventClass(
 		GetId(), DirsDeleted, FilesDeleted, DirsNotDeleted, FilesNotDeleted, Success
 	);
 }
 
-mvceditor::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int id, mvceditor::ExplorerFeatureClass& feature)
+t4p::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature)
 	: ExplorerOptionsGeneratedPanelClass(parent, id)
 	, Feature(feature) {
-	mvceditor::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
+	t4p::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
 	FileManager->SetValidator(fileManagerValidator);
-	mvceditor::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
+	t4p::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
 	Shell->SetValidator(shellValidator);	
 
 	TransferDataToWindow();
 }
 
-const wxEventType mvceditor::EVENT_EXPLORER = wxNewEventType();
-const wxEventType mvceditor::EVENT_EXPLORER_MODIFY = wxNewEventType();
+const wxEventType t4p::EVENT_EXPLORER = wxNewEventType();
+const wxEventType t4p::EVENT_EXPLORER_MODIFY = wxNewEventType();
 
-BEGIN_EVENT_TABLE(mvceditor::ExplorerFeatureClass, mvceditor::FeatureClass)
-	EVT_MENU(mvceditor::MENU_EXPLORER + 1, mvceditor::ExplorerFeatureClass::OnProjectExploreOpenFile)
-	EVT_MENU(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnProjectExplore)
-	EVT_AUITOOLBAR_TOOL_DROPDOWN(mvceditor::MENU_EXPLORER + 2, mvceditor::ExplorerFeatureClass::OnExplorerToolDropDown)
-	EVT_MENU_RANGE(mvceditor::MENU_EXPLORER + 3, mvceditor::MENU_EXPLORER + 50, mvceditor::ExplorerFeatureClass::OnExplorerProjectMenu)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, mvceditor::ExplorerFeatureClass::OnAppPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PROJECT_CREATED, mvceditor::ExplorerFeatureClass::OnAppProjectCreated)
+BEGIN_EVENT_TABLE(t4p::ExplorerFeatureClass, t4p::FeatureClass)
+	EVT_MENU(t4p::MENU_EXPLORER + 1, t4p::ExplorerFeatureClass::OnProjectExploreOpenFile)
+	EVT_MENU(t4p::MENU_EXPLORER + 2, t4p::ExplorerFeatureClass::OnProjectExplore)
+	EVT_AUITOOLBAR_TOOL_DROPDOWN(t4p::MENU_EXPLORER + 2, t4p::ExplorerFeatureClass::OnExplorerToolDropDown)
+	EVT_MENU_RANGE(t4p::MENU_EXPLORER + 3, t4p::MENU_EXPLORER + 50, t4p::ExplorerFeatureClass::OnExplorerProjectMenu)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::ExplorerFeatureClass::OnAppPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::ExplorerFeatureClass::OnAppPreferencesSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PROJECT_CREATED, t4p::ExplorerFeatureClass::OnAppProjectCreated)
 
-	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, mvceditor::ExplorerFeatureClass::OnExplorerListComplete)
+	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, t4p::ExplorerFeatureClass::OnExplorerListComplete)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass)
-	EVT_MENU(ID_EXPLORER_LIST_OPEN, mvceditor::ModalExplorerPanelClass::OnListMenuOpen)
-	EVT_MENU(ID_EXPLORER_LIST_RENAME, mvceditor::ModalExplorerPanelClass::OnListMenuRename)
-	EVT_MENU(ID_EXPLORER_LIST_DELETE, mvceditor::ModalExplorerPanelClass::OnListMenuDelete)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_JS, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, mvceditor::ModalExplorerPanelClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_DIRECTORY, mvceditor::ModalExplorerPanelClass::OnListMenuCreateDirectory)
-	EVT_MENU(ID_EXPLORER_LIST_SHELL, mvceditor::ModalExplorerPanelClass::OnListMenuShell)
-	EVT_MENU(ID_EXPLORER_LIST_FILE_MANAGER, mvceditor::ModalExplorerPanelClass::OnListMenuFileManager)
-	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, mvceditor::ModalExplorerPanelClass::OnExplorerModifyComplete)
+BEGIN_EVENT_TABLE(t4p::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass)
+	EVT_MENU(ID_EXPLORER_LIST_OPEN, t4p::ModalExplorerPanelClass::OnListMenuOpen)
+	EVT_MENU(ID_EXPLORER_LIST_RENAME, t4p::ModalExplorerPanelClass::OnListMenuRename)
+	EVT_MENU(ID_EXPLORER_LIST_DELETE, t4p::ModalExplorerPanelClass::OnListMenuDelete)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_JS, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)
+	EVT_MENU(ID_EXPLORER_LIST_CREATE_DIRECTORY, t4p::ModalExplorerPanelClass::OnListMenuCreateDirectory)
+	EVT_MENU(ID_EXPLORER_LIST_SHELL, t4p::ModalExplorerPanelClass::OnListMenuShell)
+	EVT_MENU(ID_EXPLORER_LIST_FILE_MANAGER, t4p::ModalExplorerPanelClass::OnListMenuFileManager)
+	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, t4p::ModalExplorerPanelClass::OnExplorerModifyComplete)
 
-	EVT_MENU(ID_FILTER_ALL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_MENU(ID_FILTER_ALL_SOURCE, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_MENU(ID_FILTER_PHP, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_MENU(ID_FILTER_CSS, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_MENU(ID_FILTER_SQL, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_MENU(ID_FILTER_JS, mvceditor::ModalExplorerPanelClass::OnFilterMenuCheck)
-	EVT_FSWATCHER(wxID_ANY, mvceditor::ModalExplorerPanelClass::OnFsWatcher)
+	EVT_MENU(ID_FILTER_ALL, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_ALL_SOURCE, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_PHP, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_CSS, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_SQL, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_MENU(ID_FILTER_JS, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
+	EVT_FSWATCHER(wxID_ANY, t4p::ModalExplorerPanelClass::OnFsWatcher)
 END_EVENT_TABLE()

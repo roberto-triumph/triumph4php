@@ -22,13 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_ASSETS_H__
-#define __MVCEDITOR_ASSETS_H__
+#ifndef __T4P_ASSETS_H__
+#define __T4P_ASSETS_H__
 
 #include <wx/filename.h>
 #include <wx/bitmap.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * @return the file location of the PHP native functions SQLite file. This file contains all of the
@@ -207,8 +207,8 @@ void SetSettingsDirLocation(const wxFileName& settingsDir);
  * if the versions differ.  This check will be done at app start, so that in most of the code
  * we can assume that the schema is up-to-date.
  *
- * @see mvceditor::ParsedTagFinderClass
- * @see mvceditor::TagCacheDbVersionActionClass
+ * @see t4p::ParsedTagFinderClass
+ * @see t4p::TagCacheDbVersionActionClass
  *
  * @return the full path to the tag database that stores tags for all defined projects
  */
@@ -233,7 +233,7 @@ wxFileName TagCacheWorkingAsset();
  * if the versions differ.  This check will be done at app start, so that in most of the code
  * we can assume that the schema is up-to-date.
  *
- * @see mvceditor::DetectorCacheDbVersionClass
+ * @see t4p::DetectorCacheDbVersionClass
  *
  * @return the full path to the tag database that stores detected tags for all defined projects
  */

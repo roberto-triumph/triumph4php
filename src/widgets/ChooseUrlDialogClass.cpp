@@ -24,17 +24,17 @@
  */
 #include <widgets/ChooseUrlDialogClass.h>
 
-mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, 
-													  mvceditor::UrlTagFinderClass& urls,
-													  const std::vector<mvceditor::ProjectClass>& projects,
-													  mvceditor::UrlTagClass& chosenUrl)
+t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, 
+													  t4p::UrlTagFinderClass& urls,
+													  const std::vector<t4p::ProjectClass>& projects,
+													  t4p::UrlTagClass& chosenUrl)
 	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
 	, UrlTagFinder(urls)
 	, ChosenUrl(chosenUrl) 
 	, Projects() {
 
 	// get some urls to prepopulate the list
-	std::vector<mvceditor::UrlTagClass> allUrlTags = GetFilteredUrls(wxT("http://"));
+	std::vector<t4p::UrlTagClass> allUrlTags = GetFilteredUrls(wxT("http://"));
 	FillUrlList(allUrlTags);
 	
 	ProjectChoice->Clear();
@@ -58,7 +58,7 @@ mvceditor::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 	Filter->SetFocus();
 }
 
-void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
 		int index = UrlList->GetSelection();
 		if (index >= 0) {
@@ -74,17 +74,17 @@ void mvceditor::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::ChooseUrlDialogClass::OnListItemDoubleClicked(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnListItemDoubleClicked(wxCommandEvent& event) {
 	OnOkButton(event);	
 }
 
-void mvceditor::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
 	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
 	FinalUrlLabel->SetLabel(finalUrl);
 	event.Skip();
 }
 
-void mvceditor::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	wxString filter = Filter->GetValue();
 	if (filter.IsEmpty()) {
 
@@ -93,12 +93,12 @@ void mvceditor::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 		filter = wxT("http://");
 	}
 
-	std::vector<mvceditor::UrlTagClass> filteredUrls;
+	std::vector<t4p::UrlTagClass> filteredUrls;
 	
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
 	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
-		mvceditor::ProjectClass* project = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(sel);
+		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
 	}
 	else {
@@ -110,11 +110,11 @@ void mvceditor::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	FinalUrlLabel->SetLabel(finalUrl);
 }
 
-void mvceditor::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
 	OnOkButton(event);	
 }
 
-void mvceditor::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
+void t4p::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_DOWN && event.GetModifiers() == wxMOD_NONE) {
 		int selection = UrlList->GetSelection();
 		if (selection >= 0 && selection < (int)(UrlList->GetCount() - 1)) {
@@ -134,27 +134,27 @@ void mvceditor::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::ChooseUrlDialogClass::OnExtraText(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnExtraText(wxCommandEvent& event) {
 	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
 	FinalUrlLabel->SetLabel(finalUrl);
 	event.Skip();
 }
 
-void mvceditor::ChooseUrlDialogClass::OnExtraChar(wxKeyEvent& event) {
+void t4p::ChooseUrlDialogClass::OnExtraChar(wxKeyEvent& event) {
 	wxString finalUrl = UrlList->GetStringSelection() + ExtraText->GetValue();
 	FinalUrlLabel->SetLabel(finalUrl);
 	event.Skip();
 }
 
-void mvceditor::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
+void t4p::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	int sel = event.GetSelection();
 	wxString filter = Filter->GetValue();
 
-	std::vector<mvceditor::UrlTagClass> filteredUrls;
+	std::vector<t4p::UrlTagClass> filteredUrls;
 
 	// project 0 is the "all enabled projects"
 	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
-		mvceditor::ProjectClass* project = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(sel);
+		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
 	}
 	else {
@@ -166,26 +166,26 @@ void mvceditor::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	FinalUrlLabel->SetLabel(finalUrl);
 }
 
-std::vector<mvceditor::UrlTagClass> mvceditor::ChooseUrlDialogClass::GetFilteredUrls(const wxString& filter) {
-	std::vector<mvceditor::UrlTagClass> filteredUrls;
+std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrls(const wxString& filter) {
+	std::vector<t4p::UrlTagClass> filteredUrls;
 	std::vector<wxFileName> sourceDirs = ActiveSourceDirectories();
 	UrlTagFinder.FilterUrls(filter, sourceDirs, filteredUrls);
 	return filteredUrls;
 }
 
 
-std::vector<mvceditor::UrlTagClass> mvceditor::ChooseUrlDialogClass::GetFilteredUrlsByProject(const wxString& filter, const mvceditor::ProjectClass& project) {
+std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProject(const wxString& filter, const t4p::ProjectClass& project) {
 	std::vector<wxFileName> dirs;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	for (src = project.Sources.begin(); src != project.Sources.end(); ++src) {
 		dirs.push_back(src->RootDirectory);
 	}
 	
-	std::vector<mvceditor::UrlTagClass> filteredUrls;
+	std::vector<t4p::UrlTagClass> filteredUrls;
 	UrlTagFinder.FilterUrls(filter, dirs, filteredUrls);
 
 	// check that the controller is part of the project's sources
-	std::vector<mvceditor::UrlTagClass>::iterator url = filteredUrls.begin();
+	std::vector<t4p::UrlTagClass>::iterator url = filteredUrls.begin();
 	while (url != filteredUrls.end()) {
 		wxFileName fileName = url->FileName;
 		wxString fullPath = fileName.GetFullPath();
@@ -199,7 +199,7 @@ std::vector<mvceditor::UrlTagClass> mvceditor::ChooseUrlDialogClass::GetFiltered
 	return filteredUrls;
 }
 
-void mvceditor::ChooseUrlDialogClass::FillUrlList(const std::vector<mvceditor::UrlTagClass>& urls) {
+void t4p::ChooseUrlDialogClass::FillUrlList(const std::vector<t4p::UrlTagClass>& urls) {
 	UrlList->Freeze();
 	UrlList->Clear();
 	for (size_t i = 0; i < urls.size(); ++i) {
@@ -211,15 +211,15 @@ void mvceditor::ChooseUrlDialogClass::FillUrlList(const std::vector<mvceditor::U
 	UrlList->Thaw();
 }
 
-std::vector<wxFileName> mvceditor::ChooseUrlDialogClass::ActiveSourceDirectories() {
+std::vector<wxFileName> t4p::ChooseUrlDialogClass::ActiveSourceDirectories() {
 	std::vector<wxFileName> dirs;
-	std::vector<mvceditor::ProjectClass>::const_iterator project;
-	std::vector<mvceditor::SourceClass>::const_iterator src;
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator src;
 	
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
 	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
-		mvceditor::ProjectClass* project = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(sel);
+		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
 			dirs.push_back(src->RootDirectory);
 		}

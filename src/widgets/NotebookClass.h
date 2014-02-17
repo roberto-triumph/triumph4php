@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef MVCEDITORNOTEBOOKCLASS_H_
-#define MVCEDITORNOTEBOOKCLASS_H_
+#ifndef __T4P_NOTEBOOKCLASS_H_
+#define __T4P_NOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
 #include <globals/GlobalsClass.h>
@@ -33,7 +33,7 @@
 #include <wx/dnd.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 /**
  * This class contains logic relating to the workings of the
  * notebook (source code editor tabs).
@@ -121,7 +121,7 @@ public:
 	 * Create a new source code control, and selects it.
 	 * @param mode the type of document the control will edit
 	 */
-	void AddMvcEditorPage(mvceditor::CodeControlClass::Mode mode);
+	void AddTriumphPage(t4p::CodeControlClass::Mode mode);
 	
 	/**
 	 * Prompts the user to pick an existing file and loads the contents of the
@@ -173,7 +173,7 @@ public:
 	 * Get the source code control at the given index.
 	 * 
 	 * @param size_t pageIndex the page number to get
-	 * @return mvceditor::CodeControlClass* the source code control window, NULL
+	 * @return t4p::CodeControlClass* the source code control window, NULL
 	 * if pageIndex is invalid.
 	 */
 	CodeControlClass* GetCodeControl(size_t pageIndex) const;
@@ -181,7 +181,7 @@ public:
 	/**
 	 * Get the currently visible source code control
 	 * 
-	 * @return MvcEditorCodeControlClass* the source code control window, NULL
+	 * @return tp4::CodeControlClass* the source code control window, NULL
 	 * if notebook is empty.
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
@@ -331,4 +331,4 @@ private:
 };
 
 }
-#endif /*MVCEDITORNOTEBOOKCLASS_H_*/
+#endif /*__T4P_NOTEBOOKCLASS_H_*/

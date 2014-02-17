@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <UnitTest++.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
 #include <language/CallStackClass.h>
@@ -38,8 +38,8 @@ class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTest
 	
 public:
 
-	mvceditor::TagCacheClass TagCache;
-	mvceditor::CallStackClass CallStack;
+	t4p::TagCacheClass TagCache;
+	t4p::CallStackClass CallStack;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	
@@ -81,12 +81,12 @@ public:
 
 	void BuildCache() {
 		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*session, mvceditor::ResourceSqlSchemaAsset()); 
+		CreateDatabase(*session, t4p::ResourceSqlSchemaAsset()); 
 
-		mvceditor::TagFinderListClass* tagFinderList = new mvceditor::TagFinderListClass;
+		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
 		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
-		mvceditor::DirectorySearchClass search;
+		t4p::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));
 		while (search.More()) {
 			tagFinderList->Walk(search);
@@ -98,26 +98,26 @@ public:
 };
 
 #define CHECK_SYMBOL_IS_ASSIGN(i, destinationVariable, sourceVariable) \
-		CHECK_EQUAL(mvceditor::VariableSymbolClass::ASSIGN, CallStack.Variables[i].Type);\
+		CHECK_EQUAL(t4p::VariableSymbolClass::ASSIGN, CallStack.Variables[i].Type);\
 		CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 		CHECK_UNISTR_EQUALS(sourceVariable, CallStack.Variables[i].SourceVariable);
 			
 #define CHECK_SYMBOL_IS_ARRAY(i, destinationVariable) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::ARRAY, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::ARRAY, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);
 	
 #define CHECK_SYMBOL_IS_ARRAY_KEY(i, destinationVariable, keyName) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::ARRAY_KEY, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::ARRAY_KEY, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(keyName, CallStack.Variables[i].ArrayKey);
 
 #define CHECK_SYMBOL_IS_FUNCTION_CALL(i, destinationVariable, functionName) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::FUNCTION_CALL, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::FUNCTION_CALL, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(functionName, CallStack.Variables[i].FunctionName);
 	
 #define CHECK_SYMBOL_IS_METHOD_CALL(i, destinationVariable, objectName, methodName) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::METHOD_CALL, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::METHOD_CALL, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(objectName, CallStack.Variables[i].ObjectName);\
 	CHECK_UNISTR_EQUALS(methodName, CallStack.Variables[i].MethodName);
@@ -127,23 +127,23 @@ public:
 	CHECK_UNISTR_EQUALS(argName, CallStack.Variables[i].FunctionArguments[argIndex]);
 	
 #define CHECK_SYMBOL_IS_NEW_OBJECT(i, destinationVariable, className) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::NEW_OBJECT, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::NEW_OBJECT, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(className, CallStack.Variables[i].ClassName);
 
 #define CHECK_SYMBOL_IS_PROPERTY(i, destinationVariable, objectName, propertyName) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::PROPERTY, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::PROPERTY, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(objectName, CallStack.Variables[i].ObjectName);\
 	CHECK_UNISTR_EQUALS(propertyName, CallStack.Variables[i].PropertyName);
 
 #define CHECK_SYMBOL_IS_SCALAR(i, destinationVariable, scalar) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::SCALAR, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::SCALAR, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(destinationVariable, CallStack.Variables[i].DestinationVariable);\
 	CHECK_UNISTR_EQUALS(scalar, CallStack.Variables[i].ScalarValue);
 
 #define CHECK_SYMBOL_IS_BEGIN_METHOD(i, className, methodName) \
-	CHECK_EQUAL(mvceditor::VariableSymbolClass::BEGIN_METHOD, CallStack.Variables[i].Type);\
+	CHECK_EQUAL(t4p::VariableSymbolClass::BEGIN_METHOD, CallStack.Variables[i].Type);\
 	CHECK_UNISTR_EQUALS(className, CallStack.Variables[i].ClassName);\
 	CHECK_UNISTR_EQUALS(methodName, CallStack.Variables[i].MethodName);
 	
@@ -153,13 +153,13 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("UnknownClass"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
+	CHECK_EQUAL(t4p::CallStackClass::RESOURCE_NOT_FOUND, error);
 	
-	error = mvceditor::CallStackClass::NONE;
+	error = t4p::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("unknownMethod"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::RESOURCE_NOT_FOUND, error);
+	CHECK_EQUAL(t4p::CallStackClass::RESOURCE_NOT_FOUND, error);
 }
  
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
@@ -187,12 +187,12 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
 	BuildCache();
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK_EQUAL(false, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 
-	UnicodeString expected = mvceditor::WxToIcu(file.GetFullPath());
+	UnicodeString expected = t4p::WxToIcu(file.GetFullPath());
 	CHECK_EQUAL(expected, CallStack.LintResults.UnicodeFilename);
-	CHECK_EQUAL(mvceditor::CallStackClass::PARSE_ERR0R, error);
+	CHECK_EQUAL(t4p::CallStackClass::PARSE_ERR0R, error);
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
@@ -218,12 +218,12 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 	BuildCache();
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	
 	// we still want to return true because an incomplete call stack may be helpful in some cases
 	CHECK_EQUAL(true, CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(9, CallStack.Variables);
 	
@@ -249,13 +249,13 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
 
-	mvceditor::TagCacheClass localCache;
-	mvceditor::CallStackClass localCallStack(localCache);
+	t4p::TagCacheClass localCache;
+	t4p::CallStackClass localCallStack(localCache);
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK_EQUAL(false, localCallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::EMPTY_CACHE, error);
+	CHECK_EQUAL(t4p::CallStackClass::EMPTY_CACHE, error);
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
@@ -263,11 +263,11 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 	BuildCache();
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(8, CallStack.Variables);
 	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");	
@@ -307,10 +307,10 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 	BuildCache();
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(14, CallStack.Variables);
 	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
@@ -349,10 +349,10 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultiplePropertyCalls) {
 	BuildCache();
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(6, CallStack.Variables);
 	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
@@ -384,10 +384,10 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithArrayKeyAssignment) {
 	BuildCache();
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(10, CallStack.Variables);
 	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
@@ -429,10 +429,10 @@ TEST_FIXTURE(CallStackFixtureTestClass, WithMethodCall) {
 	BuildCache();
 	
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(11, CallStack.Variables);
 	CHECK_SYMBOL_IS_BEGIN_METHOD(0, "News", "index");
@@ -457,15 +457,15 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	BuildCache();
 
 	soci::session session(*soci::factory_sqlite3(), ":memory:");
-	CreateDatabase(session, mvceditor::DetectorSqlSchemaAsset());
+	CreateDatabase(session, t4p::DetectorSqlSchemaAsset());
 
 	wxFileName file(TestProjectDir + wxT("src") + wxFileName::GetPathSeparators() + wxT("news.php"));
-	mvceditor::CallStackClass::Errors error = mvceditor::CallStackClass::NONE;
+	t4p::CallStackClass::Errors error = t4p::CallStackClass::NONE;
 	CHECK(CallStack.Build(file, UNICODE_STRING_SIMPLE("News"), UNICODE_STRING_SIMPLE("index"), pelet::PHP_53, error));
 	CHECK(CallStack.Persist(session));
 
-	CHECK_EQUAL(mvceditor::CallStackClass::NONE, error);
-	CHECK_EQUAL(mvceditor::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
+	CHECK_EQUAL(t4p::CallStackClass::NONE, error);
+	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::NONE, CallStack.MatchError.Type);
 	
 	CHECK_VECTOR_SIZE(8, CallStack.Variables);
 

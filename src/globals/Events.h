@@ -22,14 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOREVENTS_H__
-#define __MVCEDITOREVENTS_H__
+#ifndef __T4P_EVENTS_H__
+#define __T4P_EVENTS_H__
 
 #include <wx/event.h>
 #include <wx/filename.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This is the class that will listen to, and notify, of any 'interesting'
@@ -240,53 +240,53 @@ public:
 typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClass&);
 
 #define EVT_APP_FILE_NEW(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 #define EVT_APP_FILE_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #define EVT_APP_FILE_SAVED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #define EVT_APP_FILE_CLOSED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 
 typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 
 #define EVT_APP_FILE_RENAMED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #define EVT_APP_DIR_RENAMED(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
 	
 #define EVT_CMD_FILE_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenFileCommandEventClassFunction, & fn ), (wxObject *) NULL ),
 	
 typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCommandEventClass&);
 	
 #define EVT_APP_DB_TABLE_DATA_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
 
 #define EVT_APP_DB_TABLE_DEFINITION_OPEN(fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
 	

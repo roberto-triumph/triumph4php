@@ -28,7 +28,7 @@
 #include <globals/Sqlite.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -57,40 +57,40 @@ public:
 SUITE(SqliteTestClass) {
 
 TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithNewFile) {
-	CreateFixtureFile(wxT("script.sql"), mvceditor::CharToWx(
+	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
 		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
 		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
 	));
 	
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
+	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 	std::vector<std::string> tableNames;
-	CHECK(mvceditor::SqliteTables(EmptySession, tableNames, error));
+	CHECK(t4p::SqliteTables(EmptySession, tableNames, error));
 	CHECK_VECTOR_SIZE(2, tableNames);
 	CHECK_EQUAL("my_table", tableNames[0]);
 	CHECK_EQUAL("your_table", tableNames[1]);
 }
 
 TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
-	CreateFixtureFile(wxT("script.sql"), mvceditor::CharToWx(
+	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
 		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
 		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
 	));
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
+	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 
-	CreateFixtureFile(wxT("script.sql"), mvceditor::CharToWx(
+	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
 		"CREATE TABLE others_table ( id INT, othername VARCHAR(255));"	
 		"CREATE TABLE another_table ( id INT, another_name VARCHAR(255));"	
 		"CREATE TABLE yet_another_table ( id INT, yet_another_name VARCHAR(255));"	
 	));
 
-	ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
+	ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 	std::vector<std::string> tableNames;
-	CHECK(mvceditor::SqliteTables(EmptySession, tableNames, error));
+	CHECK(t4p::SqliteTables(EmptySession, tableNames, error));
 	CHECK_VECTOR_SIZE(3, tableNames);
 	CHECK_EQUAL("others_table", tableNames[0]);
 	CHECK_EQUAL("another_table", tableNames[1]);
@@ -99,14 +99,14 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 }
 
 TEST_FIXTURE(SqliteFixtureClass, SchemaVersion) {
-	CreateFixtureFile(wxT("script.sql"), mvceditor::CharToWx(
+	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
 		"CREATE TABLE schema_version ( version_number INT);"	
 		"INSERT INTO schema_version VALUES(2);"	
 	));
 	wxString error;
-	bool ret = mvceditor::SqliteSqlScript(ScriptFileName, EmptySession, error);
+	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
-	int versionNumber = mvceditor::SqliteSchemaVersion(EmptySession);
+	int versionNumber = t4p::SqliteSchemaVersion(EmptySession);
 	CHECK_EQUAL(2, versionNumber);
 }
 

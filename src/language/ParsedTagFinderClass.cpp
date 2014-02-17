@@ -37,9 +37,9 @@
 #include <soci/soci.h>
 #include <string>
 
-namespace mvceditor {
+namespace t4p {
 
-class AllMembersTagResultClass : public mvceditor::ExactMemberTagResultClass {
+class AllMembersTagResultClass : public t4p::ExactMemberTagResultClass {
 
 public:
 
@@ -54,7 +54,7 @@ private:
 	int ClassCount;
 };
 
-class ExactNonMemberTagResultClass : public mvceditor::TagResultClass {
+class ExactNonMemberTagResultClass : public t4p::TagResultClass {
 
 public:
 
@@ -66,7 +66,7 @@ public:
 	
 	void SetFileTagId(int fileTagId);
 
-	void SetTagType(mvceditor::TagClass::Types type);
+	void SetTagType(t4p::TagClass::Types type);
 
 protected:
 
@@ -79,7 +79,7 @@ protected:
 	int FileTagIdSearch;
 };
 
-class NearMatchNonMemberTagResultClass : public mvceditor::ExactNonMemberTagResultClass {
+class NearMatchNonMemberTagResultClass : public t4p::ExactNonMemberTagResultClass {
 
 public:
 
@@ -87,7 +87,7 @@ public:
 
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
-	void AddTagType(mvceditor::TagClass::Types type);
+	void AddTagType(t4p::TagClass::Types type);
 
 	bool Prepare(soci::session& session, bool doLimit);
 
@@ -100,7 +100,7 @@ private:
 // if ClassName is empty, then just check method names This ensures 
 // queries like '::getName' will work as well.
 // make sure to NOT get fully qualified  matches (key=identifier)
-class ExactMemberOnlyTagResultClass : public mvceditor::TagResultClass {
+class ExactMemberOnlyTagResultClass : public t4p::TagResultClass {
 
 public:
 
@@ -197,32 +197,32 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-mvceditor::ExactMemberTagResultClass::ExactMemberTagResultClass()
+t4p::ExactMemberTagResultClass::ExactMemberTagResultClass()
 	: TagResultClass()
 	, Keys()
 	, TagTypes()
 	, SourceDirs() {
-	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(mvceditor::TagClass::MEMBER);
-	TagTypes.push_back(mvceditor::TagClass::METHOD);
+	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::TagClass::MEMBER);
+	TagTypes.push_back(t4p::TagClass::METHOD);
 }
 
-void mvceditor::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+void t4p::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
-		Keys.push_back(mvceditor::IcuToChar(key));
+		Keys.push_back(t4p::IcuToChar(key));
 	}
 
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 }
 
-bool mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool t4p::ExactMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -262,30 +262,30 @@ bool mvceditor::ExactMemberTagResultClass::Prepare(soci::session& session,  bool
 	return Init(stmt);
 }
 
-mvceditor::AllMembersTagResultClass::AllMembersTagResultClass()
+t4p::AllMembersTagResultClass::AllMembersTagResultClass()
 	: ExactMemberTagResultClass()
 	, ClassCount(0) {
 }
 
-void mvceditor::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+void t4p::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::");
 
 		// put the key in two times so that we can buld a BETWEEN expression to emulate a LIKE
-		Keys.push_back(mvceditor::IcuToChar(key));
-		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
+		Keys.push_back(t4p::IcuToChar(key));
+		Keys.push_back(t4p::IcuToChar(key) + "zzzzzzzzzz");
 	}
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 	ClassCount = classNames.size();
 }
 
-bool mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool t4p::AllMembersTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -330,13 +330,13 @@ bool mvceditor::AllMembersTagResultClass::Prepare(soci::session& session,  bool 
 }
 
 
-mvceditor::NearMatchMemberTagResultClass::NearMatchMemberTagResultClass()
+t4p::NearMatchMemberTagResultClass::NearMatchMemberTagResultClass()
 	: ExactMemberTagResultClass() 
 	, ClassCount(0) 
 	, FileItemId(0) {
 }
 
-void mvceditor::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+void t4p::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 												int fileItemId,
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
@@ -344,21 +344,21 @@ void mvceditor::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeStri
 		UnicodeString key = classNames[i] + UNICODE_STRING_SIMPLE("::") + memberName;
 
 		// put the key in two times so that we can buld a BETWEEN expression to emulate a LIKE
-		Keys.push_back(mvceditor::IcuToChar(key));
-		Keys.push_back(mvceditor::IcuToChar(key) + "zzzzzzzzzz");
+		Keys.push_back(t4p::IcuToChar(key));
+		Keys.push_back(t4p::IcuToChar(key) + "zzzzzzzzzz");
 	}
 
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 	ClassCount = classNames.size();
 	FileItemId = fileItemId;
 }
 
 
-bool mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool t4p::NearMatchMemberTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 	wxASSERT_MSG(!Keys.empty(), wxT("keys cannot be empty"));
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
@@ -409,37 +409,37 @@ bool mvceditor::NearMatchMemberTagResultClass::Prepare(soci::session& session,  
 	return Init(stmt);
 }
 
-mvceditor::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
+t4p::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 	: TagResultClass()
 	, Key() 
 	, TagTypes()
 	, SourceDirs() 
 	, FileTagIdSearch(0) {
-	TagTypes.push_back(mvceditor::TagClass::DEFINE);
-	TagTypes.push_back(mvceditor::TagClass::CLASS);
-	TagTypes.push_back(mvceditor::TagClass::FUNCTION);
+	TagTypes.push_back(t4p::TagClass::DEFINE);
+	TagTypes.push_back(t4p::TagClass::CLASS);
+	TagTypes.push_back(t4p::TagClass::FUNCTION);
 }
 
-void mvceditor::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
-	Key = mvceditor::IcuToChar(key);
+void t4p::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
+	Key = t4p::IcuToChar(key);
 	
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 }
 
-void mvceditor::ExactNonMemberTagResultClass::SetTagType(mvceditor::TagClass::Types type) {
+void t4p::ExactNonMemberTagResultClass::SetTagType(t4p::TagClass::Types type) {
 	TagTypes.clear();
 	TagTypes.push_back(type);
 }
 
-void mvceditor::ExactNonMemberTagResultClass::SetFileTagId(int fileTagId) {
+void t4p::ExactNonMemberTagResultClass::SetFileTagId(int fileTagId) {
 	FileTagIdSearch = fileTagId;
 }
 
-bool mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::ExactNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -480,28 +480,28 @@ bool mvceditor::ExactNonMemberTagResultClass::Prepare(soci::session& session, bo
 	return Init(stmt);
 }
 
-mvceditor::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
+t4p::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
 	: ExactNonMemberTagResultClass() 
 	, KeyUpper() {
 
 }
 
-void mvceditor::NearMatchNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
-	Key = mvceditor::IcuToChar(key);
-	KeyUpper = mvceditor::IcuToChar(key) + "zzzzzzzzzz";
+void t4p::NearMatchNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
+	Key = t4p::IcuToChar(key);
+	KeyUpper = t4p::IcuToChar(key) + "zzzzzzzzzz";
 	
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 }
 
-void mvceditor::NearMatchNonMemberTagResultClass::AddTagType(mvceditor::TagClass::Types type) {
+void t4p::NearMatchNonMemberTagResultClass::AddTagType(t4p::TagClass::Types type) {
 	TagTypes.push_back(type);
 }
 
-bool mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::NearMatchNonMemberTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -545,42 +545,42 @@ bool mvceditor::NearMatchNonMemberTagResultClass::Prepare(soci::session& session
 	return Init(stmt);
 }
 
-mvceditor::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
+t4p::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 	: TagResultClass()
 	, Key()
 	, TagTypes()
 	, SourceDirs() 
 	, OnlyStatic(false) {
-	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(mvceditor::TagClass::MEMBER);
-	TagTypes.push_back(mvceditor::TagClass::METHOD);
+	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::TagClass::MEMBER);
+	TagTypes.push_back(t4p::TagClass::METHOD);
 }
 
-void mvceditor::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
+void t4p::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
 											   const std::vector<wxFileName>& sourceDirs) {
-	Key = mvceditor::IcuToChar(memberName);
+	Key = t4p::IcuToChar(memberName);
 	
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 }
 
-void mvceditor::ExactMemberOnlyTagResultClass::SetMethodType(bool onlyStatic) {
+void t4p::ExactMemberOnlyTagResultClass::SetMethodType(bool onlyStatic) {
 	TagTypes.clear();
-	TagTypes.push_back(mvceditor::TagClass::METHOD);
+	TagTypes.push_back(t4p::TagClass::METHOD);
 	OnlyStatic = onlyStatic;
 }
 
-void mvceditor::ExactMemberOnlyTagResultClass::SetPropertyType(bool onlyStatic) {
+void t4p::ExactMemberOnlyTagResultClass::SetPropertyType(bool onlyStatic) {
 	TagTypes.clear();
-	TagTypes.push_back(mvceditor::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(mvceditor::TagClass::MEMBER);
+	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::TagClass::MEMBER);
 	OnlyStatic = onlyStatic;
 }
 
-bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  bool doLimit) {
+bool t4p::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -622,24 +622,24 @@ bool mvceditor::ExactMemberOnlyTagResultClass::Prepare(soci::session& session,  
 	return Init(stmt);
 }
 
-mvceditor::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
+t4p::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
 : ExactMemberOnlyTagResultClass() 
 , KeyUpper() {
 
 }
 
-void mvceditor::NearMatchMemberOnlyTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
-	Key = mvceditor::IcuToChar(key);
-	KeyUpper = mvceditor::IcuToChar(key) + "zzzzzzzzzz";
+void t4p::NearMatchMemberOnlyTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
+	Key = t4p::IcuToChar(key);
+	KeyUpper = t4p::IcuToChar(key) + "zzzzzzzzzz";
 	
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 }
 
-bool mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
@@ -678,20 +678,20 @@ bool mvceditor::NearMatchMemberOnlyTagResultClass::Prepare(soci::session& sessio
 	return Init(stmt);
 }
 
-mvceditor::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
+t4p::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
 	: TagResultClass()
 	, FullPath() 
 	, TagTypes() {
-	TagTypes.push_back(mvceditor::TagClass::CLASS);
-	TagTypes.push_back(mvceditor::TagClass::FUNCTION);
-	TagTypes.push_back(mvceditor::TagClass::DEFINE);
+	TagTypes.push_back(t4p::TagClass::CLASS);
+	TagTypes.push_back(t4p::TagClass::FUNCTION);
+	TagTypes.push_back(t4p::TagClass::DEFINE);
 }
 
-void mvceditor::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
-	FullPath = mvceditor::WxToChar(fullPath);
+void t4p::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
+	FullPath = t4p::WxToChar(fullPath);
 }
 
-bool mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::TopLevelTagInFileResultClass::Prepare(soci::session& session, bool doLimit) {
 	
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// remove the duplicates from fully qualified namespaces
@@ -712,12 +712,12 @@ bool mvceditor::TopLevelTagInFileResultClass::Prepare(soci::session& session, bo
 	return Init(stmt);
 }
 
-mvceditor::AllTagsResultClass::AllTagsResultClass()
+t4p::AllTagsResultClass::AllTagsResultClass()
 	: TagResultClass() {
 
 }
 
-bool mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::AllTagsResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
@@ -728,17 +728,17 @@ bool mvceditor::AllTagsResultClass::Prepare(soci::session& session, bool doLimit
 	return Init(stmt);
 }
 
-mvceditor::TagByIdResultClass::TagByIdResultClass()
+t4p::TagByIdResultClass::TagByIdResultClass()
 	: TagResultClass()
 	, Id(0) {
 
 }
 
-void mvceditor::TagByIdResultClass::Set(int id) {
+void t4p::TagByIdResultClass::Set(int id) {
 	Id = id;
 }
 
-bool mvceditor::TagByIdResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::TagByIdResultClass::Prepare(soci::session& session, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
@@ -752,7 +752,7 @@ bool mvceditor::TagByIdResultClass::Prepare(soci::session& session, bool doLimit
 }
 
 
-mvceditor::FileTagResultClass::FileTagResultClass()
+t4p::FileTagResultClass::FileTagResultClass()
 	: SqliteResultClass()
 	, FileTag()
 	, SourceDirs()
@@ -764,29 +764,29 @@ mvceditor::FileTagResultClass::FileTagResultClass()
 	, IsNew(0) {
 }
 
-void mvceditor::FileTagResultClass::Next() {
+void t4p::FileTagResultClass::Next() {
 	FileTag.FileId = FileTagId;
-	FileTag.FullPath = mvceditor::CharToWx(FullPath.c_str());
+	FileTag.FullPath = t4p::CharToWx(FullPath.c_str());
 	FileTag.IsNew = IsNew > 0;
 	Fetch();
 }
 
-void mvceditor::FileTagResultClass::Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
-	FilePart = mvceditor::IcuToChar(filePart);
+void t4p::FileTagResultClass::Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
+	FilePart = t4p::IcuToChar(filePart);
 	LineNumber = lineNumber;
 	
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 	ExactMatch = exactMatch;
 }
 
-bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::FileTagResultClass::Prepare(soci::session& session, bool doLimit) {
 
 	// add the SQL wildcards
-	std::string escaped = mvceditor::SqliteSqlLikeEscape(FilePart, '^');
+	std::string escaped = t4p::SqliteSqlLikeEscape(FilePart, '^');
 	std::string query;
 	std::string sql;
 	if (ExactMatch) {
@@ -829,14 +829,14 @@ bool mvceditor::FileTagResultClass::Prepare(soci::session& session, bool doLimit
 	
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-std::vector<mvceditor::FileTagClass> mvceditor::FileTagResultClass::Matches() {
-	std::vector<mvceditor::FileTagClass> matches;
+std::vector<t4p::FileTagClass> t4p::FileTagResultClass::Matches() {
+	std::vector<t4p::FileTagClass> matches;
 	while (More()) {
 		Next();
 		if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
@@ -846,16 +846,16 @@ std::vector<mvceditor::FileTagClass> mvceditor::FileTagResultClass::Matches() {
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::MatchesAsTags() {
-	std::vector<mvceditor::TagClass> matches;
+std::vector<t4p::TagClass> t4p::FileTagResultClass::MatchesAsTags() {
+	std::vector<t4p::TagClass> matches;
 	while (More()) {
 		Next();
 		wxString path;
 		if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
-			mvceditor::TagClass newTag;
+			t4p::TagClass newTag;
 			wxFileName fileName(FileTag.FullPath);
 			newTag.FileTagId = FileTag.FileId;
-			newTag.Identifier = mvceditor::WxToIcu(fileName.GetFullName());
+			newTag.Identifier = t4p::WxToIcu(fileName.GetFullName());
 			newTag.FileIsNew = FileTag.IsNew;
 			newTag.SetFullPath(FileTag.FullPath);
 			matches.push_back(newTag);
@@ -864,7 +864,7 @@ std::vector<mvceditor::TagClass> mvceditor::FileTagResultClass::MatchesAsTags() 
 	return matches;
 }
 
-int mvceditor::FileTagResultClass::GetLineCountFromFile(const wxString& fullPath) const {
+int t4p::FileTagResultClass::GetLineCountFromFile(const wxString& fullPath) const {
 	int lineCount = 0;
 	std::ifstream file;
 	file.open(fullPath.fn_str(), std::ios::binary);
@@ -903,7 +903,7 @@ int mvceditor::FileTagResultClass::GetLineCountFromFile(const wxString& fullPath
 	return lineCount;
 }
 
-mvceditor::TraitTagResultClass::TraitTagResultClass()
+t4p::TraitTagResultClass::TraitTagResultClass()
 : SqliteResultClass()
 , TraitTag()
 , SourceDirs()
@@ -921,21 +921,21 @@ mvceditor::TraitTagResultClass::TraitTagResultClass()
 
 }
 
-void mvceditor::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
+void t4p::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
 	for (size_t i = 0; i < classNames.size(); ++i) {
-		Keys.push_back(mvceditor::IcuToChar(classNames[i]));
+		Keys.push_back(t4p::IcuToChar(classNames[i]));
 	}
 
 	// add trailing separator to lookup exact matches that include the last directory 
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
-		SourceDirs.push_back(mvceditor::WxToChar(sourceDirs[i].GetPathWithSep()));
+		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 	}
 	MemberName = memberName;
 	ExactMatch = exactMatch;
 }
 
-bool mvceditor::TraitTagResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::TraitTagResultClass::Prepare(soci::session& session, bool doLimit) {
 	wxASSERT_MSG(!Keys.empty(), wxT("keys must not be empty"));
 	std::string sql;
 
@@ -980,44 +980,44 @@ bool mvceditor::TraitTagResultClass::Prepare(soci::session& session, bool doLimi
 
 		good = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return good;
 }
 
-void mvceditor::TraitTagResultClass::Next() {
-	TraitTag.Key = mvceditor::CharToIcu(Key.c_str());
+void t4p::TraitTagResultClass::Next() {
+	TraitTag.Key = t4p::CharToIcu(Key.c_str());
 	TraitTag.FileTagId = FileTagId;
-	TraitTag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
-	TraitTag.NamespaceName = mvceditor::CharToIcu(NamespaceName.c_str());
-	TraitTag.TraitClassName = mvceditor::CharToIcu(TraitClassName.c_str());
-	TraitTag.TraitNamespaceName = mvceditor::CharToIcu(TraitNamespaceName.c_str());
+	TraitTag.ClassName = t4p::CharToIcu(ClassName.c_str());
+	TraitTag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
+	TraitTag.TraitClassName = t4p::CharToIcu(TraitClassName.c_str());
+	TraitTag.TraitNamespaceName = t4p::CharToIcu(TraitNamespaceName.c_str());
 	
 	size_t start = 0;
 	size_t found = Aliases.find_first_of(",");
 	while (found != std::string::npos) {
-		TraitTag.Aliased.push_back(mvceditor::CharToIcu(Aliases.substr(start, found).c_str()));	
+		TraitTag.Aliased.push_back(t4p::CharToIcu(Aliases.substr(start, found).c_str()));	
 		start = found++;
 	}
 	if (!Aliases.empty()) {
-		TraitTag.Aliased.push_back(mvceditor::CharToIcu(Aliases.substr(start, found).c_str()));
+		TraitTag.Aliased.push_back(t4p::CharToIcu(Aliases.substr(start, found).c_str()));
 	}
 
 	start = 0;
 	found = InsteadOfs.find_first_of(",");
 	while (found != std::string::npos) {
-		TraitTag.InsteadOfs.push_back(mvceditor::CharToIcu(InsteadOfs.substr(start, found).c_str()));	
+		TraitTag.InsteadOfs.push_back(t4p::CharToIcu(InsteadOfs.substr(start, found).c_str()));	
 		start = found++;
 	}
 	if (!InsteadOfs.empty()) {
-		TraitTag.InsteadOfs.push_back(mvceditor::CharToIcu(InsteadOfs.substr(start, found).c_str()));
+		TraitTag.InsteadOfs.push_back(t4p::CharToIcu(InsteadOfs.substr(start, found).c_str()));
 	}
 	Fetch();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TraitTagResultClass::MatchesAsTags() {
-	std::vector<mvceditor::TagClass> tags;
+std::vector<t4p::TagClass> t4p::TraitTagResultClass::MatchesAsTags() {
+	std::vector<t4p::TagClass> tags;
 	while (More()) {
 		Next();
 
@@ -1036,7 +1036,7 @@ std::vector<mvceditor::TagClass> mvceditor::TraitTagResultClass::MatchesAsTags()
 				useAlias = MemberName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
 			}
 			if (useAlias) {
-				mvceditor::TagClass res;
+				t4p::TagClass res;
 				res.ClassName = TraitTag.TraitClassName;
 				res.Identifier = alias;
 				tags.push_back(res);
@@ -1046,7 +1046,7 @@ std::vector<mvceditor::TagClass> mvceditor::TraitTagResultClass::MatchesAsTags()
 	return tags;
 }
 
-mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
+t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	: FileName()
 	, ClassName()
 	, MethodName()
@@ -1145,31 +1145,31 @@ mvceditor::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 	}
 }
 
-void mvceditor::TagSearchClass::SetParentClasses(const std::vector<UnicodeString>& parents) {
+void t4p::TagSearchClass::SetParentClasses(const std::vector<UnicodeString>& parents) {
 	ParentClasses = parents;
 }
 
-std::vector<UnicodeString> mvceditor::TagSearchClass::GetParentClasses() const {
+std::vector<UnicodeString> t4p::TagSearchClass::GetParentClasses() const {
 	return ParentClasses;
 }
 
-void mvceditor::TagSearchClass::SetTraits(const std::vector<UnicodeString>& traits) {
+void t4p::TagSearchClass::SetTraits(const std::vector<UnicodeString>& traits) {
 	Traits = traits;
 }
 
-std::vector<UnicodeString> mvceditor::TagSearchClass::GetTraits() const {
+std::vector<UnicodeString> t4p::TagSearchClass::GetTraits() const {
 	return Traits;
 }
 
-void mvceditor::TagSearchClass::SetFileItemId(int id) {
+void t4p::TagSearchClass::SetFileItemId(int id) {
 	FileItemId = id;
 }
 
-int mvceditor::TagSearchClass::GetFileItemId() const {
+int t4p::TagSearchClass::GetFileItemId() const {
 	return FileItemId;
 }
 
-std::vector<UnicodeString> mvceditor::TagSearchClass::GetClassHierarchy() const {
+std::vector<UnicodeString> t4p::TagSearchClass::GetClassHierarchy() const {
 	std::vector<UnicodeString> allClassNames;
 	if (!ClassName.isEmpty()) { 
 		allClassNames.push_back(ClassName);
@@ -1180,42 +1180,42 @@ std::vector<UnicodeString> mvceditor::TagSearchClass::GetClassHierarchy() const 
 
 }
 
-void mvceditor::TagSearchClass::SetSourceDirs(const std::vector<wxFileName>& sourceDirs) {
+void t4p::TagSearchClass::SetSourceDirs(const std::vector<wxFileName>& sourceDirs) {
 	SourceDirs = sourceDirs;
 }
 
-std::vector<wxFileName> mvceditor::TagSearchClass::GetSourceDirs() const {
+std::vector<wxFileName> t4p::TagSearchClass::GetSourceDirs() const {
 	return SourceDirs;
 }
 
-UnicodeString mvceditor::TagSearchClass::GetClassName() const {
+UnicodeString t4p::TagSearchClass::GetClassName() const {
 	return ClassName;
 }
 
-UnicodeString mvceditor::TagSearchClass::GetFileName() const {
+UnicodeString t4p::TagSearchClass::GetFileName() const {
 	return FileName;
 }
 
-UnicodeString mvceditor::TagSearchClass::GetMethodName() const {
+UnicodeString t4p::TagSearchClass::GetMethodName() const {
 	return MethodName;
 }
 
-int mvceditor::TagSearchClass::GetLineNumber() const {
+int t4p::TagSearchClass::GetLineNumber() const {
 	return LineNumber;
 }
 
-mvceditor::TagSearchClass::ResourceTypes mvceditor::TagSearchClass::GetResourceType() const {
+t4p::TagSearchClass::ResourceTypes t4p::TagSearchClass::GetResourceType() const {
 	return ResourceType;
 }
 
-UnicodeString mvceditor::TagSearchClass::GetNamespaceName() const {
+UnicodeString t4p::TagSearchClass::GetNamespaceName() const {
 	return NamespaceName;
 }
 
-mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const {
-	mvceditor::TagResultClass* results = NULL; 
-	if (GetResourceType() == mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME) {
-		mvceditor::ExactMemberTagResultClass* memberResults = new mvceditor::ExactMemberTagResultClass();
+t4p::TagResultClass* t4p::TagSearchClass::CreateExactResults() const {
+	t4p::TagResultClass* results = NULL; 
+	if (GetResourceType() == t4p::TagSearchClass::CLASS_NAME_METHOD_NAME) {
+		t4p::ExactMemberTagResultClass* memberResults = new t4p::ExactMemberTagResultClass();
 
 		// check the entire class hierachy
 		// combine the parent classes with the class being searched
@@ -1226,8 +1226,8 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const
 		memberResults->Set(classHierarchy, GetMethodName(), GetSourceDirs());
 		results = memberResults;
 	}
-	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
-		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+	else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
+		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 
 		std::vector<UnicodeString> classNames;
 		UnicodeString key = QualifyName(GetNamespaceName(), GetClassName());
@@ -1235,22 +1235,22 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateExactResults() const
 		results = nonMemberResults;
 	}
 	else if (!ClassName.isEmpty()) {
-		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 		nonMemberResults->Set(GetClassName(), GetSourceDirs());
 		results = nonMemberResults;
 	}
 	else {
-		mvceditor::ExactNonMemberTagResultClass* nonMemberResults = new mvceditor::ExactNonMemberTagResultClass();
+		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 		nonMemberResults->Set(GetFileName(), GetSourceDirs());
 		results = nonMemberResults;
 	}
 	return results;
 }
 
-mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() const {
-	mvceditor::TagResultClass* results = NULL; 
-	if (mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType() && !GetClassName().isEmpty()) {
-		mvceditor::NearMatchMemberTagResultClass* nearMatchMembersResult = new mvceditor::NearMatchMemberTagResultClass();
+t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
+	t4p::TagResultClass* results = NULL; 
+	if (t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType() && !GetClassName().isEmpty()) {
+		t4p::NearMatchMemberTagResultClass* nearMatchMembersResult = new t4p::NearMatchMemberTagResultClass();
 
 		// check the entire class hierachy
 		// combine the parent classes with the class being searched
@@ -1266,21 +1266,21 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 		nearMatchMembersResult->Set(classHierarchy, GetMethodName(), GetFileItemId(), GetSourceDirs());
 		results = nearMatchMembersResult;
 	}
-	else if ((mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
+	else if ((t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
 			&& GetClassName().isEmpty()) {
-		mvceditor::NearMatchMemberOnlyTagResultClass* nearMatchMemberOnlyResult = new mvceditor::NearMatchMemberOnlyTagResultClass();
+		t4p::NearMatchMemberOnlyTagResultClass* nearMatchMemberOnlyResult = new t4p::NearMatchMemberOnlyTagResultClass();
 		nearMatchMemberOnlyResult->Set(GetMethodName(), GetSourceDirs());
 		results = nearMatchMemberOnlyResult;
 	}
-	else if (mvceditor::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
+	else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
 
 		// needle identifier contains a namespace operator; but it may be
 		// a namespace or a fully qualified name
 		UnicodeString namespaceKey;
 		namespaceKey = QualifyName(GetNamespaceName(), GetClassName());
-		mvceditor::NearMatchNonMemberTagResultClass* nearMatchNonMemberNamespaced = new mvceditor::NearMatchNonMemberTagResultClass();
+		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMemberNamespaced = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMemberNamespaced->Set(namespaceKey, GetSourceDirs());
-		nearMatchNonMemberNamespaced->AddTagType(mvceditor::TagClass::NAMESPACE);
+		nearMatchNonMemberNamespaced->AddTagType(t4p::TagClass::NAMESPACE);
 		results = nearMatchNonMemberNamespaced;
 	} 
 	else if (!ClassName.isEmpty()) {
@@ -1292,26 +1292,26 @@ mvceditor::TagResultClass* mvceditor::TagSearchClass::CreateNearMatchResults() c
 		else {
 			key = QualifyName(GetNamespaceName(), GetClassName());
 		}
-		mvceditor::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new mvceditor::NearMatchNonMemberTagResultClass();
+		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMembers->Set(key, GetSourceDirs());
 		results = nearMatchNonMembers;
 	}
 	else {
 		UnicodeString key = GetFileName();
-		mvceditor::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new mvceditor::NearMatchNonMemberTagResultClass();
+		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMembers->Set(key, GetSourceDirs());
 		results = nearMatchNonMembers;
 	}
 	return results;
 }
 
-mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateExactFileResults() const {
-	mvceditor::FileTagResultClass* result = new mvceditor::FileTagResultClass();
-	if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
+t4p::FileTagResultClass* t4p::TagSearchClass::CreateExactFileResults() const {
+	t4p::FileTagResultClass* result = new t4p::FileTagResultClass();
+	if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
 		UnicodeString query = GetFileName();
 		result->Set(query, GetLineNumber(), true, GetSourceDirs());
 	}
-	else if (mvceditor::TagSearchClass::FILE_NAME == GetResourceType()) {
+	else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
 		UnicodeString query = GetFileName();
 
 		// empty file name = no period, get the query from the class name variable
@@ -1334,13 +1334,13 @@ mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateExactFileResults
 	return result;
 }
 
-mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileResults() const {
-	mvceditor::FileTagResultClass* result = new mvceditor::FileTagResultClass();
-	if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
+t4p::FileTagResultClass* t4p::TagSearchClass::CreateNearMatchFileResults() const {
+	t4p::FileTagResultClass* result = new t4p::FileTagResultClass();
+	if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
 		UnicodeString query = GetFileName();
 		result->Set(query, GetLineNumber(), false, GetSourceDirs());
 	}
-	else if (mvceditor::TagSearchClass::FILE_NAME == GetResourceType()) {
+	else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
 		UnicodeString query = GetFileName();
 
 		// empty file name = no period, get the query from the class name variable
@@ -1363,7 +1363,7 @@ mvceditor::FileTagResultClass* mvceditor::TagSearchClass::CreateNearMatchFileRes
 	return result;
 }
 
-mvceditor::TagResultClass::TagResultClass() 
+t4p::TagResultClass::TagResultClass() 
 	: SqliteResultClass()
 	, Tag()
 	, Id(0)
@@ -1390,7 +1390,7 @@ mvceditor::TagResultClass::TagResultClass()
 {
 }
 
-bool mvceditor::TagResultClass::Init(soci::statement* stmt) {
+bool t4p::TagResultClass::Init(soci::statement* stmt) {
 	wxString error;
 	bool ret = false;
 	try {
@@ -1415,28 +1415,28 @@ bool mvceditor::TagResultClass::Init(soci::statement* stmt) {
 		
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
-		error = mvceditor::CharToWx(e.what());
+		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
 	return ret;
 }
 
-void mvceditor::TagResultClass::Next() {
+void t4p::TagResultClass::Next() {
 	Tag.Id = Id;
 	if (soci::i_ok == FileTagIdIndicator) {
 		Tag.FileTagId = FileTagId;
 	}
 	Tag.SourceId = SourceId;
-	Tag.Key = mvceditor::CharToIcu(Key.c_str());
-	Tag.Identifier = mvceditor::CharToIcu(Identifier.c_str());
-	Tag.ClassName = mvceditor::CharToIcu(ClassName.c_str());
-	Tag.Type = (mvceditor::TagClass::Types)Type;
-	Tag.NamespaceName = mvceditor::CharToIcu(NamespaceName.c_str());
-	Tag.Signature = mvceditor::CharToIcu(Signature.c_str());
-	Tag.ReturnType = mvceditor::CharToIcu(ReturnType.c_str());
-	Tag.Comment = mvceditor::CharToIcu(Comment.c_str());
+	Tag.Key = t4p::CharToIcu(Key.c_str());
+	Tag.Identifier = t4p::CharToIcu(Identifier.c_str());
+	Tag.ClassName = t4p::CharToIcu(ClassName.c_str());
+	Tag.Type = (t4p::TagClass::Types)Type;
+	Tag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
+	Tag.Signature = t4p::CharToIcu(Signature.c_str());
+	Tag.ReturnType = t4p::CharToIcu(ReturnType.c_str());
+	Tag.Comment = t4p::CharToIcu(Comment.c_str());
 	if (soci::i_ok == FullPathIndicator) {
-		Tag.SetFullPath(mvceditor::CharToWx(FullPath.c_str()));
+		Tag.SetFullPath(t4p::CharToWx(FullPath.c_str()));
 	}
 	Tag.IsProtected = IsProtected != 0;
 	Tag.IsPrivate = IsPrivate != 0;
@@ -1452,8 +1452,8 @@ void mvceditor::TagResultClass::Next() {
 	Fetch();
 }
 
-std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
-	std::vector<mvceditor::TagClass> matches;
+std::vector<t4p::TagClass> t4p::TagResultClass::Matches() {
+	std::vector<t4p::TagClass> matches;
 	while (More()) {
 		Next();
 		matches.push_back(Tag);
@@ -1461,10 +1461,10 @@ std::vector<mvceditor::TagClass> mvceditor::TagResultClass::Matches() {
 	return matches;
 }
 
-bool mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(const mvceditor::TagClass& tag, const UnicodeString& text, int32_t& pos, 
+bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& tag, const UnicodeString& text, int32_t& pos, 
 		int32_t& length) {
 	size_t start = 0;
-	mvceditor::FinderClass finder;
+	t4p::FinderClass finder;
 	finder.Mode = FinderClass::REGULAR_EXPRESSION;
 
 	UnicodeString className,
@@ -1473,12 +1473,12 @@ bool mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(const mvceditor::
 		className = tag.ClassName;
 		methodName = tag.Identifier;
 
-		mvceditor::FinderClass::EscapeRegEx(className);
-		mvceditor::FinderClass::EscapeRegEx(methodName);
+		t4p::FinderClass::EscapeRegEx(className);
+		t4p::FinderClass::EscapeRegEx(methodName);
 	}
 	else {
 		className = tag.Identifier;
-		mvceditor::FinderClass::EscapeRegEx(className);
+		t4p::FinderClass::EscapeRegEx(className);
 	}
 	switch (tag.Type) {
 		case TagClass::CLASS:
@@ -1531,26 +1531,26 @@ bool mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(const mvceditor::
 	return false;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchClassesOrFiles(
-	const mvceditor::TagSearchClass& tagSearch) {
-	std::vector<mvceditor::TagClass> matches;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
+	const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::TagClass> matches;
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
-	mvceditor::FileTagResultClass fileTagResult;
+	t4p::FileTagResultClass fileTagResult;
 	fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), false, tagSearch.GetSourceDirs());
-	mvceditor::NearMatchNonMemberTagResultClass nonMembers;
+	t4p::NearMatchNonMemberTagResultClass nonMembers;
 	switch (tagSearch.GetResourceType()) {
-		case mvceditor::TagSearchClass::FILE_NAME:
-		case mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER:
+		case t4p::TagSearchClass::FILE_NAME:
+		case t4p::TagSearchClass::FILE_NAME_LINE_NUMBER:
 			fileTagResult.Prepare(*Session, true);
 			matches = fileTagResult.MatchesAsTags();
 			break;
-		case mvceditor::TagSearchClass::NAMESPACE_NAME:
+		case t4p::TagSearchClass::NAMESPACE_NAME:
 			nonMembers.Set(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()), tagSearch.GetSourceDirs());
-			nonMembers.SetTagType(mvceditor::TagClass::CLASS);
+			nonMembers.SetTagType(t4p::TagClass::CLASS);
 			nonMembers.Prepare(*Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
@@ -1558,10 +1558,10 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchClass
 				matches = fileTagResult.MatchesAsTags();
 			}
 			break;
-		case mvceditor::TagSearchClass::CLASS_NAME:
-		case mvceditor::TagSearchClass::CLASS_NAME_METHOD_NAME:
+		case t4p::TagSearchClass::CLASS_NAME:
+		case t4p::TagSearchClass::CLASS_NAME_METHOD_NAME:
 			nonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
-			nonMembers.SetTagType(mvceditor::TagClass::CLASS);
+			nonMembers.SetTagType(t4p::TagClass::CLASS);
 			nonMembers.Prepare(*Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
@@ -1574,8 +1574,8 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchClass
 	return matches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembers(const mvceditor::TagSearchClass& tagSearch) {
-	std::vector<mvceditor::TagClass> matches;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::TagClass> matches;
 	
 	// when looking for members we need to look
 	// 1. in the class itself
@@ -1597,12 +1597,12 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembe
 	if (tagSearch.GetMethodName().isEmpty()) {
 		
 		// special case; query for all methods for a class (UserClass::)
-		mvceditor::AllMembersTagResultClass allMembersResult;
+		t4p::AllMembersTagResultClass allMembersResult;
 		allMembersResult.Set(classesToSearch, UNICODE_STRING_SIMPLE(""), tagSearch.GetSourceDirs());
 		
 		// do not limit, a class may have more than 100 members
 		allMembersResult.Prepare(*Session, false);
-		std::vector<mvceditor::TagClass> memberMatches = allMembersResult.Matches();
+		std::vector<t4p::TagClass> memberMatches = allMembersResult.Matches();
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 	}
@@ -1612,12 +1612,12 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembe
 		// if ClassName is empty, then just check method names This ensures 
 		// queries like '::getName' will work as well.
 		// make sure to NOT get fully qualified  matches (key=identifier)
-		mvceditor::ExactMemberOnlyTagResultClass exactResult;
+		t4p::ExactMemberOnlyTagResultClass exactResult;
 		exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 		exactResult.Prepare(*Session, true);
 		matches = exactResult.Matches();
 		if (matches.empty()) {
-			mvceditor::NearMatchMemberOnlyTagResultClass nearMatchResult;
+			t4p::NearMatchMemberOnlyTagResultClass nearMatchResult;
 			nearMatchResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 			nearMatchResult.Prepare(*Session, true);
 
@@ -1631,7 +1631,7 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembe
 		// now that we found the parent classes, combine the parent class name and the queried method
 		// to make all of the keys we need to look for. remember that a tag class key is of the form
 		// ClassName::MethodName
-		mvceditor::NearMatchMemberTagResultClass nearMatchMemberResult;
+		t4p::NearMatchMemberTagResultClass nearMatchMemberResult;
 		nearMatchMemberResult.Set(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetFileItemId(), tagSearch.GetSourceDirs());
 		nearMatchMemberResult.Prepare(*Session, true);
 		matches = nearMatchMemberResult.Matches();			
@@ -1639,25 +1639,25 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::NearMatchMembe
 	return matches;
 }
 
-UnicodeString mvceditor::ParsedTagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName, int fileTagId) {
+UnicodeString t4p::ParsedTagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName, int fileTagId) {
 	UnicodeString parentClassName;
 	
 	// empty file items == search on all files
 	std::vector<wxFileName> sourceDirs;
-	mvceditor::ExactNonMemberTagResultClass exactResult;
+	t4p::ExactNonMemberTagResultClass exactResult;
 	exactResult.Set(fullyQualifiedClassName, sourceDirs);
 	exactResult.SetFileTagId(fileTagId);
-	exactResult.SetTagType(mvceditor::TagClass::CLASS);
+	exactResult.SetTagType(t4p::TagClass::CLASS);
 	exactResult.Prepare(*Session, true);
-	std::vector<mvceditor::TagClass> matches = exactResult.Matches();
+	std::vector<t4p::TagClass> matches = exactResult.Matches();
 	if (!matches.empty()) {
-		mvceditor::TagClass tag = matches[0];
+		t4p::TagClass tag = matches[0];
 		parentClassName = ExtractParentClassFromSignature(tag.Signature);
 	}
 	return parentClassName;
 }
 
-std::vector<UnicodeString> mvceditor::ParsedTagFinderClass::GetResourceTraits(const UnicodeString& className, 
+std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const UnicodeString& className, 
 																		const UnicodeString& methodName,
 																		const std::vector<wxFileName>& sourceDirs) {
 	std::vector<UnicodeString> inheritedTraits;
@@ -1665,12 +1665,12 @@ std::vector<UnicodeString> mvceditor::ParsedTagFinderClass::GetResourceTraits(co
 	std::vector<UnicodeString> classNames;
 	classNames.push_back(className);
 
-	mvceditor::TraitTagResultClass traitResult;
+	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
 	if (traitResult.Prepare(*Session, false)) {
 		while (traitResult.More()) {
 			traitResult.Next();
-			mvceditor::TraitTagClass trait = traitResult.TraitTag;
+			t4p::TraitTagClass trait = traitResult.TraitTag;
 			UnicodeString fullyQualifiedTrait = QualifyName(trait.TraitNamespaceName, trait.TraitClassName);
 			
 			// trait is used unless there is an explicit insteadof 
@@ -1696,7 +1696,7 @@ std::vector<UnicodeString> mvceditor::ParsedTagFinderClass::GetResourceTraits(co
 	return inheritedTraits;
 }
 
-UnicodeString mvceditor::ParsedTagFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
+UnicodeString t4p::ParsedTagFinderClass::ExtractParentClassFromSignature(const UnicodeString& signature) const {
 
 	// look for the parent class. tokenize the signature and get the
 	// class name after the 'extends' keyword note that since the signature is re-constructed by the parser
@@ -1724,23 +1724,23 @@ UnicodeString mvceditor::ParsedTagFinderClass::ExtractParentClassFromSignature(c
 	return parentClassName;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClassOrFile(const mvceditor::TagSearchClass& tagSearch) {
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const t4p::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
-	std::vector<mvceditor::TagClass> allMatches;
-	if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
-		mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
-		mvceditor::FileTagResultClass fileTagResult;
+	std::vector<t4p::TagClass> allMatches;
+	if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
+		t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
+		t4p::FileTagResultClass fileTagResult;
 		fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), true, tagSearch.GetSourceDirs());
 		fileTagResult.Prepare(*Session, true);
 		allMatches = fileTagResult.MatchesAsTags();
 	}
 	else {
-		mvceditor::ExactNonMemberTagResultClass exactResult;
-		exactResult.SetTagType(mvceditor::TagClass::CLASS);
+		t4p::ExactNonMemberTagResultClass exactResult;
+		exactResult.SetTagType(t4p::TagClass::CLASS);
 		exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
 		exactResult.Prepare(*Session, true);
 		allMatches = exactResult.Matches();
@@ -1748,10 +1748,10 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClassOrFi
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClass(const mvceditor::TagSearchClass& tagSearch) {
-	std::vector<mvceditor::TagClass> allMatches;	
-	mvceditor::ExactNonMemberTagResultClass exactResult;
-	exactResult.SetTagType(mvceditor::TagClass::CLASS);
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::TagClass> allMatches;	
+	t4p::ExactNonMemberTagResultClass exactResult;
+	exactResult.SetTagType(t4p::TagClass::CLASS);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()); 
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
@@ -1760,10 +1760,10 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactClass(con
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFunction(const mvceditor::TagSearchClass& tagSearch) {
-	std::vector<mvceditor::TagClass> allMatches;	
-	mvceditor::ExactNonMemberTagResultClass exactResult;
-	exactResult.SetTagType(mvceditor::TagClass::FUNCTION);
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::TagClass> allMatches;	
+	t4p::ExactNonMemberTagResultClass exactResult;
+	exactResult.SetTagType(t4p::TagClass::FUNCTION);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
@@ -1772,9 +1772,9 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactFunction(
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactMethod(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<mvceditor::TagClass> allMatches;	
-	mvceditor::ExactMemberOnlyTagResultClass exactResult;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<t4p::TagClass> allMatches;	
+	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetMethodType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
@@ -1783,9 +1783,9 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactMethod(co
 	return allMatches;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactProperty(const mvceditor::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<mvceditor::TagClass> allMatches;	
-	mvceditor::ExactMemberOnlyTagResultClass exactResult;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<t4p::TagClass> allMatches;	
+	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetPropertyType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 	exactResult.Prepare(*Session, true);
@@ -1794,10 +1794,10 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ExactProperty(
 	return allMatches;
 }
 
-void mvceditor::ParsedTagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matches) {
+void t4p::ParsedTagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matches) {
 
 	// remove from matches that have a file that is no longer in the file system
-	std::vector<mvceditor::TagClass>::iterator it = matches.begin();
+	std::vector<t4p::TagClass>::iterator it = matches.begin();
 	std::vector<int> fileTagIdsToRemove;
 	while (it != matches.end()) {
 
@@ -1821,7 +1821,7 @@ void mvceditor::ParsedTagFinderClass::EnsureMatchesExist(std::vector<TagClass>& 
 	}
 }
 
-bool mvceditor::ParsedTagFinderClass::IsFileCacheEmpty() {
+bool t4p::ParsedTagFinderClass::IsFileCacheEmpty() {
 	if (!IsInit()) {
 		return true;
 	}
@@ -1829,14 +1829,14 @@ bool mvceditor::ParsedTagFinderClass::IsFileCacheEmpty() {
 	try {
 		Session->once << "SELECT file_item_id FROM file_items LIMIT 1;", soci::into(fileItemId);
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return fileItemId <= 0;
 }
 
-bool mvceditor::ParsedTagFinderClass::IsResourceCacheEmpty() {
+bool t4p::ParsedTagFinderClass::IsResourceCacheEmpty() {
 	if (!IsInit()) {
 		return true;
 	}
@@ -1846,20 +1846,20 @@ bool mvceditor::ParsedTagFinderClass::IsResourceCacheEmpty() {
 	try {
 		Session->once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return count <= 0;
 }
 
-bool mvceditor::ParsedTagFinderClass::HasFullPath(const wxString& fullPath) {
-	mvceditor::FileTagClass fileTag;
+bool t4p::ParsedTagFinderClass::HasFullPath(const wxString& fullPath) {
+	t4p::FileTagClass fileTag;
 	return FindFileTagByFullPathExact(fullPath, fileTag);
 }
 
 
-bool mvceditor::ParsedTagFinderClass::HasDir(const wxString& dir) {
+bool t4p::ParsedTagFinderClass::HasDir(const wxString& dir) {
 	bool foundDir = false;
 	if (!IsInit()) {
 		return foundDir;
@@ -1870,7 +1870,7 @@ bool mvceditor::ParsedTagFinderClass::HasDir(const wxString& dir) {
 	wxFileName dirName;
 	dirName.AssignDir(dir);
 	std::string result;
-	std::string query = mvceditor::WxToChar(dirName.GetPathWithSep() + wxT("%"));
+	std::string query = t4p::WxToChar(dirName.GetPathWithSep() + wxT("%"));
 	std::string sql = "SELECT full_path FROM file_items WHERE full_path LIKE ? LIMIT 1";
 	try {
 		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
@@ -1880,14 +1880,14 @@ bool mvceditor::ParsedTagFinderClass::HasDir(const wxString& dir) {
 			foundDir = true;
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return foundDir;
 }
 
-bool mvceditor::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, mvceditor::FileTagClass& fileTag) {
+bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag) {
 	if (!IsInit()) {
 		return false;
 	}
@@ -1897,7 +1897,7 @@ bool mvceditor::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString&
 	int isNew;
 	bool foundFile = false;
 
-	std::string query = mvceditor::WxToChar(fullPath);
+	std::string query = t4p::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
 		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
@@ -1912,26 +1912,26 @@ bool mvceditor::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString&
 			fileTag.IsParsed = isParsed != 0;
 		}
 	} catch (std::exception& e) {
-		wxString msg = mvceditor::CharToWx(e.what());
+		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return foundFile;
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::All() {
-	mvceditor::AllTagsResultClass result;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::All() {
+	t4p::AllTagsResultClass result;
 	result.Prepare(*Session, false);
 
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
-	std::vector<mvceditor::TagClass> all;
+	std::vector<t4p::TagClass> all;
 	while (result.More()) {
 		result.Next();
 		if (result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
 
 			// fully qualified methods
 		}
-		else if (result.Tag.Type != mvceditor::TagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
+		else if (result.Tag.Type != t4p::TagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
 			
 			// fully qualified classes / functions (with namespace)
 		}
@@ -1942,33 +1942,33 @@ std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::All() {
 	return all;
 }
 
-mvceditor::ParsedTagFinderClass::ParsedTagFinderClass()
+t4p::ParsedTagFinderClass::ParsedTagFinderClass()
 	: SqliteFinderClass() {
 
 }
 
-std::vector<mvceditor::TagClass> mvceditor::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
-	std::vector<mvceditor::TagClass> tags;
-	mvceditor::TopLevelTagInFileResultClass result;
+std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
+	std::vector<t4p::TagClass> tags;
+	t4p::TopLevelTagInFileResultClass result;
 	result.Set(fullPath);
 	result.Prepare(*Session, false);
 	tags = result.Matches();
 	return tags;
 }
 
-void mvceditor::ParsedTagFinderClass::Print() {
-	std::vector<mvceditor::TagClass> tags = All();
-	std::vector<mvceditor::TagClass>::iterator tag;
+void t4p::ParsedTagFinderClass::Print() {
+	std::vector<t4p::TagClass> tags = All();
+	std::vector<t4p::TagClass>::iterator tag;
 	for (tag = tags.begin(); tag != tags.end(); ++tag) {
-		printf("key=%s\n", mvceditor::IcuToChar(tag->Key).c_str());
+		printf("key=%s\n", t4p::IcuToChar(tag->Key).c_str());
 		printf("type=%d fileItemId=%d\n", tag->Type, tag->FileTagId);
-		printf("identifier=%s\n", mvceditor::IcuToChar(tag->Identifier).c_str());
+		printf("identifier=%s\n", t4p::IcuToChar(tag->Identifier).c_str());
 		printf("\n\n");
 	}
 }
 
-bool mvceditor::ParsedTagFinderClass::FindById(int id, mvceditor::TagClass& tag) {
-	mvceditor::TagByIdResultClass result;
+bool t4p::ParsedTagFinderClass::FindById(int id, t4p::TagClass& tag) {
+	t4p::TagByIdResultClass result;
 	result.Set(id);
 	bool found = Exec(&result);
 	if (found) {
@@ -1978,7 +1978,7 @@ bool mvceditor::ParsedTagFinderClass::FindById(int id, mvceditor::TagClass& tag)
 	return found;
 }
 
-wxString mvceditor::ParsedTagFinderClass::SourceDirFromFile(int fileTagId) {
+wxString t4p::ParsedTagFinderClass::SourceDirFromFile(int fileTagId) {
 	wxString sourcePath;
 	std::string stdSourcePath;
 	if (Session) {
@@ -1987,7 +1987,7 @@ wxString mvceditor::ParsedTagFinderClass::SourceDirFromFile(int fileTagId) {
 			soci::use(fileTagId), soci::into(stdSourcePath)
 		);
 		if (stmt.execute(true)) {
-			sourcePath = mvceditor::CharToWx(stdSourcePath.c_str());
+			sourcePath = t4p::CharToWx(stdSourcePath.c_str());
 		}
 	}
 	return sourcePath;

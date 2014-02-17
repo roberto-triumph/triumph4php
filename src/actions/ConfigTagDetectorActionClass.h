@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CONFIGDETECTORACTIONCLASS_H__
-#define __MVCEDITOR_CONFIGDETECTORACTIONCLASS_H__
+#ifndef __T4P_CONFIGDETECTORACTIONCLASS_H__
+#define __T4P_CONFIGDETECTORACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * the set of parameters that will be used for each 
@@ -43,7 +43,7 @@ public:
 
 	/**
 	 * location to the php executable (php.exe / php)
-	 * this is usually retrieved from mvceditor::EnvironmentClass
+	 * this is usually retrieved from t4p::EnvironmentClass
 	 */
 	wxString PhpExecutablePath;
 
@@ -88,16 +88,16 @@ public:
  * This class will run all config detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / config detector combination
  */
-class ConfigTagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
+class ConfigTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
 public:
 
-	ConfigTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	ConfigTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * @return boolean false if PHP is not installed in the system
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	bool DoAsync();
 
@@ -110,13 +110,13 @@ private:
 	/**
 	 * used to run the external tag detector PHP script
 	 */
-	mvceditor::ProcessWithHeartbeatClass Process;
+	t4p::ProcessWithHeartbeatClass Process;
 
 	/**
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::ConfigTagDetectorParamsClass> ParamsQueue;
+	std::queue<t4p::ConfigTagDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php database 

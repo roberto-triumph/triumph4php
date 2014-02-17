@@ -22,12 +22,12 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_SETTINGSDIRECTORYPANEL_H__
-#define __MVCEDITOR_SETTINGSDIRECTORYPANEL_H__
+#ifndef __T4P_SETTINGSDIRECTORYPANEL_H__
+#define __T4P_SETTINGSDIRECTORYPANEL_H__
 
 #include <main_frame/wxformbuilder/MainFrameForms.h>
 
-namespace mvceditor {
+namespace t4p {
 
 class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass {
 

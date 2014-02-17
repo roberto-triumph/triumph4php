@@ -41,29 +41,29 @@ const int ID_LINT_READER = wxNewId();
 const int ID_LINT_READER_SAVE = wxNewId();
 const int ID_LINT_ERROR_PANEL = wxNewId();
 
-mvceditor::LintResultsEventClass::LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults)
-	: wxEvent(eventId, mvceditor::EVENT_LINT_ERROR) 
+t4p::LintResultsEventClass::LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults)
+	: wxEvent(eventId, t4p::EVENT_LINT_ERROR) 
 	, LintResults(lintResults) {
 }
 
-wxEvent* mvceditor::LintResultsEventClass::Clone() const {
-	mvceditor::LintResultsEventClass* cloned = new mvceditor::LintResultsEventClass(GetId(), LintResults);
+wxEvent* t4p::LintResultsEventClass::Clone() const {
+	t4p::LintResultsEventClass* cloned = new t4p::LintResultsEventClass(GetId(), LintResults);
 	return cloned;
 }
 
-mvceditor::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles)
-	: wxEvent(eventId, mvceditor::EVENT_LINT_SUMMARY)
+t4p::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles)
+	: wxEvent(eventId, t4p::EVENT_LINT_SUMMARY)
 	, TotalFiles(totalFiles)
 	, ErrorFiles(errorFiles) {
 
 }
 
-wxEvent* mvceditor::LintResultsSummaryEventClass::Clone() const {
-	return new mvceditor::LintResultsSummaryEventClass(GetId(), TotalFiles, ErrorFiles);
+wxEvent* t4p::LintResultsSummaryEventClass::Clone() const {
+	return new t4p::LintResultsSummaryEventClass(GetId(), TotalFiles, ErrorFiles);
 }
 
 
-mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(mvceditor::TagCacheClass& tagCache, const mvceditor::LintFeatureOptionsClass& options) 
+t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(t4p::TagCacheClass& tagCache, const t4p::LintFeatureOptionsClass& options) 
 : WithErrors(0)
 , WithNoErrors(0) 
 , Options(options)
@@ -78,19 +78,19 @@ mvceditor::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(mvceditor::Tag
 	VariableLinterOptions.CheckGlobalScope = Options.CheckGlobalScopeVariables;
 }
 
-void mvceditor::ParserDirectoryWalkerClass::ResetTotals() {
+void t4p::ParserDirectoryWalkerClass::ResetTotals() {
 	WithErrors = 0;
 	WithNoErrors = 0;
 }
 
-void mvceditor::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
+void t4p::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 	VariableLinterOptions.Version = version;
 	VariableLinter.SetOptions(VariableLinterOptions);
 	IdentifierLinter.SetVersion(version);
 }
 
-bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
+bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	bool ret = false;
 	LastResults.Error = UNICODE_STRING_SIMPLE("");
 	LastResults.LineNumber = 0;
@@ -100,7 +100,7 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 
 	wxFFile file(fileName, wxT("rb"));
 	bool hasErrors = false;
-	if (!Parser.LintFile(file.fp(), mvceditor::WxToIcu(fileName), LastResults)) {
+	if (!Parser.LintFile(file.fp(), t4p::WxToIcu(fileName), LastResults)) {
 		hasErrors = true;
 	}
 	wxFileName wxf(fileName);
@@ -125,16 +125,16 @@ bool mvceditor::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	return ret;
 }
 
-std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetLastErrors() {
+std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErrors() {
 	std::vector<pelet::LintResultsClass> allResults;
 	if (!LastResults.Error.isEmpty()) {
 		allResults.push_back(LastResults);
 	}
 	for (size_t i = 0; i < VariableResults.size(); ++i) {
 		pelet::LintResultsClass lintResult;
-		mvceditor::PhpVariableLintResultClass variableResult = VariableResults[i];
+		t4p::PhpVariableLintResultClass variableResult = VariableResults[i];
 		lintResult.Error = UNICODE_STRING_SIMPLE("Uninitialized variable ") + variableResult.VariableName;
-		lintResult.File = mvceditor::IcuToChar(variableResult.File);
+		lintResult.File = t4p::IcuToChar(variableResult.File);
 		lintResult.UnicodeFilename = variableResult.File;
 		lintResult.LineNumber = variableResult.LineNumber;
 		lintResult.CharacterPosition = variableResult.Pos;
@@ -142,20 +142,20 @@ std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetL
 	}
 	for (size_t i = 0; i < IdentifierResults.size(); ++i) {
 		pelet::LintResultsClass lintResult;
-		mvceditor::PhpIdentifierLintResultClass identifierResult = IdentifierResults[i];
-		if (mvceditor::PhpIdentifierLintResultClass::UNKNOWN_CLASS == identifierResult.Type) {
+		t4p::PhpIdentifierLintResultClass identifierResult = IdentifierResults[i];
+		if (t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown class ") + identifierResult.Identifier;
 		}
-		else if (mvceditor::PhpIdentifierLintResultClass::UNKNOWN_METHOD == identifierResult.Type) {
+		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_METHOD == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown method ") + identifierResult.Identifier;
 		}
-		else if (mvceditor::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
+		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown property ") + identifierResult.Identifier;
 		}
-		else if (mvceditor::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
+		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown function ") + identifierResult.Identifier;
 		}
-		lintResult.File = mvceditor::IcuToChar(identifierResult.File);
+		lintResult.File = t4p::IcuToChar(identifierResult.File);
 		lintResult.UnicodeFilename = identifierResult.File;
 		lintResult.LineNumber = identifierResult.LineNumber;
 		lintResult.CharacterPosition = identifierResult.Pos;
@@ -164,17 +164,17 @@ std::vector<pelet::LintResultsClass> mvceditor::ParserDirectoryWalkerClass::GetL
 	return allResults;
 }
 
-mvceditor::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, 
+t4p::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, 
 																		int eventId,
-																		const mvceditor::LintFeatureOptionsClass& options)
+																		const t4p::LintFeatureOptionsClass& options)
 	: BackgroundFileReaderClass(runningThreads, eventId)
 	, TagCache()
 	, ParserDirectoryWalker(TagCache, options) {
 		
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<mvceditor::SourceClass> sources,
-																 mvceditor::GlobalsClass& globals) {
+bool t4p::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<t4p::SourceClass> sources,
+																 t4p::GlobalsClass& globals) {
 	bool good = false;
 	if (Init(sources)) {
 		TagCache.RegisterDefault(globals);
@@ -185,14 +185,14 @@ bool mvceditor::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<mvc
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileName& fileName, mvceditor::GlobalsClass& globals) {
+bool t4p::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileName& fileName, t4p::GlobalsClass& globals) {
 	
 	bool good = false;
 	if (globals.FileTypes.HasAPhpExtension(fileName.GetFullPath())) {
-		mvceditor::SourceClass src;
+		t4p::SourceClass src;
 		src.SetIncludeWildcards(fileName.GetFullName());
 		src.RootDirectory.AssignDir(fileName.GetPath());
-		std::vector<mvceditor::SourceClass> srcs;
+		std::vector<t4p::SourceClass> srcs;
 		srcs.push_back(src);
 		if (Init(srcs)) {
 			TagCache.RegisterDefault(globals);
@@ -204,37 +204,37 @@ bool mvceditor::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileNa
 	return good;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
+bool t4p::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
 	std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
 	if (error && !lintErrors.empty()) {
-		mvceditor::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
+		t4p::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
 		PostEvent(lintResultsEvent);
 	}
 	if (!search.More() && !IsCancelled()) {
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
-		mvceditor::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
+		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
 		PostEvent(summaryEvent);
 	}
 	return !error;
 }
 
-bool mvceditor::LintBackgroundFileReaderClass::BackgroundFileMatch(const wxString& file) {
+bool t4p::LintBackgroundFileReaderClass::BackgroundFileMatch(const wxString& file) {
 	return true;
 }
 
-void mvceditor::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorFiles) {
+void t4p::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorFiles) {
 	totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 	errorFiles = ParserDirectoryWalker.WithErrors;
 }
 
-wxString mvceditor::LintBackgroundFileReaderClass::GetLabel() const {
+wxString t4p::LintBackgroundFileReaderClass::GetLabel() const {
 	return wxT("Lint Files");
 }
 
-mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, mvceditor::NotebookClass* notebook,
-														mvceditor::LintFeatureClass& feature)
+t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p::NotebookClass* notebook,
+														t4p::LintFeatureClass& feature)
 	: LintResultsGeneratedPanelClass(parent, id) 
 	, Notebook(notebook) 
 	, Feature(feature)
@@ -249,15 +249,15 @@ mvceditor::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 }
 
-void mvceditor::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
+void t4p::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
 	std::vector<pelet::LintResultsClass>::const_iterator it;
 	for (it = lintErrors.begin(); it != lintErrors.end(); ++it) {
 		pelet::LintResultsClass lintError = *it;
 		
 		Feature.LintErrors.push_back(lintError);
 		
-		wxString wxFile = mvceditor::IcuToWx(lintError.UnicodeFilename);
-		wxString errorMsg = mvceditor::IcuToWx(lintError.Error);
+		wxString wxFile = t4p::IcuToWx(lintError.UnicodeFilename);
+		wxString errorMsg = t4p::IcuToWx(lintError.Error);
 		wxVector<wxVariant> values;
 		values.push_back(wxFile);
 		values.push_back(wxString::Format(wxT("%d"), lintError.LineNumber));
@@ -267,21 +267,21 @@ void mvceditor::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintRe
 	}
 }
 
-void mvceditor::LintResultsPanelClass::ClearErrors() {
+void t4p::LintResultsPanelClass::ClearErrors() {
 	ErrorsList->DeleteAllItems();
 	Feature.LintErrors.clear();
 	Feature.VariableResults.clear();
 	Feature.IdentifierResults.clear();
 }
 
-void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
+void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
 	
 	// remove the lint result data structures as well as the 
 	// display list
 	std::vector<pelet::LintResultsClass>::iterator it = Feature.LintErrors.begin();
 	int i = 0;
 
-	UnicodeString uniFileName = mvceditor::WxToIcu(fileName);
+	UnicodeString uniFileName = t4p::WxToIcu(fileName);
 	bool found = false;
 	while (it != Feature.LintErrors.end()) {
 		if (it->UnicodeFilename == uniFileName) {
@@ -303,13 +303,13 @@ void mvceditor::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName)
 	}
 }
 
-void mvceditor::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
+void t4p::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
 	TotalFiles = totalFiles;
 	ErrorFiles = errorFiles;
 	UpdateSummary();
 }
 
-void mvceditor::LintResultsPanelClass::UpdateSummary() {
+void t4p::LintResultsPanelClass::UpdateSummary() {
 	if (0 == ErrorFiles) {
 		this->Label->SetLabel(
 			wxString::Format(_("No errors found; checked %d files"), TotalFiles)
@@ -322,20 +322,20 @@ void mvceditor::LintResultsPanelClass::UpdateSummary() {
 	}
 }
 
-void mvceditor::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
+void t4p::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 	int index = ErrorsList->GetSelectedRow();
 	GoToAndDisplayLintError(index);
 }
 
-void mvceditor::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
+void t4p::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
 	pelet::LintResultsClass results = Feature.LintErrors[index];
 
-	wxString file = mvceditor::IcuToWx(results.UnicodeFilename);
+	wxString file = t4p::IcuToWx(results.UnicodeFilename);
 	Notebook->LoadPage(file);
 	Notebook->GetCurrentCodeControl()->MarkLintErrorAndGoto(results);
 }
 
-void mvceditor::LintResultsPanelClass::SelectNextError() {
+void t4p::LintResultsPanelClass::SelectNextError() {
 	int selected = ErrorsList->GetSelectedRow();
 	if (selected != wxNOT_FOUND && (selected  + 1) < ErrorsList->GetItemCount()) {
 		ErrorsList->SelectRow(selected + 1);
@@ -347,7 +347,7 @@ void mvceditor::LintResultsPanelClass::SelectNextError() {
 	}
 }
 
-void mvceditor::LintResultsPanelClass::SelectPreviousError() {
+void t4p::LintResultsPanelClass::SelectPreviousError() {
 	int selected = ErrorsList->GetSelectedRow();
 	if (selected != wxNOT_FOUND && (selected  - 1) >= 0) {
 		ErrorsList->SelectRow(selected - 1);
@@ -359,24 +359,24 @@ void mvceditor::LintResultsPanelClass::SelectPreviousError() {
 	}
 }
 
-void mvceditor::LintResultsPanelClass::ShowLintError(int index) {
+void t4p::LintResultsPanelClass::ShowLintError(int index) {
 	if (index < 0 || (size_t)index >= Feature.LintErrors.size()) {
 		return;
 	}
-	mvceditor::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (!codeControl) {
 		return;
 	}
 	wxString fileName = codeControl->GetFileName();
 	pelet::LintResultsClass result = Feature.LintErrors[index];
-	wxString resultFile = mvceditor::CharToWx(result.File.c_str());
+	wxString resultFile = t4p::CharToWx(result.File.c_str());
 	if (resultFile != fileName) {
 		return;
 	}
 	codeControl->MarkLintError(result);
 }
 
-mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app) 
+t4p::LintFeatureClass::LintFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app)
 	, Options()
 	, LintErrors()
@@ -385,38 +385,38 @@ mvceditor::LintFeatureClass::LintFeatureClass(mvceditor::AppClass& app)
 	, RunningActionId(0) {
 }
 
-void mvceditor::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
-	viewMenu->Append(mvceditor::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
-	viewMenu->Append(mvceditor::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
+void t4p::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+	viewMenu->Append(t4p::MENU_LINT_PHP + 0, _("Lint Check"), _("Performs syntax check on the current project"), wxITEM_NORMAL);
+	viewMenu->Append(t4p::MENU_LINT_PHP + 1, _("Show Next Lint Error\tF4"), _("Selects the next lint error in the code window"), wxITEM_NORMAL);
+	viewMenu->Append(t4p::MENU_LINT_PHP + 2, _("Show Previous Lint Error\tSHIFT+F4"), _("Selects the previous lint error in the code window"), wxITEM_NORMAL);
 }
 
-void mvceditor::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("lint-check"));
-	toolBar->AddTool(mvceditor::MENU_LINT_PHP + 0, _("Lint Check"), bmp, _("Performs syntax check on the current project"));
+void t4p::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	wxBitmap bmp = t4p::IconImageAsset(wxT("lint-check"));
+	toolBar->AddTool(t4p::MENU_LINT_PHP + 0, _("Lint Check"), bmp, _("Performs syntax check on the current project"));
 }
 
-void mvceditor::LintFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::LintFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
-	menuItemIds[mvceditor::MENU_LINT_PHP + 1] = wxT("Lint Check - Show Next Lint Error");
-	menuItemIds[mvceditor::MENU_LINT_PHP + 2] = wxT("Lint Check - Show Previous Lint Error");
+	menuItemIds[t4p::MENU_LINT_PHP + 0] = wxT("Lint Check - Lint Check Project");
+	menuItemIds[t4p::MENU_LINT_PHP + 1] = wxT("Lint Check - Show Next Lint Error");
+	menuItemIds[t4p::MENU_LINT_PHP + 2] = wxT("Lint Check - Show Previous Lint Error");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::LintFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+void t4p::LintFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	parent->AddPage(
-		new mvceditor::LintPreferencesPanelClass(parent, *this),
+		new t4p::LintPreferencesPanelClass(parent, *this),
 		_("PHP Lint Check"));
 }
 
-void mvceditor::LintFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::LintFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/LintCheck/CheckOnSave"), &Options.CheckOnSave);
 	config->Read(wxT("/LintCheck/CheckUninitializedVariables"), &Options.CheckUninitializedVariables);
 	config->Read(wxT("/LintCheck/CheckUnknownIdentifiers"), &Options.CheckUnknownIdentifiers);
 	config->Read(wxT("/LintCheck/CheckGlobalScopeVariables"), &Options.CheckGlobalScopeVariables);
 }
-void mvceditor::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+void t4p::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("/LintCheck/CheckOnSave"), Options.CheckOnSave);
 	config->Write(wxT("/LintCheck/CheckUninitializedVariables"), Options.CheckUninitializedVariables);
@@ -424,40 +424,40 @@ void mvceditor::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	config->Write(wxT("/LintCheck/CheckGlobalScopeVariables"), Options.CheckGlobalScopeVariables);
 }
 
-void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
+void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 	if (RunningActionId > 0) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
 	}
 	if (App.Globals.HasSources()) {
-		mvceditor::LintBackgroundFileReaderClass* reader = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER, Options);
-		std::vector<mvceditor::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
+		t4p::LintBackgroundFileReaderClass* reader = new t4p::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER, Options);
+		std::vector<t4p::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
-		std::vector<mvceditor::SourceClass>::const_iterator source;
+		std::vector<t4p::SourceClass>::const_iterator source;
 		for (source = phpSources.begin(); source != phpSources.end(); ++source) {
 			if (!source->Exists()) {
-				mvceditor::EditorLogError(mvceditor::ERR_INVALID_DIRECTORY, 
+				t4p::EditorLogError(t4p::ERR_INVALID_DIRECTORY, 
 					source->RootDirectory.GetPath()
 				);
 			}
 		}
 		if (reader->InitDirectoryLint(phpSources, App.Globals)) {
 			RunningActionId = App.RunningThreads.Queue(reader);
-			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, mvceditor::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
+			t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
 			// create / open the outline window
 			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 			if (window) {
-				mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+				t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 				resultsPanel->ClearErrors();
 				SetFocusToToolsWindow(resultsPanel);
 			}
 			else {
-				mvceditor::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
+				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
 						GetNotebook(), *this);
-				wxBitmap lintBitmap = mvceditor::IconImageAsset(wxT("lint-check"));
+				wxBitmap lintBitmap = t4p::IconImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);
 			}
@@ -471,38 +471,38 @@ void mvceditor::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::LintFeatureClass::OnNextLintError(wxCommandEvent& event) {
+void t4p::LintFeatureClass::OnNextLintError(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
-		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 		resultsPanel->SelectNextError();
 	}
 }
 
-void mvceditor::LintFeatureClass::OnPreviousLintError(wxCommandEvent& event) {
+void t4p::LintFeatureClass::OnPreviousLintError(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
-		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 		resultsPanel->SelectPreviousError();
 	}
 }
 
-void mvceditor::LintFeatureClass::OnLintError(mvceditor::LintResultsEventClass& event) {
+void t4p::LintFeatureClass::OnLintError(t4p::LintResultsEventClass& event) {
 	std::vector<pelet::LintResultsClass> results = event.LintResults;
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
-		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 		resultsPanel->AddErrors(results);
 	}
 }
 
-void mvceditor::LintFeatureClass::OnLintErrorAfterSave(mvceditor::LintResultsEventClass& event) {
+void t4p::LintFeatureClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event) {
 	std::vector<pelet::LintResultsClass> results = event.LintResults;
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	mvceditor::LintResultsPanelClass* resultsPanel = NULL;
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+	t4p::LintResultsPanelClass* resultsPanel = NULL;
+	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (window) {
-		resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel = (t4p::LintResultsPanelClass*) window;
 
 		// do not set focus the list, just the overlay
         // of the error
@@ -532,7 +532,7 @@ void mvceditor::LintFeatureClass::OnLintErrorAfterSave(mvceditor::LintResultsEve
 			if (old) {
 				old->Destroy();
 			}
-			mvceditor::LintErrorPanelClass* errorPanel = new mvceditor::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, results);
+			t4p::LintErrorPanelClass* errorPanel = new t4p::LintErrorPanelClass(codeControl, ID_LINT_ERROR_PANEL, results);
 			wxPoint point = codeControl->PointFromPosition(codeControl->GetCurrentPos());
 			point.y = point.y - errorPanel->GetSize().GetY();
 			if (point.y < 0) {
@@ -550,38 +550,38 @@ void mvceditor::LintFeatureClass::OnLintErrorAfterSave(mvceditor::LintResultsEve
 	}
 }
 
-void mvceditor::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
+void t4p::LintFeatureClass::OnLintFileComplete(wxCommandEvent& event) {
 
 }
 
-void mvceditor::LintFeatureClass::OnLintComplete(mvceditor::ActionEventClass& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+void t4p::LintFeatureClass::OnLintComplete(t4p::ActionEventClass& event) {
+	t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 	RunningActionId = 0;
 }
 
-void mvceditor::LintFeatureClass::OnLintProgress(mvceditor::ActionProgressEventClass& event) {
-	mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+void t4p::LintFeatureClass::OnLintProgress(t4p::ActionProgressEventClass& event) {
+	t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& event) {
-	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
+void t4p::LintFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* codeControl = event.GetCodeControl();
 	wxString fileName = codeControl->GetFileName();
 	codeControl->ClearLintErrors();
 	bool hasErrors = !LintErrors.empty();
 
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
-	mvceditor::LintResultsPanelClass* resultsPanel = NULL;
+	t4p::LintResultsPanelClass* resultsPanel = NULL;
 	if (window) {
-		resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		resultsPanel = (t4p::LintResultsPanelClass*) window;
 	}
 
 	// if user has configure to do lint check on saving or user is cleaning up
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
-		mvceditor::LintBackgroundFileReaderClass* thread = new mvceditor::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
+		t4p::LintBackgroundFileReaderClass* thread = new t4p::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
 		bool good = thread->InitSingleFileLint(fileName, App.Globals);
 	
 		// handle the case where user has saved a file but has not clicked
@@ -598,7 +598,7 @@ void mvceditor::LintFeatureClass::OnFileSaved(mvceditor::CodeControlEventClass& 
 	}
 }
 
-void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
 	wxAuiNotebook* notebook = GetToolsNotebook();
 	int selection = event.GetSelection();
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
@@ -606,7 +606,7 @@ void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event
 		if (RunningActionId > 0) {
 			App.RunningThreads.CancelAction(RunningActionId);
 			RunningActionId = 0;
-			mvceditor::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
+			t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}
 		
@@ -615,16 +615,16 @@ void mvceditor::LintFeatureClass::OnNotebookPageClosed(wxAuiNotebookEvent& event
 	}
 }
 
-void mvceditor::LintFeatureClass::OnLintSummary(mvceditor::LintResultsSummaryEventClass& event) {
+void t4p::LintFeatureClass::OnLintSummary(t4p::LintResultsSummaryEventClass& event) {
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
-		mvceditor::LintResultsPanelClass* resultsPanel = (mvceditor::LintResultsPanelClass*) window;
+		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 		resultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
 	}
 }
 
-mvceditor::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
-																mvceditor::LintFeatureClass& feature)
+t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
+																t4p::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
 	wxGenericValidator checkValidator(&Feature.Options.CheckOnSave);
@@ -640,39 +640,39 @@ mvceditor::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent
 	CheckUnknownIdentifiers->SetValidator(checkIdentifiersValidator);
 }
 
-mvceditor::LintErrorPanelClass::LintErrorPanelClass(mvceditor::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
+t4p::LintErrorPanelClass::LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
 : LintErrorGeneratedPanelClass(parent, id) 
 , CodeControl(parent)
 , LintResults(results) {
-	wxString error = mvceditor::IcuToWx(results[0].Error);
+	wxString error = t4p::IcuToWx(results[0].Error);
 	error += wxString::Format(wxT(" on line %d, offset %d"), results[0].LineNumber, results[0].CharacterPosition);
 	ErrorLabel->SetLabel(error);
 }
 
-void mvceditor::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
+void t4p::LintErrorPanelClass::OnKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_SPACE) {
 		CodeControl->MarkLintErrorAndGoto(LintResults[0]);
-		CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+		CallAfter(&t4p::LintErrorPanelClass::DoDestroy);
 		return;
 	}
-	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+	CallAfter(&t4p::LintErrorPanelClass::DoDestroy);
 }
 
-void mvceditor::LintErrorPanelClass::OnGoToLink(wxHyperlinkEvent& event) {
+void t4p::LintErrorPanelClass::OnGoToLink(wxHyperlinkEvent& event) {
 	CodeControl->MarkLintErrorAndGoto(LintResults[0]);
-	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+	CallAfter(&t4p::LintErrorPanelClass::DoDestroy);
 }
 
-void mvceditor::LintErrorPanelClass::OnDismissLink(wxHyperlinkEvent& event) {
-	CallAfter(&mvceditor::LintErrorPanelClass::DoDestroy);
+void t4p::LintErrorPanelClass::OnDismissLink(wxHyperlinkEvent& event) {
+	CallAfter(&t4p::LintErrorPanelClass::DoDestroy);
 }
 
-void mvceditor::LintErrorPanelClass::DoDestroy() {
+void t4p::LintErrorPanelClass::DoDestroy() {
 	this->Destroy();
 }
 
 
-mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass()
+t4p::LintFeatureOptionsClass::LintFeatureOptionsClass()
 : CheckOnSave(true)
 , CheckUninitializedVariables(true)
 , CheckUnknownIdentifiers(false)
@@ -680,7 +680,7 @@ mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass()
 
 }
 
-mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass(const mvceditor::LintFeatureOptionsClass& src)
+t4p::LintFeatureOptionsClass::LintFeatureOptionsClass(const t4p::LintFeatureOptionsClass& src)
 : CheckOnSave(true)
 , CheckUninitializedVariables(true)
 , CheckUnknownIdentifiers(false)
@@ -688,33 +688,33 @@ mvceditor::LintFeatureOptionsClass::LintFeatureOptionsClass(const mvceditor::Lin
 	Copy(src);
 }
 
-mvceditor::LintFeatureOptionsClass& mvceditor::LintFeatureOptionsClass::operator=(const mvceditor::LintFeatureOptionsClass& src)  {
+t4p::LintFeatureOptionsClass& t4p::LintFeatureOptionsClass::operator=(const t4p::LintFeatureOptionsClass& src)  {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::LintFeatureOptionsClass::Copy(const mvceditor::LintFeatureOptionsClass& src) {
+void t4p::LintFeatureOptionsClass::Copy(const t4p::LintFeatureOptionsClass& src) {
 	CheckOnSave = src.CheckOnSave;
 	CheckUninitializedVariables = src.CheckUninitializedVariables;
 	CheckUnknownIdentifiers = src.CheckUnknownIdentifiers;
 	CheckGlobalScopeVariables = src.CheckGlobalScopeVariables;
 }
 
-BEGIN_EVENT_TABLE(mvceditor::LintFeatureClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 0, mvceditor::LintFeatureClass::OnLintMenu)
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 1, mvceditor::LintFeatureClass::OnNextLintError)
-	EVT_MENU(mvceditor::MENU_LINT_PHP + 2, mvceditor::LintFeatureClass::OnPreviousLintError)
-	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  mvceditor::LintFeatureClass::OnLintFileComplete)
-	EVT_ACTION_PROGRESS(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintProgress)
-	EVT_ACTION_COMPLETE(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintComplete)
-	EVT_APP_FILE_SAVED(mvceditor::LintFeatureClass::OnFileSaved)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_PREFERENCES_SAVED, mvceditor::LintFeatureClass::OnPreferencesSaved)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(mvceditor::ID_TOOLS_NOTEBOOK, mvceditor::LintFeatureClass::OnNotebookPageClosed)
-	EVT_LINT_ERROR(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintError)
-	EVT_LINT_ERROR(ID_LINT_READER_SAVE, mvceditor::LintFeatureClass::OnLintErrorAfterSave)
-	EVT_LINT_SUMMARY(ID_LINT_READER, mvceditor::LintFeatureClass::OnLintSummary)
+BEGIN_EVENT_TABLE(t4p::LintFeatureClass, wxEvtHandler) 
+	EVT_MENU(t4p::MENU_LINT_PHP + 0, t4p::LintFeatureClass::OnLintMenu)
+	EVT_MENU(t4p::MENU_LINT_PHP + 1, t4p::LintFeatureClass::OnNextLintError)
+	EVT_MENU(t4p::MENU_LINT_PHP + 2, t4p::LintFeatureClass::OnPreviousLintError)
+	EVT_COMMAND(ID_LINT_READER, EVENT_FILE_READ,  t4p::LintFeatureClass::OnLintFileComplete)
+	EVT_ACTION_PROGRESS(ID_LINT_READER, t4p::LintFeatureClass::OnLintProgress)
+	EVT_ACTION_COMPLETE(ID_LINT_READER, t4p::LintFeatureClass::OnLintComplete)
+	EVT_APP_FILE_SAVED(t4p::LintFeatureClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::LintFeatureClass::OnPreferencesSaved)
+	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_TOOLS_NOTEBOOK, t4p::LintFeatureClass::OnNotebookPageClosed)
+	EVT_LINT_ERROR(ID_LINT_READER, t4p::LintFeatureClass::OnLintError)
+	EVT_LINT_ERROR(ID_LINT_READER_SAVE, t4p::LintFeatureClass::OnLintErrorAfterSave)
+	EVT_LINT_SUMMARY(ID_LINT_READER, t4p::LintFeatureClass::OnLintSummary)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::LintResultsPanelClass, LintResultsGeneratedPanelClass )
-	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, mvceditor::LintResultsPanelClass::OnRowActivated)
+BEGIN_EVENT_TABLE(t4p::LintResultsPanelClass, LintResultsGeneratedPanelClass )
+	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, t4p::LintResultsPanelClass::OnRowActivated)
 END_EVENT_TABLE()

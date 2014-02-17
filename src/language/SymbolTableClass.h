@@ -33,7 +33,7 @@
 #include <map>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration
 class TagFinderListClass;
@@ -337,7 +337,7 @@ public:
 	void ExpressionCompletionMatches(pelet::VariableClass parsedVariable, 
 		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
-		mvceditor::TagFinderListClass& tagFinderList,
+		t4p::TagFinderListClass& tagFinderList,
 		std::vector<UnicodeString>& autoCompleteVariableList,
 		std::vector<TagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
@@ -374,7 +374,7 @@ public:
 	void ResourceMatches(pelet::VariableClass parsedVariable, 
 		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
-		mvceditor::TagFinderListClass& tagFinderList,
+		t4p::TagFinderListClass& tagFinderList,
 		std::vector<TagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
@@ -409,16 +409,16 @@ private:
 	 * Get the vector of variables for the given scope. If scope does not exist it will
 	 * be created.
 	 * 
-	 * @return std::vector<mvceditor::SymbolClass>&
+	 * @return std::vector<t4p::SymbolClass>&
 	 */
-	std::vector<mvceditor::SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
+	std::vector<t4p::SymbolClass>& GetScope(const UnicodeString& className, const UnicodeString& functionName);
 
 	/**
 	 * 	Add the super global PHP predefined variables into the given scope.  For example  $_GET, $_POST, ....
 	 * 
-	 *  @param vector<mvceditor::SymbolClass>& scope the scope list
+	 *  @param vector<t4p::SymbolClass>& scope the scope list
 	 */
-	void CreatePredefinedVariables(std::vector<mvceditor::SymbolClass>& scope);
+	void CreatePredefinedVariables(std::vector<t4p::SymbolClass>& scope);
 	
 	/**
 	 * Modifies the variable; resolving namespaces alias to their fully qualified equivalents
@@ -437,7 +437,7 @@ private:
 	 * @param scope the scope that containts the aliases to resolve against
 	 * @param tag a matched tag; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, mvceditor::TagClass& tag) const;
+	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::TagClass& tag) const;
 
 	/**
 	 * The parser.
@@ -451,9 +451,9 @@ private:
 	 * The key will be the scope name.  The scope name is a combination of the class, method name. 
 	 * The scope string is that which is returned by ScopeString() method.
 	 * The value is the parsed Symbol.
-	 * @var std::map<UnicodeString, vector<mvceditor::SymbolClass>>
+	 * @var std::map<UnicodeString, vector<t4p::SymbolClass>>
 	 */
-	std::map<UnicodeString, std::vector<mvceditor::SymbolClass>, UnicodeStringComparatorClass> Variables;
+	std::map<UnicodeString, std::vector<t4p::SymbolClass>, UnicodeStringComparatorClass> Variables;
 
 };
 

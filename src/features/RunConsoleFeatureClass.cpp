@@ -36,7 +36,7 @@
 static const int ID_PROCESS = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();
 
-mvceditor::CliCommandClass::CliCommandClass()
+t4p::CliCommandClass::CliCommandClass()
 	: Executable()
 	, Arguments()
 	, Description()
@@ -44,7 +44,7 @@ mvceditor::CliCommandClass::CliCommandClass()
 	, ShowInToolbar(false) {
 }
 
-void mvceditor::CliCommandClass::Copy(const mvceditor::CliCommandClass& src) {
+void t4p::CliCommandClass::Copy(const t4p::CliCommandClass& src) {
 	Executable = src.Executable;
 	Arguments = src.Arguments;
 	Description = src.Description;
@@ -52,7 +52,7 @@ void mvceditor::CliCommandClass::Copy(const mvceditor::CliCommandClass& src) {
 	ShowInToolbar = src.ShowInToolbar;
 }
 
-wxString mvceditor::CliCommandClass::CmdLine() const {
+wxString t4p::CliCommandClass::CmdLine() const {
 	wxString line;
 	if (!Executable.IsEmpty()) {
 		line += Executable;
@@ -63,7 +63,7 @@ wxString mvceditor::CliCommandClass::CmdLine() const {
 	return line;
 }
 
-mvceditor::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent, int id, mvceditor::CliCommandClass& command)
+t4p::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent, int id, t4p::CliCommandClass& command)
 	: CliCommandEditDialogGeneratedClass(parent, id) {
 	wxGenericValidator executableValidator(&command.Executable);
 	Executable->SetValidator(executableValidator);
@@ -86,13 +86,13 @@ mvceditor::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent
 	Executable->SetFocus();
 }
 
-void mvceditor::CliCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::CliCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (TransferDataFromWindow()) {
 		EndModal(wxID_OK);
 	}
 }
 
-void mvceditor::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"Store a command for future use.\n"
 		"The executable is the program that will be run.\n"
@@ -109,18 +109,18 @@ void mvceditor::CliCommandEditDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("CLI Command Help"), wxOK, this);
 }
 
-void mvceditor::CliCommandEditDialogClass::OnFileChanged(wxFileDirPickerEvent& event) {
+void t4p::CliCommandEditDialogClass::OnFileChanged(wxFileDirPickerEvent& event) {
 	Executable->SetValue(event.GetPath());
 }
 
-mvceditor::CliCommandListDialogClass::CliCommandListDialogClass(wxWindow* parent, int id, std::vector<mvceditor::CliCommandClass>& commands)
+t4p::CliCommandListDialogClass::CliCommandListDialogClass(wxWindow* parent, int id, std::vector<t4p::CliCommandClass>& commands)
 	: CliCommandListDialogGeneratedClass(parent, id)	
 	, Commands(commands)
 	, EditedCommands(commands) {
 	FillList();
 }
 
-void mvceditor::CliCommandListDialogClass::FillList() {
+void t4p::CliCommandListDialogClass::FillList() {
 	for (size_t i = 0; i < EditedCommands.size(); ++i) {
 		CommandsList->Append(EditedCommands[i].Description);
 	}
@@ -129,10 +129,10 @@ void mvceditor::CliCommandListDialogClass::FillList() {
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
 	size_t selection = (size_t) CommandsList->GetSelection();
 	if (selection > 0 && selection < EditedCommands.size()) {
-		mvceditor::CliCommandClass tmp = EditedCommands[selection];
+		t4p::CliCommandClass tmp = EditedCommands[selection];
 		EditedCommands[selection] = EditedCommands[selection - 1];
 		EditedCommands[selection - 1] = tmp;
 
@@ -142,10 +142,10 @@ void mvceditor::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnDownButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnDownButton(wxCommandEvent& event) {
 	size_t selection = (size_t) CommandsList->GetSelection();
 	if (selection >= 0 && selection < (EditedCommands.size() - 1)) {
-		mvceditor::CliCommandClass tmp = EditedCommands[selection];
+		t4p::CliCommandClass tmp = EditedCommands[selection];
 		EditedCommands[selection] = EditedCommands[selection + 1];
 		EditedCommands[selection + 1] = tmp;
 
@@ -155,9 +155,9 @@ void mvceditor::CliCommandListDialogClass::OnDownButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnAddButton(wxCommandEvent& event) {
-	mvceditor::CliCommandClass newCommand;
-	mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, newCommand);
+void t4p::CliCommandListDialogClass::OnAddButton(wxCommandEvent& event) {
+	t4p::CliCommandClass newCommand;
+	t4p::CliCommandEditDialogClass dialog(this, wxID_ANY, newCommand);
 	if (dialog.ShowModal() == wxID_OK) {
 		EditedCommands.push_back(newCommand);
 		CommandsList->Append(newCommand.Description);
@@ -165,7 +165,7 @@ void mvceditor::CliCommandListDialogClass::OnAddButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
 	size_t selection = (size_t) CommandsList->GetSelection();
 	if (selection >= 0 && selection < EditedCommands.size()) {
 		CommandsList->Delete(selection);
@@ -180,11 +180,11 @@ void mvceditor::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event)
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
 	size_t selection = (size_t) event.GetSelection();
 	if (selection >= 0 && selection < EditedCommands.size()) {
-		mvceditor::CliCommandClass cliCommand = EditedCommands[selection];
-		mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
+		t4p::CliCommandClass cliCommand = EditedCommands[selection];
+		t4p::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
 		if (dialog.ShowModal() == wxID_OK) {
 			EditedCommands[selection] = cliCommand;
 			CommandsList->SetString(selection, cliCommand.Description);
@@ -192,11 +192,11 @@ void mvceditor::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
 	size_t selection = (size_t) CommandsList->GetSelection();
 	if (selection >= 0 && selection < EditedCommands.size()) {
-		mvceditor::CliCommandClass cliCommand = EditedCommands[selection];
-		mvceditor::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
+		t4p::CliCommandClass cliCommand = EditedCommands[selection];
+		t4p::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
 		if (dialog.ShowModal() == wxID_OK) {
 			EditedCommands[selection] = cliCommand;
 			CommandsList->SetString(selection, cliCommand.Description);
@@ -204,12 +204,12 @@ void mvceditor::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnOkButton(wxCommandEvent& event) {
 	Commands = EditedCommands;
 	EndModal(wxID_OK);
 }
 
-void mvceditor::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxString help = wxString::FromAscii(
 		"This dialog shows the list of all saved commands.\n"
 		"You can edit a command by double-cliking on it or by clicking the \n"
@@ -221,9 +221,9 @@ void mvceditor::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("CLI Command Help"), wxOK, this);
 }
 
-mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
-													   mvceditor::StatusBarWithGaugeClass* gauge, 
-													   mvceditor::RunConsoleFeatureClass& feature)
+t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
+													   t4p::StatusBarWithGaugeClass* gauge, 
+													   t4p::RunConsoleFeatureClass& feature)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
 	, ProcessWithHeartbeat(*this)
@@ -240,10 +240,10 @@ mvceditor::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
 	// can't do this in destructor because we need to guarantee
 	// that the gauge pointer is valid
 	parent->Connect(wxID_ANY, wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
-		wxAuiNotebookEventHandler(mvceditor::RunConsolePanelClass::OnPageClose), NULL, this);
+		wxAuiNotebookEventHandler(t4p::RunConsolePanelClass::OnPageClose), NULL, this);
 }
 
-void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
+void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	int selected = evt.GetSelection();
 	wxAuiNotebook* ctrl = (wxAuiNotebook*)evt.GetEventObject();
 	if (ctrl->GetPage(selected) == this) {
@@ -254,12 +254,12 @@ void mvceditor::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 		}
 		Gauge->StopGauge(IdProcessGauge);
 		GetParent()->Disconnect(wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
-			wxAuiNotebookEventHandler(mvceditor::RunConsolePanelClass::OnPageClose), NULL, this);
+			wxAuiNotebookEventHandler(t4p::RunConsolePanelClass::OnPageClose), NULL, this);
 	}
 	evt.Skip();
 }
 
-void  mvceditor::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine, bool waitForArguments) {
+void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine, bool waitForArguments) {
 	
 	// cannot run new files that have not been saved yet
 	if (!cmdLine.empty()) {
@@ -282,7 +282,7 @@ void  mvceditor::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine, 
 	}
 }
 
-void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
+void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	
 	// do not run a process if one is already running. the 'Run' button
 	// converts to a 'stop' button when a process is running.
@@ -302,7 +302,7 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 		if (!stopped) {
 
 			// stale PID??
-			mvceditor::EditorLogError(mvceditor::ERR_ROGUE_PROCESS, 
+			t4p::EditorLogError(t4p::ERR_ROGUE_PROCESS, 
 				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 		}
 		
@@ -313,12 +313,12 @@ void  mvceditor::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	}
 }
 
-void  mvceditor::RunConsolePanelClass::OnClear(wxCommandEvent& event) {
+void  t4p::RunConsolePanelClass::OnClear(wxCommandEvent& event) {
 	OutputWindow->ChangeValue(wxT(""));
 	FileNameHits.clear();
 }
 
-void  mvceditor::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
+void  t4p::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
 	wxString output = event.GetString();
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
@@ -331,7 +331,7 @@ void  mvceditor::RunConsolePanelClass::OnProcessFailed(wxCommandEvent& event) {
 	RunButton->SetLabel(_("Run"));
 }
 
-void  mvceditor::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event) {
+void  t4p::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event) {
 	wxString output = ProcessWithHeartbeat.GetProcessOutput(CurrentPid);
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
@@ -341,7 +341,7 @@ void  mvceditor::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event
 	Gauge->IncrementGauge(IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void  mvceditor::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) { 
+void  t4p::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) { 
 	wxString output = event.GetString();
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
@@ -354,8 +354,8 @@ void  mvceditor::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) 
 	RunButton->SetLabel(_("Run"));
 }
 
-void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
-	mvceditor::CliCommandClass newCommand;
+void t4p::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
+	t4p::CliCommandClass newCommand;
 	wxString fullLine = Command->GetValue();
 	fullLine.Trim();
 	if (!fullLine.IsEmpty()) {
@@ -384,7 +384,7 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 		}
 
 		// using NULL so that the dialog is centered on the screen
-		mvceditor::CliCommandEditDialogClass dialog(NULL, wxID_ANY, newCommand);
+		t4p::CliCommandEditDialogClass dialog(NULL, wxID_ANY, newCommand);
 		if (dialog.ShowModal() == wxID_OK) {
 			Feature.AddCommand(newCommand);
 			Feature.PersistCommands();
@@ -392,13 +392,13 @@ void mvceditor::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 	}
 }
 
-wxString mvceditor::RunConsolePanelClass::GetCommand() const {
+wxString t4p::RunConsolePanelClass::GetCommand() const {
 	return Command->GetValue();
 }
 
-void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
-	mvceditor::FinderClass finder;
-	finder.Mode = mvceditor::FinderClass::REGULAR_EXPRESSION;
+void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
+	t4p::FinderClass finder;
+	finder.Mode = t4p::FinderClass::REGULAR_EXPRESSION;
 	finder.Expression = FileNameRegularExpression();
 	
 	// this way so that gcc does not think that good is an unused variable
@@ -407,7 +407,7 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 	prep = finder.Prepare();
 	wxASSERT(prep);
 	
-	UnicodeString uniText = mvceditor::WxToIcu(text);
+	UnicodeString uniText = t4p::WxToIcu(text);
 	int32_t totalLength = uniText.length();
 
 	wxFont regularFont = OutputWindow->GetFont();
@@ -420,14 +420,14 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 
 	int32_t index = 0;
 	while (index >= 0 && index < totalLength) {
-		mvceditor::FileNameHitClass hit;
+		t4p::FileNameHitClass hit;
 		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hit.StartIndex, hit.Length)) {
 			if (hit.StartIndex > index) {
 			
 				// render the text prior to the hit as normal
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString beforeHit(uniText, index, hit.StartIndex - index);
-				OutputWindow->AppendText(mvceditor::IcuToWx(beforeHit));
+				OutputWindow->AppendText(t4p::IcuToWx(beforeHit));
 			}
 			wxString hitTrimmed = text.Mid(hit.StartIndex, hit.Length);
 			wxString hitContents = text.Mid(hit.StartIndex, hit.Length);
@@ -452,19 +452,19 @@ void mvceditor::RunConsolePanelClass::AppendText(const wxString& text) {
 				// render the ending boundary that was taken by the regular expression
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
-				OutputWindow->AppendText(mvceditor::IcuToWx(afterHit));
+				OutputWindow->AppendText(t4p::IcuToWx(afterHit));
 			}
 		}
 		else {
 			OutputWindow->SetDefaultStyle(normalAttr);
 			UnicodeString noHit(uniText, index);
-			OutputWindow->AppendText(mvceditor::IcuToWx(noHit));
+			OutputWindow->AppendText(t4p::IcuToWx(noHit));
 			index = -1;
 		}
 	}
 }
 
-UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
+UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 	wxPlatformInfo info;
 	std::vector<wxString> allExtensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
 	
@@ -490,21 +490,21 @@ UnicodeString mvceditor::RunConsolePanelClass::FileNameRegularExpression() {
 		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
 		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
-		uniRegEx += mvceditor::WxToIcu(extensionsRegEx);
+		uniRegEx += t4p::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 		
 	}
 	else {
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
 		uniRegEx += UNICODE_STRING_SIMPLE("([\\w_. /]+)");
-		uniRegEx += mvceditor::WxToIcu(extensionsRegEx);
+		uniRegEx += t4p::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
 	}
 	return uniRegEx;
 }
 
-void mvceditor::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
-	mvceditor::FileNameHitClass mouseHit = HitAt(event);
+void t4p::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
+	t4p::FileNameHitClass mouseHit = HitAt(event);
 	bool isCursorHand = mouseHit.Length > 0;
 	if (isCursorHand) {
 		wxCursor cursor(wxCURSOR_HAND);
@@ -516,8 +516,8 @@ void mvceditor::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
 	}
 }
 
-void mvceditor::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
-	mvceditor::FileNameHitClass mouseHit = HitAt(event);
+void t4p::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
+	t4p::FileNameHitClass mouseHit = HitAt(event);
 	if (mouseHit.Length > 0) {
 		wxString output = OutputWindow->GetValue();
 		wxString fileName = output.Mid(mouseHit.StartIndex, mouseHit.Length);
@@ -536,14 +536,14 @@ void mvceditor::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
 	event.Skip();
 }
 
-mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent& event) {
-	mvceditor::FileNameHitClass mouseHit;
+t4p::FileNameHitClass t4p::RunConsolePanelClass::HitAt(wxMouseEvent& event) {
+	t4p::FileNameHitClass mouseHit;
 	wxTextCoord x, y;
 	wxTextCtrlHitTestResult result = OutputWindow->HitTest(event.GetPosition(), &x, &y);
 	if (wxTE_HT_ON_TEXT == result) {
 		int32_t pos = (int32_t)OutputWindow->XYToPosition(x, y);
 		for (size_t i = 0; i < FileNameHits.size(); ++i) {
-			mvceditor::FileNameHitClass hit = FileNameHits[i];
+			t4p::FileNameHitClass hit = FileNameHits[i];
 			if (pos > hit.StartIndex && pos < (hit.StartIndex + hit.Length)) {
 				mouseHit = hit;
 				break;
@@ -553,7 +553,7 @@ mvceditor::FileNameHitClass mvceditor::RunConsolePanelClass::HitAt(wxMouseEvent&
 	return mouseHit;
 }
 
-mvceditor::RunConsoleFeatureClass::RunConsoleFeatureClass(mvceditor::AppClass& app)
+t4p::RunConsoleFeatureClass::RunConsoleFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
@@ -562,41 +562,41 @@ mvceditor::RunConsoleFeatureClass::RunConsoleFeatureClass(mvceditor::AppClass& a
 	, CommandToolbar(NULL) {
 }
 
-void mvceditor::RunConsoleFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+void t4p::RunConsoleFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* cliMenu = new wxMenu();
-	RunCliMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
+	RunCliMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliMenuItem);
-	RunCliWithArgsMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
+	RunCliWithArgsMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
 		_("Run File As a PHP Command Line Script With Arguments"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliWithArgsMenuItem);
-	RunCliInNewWindowMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
+	RunCliInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliInNewWindowMenuItem);
-	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(cliMenu, mvceditor::MENU_RUN_PHP + 3, 
+	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 3, 
 		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliWithArgsInNewWindowMenuItem);
 	cliMenu->AppendSeparator();
-	cliMenu->Append(mvceditor::MENU_RUN_PHP + 4, 
+	cliMenu->Append(t4p::MENU_RUN_PHP + 4, 
 		_("Saved CLI Commands"),
 		_("Open a dialog that shows the saved CLI commands"),
 		wxITEM_NORMAL);
 	menuBar->Append(cliMenu, _("CLI"));
 }
 
-void mvceditor::RunConsoleFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::RunConsoleFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_RUN_PHP + 0] = wxT("Console-Run");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
-	menuItemIds[mvceditor::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
+	menuItemIds[t4p::MENU_RUN_PHP + 0] = wxT("Console-Run");
+	menuItemIds[t4p::MENU_RUN_PHP + 1] = wxT("Console-Run With Arguments");
+	menuItemIds[t4p::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
+	menuItemIds[t4p::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
+void t4p::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 	if (App.Globals.Environment.Php.NotInstalled()) {
-		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		t4p::EditorLogError(t4p::ERR_PHP_EXECUTABLE_NONE);
 		return;
 	}
 	CodeControlClass* code = GetCurrentCodeControl();
@@ -604,19 +604,19 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 
 		// cannot run new files that have not been saved yet
 		if (!code->IsNew()) {
-			mvceditor::CliCommandClass cmd;
+			t4p::CliCommandClass cmd;
 			cmd.Executable = GetEnvironment()->Php.PhpExecutablePath;
 			cmd.Arguments = code->GetFileName();
-			cmd.WaitForArguments = (mvceditor::MENU_RUN_PHP + 1) == event.GetId();
+			cmd.WaitForArguments = (t4p::MENU_RUN_PHP + 1) == event.GetId();
 			bool inNewWindow = false;
 
 			// if theres a window already opened, just re-run the selected window.
 			// make sure that the selected window is a run console panel. if we don't explictly
 			// check the name, the program will crash. Because we are typecasting we 
 			// need to be careful
-			if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
+			if (IsToolsWindowSelectedByName(wxT("t4p::RunConsolePanelClass"))) {
 				int selection = GetToolsNotebook()->GetSelection();
-				RunConsolePanelClass* runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
+				RunConsolePanelClass* runConsolePanel = (t4p::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 				inNewWindow = cmd.CmdLine() != runConsolePanel->GetCommand();
 			}
 			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, inNewWindow);
@@ -627,9 +627,9 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCli(wxCommandEvent& event) {
 	}	
 }
 
-void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
+void t4p::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
 	if (App.Globals.Environment.Php.NotInstalled()) {
-		mvceditor::EditorLogError(mvceditor::ERR_PHP_EXECUTABLE_NONE);
+		t4p::EditorLogError(t4p::ERR_PHP_EXECUTABLE_NONE);
 		return;
 	}
 	CodeControlClass* code = GetCurrentCodeControl();
@@ -637,10 +637,10 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent
 
 		// cannot run new files that have not been saved yet
 		if (!code->IsNew()) {
-			mvceditor::CliCommandClass cmd;
+			t4p::CliCommandClass cmd;
 			cmd.Executable = GetEnvironment()->Php.PhpExecutablePath;
 			cmd.Arguments = code->GetFileName();
-			cmd.WaitForArguments = (mvceditor::MENU_RUN_PHP + 3) == event.GetId();
+			cmd.WaitForArguments = (t4p::MENU_RUN_PHP + 3) == event.GetId();
 			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
 		}
 		else {
@@ -649,14 +649,14 @@ void mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow(wxCommandEvent
 	}
 }
 
-void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow) {
+void t4p::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow) {
 	if (inNewWindow) {
 		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
 			GetStatusBarWithGauge(), *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-		wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run"));
-		if (AddToolsWindow(window, _("Run"), wxT("mvceditor::RunConsolePanelClass"), runBitmap)) {
+		wxBitmap runBitmap = t4p::IconImageAsset(wxT("run"));
+		if (AddToolsWindow(window, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap)) {
 			window->SetToRunCommand(cmdLine, waitForArguments);
 		}
 	}
@@ -668,16 +668,16 @@ void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool
 
 		// make sure that the selected window is a run console panel. if we don't explictly
 		// check the name, the program will crash.
-		if (IsToolsWindowSelectedByName(wxT("mvceditor::RunConsolePanelClass"))) {
-			runConsolePanel = (mvceditor::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
+		if (IsToolsWindowSelectedByName(wxT("t4p::RunConsolePanelClass"))) {
+			runConsolePanel = (t4p::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 		}
 		else {
 			runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
 				GetStatusBarWithGauge(), *this);
 			
 			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-			wxBitmap runBitmap = mvceditor::IconImageAsset(wxT("run"));
-			AddToolsWindow(runConsolePanel, _("Run"), wxT("mvceditor::RunConsolePanelClass"), runBitmap);
+			wxBitmap runBitmap = t4p::IconImageAsset(wxT("run"));
+			AddToolsWindow(runConsolePanel, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap);
 		}
 		if (runConsolePanel) {
 			
@@ -687,7 +687,7 @@ void mvceditor::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool
 	}
 }
 
-void mvceditor::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	bool hasEditors = NULL != GetCurrentCodeControl();
 	RunCliMenuItem->Enable(hasEditors);
 	RunCliInNewWindowMenuItem->Enable(hasEditors);
@@ -696,26 +696,26 @@ void mvceditor::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("run"));
-	toolBar->AddTool(mvceditor::MENU_RUN_PHP + 0, _("Run"), bmp, _("Run"));
+void t4p::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	wxBitmap bmp = t4p::IconImageAsset(wxT("run"));
+	toolBar->AddTool(t4p::MENU_RUN_PHP + 0, _("Run"), bmp, _("Run"));
 }
 
-void mvceditor::RunConsoleFeatureClass::OnRunSavedCommands(wxCommandEvent& event) {
-	mvceditor::CliCommandListDialogClass dialog(GetMainWindow(), wxID_ANY, CliCommands);
+void t4p::RunConsoleFeatureClass::OnRunSavedCommands(wxCommandEvent& event) {
+	t4p::CliCommandListDialogClass dialog(GetMainWindow(), wxID_ANY, CliCommands);
 	if (dialog.ShowModal() == wxID_OK) {
 		PersistCommands();
 	}
 }
 
-void mvceditor::RunConsoleFeatureClass::LoadPreferences(wxConfigBase* config) {
+void t4p::RunConsoleFeatureClass::LoadPreferences(wxConfigBase* config) {
 	CliCommands.clear();
 	long index;
 	wxString groupName;
 	bool found = config->GetFirstGroup(groupName, index);
 	while (found) {
 		if (groupName.Find(wxT("CliCommand_")) >= 0) {
-			mvceditor::CliCommandClass newCommand;
+			t4p::CliCommandClass newCommand;
 			wxString key = groupName + wxT("/Executable");
 			newCommand.Executable = config->Read(key);
 			key = groupName + wxT("/Arguments");
@@ -734,7 +734,7 @@ void mvceditor::RunConsoleFeatureClass::LoadPreferences(wxConfigBase* config) {
 	FillCommandPanel();
 }
 
-void mvceditor::RunConsoleFeatureClass::PersistCommands() {
+void t4p::RunConsoleFeatureClass::PersistCommands() {
 	wxConfigBase* config = wxConfig::Get();
 
 	// delete any previous commands that are in the config
@@ -767,11 +767,11 @@ void mvceditor::RunConsoleFeatureClass::PersistCommands() {
 	FillCommandPanel();
 }
 
-void mvceditor::RunConsoleFeatureClass::AddCommand(const mvceditor::CliCommandClass& command) {
+void t4p::RunConsoleFeatureClass::AddCommand(const t4p::CliCommandClass& command) {
 	CliCommands.push_back(command);
 }
 
-void mvceditor::RunConsoleFeatureClass::FillCommandPanel() {
+void t4p::RunConsoleFeatureClass::FillCommandPanel() {
 	if (CommandToolbar == NULL) {
 		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
@@ -783,13 +783,13 @@ void mvceditor::RunConsoleFeatureClass::FillCommandPanel() {
 	}
 	CommandToolbar->Clear();	
 	for (size_t i = 0; i < CliCommands.size(); ++i) {
-		mvceditor::CliCommandClass cmd = CliCommands[i];
+		t4p::CliCommandClass cmd = CliCommands[i];
 		if (cmd.ShowInToolbar) {
 			wxString desc = cmd.Description;
 
 			// the ID is the index; we will use the index so that the
 			// handler know which command to execute
-			CommandToolbar->AddTool(mvceditor::MENU_RUN_PHP + 5 + i, desc, wxArtProvider::GetBitmap(
+			CommandToolbar->AddTool(t4p::MENU_RUN_PHP + 5 + i, desc, wxArtProvider::GetBitmap(
 				wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), _("Run in CLI Mode"), wxITEM_NORMAL);
 		}
 	}
@@ -805,46 +805,46 @@ void mvceditor::RunConsoleFeatureClass::FillCommandPanel() {
 	AuiManager->Update();
 }
 
-void mvceditor::RunConsoleFeatureClass::OnCommandButtonClick(wxCommandEvent& event) {
+void t4p::RunConsoleFeatureClass::OnCommandButtonClick(wxCommandEvent& event) {
 	size_t index = (size_t)event.GetId();
-	index = index - (mvceditor::MENU_RUN_PHP + 5);
+	index = index - (t4p::MENU_RUN_PHP + 5);
 	if (index >= 0 && index < CliCommands.size()) {
-		mvceditor::CliCommandClass cmd = CliCommands[index];
+		t4p::CliCommandClass cmd = CliCommands[index];
 		RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
 	}
 }
 
-void mvceditor::RunConsoleFeatureClass::LoadPage(const wxString& fileName) {
+void t4p::RunConsoleFeatureClass::LoadPage(const wxString& fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
-void mvceditor::RunConsoleFeatureClass::OnAppCommandRun(wxCommandEvent& event) {
+void t4p::RunConsoleFeatureClass::OnAppCommandRun(wxCommandEvent& event) {
 	RunCommand(event.GetString(), false, false);
 }
 
-mvceditor::FileNameHitClass::FileNameHitClass()
+t4p::FileNameHitClass::FileNameHitClass()
 	: StartIndex(0)
 	, Length(0) {
 
 }
 
-BEGIN_EVENT_TABLE(mvceditor::RunConsolePanelClass, wxPanel) 
-	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_COMPLETE, mvceditor::RunConsolePanelClass::OnProcessComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_PROCESS_IN_PROGRESS, mvceditor::RunConsolePanelClass::OnProcessInProgress)
-	EVT_COMMAND(ID_PROCESS, mvceditor::EVENT_PROCESS_FAILED, mvceditor::RunConsolePanelClass::OnProcessFailed)
+BEGIN_EVENT_TABLE(t4p::RunConsolePanelClass, wxPanel) 
+	EVT_COMMAND(ID_PROCESS, t4p::EVENT_PROCESS_COMPLETE, t4p::RunConsolePanelClass::OnProcessComplete)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_PROCESS_IN_PROGRESS, t4p::RunConsolePanelClass::OnProcessInProgress)
+	EVT_COMMAND(ID_PROCESS, t4p::EVENT_PROCESS_FAILED, t4p::RunConsolePanelClass::OnProcessFailed)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(mvceditor::RunConsoleFeatureClass, wxEvtHandler) 
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 0, mvceditor::RunConsoleFeatureClass::OnRunFileAsCli)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 1, mvceditor::RunConsoleFeatureClass::OnRunFileAsCli)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 2, mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 3, mvceditor::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
-	EVT_MENU(mvceditor::MENU_RUN_PHP + 4, mvceditor::RunConsoleFeatureClass::OnRunSavedCommands)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::RunConsoleFeatureClass::OnUpdateUi)
+BEGIN_EVENT_TABLE(t4p::RunConsoleFeatureClass, wxEvtHandler) 
+	EVT_MENU(t4p::MENU_RUN_PHP + 0, t4p::RunConsoleFeatureClass::OnRunFileAsCli)
+	EVT_MENU(t4p::MENU_RUN_PHP + 1, t4p::RunConsoleFeatureClass::OnRunFileAsCli)
+	EVT_MENU(t4p::MENU_RUN_PHP + 2, t4p::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(t4p::MENU_RUN_PHP + 3, t4p::RunConsoleFeatureClass::OnRunFileAsCliInNewWindow)
+	EVT_MENU(t4p::MENU_RUN_PHP + 4, t4p::RunConsoleFeatureClass::OnRunSavedCommands)
+	EVT_UPDATE_UI(wxID_ANY, t4p::RunConsoleFeatureClass::OnUpdateUi)
 
 	// take up all the rest of the IDs for the command buttons
-	EVT_MENU_RANGE(mvceditor::MENU_RUN_PHP + 5, mvceditor::MENU_RUN_PHP + 55, 
-	mvceditor::RunConsoleFeatureClass::OnCommandButtonClick)
+	EVT_MENU_RANGE(t4p::MENU_RUN_PHP + 5, t4p::MENU_RUN_PHP + 55, 
+	t4p::RunConsoleFeatureClass::OnCommandButtonClick)
 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_CMD_RUN_COMMAND, mvceditor::RunConsoleFeatureClass::OnAppCommandRun)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_RUN_COMMAND, t4p::RunConsoleFeatureClass::OnAppCommandRun)
 END_EVENT_TABLE()

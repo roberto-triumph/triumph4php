@@ -30,7 +30,7 @@
 #include <wx/string.h>
 #include <map>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * The ApacheClass searches through Apache config files for virtual host entries.  It enables
@@ -80,18 +80,18 @@ public:
 	/**
 	 * completely copy an instance
 	 */
-	ApacheClass(const mvceditor::ApacheClass& src);
+	ApacheClass(const t4p::ApacheClass& src);
 
 	/**
 	 * completely copy an instance
 	 */
-	mvceditor::ApacheClass& operator=(const mvceditor::ApacheClass& src);
+	t4p::ApacheClass& operator=(const t4p::ApacheClass& src);
 
 	/**
 	 * completely copy an instance
 	 * @param src item to copy from
 	 */
-	void Copy(const mvceditor::ApacheClass& src);
+	void Copy(const t4p::ApacheClass& src);
 	
 	/**
 	 * removes all of the virtual host mappings

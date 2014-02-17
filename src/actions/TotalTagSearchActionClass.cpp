@@ -31,83 +31,83 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-mvceditor::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int eventId,
+t4p::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int eventId,
 	const UnicodeString& searchString, int lineNumber,
-	const std::vector<mvceditor::TotalTagResultClass>& tags) 
-: wxEvent(eventId, mvceditor::EVENT_TOTAL_TAG_SEARCH_COMPLETE)
+	const std::vector<t4p::TotalTagResultClass>& tags) 
+: wxEvent(eventId, t4p::EVENT_TOTAL_TAG_SEARCH_COMPLETE)
 , SearchString(searchString) 
 , LineNumber(lineNumber)
 , Tags(tags) {
 	
 }
 
-wxEvent* mvceditor::TotalTagSearchCompleteEventClass::Clone() const {
-		return new mvceditor::TotalTagSearchCompleteEventClass(GetId(), SearchString, LineNumber, Tags);
+wxEvent* t4p::TotalTagSearchCompleteEventClass::Clone() const {
+		return new t4p::TotalTagSearchCompleteEventClass(GetId(), SearchString, LineNumber, Tags);
 }
 
-mvceditor::TotalTagResultClass::TotalTagResultClass() 
+t4p::TotalTagResultClass::TotalTagResultClass() 
 : FileTag()
 , PhpTag()
 , TableTag() 
-, Type(mvceditor::TotalTagResultClass::FILE_TAG) {
+, Type(t4p::TotalTagResultClass::FILE_TAG) {
 }
 
-mvceditor::TotalTagResultClass::TotalTagResultClass(const mvceditor::FileTagClass& fileTag) 
+t4p::TotalTagResultClass::TotalTagResultClass(const t4p::FileTagClass& fileTag) 
 : FileTag(fileTag)
 , PhpTag()
 , TableTag() 
-, Type(mvceditor::TotalTagResultClass::FILE_TAG) {
+, Type(t4p::TotalTagResultClass::FILE_TAG) {
 }
 
-mvceditor::TotalTagResultClass::TotalTagResultClass(const mvceditor::TotalTagResultClass& src) 
+t4p::TotalTagResultClass::TotalTagResultClass(const t4p::TotalTagResultClass& src) 
 : FileTag()
 , PhpTag()
 , TableTag() 
-, Type(mvceditor::TotalTagResultClass::FILE_TAG) {
+, Type(t4p::TotalTagResultClass::FILE_TAG) {
 	Copy(src);
 }
 
-mvceditor::TotalTagResultClass::TotalTagResultClass(const mvceditor::TagClass& phpTag) 
+t4p::TotalTagResultClass::TotalTagResultClass(const t4p::TagClass& phpTag) 
 : FileTag()
 , PhpTag(phpTag)
 , TableTag() 
-, Type(mvceditor::TotalTagResultClass::CLASS_TAG) {
-	if (mvceditor::TagClass::CLASS == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::CLASS_TAG;
+, Type(t4p::TotalTagResultClass::CLASS_TAG) {
+	if (t4p::TagClass::CLASS == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::CLASS_TAG;
 	}
-	else if (mvceditor::TagClass::FUNCTION == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::FUNCTION_TAG;
+	else if (t4p::TagClass::FUNCTION == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
 	}
-	else if (mvceditor::TagClass::MEMBER == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::METHOD_TAG;
+	else if (t4p::TagClass::MEMBER == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (mvceditor::TagClass::METHOD == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::METHOD_TAG;
+	else if (t4p::TagClass::METHOD == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (mvceditor::TagClass::CLASS_CONSTANT == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::METHOD_TAG;
+	else if (t4p::TagClass::CLASS_CONSTANT == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (mvceditor::TagClass::DEFINE == PhpTag.Type) {
-		Type = mvceditor::TotalTagResultClass::FUNCTION_TAG;
+	else if (t4p::TagClass::DEFINE == PhpTag.Type) {
+		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
 	}
 }
 
-mvceditor::TotalTagResultClass::TotalTagResultClass(const mvceditor::DatabaseTableTagClass& tableTag) 
+t4p::TotalTagResultClass::TotalTagResultClass(const t4p::DatabaseTableTagClass& tableTag) 
 : FileTag()
 , PhpTag()
 , TableTag(tableTag) 
-, Type(mvceditor::TotalTagResultClass::TABLE_DATA_TAG) {
+, Type(t4p::TotalTagResultClass::TABLE_DATA_TAG) {
 
 }
 
-void mvceditor::TotalTagResultClass::Copy(const mvceditor::TotalTagResultClass& src) {
+void t4p::TotalTagResultClass::Copy(const t4p::TotalTagResultClass& src) {
 	FileTag = src.FileTag;
 	PhpTag = src.PhpTag;
 	TableTag = src.TableTag;
 	Type = src.Type;
 }
 
-mvceditor::TotalTagSearchActionClass::TotalTagSearchActionClass(mvceditor::RunningThreadsClass& runningThreads, 
+t4p::TotalTagSearchActionClass::TotalTagSearchActionClass(t4p::RunningThreadsClass& runningThreads, 
 	int eventId) 
 : ActionClass(runningThreads, eventId) 
 , TagCache()
@@ -118,13 +118,13 @@ mvceditor::TotalTagSearchActionClass::TotalTagSearchActionClass(mvceditor::Runni
 	
 }
 
-void mvceditor::TotalTagSearchActionClass::SetSearch(mvceditor::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
+void t4p::TotalTagSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
 
 	// deep copy the string, wxString not thread safe
-	SearchString = mvceditor::WxToIcu(search);
-	SearchDirs = mvceditor::DeepCopyFileNames(dirs);
+	SearchString = t4p::WxToIcu(search);
+	SearchDirs = t4p::DeepCopyFileNames(dirs);
 
-	mvceditor::TagFinderListClass* cache = new mvceditor::TagFinderListClass;
+	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
 
 	// only need to initialize the global tag cache, will not show native tags 
 	// because there is no file that needs to be opened
@@ -134,23 +134,23 @@ void mvceditor::TotalTagSearchActionClass::SetSearch(mvceditor::GlobalsClass& gl
 	
 	Session.open(
 		*soci::factory_sqlite3(),
-		mvceditor::WxToChar(globals.TagCacheDbFileName.GetFullPath())
+		t4p::WxToChar(globals.TagCacheDbFileName.GetFullPath())
 	);
 	SqlTagCache.InitSession(&Session);
 }
 
-void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
+void t4p::TotalTagSearchActionClass::BackgroundWork() {
 	bool exactOnly = SearchString.length() <= 2;
 	if (IsCancelled()) {
 		return;
 	}
-	std::vector<mvceditor::TotalTagResultClass> matches;
+	std::vector<t4p::TotalTagResultClass> matches;
 
 	// do exact match first, if that succeeds then don't bother doing near matches
-	mvceditor::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
-	std::vector<mvceditor::TagClass> tags = results->Matches();
+	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
+	std::vector<t4p::TagClass> tags = results->Matches();
 	for (size_t i = 0; i < tags.size(); ++i) {
-		mvceditor::TotalTagResultClass result(tags[i]);
+		t4p::TotalTagResultClass result(tags[i]);
 		matches.push_back(result);
 	}
 	if (matches.empty() && !exactOnly) {
@@ -158,14 +158,14 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 		results = TagCache.NearMatchTags(SearchString, SearchDirs);
 		tags = results->Matches();
 		for (size_t i = 0; i < tags.size(); ++i) {
-			mvceditor::TotalTagResultClass result(tags[i]);
+			t4p::TotalTagResultClass result(tags[i]);
 			matches.push_back(result);
 		}
 		if (matches.empty()) {
-			mvceditor::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
-			std::vector<mvceditor::FileTagClass> files = fileTagResults->Matches();
+			t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
+			std::vector<t4p::FileTagClass> files = fileTagResults->Matches();
 			for (size_t i = 0; i < files.size(); ++i) {
-				mvceditor::TotalTagResultClass result(files[i]);
+				t4p::TotalTagResultClass result(files[i]);
 				matches.push_back(result);
 			}
 			if (matches.empty()) {
@@ -173,7 +173,7 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 				fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
 				files = fileTagResults->Matches();
 				for (size_t i = 0; i < files.size(); ++i) {
-					mvceditor::TotalTagResultClass result(files[i]);
+					t4p::TotalTagResultClass result(files[i]);
 					matches.push_back(result);
 				}
 			}
@@ -185,19 +185,19 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 	// now look for any sql resources (tables)
 	// do an exact match first
 	bool foundExactMatchTable = false;
-	mvceditor::ExactSqlResourceTableResultClass exactTableResults;
-	exactTableResults.SetLookup(mvceditor::IcuToWx(SearchString), "");
+	t4p::ExactSqlResourceTableResultClass exactTableResults;
+	exactTableResults.SetLookup(t4p::IcuToWx(SearchString), "");
 	SqlTagCache.Exec(&exactTableResults);
 	while (exactTableResults.More()) {
-		mvceditor::DatabaseTableTagClass tableTag;
-		tableTag.TableName = mvceditor::CharToWx(exactTableResults.TableName.c_str());
-		tableTag.ConnectionHash = mvceditor::CharToWx(exactTableResults.Connection.c_str());
+		t4p::DatabaseTableTagClass tableTag;
+		tableTag.TableName = t4p::CharToWx(exactTableResults.TableName.c_str());
+		tableTag.ConnectionHash = t4p::CharToWx(exactTableResults.Connection.c_str());
 		
-		mvceditor::TotalTagResultClass result(tableTag);
+		t4p::TotalTagResultClass result(tableTag);
 		matches.push_back(result);
 		
-		mvceditor::TotalTagResultClass resultDefinition(tableTag);
-		result.Type = mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG;
+		t4p::TotalTagResultClass resultDefinition(tableTag);
+		result.Type = t4p::TotalTagResultClass::TABLE_DEFINITION_TAG;
 		matches.push_back(result);
 		exactTableResults.Next();
 		foundExactMatchTable = true;
@@ -206,34 +206,34 @@ void mvceditor::TotalTagSearchActionClass::BackgroundWork() {
 
 		// if we did not find an exact match on the table names
 		// then do a near match
-		mvceditor::SqlResourceTableResultClass tableResults;
-		tableResults.SetLookup(mvceditor::IcuToWx(SearchString), "");
+		t4p::SqlResourceTableResultClass tableResults;
+		tableResults.SetLookup(t4p::IcuToWx(SearchString), "");
 		SqlTagCache.Exec(&tableResults);
 		while (tableResults.More()) {
-			mvceditor::DatabaseTableTagClass tableTag;
-			tableTag.TableName = mvceditor::CharToWx(tableResults.TableName.c_str());
-			tableTag.ConnectionHash = mvceditor::CharToWx(tableResults.Connection.c_str());
+			t4p::DatabaseTableTagClass tableTag;
+			tableTag.TableName = t4p::CharToWx(tableResults.TableName.c_str());
+			tableTag.ConnectionHash = t4p::CharToWx(tableResults.Connection.c_str());
 			
-			mvceditor::TotalTagResultClass result(tableTag);
+			t4p::TotalTagResultClass result(tableTag);
 			matches.push_back(result);
 			
-			mvceditor::TotalTagResultClass resultDefinition(tableTag);
-			result.Type = mvceditor::TotalTagResultClass::TABLE_DEFINITION_TAG;
+			t4p::TotalTagResultClass resultDefinition(tableTag);
+			result.Type = t4p::TotalTagResultClass::TABLE_DEFINITION_TAG;
 			matches.push_back(result);
 			tableResults.Next();
 		}
 	}
 	if (!IsCancelled()) {
-		mvceditor::TagSearchClass tagSearch(SearchString);
+		t4p::TagSearchClass tagSearch(SearchString);
 
 		// PostEvent will set the correct event ID
-		mvceditor::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, tagSearch.GetLineNumber(), matches);
+		t4p::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, tagSearch.GetLineNumber(), matches);
 		PostEvent(evt);
 	}
 }
-wxString mvceditor::TotalTagSearchActionClass::GetLabel() const {
+wxString t4p::TotalTagSearchActionClass::GetLabel() const {
 	return wxT("Total Tag Search");
 }
 
-const wxEventType mvceditor::EVENT_TOTAL_TAG_SEARCH_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_TOTAL_TAG_SEARCH_COMPLETE = wxNewEventType();
 

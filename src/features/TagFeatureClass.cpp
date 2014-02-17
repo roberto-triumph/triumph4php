@@ -39,7 +39,7 @@ static int ID_SEARCH_TIMER = wxNewId();
 static int ID_REPARSE_TIMER = wxNewId();
 static int ID_WORKING_CACHE = wxNewId();
 
-mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
+t4p::TagFeatureClass::TagFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)
 	, Timer(this, ID_REPARSE_TIMER)
 	, JumpToText()
@@ -48,29 +48,29 @@ mvceditor::TagFeatureClass::TagFeatureClass(mvceditor::AppClass& app)
 	IndexingDialog = NULL;
 }
 
-void mvceditor::TagFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
-	ProjectIndexMenu = searchMenu->Append(mvceditor::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
-	searchMenu->Append(mvceditor::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
+void t4p::TagFeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
+	ProjectIndexMenu = searchMenu->Append(t4p::MENU_RESOURCE + 0, _("Index"), _("Index the project"));
+	searchMenu->Append(t4p::MENU_RESOURCE + 1, _("Jump To Resource Under Cursor\tF12"), _("Jump To Resource that is under the cursor"));
 	ProjectIndexMenu->Enable(App.Globals.HasSources());
 }
 
-void mvceditor::TagFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::TagFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
-	menuItemIds[mvceditor::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
-	menuItemIds[mvceditor::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource Under Cursor");
+	menuItemIds[t4p::MENU_RESOURCE + 0] = wxT("Resource-Index Project");
+	menuItemIds[t4p::MENU_RESOURCE + 1] = wxT("Resource-Jump To Resource Under Cursor");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void mvceditor::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = mvceditor::IconImageAsset(wxT("tag-projects"));
-	toolBar->AddTool(mvceditor::MENU_RESOURCE + 0, wxT("Tag Projects"), bmp, _("Create tags for the enabled projects"), wxITEM_NORMAL);
+void t4p::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	wxBitmap bmp = t4p::IconImageAsset(wxT("tag-projects"));
+	toolBar->AddTool(t4p::MENU_RESOURCE + 0, wxT("Tag Projects"), bmp, _("Create tags for the enabled projects"), wxITEM_NORMAL);
 }
 
-void mvceditor::TagFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	menu->Append(mvceditor::MENU_RESOURCE + 3, _("Jump To Source"));
+void t4p::TagFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+	menu->Append(t4p::MENU_RESOURCE + 3, _("Jump To Source"));
 }
 
-void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& event) {
 	CacheState = CACHE_OK;
 	if (IndexingDialog) {
 		IndexingDialog->Destroy();
@@ -79,27 +79,27 @@ void mvceditor::TagFeatureClass::OnAppStartSequenceComplete(wxCommandEvent& even
 	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::TagFeatureClass::OnAppExit(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnAppExit(wxCommandEvent& event) {
 	Timer.Stop();
 }
 
-void mvceditor::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 
 	// stop the working cache timer because we are going to delete the rows from 
 	// the database
 	// we want to avoid locking the database
 	Timer.Stop();
 	if (App.Sequences.TagCacheWipeAndIndex()) {
-		IndexingDialog = new mvceditor::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
+		IndexingDialog = new t4p::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
 		IndexingDialog->Show();
 		IndexingDialog->Start();
 	}
 	else {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("Please wait until the running background task ends."));
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Please wait until the running background task ends."));
 	}
 }
 
-void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnJump(wxCommandEvent& event) {
 
 	// jump to selected resources
 	CodeControlClass* codeControl = GetCurrentCodeControl();
@@ -113,8 +113,8 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 		int endPos = codeControl->WordEndPosition(currentPos, true);
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
-		std::vector<mvceditor::TagClass> matches = codeControl->GetTagsAtCurrentPosition();
-		mvceditor::TagListRemoveNativeMatches(matches);
+		std::vector<t4p::TagClass> matches = codeControl->GetTagsAtCurrentPosition();
+		t4p::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
 			if (matches.size() == 1) {
@@ -126,10 +126,10 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 				// that the currently opened file is in.
 				wxFileName openedFile = codeControl->GetFileName();
 				int tagProjectMatchCount = 0;
-				mvceditor::TagClass tagProjectMatch;
+				t4p::TagClass tagProjectMatch;
 				if (openedFile.IsOk() && !codeControl->IsNew()) {
-					std::vector<mvceditor::ProjectClass>::const_iterator project;
-					std::vector<mvceditor::TagClass>::const_iterator tag;
+					std::vector<t4p::ProjectClass>::const_iterator project;
+					std::vector<t4p::TagClass>::const_iterator tag;
 					for (tag = matches.begin(); tag != matches.end(); ++tag) {
 						for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 							if (project->IsAPhpSourceFile(openedFile.GetFullPath()) && project->IsAPhpSourceFile(tag->FullPath)) {
@@ -143,8 +143,8 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 					LoadPageFromResource(term, tagProjectMatch);
 				}
 				else {
-					std::vector<mvceditor::TagClass> chosenResources;
-					mvceditor::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
+					std::vector<t4p::TagClass> chosenResources;
+					t4p::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
 					dialog.Prepopulate(term, matches);
 					if (dialog.ShowModal() == wxOK) {
 						for (size_t i = 0; i < chosenResources.size(); ++i) {
@@ -157,10 +157,10 @@ void mvceditor::TagFeatureClass::OnJump(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TagFeatureClass::OnSearchForResource(wxCommandEvent& event) {
-	std::vector<mvceditor::TagClass> chosenResources;
+void t4p::TagFeatureClass::OnSearchForResource(wxCommandEvent& event) {
+	std::vector<t4p::TagClass> chosenResources;
 	wxString term;
-	mvceditor::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
+	t4p::TagSearchDialogClass dialog(GetMainWindow(), App.Globals, CacheStatus(), term, chosenResources);
 	if (dialog.ShowModal() == wxOK) {
 		for (size_t i = 0; i < chosenResources.size(); ++i) {
 			LoadPageFromResource(term, chosenResources[i]);
@@ -169,11 +169,11 @@ void mvceditor::TagFeatureClass::OnSearchForResource(wxCommandEvent& event) {
 }
 
 
-void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuery, const mvceditor::TagClass& tag) {
-	mvceditor::TagSearchClass tagSearch(mvceditor::WxToIcu(finderQuery));
+void t4p::TagFeatureClass::LoadPageFromResource(const wxString& finderQuery, const t4p::TagClass& tag) {
+	t4p::TagSearchClass tagSearch(t4p::WxToIcu(finderQuery));
 	wxFileName fileName = tag.FileName();
 	if (!fileName.FileExists()) {
-		mvceditor::EditorLogWarning(mvceditor::WARNING_OTHER, _("File Not Found:") + fileName.GetFullPath());
+		t4p::EditorLogWarning(t4p::WARNING_OTHER, _("File Not Found:") + fileName.GetFullPath());
 		return;
 	}
 	GetNotebook()->LoadPage(tag.GetFullPath());
@@ -181,8 +181,8 @@ void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuer
 	if (codeControl) {
 		int32_t position, 
 			length;
-		bool found = mvceditor::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
-		if (mvceditor::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
+		bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
+		if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 				
 			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the 
 			// center of the screen
@@ -190,7 +190,7 @@ void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuer
 			codeControl->SetSelectionAndEnsureVisible(pos, pos);
 			codeControl->GotoLine(tagSearch.GetLineNumber() - 1);
 		}
-		if (mvceditor::TagSearchClass::FILE_NAME == tagSearch.GetResourceType()) {
+		if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType()) {
 				
 			// nothing; just open the file but don't scroll down to any place
 		}
@@ -200,29 +200,29 @@ void mvceditor::TagFeatureClass::LoadPageFromResource(const wxString& finderQuer
 	}
 }
 
-void mvceditor::TagFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::TagFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	ProjectIndexMenu->Enable(App.Globals.HasSources());
 	event.Skip();
 }
 
-void mvceditor::TagFeatureClass::OpenFile(wxString fileName) {
+void t4p::TagFeatureClass::OpenFile(wxString fileName) {
 	GetNotebook()->LoadPage(fileName);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClass& event) {
+void t4p::TagFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 
 	// only index when there is a project open
 	// need to make sure that the file that was closed is in the opened project
 	// as well.
 	// ATTN: don't want single-leaf files to be parsed for resources .. or
 	// do we?
-	mvceditor::CodeControlClass* codeCtrl = event.GetCodeControl();
+	t4p::CodeControlClass* codeCtrl = event.GetCodeControl();
 	if (!codeCtrl) {
 		return;
 	}
 	if (!codeCtrl->IsNew()) {
 		wxString fileName = codeCtrl->GetFileName();
-		mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+		t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
 		tagAction->SetFileToParse(fileName);
 		if (tagAction->Init(App.Globals)) {
 			App.SqliteRunningThreads.Queue(tagAction);
@@ -243,14 +243,14 @@ void mvceditor::TagFeatureClass::OnAppFileClosed(mvceditor::CodeControlEventClas
 	}
 }
 
-wxString mvceditor::TagFeatureClass::CacheStatus() {
+wxString t4p::TagFeatureClass::CacheStatus() {
 	if (CACHE_OK == CacheState) {
 		return _("OK");
 	}
 	return _("Stale");
 }
 
-void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheCompleteEventClass& event) {
+void t4p::TagFeatureClass::OnWorkingCacheComplete(t4p::WorkingCacheCompleteEventClass& event) {
 	wxString fileIdentifier = event.GetFileIdentifier();
 	bool good = App.Globals.TagCache.RegisterWorking(fileIdentifier, event.WorkingCache);
 	if (!good) {
@@ -261,7 +261,7 @@ void mvceditor::TagFeatureClass::OnWorkingCacheComplete(mvceditor::WorkingCacheC
 	event.Skip();
 }
 
-void mvceditor::TagFeatureClass::OnActionComplete(mvceditor::ActionEventClass& event) {
+void t4p::TagFeatureClass::OnActionComplete(t4p::ActionEventClass& event) {
 
 	 // after the file was parsed re-start the timer.  this gets called always, where as
 	 // OnWorkingCacheComplete does not get called when the file contains invalid syntax (no
@@ -269,9 +269,9 @@ void mvceditor::TagFeatureClass::OnActionComplete(mvceditor::ActionEventClass& e
 	Timer.Start(500, wxTIMER_CONTINUOUS);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClass& event) {
-	mvceditor::CodeControlClass* codeControl = event.GetCodeControl();
-	if (codeControl && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+void t4p::TagFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* codeControl = event.GetCodeControl();
+	if (codeControl && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// builder action could take a while (more than the timer)
@@ -280,7 +280,7 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClas
 		Timer.Stop();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
+		t4p::WorkingCacheBuilderClass* builder = new t4p::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
 		builder->Update(
 			App.Globals,
 			codeControl->GetFileName(),
@@ -298,9 +298,9 @@ void mvceditor::TagFeatureClass::OnAppFileOpened(mvceditor::CodeControlEventClas
 	event.Skip();
 }
 
-void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
-	mvceditor::CodeControlClass* codeControl = NULL;
-	mvceditor::NotebookClass* notebook = GetNotebook();
+void t4p::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl = NULL;
+	t4p::NotebookClass* notebook = GetNotebook();
 	bool found = false;
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		codeControl = notebook->GetCodeControl(i);
@@ -309,7 +309,7 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 			break;
 		}
 	}
-	if (found && codeControl->GetDocumentMode() == mvceditor::CodeControlClass::PHP) {
+	if (found && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// builder action could take a while (more than the timer)
@@ -318,7 +318,7 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 		Timer.Stop();
 
 		// we need to differentiate between new and opened files (the 'true' arg)
-		mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
+		t4p::WorkingCacheBuilderClass* builder = new t4p::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
 		builder->Update(
 			App.Globals,
 			codeControl->GetFileName(),
@@ -337,25 +337,25 @@ void mvceditor::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
 	event.Skip();
 }
 
-void mvceditor::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
 
 	// clean up the cache in a background thread
 	std::vector<wxFileName> filesToDelete;
 	filesToDelete.push_back(wxFileName(event.GetString()));
-	mvceditor::TagDeleteFileActionClass* action =  new mvceditor::TagDeleteFileActionClass(App.SqliteRunningThreads, wxID_ANY,
+	t4p::TagDeleteFileActionClass* action =  new t4p::TagDeleteFileActionClass(App.SqliteRunningThreads, wxID_ANY,
 		filesToDelete);
 	action->Init(App.Globals);
 	App.SqliteRunningThreads.Queue(action);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileRenamed(mvceditor::RenameEventClass& event) {
-	mvceditor::ProjectTagSingleFileRenameActionClass* action = new mvceditor::ProjectTagSingleFileRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
+void t4p::TagFeatureClass::OnAppFileRenamed(t4p::RenameEventClass& event) {
+	t4p::ProjectTagSingleFileRenameActionClass* action = new t4p::ProjectTagSingleFileRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
 	action->SetPaths(event.OldPath.GetFullPath(), event.NewPath.GetFullPath());
 	action->Init(App.Globals);
 	App.SqliteRunningThreads.Queue(action);
 }
 
-void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
 
 	// the file is assumed not be opened, we don't need to build the symbol table
 	// just retag it
@@ -363,7 +363,7 @@ void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& eve
 	// if the file is from an active project, then re-tag it
 	// otherwise do nothing
 	wxString fileName = event.GetString();
-	mvceditor::ProjectTagSingleFileActionClass* tagAction = new mvceditor::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, mvceditor::ID_EVENT_ACTION_TAG_FINDER_LIST);
+	t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
 	tagAction->SetFileToParse(fileName);
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
@@ -373,8 +373,8 @@ void mvceditor::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& eve
 	}
 }
 
-void mvceditor::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
-	mvceditor::ProjectTagDirectoryActionClass* tagAction =  new mvceditor::ProjectTagDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY);
+void t4p::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
+	t4p::ProjectTagDirectoryActionClass* tagAction =  new t4p::ProjectTagDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY);
 	tagAction->SetDirToParse(event.GetString());
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
@@ -384,12 +384,12 @@ void mvceditor::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
+void t4p::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
 	std::vector<wxFileName> dirsToDelete;
 	wxFileName dir;
 	dir.AssignDir(event.GetString());
 	dirsToDelete.push_back(dir);
-	mvceditor::TagDeleteDirectoryActionClass* tagAction =  new mvceditor::TagDeleteDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY, dirsToDelete);
+	t4p::TagDeleteDirectoryActionClass* tagAction =  new t4p::TagDeleteDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY, dirsToDelete);
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
 	}
@@ -398,15 +398,15 @@ void mvceditor::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
 	}
 }
 
-void mvceditor::TagFeatureClass::OnAppDirRenamed(mvceditor::RenameEventClass& event) {
-mvceditor::ProjectTagDirectoryRenameActionClass* action = new mvceditor::ProjectTagDirectoryRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
+void t4p::TagFeatureClass::OnAppDirRenamed(t4p::RenameEventClass& event) {
+t4p::ProjectTagDirectoryRenameActionClass* action = new t4p::ProjectTagDirectoryRenameActionClass(App.SqliteRunningThreads, wxID_ANY);
 	action->SetPaths(event.OldPath.GetPath(), event.NewPath.GetPath());
 	action->Init(App.Globals);
 	App.SqliteRunningThreads.Queue(action);
 }
 
-void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
-	mvceditor::CodeControlClass* codeControl = GetCurrentCodeControl();
+void t4p::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
+	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (!codeControl) {
 		return;
 	}
@@ -424,7 +424,7 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	// stop the timer so that we dont queue up a builder actions before the previous one
 	// finishes
 	Timer.Stop();
-	mvceditor::WorkingCacheBuilderClass* builder = new mvceditor::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
+	t4p::WorkingCacheBuilderClass* builder = new t4p::WorkingCacheBuilderClass(App.SqliteRunningThreads, ID_WORKING_CACHE);
 	builder->Update(
 		App.Globals,
 		codeControl->GetFileName(),
@@ -436,24 +436,24 @@ void mvceditor::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	App.SqliteRunningThreads.Queue(builder);
 }
 
-void mvceditor::TagFeatureClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
-	mvceditor::CodeControlClass* ctrl = GetCurrentCodeControl();
+void t4p::TagFeatureClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl) {
 		return;
 	}
 	int pos = event.GetPosition();
 	int endPos = ctrl->WordEndPosition(pos, true);
-	std::vector<mvceditor::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
+	std::vector<t4p::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
 	if (!matches.empty() && !matches[0].GetFullPath().IsEmpty()) {
 		LoadPageFromResource(wxT(""), matches[0]);
 	}
 }
 
-mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
-													  mvceditor::GlobalsClass& globals,
+t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
+													  t4p::GlobalsClass& globals,
 													  wxString cacheStatus,
 													  wxString& term,
-													  std::vector<mvceditor::TagClass>& chosenResources)
+													  std::vector<t4p::TagClass>& chosenResources)
 	: TagSearchDialogGeneratedClass(parent)
 	, RunningThreads()
 	, Globals(globals)
@@ -483,39 +483,39 @@ mvceditor::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	Timer.Start(150, wxTIMER_CONTINUOUS);
 }
 
-mvceditor::TagSearchDialogClass::~TagSearchDialogClass() {
+t4p::TagSearchDialogClass::~TagSearchDialogClass() {
 	RunningThreads.RemoveEventHandler(this);
 	RunningThreads.Shutdown();
 }
 
-void mvceditor::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 	// nothing will be done while the user is entering text
 }
 
-void mvceditor::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
+void t4p::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 	wxString text = SearchText->GetValue();
 	if (text == LastInput) {
 
 		// nothing to do, results are already being shown
 		return;
 	}
-	std::vector<mvceditor::ProjectClass*> projects;
+	std::vector<t4p::ProjectClass*> projects;
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
 	if (!showAllProjects) {
-		projects.push_back((mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
+		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
 	}
 	else {
 
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
-			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
+			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));
 		}
 	}
 	LastInput = text;
 	SearchForResources(text, projects);
 }
 
-void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchedResources.empty()) {
 		
 		// dont dismiss the dialog when no tags are shown
@@ -561,16 +561,16 @@ void mvceditor::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<mvceditor::TagClass>& allMatches) {
+void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::TagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
 	}
 	MatchesList->Clear();
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
-	mvceditor::ProjectClass* selectedProject = NULL;
+	t4p::ProjectClass* selectedProject = NULL;
 	if (!showAllProjects) {
-		selectedProject = (mvceditor::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
+		selectedProject = (t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
 	}
 	
 	// dont show the project path to the user
@@ -585,19 +585,19 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 			projectLabel = selectedProject->Label;
 		}
 		wxString matchLabel;
-		mvceditor::TagClass match = allMatches[i];
-		if (mvceditor::TagClass::MEMBER == match.Type || mvceditor::TagClass::METHOD == match.Type ||
-			mvceditor::TagClass::CLASS_CONSTANT == match.Type) {
-			matchLabel += mvceditor::IcuToWx(match.ClassName);
+		t4p::TagClass match = allMatches[i];
+		if (t4p::TagClass::MEMBER == match.Type || t4p::TagClass::METHOD == match.Type ||
+			t4p::TagClass::CLASS_CONSTANT == match.Type) {
+			matchLabel += t4p::IcuToWx(match.ClassName);
 			matchLabel += wxT("::");
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
-		else if (mvceditor::TagClass::CLASS == match.Type || mvceditor::TagClass::FUNCTION == match.Type
-			|| mvceditor::TagClass::DEFINE == match.Type) {
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+		else if (t4p::TagClass::CLASS == match.Type || t4p::TagClass::FUNCTION == match.Type
+			|| t4p::TagClass::DEFINE == match.Type) {
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		else {
-			matchLabel += mvceditor::IcuToWx(match.Identifier);
+			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		matchLabel += wxT(" - ");
 		matchLabel += relativeName;
@@ -611,7 +611,7 @@ void mvceditor::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQu
 		(int)allMatches.size(), finderQuery));
 }
 
-void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	bool isChecked = false;
 	for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
 		if (MatchesList->IsChecked(i)) {
@@ -636,19 +636,19 @@ void mvceditor::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void mvceditor::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
 	Timer.Stop();
 	RunningThreads.Shutdown();
 	EndModal(wxCANCEL);
 }
 
-void mvceditor::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vector<mvceditor::TagClass> &matches) {
+void t4p::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vector<t4p::TagClass> &matches) {
 	MatchedResources = matches;
 	SearchText->SetValue(term);
 	ShowJumpToResults(term, MatchedResources);
 }
 	
-void mvceditor::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
@@ -672,7 +672,7 @@ void mvceditor::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("Resource Search Help"), wxOK, this);	
 }
 
-void mvceditor::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
+void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
@@ -702,7 +702,7 @@ void mvceditor::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
 	if (selection >= MatchesList->GetCount()) {
 		
@@ -721,7 +721,7 @@ void mvceditor::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& e
 	EndModal(wxOK);
 }
 
-void mvceditor::TagSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
+void t4p::TagSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_RETURN) {
 		wxCommandEvent cmdEvt;
 		OnSearchEnter(cmdEvt);
@@ -731,28 +731,28 @@ void mvceditor::TagSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	}
 }
 
-void mvceditor::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
+void t4p::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	bool showAllProjects = event.GetSelection() == 0;
-	std::vector<mvceditor::ProjectClass*> projects;
+	std::vector<t4p::ProjectClass*> projects;
 	if (!showAllProjects) {
-		projects.push_back((mvceditor::ProjectClass*)ProjectChoice->GetClientData(event.GetSelection()));
+		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(event.GetSelection()));
 	}
 	else {
 
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
-			projects.push_back((mvceditor::ProjectClass*) ProjectChoice->GetClientData(i));
+			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));
 		}
 	}
 	SearchForResources(LastInput, projects);
 }
 
-void mvceditor::TagSearchDialogClass::SearchForResources(const wxString& text, std::vector<mvceditor::ProjectClass*> projects) {
-	mvceditor::TagCacheSearchActionClass* action =  new
-		mvceditor::TagCacheSearchActionClass(RunningThreads, ID_EVENT_TAG_CACHE_SEARCH);
+void t4p::TagSearchDialogClass::SearchForResources(const wxString& text, std::vector<t4p::ProjectClass*> projects) {
+	t4p::TagCacheSearchActionClass* action =  new
+		t4p::TagCacheSearchActionClass(RunningThreads, ID_EVENT_TAG_CACHE_SEARCH);
 	std::vector<wxFileName> dirs;
-	for (std::vector<mvceditor::ProjectClass*>::const_iterator p = projects.begin(); p != projects.end(); ++p) {
-		std::vector<mvceditor::SourceClass>::const_iterator src;
+	for (std::vector<t4p::ProjectClass*>::const_iterator p = projects.begin(); p != projects.end(); ++p) {
+		std::vector<t4p::SourceClass>::const_iterator src;
 		for (src = (*p)->Sources.begin(); src != (*p)->Sources.end(); ++src) {
 			dirs.push_back(src->RootDirectory);
 		}
@@ -761,11 +761,11 @@ void mvceditor::TagSearchDialogClass::SearchForResources(const wxString& text, s
 	RunningThreads.Queue(action);
 }
 
-void mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete(mvceditor::TagCacheSearchCompleteEventClass &event) {
+void t4p::TagSearchDialogClass::OnTagCacheSearchComplete(t4p::TagCacheSearchCompleteEventClass &event) {
 	MatchedResources = event.Tags;
 	if (!MatchedResources.empty()) {
 		MatchesList->Freeze();
-		ShowJumpToResults(mvceditor::IcuToWx(event.SearchString), MatchedResources);
+		ShowJumpToResults(t4p::IcuToWx(event.SearchString), MatchedResources);
 		MatchesList->Thaw();
 	}
 	else {
@@ -774,40 +774,40 @@ void mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete(mvceditor::TagCac
 	}
 }
 
-BEGIN_EVENT_TABLE(mvceditor::TagFeatureClass, wxEvtHandler)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 0, mvceditor::TagFeatureClass::OnProjectWipeAndIndex)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 1, mvceditor::TagFeatureClass::OnJump)
-	EVT_MENU(mvceditor::MENU_RESOURCE + 3, mvceditor::TagFeatureClass::OnJump)
-	EVT_UPDATE_UI(wxID_ANY, mvceditor::TagFeatureClass::OnUpdateUi)
+BEGIN_EVENT_TABLE(t4p::TagFeatureClass, wxEvtHandler)
+	EVT_MENU(t4p::MENU_RESOURCE + 0, t4p::TagFeatureClass::OnProjectWipeAndIndex)
+	EVT_MENU(t4p::MENU_RESOURCE + 1, t4p::TagFeatureClass::OnJump)
+	EVT_MENU(t4p::MENU_RESOURCE + 3, t4p::TagFeatureClass::OnJump)
+	EVT_UPDATE_UI(wxID_ANY, t4p::TagFeatureClass::OnUpdateUi)
 
-	EVT_APP_FILE_CLOSED(mvceditor::TagFeatureClass::OnAppFileClosed)
-	EVT_APP_FILE_OPEN(mvceditor::TagFeatureClass::OnAppFileOpened)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_REVERTED, mvceditor::TagFeatureClass::OnAppFileReverted)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_DELETED, mvceditor::TagFeatureClass::OnAppFileDeleted)
-	EVT_APP_FILE_RENAMED(mvceditor::TagFeatureClass::OnAppFileRenamed)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_CREATED,  mvceditor::TagFeatureClass::OnAppDirCreated)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_DIR_DELETED,  mvceditor::TagFeatureClass::OnAppDirDeleted)
-	EVT_APP_DIR_RENAMED(mvceditor::TagFeatureClass::OnAppDirRenamed)
+	EVT_APP_FILE_CLOSED(t4p::TagFeatureClass::OnAppFileClosed)
+	EVT_APP_FILE_OPEN(t4p::TagFeatureClass::OnAppFileOpened)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_REVERTED, t4p::TagFeatureClass::OnAppFileReverted)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_DELETED, t4p::TagFeatureClass::OnAppFileDeleted)
+	EVT_APP_FILE_RENAMED(t4p::TagFeatureClass::OnAppFileRenamed)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_CREATED,  t4p::TagFeatureClass::OnAppDirCreated)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_DELETED,  t4p::TagFeatureClass::OnAppDirDeleted)
+	EVT_APP_DIR_RENAMED(t4p::TagFeatureClass::OnAppDirRenamed)
 
 	// we will treat file new and file opened the same
-	EVT_APP_FILE_NEW(mvceditor::TagFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_NEW(t4p::TagFeatureClass::OnAppFileOpened)
 	
 	// we will treat new exernal file and file external modified the same
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_CREATED, mvceditor::TagFeatureClass::OnAppFileExternallyModified)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_FILE_EXTERNALLY_MODIFIED, mvceditor::TagFeatureClass::OnAppFileExternallyModified)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_CREATED, t4p::TagFeatureClass::OnAppFileExternallyModified)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED, t4p::TagFeatureClass::OnAppFileExternallyModified)
 	
 
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_SEQUENCE_COMPLETE, mvceditor::TagFeatureClass::OnAppStartSequenceComplete)
-	EVT_COMMAND(wxID_ANY, mvceditor::EVENT_APP_EXIT, mvceditor::TagFeatureClass::OnAppExit)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::TagFeatureClass::OnAppStartSequenceComplete)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::TagFeatureClass::OnAppExit)
 
-	EVT_TIMER(ID_REPARSE_TIMER, mvceditor::TagFeatureClass::OnTimerComplete)
-	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnWorkingCacheComplete)
-	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, mvceditor::TagFeatureClass::OnActionComplete)
-	EVT_STC_HOTSPOT_CLICK(wxID_ANY, mvceditor::TagFeatureClass::OnCodeControlHotspotClick)
+	EVT_TIMER(ID_REPARSE_TIMER, t4p::TagFeatureClass::OnTimerComplete)
+	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, t4p::TagFeatureClass::OnWorkingCacheComplete)
+	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, t4p::TagFeatureClass::OnActionComplete)
+	EVT_STC_HOTSPOT_CLICK(wxID_ANY, t4p::TagFeatureClass::OnCodeControlHotspotClick)
 END_EVENT_TABLE()
 
 
-BEGIN_EVENT_TABLE(mvceditor::TagSearchDialogClass, TagSearchDialogGeneratedClass)
-	EVENT_TAG_CACHE_SEARCH_COMPLETE(ID_EVENT_TAG_CACHE_SEARCH, mvceditor::TagSearchDialogClass::OnTagCacheSearchComplete)
-	EVT_TIMER(ID_SEARCH_TIMER, mvceditor::TagSearchDialogClass::OnTimerComplete)
+BEGIN_EVENT_TABLE(t4p::TagSearchDialogClass, TagSearchDialogGeneratedClass)
+	EVENT_TAG_CACHE_SEARCH_COMPLETE(ID_EVENT_TAG_CACHE_SEARCH, t4p::TagSearchDialogClass::OnTagCacheSearchComplete)
+	EVT_TIMER(ID_SEARCH_TIMER, t4p::TagSearchDialogClass::OnTimerComplete)
 END_EVENT_TABLE()

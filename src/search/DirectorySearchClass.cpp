@@ -28,7 +28,7 @@
 #include <wx/filename.h>
 #include <algorithm>
 
-mvceditor::SourceClass::SourceClass()  
+t4p::SourceClass::SourceClass()  
 	: RootDirectory()
 	, IncludeWildcards() 
 	, ExcludeWildcards() {
@@ -36,7 +36,7 @@ mvceditor::SourceClass::SourceClass()
 	ExcludeRegEx = NULL;
 }
 
-mvceditor::SourceClass::SourceClass(const mvceditor::SourceClass& src)  
+t4p::SourceClass::SourceClass(const t4p::SourceClass& src)  
 	: RootDirectory()
 	, IncludeWildcards() 
 	, ExcludeWildcards() {
@@ -45,7 +45,7 @@ mvceditor::SourceClass::SourceClass(const mvceditor::SourceClass& src)
 	Copy(src);
 }
 
-mvceditor::SourceClass::~SourceClass() {
+t4p::SourceClass::~SourceClass() {
 	if (IncludeRegEx) {
 		delete IncludeRegEx;
 	}
@@ -54,7 +54,7 @@ mvceditor::SourceClass::~SourceClass() {
 	}
 }
 
-void mvceditor::SourceClass::Copy(const mvceditor::SourceClass& src) {
+void t4p::SourceClass::Copy(const t4p::SourceClass& src) {
 	SetIncludeWildcards(src.IncludeWildcardsString());
 	SetExcludeWildcards(src.ExcludeWildcardsString());
 
@@ -63,20 +63,20 @@ void mvceditor::SourceClass::Copy(const mvceditor::SourceClass& src) {
 	RootDirectory.AssignDir(path);
 }
 
-mvceditor::SourceClass& mvceditor::SourceClass::operator=(const mvceditor::SourceClass& src) {
+t4p::SourceClass& t4p::SourceClass::operator=(const t4p::SourceClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void mvceditor::SourceClass::ClearIncludeWildcards() {
+void t4p::SourceClass::ClearIncludeWildcards() {
 	SetIncludeWildcards(wxT("*"));
 }
 
-void mvceditor::SourceClass::ClearExcludeWildcards() {
+void t4p::SourceClass::ClearExcludeWildcards() {
 	SetExcludeWildcards(wxT(""));
 }
 
-void mvceditor::SourceClass::SetIncludeWildcards(const wxString& wildcardString) {
+void t4p::SourceClass::SetIncludeWildcards(const wxString& wildcardString) {
 	if (IncludeRegEx) {
 		delete IncludeRegEx;
 		IncludeRegEx = NULL;
@@ -102,7 +102,7 @@ void mvceditor::SourceClass::SetIncludeWildcards(const wxString& wildcardString)
 	// so that we dont incur the hit of reg ex compilation until we need to.
 }
 
-void mvceditor::SourceClass::SetExcludeWildcards(const wxString& wildcardString) {
+void t4p::SourceClass::SetExcludeWildcards(const wxString& wildcardString) {
 	if (ExcludeRegEx) {
 		delete ExcludeRegEx;
 		ExcludeRegEx = NULL;
@@ -129,15 +129,15 @@ void mvceditor::SourceClass::SetExcludeWildcards(const wxString& wildcardString)
 	// so that we dont incur the hit of reg ex compilation until we need to.
 }
 
-wxString mvceditor::SourceClass::IncludeWildcardsString() const {
+wxString t4p::SourceClass::IncludeWildcardsString() const {
 	return IncludeWildcards;
 }
 
-wxString mvceditor::SourceClass::ExcludeWildcardsString() const {
+wxString t4p::SourceClass::ExcludeWildcardsString() const {
 	return ExcludeWildcards;
 }
 
-bool mvceditor::SourceClass::Contains(const wxString& fullPath) {
+bool t4p::SourceClass::Contains(const wxString& fullPath) {
 	
 	// validations: 
 	// 1. fullPath must be in RootDirectory
@@ -161,7 +161,7 @@ bool mvceditor::SourceClass::Contains(const wxString& fullPath) {
 	return matchedInclude;
 }
 
-bool mvceditor::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
+bool t4p::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 
 	// make sure to normalize so that the search can be case sensitive depending on the OS
 	wxFileName af;
@@ -174,7 +174,7 @@ bool mvceditor::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 	return af.GetPathWithSep().Find(bf.GetPathWithSep()) == 0;
 }
 
-wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
+wxString t4p::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	wxString escapedExpression(wildCardString);
 	
 	// allow ? and * wildcards, turn ';' into '|'
@@ -197,15 +197,15 @@ wxString mvceditor::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	return escapedExpression;
 }
 
-bool mvceditor::SourceClass::Exists() const {
+bool t4p::SourceClass::Exists() const {
 	return RootDirectory.DirExists();
 }
 
-bool mvceditor::CompareSourceLists(const std::vector<mvceditor::SourceClass>& a, const std::vector<mvceditor::SourceClass>& b) {
+bool t4p::CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::vector<t4p::SourceClass>& b) {
 	if (a.size() != b.size()) {
 		return false;
 	}
-	std::vector<mvceditor::SourceClass>::const_iterator aSource, bSource;
+	std::vector<t4p::SourceClass>::const_iterator aSource, bSource;
 
 	// must compare this way since there lists are not guaranteed to be in any particular order
 	for (aSource = a.begin(); aSource != a.end(); ++aSource) {
@@ -229,7 +229,7 @@ bool mvceditor::CompareSourceLists(const std::vector<mvceditor::SourceClass>& a,
 	return true;
 }
 
-mvceditor::DirectorySearchClass::DirectorySearchClass()
+t4p::DirectorySearchClass::DirectorySearchClass()
 	: MatchedFiles() 
 	, CurrentFiles()
 	, Directories()
@@ -241,16 +241,16 @@ mvceditor::DirectorySearchClass::DirectorySearchClass()
 	, HasCalledEnd(false) {
 }
 
-bool mvceditor::DirectorySearchClass::Init(const wxString& path, Modes mode, bool doHiddenFiles) {
-	mvceditor::SourceClass src;
+bool t4p::DirectorySearchClass::Init(const wxString& path, Modes mode, bool doHiddenFiles) {
+	t4p::SourceClass src;
 	src.RootDirectory.AssignDir(path);
 	src.SetIncludeWildcards(wxT("*"));
-	std::vector<mvceditor::SourceClass> sources;
+	std::vector<t4p::SourceClass> sources;
 	sources.push_back(src);
 	return Init(sources, mode, doHiddenFiles);
 }
 
-bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceClass>& sources, Modes mode, bool doHidden) {
+bool t4p::DirectorySearchClass::Init(const std::vector<t4p::SourceClass>& sources, Modes mode, bool doHidden) {
 	TotalFileCount = 0;
 	DoHiddenFiles = doHidden;
 	while (!CurrentFiles.empty()) {
@@ -264,7 +264,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 
 	size_t total = 0;
 	for (size_t i = 0; i < sources.size(); ++i) {
-		mvceditor::SourceClass source = sources[i];
+		t4p::SourceClass source = sources[i];
 		wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
 		if (wxDir::Exists(pathWithSeparator)) {
 			total++;
@@ -295,7 +295,7 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 	}
 	Sources.clear();
 	for (size_t i = 0; i < sources.size(); ++i) {
-		mvceditor::SourceClass srcCopy;
+		t4p::SourceClass srcCopy;
 		srcCopy.Copy(sources[i]);
 		Sources.push_back(srcCopy);
 	}
@@ -304,11 +304,11 @@ bool mvceditor::DirectorySearchClass::Init(const std::vector<mvceditor::SourceCl
 	return true;
 }
 
-bool mvceditor::DirectorySearchClass::More() {
+bool t4p::DirectorySearchClass::More() {
 	return !Directories.empty() || !CurrentFiles.empty();
 }
 
-void mvceditor::DirectorySearchClass::EnumerateNextDir(mvceditor::DirectoryWalkerClass& walker) {
+void t4p::DirectorySearchClass::EnumerateNextDir(t4p::DirectoryWalkerClass& walker) {
 	while (CurrentFiles.empty() && !Directories.empty()) {
 		wxString path = Directories.top();
 
@@ -351,7 +351,7 @@ void mvceditor::DirectorySearchClass::EnumerateNextDir(mvceditor::DirectoryWalke
 // the test was modified to use PRECISE mode, because the bug
 // is really in this class
 // see commit after 0038fea7e36cbe2e3b4c4795904f6
-bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walker) {
+bool t4p::DirectorySearchClass::Walk(t4p::DirectoryWalkerClass& walker) {
 	EnumerateNextDir(walker);
 	bool hit = false;
 	if (!CurrentFiles.empty()) {
@@ -396,11 +396,11 @@ bool mvceditor::DirectorySearchClass::Walk(mvceditor::DirectoryWalkerClass& walk
 	return hit;
 }
 
-const std::vector<wxString>& mvceditor::DirectorySearchClass::GetMatchedFiles() {
+const std::vector<wxString>& t4p::DirectorySearchClass::GetMatchedFiles() {
 	return MatchedFiles;
 }
 
-void mvceditor::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
+void t4p::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 	wxDir dir;
 	if (dir.Open(path)) {
 		int flags =  wxDIR_DIRS;
@@ -434,11 +434,11 @@ void mvceditor::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 	}
 }
 
-int mvceditor::DirectorySearchClass::GetTotalFileCount() {
+int t4p::DirectorySearchClass::GetTotalFileCount() {
 	return TotalFileCount;
 }
 
-bool mvceditor::DirectorySearchClass::MatchesWildcards(const wxString &fullPath) {
+bool t4p::DirectorySearchClass::MatchesWildcards(const wxString &fullPath) {
 	bool matches = false;
 	for (size_t i = 0; i < Sources.size() && !matches; ++i) {
 		matches = Sources[i].Contains(fullPath);
@@ -446,7 +446,7 @@ bool mvceditor::DirectorySearchClass::MatchesWildcards(const wxString &fullPath)
 	return matches;
 }
 
-void mvceditor::DirectorySearchClass::AddFiles(wxDir& dir) {
+void t4p::DirectorySearchClass::AddFiles(wxDir& dir) {
 	int flags =  wxDIR_DIRS;
 	if (DoHiddenFiles) {
 		flags |=  wxDIR_HIDDEN;
@@ -465,7 +465,7 @@ void mvceditor::DirectorySearchClass::AddFiles(wxDir& dir) {
 	}
 }
 
-void mvceditor::DirectorySearchClass::AddSubDirectories(wxDir& dir) {
+void t4p::DirectorySearchClass::AddSubDirectories(wxDir& dir) {
 	int flags =  wxDIR_FILES;
 	if (DoHiddenFiles) {
 		flags |=  wxDIR_HIDDEN;

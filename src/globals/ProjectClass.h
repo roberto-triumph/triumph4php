@@ -29,7 +29,7 @@
 #include <wx/string.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * The Project class represents a single project.
@@ -48,7 +48,7 @@ public:
 	/**
 	 * The directories where source files are located in. 
 	 */
-	std::vector<mvceditor::SourceClass> Sources;
+	std::vector<t4p::SourceClass> Sources;
 	
 	/**
 	 * The wildcard patterns that will be used to find PHP files in this
@@ -109,14 +109,14 @@ public:
 	 */
 	ProjectClass();
 
-	ProjectClass(const mvceditor::ProjectClass& src);
+	ProjectClass(const t4p::ProjectClass& src);
 
-	void operator=(const mvceditor::ProjectClass& src);
+	void operator=(const t4p::ProjectClass& src);
 
 	/**
 	 * Add a source directory to this project.
 	 */
-	void AddSource(const mvceditor::SourceClass& src);
+	void AddSource(const t4p::SourceClass& src);
 
 	/**
 	 * Removes all of the sources from this project.
@@ -131,7 +131,7 @@ public:
 	 * @return all of this project's source directories
 	 * but with the PHP extensions added to each source.
 	 */
-	std::vector<mvceditor::SourceClass> AllPhpSources() const;
+	std::vector<t4p::SourceClass> AllPhpSources() const;
 
 	/**
 	 * This method will return a list of sources suitable for recursing into
@@ -141,7 +141,7 @@ public:
 	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
 	 * and misc file extensions) added to each sources. 
 	 */
-	std::vector<mvceditor::SourceClass> AllSources() const;
+	std::vector<t4p::SourceClass> AllSources() const;
 
 	/**
 	 * @return TRUE if given full path is a PHP file, as determined by

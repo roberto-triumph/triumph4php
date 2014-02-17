@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_CONFIGTAGCLASS_H__
-#define __MVCEDITOR_CONFIGTAGCLASS_H__
+#ifndef __T4P_CONFIGTAGCLASS_H__
+#define __T4P_CONFIGTAGCLASS_H__
 
 #include <wx/string.h>
 #include <wx/filename.h>
 #include <globals/Sqlite.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * A config tag is a recognized config file for a php framework.
@@ -56,11 +56,11 @@ public:
 
 	ConfigTagClass();
 
-	ConfigTagClass(const mvceditor::ConfigTagClass& src);
+	ConfigTagClass(const t4p::ConfigTagClass& src);
 
-	void Copy(const mvceditor::ConfigTagClass& src);
+	void Copy(const t4p::ConfigTagClass& src);
 
-	mvceditor::ConfigTagClass& operator=(const mvceditor::ConfigTagClass& src);
+	t4p::ConfigTagClass& operator=(const t4p::ConfigTagClass& src);
 
 	/**
 	 * @return wxString menu item label with any ampersands already escaped.
@@ -73,7 +73,7 @@ public:
  * detectors sqlite file.  config detector PHP scripts will INSERT
  * into the db and this class will SELECT from the db.
  */
-class ConfigTagFinderClass : public mvceditor::SqliteFinderClass {
+class ConfigTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 
@@ -82,7 +82,7 @@ public:
 	/**
 	 * @return all of the configs tags in all attached sqlite dbs
 	 */
-	std::vector<mvceditor::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
+	std::vector<t4p::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 
 };
 

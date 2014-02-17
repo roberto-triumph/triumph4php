@@ -1,11 +1,11 @@
 
-#ifndef __MVCEDITOR_CALLTIPFEATURECLASS_H__
-#define __MVCEDITOR_CALLTIPFEATURECLASS_H__
+#ifndef __T4P_CALLTIPFEATURECLASS_H__
+#define __T4P_CALLTIPFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
 #include <features/wxformbuilder/DocCommentFeatureForms.h>
 
-namespace mvceditor {
+namespace t4p {
 
 // forward declaration, defined in another file
 class CodeControClass;
@@ -15,11 +15,11 @@ class CodeControClass;
  * comment of the item that is currently under the 
  * mouse pointer or at the current cursor position. 
  */
-class DocCommentFeatureClass : public mvceditor::FeatureClass {
+class DocCommentFeatureClass : public t4p::FeatureClass {
 
 public:
 
-	DocCommentFeatureClass(mvceditor::AppClass& app);
+	DocCommentFeatureClass(t4p::AppClass& app);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 
@@ -29,7 +29,7 @@ private:
 
 	void OnMotionAlt(wxCommandEvent& event);
 
-	void ShowDocComment(mvceditor::CodeControlClass* ctrl, int pos);
+	void ShowDocComment(t4p::CodeControlClass* ctrl, int pos);
 
 	DECLARE_EVENT_TABLE()
 };

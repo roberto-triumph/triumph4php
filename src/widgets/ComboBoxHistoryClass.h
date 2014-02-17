@@ -28,7 +28,7 @@
 #include <wx/combobox.h>
 #include <wx/event.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This class add functionality to a wxComboBox.  It will remember previous user inputs and recall them.

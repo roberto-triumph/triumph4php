@@ -22,14 +22,14 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_DATABASEDETECTORACTIONCLASS_H__
-#define __MVCEDITOR_DATABASEDETECTORACTIONCLASS_H__
+#ifndef __T4P_DATABASEDETECTORACTIONCLASS_H__
+#define __T4P_DATABASEDETECTORACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * the set of parameters that will be used for each 
@@ -43,7 +43,7 @@ public:
 
 	/**
 	 * location to the php executable (php.exe / php)
-	 * this is usually retrieved from mvceditor::EnvironmentClass
+	 * this is usually retrieved from t4p::EnvironmentClass
 	 */
 	wxString PhpExecutablePath;
 
@@ -88,16 +88,16 @@ public:
  * This class will run all database detectors across all enabled projects. This means that there is
  * one external process execution for each project source directory / database detector combination
  */
-class DatabaseTagDetectorActionClass : public wxEvtHandler, public mvceditor::GlobalActionClass {
+class DatabaseTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
 public:
 
-	DatabaseTagDetectorActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	DatabaseTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * @return bool false if php is not installed in the system
 	 */
-	bool Init(mvceditor::GlobalsClass& globals);
+	bool Init(t4p::GlobalsClass& globals);
 
 	bool DoAsync();
 
@@ -110,13 +110,13 @@ private:
 	/**
 	 * used to run the external tag detector PHP script
 	 */
-	mvceditor::ProcessWithHeartbeatClass Process;
+	t4p::ProcessWithHeartbeatClass Process;
 
 	/**
 	 * we will perform one external call for each item in this
 	 * queue
 	 */
-	std::queue<mvceditor::DatabaseTagDetectorParamsClass> ParamsQueue;
+	std::queue<t4p::DatabaseTagDetectorParamsClass> ParamsQueue;
 
 	/**
 	 * pop the next set of params from the queue and call the php database 

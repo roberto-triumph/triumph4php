@@ -28,7 +28,7 @@
 #include <wx/validate.h>
 #include <unicode/unistr.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Class that can be used to transfer UnicodeString data from wx windows. Currently this validator

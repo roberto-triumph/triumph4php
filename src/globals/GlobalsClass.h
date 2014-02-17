@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __MVCEDITOR_STRUCTSCLASS_H__
-#define __MVCEDITOR_STRUCTSCLASS_H__
+#ifndef __T4P_STRUCTSCLASS_H__
+#define __T4P_STRUCTSCLASS_H__
 
 #include <globals/EnvironmentClass.h>
 #include <globals/UrlTagClass.h>
@@ -35,7 +35,7 @@
 #include <globals/FileTypeClass.h>
 #include <vector>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Class that groups together all of the Analysis source code; ie
@@ -78,7 +78,7 @@ public:
 	/**
 	 * All of the projects defined by the user.
 	 */
-	std::vector<mvceditor::ProjectClass> Projects;
+	std::vector<t4p::ProjectClass> Projects;
 
 	/**
 	 * the URL that the user chose to view files from
@@ -93,7 +93,7 @@ public:
 	/**
 	 * Holds all of the file type => file extension associations
 	 */
-	mvceditor::FileTypeClass FileTypes;
+	t4p::FileTypeClass FileTypes;
 
 	/**
 	 * The location of the tag cache db. The tag DB file contains all of
@@ -105,8 +105,8 @@ public:
 	 * if the versions differ.  This check will be done at app start, so that in most of the code
 	 * we can assume that the schema is up-to-date.
 	 *
-	 * @see mvceditor::ParsedTagFinderClass
-	 * @see mvceditor::TagCacheDbVersionActionClass
+	 * @see t4p::ParsedTagFinderClass
+	 * @see t4p::TagCacheDbVersionActionClass
 	 *
 	 * the full path to the tag database that stores tags for all defined projects
 	 */
@@ -121,7 +121,7 @@ public:
 	 * if the versions differ.  This check will be done at app start, so that in most of the code
 	 * we can assume that the schema is up-to-date.
 	 *
-	 * @see mvceditor::DetectorCacheDbVersionClass
+	 * @see t4p::DetectorCacheDbVersionClass
 	 *
 	 * @return the full path to the tag database that stores detected tags for all defined projects
 	 */
@@ -149,7 +149,7 @@ public:
 	 * directories, then this method returns 4 source instances. Each returned source
 	 * will have the same include/exclude wildcards as the original source.
 	 */
-	std::vector<mvceditor::SourceClass> AllEnabledSources() const;
+	std::vector<t4p::SourceClass> AllEnabledSources() const;
 
 	/**
 	 * Same as AllEnabledSources() but each returned source
@@ -160,7 +160,7 @@ public:
 	 * projects. For example, if there are 3 enabled projects, each with 2 sources
 	 * directories, then this method returns 4 source instances.
 	 */
-	std::vector<mvceditor::SourceClass> AllEnabledPhpSources() const;
+	std::vector<t4p::SourceClass> AllEnabledPhpSources() const;
 
 	/**
 	 * Same as AllEnabledSources() but it returns the root directories of all enabled
@@ -173,7 +173,7 @@ public:
 	/**
 	 * @return vector of all enabled projects
 	 */
-	std::vector<mvceditor::ProjectClass> AllEnabledProjects() const;
+	std::vector<t4p::ProjectClass> AllEnabledProjects() const;
 
 	/**
 	 * @return bool TRUE if there is at least 1 enabled project that has AT LEAST 1 source
@@ -218,7 +218,7 @@ public:
 	 *
 	 * @param project set the file filters on the given project
 	 */
-	void AssignFileExtensions(mvceditor::ProjectClass& project) const;
+	void AssignFileExtensions(t4p::ProjectClass& project) const;
 
 	
 	/**
@@ -229,18 +229,18 @@ public:
 	// since this method just reads from the detector db, the templates
 	// are for the url as picked in the template files panel and NOT
 	// the URL dialog.
-	std::vector<mvceditor::TemplateFileTagClass> CurrentTemplates() const;
+	std::vector<t4p::TemplateFileTagClass> CurrentTemplates() const;
 	
 	/**
 	 * @return all of the database tags that are enabled.
 	 */
-	std::vector<mvceditor::DatabaseTagClass> AllEnabledDatabaseTags() const;
+	std::vector<t4p::DatabaseTagClass> AllEnabledDatabaseTags() const;
 	
 	/**
 	 * find a db tag by hash
 	 * will find even tags that are not enabled
 	 */
-	bool FindDatabaseTagByHash(const wxString& connectionHash, mvceditor::DatabaseTagClass& tag) const;
+	bool FindDatabaseTagByHash(const wxString& connectionHash, t4p::DatabaseTagClass& tag) const;
 
 };
 

@@ -25,7 +25,7 @@
 #include <UnitTest++.h>
 #include <language/PhpVariableLintClass.h>
 #include <globals/String.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
 /**
@@ -36,9 +36,9 @@ class PhpVariableLintTestFixtureClass {
 
 public:
 
-	mvceditor::PhpVariableLintOptionsClass Options;
-	mvceditor::PhpVariableLintClass Lint;
-	std::vector<mvceditor::PhpVariableLintResultClass> Results;
+	t4p::PhpVariableLintOptionsClass Options;
+	t4p::PhpVariableLintClass Lint;
+	std::vector<t4p::PhpVariableLintResultClass> Results;
 	bool HasError;
 
 	PhpVariableLintTestFixtureClass() 
@@ -60,7 +60,7 @@ public:
 SUITE(PhpVariableLintTestClass) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = new MyClass();\n"
 		"  $a->work();\n"
@@ -71,7 +71,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithVariable) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($b) {\n"
 		"  $a = $b;\n"
 		"  $a->work();\n"
@@ -82,7 +82,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithVariable) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithArray) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($b) {\n"
 		"  $a = array(1, 2, 3);\n"
 		"  var_dump($a);\n"
@@ -93,7 +93,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithArray) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithStatic) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($b) {\n"
 		"  static $a = 1;\n"
 		"  var_dump($a);\n"
@@ -104,7 +104,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithStatic) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithGlobal) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($b) {\n"
 		"  global $a;\n"
 		"  var_dump($a);\n"
@@ -115,7 +115,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithGlobal) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithList) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($b) {\n"
 		"  list($k) = $b;\n"
 		"  var_dump($k);\n"
@@ -126,7 +126,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithList) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, PredefinedVariables) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = $_GET['help'];\n"
 		"  $a->work();\n"
@@ -139,7 +139,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, PredefinedVariables) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 
 	// function parameters should be automatically declared
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a, &$b) {\n"
 		"  $a->work();\n"
 		"  if (!$b) {\n"
@@ -155,7 +155,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
 	
 	// no errors on exception blocks as exceptions
 	// caught are already initialized
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a, $b) {\n"
 		"  try {\n"
 		"    $a = $a + 99;\n"
@@ -176,7 +176,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
 	// if the options say to not check global variables, then
 	// don't check global variables
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"  $a->work();\n"
 	);
 	Parse(code);
@@ -187,7 +187,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
 
 	// $this variable is always defined in methods
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"class MyClass {\n"
 		"  function work() {\n"
 		"    $this->work();\n"
@@ -200,7 +200,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"class MyClass {\n"
 		"  function work() {\n"
 		"    if (self::workOnce()) {\n"
@@ -221,7 +221,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 	// in this case, we disable variable linting on
 	// the scope
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    extract($arrVars);\n"
@@ -241,7 +241,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
 	// in this case, we disable variable linting on
 	// the scope
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    eval('$arr3 = 4;');\n"
@@ -261,7 +261,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
 	// in this case, we disable variable linting on
 	// the scope
 	Options.CheckGlobalScope = false;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    include('config.php');\n"
@@ -276,7 +276,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 
 	// arrays can be initialized and assigned at the same time
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a) {\n"
 		"  $data['name'] = 'John';\n"
 		"  var_dump($data);\n"
@@ -289,7 +289,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 
 	// assignment in conditional still count as initialized
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a) {\n"
 		"  $fp = fopen('data.txt');\n"
 		"  while (!feof($fp) && ($line = fgets($fp))) {\n"
@@ -305,7 +305,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 
 	// a variable being checked with the isset keyword
 	// should not be labeled as unitialized
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrPairs)) {\n"
 		"    return $arrPairs[0];\n"
@@ -321,7 +321,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
 
 	// assignment in conditional still count as initialized
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrNames[$name = $class->getName()])) {\n"
 		"    return $arrValues[$name];\n"
@@ -334,7 +334,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc() {\n"
 		"  $a = $x + $y;\n"
 		"  $b->work();\n"
@@ -356,7 +356,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 	// test that variables are stored by scope; meaning
 	// that the same named-variable in different functions
 	// must be initialized in bothe functions
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc() {\n"
 		"  $x = myBFunc();\n"
 		"  $a = $x + 99;\n"
@@ -383,7 +383,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -406,7 +406,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 	// test that arguments to calling function are checked
 	// must recurse down function calls in case an argument
 	// is the result of another function call
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -431,7 +431,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 	// in case an argument
 	// is the result of another function call
 	Options.Version = pelet::PHP_54;
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -451,7 +451,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedArrayKeys) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$key];\n"
 		"  $c[$k] = array($f => $g); \n"
@@ -471,7 +471,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedArrayKeys) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"$file2  = include __DIR__ . $file;\n"
 		"include_once __DIR__ . $file;\n"
 		"require __DIR__ . $file;\n"
@@ -492,7 +492,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$d];\n"
 		"  $zz = function($i, $j) use ($d) {\n"
@@ -512,7 +512,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 
 	// $this variable is never defined in a function
-	UnicodeString code = mvceditor::CharToIcu(
+	UnicodeString code = t4p::CharToIcu(
 		"  function work() {\n"
 		"    $this->work();\n"
 		"  }\n"

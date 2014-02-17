@@ -25,32 +25,32 @@
 #include <features/BackgroundFileReaderClass.h>
 
 
-mvceditor::BackgroundFileReaderClass::BackgroundFileReaderClass(mvceditor::RunningThreadsClass& runningThreads, int eventId)
+t4p::BackgroundFileReaderClass::BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, DirectorySearch()
 	, Mode(WALK) {
 }
 
-bool mvceditor::BackgroundFileReaderClass::Init(const wxString& path, mvceditor::DirectorySearchClass::Modes mode,
+bool t4p::BackgroundFileReaderClass::Init(const wxString& path, t4p::DirectorySearchClass::Modes mode,
 												bool doHiddenFiles) {
 	Mode = WALK;
 	return DirectorySearch.Init(path, mode, doHiddenFiles);
 }
 
-bool mvceditor::BackgroundFileReaderClass::Init(std::vector<mvceditor::SourceClass> sources, mvceditor::DirectorySearchClass::Modes mode,
+bool t4p::BackgroundFileReaderClass::Init(std::vector<t4p::SourceClass> sources, t4p::DirectorySearchClass::Modes mode,
 												bool doHiddenFiles) {
 	Mode = WALK;
 	return DirectorySearch.Init(sources, mode, doHiddenFiles);
 }
 
 
-bool mvceditor::BackgroundFileReaderClass::InitMatched(const std::vector<wxString>& matchedFiles) {
+bool t4p::BackgroundFileReaderClass::InitMatched(const std::vector<wxString>& matchedFiles) {
 	Mode = MATCHED;
 	MatchedFiles = matchedFiles;
 	return !matchedFiles.empty();
 }
 
-void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
+void t4p::BackgroundFileReaderClass::BackgroundWork() {
 	bool isDestroy = IsCancelled();
 	int counter = 0;
 	if (Mode == WALK) {
@@ -103,5 +103,5 @@ void mvceditor::BackgroundFileReaderClass::BackgroundWork() {
 	}
 }
 
-const wxEventType mvceditor::EVENT_FILE_READ_COMPLETE = wxNewEventType();
-const wxEventType mvceditor::EVENT_FILE_READ = wxNewEventType();
+const wxEventType t4p::EVENT_FILE_READ_COMPLETE = wxNewEventType();
+const wxEventType t4p::EVENT_FILE_READ = wxNewEventType();

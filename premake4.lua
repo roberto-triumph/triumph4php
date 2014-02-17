@@ -285,7 +285,7 @@ solution "triumph4php"
 			
 			-- use the public update server in release
 			defines { 
-				string.format("T4P_UPDATE_HOST=%s", 'updates.mvceditor.com')
+				string.format("T4P_UPDATE_HOST=%s", 'updates.triumph4php.com')
 			}
 
 	project "tests"

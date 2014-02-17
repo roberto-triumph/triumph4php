@@ -37,7 +37,7 @@
 #include <vector>
 #include <unicode/unistr.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * This event will be propagated when the SQL query completes
@@ -56,10 +56,10 @@ public:
 	 * this class will not delete the pointer; the 
 	 * event handler should
 	 */
-	mvceditor::SqlResultClass* Results;
+	t4p::SqlResultClass* Results;
 	
 	
-	QueryCompleteEventClass(mvceditor::SqlResultClass* results, int eventId);
+	QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId);
 	
 	wxEvent* Clone() const;
 
@@ -68,7 +68,7 @@ public:
 typedef void (wxEvtHandler::*QueryCompleteEventClassFunction)(QueryCompleteEventClass&);
 
 #define EVT_QUERY_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::QUERY_COMPLETE_EVENT, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::QUERY_COMPLETE_EVENT, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( QueryCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
 
@@ -85,7 +85,7 @@ class SqliteConnectionDialogClass : public SqliteConnectionDialogGeneratedClass 
 
 public:
 
-	SqliteConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& tag);
+	SqliteConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag);
 
 };
 
@@ -102,8 +102,8 @@ public:
 	 * @param DatabaseTagClass& will get populated with the values that the user entered. 
 	 * @param size_t& chosenIndex the info item that the user selected 
 	 */
-	MysqlConnectionDialogClass(wxWindow* parent, mvceditor::DatabaseTagClass& dbTag,
-		mvceditor::RunningThreadsClass& runningThreads);
+	MysqlConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& dbTag,
+		t4p::RunningThreadsClass& runningThreads);
 	
 	~MysqlConnectionDialogClass();
 	
@@ -116,23 +116,23 @@ private:
 	 */
 	void OnCancelButton(wxCommandEvent& event);
 		
-	void ShowTestResults(mvceditor::QueryCompleteEventClass& event);
+	void ShowTestResults(t4p::QueryCompleteEventClass& event);
 	
 	/**
 	 * to execute the test query
 	 */
-	mvceditor::SqlQueryClass TestQuery;
+	t4p::SqlQueryClass TestQuery;
 	
 	/**
 	 * to keep track of the background thread that will
 	 * test the connection
 	 */
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 	
 	/**
 	 * to kill the test query if needed
 	 */
-	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
+	t4p::ConnectionIdentifierClass ConnectionIdentifier;
 
 	/**
 	 * to kill the test query thread if needed
@@ -149,7 +149,7 @@ class SqlConnectionListDialogClass : public SqlConnectionListDialogGeneratedClas
 
 public:
 
-	SqlConnectionListDialogClass(wxWindow* parent, std::vector<mvceditor::DatabaseTagClass>& dbTags, mvceditor::RunningThreadsClass& runningThreads);
+	SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags, t4p::RunningThreadsClass& runningThreads);
 	
 	~SqlConnectionListDialogClass();
 
@@ -175,12 +175,12 @@ private:
 	
 	void OnListDoubleClick(wxCommandEvent& event);
 	
-	void ShowTestResults(mvceditor::QueryCompleteEventClass& event);
+	void ShowTestResults(t4p::QueryCompleteEventClass& event);
 	
 	/**
 	 * add a tag to the interface and to the backing list
 	 */
-	void Push(const mvceditor::DatabaseTagClass& tag);
+	void Push(const t4p::DatabaseTagClass& tag);
 
 	/**
 	 * The info list to modify AFTER the user clicks OK
@@ -196,18 +196,18 @@ private:
 	/**
 	 * to execute the test query
 	 */
-	mvceditor::SqlQueryClass TestQuery;
+	t4p::SqlQueryClass TestQuery;
 	
 	/**
 	 * to keep track of the background thread that will
 	 * test the connection
 	 */
-	mvceditor::RunningThreadsClass& RunningThreads;
+	t4p::RunningThreadsClass& RunningThreads;
 	
 	/**
 	 * to kill the test query if needed
 	 */
-	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
+	t4p::ConnectionIdentifierClass ConnectionIdentifier;
 	
 	/**
 	 * to kill the test query thread if needed
@@ -220,7 +220,7 @@ private:
 /**
  * Class that will take a string of SQL statements and will execute them.
  */
-class MultipleSqlExecuteClass : public mvceditor::ActionClass {
+class MultipleSqlExecuteClass : public t4p::ActionClass {
 	
 public:
 
@@ -232,7 +232,7 @@ public:
 	 * @param connectionIdentifier the connection ID will be set, and the main thread can read
 	 *        the connection ID to kill a query when the user wants to cancel it
 	 */
-	MultipleSqlExecuteClass(mvceditor::RunningThreadsClass& runningThreads, int queryId, mvceditor::ConnectionIdentifierClass& connectionIdentifier);
+	MultipleSqlExecuteClass(t4p::RunningThreadsClass& runningThreads, int queryId, t4p::ConnectionIdentifierClass& connectionIdentifier);
 	
 	/**
 	 * Prepares queries to be run
@@ -338,11 +338,11 @@ public:
 	
 	SqlCopyOptionsClass();
 	
-	SqlCopyOptionsClass(const mvceditor::SqlCopyOptionsClass& src);
+	SqlCopyOptionsClass(const t4p::SqlCopyOptionsClass& src);
 	
-	mvceditor::SqlCopyOptionsClass& operator=(const mvceditor::SqlCopyOptionsClass& src);
+	t4p::SqlCopyOptionsClass& operator=(const t4p::SqlCopyOptionsClass& src);
 	
-	void Copy(const mvceditor::SqlCopyOptionsClass& src);
+	void Copy(const t4p::SqlCopyOptionsClass& src);
 	
 	/**
 	 * writes the given rows to the given output stream using
@@ -406,13 +406,13 @@ class RowToSqlInsertClass {
 	
 	RowToSqlInsertClass();
 	
-	RowToSqlInsertClass(const mvceditor::RowToSqlInsertClass& src);
+	RowToSqlInsertClass(const t4p::RowToSqlInsertClass& src);
 	
-	UnicodeString CreateStatement(mvceditor::DatabaseTagClass::Drivers driver) const;
+	UnicodeString CreateStatement(t4p::DatabaseTagClass::Drivers driver) const;
 	
-	mvceditor::RowToSqlInsertClass& operator=(const mvceditor::RowToSqlInsertClass& src);
+	t4p::RowToSqlInsertClass& operator=(const t4p::RowToSqlInsertClass& src);
 	
-	void Copy(const mvceditor::RowToSqlInsertClass& src);
+	void Copy(const t4p::RowToSqlInsertClass& src);
 };
 
 /**
@@ -473,11 +473,11 @@ public:
 	
 	RowToPhpClass();
 	
-	RowToPhpClass(const mvceditor::RowToPhpClass& src);
+	RowToPhpClass(const t4p::RowToPhpClass& src);
 	
-	mvceditor::RowToPhpClass& operator=(const mvceditor::RowToPhpClass& src);
+	t4p::RowToPhpClass& operator=(const t4p::RowToPhpClass& src);
 	
-	void Copy(const mvceditor::RowToPhpClass& src);
+	void Copy(const t4p::RowToPhpClass& src);
 	
 	UnicodeString CreatePhpArray();
 };
@@ -496,12 +496,12 @@ public:
 	 * have access to the user options (coloring, spacing, fonts, etc...).
 	 * @param wxWindow* the parent of this window
 	 * @param int id the window ID
-	 * @param mvceditor::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
-	 * @param mvceditor::SqlQueryClass connection settings to prime the browser with
+	 * @param t4p::StatusBarWithGaugeClass* the gauge control. this class will NOT own the pointer
+	 * @param t4p::SqlQueryClass connection settings to prime the browser with
 	 * @param SqlBrowserFeatureClass used to create a new panel (and attach it to the tools window) for 
 	 *        result sets
 	 */
-	SqlBrowserPanelClass(wxWindow* parent, int id, mvceditor::StatusBarWithGaugeClass* gauge,
+	SqlBrowserPanelClass(wxWindow* parent, int id, t4p::StatusBarWithGaugeClass* gauge,
 		const SqlQueryClass& query, SqlBrowserFeatureClass* feature);
 
 	~SqlBrowserPanelClass();
@@ -514,7 +514,7 @@ public:
 	/**
 	 * Runs the given query on the given connection (in a separate thread).
 	 */
-	void ExecuteQuery(const wxString& sql, const mvceditor::DatabaseTagClass& tag);
+	void ExecuteQuery(const wxString& sql, const t4p::DatabaseTagClass& tag);
 
 	/**
 	 * kills a running query in a nice way.
@@ -524,7 +524,7 @@ public:
 	/**
 	 * When a query has finished running display the results in the grid
 	 */
-	void OnQueryComplete(mvceditor::QueryCompleteEventClass& event);
+	void OnQueryComplete(t4p::QueryCompleteEventClass& event);
 	
 	/**
 	 * signal to this panel that the user changed the connection.
@@ -574,12 +574,12 @@ private:
 	 */
 	bool Check();
 	
-	void OnActionProgress(mvceditor::ActionProgressEventClass& event);
+	void OnActionProgress(t4p::ActionProgressEventClass& event);
 	
 	/**
 	 * close the connection here
 	 */
-	void OnActionComplete(mvceditor::ActionEventClass& event);
+	void OnActionComplete(t4p::ActionEventClass& event);
 	
 	/**
 	 * Fill the grid with the a single SQL result
@@ -630,7 +630,7 @@ private:
 	 * ID so that we can issue a kill command to stop
 	 * a query when this panel is destroyed.
 	 */
-	mvceditor::ConnectionIdentifierClass ConnectionIdentifier;
+	t4p::ConnectionIdentifierClass ConnectionIdentifier;
 	
 	/**
 	 * Filled in with the last error string from the database
@@ -655,13 +655,13 @@ private:
 	/**
 	 * to convert a row of data into a sql INSERT statement
 	 */
-	mvceditor::RowToSqlInsertClass RowToSqlInsert;
+	t4p::RowToSqlInsertClass RowToSqlInsert;
 	
 	/**
 	 * to convert a row of a data into a
 	 * PHP array
 	 */
-	mvceditor::RowToPhpClass RowToPhp;
+	t4p::RowToPhpClass RowToPhp;
 	
 	/**
 	 * To get the query that needs to be run. One results panel will be linked with exactly one code control.
@@ -703,7 +703,7 @@ public:
 
 	DefinitionIndicesPanelClass(wxWindow* parent);
 
-	void Fill(mvceditor::SqlResultClass* result);
+	void Fill(t4p::SqlResultClass* result);
 };
 
 /**
@@ -715,7 +715,7 @@ public:
 
 	DefinitionColumnsPanelClass(wxWindow* parent);
 
-	void Fill(mvceditor::SqlResultClass* result);
+	void Fill(t4p::SqlResultClass* result);
 
 };
 
@@ -723,27 +723,27 @@ class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
 	
 public:
 	
-	TableDefinitionPanelClass(wxWindow* parent, int id, mvceditor::SqlBrowserFeatureClass& feature);
+	TableDefinitionPanelClass(wxWindow* parent, int id, t4p::SqlBrowserFeatureClass& feature);
 	~TableDefinitionPanelClass();
 	
 	/**
 	 * set the table definition to be shown
 	 */
-	void ShowTable(const mvceditor::DatabaseTagClass& tag, const wxString& tableName);
+	void ShowTable(const t4p::DatabaseTagClass& tag, const wxString& tableName);
 	
 	void FillConnectionList();
 	
 private:
 
-	void OnColumnSqlComplete(mvceditor::QueryCompleteEventClass& event);
+	void OnColumnSqlComplete(t4p::QueryCompleteEventClass& event);
 	
-	void OnIndexSqlComplete(mvceditor::QueryCompleteEventClass& event);
+	void OnIndexSqlComplete(t4p::QueryCompleteEventClass& event);
 	
 	void OnTableNameEnter(wxCommandEvent& event);
 	
 	void OnSqlButton(wxCommandEvent& event);
 	
-	void OnCreateSqlComplete(mvceditor::QueryCompleteEventClass& event);
+	void OnCreateSqlComplete(t4p::QueryCompleteEventClass& event);
 	
 	void OnRefreshButton(wxCommandEvent& event);
 
@@ -758,21 +758,21 @@ private:
 	 * running queries if the user clicks the
 	 * close app button (closes the program)
 	 */
-	mvceditor::RunningThreadsClass RunningThreads;
+	t4p::RunningThreadsClass RunningThreads;
 	
 	/**
 	 * to kill a running query
 	 */
-	mvceditor::ConnectionIdentifierClass TableConnectionIdentifier;
+	t4p::ConnectionIdentifierClass TableConnectionIdentifier;
 	
 	/**
 	 * to kill a running query
 	 */
-	mvceditor::ConnectionIdentifierClass IndexConnectionIdentifier;
+	t4p::ConnectionIdentifierClass IndexConnectionIdentifier;
 
-	mvceditor::DefinitionIndicesPanelClass* DefinitionIndicesPanel;
+	t4p::DefinitionIndicesPanelClass* DefinitionIndicesPanel;
 
-	mvceditor::DefinitionColumnsPanelClass* DefinitionColumnsPanel;
+	t4p::DefinitionColumnsPanelClass* DefinitionColumnsPanel;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -783,7 +783,7 @@ private:
  */
 class SqlBrowserFeatureClass : public FeatureClass {
 public:
-	SqlBrowserFeatureClass(mvceditor::AppClass& app);
+	SqlBrowserFeatureClass(t4p::AppClass& app);
 	
 	~SqlBrowserFeatureClass();
 
@@ -818,9 +818,9 @@ private:
 	
 	void OnAppExit(wxCommandEvent& event);
 	
-	void OnCmdTableDataOpen(mvceditor::OpenDbTableCommandEventClass& event);
+	void OnCmdTableDataOpen(t4p::OpenDbTableCommandEventClass& event);
 	
-	void OnCmdTableDefinitionOpen(mvceditor::OpenDbTableCommandEventClass& event);
+	void OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandEventClass& event);
 	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with
@@ -864,7 +864,7 @@ class SqlCopyDialogClass : public SqlCopyDialogGeneratedClass {
 
 public:
 	
-	SqlCopyDialogClass(wxWindow* parent, int id, mvceditor::SqlCopyOptionsClass& options);
+	SqlCopyDialogClass(wxWindow* parent, int id, t4p::SqlCopyOptionsClass& options);
 
 protected:
 
@@ -874,9 +874,9 @@ protected:
 
 private:
 
-	mvceditor::SqlCopyOptionsClass EditedOptions;
+	t4p::SqlCopyOptionsClass EditedOptions;
 	
-	mvceditor::SqlCopyOptionsClass& OriginalOptions;
+	t4p::SqlCopyOptionsClass& OriginalOptions;
 };
 
 /**
@@ -889,7 +889,7 @@ class SqlCopyAsInsertDialogClass : public SqlCopyAsInsertDialogGeneratedClass {
 public:
 	
 	SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
-		mvceditor::RowToSqlInsertClass& rowToSql);
+		t4p::RowToSqlInsertClass& rowToSql);
 	
 private:
 
@@ -902,13 +902,13 @@ private:
 	/**
 	 * the object being edited
 	 */
-	mvceditor::RowToSqlInsertClass EditedRowToSql;
+	t4p::RowToSqlInsertClass EditedRowToSql;
 	
 	/**
 	 * the object passed in the constructor, only 
 	 * changed when the user clicks OK
 	 */
-	mvceditor::RowToSqlInsertClass& RowToSql;
+	t4p::RowToSqlInsertClass& RowToSql;
 	
 	bool HasCheckedAll;
 };
@@ -917,7 +917,7 @@ class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
 	
 public:
 
-	SqlCopyAsPhpDialogClass(wxWindow* parent, int id, mvceditor::RowToPhpClass& rowToPhp);
+	SqlCopyAsPhpDialogClass(wxWindow* parent, int id, t4p::RowToPhpClass& rowToPhp);
 	
 private:
 
@@ -927,9 +927,9 @@ private:
 	
 	void OnCheckAll(wxCommandEvent& event);
 	
-	mvceditor::RowToPhpClass EditedRowToPhp;
+	t4p::RowToPhpClass EditedRowToPhp;
 	
-	mvceditor::RowToPhpClass& RowToPhp;
+	t4p::RowToPhpClass& RowToPhp;
 	
 	bool HasCheckedAll;
 };

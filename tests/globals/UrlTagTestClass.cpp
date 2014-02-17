@@ -30,14 +30,14 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/stdpaths.h>
-#include <MvcEditorChecks.h>
+#include <TriumphChecks.h>
 #include <string>
 
 class UrlTagFixtureClass : public SqliteTestFixtureClass {
 
 public:
 
-	mvceditor::UrlTagFinderClass Finder;
+	t4p::UrlTagFinderClass Finder;
 	soci::session DetectorTagSession;
 	std::vector<wxFileName> SourceDirs;
 	int SourceId;
@@ -48,13 +48,13 @@ public:
 		, SourceDirs() 
 		, SourceId(0) {
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(DetectorTagSession, mvceditor::DetectorSqlSchemaAsset());
+		CreateDatabase(DetectorTagSession, t4p::DetectorSqlSchemaAsset());
 		Finder.InitSession(&DetectorTagSession);
 		
 		wxFileName tmpDir;
 		tmpDir.AssignDir(wxStandardPaths::Get().GetTempDir());
 		SourceDirs.push_back(tmpDir);
-		std::string stdDir = mvceditor::WxToChar(tmpDir.GetPathWithSep());
+		std::string stdDir = t4p::WxToChar(tmpDir.GetPathWithSep());
 		
 		// create the source
 		soci::statement stmt = (DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
@@ -97,7 +97,7 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 
 	wxURI toFind(wxT("http://localhost/frontend.php"));
-	mvceditor::UrlTagClass urlTag;
+	t4p::UrlTagClass urlTag;
 	CHECK(Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(toFind == urlTag.Url);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlTag.Url.BuildURI());
@@ -122,20 +122,20 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 
 TEST_FIXTURE(UrlTagFixtureClass, FindByUrlNoMatch) {
 	wxURI toFind(wxT("http://localhost/backend.php"));
-	mvceditor::UrlTagClass urlTag;
+	t4p::UrlTagClass urlTag;
 	CHECK_EQUAL(false, Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(urlTag.Url.BuildURI().IsEmpty());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrl) {
-	std::vector<mvceditor::UrlTagClass> urls;
+	std::vector<t4p::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("front"), SourceDirs, urls);
 	CHECK_VECTOR_SIZE(1, urls);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urls[0].Url.BuildURI());
 }
 
 TEST_FIXTURE(UrlTagFixtureClass, FilterUrlNoMatches) {
-	std::vector<mvceditor::UrlTagClass> urls;
+	std::vector<t4p::UrlTagClass> urls;
 	Finder.FilterUrls(wxT("back"), SourceDirs, urls);
 	CHECK_VECTOR_SIZE(0, urls);
 }

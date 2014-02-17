@@ -22,15 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __MVCEDITOR_FILEMODFIIEDCHECKACTIONCLASS_H__
-#define __MVCEDITOR_FILEMODFIIEDCHECKACTIONCLASS_H__
+#ifndef __T4P_FILEMODFIIEDCHECKACTIONCLASS_H__
+#define __T4P_FILEMODFIIEDCHECKACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
 #include <wx/filename.h>
 #include <wx/datetime.h>
 #include <wx/event.h>
 
-namespace mvceditor {
+namespace t4p {
 
 /**
  * Class that holds a file along with its modified time. The modified time
@@ -46,9 +46,9 @@ public:
 	
 	FileModifiedTimeClass();
 
-	FileModifiedTimeClass(const mvceditor::FileModifiedTimeClass& src);
+	FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src);
 
-	void Copy(const mvceditor::FileModifiedTimeClass& src);
+	void Copy(const t4p::FileModifiedTimeClass& src);
 };
 
 /**
@@ -91,16 +91,16 @@ extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
  * This class generates a EVENT_ACTION_FILES_MODIFIED with the results of the file checks.
  * note that even if files have not been externally modified the event is still posted.
  */
-class FileModifiedCheckActionClass : public mvceditor::ActionClass {
+class FileModifiedCheckActionClass : public t4p::ActionClass {
 
 public:
 
-	FileModifiedCheckActionClass(mvceditor::RunningThreadsClass& runningThreads, int eventId);
+	FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
 	 * set the files to be checked.
 	 */
-	void SetFiles(const std::vector<mvceditor::FileModifiedTimeClass>& files); 
+	void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files); 
 
 	/**
 	 * performs the file checks in a background thread and POSTs the results
@@ -114,15 +114,15 @@ public:
 
 private:
 
-	std::vector<mvceditor::FileModifiedTimeClass> FilesToCheck;
+	std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
 };
 
 }
 
-typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(mvceditor::FilesModifiedEventClass&);
+typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModifiedEventClass&);
 
 #define EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(id, fn) \
-	DECLARE_EVENT_TABLE_ENTRY(mvceditor::EVENT_FILES_EXTERNALLY_MODIFIED, id, -1, \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FILES_EXTERNALLY_MODIFIED, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( FilesModifiedEventClassFunction, & fn ), (wxObject *) NULL ),
 

@@ -36,8 +36,8 @@ class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public F
 
 public:
 
-	mvceditor::TagCacheDbVersionActionClass Action;
-	mvceditor::DetectorCacheDbVersionActionClass DetectorCacheAction;
+	t4p::TagCacheDbVersionActionClass Action;
+	t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;
 
 	CacheDbVersionActionFixtureClass() 
 		: ActionTestFixtureClass()
@@ -61,8 +61,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
 	Action.BackgroundWork();
 	CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
@@ -70,14 +70,14 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
 	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error); 
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error); 
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
 	CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
@@ -85,13 +85,13 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	mvceditor::SqliteSqlScript(mvceditor::ResourceSqlSchemaAsset(), session, error); 
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error); 
 
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";
 	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK(mvceditor::SqliteSchemaVersion(session) == 0);
+	CHECK(t4p::SqliteSchemaVersion(session) == 0);
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
@@ -99,8 +99,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
@@ -110,8 +110,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
 	DetectorCacheAction.BackgroundWork();
 	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
@@ -119,14 +119,14 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
 	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), session, error); 
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error); 
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
 	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
@@ -134,13 +134,13 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 	CreateProject(AbsoluteDir(wxT("project_1")));
 
 	// create the db files
-	soci::session session(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	mvceditor::SqliteSqlScript(mvceditor::DetectorSqlSchemaAsset(), session, error); 
+	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error); 
 
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";
 	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK(mvceditor::SqliteSchemaVersion(session) == 0);
+	CHECK(t4p::SqliteSchemaVersion(session) == 0);
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
@@ -148,8 +148,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
-	session.open(*soci::factory_sqlite3(), mvceditor::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	CHECK(mvceditor::SqliteSchemaVersion(session) > 0);
+	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
 
 }

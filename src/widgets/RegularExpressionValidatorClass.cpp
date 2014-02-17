@@ -110,20 +110,20 @@ static wxString errorString(UErrorCode err) {
 	return str;
 }
 
-mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass(UnicodeString *data,
+t4p::RegularExpressionValidatorClass::RegularExpressionValidatorClass(UnicodeString *data,
 													  wxRadioBox* modeRadio) 
 	: wxValidator() 
 	, ModeRadio(modeRadio) 
 	, Data(data) {
 }
 
-mvceditor::RegularExpressionValidatorClass::RegularExpressionValidatorClass() 
+t4p::RegularExpressionValidatorClass::RegularExpressionValidatorClass() 
 	: wxValidator()
 	, ModeRadio(NULL)
 	, Data(NULL) {
 }
 
-bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
+bool t4p::RegularExpressionValidatorClass::TransferFromWindow() {
 	bool ret = false;
 	if (!Data) {
 		return false;
@@ -133,11 +133,11 @@ bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
 	UnicodeString regEx;
 	if (t) {
 		wxString val = t->GetValue();
-		regEx = mvceditor::WxToIcu(val);
+		regEx = t4p::WxToIcu(val);
 	}
 	else if (combo) {
 		wxString val = combo->GetValue();
-		regEx = mvceditor::WxToIcu(val);
+		regEx = t4p::WxToIcu(val);
 	}
 	if (!regEx.isEmpty()) {
 		ret = true;
@@ -146,7 +146,7 @@ bool mvceditor::RegularExpressionValidatorClass::TransferFromWindow() {
 	return ret;
 }
 
-bool mvceditor::RegularExpressionValidatorClass::TransferToWindow() {
+bool t4p::RegularExpressionValidatorClass::TransferToWindow() {
 	bool ret = false;
 	if (!Data) {
 		return false;
@@ -155,24 +155,24 @@ bool mvceditor::RegularExpressionValidatorClass::TransferToWindow() {
 	wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
 	UnicodeString regEx;
 	if (t) {
-		wxString val = mvceditor::IcuToWx(*Data);
+		wxString val = t4p::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
 	}
 	else if (combo) {
-		wxString val = mvceditor::IcuToWx(*Data);
+		wxString val = t4p::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
 	}
 	return ret;
 }
 
-bool mvceditor::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
+bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 	bool ret =  false;
 	if (!ModeRadio || !Data) {
 		return false;
 	}
-	if (ModeRadio->GetSelection() != mvceditor::FinderClass::REGULAR_EXPRESSION) {
+	if (ModeRadio->GetSelection() != t4p::FinderClass::REGULAR_EXPRESSION) {
 		ret = true;
 	}
 	else {
@@ -183,11 +183,11 @@ bool mvceditor::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 		UnicodeString regEx;
 		if (t) {
 			wxString val = t->GetValue();
-			regEx = mvceditor::WxToIcu(val);
+			regEx = t4p::WxToIcu(val);
 		}
 		else if (combo) {
 			wxString val = combo->GetValue();
-			regEx = mvceditor::WxToIcu(val);
+			regEx = t4p::WxToIcu(val);
 		}
 		if (!regEx.isEmpty()) {
 			UParseError parseError;
@@ -214,14 +214,14 @@ bool mvceditor::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 	return ret;
 }
 
-wxObject* mvceditor::RegularExpressionValidatorClass::Clone() const {
-	mvceditor::RegularExpressionValidatorClass* validator = new mvceditor::RegularExpressionValidatorClass();
+wxObject* t4p::RegularExpressionValidatorClass::Clone() const {
+	t4p::RegularExpressionValidatorClass* validator = new t4p::RegularExpressionValidatorClass();
 	validator->Data = Data;
 	validator->ModeRadio = ModeRadio;
 	return validator;
 }
 
-void mvceditor::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
+void t4p::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_ZERO, _("*      Sequence of 0 or more"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_SEQUENCE_ONE, _("+      Sequence of 1 or more"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_ZERO_OR_ONE, _("?      Sequence of 0 or 1"));
@@ -251,7 +251,7 @@ void mvceditor::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
 
 }
 
-void mvceditor::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
+void t4p::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_ONE,		_("$1      Match Group 1"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_TWO,		_("$2      Match Group 2"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_THREE,	_("$3      Match Group 3"));
@@ -259,7 +259,7 @@ void mvceditor::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_REPLACE_MATCH_FIVE,		_("$5      Match Group 5"));
 }
 
-void mvceditor::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
+void t4p::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
 	wxString symbols;
 	if (id == ID_MENU_REG_EX_SEQUENCE_ZERO) {
 		symbols = wxT("*");
@@ -347,7 +347,7 @@ void mvceditor::AddSymbolToRegularExpression(wxComboBox* text, int id, int curre
 	}
 }
 
-void mvceditor::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
+void t4p::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int currentInsertionPoint) {
 	wxString symbols;
 	if (id == ID_MENU_REG_EX_REPLACE_MATCH_ONE) {
 		symbols = wxT("$1");

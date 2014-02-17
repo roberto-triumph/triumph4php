@@ -28,7 +28,7 @@
 #include <globals/String.h>
 #include <assert.h>
 
-mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderClass::Modes mode)
+t4p::FinderClass::FinderClass(UnicodeString expression, t4p::FinderClass::Modes mode)
 	: Expression(expression)
 	, ReplaceExpression()
 	, Mode(mode)
@@ -42,46 +42,46 @@ mvceditor::FinderClass::FinderClass(UnicodeString expression, mvceditor::FinderC
 	PatternErrorCode = U_ZERO_ERROR;
 }
 
-mvceditor::FinderClass::~FinderClass() {
+t4p::FinderClass::~FinderClass() {
 	if (Pattern != NULL) {
 		delete Pattern;
 	}
 }
 
-bool mvceditor::FinderClass::Prepare() {
+bool t4p::FinderClass::Prepare() {
 	// delete the old pattern
 	delete Pattern;
 	Pattern = NULL;
 	PatternErrorCode = U_ZERO_ERROR;
 	
-	if (mvceditor::FinderClass::REGULAR_EXPRESSION == Mode) {
+	if (t4p::FinderClass::REGULAR_EXPRESSION == Mode) {
 		PrepareForRegularExpressionMode();
 	}
 	IsPrepared = !Expression.isEmpty() && 
-		(mvceditor::FinderClass::EXACT == Mode || mvceditor::FinderClass::CASE_INSENSITIVE == Mode || U_SUCCESS(PatternErrorCode));
+		(t4p::FinderClass::EXACT == Mode || t4p::FinderClass::CASE_INSENSITIVE == Mode || U_SUCCESS(PatternErrorCode));
 	return IsPrepared;
 }
 
-bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) {
+bool t4p::FinderClass::FindNext(const UnicodeString& text, int32_t start) {
 	bool found = false;
 	if (IsPrepared) {
 		ResetLastHit();
 		switch(Mode) {
-			case mvceditor::FinderClass::EXACT:
-			case mvceditor::FinderClass::CASE_INSENSITIVE:
+			case t4p::FinderClass::EXACT:
+			case t4p::FinderClass::CASE_INSENSITIVE:
 				found = FindNextExact(text, start, EXACT == Mode);
 				break;
-			case mvceditor::FinderClass::REGULAR_EXPRESSION:
+			case t4p::FinderClass::REGULAR_EXPRESSION:
 				found = FindNextRegularExpression(text, start);
 			break;
 		}
 		if (Wrap && !found) {
 			switch(Mode) {
-				case mvceditor::FinderClass::EXACT:
-				case mvceditor::FinderClass::CASE_INSENSITIVE:
+				case t4p::FinderClass::EXACT:
+				case t4p::FinderClass::CASE_INSENSITIVE:
 					found = FindNextExact(text, 0, EXACT == Mode);
 					break;
-				case mvceditor::FinderClass::REGULAR_EXPRESSION:
+				case t4p::FinderClass::REGULAR_EXPRESSION:
 					found = FindNextRegularExpression(text, 0);
 				break;
 			}
@@ -90,13 +90,13 @@ bool mvceditor::FinderClass::FindNext(const UnicodeString& text, int32_t start) 
 	return found;
 }
 
-bool mvceditor::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
+bool t4p::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
 	bool found = false;
-	if(mvceditor::FinderClass::EXACT == Mode) {
+	if(t4p::FinderClass::EXACT == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, true);
 	}
-	else if(mvceditor::FinderClass::CASE_INSENSITIVE == Mode) {
+	else if(t4p::FinderClass::CASE_INSENSITIVE == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, false);
 	}
@@ -126,7 +126,7 @@ bool mvceditor::FinderClass::FindPrevious(const UnicodeString& text, int32_t sta
 	return IsFound;
 }
 
-bool mvceditor::FinderClass::GetLastMatch(int32_t& position, int32_t& length) const {
+bool t4p::FinderClass::GetLastMatch(int32_t& position, int32_t& length) const {
 	if (IsFound) {
 		position = LastPosition;
 		length = LastLength;
@@ -134,13 +134,13 @@ bool mvceditor::FinderClass::GetLastMatch(int32_t& position, int32_t& length) co
 	return IsFound;
 }
 
-void mvceditor::FinderClass::ResetLastHit() {
+void t4p::FinderClass::ResetLastHit() {
 	LastLength = 0;
 	LastPosition = 0;
 	IsFound = false;
 }
 
-bool mvceditor::FinderClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
+bool t4p::FinderClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
 	UBool matchFound = FALSE;
 	if (IsFound && (LastPosition + LastLength) <= text.length()) {		
 		UnicodeString matchedText(text, LastPosition, LastLength);
@@ -169,7 +169,7 @@ bool mvceditor::FinderClass::GetLastReplacementText(const UnicodeString& text, U
 	return matchFound == TRUE;
 }
 
-int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
+int t4p::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 	int matches = 0;
 	
 	// no check for ReplaceExpression.isEmpty() allow for empty replacements
@@ -210,7 +210,7 @@ int mvceditor::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 	return matches;
 }
 
-void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) {
+void t4p::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	UnicodeString symbols = UNICODE_STRING_SIMPLE("!@#$%^&*()[]{}\\-+?.,\"|");
 	
 	// there's got to be a batter way of escaping all regex symbols
@@ -238,7 +238,7 @@ void mvceditor::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));	
 }
 
-bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
+bool t4p::FinderClass::FindNextExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
 	int32_t foundIndex = 0;
 	if (!caseSensitive) {
 		UnicodeString textLower(text);
@@ -258,17 +258,17 @@ bool mvceditor::FinderClass::FindNextExact(const UnicodeString& text, int32_t st
 	return IsFound;
 }
 
-bool mvceditor::FinderClass::FindPreviousExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
+bool t4p::FinderClass::FindPreviousExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
 	int32_t foundIndex = 0;
 	if (caseSensitive) {
 		UnicodeString textLower(text);
 		textLower.toLower();
 		UnicodeString expressionLower(Expression);
 		expressionLower.toLower();
-		foundIndex = mvceditor::FindPrevious(textLower, expressionLower, start);
+		foundIndex = t4p::FindPrevious(textLower, expressionLower, start);
 	}
 	else {
-		foundIndex = mvceditor::FindPrevious(text, Expression, start);
+		foundIndex = t4p::FindPrevious(text, Expression, start);
 	}
 	IsFound = -1 != foundIndex;
 	if (IsFound) {
@@ -278,7 +278,7 @@ bool mvceditor::FinderClass::FindPreviousExact(const UnicodeString& text, int32_
 	return IsFound;
 }
 
-bool mvceditor::FinderClass::FindNextRegularExpression(const UnicodeString& text, int32_t start) {
+bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int32_t start) {
 	if (U_SUCCESS(PatternErrorCode) && Pattern != NULL) {
 		UnicodeString findText(text);
 		if (start > 0 && start < text.length()) {
@@ -313,7 +313,7 @@ bool mvceditor::FinderClass::FindNextRegularExpression(const UnicodeString& text
 	return IsFound;
 }
 
-void mvceditor::FinderClass::PrepareForRegularExpressionMode() {
+void t4p::FinderClass::PrepareForRegularExpressionMode() {
 	int flags = 0;
 	Pattern = RegexPattern::compile(Expression, flags, PatternErrorCode);
 }
