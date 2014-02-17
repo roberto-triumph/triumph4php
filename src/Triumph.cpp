@@ -143,6 +143,7 @@ bool t4p::AppClass::OnInit() {
 	LoadPreferences();
 	MainFrame->AuiManagerUpdate();
 	if (CommandLine()) {
+		MainFrame->SetIcon(t4p::IconImageAsset(wxT("triumph4php")));
 		SetTopWindow(MainFrame);
 		MainFrame->Show(true);
 

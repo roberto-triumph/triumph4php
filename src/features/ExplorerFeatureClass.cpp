@@ -122,8 +122,8 @@ void t4p::ExplorerFeatureClass::AddWindows() {
 	ExplorerToolBar->SetFont(App.Preferences.ApplicationFont);
     ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
     
-	wxBitmap bmp = t4p::IconImageAsset(wxT("explore"));
-	wxBitmap bmpOpen = t4p::IconImageAsset(wxT("explore-open-document"));
+	wxBitmap bmp = t4p::BitmapImageAsset(wxT("explore"));
+	wxBitmap bmpOpen = t4p::BitmapImageAsset(wxT("explore-open-document"));
 	
 	
 	ExplorerToolBar->AddTool(t4p::MENU_EXPLORER + 1, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
@@ -299,17 +299,17 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	FilesImageList = new wxImageList(16, 16);
 	
 	t4p::FillWithFileType(*FilesImageList);
-	FilesImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")));
-	FilesImageList->Add(t4p::IconImageAsset(wxT("arrow-up")));
+	FilesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
+	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
 	SourcesImageList = new wxImageList(16, 16);
-	SourcesImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")));
+	SourcesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	SourcesList->AssignImageList(SourcesImageList, wxIMAGE_LIST_SMALL);
 
-	FilterButton->SetBitmapLabel(t4p::IconImageAsset(wxT("filter")));
-	ParentButton->SetBitmapLabel(t4p::IconImageAsset(wxT("arrow-up")));
-	RefreshButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-refresh")));
+	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
+	ParentButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("arrow-up")));
+	RefreshButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
 
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);

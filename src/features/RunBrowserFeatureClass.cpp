@@ -68,12 +68,12 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, t4p::
  *         
  */
 static std::vector<wxBitmap> BrowserIconsLoad() {
-	wxBitmap browserOperaBitmap = t4p::IconImageAsset(wxT("browser-opera"));
-	wxBitmap browserChromeBitmap = t4p::IconImageAsset(wxT("browser-chrome"));
-	wxBitmap browserInternetExplorerBitmap = t4p::IconImageAsset(wxT("browser-internet-explorer"));
-	wxBitmap browserFirefoxBitmap = t4p::IconImageAsset(wxT("browser-firefox"));
-	wxBitmap browserSafariBitmap = t4p::IconImageAsset(wxT("browser-safari"));
-	wxBitmap browserGenericBitmap = t4p::IconImageAsset(wxT("browser-generic"));
+	wxBitmap browserOperaBitmap = t4p::BitmapImageAsset(wxT("browser-opera"));
+	wxBitmap browserChromeBitmap = t4p::BitmapImageAsset(wxT("browser-chrome"));
+	wxBitmap browserInternetExplorerBitmap = t4p::BitmapImageAsset(wxT("browser-internet-explorer"));
+	wxBitmap browserFirefoxBitmap = t4p::BitmapImageAsset(wxT("browser-firefox"));
+	wxBitmap browserSafariBitmap = t4p::BitmapImageAsset(wxT("browser-safari"));
+	wxBitmap browserGenericBitmap = t4p::BitmapImageAsset(wxT("browser-generic"));
 
 	std::vector<wxBitmap> icons;
 	icons.push_back(browserChromeBitmap);
@@ -141,10 +141,10 @@ void t4p::RunBrowserFeatureClass::AddWindows() {
                                          wxAUI_TB_HORZ_TEXT);
 	BrowserToolbar->SetFont(App.Preferences.ApplicationFont);
     BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
-    wxBitmap browserBitmap = t4p::IconImageAsset(wxT("browser-generic"));
-	wxBitmap runBitmap = t4p::IconImageAsset(wxT("run-browser"));
-	wxBitmap searchUrlBitmap = t4p::IconImageAsset(wxT("search-url-tags"));
-	wxBitmap recentUrlBitmap = t4p::IconImageAsset(wxT("recent-urls"));
+    wxBitmap browserBitmap = t4p::BitmapImageAsset(wxT("browser-generic"));
+	wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run-browser"));
+	wxBitmap searchUrlBitmap = t4p::BitmapImageAsset(wxT("search-url-tags"));
+	wxBitmap recentUrlBitmap = t4p::BitmapImageAsset(wxT("recent-urls"));
 
 	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
     BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
@@ -261,7 +261,7 @@ void t4p::RunBrowserFeatureClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 		if (RecentUrls.empty()) {
 			return;
 		}
-		wxBitmap recentUrlBitmap = t4p::IconImageAsset(wxT("recent-urls"));
+		wxBitmap recentUrlBitmap = t4p::BitmapImageAsset(wxT("recent-urls"));
 
 		BrowserToolbar->SetToolSticky(event.GetId(), true);
 		

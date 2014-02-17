@@ -25,6 +25,7 @@
 #include <globals/Assets.h>
 #include <wx/stdpaths.h>
 #include <wx/image.h>
+#include <wx/icon.h>
 #include <wx/fileconf.h>
 
 // these macros will expand a macro into its 
@@ -92,7 +93,7 @@ wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
 	return bitmap;
 }
 
-wxBitmap t4p::IconImageAsset(wxString imageName) {
+wxBitmap t4p::BitmapImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
 		wxImage::AddHandler(new wxPNGHandler());
 	}
@@ -105,6 +106,21 @@ wxBitmap t4p::IconImageAsset(wxString imageName) {
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
 	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return bitmap;
+}
+
+wxIcon t4p::IconImageAsset(wxString imageName) {
+	if (!wxImage::FindHandler(wxBITMAP_TYPE_ICO)) {
+		wxImage::AddHandler(new wxICOHandler());
+	}
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("icons"));
+    wxFileName iconFile(asset.GetPath(), imageName + wxT(".ico"));
+    
+	wxASSERT(iconFile.IsOk());
+	wxIcon icon;
+	bool loaded = icon.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_ICO);
+	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+	return icon;
 }
 
 wxFileName t4p::PhpDetectorsBaseAsset() {

@@ -62,7 +62,7 @@ void t4p::TagFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& sh
 }
 
 void t4p::TagFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = t4p::IconImageAsset(wxT("tag-projects"));
+	wxBitmap bmp = t4p::BitmapImageAsset(wxT("tag-projects"));
 	toolBar->AddTool(t4p::MENU_RESOURCE + 0, wxT("Tag Projects"), bmp, _("Create tags for the enabled projects"), wxITEM_NORMAL);
 }
 

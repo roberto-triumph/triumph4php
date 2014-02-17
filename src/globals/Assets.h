@@ -54,7 +54,14 @@ wxBitmap AutoCompleteImageAsset(wxString imageName);
  * @return the loaded bitmap of the given icon image.  The image name must exist; if it
  * does not an assertion is triggered.
  */
-wxBitmap IconImageAsset(wxString imageName);
+wxBitmap BitmapImageAsset(wxString imageName);
+
+/**
+ * @param the name of an image, minus the .ico extension
+ * @return the loaded bitmap of the given icon image.  The image name must exist; if it
+ * does not an assertion is triggered.
+ */
+wxIcon IconImageAsset(wxString imageName);
 
 /**
  * @return the base directory location of the PHP URL scripts.  The editor will use this as the

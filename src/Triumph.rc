@@ -23,7 +23,14 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-// no icons for now. see samples.rc in the wxWidgets samples directory for more info on how to add icons
+// note that the icon used by the Explorer (i.e. the programs icon) is the
+// first icon in the executable and the icons are sorted both by their order
+// (Win9x) and by alphabetically (!) (NT), so put this icon first and give it
+// a name starting with "a"
+aaaaaaaa ICON "triumph4php.ico"
+
+// this icon is used with wxFrame::SetIcon()
+frame ICON "triumph4php.ico"
 
 //  set to 1 so that we prevent linker error
 // CVTRES : fatal error CVT1100: duplicate resource. type:VERSION, name:1, language:0x0407

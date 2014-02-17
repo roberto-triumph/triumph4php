@@ -655,7 +655,7 @@ void t4p::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool waitF
 			GetStatusBarWithGauge(), *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-		wxBitmap runBitmap = t4p::IconImageAsset(wxT("run"));
+		wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run"));
 		if (AddToolsWindow(window, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap)) {
 			window->SetToRunCommand(cmdLine, waitForArguments);
 		}
@@ -676,7 +676,7 @@ void t4p::RunConsoleFeatureClass::RunCommand(const wxString& cmdLine, bool waitF
 				GetStatusBarWithGauge(), *this);
 			
 			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
-			wxBitmap runBitmap = t4p::IconImageAsset(wxT("run"));
+			wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run"));
 			AddToolsWindow(runConsolePanel, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap);
 		}
 		if (runConsolePanel) {
@@ -697,7 +697,7 @@ void t4p::RunConsoleFeatureClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 void t4p::RunConsoleFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = t4p::IconImageAsset(wxT("run"));
+	wxBitmap bmp = t4p::BitmapImageAsset(wxT("run"));
 	toolBar->AddTool(t4p::MENU_RUN_PHP + 0, _("Run"), bmp, _("Run"));
 }
 

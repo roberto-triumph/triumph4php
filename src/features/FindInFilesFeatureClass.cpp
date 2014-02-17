@@ -316,14 +316,14 @@ t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
 
-	ReplaceButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace")));
-	ReplaceAllInFileButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace-file")));
-	ReplaceInAllFilesButton->SetBitmapLabel(t4p::IconImageAsset(wxT("replace-all")));
-	PreviousHitButton->SetBitmapLabel(t4p::IconImageAsset(wxT("previous")));
-	NextHitButton->SetBitmapLabel(t4p::IconImageAsset(wxT("next")));
-	StopButton->SetBitmapLabel(t4p::IconImageAsset(wxT("stop")));
-	CopySelectedButton->SetBitmapLabel(t4p::IconImageAsset(wxT("copy")));
-	CopyAllButton->SetBitmapLabel(t4p::IconImageAsset(wxT("copy-all")));
+	ReplaceButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace")));
+	ReplaceAllInFileButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace-file")));
+	ReplaceInAllFilesButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace-all")));
+	PreviousHitButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("previous")));
+	NextHitButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("next")));
+	StopButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("stop")));
+	CopySelectedButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("copy")));
+	CopyAllButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("copy-all")));
 	
 	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT, 
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -970,10 +970,10 @@ void t4p::FindInFilesFeatureClass::OnEditFindInFiles(wxCommandEvent& event) {
 			GetNotebook(), GetStatusBarWithGauge(), App.RunningThreads);
 		wxBitmap findBitmap = wxNullBitmap;
 		if (PreviousFindInFiles.ReplaceExpression.isEmpty()) {
-			findBitmap = t4p::IconImageAsset(wxT("find-in-files"));
+			findBitmap = t4p::BitmapImageAsset(wxT("find-in-files"));
 		}
 		else {
-			findBitmap = t4p::IconImageAsset(wxT("replace-in-files"));
+			findBitmap = t4p::BitmapImageAsset(wxT("replace-in-files"));
 		}
 		
 		if(AddToolsWindow(panel, _("Find In Files Results"), wxEmptyString, findBitmap)) {

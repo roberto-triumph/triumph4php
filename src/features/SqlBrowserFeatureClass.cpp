@@ -576,7 +576,7 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
 
-	RefreshButton->SetBitmap(t4p::IconImageAsset(wxT("outline-refresh")));
+	RefreshButton->SetBitmap(t4p::BitmapImageAsset(wxT("outline-refresh")));
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }
@@ -1031,7 +1031,7 @@ void t4p::SqlBrowserFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 }
 
 void t4p::SqlBrowserFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = t4p::IconImageAsset(wxT("sql"));
+	wxBitmap bmp = t4p::BitmapImageAsset(wxT("sql"));
 	toolBar->AddTool(t4p::MENU_SQL + 0, _("SQL Browser"), bmp, wxT("Open the SQL Browser"), wxITEM_NORMAL);
 }
 
@@ -1059,7 +1059,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserFeatureClass::CreateResultsPanel(t4p::
 
 	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 	// are from this feature
-	wxBitmap tableBitmap = t4p::IconImageAsset(wxT("table"));
+	wxBitmap tableBitmap = t4p::BitmapImageAsset(wxT("table"));
 	AddToolsWindow(sqlPanel, tabText, wxT("t4p::SqlBrowserPanelClass"), tableBitmap);
 	sqlPanel->LinkToCodeControl(codeControl);
 	return sqlPanel;
@@ -1327,7 +1327,7 @@ void t4p::SqlBrowserFeatureClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEven
 
 		// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 		// are from this feature
-		wxBitmap tableBitmap = t4p::IconImageAsset(wxT("table"));
+		wxBitmap tableBitmap = t4p::BitmapImageAsset(wxT("table"));
 		AddToolsWindow(sqlPanel, tabText, wxT("t4p::SqlBrowserPanelClass"), tableBitmap);
 		sqlPanel->ExecuteQuery(sql, tag);
 	}
@@ -1369,7 +1369,7 @@ void t4p::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableComma
 		
 			// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 			// are from this feature
-			wxBitmap tableBitmap = t4p::IconImageAsset(wxT("database-medium"));
+			wxBitmap tableBitmap = t4p::BitmapImageAsset(wxT("database-medium"));
 			AddToolsWindow(sqlPanel, tabText, wxT("t4p::TableDefinitionPanelClass"), tableBitmap);
 		}
 		sqlPanel->ShowTable(tag, event.DbTableName);
@@ -1385,7 +1385,7 @@ t4p::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int 
 	Connections->Clear();
 	FillConnectionList();
 	RunningThreads.AddEventHandler(this);
-	RefreshButton->SetBitmap(t4p::IconImageAsset("outline-refresh"));
+	RefreshButton->SetBitmap(t4p::BitmapImageAsset("outline-refresh"));
 
 	DefinitionIndicesPanel = new t4p::DefinitionIndicesPanelClass(Notebook);
 	DefinitionColumnsPanel = new t4p::DefinitionColumnsPanelClass(Notebook);

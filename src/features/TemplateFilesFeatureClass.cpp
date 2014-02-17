@@ -64,7 +64,7 @@ void t4p::TemplateFilesFeatureClass::ShowPanel() {
 	}
 	else {
 		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, *this);
-		wxBitmap templateFileBitmap = t4p::IconImageAsset(wxT("template-files"));
+		wxBitmap templateFileBitmap = t4p::BitmapImageAsset(wxT("template-files"));
 		AddOutlineWindow(templateFilesPanel, _("Templates"), templateFileBitmap);
 	}
 	templateFilesPanel->UpdateControllers();
@@ -138,10 +138,10 @@ t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, 
 	StatusLabel->SetLabel(_(""));
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	ImageList.Add(t4p::IconImageAsset(wxT("folder-horizontal")));
-	ImageList.Add(t4p::IconImageAsset(wxT("folder-horizontal-open")));
-	ImageList.Add(t4p::IconImageAsset(wxT("template-files")));
-	ImageList.Add(t4p::IconImageAsset(wxT("variable-template")));
+	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
+	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal-open")));
+	ImageList.Add(t4p::BitmapImageAsset(wxT("template-files")));
+	ImageList.Add(t4p::BitmapImageAsset(wxT("variable-template")));
 	
 	// this class will own the imagelist
 	FileTree->SetImageList(&ImageList);

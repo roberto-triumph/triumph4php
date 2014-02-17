@@ -272,7 +272,7 @@ void t4p::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 		t4p::NotebookClass* notebook = GetNotebook();
 		if (notebook != NULL) {
 			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
-			wxBitmap outlineBitmap = t4p::IconImageAsset(wxT("outline"));
+			wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
 			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
 		}
 	}
@@ -359,31 +359,31 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	, SortByType(false) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
-	SyncButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-refresh")));
-	AddButton->SetBitmapLabel(t4p::IconImageAsset(wxT("outline-add")));
-	FilterButton->SetBitmapLabel(t4p::IconImageAsset(wxT("filter")));
-	SortButton->SetBitmapLabel(t4p::IconImageAsset(wxT("sort")));
+	SyncButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
+	AddButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-add")));
+	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
+	SortButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("sort")));
 
 	SetStatus(_(""));
 	
 	ImageList = new wxImageList(16, 16);
-	ImageList->Add(t4p::IconImageAsset(wxT("outline")));
-	ImageList->Add(t4p::IconImageAsset(wxT("document-php")));
-	ImageList->Add(t4p::IconImageAsset(wxT("class")));
-	ImageList->Add(t4p::IconImageAsset(wxT("method-public")));
-	ImageList->Add(t4p::IconImageAsset(wxT("method-protected")));
-	ImageList->Add(t4p::IconImageAsset(wxT("method-private")));
-	ImageList->Add(t4p::IconImageAsset(wxT("method-inherited")));
-	ImageList->Add(t4p::IconImageAsset(wxT("property-public")));
-	ImageList->Add(t4p::IconImageAsset(wxT("property-protected")));
-	ImageList->Add(t4p::IconImageAsset(wxT("property-private")));
-	ImageList->Add(t4p::IconImageAsset(wxT("property-inherited")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("outline")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("document-php")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("class")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("method-public")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("method-protected")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("method-private")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("method-inherited")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("property-public")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("property-protected")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("property-private")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("property-inherited")));
 
-	ImageList->Add(t4p::IconImageAsset(wxT("define")));
-	ImageList->Add(t4p::IconImageAsset(wxT("class-constant")));
-	ImageList->Add(t4p::IconImageAsset(wxT("namespace")));
-	ImageList->Add(t4p::IconImageAsset(wxT("function")));
-	ImageList->Add(t4p::IconImageAsset(wxT("variable-template")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("define")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("class-constant")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("namespace")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("function")));
+	ImageList->Add(t4p::BitmapImageAsset(wxT("variable-template")));
 
 	// let the tree control managet the image list
 	// since it may need to use it in the destructor

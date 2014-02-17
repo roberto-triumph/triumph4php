@@ -348,9 +348,9 @@ t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree
 
 	ImageList = new wxImageList(16, 16);
 	ImageList->Add(rootImage, wxNullBitmap);
-	ImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal")), wxNullBitmap);
-	ImageList->Add(t4p::IconImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
-	ImageList->Add(t4p::IconImageAsset(wxT("document-php")), wxNullBitmap);
+	ImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")), wxNullBitmap);
+	ImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal-open")), wxNullBitmap);
+	ImageList->Add(t4p::BitmapImageAsset(wxT("document-php")), wxNullBitmap);
 
 	// this pointer will be managed by the tree control, since the tree control
 	// may use the pointer in the destructor.
@@ -659,7 +659,7 @@ t4p::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id
 														t4p::EventSinkClass& eventSink)
 	: UrlDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("url-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("url-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -695,7 +695,7 @@ t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWi
 														t4p::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("template-file-detectors")))
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("template-file-detectors")))
 	, TestUrl()
 	, Globals(globals) 
 	, RunningThreads(runningThreads) {
@@ -751,7 +751,7 @@ t4p::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, t4p:
 														t4p::EventSinkClass& eventSink)
 	: TagDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("tag-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("tag-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -786,7 +786,7 @@ t4p::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* pare
 														t4p::EventSinkClass& eventSink)
 	: DatabaseDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("database-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("database-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -821,7 +821,7 @@ t4p::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, 
 														t4p::EventSinkClass& eventSink)
 	: ConfigDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::IconImageAsset(wxT("config-detectors"))) {
+	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("config-detectors"))) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -883,7 +883,7 @@ void t4p::DetectorFeatureClass::OnViewUrlDetectors(wxCommandEvent& event) {
 	else {
 		t4p::UrlTagDetectorPanelClass* panel = new t4p::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap urlBitmap = t4p::IconImageAsset(wxT("url-detectors"));
+		wxBitmap urlBitmap = t4p::BitmapImageAsset(wxT("url-detectors"));
 		if (AddOutlineWindow(panel, _("URL Detectors"), urlBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -899,7 +899,7 @@ void t4p::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent& even
 	else {
 		t4p::TemplateFileTagsDetectorPanelClass* panel = new t4p::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
-		wxBitmap templateFilesBitmap = t4p::IconImageAsset(wxT("template-file-detectors"));
+		wxBitmap templateFilesBitmap = t4p::BitmapImageAsset(wxT("template-file-detectors"));
 		if (AddOutlineWindow(panel, _("Template Files Detectors"), templateFilesBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -915,7 +915,7 @@ void t4p::DetectorFeatureClass::OnViewTagDetectors(wxCommandEvent& event) {
 	else {
 		t4p::TagDetectorPanelClass* panel = new t4p::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap tagBitmap = t4p::IconImageAsset(wxT("tag-detectors"));
+		wxBitmap tagBitmap = t4p::BitmapImageAsset(wxT("tag-detectors"));
 		if (AddOutlineWindow(panel, _("Tag Detectors"), tagBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -931,7 +931,7 @@ void t4p::DetectorFeatureClass::OnViewDatabaseDetectors(wxCommandEvent& event) {
 	else {
 		t4p::DatabaseTagDetectorPanelClass* panel = new t4p::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap databaseBitmap = t4p::IconImageAsset(wxT("database-detectors"));
+		wxBitmap databaseBitmap = t4p::BitmapImageAsset(wxT("database-detectors"));
 		if (AddOutlineWindow(panel, _("Database Detectors"), databaseBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();
@@ -947,7 +947,7 @@ void t4p::DetectorFeatureClass::OnViewConfigDetectors(wxCommandEvent& event) {
 	else {
 		t4p::ConfigTagDetectorPanelClass* panel = new t4p::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL, 
 			App.Globals, App.EventSink);
-		wxBitmap configBitmap = t4p::IconImageAsset(wxT("config-detectors"));
+		wxBitmap configBitmap = t4p::BitmapImageAsset(wxT("config-detectors"));
 		if (AddOutlineWindow(panel, _("Config Detectors"), configBitmap)) {
 			panel->Init();
 			panel->UpdateProjects();

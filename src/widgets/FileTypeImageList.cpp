@@ -26,19 +26,19 @@
 #include <globals/Assets.h> 
  
 void t4p::FillWithFileType(wxImageList& imgList) {
-	imgList.Add(t4p::IconImageAsset(wxT("document-php")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-sql")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-css")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-javascript")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-config")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-config")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-yaml")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-xml")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-ruby")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-lua")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-markdown")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-bash")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-diff")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-text")));
-	imgList.Add(t4p::IconImageAsset(wxT("document-blank")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-php")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-sql")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-css")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-javascript")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-config")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-config")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-yaml")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-xml")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-ruby")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-lua")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-markdown")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-bash")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-diff")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-text")));
+	imgList.Add(t4p::BitmapImageAsset(wxT("document-blank")));
 }

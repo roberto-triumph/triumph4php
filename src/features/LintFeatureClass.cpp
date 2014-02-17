@@ -392,7 +392,7 @@ void t4p::LintFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
 }
 
 void t4p::LintFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	wxBitmap bmp = t4p::IconImageAsset(wxT("lint-check"));
+	wxBitmap bmp = t4p::BitmapImageAsset(wxT("lint-check"));
 	toolBar->AddTool(t4p::MENU_LINT_PHP + 0, _("Lint Check"), bmp, _("Performs syntax check on the current project"));
 }
 
@@ -457,7 +457,7 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			else {
 				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
 						GetNotebook(), *this);
-				wxBitmap lintBitmap = t4p::IconImageAsset(wxT("lint-check"));
+				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);
 			}
