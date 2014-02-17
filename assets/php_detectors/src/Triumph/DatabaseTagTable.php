@@ -20,36 +20,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- 
-/**
- * A config file artifact. MVC Editor will turn config tags into menu items that 
- * can be easily accessed by the user; that way config files are easier to get at.
- */
-class MvcEditor_ConfigTag {
 
+class Triumph_DatabaseTagTable extends Zend_Db_Table_Abstract {
 
-	/**
-	 * @var string a friendly name for this connection. MVC Editor will display this to the user.
-	 */
-	public $label;
-	
-	/**
-	 * MVC Editor will open this file when the user clicks on a config menu item.
-	 * @var string the full path to the config file.
-	 */
-	public $fullPath;
+	protected $_name = 'database_tags';
 	
 
 	/**
-	 * @param $label string
-	 * @param $fullPath string this must be the full path. must have OS-dependant directory separators
+	 * Retrieves all of the methods from the given files. Only resources that 
+	 * are methods will be returned.
+	 *
+	 * @param Triumph_DatabaseTag[] the database tags to save
+	 * @param string $sourceDir the source directory for this database tag
 	 */
-	public function __construct($label, $fullPath) {
-		$this->label = $label;
-		$this->fullPath = $fullPath;
-	}
-
+	public function saveDatabaseTags($databaseTags, $sourceDir) {
+		
+		// delete all old database tags
+		$sourceDbTable = new Triumph_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
+		$this->delete($strWhere);
+		
+		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
+		$this->getAdapter()->beginTransaction();
+		foreach ($databaseTags as $databaseTag) {
+			$this->insert(array(
+				'source_id' => $sourceId,
+				'label' => $databaseTag->label,
+				'schema' => $databaseTag->schema,
+				'driver' => $databaseTag->driver,
+				'host' => $databaseTag->host,
+				'port' => $databaseTag->port,
+				'user' => $databaseTag->user,
+				'password' => $databaseTag->password
+			));
+		}
+		$this->getAdapter()->commit();
+ 	}
+	
 }

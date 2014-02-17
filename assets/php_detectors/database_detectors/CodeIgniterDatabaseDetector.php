@@ -5,11 +5,11 @@
  * that it will list all of the datbase connections that all of the projects use. This script
  * will be called via a command line; it is a normal command line script.
  *
- * This script is part of MVC Editor's Database Detection feature; it enables the editor to have a 
+ * This script is part of Triumph's Database Detection feature; it enables the editor to have a 
  * list of all of a project's datatabase connections so that the user can easily open / jump to tables
  * without needing to re-enter them in the editor. More
- * info can be about MVC Editor's Database detector feature can be found at 
- * http://code.google.com/p/mvc-editor/wiki/DatabaseDetectors
+ * info can be about Triumph's Database detector feature can be found at 
+ * http://code.google.com/p/triumph4php/wiki/DatabaseDetectors
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -42,11 +42,11 @@ The goal of this script is to discover all of the database connections for your 
 that it will list all of the datbase connections that all of the projects use. This script
 will be called via a command line; it is a normal command line script.
 
-This script is part of MVC Editor's Database Detection feature; it enables the editor to have a 
+This script is part of Triumph's Database Detection feature; it enables the editor to have a 
 list of all of a project's datatabase connections so that the user can easily open / jump to tables
 without needing to re-enter them in the editor. More
-info can be about MVC Editor's Database detector feature can be found at 
-http://code.google.com/p/mvc-editor/wiki/DatabaseDetectors
+info can be about Triumph's Database detector feature can be found at 
+http://code.google.com/p/triumph4php/wiki/DatabaseDetectors
 
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
@@ -83,7 +83,7 @@ EOF;
 		// now send the detected databases to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$databaseTagTable = new MvcEditor_DatabaseTagTable($pdo);
+		$databaseTagTable = new Triumph_DatabaseTagTable($pdo);
 		$databaseTagTable->saveDatabaseTags($arrDatabases, $sourceDir);
 		echo "Database dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -111,13 +111,13 @@ EOF;
 
 /**
  * This function will lookup all database connections for the given source.  Then it
- * will create a MvcEditor_DatabaseTag connection.
+ * will create a Triumph_DatabaseTag connection.
  *
  * @param  string $sourceDir            the root directory of the project in question
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect databases for the given source directory; this situation
  *                                      is different than zero databases being detected.
- * @return MvcEditor_DatabaseTag[]      array of MvcEditor_DatabaseTag instances the detected databases
+ * @return Triumph_DatabaseTag[]      array of Triumph_DatabaseTag instances the detected databases
  */
 function detectDatabases($sourceDir, &$doSkip) {
 	$doSkip = TRUE;
@@ -172,7 +172,7 @@ function tagFromDbArray($groupName, $groupConnection) {
 		$port = $groupConnection['port'];
 	}
 
-	$tag = new MvcEditor_DatabaseTag(MvcEditor_DatabaseTag::DRIVER_MYSQL, 
+	$tag = new Triumph_DatabaseTag(Triumph_DatabaseTag::DRIVER_MYSQL, 
 		$groupName, $groupConnection['hostname'], 
 		$port, $groupConnection['database'], 
 		'', 

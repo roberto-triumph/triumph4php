@@ -20,45 +20,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_DatabaseTagTable extends Zend_Db_Table_Abstract {
+/**
+ * This class will take care of inserting and deleting from the
+ * detected_tags table.
+ */
+class Triumph_DetectedTagTable extends Zend_Db_Table_Abstract {
 
-	protected $_name = 'database_tags';
+	protected $_name = 'detected_tags';
 	
-
 	/**
-	 * Retrieves all of the methods from the given files. Only resources that 
-	 * are methods will be returned.
+	 * Saves all of the tags into the database
 	 *
-	 * @param MvcEditor_DatabaseTag[] the database tags to save
-	 * @param string $sourceDir the source directory for this database tag
+	 * @param Triumph_DetectedTag[] $allTags the tags to save
 	 */
-	public function saveDatabaseTags($databaseTags, $sourceDir) {
+	public function saveTags($allTags, $sourceDir) {
 		
-		// delete all old database tags
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		// remove all tags from previous detection. since there is no
+		// easy way to tell of duplicates
+		$sourceDbTable = new Triumph_SourceTable($this->getAdapter());
 		$sourceId = $sourceDbTable->getOrSave($sourceDir);
 		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
 		$this->delete($strWhere);
 		
+		if (empty($allTags)) {
+			return ;
+		}
+				
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
-		foreach ($databaseTags as $databaseTag) {
+		foreach ($allTags as $tag) {
+			
+			// insert twice; once fully qualified and once
+			// just the method name; that way qualified lookups
+			// work 
 			$this->insert(array(
 				'source_id' => $sourceId,
-				'label' => $databaseTag->label,
-				'schema' => $databaseTag->schema,
-				'driver' => $databaseTag->driver,
-				'host' => $databaseTag->host,
-				'port' => $databaseTag->port,
-				'user' => $databaseTag->user,
-				'password' => $databaseTag->password
+				'key' => $tag->className . '::' . $tag->identifier,
+				'type' => $tag->type,
+				'class_name' => $tag->className,
+				'method_name' => $tag->identifier,
+				'return_type' => $tag->returnType,
+				'namespace_name' => $tag->namespaceName,
+				'comment' => $tag->comment
+			));
+			
+			$this->insert(array(
+				'source_id' => $sourceId,
+				'key' => $tag->identifier,
+				'type' => $tag->type,
+				'class_name' => $tag->className,
+				'method_name' => $tag->identifier,
+				'return_type' => $tag->returnType,
+				'namespace_name' => $tag->namespaceName,
+				'comment' => $tag->comment
 			));
 		}
 		$this->getAdapter()->commit();
  	}
-	
 }

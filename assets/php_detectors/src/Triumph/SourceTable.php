@@ -24,16 +24,30 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_TemplateFileTag {
 
-	public $fullPath;
+class Triumph_SourceTable extends Zend_Db_Table_Abstract {
+
+	protected $_name = 'sources';
 	
-	public $variables;
-	
-	
-	public function __construct($fullPath = '', $variables = '') {
-		$this->fullPath = $fullPath;
-		$this->variables = $variables;
+
+	/**
+	 * @return the primary key of the source directory
+	 */
+	public function getOrSave($sourceDir) {
+		
+		/// make sure that sourceDir ends with the separator to make sure
+		// only the correct entries are selected / saved
+		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
+		
+		$select = $this->select()->where('directory = ?', $sourceDir);
+		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
+		if ($row = $stmt->fetch()) {
+			return $row['source_id'];
+		}
+		return $this->insert(array(
+			'directory' => $sourceDir
+		));
+		
 	}
 
 }

@@ -24,19 +24,19 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_UrlTagTable extends Zend_Db_Table_Abstract {
+class Triumph_UrlTagTable extends Zend_Db_Table_Abstract {
 
 	protected $_name = 'url_tags';
 
 	/**
-	 * saves the given MvcEditor_Urls into the database.
+	 * saves the given Triumph_Urls into the database.
 	 * 
-	 * @param MvcEditor_Url[] $arrUrls the urls to insert 
+	 * @param Triumph_Url[] $arrUrls the urls to insert 
 	 */
 	function saveUrls($arrUrls, $sourceDir) {
 	
 		// delete the old rows
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		$sourceDbTable = new Triumph_SourceTable($this->getAdapter());
 		$sourceId = $sourceDbTable->getOrSave($sourceDir);
 		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
 		$this->delete($strWhere);

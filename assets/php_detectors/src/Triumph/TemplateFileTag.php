@@ -24,34 +24,16 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-class MvcEditor_TemplateFileTagTable extends Zend_Db_Table_Abstract {
+class Triumph_TemplateFileTag {
 
-	protected $_name = 'template_file_tags';
+	public $fullPath;
 	
-	public function saveTemplateFiles($templateFiles, $sourceDir) {
-		
-		// delete the old rows
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
-		$sourceId = $sourceDbTable->getOrSave($sourceDir);
-		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
-		$this->delete($strWhere);
-		
-		if (!is_array($templateFiles)) {
-			return;
-		}
-		
-		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
-		$this->getAdapter()->beginTransaction();
-		
-		foreach ($templateFiles as $templateFile) {
-			$variables = join(',', $templateFile->variables);
-			$this->insert(array(
-				'source_id' => $sourceId,
-				'full_path' => $templateFile->fullPath,
-				'variables' => $variables
-			));
-		}
-		$this->getAdapter()->commit();
+	public $variables;
+	
+	
+	public function __construct($fullPath = '', $variables = '') {
+		$this->fullPath = $fullPath;
+		$this->variables = $variables;
 	}
 
 }

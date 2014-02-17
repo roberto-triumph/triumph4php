@@ -23,31 +23,33 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+ 
+/**
+ * A config file artifact. Triumph will turn config tags into menu items that 
+ * can be easily accessed by the user; that way config files are easier to get at.
+ */
+class Triumph_ConfigTag {
 
 
-class MvcEditor_SourceTable extends Zend_Db_Table_Abstract {
-
-	protected $_name = 'sources';
+	/**
+	 * @var string a friendly name for this connection. Triumph will display this to the user.
+	 */
+	public $label;
+	
+	/**
+	 * Triumph will open this file when the user clicks on a config menu item.
+	 * @var string the full path to the config file.
+	 */
+	public $fullPath;
 	
 
 	/**
-	 * @return the primary key of the source directory
+	 * @param $label string
+	 * @param $fullPath string this must be the full path. must have OS-dependant directory separators
 	 */
-	public function getOrSave($sourceDir) {
-		
-		/// make sure that sourceDir ends with the separator to make sure
-		// only the correct entries are selected / saved
-		$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-		
-		$select = $this->select()->where('directory = ?', $sourceDir);
-		$stmt = $select->query(Zend_Db::FETCH_ASSOC);
-		if ($row = $stmt->fetch()) {
-			return $row['source_id'];
-		}
-		return $this->insert(array(
-			'directory' => $sourceDir
-		));
-		
+	public function __construct($label, $fullPath) {
+		$this->label = $label;
+		$this->fullPath = $fullPath;
 	}
 
 }

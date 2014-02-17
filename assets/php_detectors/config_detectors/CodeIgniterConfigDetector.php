@@ -5,10 +5,10 @@
  * that it will list all of the confi files for all of the projects. This script
  * will be called via a command line; it is a normal command line script.
  *
- * This script is part of MVC Editor's Config Detection feature; it enables the editor to have a 
+ * This script is part of Triumph's Config Detection feature; it enables the editor to have a 
  * list of all of a project's config files so that the user can easily open / jump to them. More
- * info can be about MVC Editor's config detector feature can be found at 
- * http://code.google.com/p/mvc-editor/wiki/ConfigDetectors
+ * info can be about Triumph's config detector feature can be found at 
+ * http://code.google.com/p/triumph4php/wiki/ConfigDetectors
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -41,10 +41,10 @@ The goal of this script is to discover all of the config files for your PHP proj
 that it will list all of the confi files for all of the projects. This script
 will be called via a command line; it is a normal command line script.
 
-This script is part of MVC Editor's Config Detection feature; it enables the editor to have a 
+This script is part of Triumph's Config Detection feature; it enables the editor to have a 
 list of all of a project's config files so that the user can easily open / jump to them. More
-info can be about MVC Editor's config detector feature can be found at 
-http://code.google.com/p/mvc-editor/wiki/ConfigDetectors
+info can be about Triumph's config detector feature can be found at 
+http://code.google.com/p/triumph4php/wiki/ConfigDetectors
 
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
@@ -81,7 +81,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$configTagTable = new MvcEditor_ConfigTagTable($pdo);
+		$configTagTable = new Triumph_ConfigTagTable($pdo);
 		$configTagTable->saveConfigTags($arrConfigTags, $sourceDir);
 		echo "Config dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -102,13 +102,13 @@ EOF;
 
 /**
  * This function will look for config files in the given source directory. Then it
- * will create a MvcEditor_ConfigTag instance for each config file that it finds.
+ * will create a Triumph_ConfigTag instance for each config file that it finds.
  *
  * @param  string $sourceDir            the root directory of the project in question
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect config for the given source directory; this situation
  *                                      is different than zero condifs being detected.
- * @return MvcEditor_ConfigTag[]        array of MvcEditor_ConfigTag instances the detected configs
+ * @return Triumph_ConfigTag[]        array of Triumph_ConfigTag instances the detected configs
  */
 function detectConfigs($sourceDir, &$doSkip) {
 	$allConfigs = array();
@@ -124,18 +124,18 @@ function detectConfigs($sourceDir, &$doSkip) {
 	}
 	$doSkip = FALSE;
 	$allConfigs = array(
-		new MvcEditor_ConfigTag('AutoLoad', realpath($sourceDir . 'application/config/autoload.php')),
-		new MvcEditor_ConfigTag('Config', realpath($sourceDir . 'application/config/config.php')),
-		new MvcEditor_ConfigTag('Constants', realpath($sourceDir . 'application/config/constants.php')), 
-		new MvcEditor_ConfigTag('Database', realpath($sourceDir . 'application/config/database.php')), 
-		new MvcEditor_ConfigTag('DocTypes', realpath($sourceDir . 'application/config/doctypes.php')),
-		new MvcEditor_ConfigTag('Foreign Characters', realpath($sourceDir . 'application/config/foreign_chars.php')),
-		new MvcEditor_ConfigTag('Hooks', realpath($sourceDir . 'application/config/hooks.php')),
-		new MvcEditor_ConfigTag('Mime Types', realpath($sourceDir . 'application/config/mimes.php')),
-		new MvcEditor_ConfigTag('Profiler', realpath($sourceDir . 'application/config/profiler.php')),
-		new MvcEditor_ConfigTag('Routes', realpath($sourceDir . 'application/config/routes.php')),
-		new MvcEditor_ConfigTag('Smileys', realpath($sourceDir . 'application/config/smileys.php')),
-		new MvcEditor_ConfigTag('User Agents', realpath($sourceDir . 'application/config/user_agents.php'))
+		new Triumph_ConfigTag('AutoLoad', realpath($sourceDir . 'application/config/autoload.php')),
+		new Triumph_ConfigTag('Config', realpath($sourceDir . 'application/config/config.php')),
+		new Triumph_ConfigTag('Constants', realpath($sourceDir . 'application/config/constants.php')), 
+		new Triumph_ConfigTag('Database', realpath($sourceDir . 'application/config/database.php')), 
+		new Triumph_ConfigTag('DocTypes', realpath($sourceDir . 'application/config/doctypes.php')),
+		new Triumph_ConfigTag('Foreign Characters', realpath($sourceDir . 'application/config/foreign_chars.php')),
+		new Triumph_ConfigTag('Hooks', realpath($sourceDir . 'application/config/hooks.php')),
+		new Triumph_ConfigTag('Mime Types', realpath($sourceDir . 'application/config/mimes.php')),
+		new Triumph_ConfigTag('Profiler', realpath($sourceDir . 'application/config/profiler.php')),
+		new Triumph_ConfigTag('Routes', realpath($sourceDir . 'application/config/routes.php')),
+		new Triumph_ConfigTag('Smileys', realpath($sourceDir . 'application/config/smileys.php')),
+		new Triumph_ConfigTag('User Agents', realpath($sourceDir . 'application/config/user_agents.php'))
 	);
 	return $allConfigs; 
 }

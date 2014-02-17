@@ -24,50 +24,30 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
+
 /**
- * This is a class that represents a URL tag. MVC Editor will use these URL
- * objects to open files, run web pages, and inspect controllers and view files.
+ * Triumph_FileItem class represents a single file name (full path) that was
+ * found by Triumph.  
+ *
+ * Triumph creates a database of resources; this source code file can be 
+ * used to get items from it.
  */
-class MvcEditor_UrlTag {
+class Triumph_FileItemTable extends Zend_Db_Table_Abstract {
 
-	/**
-	 * These are relative URLs; they are relative to the server root and may contain a query string.
-	 * For example, if a user would type in "http://localhost.codeigniter/index.php/news/index" the
-	 * this URL should contain "index.php/news/index"
-	 *
-	 * @var string
-	 */
-	public $url;
+	protected $_name = 'file_items';
 	
 	/**
-	 * The file where the source code of the URL is located in.  This is the entry point
-	 * to the URL; for a framework $fileName will be the location of the controller.
-	 * fileName is full path (os-dependant).
-	 * @var string
+	 * @param $pdo the connection to the resource database
+	 * @param $startingPath the path to query
+	 * @return Triumph_FileItem[] all files whose full path starts with $startingPath 
 	 */
-	public $fileName;
-	
-	/**
-	 * The name of the controller class that handles this URL.  If a project does not
-	 * use a framework, this will be empty.
-	 *
-	 * @var string
-	 */
-	public $className;
-	
-	/**
-	 * The name of the controller method that handles this URL.  If a project does not
-	 * use a framework, this will be empty.
-	 *
-	 * @var string
-	 */
-	public $methodName;
-	
-
-	public function __construct($url, $fileName, $className, $methodName) {
-		$this->url = $url;
-		$this->fileName = $fileName;
-		$this->className = $className;
-		$this->methodName = $methodName;
+	public function MatchingFiles($startingPath) {
+		$startingPath .= '%';
+		
+		$select = $this->select();
+		$select->where('full_path LIKE ?', $startingPath);
+		$stmt = $select->query();
+		
+		return $stmt->fetchAll(Zend_Db::FETCH_OBJ);
 	}
 }

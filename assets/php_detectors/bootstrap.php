@@ -11,7 +11,7 @@ require_once dirname(__FILE__) . '/lib/opportunity/array.php';
 require_once dirname(__FILE__) . '/lib/opportunity/string.php';
 
 /**
- * autoload the MVC Editor classes.
+ * autoload the Triumph classes.
  */
 function autoload($className) {	
 	$className = ltrim($className, '\\');
@@ -27,7 +27,7 @@ function autoload($className) {
 	$dir = dirname(__FILE__) . '\\src\\';
 	if (\opstring\begins_with($className, 'Zend_')) {
 	
-		// MVC Editor code will not use requires to load in zend framework files
+		// Triumph code will not use requires to load in zend framework files
 		// we will use this autoloader too
 		$dir = dirname(__FILE__) . '\\lib\\';
 	}

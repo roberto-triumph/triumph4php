@@ -2,17 +2,17 @@
 
 /**
  * The goal of this script is to discover all of the 'dynamic' tags for any PHP projects that use the
- * CodeIgniter framework. In a nutshell, MVC Editor cannot provide Code completion for calling the
+ * CodeIgniter framework. In a nutshell, Triumph cannot provide Code completion for calling the
  * core CodeIgniter classes within a controller (ie "$this->input" will not trigger code completion").
- * This script will add he CI core objects and libraries to the MVC Editor tag cache so that 
- * MVC Editor can know about them during code completion. It will also
+ * This script will add he CI core objects and libraries to the Triumph tag cache so that 
+ * Triumph can know about them during code completion. It will also
  * detect any user-created libraries as well. This script.
  * will be called via a command line; it is a normal command line script.
  *
- * This script is part of MVC Editor's Tag Detection feature; it enables the editor to have a 
+ * This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
  * more useful list when performing code completion. More
- * info can be about MVC Editor's Tag detector feature can be found at 
- * http://code.google.com/p/mvc-editor/wiki/TagDetectors
+ * info can be about Triumph's Tag detector feature can be found at 
+ * http://code.google.com/p/triumph4php/wiki/TagDetectors
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -42,17 +42,17 @@ function parseArgs() {
 	if ($help) {
 		$helpMessage = <<<EOF
 The goal of this script is to discover all of the 'dynamic' tags for any PHP projects that use the
-CodeIgniter framework. In a nutshell, MVC Editor cannot provide Code completion for calling the
+CodeIgniter framework. In a nutshell, Triumph cannot provide Code completion for calling the
 core CodeIgniter classes within a controller (ie "$this->input" will not trigger code completion").
-This script will add he CI core objects and libraries to the MVC Editor tag cache so that 
-MVC Editor can know about them during code completion. It will also
+This script will add he CI core objects and libraries to the Triumph tag cache so that 
+Triumph can know about them during code completion. It will also
 detect any user-created libraries as well. This script.
 will be called via a command line; it is a normal command line script.
 
-This script is part of MVC Editor's Tag Detection feature; it enables the editor to have a 
+This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
 more useful list when performing code completion. More
-info can be about MVC Editor's Tag detector feature can be found at 
-http://code.google.com/p/mvc-editor/wiki/TagDetectors
+info can be about Triumph's Tag detector feature can be found at 
+http://code.google.com/p/triumph4php/wiki/TagDetectors
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 
@@ -88,7 +88,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$resourceTable = new MvcEditor_DetectedTagTable($pdo);
+		$resourceTable = new Triumph_DetectedTagTable($pdo);
 		$resourceTable->saveTags($arrTags, $sourceDir);
 		echo "Tag detection complete, written to {$outputDbFileName}\n";
 	}
@@ -99,7 +99,7 @@ EOF;
 				str_pad("Class", 25) . str_pad("Member", 25) . 
 				str_pad("Return Type", 20)  . "\n";
 			foreach ($arrTags as $tag) {
-				echo str_pad(MvcEditor_DetectedTag::typeString($tag->type), 10);
+				echo str_pad(Triumph_DetectedTag::typeString($tag->type), 10);
 				echo str_pad($tag->className, 25);
 				echo str_pad($tag->identifier, 25);
 				echo str_pad($tag->returnType, 25);
@@ -118,7 +118,7 @@ EOF;
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect URLs for the given source directory; this situation
  *                                      is different than zero URLs being detected.
- * @return MvcEditor_DetectedTag[]         array of MvcEditor_DetectedTag instances the detected tags
+ * @return Triumph_DetectedTag[]         array of Triumph_DetectedTag instances the detected tags
  */
 function detectTags($sourceDir, &$doSkip) {
 	$allTags = array();
@@ -147,7 +147,7 @@ function detectTags($sourceDir, &$doSkip) {
 	modelResources($sourceDir, $modelDir, $allTags);
 
 	// the "super" object
-	$allTags[] = MvcEditor_DetectedTag::CreateMethod('CI_Controller', 'get_instance', '\CI_Controller');
+	$allTags[] = Triumph_DetectedTag::CreateMethod('CI_Controller', 'get_instance', '\CI_Controller');
 
 	return $allTags;
 }
@@ -230,8 +230,8 @@ function coreResources($dir, $codeIgniterSystemDir, &$allTags) {
 			$propertyType = 'CI_' . $baseName;
 			$propertyName = strtolower($baseName);
 			
-			$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
-			$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType, $comment);
+			$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType, $comment);
+			$allTags[] = Triumph_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType, $comment);
 		}
 	}
 	
@@ -240,13 +240,13 @@ function coreResources($dir, $codeIgniterSystemDir, &$allTags) {
 		$db = array();
 		include ($dir . '/application/config/database.php');
 		$propertyType = isset($active_record) && $active_record ? 'CI_DB_active_record' : 'CI_DB_driver';
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', 'db', $propertyType, $comment);
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Model', 'db', $propertyType, $comment);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', 'db', $propertyType, $comment);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Model', 'db', $propertyType, $comment);
 	}
 	
 	// alias the Loader library; seems that there is two properties
-	$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', 'load', 'CI_Loader', $comment);
-	$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Model', 'load', 'CI_Loader', $comment);
+	$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', 'load', 'CI_Loader', $comment);
+	$allTags[] = Triumph_DetectedTag::CreateMember('CI_Model', 'load', 'CI_Loader', $comment);
 	
 }
 
@@ -261,8 +261,8 @@ function libraryResources($dir, $codeIgniterSystemDir, &$allTags) {
 		$key = basename($libFile, '.php');
 		$propertyType = 'CI_' . $key;
 		$propertyName = strtolower($key);
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType);
 	}
 	
 	// user-created libraries. need to get the configured prefix
@@ -275,8 +275,8 @@ function libraryResources($dir, $codeIgniterSystemDir, &$allTags) {
 		
 		// the property name will NOT have the prefix
 		$propertyName = strtolower(substr($key, strlen($prefix)));
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Model', $propertyName, $propertyType);
 	}
 }
 
@@ -290,7 +290,7 @@ function modelResources($dir, $modelDir, &$allTags) {
 		
 		// the property name will NOT have the prefix
 		$propertyName = strtolower($key);
-		$allTags[] = MvcEditor_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
+		$allTags[] = Triumph_DetectedTag::CreateMember('CI_Controller', $propertyName, $propertyType);
 	}
 	
 	// models can be located in sub-directories need to recurse down sub-dirs

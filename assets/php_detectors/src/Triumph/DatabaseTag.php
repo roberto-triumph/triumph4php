@@ -25,11 +25,11 @@
  */
  
 /**
- * A database artifact. MVC Editor will use this info to populate the database credentials in the SQL Browser
+ * A database artifact. Triumph will use this info to populate the database credentials in the SQL Browser
  * and will also allow the user to run SQL scripts against any of these databases; all without needing the 
  * user to enter the same info in the editor.
  */
-class MvcEditor_DatabaseTag {
+class Triumph_DatabaseTag {
 
 	/**
 	 * The drivers that the editor can recognize and query.
@@ -39,7 +39,7 @@ class MvcEditor_DatabaseTag {
 	const DRIVER_SQLITE = 'SQLITE';
 	
 	/**
-	 * @var string an optional friendly name for this connection. MVC Editor will display this to the user.
+	 * @var string an optional friendly name for this connection. Triumph will display this to the user.
 	 */
 	public $label;
 	
@@ -49,13 +49,13 @@ class MvcEditor_DatabaseTag {
 	public $driver;
 	
 	/**
-	 * MVC Editor will open this file when the user opens the query browser.
+	 * Triumph will open this file when the user opens the query browser.
 	 * @var string In case of a SQLite database, the full path to the SQLite file
 	 */
 	public $fileName;
 	
 	/**
-	 * MVC Editor will open a connection to this server when the user opens the query browser.
+	 * Triumph will open a connection to this server when the user opens the query browser.
 	 * @var string host or IP address
 	 */
 	public $host;
@@ -71,12 +71,12 @@ class MvcEditor_DatabaseTag {
 	public $schema;
 	
 	/**
-	 * User that MVC Editor will use when connecting. (Optional)
+	 * User that Triumph will use when connecting. (Optional)
 	 */
 	public $user;
 	
 	/**
-	 * Password that MVC Editor will use when connecting. (Optional)
+	 * Password that Triumph will use when connecting. (Optional)
 	 */
 	public $password;
 	

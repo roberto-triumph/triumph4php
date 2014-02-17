@@ -20,68 +20,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
 /**
- * This is a resource artifact.  The MVC Editor will use a list of resources to aid
- * in code completion.  The PHP code will only augment what the MVC Editor does; MVC Editor will already
- * gather resources the source code (classes, methods, functions) and will gather resource types
- * from the PHPDoc comments; but sometimes some resources may not be are created at run-time and the
- * editor cannot gather them. In this case, the PHP code can tell the editor the what those dynamic resources
- * are.
+ * A detected tag is a tag artifact.  The Triumph will use the list of detected tags to aid
+ * in code completion.  The tag detectors will only augment what the Triumph does; Triumph will already
+ * gather tags the source code (classes, methods, functions) and will gather tag types
+ * from the PHPDoc comments; but sometimes some tags may not be caught because they are created 
+ * at run-time and with variable names. In this case, the PHP tag detectors can tell the editor 
+ * what those dynamic resources are.
  */
-class MvcEditor_Resource {
+class Triumph_DetectedTag {
 
 	/**
-	 * This is the fully qualified name of a resource. This means that it includes a class name followed by
-	 * the method name, with a "::" in the middle. For example 'MY_Email::read'
-	 * @var string
-	 */
-	public $resource;
-	
-	/**
-	 * The lexeme of the resource; the identifier name only. For example, if the resource was 'MY_Email::read'
+	 * The lexeme of the tag; the identifier name only. For example, if the resource was 'MY_Email::read'
 	 * then the identifer would be 'read'
 	 * @var string
 	 */
 	public $identifier;
 	
 	/**
-	 * The class of the resource; the class name only. For example, if the resource was 'MY_Email::read'
+	 * The class of the tag; the class name only. For example, if the resource was 'MY_Email::read'
 	 * then the identifer would be 'MY_Email'
 	 * @var string
 	 */
 	public $className;
 	
 	/**
-	 * The fully qualified name of the type of this resource. This means that it includes a class name followed by
-	 * the method name, with a "::" in the middle. For example 'MY_Email::read'
+	 * The fully qualified namespace name of the tag; For example, if the resource was '\Zend\Email::read'
+	 * then the identifer would be '\Zend'
+	 * @var string
+	 */
+	public $namespaceName;
+	
+	/**
+	 * The fully qualified name of the return type of this tag. If the return type is a class
+	 * it should contain the fully qualified namespace name. 
 	 * @var string
 	 */
 	public $returnType;
 	
 	/**
-	 * For a class property; signature will just be the same as resource. For a method or functions, this will have the 
-	 * function arguments.
-	 * @var string
-	 */
-	public $signature;
-	
-	/**
-	 * This will be shown in the tool tip when a user hovers on one of the instances of this resource.
+	 * A friendly message that is displayed to the user when this tag is shown.
 	 * @var string
 	 */
 	public $comment;
-	
-	/**
-	 * The full path to the file where this resource is located in. The path is OS-dependant (may contain
-	 * forward or backslashes).
-	 * @var string
-	 */
-	public $fullPath;
-	
+		
 	/**
 	 * The type of this resource. One of the type constants.
 	 */
@@ -97,45 +83,42 @@ class MvcEditor_Resource {
 	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
 	 */
-	public static function CreateMember($className, $propertyName, $propertyType, $comment) {
-		$member = new MvcEditor_Resource();
-		$member->MakeMember($className, $propertyName, $propertyType, $comment);
+	public static function CreateMember($className, $propertyName, $propertyType, $namespaceName = '\\', $comment = '') {
+		$member = new Triumph_DetectedTag();
+		$member->MakeMember($className, $propertyName, $propertyType, $namespaceName, $comment);
 		return $member;
 	}
 	
 	/**
 	 * Create a method resource(a class member). For now this method is assumed to have public access.
 	 */
-	public static function CreateMethod($className, $methodName, $methodArgs, $methodReturnType, $comment) {
-		$method = new MvcEditor_Resource();
-		$method->MakeMethod($className, $methodName, $methodArgs, $methodReturnType, $comment);
+	public static function CreateMethod($className, $methodName, $methodReturnType, $namespaceName = '\\', $comment = '') {
+		$method = new Triumph_DetectedTag();
+		$method->MakeMethod($className, $methodName, $methodReturnType, $namespaceName, $comment);
 		return $method;
 	}
 	
 	/**
 	 * create a filled or empty instance. If creating an empty instance, the MakeXXX methods will be useful.
 	 */
-	public function __construct($resource = '', $identifier = '', $returnType = '', $signature = '', $comment = '', $type = '') {
+	public function __construct($resource = '', $identifier = '', $returnType = '', $type = '', $namespaceName = '\\', $comment = '') {
 		$this->resource = $resource;
 		$this->identifier = $identifier;
 		$this->returnType = $returnType;
-		$this->signature = $signature;
-		$this->comment = $comment;
 		$this->type = $type;
-		$this->fullPath = '';
 		$this->className = '';
+		$this->namespaceName = $namespaceName;
+		$this->comment = $comment;
 	}
 
 	/**
 	 * Create a property resource(a class member). For now this property is assumed to have public access.
 	 */
-	public function MakeMember($className, $propertyName, $propertyType, $comment) {
-		$resource = $className . '::' . $propertyName;
+	public function MakeMember($className, $propertyName, $propertyType, $namespaceName, $comment) {
 		$this->className = $className;
-		$this->resource = $resource;
 		$this->identifier = $propertyName;
 		$this->returnType = $propertyType;
-		$this->signature = $resource;
+		$this->namespaceName = $namespaceName;
 		$this->comment = $comment;
 		$this->type = self::TYPE_MEMBER;
 	}
@@ -143,53 +126,30 @@ class MvcEditor_Resource {
 	/**
 	 * Create a class method. For now this method is assumed to have public access.
 	 */
-	public function MakeMethod($className, $methodName, $methodArgs, $methodReturnType, $comment) {
-		$resource = $className . '::' . $methodName;
-		$signature = 'public function ' . $methodName . '(' . $methodArgs . ')';
-		$this->resource = $resource;
+	public function MakeMethod($className, $methodName, $methodReturnType, $namespaceName, $comment) {
 		$this->className = $className;
 		$this->identifier = $methodName;
 		$this->returnType = $methodReturnType;
-		$this->signature = $signature;
+		$this->namespaceName = $namespaceName;
 		$this->comment = $comment;
 		$this->type = self::TYPE_METHOD;
-	}
-	
-	/**
-	 * Sets the properties so that this resource is a class.
-	 * @return void
-	 */
-	public function MakeClass($className) {
-		$resource = $className;
-		$signature = 'class ' . $className;
- 		$this->resource = $resource;
-		$this->identifier = $className;
-		$this->returnType = '';
-		$this->signature = $resource;
-		$this->comment = '';
-		$this->type = self::TYPE_CLASS;
 	}
 	
 	/**
 	 * Sets the properties so that this resource is a function.
 	 * @return void
 	 */
-	public function MakeFunction($functionName, $functionArgs) {
+	public function MakeFunction($functionName, $returnType, $namespaceName, $comment) {
 		$resource = $functionName;
-		$signature = 'function ' . $functionName . '(' . $functionArgs . ')';
-		$this->resource = $resource;
 		$this->identifier = $functionName;
-		$this->returnType = '';
- 		$this->signature = $signature;
-		$this->comment = '';
+		$this->returnType = $returnType;
+		$this->namespaceName = $namespaceName;
 		$this->type = self::TYPE_FUNCTION;
 	}
 	
 	public function Clear() {
-		$this->resource = '';
 		$this->identifier = '';
 		$this->returnType = '';
-		$this->signature = '';
 		$this->comment = '';
 		$this->type = '';
 	}

@@ -20,65 +20,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-/**
- * This class will take care of inserting and deleting from the
- * detected_tags table.
- */
-class MvcEditor_DetectedTagTable extends Zend_Db_Table_Abstract {
+class Triumph_ConfigTagTable extends Zend_Db_Table_Abstract {
 
-	protected $_name = 'detected_tags';
+	protected $_name = 'config_tags';
 	
+
 	/**
-	 * Saves all of the tags into the database
+	 * Saves all of the given config tags. 
 	 *
-	 * @param MvcEditor_DetectedTag[] $allTags the tags to save
+	 * @param Triumph_DatabaseTag[] the database tags to save
+	 * @param string $sourceDir the source directory for this database tag
 	 */
-	public function saveTags($allTags, $sourceDir) {
+	public function saveConfigTags($configTags, $sourceDir) {
 		
-		// remove all tags from previous detection. since there is no
-		// easy way to tell of duplicates
-		$sourceDbTable = new MvcEditor_SourceTable($this->getAdapter());
+		// delete all old config tags
+		$sourceDbTable = new Triumph_SourceTable($this->getAdapter());
 		$sourceId = $sourceDbTable->getOrSave($sourceDir);
 		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
 		$this->delete($strWhere);
 		
-		if (empty($allTags)) {
-			return ;
-		}
-				
 		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
 		$this->getAdapter()->beginTransaction();
-		foreach ($allTags as $tag) {
-			
-			// insert twice; once fully qualified and once
-			// just the method name; that way qualified lookups
-			// work 
+		foreach ($configTags as $configTag) {
 			$this->insert(array(
 				'source_id' => $sourceId,
-				'key' => $tag->className . '::' . $tag->identifier,
-				'type' => $tag->type,
-				'class_name' => $tag->className,
-				'method_name' => $tag->identifier,
-				'return_type' => $tag->returnType,
-				'namespace_name' => $tag->namespaceName,
-				'comment' => $tag->comment
-			));
-			
-			$this->insert(array(
-				'source_id' => $sourceId,
-				'key' => $tag->identifier,
-				'type' => $tag->type,
-				'class_name' => $tag->className,
-				'method_name' => $tag->identifier,
-				'return_type' => $tag->returnType,
-				'namespace_name' => $tag->namespaceName,
-				'comment' => $tag->comment
+				'label' => $configTag->label,
+				'full_path' => $configTag->fullPath
 			));
 		}
 		$this->getAdapter()->commit();
  	}
+	
 }

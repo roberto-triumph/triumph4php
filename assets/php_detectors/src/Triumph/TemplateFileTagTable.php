@@ -20,34 +20,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
+class Triumph_TemplateFileTagTable extends Zend_Db_Table_Abstract {
 
-/**
- * MvcEditor_FileItem class represents a single file name (full path) that was
- * found by MVC Editor.  
- *
- * MVC Editor creates a database of resources; this source code file can be 
- * used to get items from it.
- */
-class MvcEditor_FileItemTable extends Zend_Db_Table_Abstract {
-
-	protected $_name = 'file_items';
+	protected $_name = 'template_file_tags';
 	
-	/**
-	 * @param $pdo the connection to the resource database
-	 * @param $startingPath the path to query
-	 * @return MvcEditor_FileItem[] all files whose full path starts with $startingPath 
-	 */
-	public function MatchingFiles($startingPath) {
-		$startingPath .= '%';
+	public function saveTemplateFiles($templateFiles, $sourceDir) {
 		
-		$select = $this->select();
-		$select->where('full_path LIKE ?', $startingPath);
-		$stmt = $select->query();
+		// delete the old rows
+		$sourceDbTable = new Triumph_SourceTable($this->getAdapter());
+		$sourceId = $sourceDbTable->getOrSave($sourceDir);
+		$strWhere = $this->getAdapter()->quoteInto("source_id = ?", $sourceId);
+		$this->delete($strWhere);
 		
-		return $stmt->fetchAll(Zend_Db::FETCH_OBJ);
+		if (!is_array($templateFiles)) {
+			return;
+		}
+		
+		// sqlite optimizes transactions really well; use transaction so that the inserts are faster
+		$this->getAdapter()->beginTransaction();
+		
+		foreach ($templateFiles as $templateFile) {
+			$variables = join(',', $templateFile->variables);
+			$this->insert(array(
+				'source_id' => $sourceId,
+				'full_path' => $templateFile->fullPath,
+				'variables' => $variables
+			));
+		}
+		$this->getAdapter()->commit();
 	}
+
 }

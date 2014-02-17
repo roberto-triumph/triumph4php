@@ -5,10 +5,10 @@
  * that given a URL, this script will list all of the template files that are used by the 
  * given controller functions. This script will be called via a command line; it is a normal command line script.
  *
- * This script is part of MVC Editor's Template Files Detection feature; it enables the editor to have a 
+ * This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
  * list of all of a project's template files so that the user can easily open / jump to templates. More
- * info can be about MVC Editor's URL detector feature can be found at 
- * http://code.google.com/p/mvc-editor/wiki/TemplateFileDetectors
+ * info can be about Triumph's URL detector feature can be found at 
+ * http://code.google.com/p/triumph4php/wiki/TemplateFileDetectors
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -26,7 +26,7 @@ function parseArgs() {
 	$rules = array(
 		'sourceDir|d=s' => 'Required. The base directory that the project resides in',
 		'detectorDbFileName|i=s' => 'Required. SQLite file that contains the call stack to examine. This file is created by ' .
-			'MVC Editor; MVC Editor performs INSERTs as it generates a call stack.',
+			'Triumph; Triumph performs INSERTs as it generates a call stack.',
 		'outputDbFileName|o-s' => 'Optional. If given, the output will be written to the given file. If not given, output goes to STDOUT.',
 		'help|h' => 'This help message'
 	);
@@ -44,10 +44,10 @@ The goal of this script is to discover template files for your PHP projects. Thi
 that given a URL, this script will list all of the template files that are used by the 
 given controller functions. This script will be called via a command line; it is a normal command line script.
 
-This script is part of MVC Editor's Template Files Detection feature; it enables the editor to have a 
+This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
 list of all of a project's template files so that the user can easily open / jump to templates. More
-info can be about MVC Editor's URL detector feature can be found at 
-http://code.google.com/p/mvc-editor/wiki/TemplateFileDetectors
+info can be about Triumph's URL detector feature can be found at 
+http://code.google.com/p/triumph4php/wiki/TemplateFileDetectors
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 
@@ -89,7 +89,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$templateFileTable = new MvcEditor_TemplateFileTagTable($pdo);
+		$templateFileTable = new Triumph_TemplateFileTagTable($pdo);
 		$templateFileTable->saveTemplateFiles($arrTemplates, $sourceDir);
 		echo "Template file detection complete, written to {$outputDbFileName}\n";
 	}
@@ -110,16 +110,16 @@ EOF;
 
 /**
  * This function will use the resource cache to lookup all controllers and their methods.  Then it
- * will create a MvcEditor_TemplateFileTag instance for each method; note that the routes file is 
+ * will create a Triumph_TemplateFileTag instance for each method; note that the routes file is 
  * also consulted and we will generate URLs for the default controller.
  *
  * @param  string $sourceDir            the root directory of the project in question
- * @param  string $detectorDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
+ * @param  string $detectorDbFileName   the location of the resource cache SQLite file; as created by Triumph
  * @param  string $host                 the hostname of the application; this will be used a the prefix on all URLs
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect URLs for the given source directory; this situation
  *                                      is different than zero URLs being detected.
- * @return MvcEditor_TemplateFileTag[]  array of MvcEditor_TemplateFileTag instances the detected template files and their variables
+ * @return Triumph_TemplateFileTag[]  array of Triumph_TemplateFileTag instances the detected template files and their variables
  */
 function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	$allTemplates = array();

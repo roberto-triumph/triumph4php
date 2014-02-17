@@ -30,10 +30,10 @@
  * is a bit smarter because it is able to detect default controllers and also read the code igniter
  * config for url suffixes.
  *
- * This script is part of MVC Editor's URL Detection feature; it enables the editor to have a 
+ * This script is part of Triumph's URL Detection feature; it enables the editor to have a 
  * list of all of a project's urls so that the user can easily open / jump to URLs. More
- * info can be about MVC Editor's URL detector feature can be found at 
- * http://code.google.com/p/mvc-editor/wiki/URLDetectors
+ * info can be about Triumph's URL detector feature can be found at 
+ * http://code.google.com/p/triumph4php/wiki/URLDetectors
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -51,8 +51,8 @@ function parseArgs() {
 	$rules = array(
 		'sourceDir|d=s' => 'Required. The base directory that the project resides in',
 		'resourceDbFileName|i=s' => 'Required. SQLite file that contains the project\'s files, classes, and methods. This file is created by ' .
-			'MVC Editor; MVC Editor performs INSERTs as it indexes a project.',
-		'host|s=s' => 'Required. Host name to start the URLs with. MVC Editor determines the host name by using the configured ' .
+			'Triumph; Triumph performs INSERTs as it indexes a project.',
+		'host|s=s' => 'Required. Host name to start the URLs with. Triumph determines the host name by using the configured ' .
 			'virtual host mappings that the user adds via the menu Edit -> Preferences -> Apache',
 		'outputDbFileName|o-s' => 'Optional. If given, the output will be written to the given file. If not given, output goes to STDOUT.',
 		'help|h' => 'This help message'
@@ -73,10 +73,10 @@ that it will list all of the URLs that correspond all of the project's controlle
 is a bit smarter because it is able to detect default controllers and also read the code igniter
 config for url suffixes.
 
-This script is part of MVC Editor's URL Detection feature; it enables the editor to have a 
+This script is part of Triumph's URL Detection feature; it enables the editor to have a 
 list of all of a project's urls so that the user can easily open / jump to URLs. More
-info can be about MVC Editor's URL detector feature can be found at 
-http://code.google.com/p/mvc-editor/wiki/URLDetectors
+info can be about Triumph's URL detector feature can be found at 
+http://code.google.com/p/triumph4php/wiki/URLDetectors
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 
@@ -123,7 +123,7 @@ EOF;
 		// now send the detected URLs to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
-		$urlResourceTable = new MvcEditor_UrlTagTable($pdo);
+		$urlResourceTable = new Triumph_UrlTagTable($pdo);
 		$urlResourceTable->saveUrls($arrUrls, $sourceDir);
 		echo "Url dectection complete, written to {$outputDbFileName}\n";
 	}
@@ -146,16 +146,16 @@ EOF;
 
 /**
  * This function will use the resource cache to lookup all controllers and their methods.  Then it
- * will create a MvcEditor_Url instance for each method; note that the routes file is 
+ * will create a Triumph_Url instance for each method; note that the routes file is 
  * also consulted and we will generate URLs for the default controller.
  *
  * @param  string  $sourceDir            the root directory of the project in question
- * @param  string  $resourceDbFileName   the location of the resource cache SQLite file; as created by MVC Editor
+ * @param  string  $resourceDbFileName   the location of the resource cache SQLite file; as created by Triumph
  * @param  string  $host                 the hostname of the application; this will be used a the prefix on all URLs
  * @param  boolean $doSkip               out parameter; if TRUE then this detector does not know how
  *                                       to detect URLs for the given source directory; this situation
  *                                       is different than zero URLs being detected.
- * @return MvcEditor_Url[]               array of MvcEditor_Url instances the detected URLs
+ * @return Triumph_Url[]               array of Triumph_Url instances the detected URLs
  */
 function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
 	$doSkip = TRUE;
@@ -190,12 +190,12 @@ function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
 	// lookup all controller files from the resource cache, only controllers are accessible via URLs
 	// since file names in the cache are OS dependant, need to use the correct directory separators
 	$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $resourceDbFileName));
-	$fileItemTable = new MvcEditor_FileItemTable($pdo);
+	$fileItemTable = new Triumph_FileItemTable($pdo);
 	$controllerDir = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'controllers';
 	$matchingFiles = $fileItemTable->MatchingFiles($controllerDir);
 	
 	// lookup all of the methods for all controller files.
-	$resourceTable = new MvcEditor_ResourceTable($pdo);
+	$resourceTable = new Triumph_ResourceTable($pdo);
 	$methods = $resourceTable->PublicMethodsFromFiles($matchingFiles);
 	foreach ($methods as $resource) {
 		
@@ -233,7 +233,7 @@ function detectUrls($sourceDir, $resourceDbFileName, $host, &$doSkip) {
  * @param  string $className the name of the controller class
  * @param  string $methodName the name of the method
  * @param  string $extra any extra segments to append to the URL
- * @return MvcEditor_Url the full URL after routing rules have been applied.
+ * @return Triumph_Url the full URL after routing rules have been applied.
  */
 function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodName, $extra) {
 	
@@ -302,8 +302,8 @@ function makeUrl($route, $config, $subDirectory, $fileName, $className, $methodN
 	if (isset($config['url_suffix']) && $config['url_suffix']) {
 		$url .= $config['url_suffix'];
 	}
-	$mvcUrl = new MvcEditor_UrlTag($url, $fileName, $className, $methodName);
-	return $mvcUrl;
+	$triumphUrl = new Triumph_UrlTag($url, $fileName, $className, $methodName);
+	return $triumphUrl;
 }
 
 

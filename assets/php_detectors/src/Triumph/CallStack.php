@@ -27,7 +27,7 @@
 /**
  * This is a class that will take care of deserializing a single CallClass from the call stack file.
  */
-class MvcEditor_CallStack {
+class Triumph_CallStack {
 
 	/** 
 	 * variable is assigned a scalar (string or number) 
@@ -207,7 +207,7 @@ class MvcEditor_CallStack {
 	}
 
 	/**
-	 * Read a single instance of MvcEditor_CallStack from the line.
+	 * Read a single instance of Triumph_CallStack from the line.
 	 *
 	 * @param string $stepType one of the constants above
 	 * @param string line from 
