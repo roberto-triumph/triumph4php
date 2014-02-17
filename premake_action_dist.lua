@@ -32,26 +32,27 @@ newaction {
 			end
 			batchexecute(normalizepath(""), {
 				"mkdir dist",
-				"mkdir dist\\triumph\\bin",
-				"mkdir dist\\triumph\\assets",
-				"xcopy /S /Y Release\\*.dll dist\\triumph\\bin",
-				"copy Release\\triumph.exe dist\\triumph\\bin",
-				"xcopy  /S /Y assets\\* dist\\triumph\\assets"
+				"mkdir dist\\triumph4php",
+				"mkdir dist\\triumph4php\\bin",
+				"mkdir dist\\triumph4php\\assets",
+				"xcopy /S /Y Release\\*.dll dist\\triumph4php\\bin",
+				"copy Release\\triumph4php.exe dist\\triumph4php\\bin",
+				"xcopy  /S /Y assets\\* dist\\triumph4php\\assets"
 			});
 			
 			-- get the version info from git and populate the version file
 			-- if we have no tags yet, use the -all flag
-			cmd = "git describe --long > dist\\triumph\\assets\\version.txt"
+			cmd = "git describe --long > dist\\triumph4php\\assets\\version.txt"
 			if 0 ~= os.execute(cmd) then
-				cmd = "git describe --all --long > dist\\triumph\\assets\\version.txt"
+				cmd = "git describe --all --long > dist\\triumph4php\\assets\\version.txt"
 				os.execute(cmd) 
 			end
 		else
-			workDir = path.getabsolute("../triumph-0.6")
-			workLibDir = path.getabsolute("../triumph-0.6/Release/libs")
+			workDir = path.getabsolute("../triumph4php-0.6")
+			workLibDir = path.getabsolute("../triumph4php-0.6/Release/libs")
 			rootDir = normalizepath("./")
 			libWildcards =  normalizepath("./Release/*.so*")
-			assetDir = "/usr/share/triumph"
+			assetDir = "/usr/share/triumph4php"
 			branch = "master";
 			debianControl = path.getabsolute("../debian.control");
 			
@@ -131,20 +132,20 @@ newaction {
 				-- populate the install file, the file that tells which files to 
 				-- include in the .deb file
 				-- double quote the backslash since we have to escape the backslash in the shell
-				"echo 'Release/triumph usr/bin\\n' > debian/install",
-				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph\" }' >> debian/install",
-				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph\" }' >> debian/install",
+				"echo 'Release/triumph4php usr/bin\\n' > debian/install",
+				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
+				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
 
 				-- regex is complicated
 				-- find the basename from the asset file, then remove it
 				-- for example, from  "assets/icons/database-delete.png"
 				-- we want to end up with the line 
-				-- "assets/icons/database-delete.png usr/share/triumph/icons"
+				-- "assets/icons/database-delete.png usr/share/triumph4php/icons"
 				-- double quote the backslash since we have to escape the backslash in the shell
-				"find assets/  -type f -name \"*\" -printf '%p /%h\n' | sed 's/\\/assets/usr\\/share\\/triumph/g' >> debian/install",
+				"find assets/  -type f -name \"*\" -printf '%p /%h\n' | sed 's/\\/assets/usr\\/share\\/triumph4php/g' >> debian/install",
 
 				-- mofiy the makefile to only build the main app not all of the examples, profilers, 
-				"sed -i 's/all: \$(PROJECTS)/all: triumph/g' Makefile",
+				"sed -i 's/all: \$(PROJECTS)/all: triumph4php/g' Makefile",
 				
 				-- modify the license file to be our own
 				"cat LICENSE > debian/copyright",
