@@ -24,9 +24,9 @@
 -------------------------------------------------------------------
 
 --
--- This database is used by MVC Editor to communicate between the 
+-- This database is used by Triumph to communicate between the 
 -- C++ source code and the PHP detectors. The various detector scripts
--- will write into this database and MVC Editor will read from the tables.
+-- will write into this database and Triumph will read from the tables.
 --
 
 
@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS url_tags (
 );
 
 -- 
--- This table stores the call stack for the URL that is currently selected in MVC Editor.
--- This table is populated by MVC Editor before the template files detectors are called.
+-- This table stores the call stack for the URL that is currently selected in Triumph.
+-- This table is populated by Triumph before the template files detectors are called.
 --
 CREATE TABLE IF NOT EXISTS call_stacks (
 	
@@ -136,8 +136,8 @@ CREATE TABLE IF NOT EXISTS template_file_tags (
 
 --
 -- this table will store all of the "dynamic" tags 
--- (methods and properties) that MVC Editor could not detect because
--- they are added during runtime.  MVC Editor will look at this table
+-- (methods and properties) that Triumph could not detect because
+-- they are added during runtime.  Triumph will look at this table
 -- during the code completion process.
 --
 CREATE TABLE IF NOT EXISTS detected_tags (
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	source_id INT INTEGER NOT NULL,
 	
 	--
-	-- The key is the string that MVC Editor will use to query
+	-- The key is the string that Triumph will use to query
 	-- The key is either the method / property / function name, or
 	-- the fully qualified name (class::method, class::property)
 	-- this is NOT unique because there can be two properties that
@@ -218,44 +218,44 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	source_id INT INTEGER NOT NULL,
 	
 	--
-	-- a friendly label for this connection. MVC Editor will show
+	-- a friendly label for this connection. Triumph will show
 	-- this to the user.
 	--
 	label TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the database name (schema) for this connection. MVC Editor will 
+	-- the database name (schema) for this connection. Triumph will 
 	-- use this to determine which database driver to use
 	--
 	schema TEXT NOT NULL COLLATE NOCASE,
 	
 	--
 	-- the database server program that this connection
-	-- connects to. MVC Editor will use this to determine
+	-- connects to. Triumph will use this to determine
 	-- which database driver to use
 	--
 	driver TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the IP or host name of the connection. MVC Editor will use this to determine
+	-- the IP or host name of the connection. Triumph will use this to determine
 	-- what host to connect to.
 	--
 	host TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the port number of the connection. MVC Editor will use this to determine
+	-- the port number of the connection. Triumph will use this to determine
 	-- what port to connect to.
 	--
 	port INTEGER NOT NULL COLLATE NOCASE,
 	
 	--
-	-- user of the connection. MVC Editor will use this to determine
+	-- user of the connection. Triumph will use this to determine
 	-- what user to connect as.
 	--
 	"user" TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the password of the connection. MVC Editor will use this to determine
+	-- the password of the connection. Triumph will use this to determine
 	-- what password to use when connecting. Note that this is 
 	-- stored in plain text.
 	--
@@ -278,21 +278,21 @@ CREATE TABLE IF NOT EXISTS config_tags (
 	source_id INT INTEGER NOT NULL,
 	
 	--
-	-- a friendly label for this connection. MVC Editor will show
+	-- a friendly label for this connection. Triumph will show
 	-- this to the user.
 	--
 	label TEXT NOT NULL COLLATE NOCASE,
 	
 	--
-	-- the full path of the config file. MVC Editor will 
+	-- the full path of the config file. Triumph will 
 	-- use path to open the config file when the user asks for it.
 	--
 	full_path TEXT NOT NULL COLLATE NOCASE
 );
 
 --
--- MVC Editor will check the version number in this table and compare it against the
--- version the code expects.  MVC Editor will recreate the database if the
+-- Triumph will check the version number in this table and compare it against the
+-- version the code expects.  Triumph will recreate the database if the
 -- versions do not match
 --
 CREATE TABLE schema_version (

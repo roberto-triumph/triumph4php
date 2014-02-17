@@ -24,7 +24,7 @@
 -------------------------------------------------------------------
 
 --
--- This database is used by MVC Editor to hold the results of PHP source code
+-- This database is used by Triumph to hold the results of PHP source code
 -- parsing. The database is also given to the various PHP detector scripts.
 --
 
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS sources (
 	directory TEXT
 );
 
--- this table stores all of the files that have been seen by MVC Editor
+-- this table stores all of the files that have been seen by Triumph
 CREATE TABLE IF NOT EXISTS file_items (
 	file_item_id INTEGER PRIMARY KEY, 
 		
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS file_items (
 );
 
 -- this table stores all of the resources (tags) for all files that
--- have been seen by MVC Editor
+-- have been seen by Triumph
 -- note that this table will have "duplicate" entries for methods, properties,
 -- functions and classes.  One entry will be as it was found in the source
 -- and one will be the "fully qualified" entry.  This will make it easy to
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS resources (
 	--
 	-- The signatures are re-constituted from an AST representation, they will not
 	-- contain newlines.
-	-- The signature *may* contain the return type, if MVC Editor is able to determine
+	-- The signature *may* contain the return type, if Triumph is able to determine
 	-- it from the PHPDoc comment.
 	signature TEXT, 
 	
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- delimiters ("/**" and "*/")
 	comment TEXT,
 	
-	-- if MVC Editor is able to determine it from the PHPDoc comment, then this column
+	-- if Triumph is able to determine it from the PHPDoc comment, then this column
 	-- contains the function / method return type. In the case of members, this is the
 	-- member class name.
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS resources (
 
 );
 
--- This table stores all of the trait relationships that have been found by MVC Editor.
+-- This table stores all of the trait relationships that have been found by Triumph.
 -- note that this table will have "duplicate" entries for each trait.
 -- One entry will be as it was found in the source
 -- and one will be the "fully qualified" entry.  This will make it easy to
@@ -259,8 +259,8 @@ CREATE TABLE IF NOT EXISTS db_columns (
 );
 
 --
--- MVC Editor will check the version number in this table and compare it against the
--- version the code expects.  MVC Editor will recreate the database if the
+-- Triumph will check the version number in this table and compare it against the
+-- version the code expects.  Triumph will recreate the database if the
 -- versions do not match
 --
 CREATE TABLE schema_version (

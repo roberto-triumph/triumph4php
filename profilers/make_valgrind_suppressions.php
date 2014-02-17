@@ -29,7 +29,7 @@
  * profiler apps.  Since these apps use wxWidgets, some of the underlying libraries
  * like pango, gtk, ans such are not clean. The resulting suppression file can then
  * be used when running valgrind; the end goal is that it becomes MUCH easier to
- * spot errors in the MVC Editor source code.
+ * spot errors in the Triumph source code.
  */
 
 // get the nice args parsing library
@@ -48,7 +48,7 @@ This file will create a suppressions file to use when profiling the various
 profiler apps.  Since these apps use wxWidgets, some of the underlying libraries
 like pango, gtk, and such are not clean. The resulting suppression file can then
 be used when running valgrind; the end goal is that it becomes MUCH easier to
-spot errors in the MVC Editor source code.
+spot errors in the Triumph source code.
 
 This program will output the resulting suppression file to STDOUT, user can then
 redirect the output to any file on the file system.
