@@ -205,18 +205,18 @@ void t4p::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextCtrl* c
 		t4p::StylePreferenceClass pref = styles[i];
 		int style = pref.StcStyle;
 		switch (style) {
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
+			case CodeControlOptionsClass::T4P_STYLE_CARET:
 				ctrl->SetCaretForeground(pref.Color);
 				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
+			case CodeControlOptionsClass::T4P_STYLE_CARET_LINE:
 				ctrl->SetCaretLineVisible(true);
 				ctrl->SetCaretLineBackground(pref.BackgroundColor);
 				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
+			case CodeControlOptionsClass::T4P_STYLE_SELECTION:
 				ctrl->SetSelForeground(true, pref.Color);
 				ctrl->SetSelBackground(true, pref.BackgroundColor);
 				break;
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
+			case CodeControlOptionsClass::T4P_STYLE_CODE_FOLDING:
 				if (App.Preferences.CodeControlOptions.EnableCodeFolding) {
 					ctrl->SetFoldMarginColour(true, pref.BackgroundColor);
 					ctrl->SetFoldMarginHiColour(true, pref.BackgroundColor);
@@ -228,12 +228,12 @@ void t4p::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextCtrl* c
 					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, pref.BackgroundColor, pref.Color);
 					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, pref.BackgroundColor, pref.Color);
 				}
-			case CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
+			case CodeControlOptionsClass::T4P_STYLE_RIGHT_MARGIN:
 				if (App.Preferences.CodeControlOptions.RightMargin > 0) {
 					ctrl->SetEdgeColour(pref.Color);
 				}
 				break;
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT:
 				// since we need to share one indicator with the matching word highlight
 				// and the parse errors indicators; we will set this setting when the
 				// user initiates the matching word feature
@@ -403,7 +403,7 @@ void t4p::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ctrl,
 	// the found match indicator style
 	pref = App.Preferences.CodeControlOptions.FindByStcStyle(
 	           styles,
-	           t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT
+	           t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT
 	       );
 	ctrl->IndicatorSetStyle(CODE_CONTROL_INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
 	ctrl->IndicatorSetForeground(CODE_CONTROL_INDICATOR_FIND, pref.Color);
@@ -593,18 +593,18 @@ void t4p::EditColorsPanelClass::OnListBox(wxCommandEvent& event) {
 		Italic->SetValue(pref->IsItalic);
 		int style = pref->StcStyle;
 		switch (style) {
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET:
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE:
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION:
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_CODE_FOLDING:
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_RIGHT_MARGIN:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CARET:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CODE_FOLDING:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_RIGHT_MARGIN:
 			case wxSTC_STYLE_INDENTGUIDE:
 				Font->Enable(false);
 				Bold->Enable(false);
 				Italic->Enable(false);
 				BackgroundColor->Enable(true);
 				break;
-			case t4p::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT:
+			case t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT:
 				Font->Enable(false);
 				Bold->Enable(false);
 				Italic->Enable(false);

@@ -30,23 +30,23 @@
 
 #define SQL_LEXICAL_ANALYZER_SET_CONDITION(c) CurrentCondition = c
 
-mvceditor::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
+t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
 	: Buffer()
 	, QueryStartLineNumber(0)
 	, CurrentCondition(SQL_ANY) {
 
 }
 
-void mvceditor::SqlLexicalAnalyzerClass::Close() {
+void t4p::SqlLexicalAnalyzerClass::Close() {
 	Buffer.Close();
 }
 
-bool mvceditor::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
+bool t4p::SqlLexicalAnalyzerClass::OpenString(const UnicodeString& queries) {
 	QueryStartLineNumber = 1;
 	return Buffer.OpenString(queries);
 }
 
-bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
+bool t4p::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	Buffer.MarkTokenStart();
 	query.remove();
 	QueryStartLineNumber = Buffer.GetLineNumber();
@@ -68,13 +68,13 @@ bool mvceditor::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	return contents;
 }
 
-int mvceditor::SqlLexicalAnalyzerClass::GetLineNumber() const {
+int t4p::SqlLexicalAnalyzerClass::GetLineNumber() const {
 	return QueryStartLineNumber;
 }
 
-int mvceditor::SqlLexicalAnalyzerClass::NextToken() {
+int t4p::SqlLexicalAnalyzerClass::NextToken() {
 	if (Buffer.HasReachedEnd()) {
-		return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF;
+		return t4p::SqlLexicalAnalyzerClass::SQL_EOF;
 	}
 
 sql_lexical_analyzer_next:
@@ -86,7 +86,7 @@ re2c:define:YYCURSOR = Buffer.Current;
 re2c:define:YYLIMIT = Buffer.Limit;
 re2c:define:YYMARKER = Buffer.Marker;
 re2c:define:YYFILL = SQL_LEXICAL_ANALYZER_BUFFER_FILL;
-re2c:define:YYCONDTYPE = mvceditor::SqlLexicalAnalyzerClass::Conditions;
+re2c:define:YYCONDTYPE = t4p::SqlLexicalAnalyzerClass::Conditions;
 re2c:define:YYGETCONDITION = SQL_LEXICAL_ANALYZER_GET_CONDITION;
 re2c:define:YYSETCONDITION = SQL_LEXICAL_ANALYZER_SET_CONDITION;
 re2c:indent:top = 1;
@@ -100,7 +100,7 @@ ANY = ALL\EOF;
 NEWLINE = [\r][\n] | [\r] | [\n];
 WHITESPACE = [ \t\v\f];
 
-<*> EOF { return mvceditor::SqlLexicalAnalyzerClass::SQL_EOF; }
+<*> EOF { return t4p::SqlLexicalAnalyzerClass::SQL_EOF; }
 
 <ANY> ["]  { CurrentCondition = SQL_DOUBLE_QUOTE_STRING; goto sql_lexical_analyzer_next; }
 <ANY> ['] { CurrentCondition = SQL_SINGLE_QUOTE_STRING; goto sql_lexical_analyzer_next; }
@@ -109,7 +109,7 @@ WHITESPACE = [ \t\v\f];
 <ANY> [#] { CurrentCondition = SQL_LINE_COMMENT; goto sql_lexical_analyzer_next; }
 <ANY> NEWLINE  { Buffer.IncrementLine(); goto sql_lexical_analyzer_next; }
 <ANY> WHITESPACE {  goto sql_lexical_analyzer_next; }
-<ANY> ';' {  return mvceditor::SqlLexicalAnalyzerClass::SEMICOLON; }
+<ANY> ';' {  return t4p::SqlLexicalAnalyzerClass::SEMICOLON; }
 <ANY> ANY {  goto sql_lexical_analyzer_next; }
 
 <SINGLE_QUOTE_STRING> [\\]['] { goto sql_lexical_analyzer_next; }

@@ -26,7 +26,7 @@
 
 /**
  * this file will parse out theme files and create a c++ source code file.
- * The source code file can then be copied into the mvc editor project to
+ * The source code file can then be copied into the Triumph project to
  * add new color themes to the editor.
  * Adding a new theme:
  * 1. Go to http://eclipsecolorthemes.org and pick theme.
@@ -35,7 +35,7 @@
  * 3. run this script. Copy and paste the output into the file
  *    src/code_control/CodeControlStyles.cpp (yes, overwrite the entire
  *    file)
- * 4. Recompile mvc-editor
+ * 4. Recompile triumph4php
  * 5. Go to Edit -> Preferences, switch to the "Styles & Colors" tab
  *    The new theme will show up in the Themes drop down.
  * 
@@ -51,7 +51,7 @@ if (isset($opts['h']) || isset($opts['help'])) {
 	echo <<<HELP
 This file will parse out theme files and create a c++ source code file.
 
-The source code file can then be copied into the mvc editor project to
+The source code file can then be copied into the triumph4php project to
 add new color themes to the editor.
 Adding a new theme:
 
@@ -61,7 +61,7 @@ Adding a new theme:
 3. run this script. Copy and paste the output into the file
    src/code_control/CodeControlStyles.cpp (yes, overwrite the entire
    file)
-4. Recompile mvc-editor
+4. Recompile triump4php
 5. Go to Edit -> Preferences, switch to the "Styles & Colors" tab
    The new theme will show up in the Themes drop down.
 
@@ -141,7 +141,7 @@ foreach (glob("{$themesDir}/*.xml") as $file ) {
 	
 	$strFunc = themeFuncName($name);
 	$strCode .= <<<CODE
-static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
+static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
@@ -269,12 +269,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.PhpStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));	
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("{$variable}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).IsBold = true;
@@ -339,12 +339,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.JsStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("{$commentSingle}"));
@@ -359,12 +359,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.SqlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("{$keyword}"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("{$defaultForeground}"));
@@ -387,12 +387,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.CssStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -408,12 +408,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.ConfigStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("{$operator}"));
@@ -430,12 +430,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.CrontabStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -451,12 +451,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.YamlStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("{$defaultForeground}"));
@@ -496,12 +496,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.RubyStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("{$string}"));
@@ -528,12 +528,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.LuaStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("{$string}"));
@@ -561,12 +561,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.MarkdownStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("{$string}"));
@@ -585,12 +585,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.BashStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
@@ -604,12 +604,12 @@ static void SetTo{$strFunc}Theme(mvceditor::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_BRACEBAD).Color = wxColour(wxT("{$mismatchedBrace}"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).Color = wxColour(wxT("{$lineNumberMargin}"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_STYLE_LINENUMBER).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
-	options.FindByStcStyle(options.DiffStyles, mvceditor::CodeControlOptionsClass::MVC_EDITOR_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));	
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).Color = wxColour(wxT("{$caret}"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("{$defaultBackground}"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("{$defaultForeground}"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));	
 }
 
 CODE;
@@ -619,7 +619,7 @@ CODE;
 $strFunc = themeFuncName($arrThemes[0]);
 $strCode .= <<<CODE
 
-void mvceditor::CodeControlStylesSetTheme(mvceditor::CodeControlOptionsClass& options, const wxString& theme) {
+void t4p::CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxString& theme) {
 	if (theme == wxT("{$arrThemes[0]}")) {
 		SetTo{$strFunc}Theme(options);
 	}
@@ -636,7 +636,7 @@ CODE;
 $strCode .= "\n}\n";
 
 $strCode .= <<<CODE
-wxArrayString mvceditor::CodeControlStylesGetThemes() {
+wxArrayString t4p::CodeControlStylesGetThemes() {
 	wxArrayString themes;
 	
 CODE;
