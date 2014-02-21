@@ -87,17 +87,17 @@ t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app)
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
 		case wxOS_WINDOWS_NT:
-			FileManagerExecutable = wxT("explorer.exe");
-			ShellExecutable = wxT("cmd.exe");
+			FileManagerExecutable = wxT("C:\\windows\\system32\\explorer.exe");
+			ShellExecutable = wxT("C:\\windows\\system32\\cmd.exe");
 			break;
 		case wxOS_UNIX:
 		case wxOS_UNIX_LINUX:
-			FileManagerExecutable = wxT("nautilus");
-			ShellExecutable = wxT("sh");
+			FileManagerExecutable = wxT("/usr/bin/nautilus");
+			ShellExecutable = wxT("/bin/sh");
 			break;
 		default:
-			FileManagerExecutable = wxT("explorer");
-			ShellExecutable = wxT("sh");
+			FileManagerExecutable = wxT("C:\\windows\\system32\\explorer.exe");
+			ShellExecutable = wxT("C:\\windows\\system32\\cmd.exe");
 	}
 }
 
@@ -143,10 +143,17 @@ void t4p::ExplorerFeatureClass::AddWindows() {
 void t4p::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
 	wxString s;
 	config->Read(wxT("/Explorer/FileManagerExecutable"), &s);
-	FileManagerExecutable.Assign(s);
+
+	// when setting, make sure to have the defaults in case there is nothing
+	// in the config yet 
+	if (!s.IsEmpty()) {
+		FileManagerExecutable.Assign(s);
+	}
 	s = wxT("");
 	config->Read(wxT("/Explorer/ShellExecutable"), &s);
-	ShellExecutable.Assign(s);
+	if (!s.IsEmpty()) {
+		ShellExecutable.Assign(s);
+	}
 }
 
 void t4p::ExplorerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
