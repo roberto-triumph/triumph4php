@@ -34,6 +34,7 @@
 #include <actions/ActionClass.h>
 #include <actions/SequenceClass.h>
 #include <wx/aui/aui.h>
+#include <wx/wizard.h>
 
 namespace t4p {
 
@@ -306,6 +307,11 @@ private:
 	 * their own menus
 	 */
 	void OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event);
+
+	/**
+	 * propagate wizard events to features, so that they can handle wizard events themselves
+	 */
+	void OnAnyWizardEvent(wxWizardEvent& event);
 
 	/**
 	 * when a sequence has started show the Gauge

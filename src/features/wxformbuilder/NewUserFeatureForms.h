@@ -19,17 +19,17 @@
 #include <wx/statbox.h>
 #include <wx/radiobut.h>
 #include <wx/filepicker.h>
-#include <wx/hyperlink.h>
+#include <wx/panel.h>
 #include <wx/textctrl.h>
-#include <wx/button.h>
-#include <wx/dialog.h>
+#include <wx/hyperlink.h>
+#include <wx/choice.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class NewUserDialogGeneratedClass
+/// Class NewUserSettingsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class NewUserDialogGeneratedClass : public wxDialog 
+class NewUserSettingsPanelGeneratedClass : public wxPanel 
 {
 	private:
 	
@@ -42,30 +42,70 @@ class NewUserDialogGeneratedClass : public wxDialog
 		wxRadioButton* ApplicationDirectory;
 		wxRadioButton* CustomDirectory;
 		wxDirPickerCtrl* SettingsDirectory;
+	
+	public:
+		
+		NewUserSettingsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~NewUserSettingsPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class NewUserAssociationsPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class NewUserAssociationsPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxStaticText* PhpLabel;
+		wxTextCtrl* PhpFileExtensions;
+		wxStaticText* JsLabel;
+		wxTextCtrl* JsFileExtensions;
+		wxStaticText* CssLabel;
+		wxTextCtrl* CssFileExtensions;
+		wxStaticText* SqlLabel;
+		wxTextCtrl* SqlFileExtensions;
+		wxStaticText* ConfigLabel;
+		wxTextCtrl* ConfigFileExtensions;
+		wxStaticText* YamlLabel;
+		wxTextCtrl* YamlFileExtensions;
+		wxStaticText* XmlLabel;
+		wxTextCtrl* XmlFileExtensions;
+		wxStaticText* MarkdownLabel;
+		wxTextCtrl* MarkdownFileExtensions;
+		wxStaticText* BashLabel;
+		wxTextCtrl* BashFileExtensions;
+		wxStaticText* MiscLabel;
+		wxTextCtrl* MiscFileExtensions;
+	
+	public:
+		
+		NewUserAssociationsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxTAB_TRAVERSAL );
+		~NewUserAssociationsPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class NewUserPhpSettingsPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class NewUserPhpSettingsPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
 		wxStaticText* PhpHelpLabel;
 		wxHyperlinkCtrl* PhpDetectorsLink;
 		wxCheckBox* Installed;
 		wxFilePickerCtrl* PhpExecutable;
-		wxStaticText* FileExtensionsHelpLabel;
-		wxStaticText* PhpLabel;
-		wxTextCtrl* PhpFileExtensions;
-		wxStaticText* SqlLabel;
-		wxTextCtrl* SqlFileExtensions;
-		wxStaticText* CssLabel;
-		wxTextCtrl* CssFileExtensions;
-		wxStaticText* MiscLabel;
-		wxTextCtrl* MiscFileExtensions;
-		wxStdDialogButtonSizer* ButtonsSizer;
-		wxButton* ButtonsSizerOK;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
+		wxStaticText* VersionLabel;
+		wxChoice* Version;
 	
 	public:
 		
-		NewUserDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Welcome New User"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION );
-		~NewUserDialogGeneratedClass();
+		NewUserPhpSettingsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~NewUserPhpSettingsPanelGeneratedClass();
 	
 };
 

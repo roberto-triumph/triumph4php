@@ -838,6 +838,10 @@ void t4p::MainFrameClass::OnAnyMenuCommandEvent(wxCommandEvent& event) {
 	App.EventSink.Publish(event);
 }
 
+void t4p::MainFrameClass::OnAnyWizardEvent(wxWizardEvent& event) {
+	App.EventSink.Publish(event);
+}
+
 void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 	if (event.GetEventType() == wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED) {
 		if (t4p::ID_CODE_NOTEBOOK == event.GetId()) {
@@ -1036,6 +1040,16 @@ BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_AUITOOLBAR_OVERFLOW_CLICK(wxID_ANY, t4p::MainFrameClass::OnAnyAuiToolbarEvent)
 	EVT_AUITOOLBAR_RIGHT_CLICK(wxID_ANY, t4p::MainFrameClass::OnAnyAuiToolbarEvent)
 	EVT_AUITOOLBAR_TOOL_DROPDOWN(wxID_ANY, t4p::MainFrameClass::OnAnyAuiToolbarEvent)
+
+	// make sure wizard events are propagated
+	EVT_WIZARD_BEFORE_PAGE_CHANGED(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_CANCEL(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_FINISHED(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_HELP(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_PAGE_CHANGED(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_PAGE_CHANGING(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+	EVT_WIZARD_PAGE_SHOWN(wxID_ANY, t4p::MainFrameClass::OnAnyWizardEvent)
+
 
 	// make sure to show status of running sequences
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_START, t4p::MainFrameClass::OnSequenceStart)

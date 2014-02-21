@@ -24,12 +24,16 @@
  */
 #include <features/NewUserFeatureClass.h>
 #include <globals/Assets.h>
+#include <widgets/NonEmptyTextValidatorClass.h>
 #include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/stdpaths.h>
 #include <wx/fileconf.h>
+#include <wx/wizard.h>
 
 static int ID_NEW_USER_DIALOG = wxNewId();
+static int ID_NEW_USER_PHP_SETTINGS = wxNewId();
+static int ID_NEW_USER_WIZARD = wxNewId();
 static int ID_NEW_USER_TIMER = wxNewId();
 
 t4p::NewUserFeatureClass::NewUserFeatureClass(t4p::AppClass& app)
@@ -46,33 +50,80 @@ void t4p::NewUserFeatureClass::OnAppReady(wxCommandEvent &event) {
 
 void t4p::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxFileName settingsDir;
-	NewUserDialogClass dialog(GetMainWindow(), App.Globals, settingsDir);
-	dialog.ShowModal();
+	wxWizard wizard(GetMainWindow(), wxID_ANY, _("Welcome New User"));
 	
-	// true means that we will
-	// re trigger the app start sequence, that way the tag dbs get created
-	// in the new location
-	App.SavePreferences(settingsDir, true);
+	wxWizardPageSimple* page1 = new wxWizardPageSimple(&wizard);
+	page1->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
+	wxWizardPageSimple* page2 = new wxWizardPageSimple(&wizard);
+	page2->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
+	wxWizardPageSimple* page3 = new wxWizardPageSimple(&wizard);
+	page3->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
+
+	wxWizardPageSimple::Chain(page1, page2);
+	wxWizardPageSimple::Chain(page2, page3);
+	t4p::NewUserSettingsPanelClass* settingsPanel = new t4p::NewUserSettingsPanelClass(page1, App.Globals, App.Preferences, settingsDir);
+	t4p::NewUserPhpSettingsPanelClass* phpPanel = new t4p::NewUserPhpSettingsPanelClass(page2, App.Globals);
+	t4p::NewUserAssociationsPanelClass* filePanel = new t4p::NewUserAssociationsPanelClass(page3, App.Globals);
+
+	wizard.GetPageAreaSizer()->Add(page1);
+	wizard.GetPageAreaSizer()->Add(page2);
+	wizard.GetPageAreaSizer()->Add(page3);
+	
+	if (wizard.RunWizard(page1)) {
+
+		// true means that we will
+		// re trigger the app start sequence, that way the tag dbs get created
+		// in the new location
+		App.SavePreferences(settingsDir, true);
+	}
+	else {
+		// use default settings
+		// use the user data directory
+		// create our subDir if it does not exist
+		wxStandardPaths paths = wxStandardPaths::Get();
+		wxFileName tempDir;
+		tempDir.AssignDir(paths.GetUserConfigDir());
+		tempDir.AppendDir(wxT(".triumph4php"));
+		if (!tempDir.DirExists()) {
+			bool created = wxMkdir(tempDir.GetPath(), 0777);
+			if (!created) {
+				wxMessageBox(wxT("Could not create directory: ") + tempDir.GetPath(), wxT("Error"));
+			}
+		}
+
+		// revert settings to defaults
+		App.Preferences.CheckForUpdates = true;
+		App.Globals.Environment.Php.Installed = false;
+		App.Globals.Environment.Php.Version = pelet::PHP_54;
+		App.Globals.FileTypes.PhpFileExtensionsString = wxT("*.php");
+		App.Globals.FileTypes.JsFileExtensionsString = wxT("*.js");
+		App.Globals.FileTypes.CssFileExtensionsString = wxT("*.css");
+		App.Globals.FileTypes.SqlFileExtensionsString = wxT("*.sql");
+		App.Globals.FileTypes.ConfigFileExtensionsString = wxT("*.conf;*.ini;.htaccess");
+		App.Globals.FileTypes.YamlFileExtensionsString = wxT("*.yml");
+		App.Globals.FileTypes.XmlFileExtensionsString = wxT("*.xml");
+		App.Globals.FileTypes.MarkdownFileExtensionsString = wxT("*.md");
+		App.Globals.FileTypes.BashFileExtensionsString = wxT("*.sh");
+		App.Globals.FileTypes.MiscFileExtensionsString = wxT("*.json;*.twig;*.txt");
+
+
+		App.SavePreferences(settingsDir, true);
+	}
 }
 
+void t4p::NewUserFeatureClass::OnWizardCancel(wxWizardEvent& event) {
+	wxMessageBox(_("Default settings will be used"), _("Triumph 4 PHP"));
+}
 
-t4p::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, t4p::GlobalsClass &globals, wxFileName& configFileDir)
-: NewUserDialogGeneratedClass(parent, ID_NEW_USER_DIALOG)
+t4p::NewUserSettingsPanelClass::NewUserSettingsPanelClass(wxWindow *parent, 
+														  t4p::GlobalsClass &globals, 
+														  t4p::PreferencesClass& preferences,
+														  wxFileName& configFileDir)
+: NewUserSettingsPanelGeneratedClass(parent, ID_NEW_USER_DIALOG)
 , Globals(globals)
+, Preferences(preferences)
 , ConfigFileDir(configFileDir) {
-
-	wxTextValidator phpFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.PhpFileExtensionsString);
-	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
-	wxTextValidator sqlFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.SqlFileExtensionsString);
-	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
-	wxTextValidator cssFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.CssFileExtensionsString);
-	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
-	wxTextValidator miscFileExtensionsValidator(wxFILTER_EMPTY, &globals.FileTypes.MiscFileExtensionsString);
-	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
-
-	wxGenericValidator phpInstalledValidator(&globals.Environment.Php.Installed);
-	Installed->SetValidator(phpInstalledValidator);
-
+	
 	wxString label = UserDataDirectory->GetLabel();
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
@@ -81,25 +132,20 @@ t4p::NewUserDialogClass::NewUserDialogClass(wxWindow *parent, t4p::GlobalsClass 
 	label += wxT(" (") + tempDir.GetPath() + wxT(")");
 	UserDataDirectory->SetLabel(label);
 
+	wxGenericValidator updateValidator(&Preferences.CheckForUpdates);
+	CheckForUpdates->SetValidator(updateValidator);
+
 	TransferDataToWindow();
 }
 
-void t4p::NewUserDialogClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::NewUserSettingsPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	SettingsDirectory->Enable(CustomDirectory->GetValue());
-	PhpExecutable->Enable(Installed->GetValue());
 }
 
-void t4p::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
-	TransferDataFromWindow();
-	if (Installed->GetValue()) {
-
-		// only if the user has php installed do we check to see if the 
-		// executable is good
-		wxString phpPath = PhpExecutable->GetPath();
-		if (!wxFileName::FileExists(phpPath)) {
-			wxMessageBox(wxT("PHP Executable must exist."), wxT("Error"));
-			return;
-		}
+bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
+	bool good = NewUserSettingsPanelGeneratedClass::TransferDataFromWindow();
+	if (!good) {
+		return good;
 	}
 	if (CustomDirectory->GetValue()) {
 		
@@ -107,10 +153,9 @@ void t4p::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxString settingsDir = SettingsDirectory->GetPath();
 		if (!wxFileName::DirExists(settingsDir)) {
 			wxMessageBox(wxT("Custom settings directory must exist."), wxT("Error"));
-			return;
+			return false;
 		}
 	}
-	Globals.Environment.Php.PhpExecutablePath = PhpExecutable->GetPath();
 	wxStandardPaths paths = wxStandardPaths::Get();
 	if (ApplicationDirectory->GetValue()) {
 		
@@ -127,7 +172,7 @@ void t4p::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 			bool created = wxMkdir(tempDir.GetPath(), 0777);
 			if (!created) {
 				wxMessageBox(wxT("Could not create directory: ") + tempDir.GetPath(), wxT("Error"));
-				return;
+				return false;
 			}
 		}
 		ConfigFileDir = tempDir;
@@ -146,25 +191,106 @@ void t4p::NewUserDialogClass::OnOkButton(wxCommandEvent& event) {
 			bool created = wxMkdir(tempDir.GetPath(), 0777);
 			if (!created) {
 				wxMessageBox(wxT("Could not create directory: ") + tempDir.GetPath(), wxT("Error"));
-				return;
+				return false;
 			}
 		}
 		ConfigFileDir = tempDir;
 	}
-	if (!Installed->GetValue()) {
+	return true;
+}
+
+t4p::NewUserAssociationsPanelClass::NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals)
+: NewUserAssociationsPanelGeneratedClass(parent, ID_NEW_USER_PHP_SETTINGS)
+, Globals(globals) {
+	NonEmptyTextValidatorClass phpFileExtensionsValidator(&Globals.FileTypes.PhpFileExtensionsString, PhpLabel);
+	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
+
+	NonEmptyTextValidatorClass cssFileExtensionsValidator(&Globals.FileTypes.CssFileExtensionsString, CssLabel);
+	CssFileExtensions->SetValidator(cssFileExtensionsValidator);
+
+	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&Globals.FileTypes.SqlFileExtensionsString, SqlLabel);
+	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass jsFileExtensionsValidator(&Globals.FileTypes.JsFileExtensionsString, JsLabel);
+	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
+
+	NonEmptyTextValidatorClass configFileExtensionsValidator(&Globals.FileTypes.ConfigFileExtensionsString, ConfigLabel);
+	ConfigFileExtensions->SetValidator(configFileExtensionsValidator);
+		
+	NonEmptyTextValidatorClass yamlFileExtensionsValidator(&Globals.FileTypes.YamlFileExtensionsString, YamlLabel);
+	YamlFileExtensions->SetValidator(yamlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass xmlFileExtensionsValidator(&Globals.FileTypes.XmlFileExtensionsString, XmlLabel);
+	XmlFileExtensions->SetValidator(xmlFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass markdownFileExtensionsValidator(&Globals.FileTypes.MarkdownFileExtensionsString, MarkdownLabel);
+	MarkdownFileExtensions->SetValidator(markdownFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass bashFileExtensionsValidator(&Globals.FileTypes.BashFileExtensionsString, BashLabel);
+	BashFileExtensions->SetValidator(bashFileExtensionsValidator);
+	
+	NonEmptyTextValidatorClass miscFileExtensionsValidator(&Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
+	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
+	
+	TransferDataToWindow();
+}
+
+t4p::NewUserPhpSettingsPanelClass::NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals)
+: NewUserPhpSettingsPanelGeneratedClass(parent, wxID_ANY)
+, Globals(globals) {
+
+	wxGenericValidator phpInstalledValidator(&Globals.Environment.Php.Installed);
+	Installed->SetValidator(phpInstalledValidator);
+}
+
+void t4p::NewUserPhpSettingsPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
+	PhpExecutable->Enable(Installed->GetValue());
+}
+
+bool t4p::NewUserPhpSettingsPanelClass::TransferDataFromWindow() {
+	bool good = NewUserPhpSettingsPanelGeneratedClass::TransferDataFromWindow();
+	if (!good) {
+		return good;
+	}
+	if (Installed->GetValue()) {
+
+		// only if the user has php installed do we check to see if the 
+		// executable is good
+		wxString phpPath = PhpExecutable->GetPath();
+		if (!wxFileName::FileExists(phpPath)) {
+			wxMessageBox(wxT("PHP Executable must exist."), wxT("Error"));
+			return false;
+		}
+	}
+	else if (Version->GetSelection() == 0) {
 
 		// no PHP then dont try to detect version
+		// but the user must have not have chosen auto
+		wxMessageBox(wxT("Since PHP is not available you must provide the PHP version to use during parsing."), wxT("Error"));
+		return false;
+	}
+	else if (Version->GetSelection() == 1) {
+		Globals.Environment.Php.IsAuto = 0;
+		Globals.Environment.Php.Version = pelet::PHP_53;
+	}
+	else {
 		Globals.Environment.Php.IsAuto = 0;
 		Globals.Environment.Php.Version = pelet::PHP_54;
 	}
-	EndModal(wxOK);
+	Globals.Environment.Php.PhpExecutablePath = PhpExecutable->GetPath();
+	return true;
 }
 
-BEGIN_EVENT_TABLE(t4p::NewUserDialogClass, wxDialog)
-	EVT_UPDATE_UI(ID_NEW_USER_DIALOG, t4p::NewUserDialogClass::OnUpdateUi)
+BEGIN_EVENT_TABLE(t4p::NewUserSettingsPanelClass, NewUserSettingsPanelGeneratedClass)
+	EVT_UPDATE_UI(ID_NEW_USER_DIALOG, t4p::NewUserSettingsPanelClass::OnUpdateUi)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(t4p::NewUserPhpSettingsPanelClass, NewUserPhpSettingsPanelGeneratedClass)
+	EVT_UPDATE_UI(ID_NEW_USER_PHP_SETTINGS, t4p::NewUserPhpSettingsPanelClass::OnUpdateUi)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::NewUserFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::NewUserFeatureClass::OnAppReady)
 	EVT_TIMER(ID_NEW_USER_TIMER, t4p::NewUserFeatureClass::OnTimer)
+	EVT_WIZARD_CANCEL(wxID_ANY, t4p::NewUserFeatureClass::OnWizardCancel)
 END_EVENT_TABLE()
