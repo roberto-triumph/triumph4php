@@ -592,19 +592,6 @@ solution "triumph4php"
 			pickywarnings(_ACTION)
 			icuconfiguration("Release", _ACTION)
 
-	project "generic_dir_tutorial"
-		language "C++"
-		kind "WindowedApp"
-		files { "tutorials/generic_dir_tutorial.cpp" }
-		configuration "Debug"
-			pickywarnings(_ACTION)
-			wxconfiguration("Debug", _ACTION)
-			wxappconfiguration("Debug", _ACTION)
-	configuration "Release"
-			pickywarnings(_ACTION)
-			wxconfiguration("Release", _ACTION)
-			wxappconfiguration("Release", _ACTION)
-
 	project "wx_styled_text_control_tutorial"
 		language "C++"
 		kind "WindowedApp"
