@@ -120,7 +120,8 @@ MYSQL_LIB_NAME = 'libmysqlclient.so'
 -- try serveral locations that way we can support ubuntu 9.0-12.10 without needing
 -- changes to this file
 MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so', 
-	"/usr/lib/", 
+	"/usr/lib/",
+	"/usr/lib/64", 
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
@@ -139,6 +140,7 @@ SQLITE_LIB_NAME = 'libsqlite3.so'
 -- changes to this file
 SQLITE_LIB_DIR = os.pathsearch('libsqlite3.so', 
 	"/usr/lib", 
+	"/usr/lib64", 
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
@@ -147,7 +149,8 @@ SQLITE_LIB_DIR = os.pathsearch('libsqlite3.so',
 CURL_INCLUDE_DIR = '/usr/include/'
 CURL_LIB_NAME = 'libcurl.so'
 CURL_LIB_DIR = os.pathsearch('libcurl.so', 
-	"/usr/lib", 
+	"/usr/lib",
+	"/usr/lib64", 
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
