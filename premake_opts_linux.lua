@@ -67,6 +67,22 @@ if (not WX_CONFIG) then
     print "Using default location of lib/wxWidgets/triumph/bin/wx-config for wxWidgets dir"
 end
 
+-- location of the Git executable. this is used by the
+-- setupdev action to get all submodule
+GIT = 'git';
+
+-- location of the cmake executable. cmake is used to build the SOCI
+-- library (Database Access wrapper)
+CMAKE = 'cmake';
+
+-- location of 7-zip, used to unzip downloaded binaries of Triumph
+-- dependencies from the Internet
+SEVENZIP = 'unzip';
+
+-- location of wget, used to retrieve some of Triumph
+-- dependencies from the Internet
+WGET = 'wget';
+
 
 SOCI_DEBUG_INCLUDE_DIR = os.getenv("T4P_SOCI_DEBUG_INCLUDE_DIR");
 if (not SOCI_DEBUG_INCLUDE_DIR) then
