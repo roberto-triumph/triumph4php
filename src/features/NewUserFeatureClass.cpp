@@ -61,9 +61,9 @@ void t4p::NewUserFeatureClass::OnTimer(wxTimerEvent& event) {
 
 	wxWizardPageSimple::Chain(page1, page2);
 	wxWizardPageSimple::Chain(page2, page3);
-	t4p::NewUserSettingsPanelClass* settingsPanel = new t4p::NewUserSettingsPanelClass(page1, App.Globals, App.Preferences, settingsDir);
-	t4p::NewUserPhpSettingsPanelClass* phpPanel = new t4p::NewUserPhpSettingsPanelClass(page2, App.Globals);
-	t4p::NewUserAssociationsPanelClass* filePanel = new t4p::NewUserAssociationsPanelClass(page3, App.Globals);
+	new t4p::NewUserSettingsPanelClass(page1, App.Globals, App.Preferences, settingsDir);
+	new t4p::NewUserPhpSettingsPanelClass(page2, App.Globals);
+	new t4p::NewUserAssociationsPanelClass(page3, App.Globals);
 
 	wizard.GetPageAreaSizer()->Add(page1);
 	wizard.GetPageAreaSizer()->Add(page2);
