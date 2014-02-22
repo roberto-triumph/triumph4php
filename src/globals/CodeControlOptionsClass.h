@@ -227,8 +227,6 @@ public:
 
 	CodeControlOptionsClass();
 
-	CodeControlOptionsClass(const t4p::CodeControlOptionsClass& src);
-
 	t4p::CodeControlOptionsClass& operator=(const t4p::CodeControlOptionsClass& src);
 
 	void Copy(const t4p::CodeControlOptionsClass& src);

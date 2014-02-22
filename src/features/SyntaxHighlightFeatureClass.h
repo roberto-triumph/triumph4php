@@ -62,7 +62,11 @@ private:
 
 	t4p::CodeControlOptionsClass EditedCodeControlOptions;
 
-	t4p::CodeControlClass* CodeCtrl;
+	// the different code previews
+	t4p::CodeControlClass* PhpCodeCtrl;
+	t4p::CodeControlClass* SqlCodeCtrl;
+	t4p::CodeControlClass* CssCodeCtrl;
+	t4p::CodeControlClass* JsCodeCtrl;
 
 	t4p::GlobalsClass Globals;
 
@@ -87,10 +91,10 @@ public:
 	SyntaxHighlightFeatureClass(t4p::AppClass& app);
 	
 	/**
-	 * Determine the correct styles to use based on the
-	 * code control's document mode
+	 * Change the styles to use based on the
+	 * code control's document mode and the given options
 	 */
-	void ApplyPreferences(t4p::CodeControlClass* ctrl);
+	void ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options);
 
 private:
 
@@ -108,54 +112,6 @@ private:
 	 * control because the styles might have changed.
 	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
-
-//------------------------------------------------------------------------
-// setting the various wxStyledTextCtrl options
-// wxStyledTextCtrl is super-configurable.  These methods will turn on
-// some sensible defaults for plain-text, PHP, HTML, and SQL editing.
-//------------------------------------------------------------------------
-
-	/**
-	 * set the margin look of the source control
-	 */
-	void SetMargin(wxStyledTextCtrl* ctrl);
-
-	/**
-	 * set the colors for all lexer styles
-	 */
-	void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles);
-
-	/**
-	 * Set the font, EOL, tab options of the source control
-	 * Set generic defaults for plain text editing.
-	 */
-	void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles);
-
-	/**
-	 * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
-	 * HTML and Javascript editing as well.
-	 */
-	void SetPhpOptions(wxStyledTextCtrl* ctrl);
-
-	/**
-	 * Set the SQL highlight options of the source control
-	 */
-	void SetSqlOptions(wxStyledTextCtrl* ctrl);
-
-	/**
-	 * Set the CSS highlight options of the source control
-	 */
-	void SetCssOptions(wxStyledTextCtrl* ctrl);
-
-	/**
-	 * Set the JS highlight options of the source control
-	 */
-	void SetJsOptions(wxStyledTextCtrl* ctrl);
-
-	/**
-	 * Set the font settings for plain text documents.
-	 */
-	void SetPlainTextOptions(wxStyledTextCtrl* ctrl);
 	
 	/**
 	 * on app start we load the bitmaps we use

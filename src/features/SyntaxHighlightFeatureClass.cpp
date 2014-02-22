@@ -29,19 +29,167 @@
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>
 
-t4p::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) {
+//------------------------------------------------------------------------
+// setting the various wxStyledTextCtrl options
+// wxStyledTextCtrl is super-configurable.  These methods will turn on
+// some sensible defaults for plain-text, PHP, HTML, and SQL editing.
+//------------------------------------------------------------------------
+
+/**
+ * set the margin look of the source control
+ */
+static void SetMargin(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options) {
+	if (options.EnableLineNumbers) {
+		ctrl->SetMarginType(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, wxSTC_MARGIN_NUMBER);
+		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, ctrl->TextWidth(wxSTC_STYLE_LINENUMBER, wxT("_99999")));
+	}
+	else {
+		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, 0);
+	}
+	if (options.EnableCodeFolding) {
+		ctrl->SetProperty(wxT("fold"), wxT("1"));
+		ctrl->SetProperty(wxT("fold.comment"), wxT("1"));
+		ctrl->SetProperty(wxT("fold.html"), wxT("1"));
+		ctrl->SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED);
+		ctrl->SetMarginType(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
+		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, 16);
+		ctrl->SetMarginSensitive(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, true);
+		ctrl->SetMarginMask(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MASK_FOLDERS);
+	}
+	else {
+		ctrl->SetProperty(wxT("fold"), wxT("0"));
+		ctrl->SetProperty(wxT("fold.comment"), wxT("0"));
+		ctrl->SetProperty(wxT("fold.html"), wxT("0"));
+		ctrl->SetFoldFlags(0);
+		ctrl->SetMarginType(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
+		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, 0);
+		ctrl->SetMarginSensitive(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, false);
+	}
 }
 
-void t4p::SyntaxHighlightFeatureClass::OnFileNew(t4p::CodeControlEventClass& event) {
-	ApplyPreferences(event.GetCodeControl());
+/**
+ * set the colors for all lexer styles
+ */
+static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, t4p::CodeControlOptionsClass& options) {
+
+	t4p::StylePreferenceClass pref = options.FindByStcStyle(
+        options.PhpStyles,
+        wxSTC_HPHP_DEFAULT
+	 );
+
+	// use the PHP default settings as the catch-all for settings not yet exposed
+	// so the user sees a uniform style.
+	ctrl->StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
+	ctrl->StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
+	ctrl->StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
+	ctrl->StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
+	ctrl->StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
+
+	for (size_t i = 0; i < styles.size(); ++i) {
+		t4p::StylePreferenceClass pref = styles[i];
+		int style = pref.StcStyle;
+		ctrl->StyleSetFont(style, pref.Font);
+		ctrl->StyleSetForeground(style, pref.Color);
+		ctrl->StyleSetBackground(style, pref.BackgroundColor);
+		ctrl->StyleSetBold(style, pref.IsBold);
+		ctrl->StyleSetItalic(style, pref.IsItalic);
+	}
+
+	// the found match indicator style
+	pref = options.FindByStcStyle(
+	           styles,
+	           t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT
+	       );
+	ctrl->IndicatorSetStyle(t4p::CODE_CONTROL_INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
+	ctrl->IndicatorSetForeground(t4p::CODE_CONTROL_INDICATOR_FIND, pref.Color);
 }
 
-void t4p::SyntaxHighlightFeatureClass::OnFileOpen(t4p::CodeControlEventClass& event) {
-	ApplyPreferences(event.GetCodeControl());
+/**
+ * Set the font, EOL, tab options of the source control
+ * Set generic defaults for plain text editing.
+ */
+static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, 
+						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
+						   wxBitmap& searchHitBadBitmap) {
+	if (options.IndentUsingTabs) {
+		ctrl->SetUseTabs(true);
+		ctrl->SetTabWidth(options.TabWidth);
+		ctrl->SetIndent(0);
+		ctrl->SetTabIndents(true);
+		ctrl->SetBackSpaceUnIndents(true);
+	}
+	else {
+		ctrl->SetUseTabs(false);
+		ctrl->SetTabWidth(options.SpacesPerIndent);
+		ctrl->SetIndent(options.SpacesPerIndent);
+		ctrl->SetTabIndents(false);
+		ctrl->SetBackSpaceUnIndents(false);
+	}
+	if (options.RightMargin > 0) {
+		ctrl->SetEdgeMode(wxSTC_EDGE_LINE);
+		ctrl->SetEdgeColumn(options.RightMargin);
+	}
+	else {
+		ctrl->SetEdgeMode(wxSTC_EDGE_NONE);
+	}
+	ctrl->SetIndentationGuides(options.EnableIndentationGuides);
+	ctrl->SetEOLMode(options.LineEndingMode);
+	ctrl->SetViewEOL(options.EnableLineEndings);
+
+	// caret, line, selection, margin colors
+	for (size_t i = 0; i < styles.size(); ++i) {
+		t4p::StylePreferenceClass pref = styles[i];
+		int style = pref.StcStyle;
+		switch (style) {
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CARET:
+				ctrl->SetCaretForeground(pref.Color);
+				break;
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE:
+				ctrl->SetCaretLineVisible(true);
+				ctrl->SetCaretLineBackground(pref.BackgroundColor);
+				break;
+			case t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION:
+				ctrl->SetSelForeground(true, pref.Color);
+				ctrl->SetSelBackground(true, pref.BackgroundColor);
+				break;
+			case t4p::CodeControlOptionsClass::T4P_STYLE_CODE_FOLDING:
+				if (options.EnableCodeFolding) {
+					ctrl->SetFoldMarginColour(true, pref.BackgroundColor);
+					ctrl->SetFoldMarginHiColour(true, pref.BackgroundColor);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, pref.BackgroundColor, pref.Color);
+					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, pref.BackgroundColor, pref.Color);
+				}
+			case t4p::CodeControlOptionsClass::T4P_STYLE_RIGHT_MARGIN:
+				if (options.RightMargin > 0) {
+					ctrl->SetEdgeColour(pref.Color);
+				}
+				break;
+			case t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT:
+				// since we need to share one indicator with the matching word highlight
+				// and the parse errors indicators; we will set this setting when the
+				// user initiates the matching word feature
+				break;
+		}
+	}
+	
+	
+	// set the search hit margin; we want this marker to be available to
+	// all file types
+	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, searchHitGoodBitmap); 
+	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER, searchHitBadBitmap);
+	SetLexerStyles(ctrl, styles, options);
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctrl) {
+/**
+ * Set the PHP syntax highlight options. Note that since PHP is embedded the PHP options will be suitable for
+ * HTML and Javascript editing as well.
+ */
+static void SetPhpOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options, t4p::GlobalsClass& globals) {
 
 	// set the lexer before setting the keywords
 	ctrl->SetLexer(wxSTC_LEX_HTML);
@@ -53,7 +201,7 @@ void t4p::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctrl) {
 	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
 	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
 	// and 5 is for SGML and DTD keywords
-	t4p::PhpDocumentClass doc(&App.Globals);
+	t4p::PhpDocumentClass doc(&globals);
 	ctrl->SetKeyWords(0, doc.GetHtmlKeywords());
 	ctrl->SetKeyWords(1, doc.GetJavascriptKeywords());
 	ctrl->SetKeyWords(4, doc.GetPhpKeywords());
@@ -68,31 +216,34 @@ void t4p::SyntaxHighlightFeatureClass::SetPhpOptions(wxStyledTextCtrl* ctrl) {
 	// ctrl->AutoCompletion to workwith namespaces.
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\"));
 
-	ctrl->SetMarginType(CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	ctrl->SetMarginWidth(CODE_CONTROL_LINT_RESULT_MARGIN, 16);
-	ctrl->SetMarginSensitive(CODE_CONTROL_LINT_RESULT_MARGIN, false);
-	ctrl->SetMarginMask(CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	ctrl->MarkerDefine(CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	ctrl->SetMarginType(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	ctrl->SetMarginWidth(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, 16);
+	ctrl->SetMarginSensitive(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, false);
+	ctrl->SetMarginMask(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 
 	// the annotation styles
-	ctrl->StyleSetForeground(CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
-	ctrl->StyleSetBackground(CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-	ctrl->StyleSetBold(CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, true);
-	ctrl->StyleSetItalic(CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, true);
+	ctrl->StyleSetForeground(t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
+	ctrl->StyleSetBackground(t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+	ctrl->StyleSetBold(t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, true);
+	ctrl->StyleSetItalic(t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, true);
 
 	// the lint error ctrl->Marker styles
-	ctrl->IndicatorSetStyle(CODE_CONTROL_INDICATOR_PHP_LINT, wxSTC_INDIC_SQUIGGLE);
-	ctrl->IndicatorSetForeground(CODE_CONTROL_INDICATOR_PHP_LINT, *wxRED);
+	ctrl->IndicatorSetStyle(t4p::CODE_CONTROL_INDICATOR_PHP_LINT, wxSTC_INDIC_SQUIGGLE);
+	ctrl->IndicatorSetForeground(t4p::CODE_CONTROL_INDICATOR_PHP_LINT, *wxRED);
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetSqlOptions(wxStyledTextCtrl* ctrl) {
+/**
+ * Set the SQL highlight options of the source control
+ */
+static void SetSqlOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options, t4p::GlobalsClass& globals) {
 	ctrl->SetLexer(wxSTC_LEX_SQL);
 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	ctrl->SetStyleBits(5);
 
 	t4p::DatabaseTagClass emptyTag;
-	t4p::SqlDocumentClass doc(&App.Globals, emptyTag);
+	t4p::SqlDocumentClass doc(&globals, emptyTag);
 	ctrl->SetKeyWords(0, doc.GetMySqlKeywords());
 	ctrl->SetKeyWords(1, wxT(""));
 	ctrl->SetKeyWords(2, wxT(""));
@@ -107,7 +258,10 @@ void t4p::SyntaxHighlightFeatureClass::SetSqlOptions(wxStyledTextCtrl* ctrl) {
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctrl) {
+/**
+ * Set the CSS highlight options of the source control
+ */
+static void SetCssOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options) {
 	ctrl->SetLexer(wxSTC_LEX_CSS);
 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
@@ -130,7 +284,10 @@ void t4p::SyntaxHighlightFeatureClass::SetCssOptions(wxStyledTextCtrl* ctrl) {
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl) {
+/**
+ * Set the JS highlight options of the source control
+ */
+static void SetJsOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options) {
 
 	// the CPP lexer is used to handle javascript
 	ctrl->SetLexer(wxSTC_LEX_CPP);
@@ -158,107 +315,45 @@ void t4p::SyntaxHighlightFeatureClass::SetJsOptions(wxStyledTextCtrl* ctrl) {
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetPlainTextOptions(wxStyledTextCtrl* ctrl) {
-
+/**
+ * Set the font settings for plain text documents.
+ */
+static void SetPlainTextOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options) {
 	ctrl->SetLexer(wxSTC_LEX_NULL);
 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	ctrl->SetStyleBits(5);
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
 
-	ctrl->SetMarginType(CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	ctrl->SetMarginWidth(CODE_CONTROL_LINT_RESULT_MARGIN, 16);
-	ctrl->SetMarginSensitive(CODE_CONTROL_LINT_RESULT_MARGIN, false);
-	ctrl->SetMarginMask(CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	ctrl->MarkerDefine(CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	ctrl->SetMarginType(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	ctrl->SetMarginWidth(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, 16);
+	ctrl->SetMarginSensitive(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, false);
+	ctrl->SetMarginMask(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 }
 
-void t4p::SyntaxHighlightFeatureClass::SetCodeControlOptions(wxStyledTextCtrl* ctrl,
-        std::vector<t4p::StylePreferenceClass>& styles) {
-	if (App.Preferences.CodeControlOptions.IndentUsingTabs) {
-		ctrl->SetUseTabs(true);
-		ctrl->SetTabWidth(App.Preferences.CodeControlOptions.TabWidth);
-		ctrl->SetIndent(0);
-		ctrl->SetTabIndents(true);
-		ctrl->SetBackSpaceUnIndents(true);
-	}
-	else {
-		ctrl->SetUseTabs(false);
-		ctrl->SetTabWidth(App.Preferences.CodeControlOptions.SpacesPerIndent);
-		ctrl->SetIndent(App.Preferences.CodeControlOptions.SpacesPerIndent);
-		ctrl->SetTabIndents(false);
-		ctrl->SetBackSpaceUnIndents(false);
-	}
-	if (App.Preferences.CodeControlOptions.RightMargin > 0) {
-		ctrl->SetEdgeMode(wxSTC_EDGE_LINE);
-		ctrl->SetEdgeColumn(App.Preferences.CodeControlOptions.RightMargin);
-	}
-	else {
-		ctrl->SetEdgeMode(wxSTC_EDGE_NONE);
-	}
-	ctrl->SetIndentationGuides(App.Preferences.CodeControlOptions.EnableIndentationGuides);
-	ctrl->SetEOLMode(App.Preferences.CodeControlOptions.LineEndingMode);
-	ctrl->SetViewEOL(App.Preferences.CodeControlOptions.EnableLineEndings);
+t4p::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(t4p::AppClass& app)
+	: FeatureClass(app) {
+}
 
-	// caret, line, selection, margin colors
-	for (size_t i = 0; i < styles.size(); ++i) {
-		t4p::StylePreferenceClass pref = styles[i];
-		int style = pref.StcStyle;
-		switch (style) {
-			case CodeControlOptionsClass::T4P_STYLE_CARET:
-				ctrl->SetCaretForeground(pref.Color);
-				break;
-			case CodeControlOptionsClass::T4P_STYLE_CARET_LINE:
-				ctrl->SetCaretLineVisible(true);
-				ctrl->SetCaretLineBackground(pref.BackgroundColor);
-				break;
-			case CodeControlOptionsClass::T4P_STYLE_SELECTION:
-				ctrl->SetSelForeground(true, pref.Color);
-				ctrl->SetSelBackground(true, pref.BackgroundColor);
-				break;
-			case CodeControlOptionsClass::T4P_STYLE_CODE_FOLDING:
-				if (App.Preferences.CodeControlOptions.EnableCodeFolding) {
-					ctrl->SetFoldMarginColour(true, pref.BackgroundColor);
-					ctrl->SetFoldMarginHiColour(true, pref.BackgroundColor);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED, pref.BackgroundColor, pref.Color);
-					ctrl->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER, pref.BackgroundColor, pref.Color);
-				}
-			case CodeControlOptionsClass::T4P_STYLE_RIGHT_MARGIN:
-				if (App.Preferences.CodeControlOptions.RightMargin > 0) {
-					ctrl->SetEdgeColour(pref.Color);
-				}
-				break;
-			case t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT:
-				// since we need to share one indicator with the matching word highlight
-				// and the parse errors indicators; we will set this setting when the
-				// user initiates the matching word feature
-				break;
-		}
-	}
-	
-	
-	// set the search hit margin; we want this marker to be available to
-	// all file types
-	ctrl->MarkerDefineBitmap(CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, SearchHitGoodBitmap); 
-	ctrl->MarkerDefineBitmap(CODE_CONTROL_SEARCH_HIT_BAD_MARKER, SearchHitBadBitmap);
-	SetLexerStyles(ctrl, styles);
+void t4p::SyntaxHighlightFeatureClass::OnFileNew(t4p::CodeControlEventClass& event) {
+	ApplyPreferences(event.GetCodeControl(), App.Preferences.CodeControlOptions);
+}
+
+void t4p::SyntaxHighlightFeatureClass::OnFileOpen(t4p::CodeControlEventClass& event) {
+	ApplyPreferences(event.GetCodeControl(), App.Preferences.CodeControlOptions);
 }
 
 void t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	t4p::NotebookClass* notebook = GetNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		ApplyPreferences(ctrl);
+		ApplyPreferences(ctrl, App.Preferences.CodeControlOptions);
 	}
 }
 
-void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl) {
-	if (App.Preferences.CodeControlOptions.EnableWordWrap) {
+void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options) {
+	if (options.EnableWordWrap) {
 		ctrl->SetWrapMode(wxSTC_WRAP_WORD);
 		ctrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
 	}
@@ -267,146 +362,81 @@ void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* c
 	}
 
 	if (t4p::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
-		SetPhpOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPhpOptions(ctrl, options, App.Globals);
 	}
 	else if (t4p::CodeControlClass::CSS == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.CssStyles);
-		SetCssOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCssOptions(ctrl, options);
 	}
 	else if (t4p::CodeControlClass::SQL == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.SqlStyles);
-		SetSqlOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetSqlOptions(ctrl, options, App.Globals);
 	}
 	else if (t4p::CodeControlClass::JS == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.JsStyles);
-		SetJsOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetJsOptions(ctrl, options);
 	}
 	else if (t4p::CodeControlClass::CONFIG == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.ConfigStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
 	}
 	else if (t4p::CodeControlClass::CRONTAB == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.CrontabStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
 	}
 	else if (t4p::CodeControlClass::YAML == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.YamlStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 
 		// yaml override; never use tabs for yaml editing since yaml requires spaces
 		ctrl->SetUseTabs(false);
 		ctrl->SetLexer(wxSTC_LEX_YAML);
 	}
 	else if (t4p::CodeControlClass::XML == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
 	}
 	else if (t4p::CodeControlClass::RUBY == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.RubyStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.RubyStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
 	}
 	else if (t4p::CodeControlClass::LUA == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.LuaStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
 	}
 	else if (t4p::CodeControlClass::MARKDOWN == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.MarkdownStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
 	}
 	else if (t4p::CodeControlClass::BASH == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.BashStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
 	}
 	else if (t4p::CodeControlClass::DIFF == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.DiffStyles);
-		SetPlainTextOptions(ctrl);
+		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_DIFF);
 	}
 	else {
-		SetPlainTextOptions(ctrl);
+		SetPlainTextOptions(ctrl, options);
 
 		// plain text files don't have a lexer, but we still want to
 		// set a default background and foreground color
-		SetCodeControlOptions(ctrl, App.Preferences.CodeControlOptions.PhpStyles);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
 	}
 
 	// in wxWidgets 2.9.5, need to set margin after setting the lexer
 	// otherwise code folding does not work
-	SetMargin(ctrl);
+	SetMargin(ctrl, options);
 	ctrl->Colourise(0, -1);
-}
-
-
-void t4p::SyntaxHighlightFeatureClass::SetMargin(wxStyledTextCtrl* ctrl) {
-	if (App.Preferences.CodeControlOptions.EnableLineNumbers) {
-		ctrl->SetMarginType(CodeControlOptionsClass::MARGIN_LINE_NUMBER, wxSTC_MARGIN_NUMBER);
-		ctrl->SetMarginWidth(CodeControlOptionsClass::MARGIN_LINE_NUMBER, ctrl->TextWidth(wxSTC_STYLE_LINENUMBER, wxT("_99999")));
-	}
-	else {
-		ctrl->SetMarginWidth(CodeControlOptionsClass::MARGIN_LINE_NUMBER, 0);
-	}
-	if (App.Preferences.CodeControlOptions.EnableCodeFolding) {
-		ctrl->SetProperty(wxT("fold"), wxT("1"));
-		ctrl->SetProperty(wxT("fold.comment"), wxT("1"));
-		ctrl->SetProperty(wxT("fold.html"), wxT("1"));
-		ctrl->SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED);
-		ctrl->SetMarginType(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
-		ctrl->SetMarginWidth(CodeControlOptionsClass::MARGIN_CODE_FOLDING, 16);
-		ctrl->SetMarginSensitive(CodeControlOptionsClass::MARGIN_CODE_FOLDING, true);
-		ctrl->SetMarginMask(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MASK_FOLDERS);
-	}
-	else {
-		ctrl->SetProperty(wxT("fold"), wxT("0"));
-		ctrl->SetProperty(wxT("fold.comment"), wxT("0"));
-		ctrl->SetProperty(wxT("fold.html"), wxT("0"));
-		ctrl->SetFoldFlags(0);
-		ctrl->SetMarginType(CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MARGIN_SYMBOL);
-		ctrl->SetMarginWidth(CodeControlOptionsClass::MARGIN_CODE_FOLDING, 0);
-		ctrl->SetMarginSensitive(CodeControlOptionsClass::MARGIN_CODE_FOLDING, false);
-	}
-}
-
-void t4p::SyntaxHighlightFeatureClass::SetLexerStyles(wxStyledTextCtrl* ctrl,
-        std::vector<t4p::StylePreferenceClass>& styles) {
-
-	t4p::StylePreferenceClass pref = App.Preferences.CodeControlOptions.FindByStcStyle(
-	        App.Preferences.CodeControlOptions.PhpStyles,
-	        wxSTC_HPHP_DEFAULT
-	                                       );
-
-	// use the PHP default settings as the catch-all for settings not yet exposed
-	// so the user sees a uniform style.
-	ctrl->StyleSetFont(wxSTC_STYLE_DEFAULT, pref.Font);
-	ctrl->StyleSetForeground(wxSTC_STYLE_DEFAULT, pref.Color);
-	ctrl->StyleSetBackground(wxSTC_STYLE_DEFAULT, pref.BackgroundColor);
-	ctrl->StyleSetBold(wxSTC_STYLE_DEFAULT, pref.IsBold);
-	ctrl->StyleSetItalic(wxSTC_STYLE_DEFAULT, pref.IsItalic);
-
-	for (size_t i = 0; i < styles.size(); ++i) {
-		t4p::StylePreferenceClass pref = styles[i];
-		int style = pref.StcStyle;
-		ctrl->StyleSetFont(style, pref.Font);
-		ctrl->StyleSetForeground(style, pref.Color);
-		ctrl->StyleSetBackground(style, pref.BackgroundColor);
-		ctrl->StyleSetBold(style, pref.IsBold);
-		ctrl->StyleSetItalic(style, pref.IsItalic);
-	}
-
-	// the found match indicator style
-	pref = App.Preferences.CodeControlOptions.FindByStcStyle(
-	           styles,
-	           t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT
-	       );
-	ctrl->IndicatorSetStyle(CODE_CONTROL_INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
-	ctrl->IndicatorSetForeground(CODE_CONTROL_INDICATOR_FIND, pref.Color);
 }
 
 void t4p::SyntaxHighlightFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -425,7 +455,10 @@ t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, t4p::SyntaxHig
 : SyntaxHighlightPanelGeneratedClass(parent)
 , CodeControlOptions(feature.App.Preferences.CodeControlOptions)
 , EditedCodeControlOptions(feature.App.Preferences.CodeControlOptions)
-, CodeCtrl(NULL) 
+, PhpCodeCtrl(NULL) 
+, SqlCodeCtrl(NULL) 
+, CssCodeCtrl(NULL) 
+, JsCodeCtrl(NULL) 
 , Globals() 
 , EventSink() 
 , Feature(feature) {
@@ -494,11 +527,11 @@ t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, t4p::SyntaxHig
 }
 
 void t4p::EditColorsPanelClass::AddPreviews() {
-	CodeCtrl = new t4p::CodeControlClass(this,
+	PhpCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	CodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
-	PreviewNotebook->AddPage(CodeCtrl, _("PHP"));
+	PhpCodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
+	PreviewNotebook->AddPage(PhpCodeCtrl, _("PHP"));
 	wxString txt = t4p::CharToWx(
 		"<?php\n"
 		"/**\n"
@@ -520,13 +553,13 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 		"}\n"
 		"\n"
 	);
-	CodeCtrl->SetText(txt);
-	Feature.ApplyPreferences(CodeCtrl);
+	PhpCodeCtrl->SetText(txt);
+	Feature.ApplyPreferences(PhpCodeCtrl, EditedCodeControlOptions);
 	
-	t4p::CodeControlClass* sql = new t4p::CodeControlClass(this,
+	SqlCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	sql->SetDocumentMode(t4p::CodeControlClass::SQL);
+	SqlCodeCtrl->SetDocumentMode(t4p::CodeControlClass::SQL);
 	txt =  t4p::CharToWx(
 		" -- table to store users\n"
 		"CREATE TABLE my_users(\n"
@@ -535,14 +568,14 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 		"	createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n"
 		");"
 	);
-	sql->SetText(txt);
-	PreviewNotebook->AddPage(sql, _("SQL"));
-	Feature.ApplyPreferences(sql);
+	SqlCodeCtrl->SetText(txt);
+	PreviewNotebook->AddPage(SqlCodeCtrl, _("SQL"));
+	Feature.ApplyPreferences(SqlCodeCtrl, EditedCodeControlOptions);
 	
-	t4p::CodeControlClass* css = new t4p::CodeControlClass(this,
+	CssCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	css->SetDocumentMode(t4p::CodeControlClass::CSS);
+	CssCodeCtrl->SetDocumentMode(t4p::CodeControlClass::CSS);
 	txt =  t4p::CharToWx(
 		" /* render users nicely */\n"
 		".user {\n"
@@ -550,14 +583,14 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 		"	font-family: 'Arial';\n"
 		"}"
 	);
-	css->SetText(txt);
-	PreviewNotebook->AddPage(css, _("CSS"));
-	Feature.ApplyPreferences(css);
+	CssCodeCtrl->SetText(txt);
+	PreviewNotebook->AddPage(CssCodeCtrl, _("CSS"));
+	Feature.ApplyPreferences(CssCodeCtrl, EditedCodeControlOptions);
 	
-	t4p::CodeControlClass* js = new t4p::CodeControlClass(this,
+	JsCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	js->SetDocumentMode(t4p::CodeControlClass::JS);
+	JsCodeCtrl->SetDocumentMode(t4p::CodeControlClass::JS);
 	txt =  t4p::CharToWx(
 		" /* represents a logged-in user */\n"
 		"function myFunction() {\n"
@@ -569,9 +602,9 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 		"	document.getElementById(\"demo\").innerHTML = x;\n"
 		"}\n"
 	);
-	js->SetText(txt);
-	PreviewNotebook->AddPage(js, _("Javascript"));
-	Feature.ApplyPreferences(js);
+	JsCodeCtrl->SetText(txt);
+	PreviewNotebook->AddPage(JsCodeCtrl, _("Javascript"));
+	Feature.ApplyPreferences(JsCodeCtrl, EditedCodeControlOptions);
 }
 
 bool t4p::EditColorsPanelClass::TransferDataFromWindow() {
@@ -646,15 +679,27 @@ void t4p::EditColorsPanelClass::OnColorChanged(wxColourPickerEvent& event) {
 	int selected = Styles->GetSelection();
 	t4p::StylePreferenceClass* pref = (t4p::StylePreferenceClass*)Styles->GetClientData(selected);
 	if (pref) {
+		bool apply = false;
 		switch (event.GetId()) {
 			case ID_FOREGROUND_COLOR:
 				pref->Color = event.GetColour();
-				CodeCtrl->ApplyPreferences();
+				apply = true;
 				break;
 			case ID_BACKGROUND_COLOR:
 				pref->BackgroundColor = event.GetColour();
-				CodeCtrl->ApplyPreferences();
+				apply = true;
 				break;
+		}
+
+		if (apply) {
+			PhpCodeCtrl->ApplyPreferences();
+			SqlCodeCtrl->ApplyPreferences();
+			CssCodeCtrl->ApplyPreferences();
+			JsCodeCtrl->ApplyPreferences();
+			Feature.ApplyPreferences(PhpCodeCtrl, EditedCodeControlOptions);
+			Feature.ApplyPreferences(SqlCodeCtrl, EditedCodeControlOptions);
+			Feature.ApplyPreferences(CssCodeCtrl, EditedCodeControlOptions);
+			Feature.ApplyPreferences(JsCodeCtrl, EditedCodeControlOptions);
 		}
 	}
 }
@@ -665,7 +710,15 @@ void t4p::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	if (pref) {
 		wxFont font = event.GetFont();
 		pref->Font = font;
-		CodeCtrl->ApplyPreferences();
+		
+		PhpCodeCtrl->ApplyPreferences();
+		SqlCodeCtrl->ApplyPreferences();
+		CssCodeCtrl->ApplyPreferences();
+		JsCodeCtrl->ApplyPreferences();
+		Feature.ApplyPreferences(PhpCodeCtrl, EditedCodeControlOptions);
+		Feature.ApplyPreferences(SqlCodeCtrl, EditedCodeControlOptions);
+		Feature.ApplyPreferences(CssCodeCtrl, EditedCodeControlOptions);
+		Feature.ApplyPreferences(JsCodeCtrl, EditedCodeControlOptions);
 	}
 }
 
@@ -677,10 +730,18 @@ void t4p::EditColorsPanelClass::OnThemeChoice(wxCommandEvent& event) {
 	}
 	listBoxEvent.SetInt(sel);
 
-	t4p::CodeControlStylesSetTheme(EditedCodeControlOptions, Theme->GetStringSelection());
+	wxString newTheme = Theme->GetStringSelection();
+	t4p::CodeControlStylesSetTheme(EditedCodeControlOptions, newTheme);
 	wxPostEvent(this, listBoxEvent);
 
-	CodeCtrl->ApplyPreferences();
+	PhpCodeCtrl->ApplyPreferences();
+	SqlCodeCtrl->ApplyPreferences();
+	CssCodeCtrl->ApplyPreferences();
+	JsCodeCtrl->ApplyPreferences();
+	Feature.ApplyPreferences(PhpCodeCtrl, EditedCodeControlOptions);
+	Feature.ApplyPreferences(SqlCodeCtrl, EditedCodeControlOptions);
+	Feature.ApplyPreferences(CssCodeCtrl, EditedCodeControlOptions);
+	Feature.ApplyPreferences(JsCodeCtrl, EditedCodeControlOptions);
 }
 
 BEGIN_EVENT_TABLE(t4p::SyntaxHighlightFeatureClass, t4p::FeatureClass)

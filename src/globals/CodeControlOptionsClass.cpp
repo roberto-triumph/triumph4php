@@ -59,11 +59,6 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 
 }
 
-t4p::CodeControlOptionsClass::CodeControlOptionsClass(const t4p::CodeControlOptionsClass& src) {
-	Copy(src);
-}
-
-
 t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
 	Copy(src);
 	return *this;
@@ -134,6 +129,12 @@ std::vector<t4p::StylePreferenceClass> t4p::CodeControlOptionsClass::AllStyles()
 	return all;
 }
 
+static void ReadStyles(std::vector<t4p::StylePreferenceClass>& styles, wxConfigBase* config) {
+	for (size_t i = 0; i < styles.size(); ++i) {
+		styles[i].Read(config);
+	}
+}
+
 void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/SpacesPerIndent"), &SpacesPerIndent);
 	config->Read(wxT("EditorBehavior/TabWidth"), &TabWidth);
@@ -152,10 +153,17 @@ void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
 	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
 	
-	std::vector<t4p::StylePreferenceClass> allStyles = AllStyles();
-	for (size_t i = 0; i < allStyles.size(); ++i) {
-		allStyles[i].Read(config);
-	}
+	ReadStyles(PhpStyles, config);
+	ReadStyles(SqlStyles, config);
+	ReadStyles(CssStyles, config);
+	ReadStyles(JsStyles, config);
+	ReadStyles(CrontabStyles, config);
+	ReadStyles(YamlStyles, config);
+	ReadStyles(RubyStyles, config);
+	ReadStyles(LuaStyles, config);
+	ReadStyles(MarkdownStyles, config);
+	ReadStyles(BashStyles, config);
+	ReadStyles(DiffStyles, config);
 }
 	 
 void t4p::CodeControlOptionsClass::Save(wxConfigBase* config) {
