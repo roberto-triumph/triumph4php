@@ -24,35 +24,45 @@
 -------------------------------------------------------------------
 
 function setupDev()
-	failMsg = "This program is required to setup the development environment.\n" ..
-		"You can set the proper location for the file by editing\n" ..
-		"premake_opts_windows.lua. Or if you don't have it you will have to\n" ..
-		"install it.  One nice way to install it is by using Chocolatey for " ..
-		"windows\n\n" .. 
-		"@powershell -NoProfile -ExecutionPolicy unrestricted " ..
-		"-Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" " ..
-		" && SET PATH=%PATH%;%systemdrive%\\chocolatey\\bin\n" ..
-		"cinst git\n" ..
-		"cinst cmake\n" ..
-		"cinst 7zip.commandline\n" ..
-		"cinst wget\n" ..
-		"\n\n" ..
-		"However, be sure to uninstall any previous versions first.\n\n" ..
-		"See https://github.com/chocolatey/chocolatey/wiki for more info on chocolatey\n"
+    if (os.is "windows") then
+    	failMsg = "This program is required to setup the development environment.\n" ..
+	    	"You can set the proper location for the file by editing\n" ..
+		    "premake_opts_windows.lua. Or if you don't have it you will have to\n" ..
+    		"install it.  One nice way to install it is by using Chocolatey for " ..
+	    	"windows\n\n" .. 
+		    "@powershell -NoProfile -ExecutionPolicy unrestricted " ..
+	    	"-Command \"iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))\" " ..
+    		" && SET PATH=%PATH%;%systemdrive%\\chocolatey\\bin\n" ..
+		    "cinst git\n" ..
+	    	"cinst cmake\n" ..
+    		"cinst 7zip.commandline\n" ..
+		    "cinst wget\n" ..
+    		"\n\n" ..
+	    	"However, be sure to uninstall any previous versions first.\n\n" ..
+		    "See https://github.com/chocolatey/chocolatey/wiki for more info on chocolatey\n"
+    else 
+        failMsg = "This program is required to setup the development enviroment.\n" ..
+	    	"You can set the proper location for the file by editing\n" ..
+		    "premake_opts_linux.lua. Or if you don't have it you will have to\n" ..
+    		"install it.  One nice way to install it is by using the package manager, either apt or yum\n\n"
+    end
+
 	programexistence(GIT, "--version", failMsg);
 	programexistence(CMAKE, "--version", failMsg);
 	programexistence(SEVENZIP, "", failMsg);
 	programexistence(WGET, "--version", failMsg);
-	
-	failMsg = "This batch file is needed to setup compilation variables in order\n" ..
-		"to compile from the command line.  This batch file comes with Visual\n" ..
-		"Studio Express. You can set the proper location for the file by editing\n" ..
-		"premake_opts_windows.lua. Or if you don't have Visual Studio installed\n" ..
-		"you will have to install it. Currently, triumph4php requires use of the\n" ..
-		"Visual Studio compiler on windows\n"
-	existence({
-		VSVARS
-	}, failMsg)
+
+    if os.is("windows") then	
+    	failMsg = "This batch file is needed to setup compilation variables in order\n" ..
+		    "to compile from the command line.  This batch file comes with Visual\n" ..
+	    	"Studio Express. You can set the proper location for the file by editing\n" ..
+    		"premake_opts_windows.lua. Or if you don't have Visual Studio installed\n" ..
+		    "you will have to install it. Currently, triumph4php requires use of the\n" ..
+	    	"Visual Studio compiler on windows\n"
+    	existence({
+	    	VSVARS
+    	}, failMsg)
+    end
 	rootDir = normalizepath("");
 	
 	print "Getting submodules; this will take a several minutes..."
