@@ -575,7 +575,13 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 }
 
 bool t4p::EditColorsPanelClass::TransferDataFromWindow() {
-	CodeControlOptions = EditedCodeControlOptions;
+	
+	// ATTN: only copy the styles
+	// do not copy the other flags (editor behavior) since 
+	// they are being edited in the editor behavtior panel
+	// if we just copy the entire EditedCodeControlOption
+	// the we would revert the user's changes
+	CodeControlOptions.CopyStyles(EditedCodeControlOptions);
 	return true;
 }
 

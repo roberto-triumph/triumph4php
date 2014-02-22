@@ -63,12 +63,13 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass(const t4p::CodeControlOpti
 	Copy(src);
 }
 
+
 t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
 	Copy(src);
 	return *this;
 }
 
-void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src) {
+void t4p::CodeControlOptionsClass::CopyStyles(const t4p::CodeControlOptionsClass& src) {
 	PhpStyles = src.PhpStyles; 
 	SqlStyles = src.SqlStyles;
 	CssStyles = src.CssStyles;
@@ -81,6 +82,10 @@ void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src)
 	MarkdownStyles = src.MarkdownStyles;
 	BashStyles = src.BashStyles;
 	DiffStyles = src.DiffStyles;
+}
+
+void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src) {
+	CopyStyles(src);
 
 	CodeStyles = src.CodeStyles; 
 	SpacesPerIndent = src.SpacesPerIndent;

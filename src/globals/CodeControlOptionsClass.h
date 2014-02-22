@@ -232,6 +232,8 @@ public:
 	t4p::CodeControlOptionsClass& operator=(const t4p::CodeControlOptionsClass& src);
 
 	void Copy(const t4p::CodeControlOptionsClass& src);
+
+	void CopyStyles(const t4p::CodeControlOptionsClass& src);
 	
 	/**
 	 * @return concatenation of all styles for all languages
