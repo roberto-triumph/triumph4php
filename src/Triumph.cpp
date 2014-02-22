@@ -69,6 +69,11 @@ class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 
 public:
 
+	MysqlThreadCleanupClass() 
+	: ThreadCleanupClass() {
+		
+	}
+
 	void ThreadEnd() {
 
 		// clean up the MySQL library. 

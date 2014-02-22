@@ -25,6 +25,14 @@
 #include <actions/ActionClass.h>
 #include <wx/intl.h>
 #include <algorithm>
+
+t4p::ThreadCleanupClass::ThreadCleanupClass() {
+	
+}
+
+t4p::ThreadCleanupClass::~ThreadCleanupClass() {
+	
+}
 	
 t4p::ActionClass::ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: RunningThreads(runningThreads)

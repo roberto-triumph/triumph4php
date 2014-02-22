@@ -234,6 +234,10 @@ class ThreadCleanupClass {
 
 public:
 
+	ThreadCleanupClass();
+
+	virtual ~ThreadCleanupClass();
+
 	/**
 	 * override this method to put in logic to be executed just as the thread
 	 * ends.
