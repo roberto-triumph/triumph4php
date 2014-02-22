@@ -4,9 +4,12 @@
 [submodule "lib/soci"]
 	path = lib/soci
 	url = git://github.com/SOCI/soci.git
+	ignore = dirty
 [submodule "lib/wxWidgets"]
 	path = lib/wxWidgets
 	url = https://github.com/robertop/wxWidgets.git
+	ignore = dirty
 [submodule "lib/curl"]
 	path = lib/curl
 	url = https://github.com/bagder/curl.git
+	ignore = dirty
