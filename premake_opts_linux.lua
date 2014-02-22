@@ -122,8 +122,8 @@ MYSQL_LIB_NAME = 'libmysqlclient.so'
 MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so', 
 	"/usr/lib/",
 	"/usr/lib/mysql",
-	"/usr/lib/64", 
-	"/usr/lib/64/mysql", 
+	"/usr/lib64", 
+	"/usr/lib64/mysql", 
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
