@@ -664,10 +664,19 @@ void t4p::FileModifiedCheckFeatureClass::HandleWatchError() {
 	StartWatch();
 }
 
+
 void t4p::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
 	if (FilesToPoll.empty()) {
 		return;
 	}
+	if (!App.IsActive()) {
+		
+		// dont bother checking for
+		// files as the user wont be around to answer questions
+		return;
+	}
+	
+	
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl) {
 		return;

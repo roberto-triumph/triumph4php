@@ -229,10 +229,31 @@ private:
 	std::vector<wxString> NetworkVolumes;
 
 	/**
-	 * these are files that are opened but do not belong in a project.
-	 * we poll for external file changes since we do not watch the directories. Also,
-	 * we poll files that are in network drives since we don't create watches for
-	 * sources in network drivers either.
+	 * to periodically check the modified time of the opened files that we poll (files outside
+	 * watched directories).
+	 * Note that the logic will work like this:
+	 * 
+	 * 1. this PollTimer runs continuously
+	 * 2. when the timer triggers, OnPollTimer is called
+	 * 3. if the App is not active (user is using another app)
+ 	 *    exit the timer handler
+	 * 4. otherwise, we initiate the file modified check action
+	 *    which will read the file last modified time from a background thread
+	 * 5. when the file modified action finishes, ask the user if the file 
+	 *    was modified externally.
+	 * 
+	 * The reason for checking for file times  in this seemingly convulted way
+	 * a. by checking to see if we are the acitve app, we only check the file time when the user
+	 *    is actively using the editor. for example, when the user leaves 
+	 *    work for the day we dont want to continually poll for file
+	 *    times since the user is not around to answer the questions
+	 * b. a timer is used because we want to perform the file checks at 
+	 *    most once a second
+	 * c. we can use this same logic for local files and files that are 
+	 *    located in a network drive. we wont have to hit the network in
+	 *    the foreground thread (file checking is done in the background)
+	 *    plus we wont hit the network repeatedly many times if the user
+	 *    goes home for the day
 	 */
 	std::vector<wxFileName> FilesToPoll;
 
