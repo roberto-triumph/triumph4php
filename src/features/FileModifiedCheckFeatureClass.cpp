@@ -291,7 +291,7 @@ void t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete(t4p::VolumeListEve
 void t4p::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxDateTime now = wxDateTime::Now();
 	wxTimeSpan span = now.Subtract(LastWatcherEventTime);
-	if (span.GetSeconds() <= 1) {
+	if (span.GetSeconds() <= 2) {
 
 		// we are still getting file change events. let's wait until all
 		// of the changes are done 
@@ -339,6 +339,16 @@ void t4p::FileModifiedCheckFeatureClass::OnTimer(wxTimerEvent& event) {
 	
 	std::map<wxString, wxString>::iterator rename = pathsRenamed.begin();
 	while (rename != pathsRenamed.end()) {
+		
+		// make sure renamed files are actually renamed. sometime editors will swap files 
+		// instead of overwriting them, and this results in RENAME events
+		wxFileName fileName(rename->first);
+		if (fileName.FileExists()) {
+			std::map<wxString, wxString>::iterator toErase = rename;
+			rename++;
+			pathsRenamed.erase(toErase->first);
+			continue;
+		}
 		
 		// if a file has been renamed, then remove any modify events for it
 		std::map<wxString, int>::iterator it = FilesExternallyModified.find(rename->first);
