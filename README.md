@@ -1,15 +1,13 @@
-Triumph 4 PHP: Win the battle against your PHP projects
+Triumph4PHP: Win the battle against your PHP projects
 ============================================================
 The goal of Triumph4PHP is to provide a truly integrated development environment for developing mid to large size web 
-applications using the LAMP stack and the Model-View-Controller (MVC) architecture. The main objectives are:
+applications using the LAMP stack. The main objectives are:
 
  - Made specifically for PHP web applications; taking into account web application issues such as pretty URLs, 
    active record patterns, duck-typing, and virtual hosts.
  - Provide a clutter-free, tight interface for managing PHP source code that has a native look on either 
    Windows or Linux.
  - Leverage existing MVC frameworks (CodeIgniter, Symfony, CakePHP, Zend)
- - Reduce the time it takes to develop and debug applications by actively communicating with 
-   MySQL and Apache processes
  
 License
 -------
