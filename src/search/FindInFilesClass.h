@@ -114,7 +114,8 @@ public:
 	enum OpenErrors {
 		NONE,
 		FILE_NOT_FOUND,
-		CHARSET_DETECTION
+		CHARSET_DETECTION,
+		FILE_TOO_LARGE
 	};
 
 	FindInFilesClass(const UnicodeString& expression = UNICODE_STRING_SIMPLE(""), FinderClass::Modes mode = FinderClass::EXACT);

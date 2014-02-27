@@ -355,6 +355,9 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
 			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, filename);
 		}
+		else if (t4p::FindInFilesClass::FILE_TOO_LARGE == error) {
+			t4p::EditorLogError(t4p::ERR_FILE_TOO_LARGE, filename);
+		}
 	}
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
 		this->Thaw();

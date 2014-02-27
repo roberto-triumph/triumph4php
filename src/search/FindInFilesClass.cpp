@@ -184,6 +184,10 @@ void t4p::FindInFilesClass::CopyFinder(FinderClass& dest) {
 
 t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxString& fileName, UnicodeString& fileContents) {
 	OpenErrors error = NONE;
+	wxFileName wxf(fileName);
+	if (wxf.GetSize() > 10000000) {  // file > 10 MB
+		return FILE_TOO_LARGE;
+	}
 	wxFFile fFile(fileName, wxT("rb"));
 	if (fFile.IsOpened()) {
 

@@ -92,6 +92,10 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 			msg = t4p::MessageWithFix(_("Could not open directory: ") + extra,
 				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to File ... Defined Projects to remove the nonexistant source."));
 			break;
+		case t4p::ERR_FILE_TOO_LARGE:
+			msg = t4p::MessageWithFix(_("File is too large: ") + extra,
+				_("Triumph cannot handle files larger than 10 MB"));
+			break;
 		case t4p::WARNING_OTHER:
 			msg = extra;
 		default:
