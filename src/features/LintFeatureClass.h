@@ -383,6 +383,13 @@ public:
 	 */
 	void UpdateSummary();
 	
+	/**
+	 * Adds 1 to the error file count. this is used when a file is saved right 
+	 * after the user sees a lint error, fixes the error, but the linter finds another
+	 * error
+	 */
+	void IncrementErrorFileCount();
+	
 	void OnRowActivated(wxDataViewEvent& event);
 
 private:

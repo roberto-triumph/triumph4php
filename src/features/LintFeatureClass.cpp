@@ -324,7 +324,9 @@ void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
 		}
 	}
 	if (found) {
-		ErrorFiles--;
+		if (ErrorFiles > 0) {
+			ErrorFiles--;
+		}
 		UpdateSummary();
 	}
 }
@@ -400,6 +402,11 @@ void t4p::LintResultsPanelClass::ShowLintError(int index) {
 		return;
 	}
 	codeControl->MarkLintError(result);
+}
+
+void t4p::LintResultsPanelClass::IncrementErrorFileCount() {
+	ErrorFiles++;
+	UpdateSummary();
 }
 
 t4p::LintFeatureClass::LintFeatureClass(t4p::AppClass& app) 
@@ -534,7 +541,8 @@ void t4p::LintFeatureClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& eve
         // of the error
         int i = LintErrors.size(); 
         resultsPanel->AddErrors(results);
-        resultsPanel->ShowLintError(i);
+       resultsPanel->IncrementErrorFileCount(); 
+		resultsPanel->ShowLintError(i);
 	}
 	else if (codeControl && results.empty()) {
 		
