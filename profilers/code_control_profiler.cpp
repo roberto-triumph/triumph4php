@@ -63,9 +63,9 @@ class FileDropTargetClass : public wxFileDropTarget {
 public:
 
 	/**
-	 * This class will NOT own the codeControl pointer
+	 * This class will NOT own the codeControl or the globals pointer
 	 */
-	FileDropTargetClass(t4p::CodeControlClass* codeControl);
+	FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals);
 
 	/** 
 	 * Called by wxWidgets when user drags a file to this application frame. All files dragged in will be opened
@@ -76,10 +76,12 @@ public:
 private:
 
 	t4p::CodeControlClass* CodeControl;
+	t4p::GlobalsClass* Globals;
 };
 
-FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl) :
-	CodeControl(codeControl) {
+FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals)
+ : CodeControl(codeControl)
+ , Globals(globals) {
 
 }
 
@@ -101,6 +103,27 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	UnicodeString contents;
 	t4p::FindInFilesClass::FileContents(fileNameString, contents);
 	CodeControl->TrackFile(fileNameString, contents);
+
+	// add the new file to the  tag cache
+	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();
+	tagFinderlist->InitGlobalTag(
+		Globals->TagCacheDbFileName, Globals->FileTypes.GetPhpFileExtensions(),
+		Globals->FileTypes.GetMiscFileExtensions(),
+		Globals->Environment.Php.Version
+	);
+	
+	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
+	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true);
+	bool good = workingCache->Update(contents);
+	if (good) {
+		tagFinderlist->TagParser.BuildResourceCacheForFile(fileNameString, contents, false);
+		Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
+	}
+	else {
+		delete workingCache;
+	}
+	
+	delete tagFinderlist;
 	return true;
 }
 
@@ -153,18 +176,27 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 
 bool CodeControlProfilerAppClass::OnInit() {
 	t4p::CodeControlStylesInit(Options);
+	Globals.TagCacheDbFileName = t4p::TagCacheAsset();
+	Globals.DetectorCacheDbFileName = t4p::DetectorCacheAsset();
+	Globals.Environment.Php.Version = pelet::PHP_54;
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
+	
+	
 	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass;
-	std::vector<wxString> phpFileFilters,
-		miscFileFilters;
-	phpFileFilters.push_back(wxT("*.php"));
-	tagFinderlist->InitGlobalTag(t4p::NativeFunctionsAsset(), phpFileFilters, miscFileFilters, pelet::PHP_53);
+	tagFinderlist->InitGlobalTag(
+		Globals.TagCacheDbFileName,
+		Globals.FileTypes.GetPhpFileExtensions(),
+		Globals.FileTypes.GetMiscFileExtensions(),
+		Globals.Environment.Php.Version
+	);
+	tagFinderlist->InitDetectorTag(Globals.DetectorCacheDbFileName);
+	tagFinderlist->InitNativeTag(t4p::NativeFunctionsAsset());
 	Globals.TagCache.RegisterGlobal(tagFinderlist);
 	
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
-	frame->Show(true);	
+	frame->Show(true);
 	return true;
 }
 
@@ -178,7 +210,7 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 			wxSize(1024, 768)) 
 	, App(app) {
 	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
-	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl));
+	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
 	Ctrl->SetDocumentMode(t4p::CodeControlClass::PHP);
 	CreateMenu();
 }
