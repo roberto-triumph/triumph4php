@@ -206,8 +206,8 @@ private:
 };
 
 /**
- * This class will allow us to perform parsing in a background thread.
- * 
+ * This class will allow us to perform parsing on an entire directory
+ * in a background thread.
  */
 class LintBackgroundFileReaderClass : public BackgroundFileReaderClass {
 
@@ -232,16 +232,7 @@ public:
 	 * @return bool TRUE if sources is not empty
 	 */
 	bool InitDirectoryLint(std::vector<t4p::SourceClass> sources, t4p::GlobalsClass& globals);
-
-	/**
-	 * prepare to lint a list a single file
-	 *
-	 * @param fileName the full path of the file to lint
-	 * @param globals nto know which PHP version to check against, and to get the location of the tag cache files
-	 * @return TRUE if the filename is OK (a valid file name, PHP extension)
-	 */
-	bool InitSingleFileLint(const wxFileName& fileName, t4p::GlobalsClass& globals);
-
+	
 	/**
 	 * Return a summary of the number of files that were lint'ed.
 	 * Only use this method after the EVENT_ACTION_COMPLETE event is dispatched.
@@ -269,6 +260,56 @@ protected:
 	bool BackgroundFileMatch(const wxString& file);
 
 private:
+	
+	// needed by PhpIdentifierLintClass in order to find
+	// function/class names
+	t4p::TagCacheClass TagCache;
+
+	ParserDirectoryWalkerClass ParserDirectoryWalker;
+};
+
+/**
+ * This class will allow us to perform parsing on a single 
+ * file in a background thread.
+ */
+class LintBackgroundSingleFileClass : public t4p::ActionClass {
+
+public:
+
+	/**
+	 * @param runningThreads the object that will receive LINT_ERROR events
+	 * 	      as well as WORK_* events
+	 * @param eventId the ID of the generated events
+	 * @param options flags to control how strict linter will be
+	 * @see t4p::ActionClass class
+	 */
+	LintBackgroundSingleFileClass(t4p::RunningThreadsClass& runningThreads, int eventId,
+		const t4p::LintFeatureOptionsClass& options);
+	
+	/**
+	 * prepare to lint a list a single file
+	 *
+	 * @param fileName the full path of the file to lint
+	 * @param globals nto know which PHP version to check against, and to get the location of the tag cache files
+	 * @return TRUE if the filename is OK (a valid file name, PHP extension)
+	 */
+	bool Init(const wxFileName& fileName, t4p::GlobalsClass& globals);
+
+	wxString GetLabel() const;
+	
+protected:
+
+	/**
+	 * Will parse the current file. 
+	 */
+	void BackgroundWork();
+	
+private:
+
+	/**
+	 * the file to parse
+	 */
+	wxFileName FileName;
 
 	// needed by PhpIdentifierLintClass in order to find
 	// function/class names

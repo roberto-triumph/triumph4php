@@ -185,25 +185,6 @@ bool t4p::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<t4p::Sour
 	return good;
 }
 
-bool t4p::LintBackgroundFileReaderClass::InitSingleFileLint(const wxFileName& fileName, t4p::GlobalsClass& globals) {
-	
-	bool good = false;
-	if (globals.FileTypes.HasAPhpExtension(fileName.GetFullPath())) {
-		t4p::SourceClass src;
-		src.SetIncludeWildcards(fileName.GetFullName());
-		src.RootDirectory.AssignDir(fileName.GetPath());
-		std::vector<t4p::SourceClass> srcs;
-		srcs.push_back(src);
-		if (Init(srcs)) {
-			TagCache.RegisterDefault(globals);
-			ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
-			ParserDirectoryWalker.ResetTotals();
-			good = true;
-		}
-	}
-	return good;
-}
-
 bool t4p::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
 	bool error = search.Walk(ParserDirectoryWalker);
 	std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
@@ -230,7 +211,52 @@ void t4p::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorF
 }
 
 wxString t4p::LintBackgroundFileReaderClass::GetLabel() const {
-	return wxT("Lint Files");
+	return wxT("Lint Directories");
+}
+
+t4p::LintBackgroundSingleFileClass::LintBackgroundSingleFileClass(t4p::RunningThreadsClass& runningThreads, 
+																		int eventId,
+																		const t4p::LintFeatureOptionsClass& options)
+	: ActionClass(runningThreads, eventId)
+	, FileName()
+	, TagCache()
+	, ParserDirectoryWalker(TagCache, options) {
+		
+}
+
+bool t4p::LintBackgroundSingleFileClass::Init(const wxFileName& fileName, t4p::GlobalsClass& globals) {
+	
+	bool good = false;
+	if (globals.FileTypes.HasAPhpExtension(fileName.GetFullPath())) {
+		
+		// need to be thread safe and deep clone 
+		FileName.Assign(fileName.GetFullPath());
+		TagCache.RegisterDefault(globals);
+		ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
+		ParserDirectoryWalker.ResetTotals();
+		good = true;
+	}
+	return good;
+}
+
+void t4p::LintBackgroundSingleFileClass::BackgroundWork() {
+	bool error = ParserDirectoryWalker.Walk(FileName.GetFullPath());
+	std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
+	if (error && !lintErrors.empty()) {
+		t4p::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
+		PostEvent(lintResultsEvent);
+	}
+	/*
+	if (!search.More() && !IsCancelled()) {
+		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
+		int errorFiles = ParserDirectoryWalker.WithErrors;
+		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
+		PostEvent(summaryEvent);
+	}*/
+}
+
+wxString t4p::LintBackgroundSingleFileClass::GetLabel() const {
+	return wxT("Lint Single File");
 }
 
 t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p::NotebookClass* notebook,
@@ -581,8 +607,8 @@ void t4p::LintFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
-		t4p::LintBackgroundFileReaderClass* thread = new t4p::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
-		bool good = thread->InitSingleFileLint(fileName, App.Globals);
+		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
+		bool good = thread->Init(fileName, App.Globals);
 	
 		// handle the case where user has saved a file but has not clicked
 		// on the Lint project button.

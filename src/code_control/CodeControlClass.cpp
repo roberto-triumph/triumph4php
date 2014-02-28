@@ -317,6 +317,7 @@ void t4p::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 		event.Skip();
 		return;
 	}
+
 	Document->MatchBraces(GetCurrentPos());
 	HandleCallTip(0, false);
 	event.Skip();
