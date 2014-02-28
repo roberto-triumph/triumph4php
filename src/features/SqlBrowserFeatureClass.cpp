@@ -795,6 +795,15 @@ void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 		RunningActionId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 		Feature->AuiManagerUpdate();
+		
+		if (CodeControl) {
+			
+			// give focus back to the editor
+			// this is the behavior in other sql browsers (sqlyog et al)
+			// this way the user can modify the query or 
+			// write another one without having to use the mouse
+			CodeControl->SetFocus();
+		}
 	}
 	else {
 		event.Skip();
