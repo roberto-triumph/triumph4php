@@ -352,7 +352,7 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	, ShowMethods(true)
 	, ShowProperties(true)
 	, ShowConstants(true) 
-	, ShowInherited(true)
+	, ShowInherited(false)
 	, ShowPublicOnly(false) 
 	, ShowFunctionArgs(false)
 	, SortByName(true)
