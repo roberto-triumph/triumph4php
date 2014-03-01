@@ -127,6 +127,11 @@ MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so',
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
+if (not MYSQL_LIB_DIR) then
+	print("libmsysqlclient.so NOT FOUND. Please install libmysqlclient.so or change\n".. 
+		"the directories being searched by modifying premake_opts_linux.lua")
+	os.exit(-1)
+end
 
 -- On some unit tests, Triumph attempt to connect to a database
 -- Set the username and password to use here.
