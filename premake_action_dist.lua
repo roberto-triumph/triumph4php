@@ -27,6 +27,11 @@ newaction {
 	description = "Build the Triumph distributable.",
 	execute = function()
 		if os.is "windows" then
+			
+			--
+			-- MSW version, we just zip up the compiled executable
+			-- the shared libs and assets
+			--
 			if os.isdir("dist") then
 				os.execute("rmdir /s /q dist")
 			end
@@ -48,8 +53,13 @@ newaction {
 				os.execute(cmd) 
 			end
 		else
-			workDir = path.getabsolute("../triumph4php-0.6")
-			workLibDir = path.getabsolute("../triumph4php-0.6/Release/libs")
+		
+			--
+			-- linux distribution: we package a .DEB file
+			--
+			--
+			workDir = path.getabsolute("../triumph4php-0.4")
+			workLibDir = path.getabsolute("../triumph4php-0.4/Release/libs")
 			rootDir = normalizepath("./")
 			libWildcards =  normalizepath("./Release/*.so*")
 			assetDir = "/usr/share/triumph4php"
@@ -90,13 +100,35 @@ newaction {
 					"dh_make -s --email roberto@triumph4php.com  --native",
 					
 					-- remove any example files put there by dh_make
-					"rm -rf debian/*.ex",
-					"rm -rf debian/*.EX",
+					 "rm -rf debian/*.ex",
+					 "rm -rf debian/*.EX",
 				});
 			end
 			
-			
+			menuItem = "?package(triumph4php):needs=\"X11|text|vc|wm\" " ..
+				"section=\"Applications/Programming\" " ..
+				"title=\"triumph4php\" " ..
+				"command=\"/usr/bin/triumph4php\" " ..
+				"icon=\"/usr/share/triumph4php/icons/triumph4php.png\"";
+			desktopItem = "[Desktop Entry]\n" ..
+				"Encoding=UTF-8\n" ..
+				"Name=triumph4php\n" ..
+				"Exec=triumph4php %f\n" ..
+				"Icon=/usr/share/triumph4php/icons/triumph4php.png\n" ..
+				"Terminal=false\n" ..
+				"Type=Application\n" ..
+				"Categories=Development;\n" ..
+				"StartupNotify=true\n"
+
 			batchexecute(workDir, {
+			
+				-- add the menu file to add a menu to the system bar
+				"echo '" .. menuItem .. "' > debian/menu",
+				
+				-- create a new desktop file; so that ubuntu creates a 
+				-- desktop icon 
+				string.format("echo \"%s\" > triumph4php.desktop", desktopItem),
+			
 				string.format("git checkout %s", branch),
 				"git submodule init",
 				"git submodule update lib/pelet",
@@ -133,6 +165,7 @@ newaction {
 				-- include in the .deb file
 				-- double quote the backslash since we have to escape the backslash in the shell
 				"echo 'Release/triumph4php usr/bin\\n' > debian/install",
+				
 				"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
 				"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
 
@@ -157,6 +190,11 @@ newaction {
 				-- copy the debian control file, it gives the debian package
 				-- a description of our project
 				string.format("cat \"%s\" > debian/control", debianControl),
+				
+				-- make the desktop file install into the user's applitcations directory
+				string.format("echo \"%s\" >> %s", "\ntriumph4php.desktop usr/share/applications\n", "debian/install"),
+				
+				
 				
 				-- finally, create the .deb this command will basically run our makefile
 				-- gather all of the 3rd party libs and assets and package them
