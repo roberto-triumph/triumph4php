@@ -31,7 +31,9 @@ else
 	error "You are running on a non-supported operating system. triumph4php cannot be built.\n"
 end
 dofile "premake_functions.lua"
-dofile "premake_action_dist.lua"
+dofile "premake_action_dist_msw.lua"
+dofile "premake_action_dist_deb.lua"
+dofile "premake_action_dist_rpm.lua"
 dofile "premake_action_generate.lua"
 dofile "premake_action_soci.lua"
 dofile "premake_action_wxwidgets.lua"
