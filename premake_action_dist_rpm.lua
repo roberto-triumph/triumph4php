@@ -107,6 +107,7 @@ newaction {
 			-- copy the compiled 3rd party dependencies into the work dir
 			-- remove any libs that were removed since the last time
 			-- this script ran
+			string.format("install -d Release"),
 			string.format("cp -r %s %s", os.getcwd() .. "/Release/*.so*", "Release/")
 		})
 		
