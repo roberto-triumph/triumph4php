@@ -1,4 +1,4 @@
-[Home](/#toc) | [Next - new user wizard](/new-user-wizard)
+[Home](/#toc) | [Next - new user wizard](/new-user-wizard/)
 
 # System Requirements #
 The following software is required to run triumph4php 
@@ -34,6 +34,19 @@ that can be run on its own. Just download the distribution archive, extract, and
 There are debian and RPM archives of triumph4php available at the triumph4php main site. Once downloaded,
 the debian package can be run via `dpkg -i` and the RPM can be installed via `rpm -i`
 
+##Installation On Debian-based Systems##
 
+    sudo apt-get install libmysqlclient sqlite3 libicu libcurl
+	dpkg -i triumph4php_0.4_amd64.deb
 
-[Home](/#toc) | [Next - new user wizard](/new-user-wizard)
+##Installation On RedHat-based Systems##
+
+    sudo yum install libicu community-mysql-common sqlite
+    rpm -iVh triumph4php_0.4_x86_64.rpm
+
+##Installation On Other Linux Systems##
+
+triumph4php will run on most other linux distributions, but you will need to compile it from source.
+See [compiling](/compiling/) for more info.
+
+[Home](/#toc) | [Next - new user wizard](/new-user-wizard/)

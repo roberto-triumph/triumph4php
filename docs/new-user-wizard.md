@@ -1,4 +1,4 @@
-[Home](/#toc) | [Next - Projects](/projects)
+[Home](/#toc) | [Next - Projects](/projects/)
 
 # New User Wizard #
 
@@ -8,7 +8,7 @@ following:
 
 1. Check for new versions
 
-	Triumph can check for new versions of the editor.  Version checking requires an 
+	triumph4php can check for new versions of the editor.  Version checking requires an 
 	active internet connection. If enabled, version update checks will be done once a week.
 
 2. Location of settings
@@ -24,8 +24,8 @@ following:
 
 3. Editor Associations
 
-	Triumph uses file extensions to determine how to display the source code contained within 
-	them. Triumph's syntax highlighting and source code parsing features use these settings 
+	triumph4php uses file extensions to determine how to display the source code contained within 
+	them. triumph4php's syntax highlighting and source code parsing features use these settings 
 	to determine which files contain PHP, SQL, and CSS source code. You can change the 
 	file extensions if desired.
 	
@@ -47,16 +47,16 @@ following:
 
 4. PHP settings
 
-	The PHP executable is used by Triumph when running scripts. It is also used when 
+	The PHP executable is used by triumph4php when running scripts. It is also used when 
 	running framework detection scripts. If you are running on a Windows PC, choose 
 	php-win.exe. On linux, choose php.
 	
-	The version dropdown will determine which version of PHP Triumph will use for source 
-	code parsing. Choose `Auto` to have Triumph use the same version as the PHP 
-	executable; or one of the other versions to use have Triumph use a different version.
+	The version dropdown will determine which version of PHP triumph4php will use for source 
+	code parsing. Choose `Auto` to have triumph4php use the same version as the PHP 
+	executable; or one of the other versions to use have triumph4php use a different version.
 	Choosing PHP 5.4 will enable parsing of traits, it will also parse the `use`
 	statements and allow PHP code completion to work on inherited traits!
 
 
 
-[Home](/#toc) | [Next - Projects](/projects)
+[Home](/#toc) | [Next - Projects](/projects/)

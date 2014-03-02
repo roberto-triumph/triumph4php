@@ -34,15 +34,17 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
 
 <a id="toc"></a>
 # Chapters: #
-  * [Installation & Requirements](/installation)
-  * [New User Wizard](/new-user-wizard)
-  * [Project Management](/projects)
-  * [Total Search](/total-search)
-  * [PHP Linter](/php-linter)
-  * [PHP Code Completion](/php-code-completion)
-  * [Find In Files](/find-in-files)
-  * [Find](/find)
-  * [SQL Browser](/sql-browser)
-  * [Database Connections](/database-connections)
-  * [PHP Doc Comments](/php-doc-comments)
+  * [Installation & Requirements](/installation/)
+  * [New User Wizard](/new-user-wizard/)
+  * [Project Management](/projects/)
+  * [Total Search](/total-search/)
+  * [PHP Linter](/php-linter/)
+  * [PHP Code Completion](/php-code-completion/)
+  * [Find In Files](/find-in-files/)
+  * [Find](/find/)
+  * [SQL Browser](/sql-browser/)
+  * [Database Connections](/database-connections/)
+  * [PHP Doc Comments](/php-doc-comments/)
 
+# Apendix #
+  * [Compiling triumph4php](/compiling/)
