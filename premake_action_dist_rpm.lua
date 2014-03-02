@@ -30,7 +30,12 @@ newaction {
 		--
 		-- linux distribution: we package a .RPM file
 		--
-		userRoot = os.outputof("echo ~")
+		cmd = "echo ~"
+		cmdStream = io.popen(cmd)
+		cmdOutput = cmdStream:read("*l")
+		cmdStream:close()
+		
+		userRoot = cmdOutput
 		workDir = path.getabsolute(userRoot .. "/rpmbuild/SOURCES/triumph4php-0.4")
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
