@@ -122,21 +122,23 @@ function prepSoci()
 		if #libs > 0 then
 			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib64/*.so* Debug/");
 			foundCount = foundCount + 1;
-		end
-		libs = os.matchfiles("lib/soci/triumph/Debug/lib/*.so*");
-		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib/*.so* Debug/");
-			foundCount = foundCount + 1;
+		else 
+			libs = os.matchfiles("lib/soci/triumph/Debug/lib/*.so*");
+			if #libs > 0 then
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib/*.so* Debug/");
+				foundCount = foundCount + 1;
+			end
 		end
 		libs = os.matchfiles("lib/soci/triumph/Release/lib64/*.so*");
 		if #libs > 0 then
 			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib64/*.so* Release/");
 			foundCount = foundCount + 1;
-		end
-		libs = os.matchfiles("lib/soci/triumph/Release/lib/*.so*");
-		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib/*.so* Release/");
-			foundCount = foundCount + 1;
+		else
+			libs = os.matchfiles("lib/soci/triumph/Release/lib/*.so*");
+			if #libs > 0 then
+				os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib/*.so* Release/");
+				foundCount = foundCount + 1;
+			end
 		end
 	end
 end
