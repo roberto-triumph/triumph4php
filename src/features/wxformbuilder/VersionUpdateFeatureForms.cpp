@@ -56,7 +56,7 @@ VersionUpdateGeneratedDialogClass::VersionUpdateGeneratedDialogClass( wxWindow* 
 	
 	DialogSizer->Add( fgSizer1, 0, wxEXPAND, 5 );
 	
-	DownloadLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("View Downloads (Google Drive)"), wxT("https://googledrive.com/host/0B-jqHr6XJDQWM3JCRm5FQmgwLVU/"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE );
+	DownloadLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("View Downloads"), wxT("http://triumph4php.com/downloads"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE );
 	DialogSizer->Add( DownloadLink, 0, wxALL|wxEXPAND, 5 );
 	
 	ButtonsSizer = new wxStdDialogButtonSizer();
