@@ -1,4 +1,4 @@
-[Home](/#toc) | [Next - total search](/total-search/)
+[Table Of Contents](/#toc) | [Next - total search](/total-search/)
 
 # Projects #
 Projects in triumph4php are defined as the following:
@@ -76,4 +76,4 @@ total search features use.  You might want to disable / enable projects when you
 are switching and working on separate projects.
 
 
-[Home](/#toc) | [Next - total search](/total-search/)
+[Table Of Contents](/#toc) | [Next - total search](/total-search/)

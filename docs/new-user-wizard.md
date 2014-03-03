@@ -1,4 +1,4 @@
-[Home](/#toc) | [Next - Projects](/projects/)
+[Table Of Contents](/#toc) | [Next - Projects](/projects/)
 
 # New User Wizard #
 
@@ -59,4 +59,4 @@ following:
 
 
 
-[Home](/#toc) | [Next - Projects](/projects/)
+[Table Of Contents](/#toc) | [Next - Projects](/projects/)

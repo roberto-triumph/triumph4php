@@ -1,4 +1,4 @@
-[Home](/#toc) 
+[Table Of Contents](/#toc) 
 
   * [MS Windows Instructions](/compiling/#msw)
   * [Ubuntu Instructions](/compiling/#ubuntu)
@@ -156,4 +156,4 @@ gmake directory. Open the codelite workspace and compile, or use Make
 to compile triumph4php. This will also take a good 30 minutes
 to an hour, depending on your machine's processing power.
 
-[Home](/#toc) 
+[Table Of Contents](/#toc) 
