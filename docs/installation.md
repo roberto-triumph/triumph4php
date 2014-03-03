@@ -36,7 +36,7 @@ the debian package can be run via `dpkg -i` and the RPM can be installed via `rp
 
 ##Installation On Debian-based Systems##
 
-    sudo apt-get install libmysqlclient sqlite3 libicu libcurl
+    sudo apt-get install libmysqlclient18 sqlite3 libicu48 libcurl3
 	dpkg -i triumph4php_0.4_amd64.deb
 
 ##Installation On RedHat-based Systems##
