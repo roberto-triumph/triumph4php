@@ -36,12 +36,13 @@ newaction {
 		cmdStream:close()
 		
 		userRoot = cmdOutput
-		workDir = path.getabsolute(userRoot .. "/rpmbuild/SOURCES/triumph4php-0.4")
+		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-0.4"
+		desktopFile = userRoot .. "/rpmbuild/SPECS/triumph4php.desktop"
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
-		branch = "master";
+		branch = "0.4.1";
 		specFile = path.getabsolute("package/triumph4php.spec");
 		specLinkFile = userRoot .. "/rpmbuild/SPECS/triumph4php.spec";
 		
@@ -98,7 +99,7 @@ newaction {
 					
 			-- create a new desktop file; so that fedora creates a 
 			-- desktop icon 
-			string.format("echo \"%s\" > triumph4php.desktop", desktopItem),
+			string.format("echo \"%s\" > \"%s\"", desktopItem, desktopFile),
 		
 			string.format("git checkout %s", branch),
 			"git submodule init",
@@ -133,6 +134,14 @@ newaction {
 			
 			-- finally, create the .rpm this command will basically run our makefile
 			-- gather all of the 3rd party libs and assets and package them
+			"T4P_WXCONFIG=" .. normalizepath(WX_CONFIG) .. " " ..
+			"T4P_SOCI_DEBUG_INCLUDE_DIR=" .. normalizepath(SOCI_DEBUG_INCLUDE_DIR) .. " " ..
+			"T4P_SOCI_DEBUG_LIB_DIR=" .. normalizepath(SOCI_DEBUG_LIB_DIR)  .. " "  ..
+			"T4P_SOCI_RELEASE_INCLUDE_DIR=" .. normalizepath(SOCI_RELEASE_INCLUDE_DIR) .. " " ..
+			"T4P_SOCI_RELEASE_LIB_DIR=" .. normalizepath(SOCI_RELEASE_LIB_DIR) .. " " .. 
+			"T4P_BUILD_SCRIPTS_DIR=. " .. 
+			"T4P_LIB_DIR=" .. finalLibDir .. " " ..
+			"T4P_ASSET_DIR=" .. assetDir .. " " ..
 			"rpmbuild -bb " .. specFile
 		});
 	end

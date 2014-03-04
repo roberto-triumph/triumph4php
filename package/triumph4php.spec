@@ -37,6 +37,7 @@ cp -r %SOURCE0/* .
 
 %build
 #make config=release clean
+T4P_BUILDSCRIPTS_DIR=. ./premake4 gmake
 make config=release triumph4php  %{?_smp_mflags}
 
 %install
