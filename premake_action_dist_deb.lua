@@ -142,8 +142,8 @@ newaction {
 			-- include in the .deb file
 			-- double quote the backslash since we have to escape the backslash in the shell
 			"echo 'Release/triumph4php usr/bin\\n' > debian/install",
-			"echo 'Release/libpelet.so usr/bin\\n' >> debian/install",
-			"echo 'Release/libkeybinder.so usr/bin\\n' >> debian/install",
+			"echo 'Release/libpelet.so usr/lib/triumph4php' >> debian/install",
+			"echo 'Release/libkeybinder.so usr/lib/triumph4php' >> debian/install",
 			
 			"find Release/libs -type f -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
 			"find Release/libs -type l -name \"*\\\\.so*\" | awk '{ print $1  \" usr/lib/triumph4php\" }' >> debian/install",
