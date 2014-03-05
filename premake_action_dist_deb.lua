@@ -26,17 +26,21 @@ newaction {
 	trigger = "distdeb",
 	description = "Build the Triumph distributable DEB package",
 	execute = function()
-	
+		tag = os.getenv('T4P_TAG');
+		if (not tag) then
+			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
+			os.exit(-1)
+		end
+		
 		--
 		-- linux distribution: we package a .DEB file
 		--
 		--
 		workDir = path.getabsolute("../triumph4php-0.4")
-		workLibDir = path.getabsolute("../triumph4php-0.4/Release/libs")
+		workLibDir = "/usr/lib/triumph4php"
 		rootDir = normalizepath("./")
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
-		branch = "master";
 		debianControl = path.getabsolute("../debian.control");
 		
 		if (not os.isdir(workDir)) then
@@ -102,7 +106,7 @@ newaction {
 			-- desktop icon 
 			string.format("echo \"%s\" > triumph4php.desktop", desktopItem),
 		
-			string.format("git checkout %s", branch),
+			string.format("git checkout %s", tag),
 			"git submodule init",
 			"git submodule update lib/pelet",
 			

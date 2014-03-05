@@ -27,6 +27,12 @@ newaction {
 	description = "Build the Triumph distributable RPM package.",
 	execute = function()
 		
+		tag = os.getenv('T4P_TAG');
+		if (not tag) then
+			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
+			os.exit(-1)
+		end
+		
 		--
 		-- linux distribution: we package a .RPM file
 		--
@@ -42,7 +48,6 @@ newaction {
 		rootDir = normalizepath("./")
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
-		branch = "0.4.1";
 		specFile = path.getabsolute("package/triumph4php.spec");
 		specLinkFile = userRoot .. "/rpmbuild/SPECS/triumph4php.spec";
 		
@@ -101,7 +106,7 @@ newaction {
 			-- desktop icon 
 			string.format("echo \"%s\" > \"%s\"", desktopItem, desktopFile),
 		
-			string.format("git checkout %s", branch),
+			string.format("git checkout %s", tag),
 			"git submodule init",
 			"git submodule update lib/pelet",
 			
