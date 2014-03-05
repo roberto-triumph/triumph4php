@@ -8,7 +8,7 @@
  * This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
  * list of all of a project's template files so that the user can easily open / jump to templates. More
  * info can be about Triumph's URL detector feature can be found at 
- * http://docs.triumph4php.com/TemplateFileDetectors/
+ * http://docs.triumph4php.com/template-file-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -47,7 +47,7 @@ given controller functions. This script will be called via a command line; it is
 This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
 list of all of a project's template files so that the user can easily open / jump to templates. More
 info can be about Triumph's URL detector feature can be found at 
-http://docs.triumph4php.com/TemplateFileDetectors/
+http://docs.triumph4php.com/template-file-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 

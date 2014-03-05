@@ -9,7 +9,7 @@
  * list of all of a project's datatabase connections so that the user can easily open / jump to tables
  * without needing to re-enter them in the editor. More
  * info can be about Triumph's Database detector feature can be found at 
- * http://docs.triumph4php.com/DatabaseDetectors/
+ * http://docs.triumph4php.com/database-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -46,7 +46,7 @@ This script is part of Triumph's Database Detection feature; it enables the edit
 list of all of a project's datatabase connections so that the user can easily open / jump to tables
 without needing to re-enter them in the editor. More
 info can be about Triumph's Database detector feature can be found at 
-http://docs.triumph4php.com/DatabaseDetectors/
+http://docs.triumph4php.com/database-detectors/
 
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)

@@ -8,7 +8,7 @@
  * This script is part of Triumph's Config Detection feature; it enables the editor to have a 
  * list of all of a project's config files so that the user can easily open / jump to them. More
  * info can be about Triumph's config detector feature can be found at 
- * http://docs.triumph4php.com/ConfigDetectors/
+ * http://docs.triumph4php.com/config-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -44,7 +44,7 @@ will be called via a command line; it is a normal command line script.
 This script is part of Triumph's Config Detection feature; it enables the editor to have a 
 list of all of a project's config files so that the user can easily open / jump to them. More
 info can be about Triumph's config detector feature can be found at 
-http://docs.triumph4php.com/ConfigDetectors/
+http://docs.triumph4php.com/config-detectors/
 
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)

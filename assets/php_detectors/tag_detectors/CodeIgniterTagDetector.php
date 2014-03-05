@@ -12,7 +12,7 @@
  * This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
  * more useful list when performing code completion. More
  * info can be about Triumph's Tag detector feature can be found at 
- * http://docs.triumph4php.com/TagDetectors/
+ * http://docs.triumph4php.com/tag-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -52,7 +52,7 @@ will be called via a command line; it is a normal command line script.
 This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
 more useful list when performing code completion. More
 info can be about Triumph's Tag detector feature can be found at 
-http://docs.triumph4php.com/TagDetectors/
+http://docs.triumph4php.com/tag-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 

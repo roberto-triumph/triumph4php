@@ -8,7 +8,7 @@
  * This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
  * list of all of a project's urls so that the user can easily open / jump to URLs. More
  * info can be about Triumph's URL detector feature can be found at 
- * http://docs.triumph4php.com/TagDetectors/
+ * http://docs.triumph4php.com/tag-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -44,7 +44,7 @@ function parseArgs() {
  This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
  list of all of a project's urls so that the user can easily open / jump to URLs. More
  info can be about Triumph's URL detector feature can be found at 
- http://docs.triumph4php.com/TagDetectors/
+ http://docs.triumph4php.com/tag-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 
