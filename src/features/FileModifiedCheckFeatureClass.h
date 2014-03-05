@@ -157,7 +157,7 @@ private:
 	/**
 	 * when the user puts this app in the foreground, check for
 	 * file modifications.  maybe the user went to another editor
-	 * and modified one of the files that is opened in triumph.
+	 * and modified one of the files that is opened in triumph.7
 	 */
 	void OnActivateApp(wxCommandEvent& event);
 
