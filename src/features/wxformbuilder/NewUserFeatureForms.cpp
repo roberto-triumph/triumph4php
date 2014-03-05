@@ -206,7 +206,7 @@ NewUserPhpSettingsPanelGeneratedClass::NewUserPhpSettingsPanelGeneratedClass( wx
 	PhpHelpLabel->Wrap( 600 );
 	PhpLocationSizer->Add( PhpHelpLabel, 0, wxALL|wxEXPAND, 5 );
 	
-	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in Triumph 4 PHP"), wxT("https://code.google.com/p/triumph4php/wiki/FrameworkDetection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	PhpDetectorsLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about framework detection in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/framework-detection"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	PhpDetectorsLink->SetToolTip( wxT("https://code.google.com/p/triumph4php/wiki/FrameworkDetection") );
 	
 	PhpLocationSizer->Add( PhpDetectorsLink, 0, wxALL, 5 );

@@ -21,7 +21,7 @@
         <property name="skip_python_events">1</property>
         <property name="use_enum">1</property>
         <property name="use_microsoft_bom">0</property>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -2067,7 +2067,7 @@
                                 <property name="style">wxHL_DEFAULT_STYLE</property>
                                 <property name="subclass"></property>
                                 <property name="tooltip">https://code.google.com/p/triumph4php/wiki/FrameworkDetection</property>
-                                <property name="url">https://code.google.com/p/triumph4php/wiki/FrameworkDetection</property>
+                                <property name="url">http://docs.triumph4php.com/framework-detection</property>
                                 <property name="validator_data_type"></property>
                                 <property name="validator_style">wxFILTER_NONE</property>
                                 <property name="validator_type">wxDefaultValidator</property>
