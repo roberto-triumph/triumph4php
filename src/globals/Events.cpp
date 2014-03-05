@@ -119,6 +119,7 @@ wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
 
 
 const wxEventType t4p::EVENT_APP_READY = wxNewEventType();
+const wxEventType t4p::EVENT_APP_ACTIVATED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_CREATED = wxNewEventType();

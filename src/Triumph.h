@@ -180,6 +180,11 @@ private:
 	void FeatureWindows();
 
 	/**
+	 * when the app is re-activated, tell the features about it
+	 */
+	void OnActivateApp(wxActivateEvent& event);
+
+	/**
 	 * Additional functionality
 	 */
 	std::vector<FeatureClass*> Features;
@@ -212,6 +217,7 @@ private:
 
 	friend class t4p::AppTimerClass;
 
+	DECLARE_EVENT_TABLE()
 };
 
 }

@@ -300,6 +300,14 @@ typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCo
 extern const wxEventType EVENT_APP_READY;
 
 /**
+ * This is an event that gets generated after the application is
+ * re-activated after being put in the background.  Basically
+ * this is an EVT_ACTIVATE_APP event, but this event's callback
+ * accepts a wxCommandEvent
+ */
+extern const wxEventType EVENT_APP_ACTIVATED;
+
+/**
  * This is a one-time event that gets generated after the user has clicked the
  * Exit or Close button on the main frame AND the user has chosen to 
  * not save the open files (or has already saved them).  Features can

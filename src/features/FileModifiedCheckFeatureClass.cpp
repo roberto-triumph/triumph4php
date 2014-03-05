@@ -148,11 +148,11 @@ t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass&
 , PathsExternallyModified()
 , PathsExternallyDeleted() 
 , PathsExternallyRenamed()
-, AllVolumes()
-, NetworkVolumes()
+, LocalVolumes()
 , FilesToPoll()
 , LastWatcherEventTime() 
 , PollDeleteCount(0)
+, PollModifiedCount(0)
 , IsWatchError(false)
 , JustSaved(false) {
 	FsWatcher = NULL;
@@ -189,10 +189,10 @@ void t4p::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
 void t4p::FileModifiedCheckFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	wxString fullPath = event.GetCodeControl()->GetFileName();
 	bool isInSources = false;
-	bool doAddWatch = false;
+	bool doPoll = false;
 
-	// In case the file that was opened is not part of a project, we want to setup a 
-	// watch for it.
+	// In case the file that was opened is not part of a project, we want to setup
+	// polling for it.
 	std::vector<t4p::SourceClass> sources = App.Globals.AllEnabledSources();
 	std::vector<t4p::SourceClass>::const_iterator src;
 	for (src = sources.begin(); src != sources.end(); ++src) {
@@ -201,21 +201,21 @@ void t4p::FileModifiedCheckFeatureClass::OnAppFileOpened(t4p::CodeControlEventCl
 		}
 	}
 	if (!isInSources) {
-		doAddWatch = true;
+		doPoll = true;
 	}
 	wxFileName fileName(fullPath);
-	if (!doAddWatch) {
+	if (!doPoll) {
 
-		// OR it is in a network drive, create a watch for it
+		// OR it is in a network drive, create a polling for it
 		// since sources from network drives are not added to the watch
 		if (fileName.HasVolume()) {
 			wxString vol = fileName.GetVolume() + wxT(":\\");
-			if (std::find(NetworkVolumes.begin(), NetworkVolumes.end(), vol) != NetworkVolumes.end()) {
-				doAddWatch = true;
+			if (std::find(LocalVolumes.begin(), LocalVolumes.end(), vol) == LocalVolumes.end()) {
+				doPoll = true;
 			}
 		}
 	}
-	if (doAddWatch && fileName.FileExists()) {
+	if (doPoll && fileName.FileExists()) {
 		FilesToPoll.push_back(fileName);
 	}
 }
@@ -266,9 +266,17 @@ void t4p::FileModifiedCheckFeatureClass::StartWatch() {
 		// if any source directories
 		// are in network drives, we will not add them to the watch, as watches on network
 		// directories fail to notify of file changes inside of sub-directories.
+		// note that at program start we query for the local hard drives, and
+		// by deduction if the source is not in one of the local hard drives
+		// it means that its in a network drive.
 		bool doAdd = true;
+		wxString sourceVol = sourceDir.GetVolume();
+		wxString volWithSep = sourceVol + wxT(":\\");
 		if (sourceDir.HasVolume()) {
-			doAdd = std::find(NetworkVolumes.begin(), NetworkVolumes.end(), sourceDir.GetVolume()) == NetworkVolumes.end();
+			std::vector<wxString>::iterator begin = LocalVolumes.begin();
+			std::vector<wxString>::iterator end = LocalVolumes.end();
+			doAdd = std::find(begin, end, sourceVol) != end
+				|| std::find(begin, end, volWithSep) != end;
 		}
 		if (doAdd) {
 			int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
@@ -283,8 +291,7 @@ void t4p::FileModifiedCheckFeatureClass::StartWatch() {
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete(t4p::VolumeListEventClass& event) {
-	AllVolumes = event.AllVolumes;
-	NetworkVolumes = event.NetworkVolumes;
+	LocalVolumes = event.LocalVolumes;
 	StartWatch();
 }
 
@@ -532,7 +539,7 @@ void t4p::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, 
 	if (filesToPrompt.empty()) {
 		return;
 	}
-	wxArrayString choices;
+ 	wxArrayString choices;
 	std::map<wxString, t4p::CodeControlClass*>::iterator it;
 	for (it = filesToPrompt.begin(); it != filesToPrompt.end(); ++it) {
 		choices.Add(it->first);
@@ -684,8 +691,7 @@ void t4p::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
 		// dont bother checking for
 		// files as the user wont be around to answer questions
 		return;
-	}
-	
+	}	
 	
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl) {
@@ -707,50 +713,18 @@ void t4p::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
 	if (!found) {
 		return;
 	}
-	
 	PollTimer.Stop();
-	
-	t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass
-		(App.RunningThreads, ID_FILE_MODIFIED_ACTION);
-	std::vector<t4p::FileModifiedTimeClass> filesToCheck;
-	t4p::FileModifiedTimeClass fileToCheck;
-	fileToCheck.FileName = ctrlFileName;
-	fileToCheck.ModifiedTime = ctrl->GetFileOpenedDateTime(); 
-	filesToCheck.push_back(fileToCheck);
-	
-	action->SetFiles(filesToCheck);
-	
-	// reset the saved flag
-	// if the user happens to save after we queue the modified time check
-	// action, then the check will say the file has been modified, but 
-	// in this case the file has been knowingly modified by the user, so
-	// we suppress the prompt
-	JustSaved = false;
-	App.RunningThreads.Queue(action);
-}
 
-void t4p::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(t4p::FilesModifiedEventClass& event) {
-	if (JustSaved) {
-		
-		// ignoring results, file has just been saved
-		// if the user happens to save after we queue the modified time check
-		// action, then the check will say the file has been modified, but 
-		// in this case the file has been knowingly modified by the user, so
-		// we suppress the prompt
-		PollTimer.Start(1000, wxTIMER_CONTINUOUS);
-		return;
+	bool exists = ctrlFileName.FileExists();
+	bool modified  = false;
+	wxDateTime newModTime;
+	if (exists) {
+		newModTime = ctrlFileName.GetModificationTime();
+		if (newModTime.IsValid() && !newModTime.IsEqualTo(ctrl->GetFileOpenedDateTime())) {
+			modified = true;
+		}
 	}
-	// since we only gave it one file
-	bool exists = event.Deleted.empty();
-	bool modified = !event.Modified.empty();
-	
-	wxFileName ctrlFileName;
-	if (modified) {
-		ctrlFileName.Assign(event.Modified[0]);
-	}
-	else if (!exists) {
-		ctrlFileName.Assign(event.Deleted[0]);
-	}
+
 	if (!exists && PollDeleteCount <= 2) {
 		
 		// files doesnt exist. it may actually, but it may be in
@@ -765,15 +739,21 @@ void t4p::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck(t4p::File
 		// not existed.  assume file was delted.
 		PollFileModifiedPrompt(ctrlFileName, true);
 		PollDeleteCount = 0;
-		
 	}
-	else if (exists && modified) {
-		
+	else if (exists && modified && !JustSaved) {
+
 		// file time has been updated; file has been modified
 		PollFileModifiedPrompt(ctrlFileName, false);
-		PollDeleteCount = 0;
 	}
-	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
+	else if (exists && modified && JustSaved) {
+
+		// a file was just saved in this editor.  the modified
+		// time changed because this app changed it. set the
+		// file modified time
+		ctrl->UpdateOpenedDateTime(newModTime);
+	}
+	JustSaved = false;
+	PollTimer.Start();
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
@@ -800,6 +780,20 @@ void t4p::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName
 	}
 }
 
+void t4p::FileModifiedCheckFeatureClass::OnActivateApp(wxCommandEvent& event) {
+
+	// when user comes back to the app after the app was put in the 
+	// background, check for external file modifications, as the user
+	// might have changed it
+	// don't do this on linux; prevent double modified dialogs popping up
+	// on linux
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX) {
+		wxTimerEvent timerEvt;
+		OnPollTimer(timerEvt);
+	}
+}
+
 t4p::VolumeListActionClass::VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId) {
 }
@@ -807,19 +801,15 @@ t4p::VolumeListActionClass::VolumeListActionClass(t4p::RunningThreadsClass& runn
 void t4p::VolumeListActionClass::BackgroundWork() {
 #ifdef __WXMSW__
 
-	wxArrayString allVols = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
+	wxArrayString localVolArray = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, 
+		wxFS_VOL_REMOTE | wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
 	
 
-	std::vector<wxString> allVolumes,
-		networkVolumes;
-	for (size_t i = 0; i < allVols.GetCount(); ++i) {
-		wxFSVolume vol(allVols[i]);
-		allVolumes.push_back(allVols[i]);
-		if (vol.GetFlags() & wxFS_VOL_REMOTE) {
-			networkVolumes.push_back(allVols[i]);
-		}
+	std::vector<wxString> localVols;
+	for (size_t i = 0; i < localVolArray.GetCount(); ++i) {
+		localVols.push_back(localVolArray[i]);
 	}
-	t4p::VolumeListEventClass evt(GetEventId(), allVolumes, networkVolumes);
+	t4p::VolumeListEventClass evt(GetEventId(), localVols);
 	PostEvent(evt);
 #endif
 }
@@ -835,18 +825,15 @@ wxString t4p::VolumeListActionClass::GetLabel() const {
 }
 
 t4p::VolumeListEventClass::VolumeListEventClass(int id, 
-													  const std::vector<wxString>& allVolumes, 
-													  const std::vector<wxString>& networkVolumes)
+												const std::vector<wxString>& localVolumes)
 : wxEvent(id, t4p::EVENT_ACTION_VOLUME_LIST)
-, AllVolumes()
-, NetworkVolumes() {
-	t4p::DeepCopy(AllVolumes, allVolumes);
-	t4p::DeepCopy(NetworkVolumes, networkVolumes);
+, LocalVolumes() {
+	t4p::DeepCopy(LocalVolumes, localVolumes);
 }	
 
 
 wxEvent* t4p::VolumeListEventClass::Clone() const {
-	return new t4p::VolumeListEventClass(GetId(), AllVolumes, NetworkVolumes);
+	return new t4p::VolumeListEventClass(GetId(), LocalVolumes);
 }
 
 const wxEventType t4p::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
@@ -858,9 +845,9 @@ BEGIN_EVENT_TABLE(t4p::FileModifiedCheckFeatureClass, t4p::FeatureClass)
 	EVT_APP_FILE_CLOSED(t4p::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, t4p::FileModifiedCheckFeatureClass::OnTimer)
 	EVT_TIMER(ID_FILE_MODIFIED_POLL, t4p::FileModifiedCheckFeatureClass::OnPollTimer)
-	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_ACTION, t4p::FileModifiedCheckFeatureClass::OnFileExternallyModifiedCheck)
 	EVT_FSWATCHER(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnFsWatcher)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 	EVT_ACTION_VOLUME_LIST(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete)
 	EVT_APP_FILE_SAVED(t4p::FileModifiedCheckFeatureClass::OnFileSaved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_ACTIVATED, t4p::FileModifiedCheckFeatureClass::OnActivateApp)
 END_EVENT_TABLE()

@@ -145,21 +145,21 @@ private:
 	void OnVolumeListComplete(t4p::VolumeListEventClass& event);
 	
 	/**
-	 * when the file modified times have been queried, prompt the user
-	 * if the files have been modified externally
-	 */
-	void OnFileExternallyModifiedCheck(t4p::FilesModifiedEventClass& event);
-	
-	/**
 	 * when a file has been saved, we set the JustSaved flag
-	 * when a file is saved, we ignore the results of the file modified
-	 * checks that are done in the background; since the user just
-	 * saved the file, the modified time we have in memory is now out of
-	 * date, the modified time is changed, but the user knows about
-	 * the change, so we dont have to  prompt them about
-	 * the file modification.
+	 * when a file is saved, update the modified time instead
+	 * of flagging the file as externally changed. we set a flag
+	 * because the file may be in a network drive, and the file's
+	 * mod time may not be accurately known untila bit of time
+	 * after the save ocurred.
 	 */
 	void OnFileSaved(t4p::CodeControlEventClass& event);
+
+	/**
+	 * when the user puts this app in the foreground, check for
+	 * file modifications.  maybe the user went to another editor
+	 * and modified one of the files that is opened in triumph.
+	 */
+	void OnActivateApp(wxCommandEvent& event);
 
 	/**
 	 * timer that we will use to see if file system watcher events have been captured. in this timer's
@@ -216,17 +216,13 @@ private:
 	std::map<wxString, wxString> PathsExternallyRenamed;
 
 	/**
-	 * List of all volumes that are mounted (local + remote).
+	 * List of the local volumes that are mounted and writab;e.
 	 * if any source directories
-	 * are in network drives, we will not add them to the watch, as watches on network
+	 * are not in one of these voluimes, it means that they are in network drives
+	 * we will not add them to the watch, as watches on network
 	 * directories fail to notify of file changes inside of sub-directories.
 	 */
-	std::vector<wxString> AllVolumes;
-	
-	/**
-	 * List of network (remote) volumes that are mounted
-	 */
-	std::vector<wxString> NetworkVolumes;
+	std::vector<wxString> LocalVolumes;
 
 	/**
 	 * to periodically check the modified time of the opened files that we poll (files outside
@@ -274,6 +270,15 @@ private:
 	 * a polled file was actually deleted
 	 */
 	int PollDeleteCount;
+
+	/**
+	 * the number of consecutive times that we have polled a file
+	 * and it is seen as modified.  We use this number to see if a polled
+	 * file was actually modified.  We want to ignore file modified
+	 * time updates due to the user saving a file inside the triumph
+	 * editor
+	 */
+	int PollModifiedCount;
 	
 	/**
 	 * will be set to TRUE if the watcher saw an error event.  We may get 
@@ -297,12 +302,15 @@ private:
 };
 
 /**
- * A class that lists all file system volumes. This
+ * A class that lists the LOCAL file system volumes. This
  * is used only on windows in order to find the volumes
  * on a system; we determine if a source directory is located in a network
  * share and if so we don't watch it for changes (because we can't, 
  * file changes in network drives don't work properly when
- * watching entire directory structures).
+ * watching entire directory structures). This action will
+ * return the local, writable drives only, meaning that any project
+ * not one of the local writable drives means that the project
+ * is in a remote drive or removable media.
  *
  * This action generates event of type t4p::EVENT_ACTION_VOLUME_LIST
  */
@@ -335,16 +343,12 @@ class VolumeListEventClass : public wxEvent {
 public:
 
 	/**
-	 * List of all volumes that are mounted (local + remote)
+	 * List of the LOCAL volumes that are mounted. this will
+	 * not include remote drives
 	 */
-	std::vector<wxString> AllVolumes;
-	
-	/**
-	 * List of network (remote) volumes that are mounted
-	 */
-	std::vector<wxString> NetworkVolumes;
+	std::vector<wxString> LocalVolumes;
 
-	VolumeListEventClass(int id, const std::vector<wxString>& allVolumes, const std::vector<wxString>& networkVolumes);
+	VolumeListEventClass(int id, const std::vector<wxString>& allVolumes);
 
 
 	wxEvent* Clone() const;

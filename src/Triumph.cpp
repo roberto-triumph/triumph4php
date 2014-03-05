@@ -370,6 +370,11 @@ void t4p::AppClass::UpdateConfigModifiedTime() {
 	Timer.Start();
 }
 
+void t4p::AppClass::OnActivateApp(wxActivateEvent& event) {
+	wxCommandEvent cmdEvent(t4p::EVENT_APP_ACTIVATED);
+	EventSink.Publish(cmdEvent);
+}
+
 t4p::AppTimerClass::AppTimerClass(t4p::AppClass& app)
 	: wxTimer()
 	, App(app) {
@@ -447,4 +452,9 @@ void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& even
 
 BEGIN_EVENT_TABLE(t4p::AppTimerClass, wxTimer)
 	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_EVENT_CONFIG_FILE_CHECK, t4p::AppTimerClass::OnConfigFileModified)
+END_EVENT_TABLE()
+
+
+BEGIN_EVENT_TABLE(t4p::AppClass, wxApp)
+	EVT_ACTIVATE_APP(t4p::AppClass::OnActivateApp)
 END_EVENT_TABLE()
