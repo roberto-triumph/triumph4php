@@ -24,11 +24,13 @@ triumph4php will take moderate resources on the system.
 # Installation #
 The latest version of triumph4php is available in binary form at the project's [main site](http://triumph4php.com).  
 The source code is also made available in the same place. You can choose to compile from source if you wish but you will 
-need to setup your developer environment. 
+need to [compile from source](/compiling/). 
 
 # Installation On MS Windows Systems #
 The Windows verson of triumph4php does not have an installation process; it is available as a standalone executable 
-that can be run on its own. Just download the distribution archive, extract, and run the triumph4php binary.
+that can be run on its own. Just download the distribution archive, extract, and run the triumph4php binary. The
+downloaded archive is a 7-zip archive (not a regular zip file). On you extract the archive, triumph4php.exe is
+located inside the bin directory.
 
 # Installation On Linux Systems #
 There are debian and RPM archives of triumph4php available at the triumph4php main site. Once downloaded,

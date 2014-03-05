@@ -84,6 +84,35 @@ this is because most templating systems use global variables that are defined
 elsewhere; if triumph4php checked variables in the global scope then all
 of you template files would have errors!
 
+##The linter does not look like its showing me uninitialized variables. What gives?##
+
+There is one instance where uninitialized variable detection is not working
+right now: during function calls.  For example:
+
+	function performWork() {
+		logDebug($myVar);
+	}
+
+Here, `$myVar` should be labelled as uninitialized, but triump4php's linter
+does not do so.  There is a valid reason for this: PHP allows use of
+uninitialized variables that to be passed by reference and initialized
+by the function that is called. An example of this is the preg_match function
+
+
+	preg_match('string', 'this is a long string', $arrMatches);
+	var_dump($arrMatches);
+
+In this example, `$arrMatches` is not initialized in the code, but the
+function that is called initializes it.  
+
+Initially, triumph4php's linter had labelled this as an error. 
+However, while testing the linter against various open source projects, there
+was quite a bit of false positives since preg_match is a pretty
+common function and many people use the function like in the example.
+Later on, the triumph4php linter will be updated to take into account the fact
+that the argument is passed by reference or not, and flag errors
+accordingly.
+
 #Unknown identifiers#
 triumph4php's linter can also warn you about calling functions, methods, or classes
 that do not exist.  In order for this check to work, you need to create and 
