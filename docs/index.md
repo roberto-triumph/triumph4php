@@ -43,8 +43,15 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [PHP Linter](/php-linter/)
   * [Database Connections](/database-connections/)
   * [SQL Browser](/sql-browser/)  
-  * [Find In Files](/find-in-files/)
   * [Find](/find/)
+  * [Find In Files](/find-in-files/)
+  * [Explorer](/explorer/)
+  * [Framework Detection](/framework-detection/)
+  * [Config Detectors](/config-detectors/)
+  * [Database Detectors](/database-detectors/)
+  * [url-detectors](/url-detectors/)
+  * [template-file-detectors](/template-file-detectors/)
+  * [What next](/what-next/)
 
 # Apendix #
   * [Compiling triumph4php](/compiling/)
