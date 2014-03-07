@@ -504,9 +504,17 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		}
 	}
 	if (var->ChainList[0].IsFunction) {
-		
+
 		// is this a call to extract()
 		if (var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("extract"), 0) == 0) {
+			HasExtractCall = true;
+		}
+		if (var->ChainList[0].Name.endsWith(UNICODE_STRING_SIMPLE("\\extract"))) {
+			
+			// this is a call to extract but this call is within a declared namespace.
+			// PHP has a fallback mechanism for namespaced functions; if a function is
+			// called inside  namespace, it looks for a function in the declared
+			// namespace AND in the global namespace
 			HasExtractCall = true;
 		}
 	}

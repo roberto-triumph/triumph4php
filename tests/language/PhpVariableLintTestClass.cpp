@@ -233,6 +233,33 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 	CHECK_EQUAL(false, HasError);
 }
 
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
+	
+	// when the extract() function is used, we can't really
+	// detect wich variables have been initialized, as 
+	// extract defines variables based on the array keys.
+	// in this case, we disable variable linting on
+	// the scope
+	// here, even though the code is using namespaces, we
+	// should ignore variables since PHP falls back to
+	// the global functions when a function does not exist in
+	// the namespace
+	Options.CheckGlobalScope = false;
+	UnicodeString code = t4p::CharToIcu(
+		"namespace Models;\n"
+		"class MyClass {\n"
+		"  function work($arrVars) {\n"
+		"    extract($arrVars);\n"
+		"    echo $name;\n"
+		"  }\n"
+		"}\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
 	
 	// when the eval() function is used, we can't really
