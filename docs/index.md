@@ -49,9 +49,9 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [Framework Detection](/framework-detection/)
   * [Config Detectors](/config-detectors/)
   * [Database Detectors](/database-detectors/)
-  * [url-detectors](/url-detectors/)
-  * [template-file-detectors](/template-file-detectors/)
-  * [What next](/what-next/)
+  * [URL detectors](/url-detectors/)
+  * [Template File Detectors](/template-file-detectors/)
+  * [What's next](/what-next/)
 
 # Apendix #
   * [Compiling triumph4php](/compiling/)
