@@ -315,7 +315,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 
-	// assignment in conditional still count as initialized
+	// assignment in conditional still counts as initialized
 	UnicodeString code = t4p::CharToIcu(
 		"function myFunc($a) {\n"
 		"  $fp = fopen('data.txt');\n"
@@ -327,6 +327,26 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInSwitch) {
+	Options.Version = pelet::PHP_54;
+	
+	// assignment in switch still counts as initialized
+	UnicodeString code = t4p::CharToIcu(
+		"function getCommandId(CommandInterface $command)\n"
+		"{\n"
+		"  switch (($commandId = $command->getId())) {\n"
+		"  case 'AUTH':\n"
+		"    throw new NotSupportedException(\"Disabled command: {$command->getId()}\");\n"
+		"\n"
+		"  default:\n"
+		"    return $commandId;\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 /*
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 
