@@ -110,13 +110,13 @@ public:
 
 	/**
 	 * Start the full tag cache rebuild sequence.  This will include
-	 * - wiping all existing global caches from all projects
-	 * - indexing all enabled projects
+	 * - wiping all existing global caches from the given projects
+	 * - indexing the given projects
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
 	 *         sequence running then we will not start another sequence as sequences deal with 
 	 *         GlobalsClass and running many sequences may cause problems 
 	 */
-	bool TagCacheWipeAndIndex();
+	bool TagCacheWipeAndIndex(const std::vector<t4p::ProjectClass>& enabledProjects);
 
 	/**
 	 * Start the database detection sequence. This will include

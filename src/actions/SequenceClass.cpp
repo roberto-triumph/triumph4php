@@ -158,14 +158,24 @@ bool t4p::SequenceClass::ProjectDefinitionsUpdated(const std::vector<t4p::Projec
 	return true;
 }
 
-bool t4p::SequenceClass::TagCacheWipeAndIndex() {
+bool t4p::SequenceClass::TagCacheWipeAndIndex(const std::vector<t4p::ProjectClass>& enabledProjects) {
 	if (Running()) {
 		return false;
 	}
 	SourceCheck();
 
-	// this step will wipe the global cache from all projects
-	AddStep(new t4p::TagWipeActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE));
+	// do not wipe the entire db, for now, just delete the enabled projects
+	// that way, if a user re-enables a project, the existing tags can be used
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
+	std::vector<wxFileName> sourceDirsToDelete;
+	for (project = enabledProjects.begin(); project != enabledProjects.end(); ++project) {
+		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+			sourceDirsToDelete.push_back(source->RootDirectory);
+		}
+	}
+	
+	AddStep(new t4p::TagDeleteSourceActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
 	
 	// this will detect all of the config files for projects
 	AddStep(new t4p::ConfigTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));

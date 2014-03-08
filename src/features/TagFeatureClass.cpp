@@ -89,7 +89,7 @@ void t4p::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 	// the database
 	// we want to avoid locking the database
 	Timer.Stop();
-	if (App.Sequences.TagCacheWipeAndIndex()) {
+	if (App.Sequences.TagCacheWipeAndIndex(App.Globals.AllEnabledProjects())) {
 		IndexingDialog = new t4p::GaugeDialogClass(GetMainWindow(), _("Indexing"), _("Wiping and Rebuilding Index"));
 		IndexingDialog->Show();
 		IndexingDialog->Start();
