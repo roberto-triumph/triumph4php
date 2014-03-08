@@ -241,6 +241,7 @@ t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent)
 }
 
 void t4p::DocCommentPanelClass::SetText(const wxString& text) {
+	Text->BeginTextColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
 	Text->SetValue(text);
 }
 

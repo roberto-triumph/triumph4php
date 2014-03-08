@@ -11,6 +11,7 @@
 
 DocCommentPanelGeneratedClass::DocCommentPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	this->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOTEXT ) );
 	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
 	wxBoxSizer* BoxSizer;
@@ -35,6 +36,7 @@ DocCommentPanelGeneratedClass::DocCommentPanelGeneratedClass( wxWindow* parent, 
 	GridSizer->Add( TopSizer, 1, wxALIGN_RIGHT, 5 );
 	
 	Text = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxHSCROLL|wxVSCROLL|wxWANTS_CHARS );
+	Text->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOTEXT ) );
 	Text->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
 	
 	GridSizer->Add( Text, 1, wxEXPAND | wxALL, 5 );
