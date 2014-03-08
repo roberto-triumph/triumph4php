@@ -20,6 +20,8 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
+#define ID_PHP_SITE_LINK 1000
+#define ID_CLOSE_LINK 1001
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DocCommentPanelGeneratedClass
@@ -29,11 +31,13 @@ class DocCommentPanelGeneratedClass : public wxPanel
 	private:
 	
 	protected:
+		wxHyperlinkCtrl* PhpSiteDocs;
 		wxHyperlinkCtrl* CloseLink;
 		wxRichTextCtrl* Text;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnPhpSiteDocs( wxHyperlinkEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxHyperlinkEvent& event ) { event.Skip(); }
 		
 	

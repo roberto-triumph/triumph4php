@@ -30,6 +30,35 @@
 #include <wx/log.h>
 
 namespace t4p {
+	
+/**
+ * event that gets generated whenever we get a log message from the
+ * wxWidgets logging system. when we get a log message from the wxWidgets
+ * system, we will POST an event to the panel so that the panel
+ * log gets drawn in the event loop. It seems that wxWidgets calls
+ * the logger in background threads.
+ */
+extern const wxEventType EVENT_APP_LOG;
+
+class EditorLogEventClass : public wxEvent {
+
+public:
+
+	wxString Message;
+	wxLogLevel Level;
+	time_t Timestamp;
+	
+	EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp);
+	
+	wxEvent* Clone() const;
+};
+
+typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
+
+#define EVT_APP_LOG(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_LOG, -1, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( EditorLogEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * This class will display a grid containing all of the 
@@ -58,7 +87,7 @@ protected:
 /**
  * This class is the handler for the editor message menu items.  
  */
-class EditorMessagesFeatureClass : public FeatureClass, wxLog {
+class EditorMessagesFeatureClass : public FeatureClass {
 
 public:
 
@@ -82,6 +111,8 @@ private:
 	 * show the editor messages window
 	 */
 	void OnMenu(wxCommandEvent& event);
+	
+	void OnAppLog(t4p::EditorLogEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };

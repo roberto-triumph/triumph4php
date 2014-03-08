@@ -44,12 +44,14 @@ public:
 	DocCommentPanelClass(wxWindow* parent);
 
 	void SetText(const wxString& text);
+	
+	void EnablePhpSiteLink(const wxString& functionName);
 
 protected:
 
 	void OnClose(wxHyperlinkEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
-
+	void OnPhpSiteDocs(wxHyperlinkEvent& event);
 	void DoDestroy();
 };
 

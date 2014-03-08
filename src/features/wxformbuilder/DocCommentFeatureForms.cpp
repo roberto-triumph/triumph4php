@@ -24,12 +24,15 @@ DocCommentPanelGeneratedClass::DocCommentPanelGeneratedClass( wxWindow* parent, 
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxBoxSizer* TopSizer;
-	TopSizer = new wxBoxSizer( wxVERTICAL );
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	CloseLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("Close"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	PhpSiteDocs = new wxHyperlinkCtrl( this, ID_PHP_SITE_LINK, wxT("php.net docs"), wxT("php.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	TopSizer->Add( PhpSiteDocs, 0, wxALL, 5 );
+	
+	CloseLink = new wxHyperlinkCtrl( this, ID_CLOSE_LINK, wxT("Close"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	TopSizer->Add( CloseLink, 0, wxALL|wxALIGN_RIGHT, 5 );
 	
-	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	GridSizer->Add( TopSizer, 1, wxALIGN_RIGHT, 5 );
 	
 	Text = new wxRichTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxHSCROLL|wxVSCROLL|wxWANTS_CHARS );
 	Text->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INFOBK ) );
@@ -43,6 +46,8 @@ DocCommentPanelGeneratedClass::DocCommentPanelGeneratedClass( wxWindow* parent, 
 	
 	// Connect Events
 	this->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ) );
+	PhpSiteDocs->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( DocCommentPanelGeneratedClass::OnPhpSiteDocs ), NULL, this );
+	PhpSiteDocs->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );
 	CloseLink->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( DocCommentPanelGeneratedClass::OnClose ), NULL, this );
 	CloseLink->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );
 	Text->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );
@@ -52,6 +57,8 @@ DocCommentPanelGeneratedClass::~DocCommentPanelGeneratedClass()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ) );
+	PhpSiteDocs->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( DocCommentPanelGeneratedClass::OnPhpSiteDocs ), NULL, this );
+	PhpSiteDocs->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );
 	CloseLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( DocCommentPanelGeneratedClass::OnClose ), NULL, this );
 	CloseLink->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );
 	Text->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( DocCommentPanelGeneratedClass::OnKeyDown ), NULL, this );

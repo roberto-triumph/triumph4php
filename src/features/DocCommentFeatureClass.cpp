@@ -3,6 +3,7 @@
 #include <Triumph.h>
 #include <unicode/unistr.h>
 #include <wx/tokenzr.h>
+#include <wx/wupdlock.h>
 
 /**
  * Turns a tag PHPDoc comment into a nicer format that is more suitable
@@ -157,10 +158,14 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 	wxString msg;
 	bool hasMatches = false;
 	bool hasContent = false;
+	bool isNativeTag = false;
+	wxString funcName = wxT("");
 	t4p::TagClass tag;
 	if (!matches.empty()) {
 		tag = matches[0];
 		hasMatches = true;
+		isNativeTag = tag.IsNative;
+		funcName = t4p::IcuToWx(tag.Identifier);
 		if (tag.Type == t4p::TagClass::FUNCTION) {
 			msg = t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
@@ -208,13 +213,23 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 
 		// freeze thaw the code control so that the call tip popup is 
 		// not drawn while its being moved into place
-		ctrl->Freeze();
+		// in linux, freezing already happens internally so we don't
+		// want to do it here 
+		wxPlatformInfo info;
+		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+			ctrl->Freeze();
+		}
 		wxPoint point = ctrl->PointFromPosition(pos);
 		t4p::DocCommentPanelClass* panel = new t4p::DocCommentPanelClass(ctrl);
 		panel->SetPosition(point);
 		panel->SetText(msg);
+		if (isNativeTag) {
+			panel->EnablePhpSiteLink(funcName);
+		}
 		panel->SetFocus();
-		ctrl->Thaw();
+		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+			ctrl->Thaw();
+		}
 	}
 }
 
@@ -222,14 +237,29 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent) 
 : DocCommentPanelGeneratedClass(parent) {
 	SetName(wxT("DocComment"));
+	PhpSiteDocs->Hide();
 }
 
 void t4p::DocCommentPanelClass::SetText(const wxString& text) {
 	Text->SetValue(text);
 }
 
+void t4p::DocCommentPanelClass::EnablePhpSiteLink(const wxString& functionName) {
+	wxString url = wxT("http://php.net/") + functionName;
+	PhpSiteDocs->SetURL(url);
+	PhpSiteDocs->Show();
+}
+
 void t4p::DocCommentPanelClass::OnClose(wxHyperlinkEvent& event) {
 	CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
+}
+
+void t4p::DocCommentPanelClass::OnPhpSiteDocs(wxHyperlinkEvent& event) {
+	CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
+	
+	// call skip so that the default link processing takes over
+	// (opening a browser)
+	event.Skip();
 }
 
 void t4p::DocCommentPanelClass::OnKeyDown(wxKeyEvent& event) {

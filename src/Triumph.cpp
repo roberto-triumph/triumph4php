@@ -161,7 +161,9 @@ bool t4p::AppClass::OnInit() {
 		// this line is needed so that we get all the wxLogXXX messages
 		// pointer will be managed by wxWidgets
 		// need to put this here because the logger needs an initialized window state
-		wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*EditorMessagesFeature));
+		if (EditorMessagesFeature) {
+			wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*EditorMessagesFeature));
+		}
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
 	}
@@ -226,7 +228,8 @@ bool t4p::AppClass::CommandLine() {
 }
 
 void t4p::AppClass::CreateFeatures() {
-	FeatureClass* feature = new RunConsoleFeatureClass(*this);
+	FeatureClass* feature;
+	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FinderFeatureClass(*this);
 	Features.push_back(feature);
@@ -242,13 +245,10 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new LintFeatureClass(*this);
 	Features.push_back(feature);
-
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
-
 	EditorMessagesFeature = new t4p::EditorMessagesFeatureClass(*this);
 	Features.push_back(EditorMessagesFeature);
-
 	feature = new RunBrowserFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);

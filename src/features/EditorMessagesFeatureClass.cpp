@@ -122,6 +122,10 @@ void t4p::EditorMessagesFeatureClass::OnMenu(wxCommandEvent& event) {
 	}
 }
 
+void t4p::EditorMessagesFeatureClass::OnAppLog(t4p::EditorLogEventClass& evt) {
+	AddMessage(evt.Level, evt.Message, evt.Timestamp);
+}
+
 void t4p::EditorMessagesFeatureClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 
 	// in MSW ignore log messages dealting with SetFocus() 
@@ -171,9 +175,28 @@ t4p::EditorMessagesLoggerClass::EditorMessagesLoggerClass(t4p::EditorMessagesFea
 }
 
 void t4p::EditorMessagesLoggerClass::DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
-	Feature.AddMessage(level, msg, info.timestamp);
+	t4p::EditorLogEventClass evt(msg, level, info.timestamp);
+	wxPostEvent(&Feature, evt);
 }
+
+t4p::EditorLogEventClass::EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp)
+: wxEvent(wxID_ANY, t4p::EVENT_APP_LOG)
+
+// make thread safe
+, Message(msg.c_str())
+, Level(level)
+, Timestamp(timestamp) {
+	
+}
+
+wxEvent* t4p::EditorLogEventClass::Clone() const {
+	t4p::EditorLogEventClass* evt = new t4p::EditorLogEventClass(Message, Level, Timestamp);
+	return evt;
+}
+
+const wxEventType t4p::EVENT_APP_LOG = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::EditorMessagesFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_EDITOR_MESSAGES, t4p::EditorMessagesFeatureClass::OnMenu)
+	EVT_APP_LOG(t4p::EditorMessagesFeatureClass::OnAppLog)
 END_EVENT_TABLE()
