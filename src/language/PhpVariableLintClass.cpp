@@ -354,27 +354,32 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 
 void t4p::PhpVariableLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
 	
-	// for isset expression, we want to see if any expression is an assignment 
-	// expression if so, then we set the destination variable as a scope variable
-	for (size_t i = 0; i < expression->Expressions.size(); ++i) {
-		/*if (pelet::ExpressionClass::ASSIGNMENT == expression->Expressions[i]->ExpressionType) {
-		
-			// for now, ignore assignments to properties ie. $obj->prop1
-			// but we want to check arrays ie $data['name'] = '';
-			pelet::AssignmentExpressionClass* assignment = (pelet::AssignmentExpressionClass*)expression->Expressions[i];
-			if (assignment->Destination.ChainList.size() == 1 && 
-				!assignment->Destination.ChainList[0].IsFunction) {
-				
-				ScopeVariables[assignment->Destination.ChainList[0].Name] = 1;
-			}
-			else if (assignment->Destination.ChainList.size() > 1 && 
-				assignment->Destination.ChainList[1].IsArrayAccess) {
-				
-				ScopeVariables[assignment->Destination.ChainList[0].Name] = 1;
+	
+	// isset expressions have a bit of logic
+	//
+	// examples that don't trigger PHP notices
+	//  isset($arrNames)
+	//  isset($arrNames['123'])
+	//
+	// examples that do trigger PHP notices
+	//  isset($arrNames[$name])   when $name has not been initialized
+	//
+	
+	// first check to see if this isset is for a single, simple variable
+	// if so then we should never label it as uninitialized
+	if (expression->Expressions.size() == 1 && 
+		pelet::ExpressionClass::VARIABLE == expression->Expressions[0]->ExpressionType) {
+		pelet::VariableClass* var = (pelet::VariableClass*) expression->Expressions[0];
+		if (var->ChainList.size() == 1) {
+			return;
+		}
+			
+		// only check the array keys
+		for (size_t i = 0; i < var->ChainList.size(); ++i) {
+			if (var->ChainList[i].IsArrayAccess && var->ChainList[i].ArrayAccess) {
+				CheckExpression(var->ChainList[i].ArrayAccess);
 			}
 		}
-		 */
-		CheckExpression(expression->Expressions[i]);
 	}
 }
 

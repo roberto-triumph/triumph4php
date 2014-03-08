@@ -347,7 +347,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInSwitch) {
 	CHECK_EQUAL(false, HasError);
 }
 
-/*
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 
 	// a variable being checked with the isset keyword
@@ -355,7 +354,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 	UnicodeString code = t4p::CharToIcu(
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrPairs)) {\n"
-		"    return $arrPairs[0];\n"
+		"    return $arrNames[0];\n"
 		"  }\n"
 		"  return '';\n"
 		"}"
@@ -363,7 +362,26 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
-*/
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIssetArrayKeys) {
+
+	// a variable that is used as a key inside an isset statement
+	// should in fact be labeled as uninitialized
+	UnicodeString code = t4p::CharToIcu(
+		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
+		"   if (isset($arrPairs[$name])) {\n"
+		"    return $arrNames;\n"
+		"  }\n"
+		"  return '';\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("$name", Results[0].VariableName);
+	CHECK_EQUAL(2, Results[0].LineNumber);
+}
+
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
 
