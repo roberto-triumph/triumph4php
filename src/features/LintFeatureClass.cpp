@@ -561,7 +561,16 @@ void t4p::LintFeatureClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& eve
 		if (results[0].LineNumber < firstVisibleLine || results[0].LineNumber >= lastVisibleLine) {
 			
 			// the error is out of view show a message, remove any other existing message
-			codeControl->Freeze();
+			
+			// freeze thaw the code control so that the popup is 
+			// not drawn while its being moved into place
+			// in linux, freezing already happens internally so we don't
+			// want to do it here 
+			wxPlatformInfo info;
+			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+				codeControl->Freeze();
+			}
+			
 			wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
 			if (old) {
 				old->Destroy();
@@ -574,7 +583,10 @@ void t4p::LintFeatureClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& eve
 			}
 			errorPanel->SetPosition(point);
 			errorPanel->SetFocus();
-			codeControl->Thaw();
+			
+			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+				codeControl->Thaw();
+			}
 		}
 		else {
 
