@@ -26,6 +26,8 @@
 #define __T4P_EDITORFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <features/wxformbuilder/EditorBehaviorFeatureForms.h>
+#include <globals/CodeControlOptionsClass.h>
 
 namespace t4p {
 	
@@ -46,9 +48,13 @@ public:
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
+	void AddEditMenuItems(wxMenu* editMenu);
+	
 	void AddViewMenuItems(wxMenu* viewMenu);
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+	
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 private:
 
@@ -56,6 +62,7 @@ private:
 	void SetFeatures(const t4p::CodeControlOptionsClass& options, wxStyledTextCtrl* codeCtrl);
 	
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+	void OnAppFileNew(t4p::CodeControlEventClass& event);
 	
 	void OnToggleRectangularSelection(wxCommandEvent& event);
 	void OnToggleWordWrap(wxCommandEvent& event);
@@ -64,8 +71,28 @@ private:
 	void OnZoomIn(wxCommandEvent& event);
 	void OnZoomOut(wxCommandEvent& event);
 	void OnZoomReset(wxCommandEvent& event);
+	void OnEditConvertEols(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
+};
+
+/**
+ * panel that shows all options regarding editor behavior
+ */
+class EditorBehaviorPanelClass : public EditorBehaviorPanelGeneratedClass {
+
+public:
+	
+	EditorBehaviorPanelClass(wxWindow* parent, CodeControlOptionsClass& options);
+	bool TransferDataToWindow();
+	bool TransferDataFromWindow();
+
+protected:
+
+	// Handlers for EditorBehaviorPanelGeneratedClass events.
+	void OnIndentUsingSpaces(wxCommandEvent& event);
+	void OnCheckRightMargin(wxCommandEvent& event);
+
 };
 
 }

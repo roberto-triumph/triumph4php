@@ -50,8 +50,6 @@ t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 	
 	// make it so that no other preference dialogs have to explictly call Transfer methods
 	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-	EditorBehavior = new EditorBehaviorPanelClass(notebook, Preferences.CodeControlOptions);
-	notebook->AddPage(EditorBehavior, _("Editor Behavior"));
 	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
 
