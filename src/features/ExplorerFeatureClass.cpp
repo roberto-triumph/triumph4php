@@ -33,6 +33,7 @@
 #include <wx/file.h>
 #include <wx/wupdlock.h>
 #include <wx/stdpaths.h>
+#include <wx/artprov.h>
 #include <algorithm>
 
 static int ID_EXPLORER_PANEL = wxNewId();
@@ -317,6 +318,9 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("arrow-up")));
 	RefreshButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
+	HelpButton->SetBitmap(
+		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
+	);
 
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
@@ -346,6 +350,11 @@ void t4p::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 
 void t4p::ModalExplorerPanelClass::OnRefreshClick(wxCommandEvent& event) {
 	RefreshDir(CurrentListDir);
+}
+
+void t4p::ModalExplorerPanelClass::OnHelpButton(wxCommandEvent& event) {
+	ExplorerHelpGeneratedDialogClass dialog(this);
+	dialog.ShowModal();
 }
 
 void t4p::ModalExplorerPanelClass::OnDirectoryEnter(wxCommandEvent& event) {

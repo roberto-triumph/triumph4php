@@ -26,6 +26,8 @@
 #include <wx/treectrl.h>
 #include <wx/panel.h>
 #include <wx/textctrl.h>
+#include <wx/hyperlink.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -169,6 +171,86 @@ class ConfigDetectorPanelGeneratedClass : public wxPanel
 		
 		ConfigDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~ConfigDetectorPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class UrlDetectorHelpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class UrlDetectorHelpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		UrlDetectorHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("URL Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~UrlDetectorHelpDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class TemplateFilesDetectorHelpGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class TemplateFilesDetectorHelpGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		TemplateFilesDetectorHelpGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Template File Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~TemplateFilesDetectorHelpGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ConfigDetectorsHelpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class ConfigDetectorsHelpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		ConfigDetectorsHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Config Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~ConfigDetectorsHelpDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DatabaseDetectorHelpDialogGenereatedClass
+///////////////////////////////////////////////////////////////////////////////
+class DatabaseDetectorHelpDialogGenereatedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		DatabaseDetectorHelpDialogGenereatedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Database Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~DatabaseDetectorHelpDialogGenereatedClass();
 	
 };
 

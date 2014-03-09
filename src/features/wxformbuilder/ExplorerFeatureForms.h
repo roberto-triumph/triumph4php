@@ -24,6 +24,8 @@
 #include <wx/stattext.h>
 #include <wx/panel.h>
 #include <wx/splitter.h>
+#include <wx/hyperlink.h>
+#include <wx/dialog.h>
 #include <wx/filepicker.h>
 #include <wx/statbox.h>
 
@@ -41,6 +43,7 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		wxBitmapButton* FilterButton;
 		wxBitmapButton* ParentButton;
 		wxBitmapButton* RefreshButton;
+		wxBitmapButton* HelpButton;
 		wxComboBox* Directory;
 		wxSplitterWindow* Splitter;
 		wxPanel* SourcesPanel;
@@ -54,6 +57,7 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		virtual void OnFilterButtonLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRefreshClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSourceActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListKeyDown( wxKeyEvent& event ) { event.Skip(); }
@@ -74,6 +78,26 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 			Splitter->SetSashPosition( 164 );
 			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( ModalExplorerGeneratedPanelClass::SplitterOnIdle ), NULL, this );
 		}
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ExplorerHelpGeneratedDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class ExplorerHelpGeneratedDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		ExplorerHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Explorer Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~ExplorerHelpGeneratedDialogClass();
 	
 };
 

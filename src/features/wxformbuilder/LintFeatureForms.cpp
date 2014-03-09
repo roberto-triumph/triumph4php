@@ -21,9 +21,17 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	FlexSizer->SetFlexibleDirection( wxBOTH );
 	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	
 	Label = new wxStaticText( this, wxID_ANY, wxT("PHP Lint Results"), wxDefaultPosition, wxDefaultSize, 0 );
 	Label->Wrap( -1 );
-	FlexSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( Label, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	FlexSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	ErrorsList = new wxDataViewListCtrl(this, ID_ERRORS_LIST);
 	FlexSizer->Add( ErrorsList, 1, wxALL|wxEXPAND, 5 );
@@ -32,10 +40,16 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	
+	// Connect Events
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
 }
 
 LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 {
+	// Disconnect Events
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
+	
 }
 
 LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -132,4 +146,42 @@ LintErrorGeneratedPanelClass::~LintErrorGeneratedPanelClass()
 	DismissLink->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( LintErrorGeneratedPanelClass::OnDismissLink ), NULL, this );
 	DismissLink->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintErrorGeneratedPanelClass::OnKeyDown ), NULL, this );
 	
+}
+
+LintHelpDialogGeneratedDialogClass::LintHelpDialogGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, wxT("The Lint feature of Triumph 4 PHP detects PHP syntax errors, uninitialized variables, and unknown identifers. "), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 400 );
+	GridSizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about lint checks in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/php-linter/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	GridSizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	GridSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( GridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	BoxSizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+LintHelpDialogGeneratedDialogClass::~LintHelpDialogGeneratedDialogClass()
+{
 }

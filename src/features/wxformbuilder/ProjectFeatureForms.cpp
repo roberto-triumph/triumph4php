@@ -309,15 +309,18 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
-	FlexGridSizer->AddGrowableRow( 1 );
+	FlexGridSizer->AddGrowableRow( 2 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that Triumph looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its resource cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that Triumph looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its tag cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
 	HelpLabel->Wrap( 400 );
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More About Projects In Triumph 4 PHP"), wxT("http://docs.triumph4php.com/projects/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	FlexGridSizer->Add( HelpLink, 0, wxALL, 5 );
 	
 	wxArrayString ProjectsListChoices;
 	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, wxLB_EXTENDED );

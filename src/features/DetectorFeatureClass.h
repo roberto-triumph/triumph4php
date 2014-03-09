@@ -53,7 +53,7 @@ public:
 
 	virtual wxString Label() = 0;
 
-	virtual wxString HelpMessage()  = 0;
+	virtual void HelpMessage()  = 0;
 
 };
 
@@ -75,7 +75,7 @@ public:
 
 	wxString Label();
 
-	wxString HelpMessage();
+	void HelpMessage();
 };
 
 class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
@@ -96,7 +96,7 @@ public:
 
 	wxString Label();
 
-	wxString HelpMessage();
+	void HelpMessage();
 };
 
 class TagDetectorClass : public t4p::DetectorClass {
@@ -117,7 +117,7 @@ public:
 
 	wxString Label();
 
-	wxString HelpMessage();
+	void HelpMessage();
 };
 
 class DatabaseTagDetectorClass : public t4p::DetectorClass {
@@ -138,7 +138,7 @@ public:
 
 	wxString Label();
 
-	wxString HelpMessage();
+	void HelpMessage();
 };
 
 class ConfigTagDetectorClass : public t4p::DetectorClass {
@@ -159,7 +159,7 @@ public:
 
 	wxString Label();
 
-	wxString HelpMessage();
+	void HelpMessage();
 };
 
 class DetectorTreeHandlerClass : public wxEvtHandler {

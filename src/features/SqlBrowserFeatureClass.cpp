@@ -577,6 +577,9 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	UpdateLabels(wxT(""));
 
 	RefreshButton->SetBitmap(t4p::BitmapImageAsset(wxT("outline-refresh")));
+	HelpButton->SetBitmap(
+		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
+	);
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }
@@ -655,6 +658,11 @@ void t4p::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const t4p::Dat
 
 void t4p::SqlBrowserPanelClass::OnRefreshButton(wxCommandEvent& event) {
 	ExecuteQuery(t4p::IcuToWx(LastQuery), Query.DatabaseTag);
+}
+
+void t4p::SqlBrowserPanelClass::OnHelpButton(wxCommandEvent& event) {
+	SqlBrowserHelpDialogGeneratedClass dialog(this);
+	dialog.ShowModal();
 }
 
 void t4p::SqlBrowserPanelClass::Stop() {

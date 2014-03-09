@@ -24,6 +24,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
+#include <wx/hyperlink.h>
 #include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -148,6 +149,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 	
 	protected:
 		wxStaticText* HelpLabel;
+		wxHyperlinkCtrl* HelpLink;
 		wxCheckListBox* ProjectsList;
 		wxButton* SelectAll;
 		wxButton* AddButton;

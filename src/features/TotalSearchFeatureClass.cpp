@@ -141,29 +141,8 @@ void t4p::TotalSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
 }
 
 void t4p::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
-	wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
-		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
-		"user.php\n"
-		"user.php:129\n"
-		"User\n"
-		"User::login\n\n"
-		"You can search with partial files names\n"
-		"ser.php (would match user.php)\n\n"
-		"You can search with partial class names\n"
-		"Use (would match Use, User, UserClass, ...)\n\n"
-		"You can search entire class names\n"
-		"User:: (would match all methods including inherited methods, from User class)\n\n"
-		"You can search all methods\n"
-		"::print (would match all methods in all classes that start with 'print' )\n\n"
-		"You can also search for any database tables found in any of your configured connections\n\n"
-		"use (would match on tables that start with \"use\": \"user\", \"user_roles\", ...)\n"
-		"\n"
-		"Cache Status:\n"
-		"A search cannot be made while indexing is taking place. If indexing is taking place\n"
-		"then you will see the status as \"indexing\". Please wait until indexing completes."
-	);
-	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Resource Search Help"), wxOK, this);
+	TotalSearchHelpDialogGeneratedClass dialog(this);
+	dialog.ShowModal();
 }
 
 void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {

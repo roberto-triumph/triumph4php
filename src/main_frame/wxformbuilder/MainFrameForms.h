@@ -69,6 +69,7 @@ class MainFrameGeneratedClass : public wxFrame
 		void _wxFB_OnEditPreferences( wxCommandEvent& event ){ OnEditPreferences( event ); }
 		void _wxFB_OnViewToggleTools( wxCommandEvent& event ){ OnViewToggleTools( event ); }
 		void _wxFB_OnViewToggleOutline( wxCommandEvent& event ){ OnViewToggleOutline( event ); }
+		void _wxFB_OnHelpManual( wxCommandEvent& event ){ OnHelpManual( event ); }
 		void _wxFB_OnHelpAbout( wxCommandEvent& event ){ OnHelpAbout( event ); }
 		void _wxFB_OnHelpCredits( wxCommandEvent& event ){ OnHelpCredits( event ); }
 		void _wxFB_OnHelpLicense( wxCommandEvent& event ){ OnHelpLicense( event ); }
@@ -91,6 +92,7 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_EDIT_PREFERENCES,
 			ID_VIEW_TOGGLE_TOOLS,
 			ID_VIEW_TOGGLE_OUTLINE,
+			ID_MENUITEMMANUAL,
 			ID_ABOUT,
 			ID_MENUITEMCREDITS,
 			ID_MENUITEMLICENSE,
@@ -128,6 +130,7 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnEditPreferences( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewToggleTools( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewToggleOutline( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpManual( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpCredits( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpLicense( wxCommandEvent& event ) { event.Skip(); }

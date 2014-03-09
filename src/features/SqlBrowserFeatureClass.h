@@ -604,6 +604,8 @@ private:
 	 */
 	void OnRefreshButton(wxCommandEvent& event);
 	
+	void OnHelpButton(wxCommandEvent& event);
+	
 	/**
 	 * When the user right-mouse clicks on a cell, show a context
 	 * menu

@@ -260,3 +260,39 @@ ReplacePanelGeneratedClass::~ReplacePanelGeneratedClass()
 	UndoButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReplacePanelGeneratedClass::OnUndoButton ), NULL, this );
 	
 }
+
+FindHelpDialogGeneratedClass::FindHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* Sizer;
+	Sizer = new wxFlexGridSizer( 4, 1, 0, 0 );
+	Sizer->SetFlexibleDirection( wxBOTH );
+	Sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, _("Find modes:\nExact:\nSearching will be done using exact, case sensitive matching\n\nCase Insensitive:\nSearching will be done using exact, case insensitive matching\n\nRegular Expression:\nSearching will be done using the entered regular expression. You can use the button on the right to see all regular expression symbols.\n\nThe full regular expression syntax is described below:"), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 400 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	RegexHelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("http://www.unicode.org/reports/tr18/"), wxT("http://www.unicode.org/reports/tr18/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( RegexHelpLink, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about Find in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/find/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+FindHelpDialogGeneratedClass::~FindHelpDialogGeneratedClass()
+{
+}

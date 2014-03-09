@@ -8,18 +8,24 @@
 #ifndef __LintFeatureForms__
 #define __LintFeatureForms__
 
-#include <wx/string.h>
-#include <wx/stattext.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/bmpbuttn.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/dataview.h>
+#include <wx/string.h>
+#include <wx/button.h>
+#include <wx/stattext.h>
 #include <wx/sizer.h>
+#include <wx/dataview.h>
 #include <wx/panel.h>
 #include <wx/checkbox.h>
 #include <wx/statbox.h>
 #include <wx/hyperlink.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -36,8 +42,13 @@ class LintResultsGeneratedPanelClass : public wxPanel
 			ID_ERRORS_LIST = 1000,
 		};
 		
+		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxDataViewListCtrl* ErrorsList;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
@@ -90,6 +101,26 @@ class LintErrorGeneratedPanelClass : public wxPanel
 		
 		LintErrorGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,77 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL|wxWANTS_CHARS );
 		~LintErrorGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class LintHelpDialogGeneratedDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class LintHelpDialogGeneratedDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		LintHelpDialogGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("PHP Lint Check Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~LintHelpDialogGeneratedDialogClass();
 	
 };
 

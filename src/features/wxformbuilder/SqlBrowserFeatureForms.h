@@ -27,6 +27,7 @@
 #include <wx/spinctrl.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
+#include <wx/hyperlink.h>
 #include <wx/checklst.h>
 #include <wx/aui/auibook.h>
 #include <wx/radiobox.h>
@@ -50,6 +51,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		};
 		
 		wxBitmapButton* RefreshButton;
+		wxBitmapButton* HelpButton;
 		wxStaticText* ConnectionLabel;
 		wxChoice* Connections;
 		
@@ -58,6 +60,7 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnectionChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGridRightClick( wxGridEvent& event ) { event.Skip(); }
 		
@@ -166,6 +169,7 @@ class SqlConnectionListDialogGeneratedClass : public wxDialog
 		};
 		
 		wxStaticText* HelpLabel;
+		wxHyperlinkCtrl* HelpLink;
 		wxCheckListBox* List;
 		wxButton* AdMysqlButton;
 		wxButton* AddSqliteButton;
@@ -347,6 +351,26 @@ class SqlCopyAsPhpDialogGeneratedClass : public wxDialog
 		
 		SqlCopyAsPhpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As PHP Array"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,510 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyAsPhpDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SqlBrowserHelpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class SqlBrowserHelpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		SqlBrowserHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQL Browser Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~SqlBrowserHelpDialogGeneratedClass();
 	
 };
 

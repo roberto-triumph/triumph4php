@@ -26,6 +26,8 @@
 #include <wx/radiobox.h>
 #include <wx/sizer.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -131,6 +133,27 @@ class ReplacePanelGeneratedClass : public wxPanel
 		
 		ReplacePanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1003,105 ), long style = wxTAB_TRAVERSAL );
 		~ReplacePanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class FindHelpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class FindHelpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpText;
+		wxHyperlinkCtrl* RegexHelpLink;
+		wxHyperlinkCtrl* HelpLink;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+	
+	public:
+		
+		FindHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Help On Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~FindHelpDialogGeneratedClass();
 	
 };
 

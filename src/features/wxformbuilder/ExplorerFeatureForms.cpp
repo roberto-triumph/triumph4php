@@ -37,6 +37,9 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	RefreshButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	TopSizer->Add( RefreshButton, 0, wxALL, 5 );
 	
+	HelpButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	
 	Directory = new wxComboBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
 	TopSizer->Add( Directory, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -94,6 +97,7 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	FilterButton->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanelClass::OnFilterButtonLeftDown ), NULL, this );
 	ParentButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnParentButtonClick ), NULL, this );
 	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnRefreshClick ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
 	SourcesList->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
 	List->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
@@ -110,6 +114,7 @@ ModalExplorerGeneratedPanelClass::~ModalExplorerGeneratedPanelClass()
 	FilterButton->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanelClass::OnFilterButtonLeftDown ), NULL, this );
 	ParentButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnParentButtonClick ), NULL, this );
 	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnRefreshClick ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
 	SourcesList->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
 	List->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
@@ -119,6 +124,39 @@ ModalExplorerGeneratedPanelClass::~ModalExplorerGeneratedPanelClass()
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemSelected ), NULL, this );
 	List->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ModalExplorerGeneratedPanelClass::OnListRightDown ), NULL, this );
 	
+}
+
+ExplorerHelpGeneratedDialogClass::ExplorerHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* Sizer;
+	Sizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	Sizer->SetFlexibleDirection( wxBOTH );
+	Sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, wxT("The explorer panel can be used to browse any directory in your file system."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( -1 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about the explorer panel in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/explorer/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+ExplorerHelpGeneratedDialogClass::~ExplorerHelpGeneratedDialogClass()
+{
 }
 
 ExplorerOptionsGeneratedPanelClass::ExplorerOptionsGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )

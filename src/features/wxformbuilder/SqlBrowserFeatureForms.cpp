@@ -23,29 +23,32 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxBoxSizer* bSizer13;
-	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* GridSizer;
+	GridSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	RefreshButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	bSizer13->Add( RefreshButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	GridSizer->Add( RefreshButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	GridSizer->Add( HelpButton, 0, wxALL, 5 );
 	
 	ConnectionLabel = new wxStaticText( this, ID_CONNECTIONLABEL, wxT("Connection"), wxDefaultPosition, wxDefaultSize, 0 );
 	ConnectionLabel->Wrap( -1 );
-	bSizer13->Add( ConnectionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	GridSizer->Add( ConnectionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ConnectionsChoices;
 	Connections = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ConnectionsChoices, 0 );
 	Connections->SetSelection( 0 );
-	bSizer13->Add( Connections, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	GridSizer->Add( Connections, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizer13->Add( 0, 0, 1, wxEXPAND, 5 );
+	GridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	ResultsLabel = new wxStaticText( this, ID_RESULTSLABEL, wxT("20 rows returned"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	ResultsLabel->Wrap( -1 );
-	bSizer13->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
+	GridSizer->Add( ResultsLabel, 0, wxALL|wxEXPAND, 5 );
 	
-	FlexGridSizer->Add( bSizer13, 1, wxEXPAND, 5 );
+	FlexGridSizer->Add( GridSizer, 1, wxEXPAND, 5 );
 	
 	ResultsGrid = new wxGrid( this, ID_DATAGRID, wxDefaultPosition, wxDefaultSize, 0 );
 	
@@ -85,6 +88,7 @@ SqlBrowserPanelGeneratedClass::SqlBrowserPanelGeneratedClass( wxWindow* parent, 
 	
 	// Connect Events
 	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnHelpButton ), NULL, this );
 	Connections->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
 	ResultsGrid->Connect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( SqlBrowserPanelGeneratedClass::OnGridRightClick ), NULL, this );
 }
@@ -93,6 +97,7 @@ SqlBrowserPanelGeneratedClass::~SqlBrowserPanelGeneratedClass()
 {
 	// Disconnect Events
 	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnRefreshButton ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnHelpButton ), NULL, this );
 	Connections->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SqlBrowserPanelGeneratedClass::OnConnectionChoice ), NULL, this );
 	ResultsGrid->Disconnect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( SqlBrowserPanelGeneratedClass::OnGridRightClick ), NULL, this );
 	
@@ -272,6 +277,9 @@ SqlConnectionListDialogGeneratedClass::SqlConnectionListDialogGeneratedClass( wx
 	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("This is the list of connections that are available to Triumph. You can add a new connection, and the table names and column names of each enabled connection will be available for code completion."), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 500 );
 	BoxSizer->Add( HelpLabel, 0, wxALL|wxEXPAND, 15 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about SQL Connections in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/database-connections"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	BoxSizer->Add( HelpLink, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* GridSizer;
 	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
@@ -716,4 +724,35 @@ SqlCopyAsPhpDialogGeneratedClass::~SqlCopyAsPhpDialogGeneratedClass()
 	ButtonSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnCancelButton ), NULL, this );
 	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SqlCopyAsPhpDialogGeneratedClass::OnOkButton ), NULL, this );
 	
+}
+
+SqlBrowserHelpDialogGeneratedClass::SqlBrowserHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* Sizer;
+	Sizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, wxT("The SQL results panel shows you the results of one or more queries you executed."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( -1 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about the SQL Browser in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/sql-browser/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+SqlBrowserHelpDialogGeneratedClass::~SqlBrowserHelpDialogGeneratedClass()
+{
 }

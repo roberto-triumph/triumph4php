@@ -35,6 +35,7 @@ BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_MENU( ID_EDIT_PREFERENCES, MainFrameGeneratedClass::_wxFB_OnEditPreferences )
 	EVT_MENU( ID_VIEW_TOGGLE_TOOLS, MainFrameGeneratedClass::_wxFB_OnViewToggleTools )
 	EVT_MENU( ID_VIEW_TOGGLE_OUTLINE, MainFrameGeneratedClass::_wxFB_OnViewToggleOutline )
+	EVT_MENU( ID_MENUITEMMANUAL, MainFrameGeneratedClass::_wxFB_OnHelpManual )
 	EVT_MENU( ID_ABOUT, MainFrameGeneratedClass::_wxFB_OnHelpAbout )
 	EVT_MENU( ID_MENUITEMCREDITS, MainFrameGeneratedClass::_wxFB_OnHelpCredits )
 	EVT_MENU( ID_MENUITEMLICENSE, MainFrameGeneratedClass::_wxFB_OnHelpLicense )
@@ -158,6 +159,10 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	MenuBar->Append( SearchMenu, _("&Search") ); 
 	
 	HelpMenu = new wxMenu();
+	wxMenuItem* MenuItemManual;
+	MenuItemManual = new wxMenuItem( HelpMenu, ID_MENUITEMMANUAL, wxString( _("Online Manual") ) , _("Open a web browser to the online manual"), wxITEM_NORMAL );
+	HelpMenu->Append( MenuItemManual );
+	
 	wxMenuItem* MenuItemAbout;
 	MenuItemAbout = new wxMenuItem( HelpMenu, ID_ABOUT, wxString( _("About") ) , _("About this program"), wxITEM_NORMAL );
 	HelpMenu->Append( MenuItemAbout );

@@ -340,3 +340,127 @@ ConfigDetectorPanelGeneratedClass::~ConfigDetectorPanelGeneratedClass()
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigDetectorPanelGeneratedClass::OnHelpButton ), NULL, this );
 	
 }
+
+UrlDetectorHelpDialogGeneratedClass::UrlDetectorHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* Sizer;
+	Sizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, _("URL Detectors are PHP scripts that Triumph uses to find out\nall of the valid URL routes for your projects. \n\nTriumph can detect routes for CodeIgniter projects."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 450 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about URL Detection in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/url-detectors/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+UrlDetectorHelpDialogGeneratedClass::~UrlDetectorHelpDialogGeneratedClass()
+{
+}
+
+TemplateFilesDetectorHelpGeneratedClass::TemplateFilesDetectorHelpGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* Sizer;
+	Sizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, _("Template files detectors are PHP scripts that Triumph uses to find out all of the 'view' files for your projects.\n\nTriumph can detect view files for CodeIgniter projects."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 450 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about Template File Detection in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/template-file-detectors/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+TemplateFilesDetectorHelpGeneratedClass::~TemplateFilesDetectorHelpGeneratedClass()
+{
+}
+
+ConfigDetectorsHelpDialogGeneratedClass::ConfigDetectorsHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* Sizer;
+	Sizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, _("Config Detectors are PHP scripts that Triumph uses to find out any config files that PHP frameworks use. \n\nTriumph can detect config files for CodeIgniter projects."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 450 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about Config Detection in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/config-detectors/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+ConfigDetectorsHelpDialogGeneratedClass::~ConfigDetectorsHelpDialogGeneratedClass()
+{
+}
+
+DatabaseDetectorHelpDialogGenereatedClass::DatabaseDetectorHelpDialogGenereatedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* Sizer;
+	Sizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpText = new wxStaticText( this, wxID_ANY, _("Database Detectors are PHP scripts that Triumph uses to find out any database connections that PHP frameworks dynamically create.\n\nTriumph can detect database connections for CodeIgniter projects."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( 450 );
+	Sizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about Database Detection in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/database-detectors/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	Sizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizer->Realize();
+	Sizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	Sizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+DatabaseDetectorHelpDialogGenereatedClass::~DatabaseDetectorHelpDialogGenereatedClass()
+{
+}

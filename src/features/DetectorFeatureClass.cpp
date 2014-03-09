@@ -106,14 +106,9 @@ wxString t4p::UrlTagDetectorClass::Label() {
 	return _("URL Detectors");
 }
 
-wxString t4p::UrlTagDetectorClass::HelpMessage() {
-	wxString help = wxString::FromAscii(
-		"URL Detectors are PHP scripts that Triumph uses to find out "
-		"all of the valid URL routes for your projects.  \n"
-		"Triumph can detect routes for CodeIgniter projects.\n"
-	);
-	help = wxGetTranslation(help);
-	return help;
+void t4p::UrlTagDetectorClass::HelpMessage() {
+	UrlDetectorHelpDialogGeneratedClass dialog(NULL);
+	dialog.ShowModal();
 }
 
 t4p::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass() 
@@ -157,14 +152,9 @@ wxString t4p::TemplateFileTagsDetectorClass::Label() {
 	return _("Template File Detectors");
 }
 
-wxString t4p::TemplateFileTagsDetectorClass::HelpMessage() {
-	wxString help = wxString::FromAscii(
-		"Template files detectors are PHP scripts that Triumph uses to find out "
-		"all of the 'view' files for your projects.  \n"
-		"Triumph can detect view files for CodeIgniter projects.\n"
-	);
-	help = wxGetTranslation(help);
-	return help;
+void t4p::TemplateFileTagsDetectorClass::HelpMessage() {
+	TemplateFilesDetectorHelpGeneratedClass dialog(NULL);
+	dialog.ShowModal();
 }
 
 t4p::TagDetectorClass::TagDetectorClass()  {
@@ -207,14 +197,14 @@ wxString t4p::TagDetectorClass::Label() {
 	return _("Tag Detectors");
 }
 
-wxString t4p::TagDetectorClass::HelpMessage() {
+void t4p::TagDetectorClass::HelpMessage() {
 	wxString help = wxString::FromAscii(
 		"Tag Detectors are PHP scripts that Triumph uses to find out "
 		"any tags (methods, properties, or classes) that PHP frameworks dynamically create.  \n"
 		"Triumph can detect tags for CodeIgniter projects.\n"
 	);
 	help = wxGetTranslation(help);
-	return help;
+	wxMessageBox(help, _("Help"), wxOK);
 }
 
 t4p::DatabaseTagDetectorClass::DatabaseTagDetectorClass()  {
@@ -256,14 +246,9 @@ wxString t4p::DatabaseTagDetectorClass::Label() {
 	return _("Database Detectors");
 }
 
-wxString t4p::DatabaseTagDetectorClass::HelpMessage() {
-	wxString help = wxString::FromAscii(
-		"Database Detectors are PHP scripts that Triumph uses to find out "
-		"any database connections that PHP frameworks dynamically create.  \n"
-		"Triumph can detect database connections for CodeIgniter projects.\n"
-	);
-	help = wxGetTranslation(help);
-	return help;
+void t4p::DatabaseTagDetectorClass::HelpMessage() {
+	DatabaseDetectorHelpDialogGenereatedClass dialog(NULL);
+	dialog.ShowModal();
 }
 
 t4p::ConfigTagDetectorClass::ConfigTagDetectorClass()  {
@@ -306,14 +291,9 @@ wxString t4p::ConfigTagDetectorClass::Label() {
 	return _("Config Detectors");
 }
 
-wxString t4p::ConfigTagDetectorClass::HelpMessage() {
-	wxString help = wxString::FromAscii(
-		"Config Detectors are PHP scripts that Triumph uses to find out "
-		"any config files that PHP frameworks use.  \n"
-		"Triumph can detect config files for CodeIgniter projects.\n"
-	);
-	help = wxGetTranslation(help);
-	return help;
+void t4p::ConfigTagDetectorClass::HelpMessage() {
+	ConfigDetectorsHelpDialogGeneratedClass dialog(NULL);
+	dialog.ShowModal();
 }
 
 t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree,
@@ -435,8 +415,7 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event) {
 }
 
 void t4p::DetectorTreeHandlerClass::OnHelpButton(wxCommandEvent& event) {
-	wxString help = Detector->HelpMessage();
-	wxMessageBox(help, _("Help"), wxOK);
+	Detector->HelpMessage();
 }
 
 void t4p::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {

@@ -541,7 +541,7 @@ void t4p::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	info.SetVersion(version);
 	wxAboutBox(info);
 }
-void t4p::MainFrameClass::OnHelpCredits (wxCommandEvent& event) {
+void t4p::MainFrameClass::OnHelpCredits(wxCommandEvent& event) {
 	CreditsDialogClass dialog(this);
 	dialog.ShowModal();
 }
@@ -549,6 +549,10 @@ void t4p::MainFrameClass::OnHelpCredits (wxCommandEvent& event) {
 void t4p::MainFrameClass::OnHelpLicense(wxCommandEvent& event) {
 	LicenseDialogClass dialog(this, wxID_ANY, _("License"), wxDefaultPosition);
 	dialog.ShowModal();
+}
+
+void t4p::MainFrameClass::OnHelpManual(wxCommandEvent& event) {
+	wxLaunchDefaultBrowser(wxT("http://docs.triumph4php.com/"), 0);
 }
 
 void t4p::MainFrameClass::SaveCurrentFile(wxCommandEvent& event) {

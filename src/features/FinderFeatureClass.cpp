@@ -147,16 +147,8 @@ void t4p::FinderPanelClass::OnNextButton(wxCommandEvent& event) {
 }
 
 void t4p::FinderPanelClass::OnHelpButton(wxCommandEvent& event) {
-	wxString help = wxString::FromAscii("Find modes:\n"
-	  "Exact:\n"
-	  "Searching will be done using exact, case sensitive matching\n\n"
-	  "Regular Expression:\n"
-	  "Searching will be done using the entered regular expression. You "
-	  "can use the button on the right to see all regular expression symbols."
-	  "The full regular expression syntax is described at "
-	  "http://www.unicode.org/reports/tr18/\n");
-	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Find Help"), wxOK, this);
+	FindHelpDialogGeneratedClass dialog(this);
+	dialog.ShowModal();
 }
 
 void t4p::FinderPanelClass::OnOkButton(wxCommandEvent& event) {
@@ -355,16 +347,8 @@ void t4p::ReplacePanelClass::OnNextButton(wxCommandEvent& event) {
 }
 
 void t4p::ReplacePanelClass::OnHelpButton(wxCommandEvent& event) {
-	wxString help = wxString::FromAscii("Find modes:\n"
-	  "Exact:\n"
-	  "Searching will be done using exact, case sensitive matching\n\n"
-	  "Regular Expression:\n"
-	  "Searching will be done using the entered regular expression. You "
-	  "can use the button on the right to see all regular expression symbols."
-	  "The full regular expression syntax is described at "
-	  "http://www.unicode.org/reports/tr18/\n");
-	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Replace Help"), wxOK, this);
+	FindHelpDialogGeneratedClass dialog(this);
+	dialog.ShowModal();
 }
 
 void t4p::ReplacePanelClass::OnOkButton(wxCommandEvent& event) {

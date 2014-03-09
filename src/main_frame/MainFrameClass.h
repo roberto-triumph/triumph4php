@@ -194,6 +194,7 @@ protected:
 	void OnHelpAbout(wxCommandEvent& event);
 	void OnHelpCredits(wxCommandEvent& event);
 	void OnHelpLicense(wxCommandEvent& event);
+	void OnHelpManual(wxCommandEvent& event);
 	
 	/**
 	 * Context menu handler

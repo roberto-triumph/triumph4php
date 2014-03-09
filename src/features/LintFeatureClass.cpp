@@ -266,6 +266,9 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 	, Feature(feature)
 	, TotalFiles(0)
 	, ErrorFiles(0) {
+	HelpButton->SetBitmap(
+		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
+	);
 	
 	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -407,6 +410,11 @@ void t4p::LintResultsPanelClass::ShowLintError(int index) {
 void t4p::LintResultsPanelClass::IncrementErrorFileCount() {
 	ErrorFiles++;
 	UpdateSummary();
+}
+
+void t4p::LintResultsPanelClass::OnHelpButton(wxCommandEvent& event) {
+	LintHelpDialogGeneratedDialogClass dialog(this);
+	dialog.ShowModal();
 }
 
 t4p::LintFeatureClass::LintFeatureClass(t4p::AppClass& app) 

@@ -391,6 +391,8 @@ public:
 	void IncrementErrorFileCount();
 	
 	void OnRowActivated(wxDataViewEvent& event);
+	
+	void OnHelpButton(wxCommandEvent& event);
 
 private:
 

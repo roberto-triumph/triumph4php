@@ -224,6 +224,7 @@ private:
 	void OnFilterButtonLeftDown(wxMouseEvent& event);
 	void OnFilterMenuCheck(wxCommandEvent& event);
 	void OnRefreshClick(wxCommandEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
 
 	// when a file is added/remove update the panel
 	void OnFsWatcher(wxFileSystemWatcherEvent& event);
