@@ -61,6 +61,16 @@ t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::C
 	RemoveTrailingBlankLines->SetValidator(removeTrailingBlankLinesValidator);
 	wxGenericValidator callTipOnMouseHoverValidator(&options.EnableCallTipsOnMouseHover);
 	EnableCallTipOnMouseHover->SetValidator(callTipOnMouseHoverValidator);
+	wxGenericValidator multipleSelectionValidator(&options.EnableMultipleSelection);
+	EnableMultipleSelection->SetValidator(multipleSelectionValidator);
+	wxGenericValidator virtualSpaceValidator(&options.EnableVirtualSpace);
+	EnableVirtualSpace->SetValidator(virtualSpaceValidator);
+	wxGenericValidator rectangularSelectionValidator(&options.EnableRectangularSelection);
+	EnableRectangularSelection->SetValidator(rectangularSelectionValidator);
+	wxGenericValidator whitespaceValidator(&options.ShowWhitespace);
+	ShowWhitespace->SetValidator(whitespaceValidator);
+	wxGenericValidator zoomValidator(&options.Zoom);
+	Zoom->SetValidator(zoomValidator);
 }
 
 void t4p::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {

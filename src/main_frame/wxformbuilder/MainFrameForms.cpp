@@ -194,7 +194,7 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	StaticBoxSizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Editor Behaviors") ), wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 15, 2, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 17, 2, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableCol( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
@@ -247,8 +247,30 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	EnableCallTipOnMouseHover = new wxCheckBox( this, ID_ENABLECALLTIPONMOUSEHOVER, _("Enable CallTip On ALT+ Mouse Hover"), wxDefaultPosition, wxDefaultSize, 0 );
 	FlexGridSizer->Add( EnableCallTipOnMouseHover, 0, wxALL, 5 );
 	
+	EnableMultipleSelection = new wxCheckBox( this, ID_ENABLEMULTIPLESELECTION, _("Enable Multiple Selections"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableMultipleSelection, 0, wxALL, 5 );
 	
-	FlexGridSizer->Add( 0, 0, 1, wxEXPAND, 5 );
+	EnableVirtualSpace = new wxCheckBox( this, ID_ENABLEVIRTUALSPACE, _("Enable Virtual Space"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableVirtualSpace, 0, wxALL, 5 );
+	
+	EnableRectangularSelection = new wxCheckBox( this, ID_ENABLERECTANGULARSELECTION, _("Enable Rectangular Selection"), wxDefaultPosition, wxDefaultSize, 0 );
+	FlexGridSizer->Add( EnableRectangularSelection, 0, wxALL, 5 );
+	
+	ShowWhitespace = new wxCheckBox( this, ID_SHOWWHITESPACE, _("Show Whitespace"), wxDefaultPosition, wxDefaultSize, 0 );
+	ShowWhitespace->SetValue(true); 
+	FlexGridSizer->Add( ShowWhitespace, 0, wxALL, 5 );
+	
+	wxBoxSizer* ZoomSizer;
+	ZoomSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	ZoomLabel = new wxStaticText( this, ID_ZOOMLABEL, _("Default Zoom"), wxDefaultPosition, wxDefaultSize, 0 );
+	ZoomLabel->Wrap( -1 );
+	ZoomSizer->Add( ZoomLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	Zoom = new wxSpinCtrl( this, ID_ZOOM, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, -35, 50, 0 );
+	ZoomSizer->Add( Zoom, 0, wxALL, 5 );
+	
+	FlexGridSizer->Add( ZoomSizer, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* NumbersSizer;
 	NumbersSizer = new wxBoxSizer( wxHORIZONTAL );
@@ -291,6 +313,7 @@ EditorBehaviorPanelGeneratedClass::EditorBehaviorPanelGeneratedClass( wxWindow* 
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	BoxSizer->Fit( this );
 }
 
 EditorBehaviorPanelGeneratedClass::~EditorBehaviorPanelGeneratedClass()

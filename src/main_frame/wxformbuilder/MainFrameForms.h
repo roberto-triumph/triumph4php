@@ -167,6 +167,12 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 			ID_TRIMTRAILINGSPACEBEFORESAVE,
 			ID_REMOVETRAILINGBLANKLINES,
 			ID_ENABLECALLTIPONMOUSEHOVER,
+			ID_ENABLEMULTIPLESELECTION,
+			ID_ENABLEVIRTUALSPACE,
+			ID_ENABLERECTANGULARSELECTION,
+			ID_SHOWWHITESPACE,
+			ID_ZOOMLABEL,
+			ID_ZOOM,
 		};
 		
 		wxCheckBox* EnableCodeFolding;
@@ -183,7 +189,12 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 		wxCheckBox* TrimTrailingSpaceBeforeSave;
 		wxCheckBox* RemoveTrailingBlankLines;
 		wxCheckBox* EnableCallTipOnMouseHover;
-		
+		wxCheckBox* EnableMultipleSelection;
+		wxCheckBox* EnableVirtualSpace;
+		wxCheckBox* EnableRectangularSelection;
+		wxCheckBox* ShowWhitespace;
+		wxStaticText* ZoomLabel;
+		wxSpinCtrl* Zoom;
 		wxStaticText* TabWidthLabel;
 		wxSpinCtrl* TabWidth;
 		wxStaticText* SpacesPerIndentLabel;
@@ -197,7 +208,7 @@ class EditorBehaviorPanelGeneratedClass : public wxPanel
 	
 	public:
 		
-		EditorBehaviorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 603,339 ), long style = wxTAB_TRAVERSAL );
+		EditorBehaviorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~EditorBehaviorPanelGeneratedClass();
 	
 };

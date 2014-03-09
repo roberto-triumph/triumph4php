@@ -224,7 +224,33 @@ public:
 	 * over a function / class name.
 	 */
 	bool EnableCallTipsOnMouseHover;
-
+	
+	/**
+	 * if TRUE, the editor will allow for multple selections.  Selections are 
+	 * 
+	 */
+	bool EnableMultipleSelection;
+	
+	/**
+	 * If TRUE, the user will be able to click and enter text anywhere in the editor 
+	 * even past the end of the line
+	 */
+	bool EnableVirtualSpace;
+	
+	/**
+	 * If TRUE the user's selection will be rectangular, allowing the user to select
+	 * a square-shaped region of text
+	 */
+	bool EnableRectangularSelection;
+	
+	/**
+	 * If TRUE, the editor wil render space and tab characters
+	 */
+	bool ShowWhitespace;
+	
+	// range of -10 to 20
+	int Zoom;
+	
 	CodeControlOptionsClass();
 
 	t4p::CodeControlOptionsClass& operator=(const t4p::CodeControlOptionsClass& src);

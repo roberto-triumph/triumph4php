@@ -69,7 +69,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureClass*>& featu
 	App.RunningThreads.AddEventHandler(this);
 	App.SqliteRunningThreads.AddEventHandler(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
-		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
+		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT | wxAUI_TB_OVERFLOW);
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));

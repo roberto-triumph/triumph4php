@@ -55,8 +55,14 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 , EnableWordWrap(false) 
 , TrimTrailingSpaceBeforeSave(false) 
 , RemoveTrailingBlankLinesBeforeSave(true) 
-, EnableCallTipsOnMouseHover(true) {
-
+, EnableCallTipsOnMouseHover(true) 
+, EnableMultipleSelection(true)
+, EnableVirtualSpace(false)
+, EnableRectangularSelection(false)
+, ShowWhitespace(false)
+, Zoom(0)
+{
+	
 }
 
 t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
@@ -99,6 +105,11 @@ void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src)
 	TrimTrailingSpaceBeforeSave = src.TrimTrailingSpaceBeforeSave;
 	RemoveTrailingBlankLinesBeforeSave = src.RemoveTrailingBlankLinesBeforeSave; 
 	EnableCallTipsOnMouseHover = src.EnableCallTipsOnMouseHover;
+	EnableMultipleSelection = src.EnableMultipleSelection;
+	EnableVirtualSpace = src.EnableVirtualSpace;
+	EnableRectangularSelection = src.EnableRectangularSelection;
+	ShowWhitespace = src.ShowWhitespace;
+	Zoom = src.Zoom;
 }
 
 t4p::StylePreferenceClass& t4p::CodeControlOptionsClass::FindByStcStyle(std::vector<t4p::StylePreferenceClass>& styles, int stcStyle) const {
@@ -152,7 +163,12 @@ void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), &TrimTrailingSpaceBeforeSave);
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
 	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
-	
+	config->Read(wxT("EditorBehavior/EnableMultipleSelection"), &EnableMultipleSelection); 
+	config->Read(wxT("EditorBehavior/EnableVirtualSpace"), &EnableVirtualSpace); 
+	config->Read(wxT("EditorBehavior/EnableRectangularSelection"), &EnableRectangularSelection); 
+	config->Read(wxT("EditorBehavior/Showhitespace"), &ShowWhitespace); 
+	config->Read(wxT("EditorBehavior/Zoom"), &Zoom); 
+		
 	ReadStyles(PhpStyles, config);
 	ReadStyles(SqlStyles, config);
 	ReadStyles(CssStyles, config);
@@ -183,6 +199,11 @@ void t4p::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), TrimTrailingSpaceBeforeSave);
 	config->Write(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), RemoveTrailingBlankLinesBeforeSave);
 	config->Write(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), EnableCallTipsOnMouseHover);
+	config->Write(wxT("EditorBehavior/EnableMultipleSelection"), EnableMultipleSelection); 
+	config->Write(wxT("EditorBehavior/EnableVirtualSpace"), EnableVirtualSpace); 
+	config->Write(wxT("EditorBehavior/EnableRectangularSelection"), EnableRectangularSelection); 
+	config->Write(wxT("EditorBehavior/Showhitespace"), ShowWhitespace); 
+	config->Write(wxT("EditorBehavior/Zoom"), Zoom); 
 	
 	std::vector<t4p::StylePreferenceClass> allStyles = AllStyles();
 	for (size_t i = 0; i < allStyles.size(); ++i) {

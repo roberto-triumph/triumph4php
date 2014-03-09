@@ -111,30 +111,7 @@ static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePrefere
 static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, 
 						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
 						   wxBitmap& searchHitBadBitmap) {
-	if (options.IndentUsingTabs) {
-		ctrl->SetUseTabs(true);
-		ctrl->SetTabWidth(options.TabWidth);
-		ctrl->SetIndent(0);
-		ctrl->SetTabIndents(true);
-		ctrl->SetBackSpaceUnIndents(true);
-	}
-	else {
-		ctrl->SetUseTabs(false);
-		ctrl->SetTabWidth(options.SpacesPerIndent);
-		ctrl->SetIndent(options.SpacesPerIndent);
-		ctrl->SetTabIndents(false);
-		ctrl->SetBackSpaceUnIndents(false);
-	}
-	if (options.RightMargin > 0) {
-		ctrl->SetEdgeMode(wxSTC_EDGE_LINE);
-		ctrl->SetEdgeColumn(options.RightMargin);
-	}
-	else {
-		ctrl->SetEdgeMode(wxSTC_EDGE_NONE);
-	}
-	ctrl->SetIndentationGuides(options.EnableIndentationGuides);
-	ctrl->SetEOLMode(options.LineEndingMode);
-	ctrl->SetViewEOL(options.EnableLineEndings);
+
 
 	// caret, line, selection, margin colors
 	for (size_t i = 0; i < styles.size(); ++i) {
@@ -353,14 +330,6 @@ void t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event)
 }
 
 void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options) {
-	if (options.EnableWordWrap) {
-		ctrl->SetWrapMode(wxSTC_WRAP_WORD);
-		ctrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
-	}
-	else {
-		ctrl->SetWrapMode(wxSTC_WRAP_NONE);
-	}
-
 	if (t4p::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
 		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
 		SetPhpOptions(ctrl, options, App.Globals);
