@@ -494,8 +494,10 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	
 	int style = wxSTC_HPHP_DEFAULT;
 	
-	// enable doc text when user holds down ALT+SHIFT
-	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT)) {
+	// enable doc text when user holds down **only** ALT
+	// since CTRL+ALT enables multiple selection
+	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT) 
+		&& !(event.GetModifiers() & wxMOD_CONTROL)) {
 		wxCommandEvent altEvt(t4p::EVT_MOTION_ALT);
 		altEvt.SetInt(pos);
 		altEvt.SetEventObject(this);
@@ -503,7 +505,8 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	}
 
 	// enable clickable links on identifiers
-	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)) {
+	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD) 
+		&& !(event.GetModifiers() & wxMOD_ALT)) {
 		StyleSetHotSpot(style, true);
 		SetHotspotActiveForeground(true, *wxBLUE);
 		SetHotspotActiveUnderline(true);
