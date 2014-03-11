@@ -33,7 +33,6 @@ newaction {
 		end
 		destDir = normalizepath("..\\triumph4php-" .. tag)
 		
-		--[[
 		--
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
@@ -42,14 +41,13 @@ newaction {
 			os.execute("rmdir /s /q " .. destDir)
 		end
 		batchexecute(normalizepath(""), {
-			string.format("%s clone . %s", GIT, destDir),
+			string.format("\"%s\" clone %s %s", GIT, ".", destDir),
 			string.format("cd %s", destDir),
-			string.format("%s checkout %s", GIT, tag),
-			string.format("%s submodule init", GIT),
-			string.format("%s submodule update lib/pelet", GIT)
+			string.format("\"%s\" checkout %s", GIT, tag),
+			string.format("\"%s\" submodule init", GIT),
+			string.format("\"%s\" submodule update lib/pelet", GIT)
 		});
 		
-		]]--
 		
 		-- next we create the make file, pointing the soci and 
 		-- wxwidgets locations to inside this project, so that we dont
@@ -83,7 +81,7 @@ newaction {
 		-- get the version info from git and populate the version file
 		-- if we have no tags yet, use the -all flag
 		batchexecute(destDir, {
-			"git describe --long > dist\\triumph4php\\assets\\version.txt",
+			string.format("\"%s\" describe --long > dist\\triumph4php\\assets\\version.txt", GIT),
 			string.format("%s a triumph4php-0.4.2.7za triumph4php\\*", SEVENZIP)
 		})
 	end

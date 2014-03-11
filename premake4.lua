@@ -23,6 +23,9 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+dofile "premake_functions.lua"
+
+-- load opts after functions, opts need the trim function
 if os.is("windows") then
 	dofile "premake_opts_windows.lua"
 elseif os.is("linux") then
@@ -30,7 +33,7 @@ elseif os.is("linux") then
 else
 	error "You are running on a non-supported operating system. triumph4php cannot be built.\n"
 end
-dofile "premake_functions.lua"
+
 dofile "premake_action_dist_msw.lua"
 dofile "premake_action_dist_deb.lua"
 dofile "premake_action_dist_rpm.lua"

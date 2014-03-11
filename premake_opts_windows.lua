@@ -52,6 +52,7 @@ if (not ICU_DIR) then
 	ICU_DIR = "lib/icu"
 	print "Using default location of lib/icu for ICU dir"
 end
+ICU_DIR = trim(ICU_DIR)
 
 -- location where the ICU lib files are located
 ICU_LIB_DIR = ICU_DIR .. "/lib/"
@@ -95,6 +96,7 @@ if (not WXWIDGETS_DIR) then
 	WXWIDGETS_DIR = "lib/wxWidgets"
 	print "Using default location of lib/wxWidgets for wxWidgets dir"
 end
+WXWIDGETS_DIR = trim(WXWIDGETS_DIR )
 
 WX_LIB_DIR = WXWIDGETS_DIR .. "/lib/vc_dll/"
 WX_INCLUDE_DIRS_DEBUG = { WXWIDGETS_DIR .. "/include/", WXWIDGETS_DIR .. "/lib/vc_dll/mswud/" }
@@ -105,7 +107,7 @@ WX_LIB_STC_RELEASE = "wxmsw29u_stc"
 
 -- location of the Git executable. this is used by the
 -- setupdev action to get all submodule
-GIT = 'C:\\Program Files (x86)\Git\\bin\\git.exe';
+GIT = 'C:\\Program Files (x86)\\Git\\bin\\git.exe';
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
@@ -135,6 +137,8 @@ if (not MYSQL_CONNECTOR_DIR) then
 	MYSQL_CONNECTOR_DIR = "lib/mysql-connector-c-noinstall-6.0.2-win32"
 	print("Using default dir for MySQL Connector: " .. MYSQL_CONNECTOR_DIR)
 end
+MYSQL_CONNECTOR_DIR  = trim(MYSQL_CONNECTOR_DIR)
+
 MYSQL_INCLUDE_DIR = MYSQL_CONNECTOR_DIR .. '/include'
 MYSQL_LIB = MYSQL_CONNECTOR_DIR .. '/lib/libmysql.lib'
 MYSQL_LIB_DIR = MYSQL_CONNECTOR_DIR .. '/lib/'
@@ -153,12 +157,14 @@ if (not SQLITE_INCLUDE_DIR) then
 	SQLITE_INCLUDE_DIR = "lib/sqlite-amalgamation-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_INCLUDE_DIR)
 end
+SQLITE_INCLUDE_DIR = trim(SQLITE_INCLUDE_DIR)
 
 SQLITE_LIB_DIR = os.getenv("T4P_SQLITE_LIB_DIR")
 if (not SQLITE_LIB_DIR) then
 	SQLITE_LIB_DIR = "lib/sqlite-dll-win32-x86-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_LIB_DIR)
 end
+SQLITE_LIB_DIR = trim(SQLITE_LIB_DIR)
 SQLITE_LIB = SQLITE_LIB_DIR .. '/sqlite3.lib'
 SQLITE_LIB_NAME = 'sqlite3.lib'
 
@@ -169,13 +175,14 @@ if (not SOCI_INCLUDE_DIR) then
     SOCI_INCLUDE_DIR = "lib/soci/triumph/include",
     print "Using default location of lib/soci/triumph/include for SOCI debug include dir"
 end
+SOCI_INCLUDE_DIR = trim(SOCI_INCLUDE_DIR)
 
 SOCI_LIB_DIR = os.getenv("T4P_SOCI_LIB_DIR");
 if (not SOCI_LIB_DIR) then
     SOCI_LIB_DIR = 'lib/soci/src/lib/Release';
     print "Using default location of lib/soci/src/lib/Release for SOCI debug lib dir"
 end
-
+SOCI_LIB_DIR = trim(SOCI_LIB_DIR);
 
 -- will look for CURL in these directories
 -- these are the directories where
@@ -194,6 +201,7 @@ if (not CURL_RELEASE_DIR) then
 	CURL_RELEASE_DIR = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
 	print("Using default dir for CURL Release: " .. CURL_RELEASE_DIR)
 end
+CURL_RELEASE_DIR = trim(CURL_RELEASE_DIR)
 CURL_RELEASE_INCLUDE_DIR = CURL_RELEASE_DIR .. '/include'
 CURL_RELEASE_LIB = CURL_RELEASE_DIR .. '/lib/libcurl.lib'
 CURL_RELEASE_LIB_DIR = CURL_RELEASE_DIR .. '/lib'
