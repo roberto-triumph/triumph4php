@@ -47,17 +47,17 @@ ICU_LIBS_DEBUG = {
        "iculxd", "icutud", "icuucd"
 }
 
-icuDir = os.getenv("T4P_ICU_DIR")
-if (not icuDir) then
-	icuDir = "lib/icu"
+ICU_DIR = os.getenv("T4P_ICU_DIR")
+if (not ICU_DIR) then
+	ICU_DIR = "lib/icu"
 	print "Using default location of lib/icu for ICU dir"
 end
 
 -- location where the ICU lib files are located
-ICU_LIB_DIR = icuDir .. "/lib/"
+ICU_LIB_DIR = ICU_DIR .. "/lib/"
 
 -- location where the ICU header files are located
-ICU_INCLUDE_DIR = icuDir .. "/include/"
+ICU_INCLUDE_DIR = ICU_DIR .. "/include/"
 
 -- location to the wxWidgets libraries. Make sure to copy the
 -- wxWidgets DLLs to the Debug directory, otherwise the wxWidgets library
@@ -90,22 +90,22 @@ WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html", "wxm
 -- the styled text control library
 WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
 
-wxWidgetsDir = os.getenv("T4P_WXWIDGETS_DIR")
-if (not wxWidgetsDir) then
-	wxWidgetsDir = "lib/wxWidgets"
+WXWIDGETS_DIR = os.getenv("T4P_WXWIDGETS_DIR")
+if (not WXWIDGETS_DIR) then
+	WXWIDGETS_DIR = "lib/wxWidgets"
 	print "Using default location of lib/wxWidgets for wxWidgets dir"
 end
 
-WX_LIB_DIR = wxWidgetsDir .. "/lib/vc_dll/"
-WX_INCLUDE_DIRS_DEBUG = { wxWidgetsDir .. "/include/", wxWidgetsDir .. "/lib/vc_dll/mswud/" }
-WX_INCLUDE_DIRS_RELEASE =  { wxWidgetsDir .. "/include/", wxWidgetsDir .. "/lib/vc_dll/mswu/" }
+WX_LIB_DIR = WXWIDGETS_DIR .. "/lib/vc_dll/"
+WX_INCLUDE_DIRS_DEBUG = { WXWIDGETS_DIR .. "/include/", WXWIDGETS_DIR .. "/lib/vc_dll/mswud/" }
+WX_INCLUDE_DIRS_RELEASE =  { WXWIDGETS_DIR .. "/include/", WXWIDGETS_DIR .. "/lib/vc_dll/mswu/" }
 
 -- the styled text control library
 WX_LIB_STC_RELEASE = "wxmsw29u_stc"
 
 -- location of the Git executable. this is used by the
 -- setupdev action to get all submodule
-GIT = 'git.exe';
+GIT = 'C:\\Program Files (x86)\Git\\bin\\git.exe';
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
@@ -129,15 +129,15 @@ VSVARS = "C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\Common7\\Tools\\
 -- not easy to get MySQL Connector C libs in windows
 -- doing a manual, binary install
 
-mysqlDir = os.getenv("T4P_MYSQL_CONNECTOR_DIR")
-if (not mysqlDir) then
+MYSQL_CONNECTOR_DIR = os.getenv("T4P_MYSQL_CONNECTOR_DIR")
+if (not MYSQL_CONNECTOR_DIR) then
 
-	mysqlDir = "lib/mysql-connector-c-noinstall-6.0.2-win32"
-	print("Using default dir for MySQL Connector: " .. mysqlDir)
+	MYSQL_CONNECTOR_DIR = "lib/mysql-connector-c-noinstall-6.0.2-win32"
+	print("Using default dir for MySQL Connector: " .. MYSQL_CONNECTOR_DIR)
 end
-MYSQL_INCLUDE_DIR = mysqlDir .. '/include'
-MYSQL_LIB = mysqlDir .. '/lib/libmysql.lib'
-MYSQL_LIB_DIR = mysqlDir .. '/lib/'
+MYSQL_INCLUDE_DIR = MYSQL_CONNECTOR_DIR .. '/include'
+MYSQL_LIB = MYSQL_CONNECTOR_DIR .. '/lib/libmysql.lib'
+MYSQL_LIB_DIR = MYSQL_CONNECTOR_DIR .. '/lib/'
 MYSQL_LIB_NAME = 'libmysql.lib'
 
 -- On some unit tests, Triumph attempt to connect to a database
@@ -148,21 +148,34 @@ T4P_DB_PASSWORD = ''
 
 -- will look for SQLite in these directories
 -- read lib/sqlite/README  for more info
-sqliteIncludeDir = os.getenv("T4P_SQLITE_INCLUDE_DIR")
-if (not sqliteIncludeDir) then
-	sqliteIncludeDir = "lib/sqlite-amalgamation-3071300";
-	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteIncludeDir)
+SQLITE_INCLUDE_DIR = os.getenv("T4P_SQLITE_INCLUDE_DIR")
+if (not SQLITE_INCLUDE_DIR) then
+	SQLITE_INCLUDE_DIR = "lib/sqlite-amalgamation-3071300";
+	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_INCLUDE_DIR)
 end
-SQLITE_INCLUDE_DIR = sqliteIncludeDir
 
-sqliteLibDir = os.getenv("T4P_SQLITE_LIB_DIR")
-if (not sqliteLibDir) then
-	sqliteLibDir = "lib/sqlite-dll-win32-x86-3071300";
-	print("Using default dir for SQLITE INCLUDE DIR: " .. sqliteLibDir)
+SQLITE_LIB_DIR = os.getenv("T4P_SQLITE_LIB_DIR")
+if (not SQLITE_LIB_DIR) then
+	SQLITE_LIB_DIR = "lib/sqlite-dll-win32-x86-3071300";
+	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_LIB_DIR)
 end
-SQLITE_LIB = sqliteLibDir.. '/sqlite3.lib'
-SQLITE_LIB_DIR = sqliteLibDir 
+SQLITE_LIB = SQLITE_LIB_DIR .. '/sqlite3.lib'
 SQLITE_LIB_NAME = 'sqlite3.lib'
+
+-- will look for SOCI in these directories
+-- so that we can move the SOCI files to an outside dir if we want to
+SOCI_INCLUDE_DIR = os.getenv("T4P_SOCI_INCLUDE_DIR");
+if (not SOCI_INCLUDE_DIR) then
+    SOCI_INCLUDE_DIR = "lib/soci/triumph/include",
+    print "Using default location of lib/soci/triumph/include for SOCI debug include dir"
+end
+
+SOCI_LIB_DIR = os.getenv("T4P_SOCI_LIB_DIR");
+if (not SOCI_LIB_DIR) then
+    SOCI_LIB_DIR = 'lib/soci/src/lib/Release';
+    print "Using default location of lib/soci/src/lib/Release for SOCI debug lib dir"
+end
+
 
 -- will look for CURL in these directories
 -- these are the directories where
@@ -176,15 +189,15 @@ CURL_DEBUG_LIB = curlDebugDir .. '/lib/libcurl.lib'
 CURL_DEBUG_LIB_DIR = curlDebugDir .. '/lib'
 CURL_DEBUG_BIN_DIR = curlDebugDir .. '/bin'
 
-curlReleaseDir = os.getenv("T4P_CURL_RELEASE_DIR")
-if (not curlReleaseDir) then
-	curlReleaseDir = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
-	print("Using default dir for CURL Release: " .. curlReleaseDir)
+CURL_RELEASE_DIR = os.getenv("T4P_CURL_RELEASE_DIR")
+if (not CURL_RELEASE_DIR) then
+	CURL_RELEASE_DIR = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
+	print("Using default dir for CURL Release: " .. CURL_RELEASE_DIR)
 end
-CURL_RELEASE_INCLUDE_DIR = curlReleaseDir .. '/include'
-CURL_RELEASE_LIB = curlReleaseDir .. '/lib/libcurl.lib'
-CURL_RELEASE_LIB_DIR = curlReleaseDir .. '/lib'
-CURL_RELEASE_BIN_DIR = curlReleaseDir .. '/bin'
+CURL_RELEASE_INCLUDE_DIR = CURL_RELEASE_DIR .. '/include'
+CURL_RELEASE_LIB = CURL_RELEASE_DIR .. '/lib/libcurl.lib'
+CURL_RELEASE_LIB_DIR = CURL_RELEASE_DIR .. '/lib'
+CURL_RELEASE_BIN_DIR = CURL_RELEASE_DIR .. '/bin'
 
 -- location of the final lib directory
 -- all of the dependant shared libraries (DLLs) will be placed here

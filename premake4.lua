@@ -134,8 +134,8 @@ function sociconfiguration(config)
 	}
 	if os.is "windows" then 
 		includedirs {
-			"lib/soci/triumph/include",
-			"lib/soci/triumph/include/soci",
+			SOCI_INCLUDE_DIR,
+			SOCI_INCLUDE_DIR .. "/soci",
 			MYSQL_INCLUDE_DIR,
 			SQLITE_INCLUDE_DIR
 		}
@@ -153,7 +153,7 @@ function sociconfiguration(config)
 		-- grab the libraries from the build directory.  the ones from
 		-- from the install directory (lib/soci/triumph) do not work (programs 
 		-- that use them crash)
-		libdirs { "lib/soci/src/lib/Release" }
+		libdirs { SOCI_LIB_DIR }
 	else 
 		if config == "Debug" then
 			includedirs {
