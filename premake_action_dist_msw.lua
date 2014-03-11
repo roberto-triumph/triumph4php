@@ -33,7 +33,6 @@ newaction {
 		end
 		destDir = normalizepath("..\\triumph4php-" .. tag)
 		
-		--[[
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
 		--
@@ -47,7 +46,6 @@ newaction {
 			string.format("\"%s\" submodule init", GIT),
 			string.format("\"%s\" submodule update lib/pelet", GIT)
 		});
-		]]--
 		
 		-- next we create the make file, pointing the soci and 
 		-- wxwidgets locations to inside this project, so that we dont
