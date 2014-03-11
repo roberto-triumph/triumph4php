@@ -33,11 +33,11 @@ newaction {
 		end
 		destDir = normalizepath("..\\triumph4php-" .. tag)
 		
-		--
+		--[[
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
 		--
-		if os.isdir("dist") then
+		if os.isdir(destDir) then
 			os.execute("rmdir /s /q " .. destDir)
 		end
 		batchexecute(normalizepath(""), {
@@ -47,7 +47,7 @@ newaction {
 			string.format("\"%s\" submodule init", GIT),
 			string.format("\"%s\" submodule update lib/pelet", GIT)
 		});
-		
+		]]--
 		
 		-- next we create the make file, pointing the soci and 
 		-- wxwidgets locations to inside this project, so that we dont
@@ -65,24 +65,38 @@ newaction {
 			"premake4.exe vs2008",
 			"\"" .. VSVARS .. "\"",
 			"cd build\\vs2008",
-			"vcbuild triumph4php.vcproj \"Release|Win32\""
+			"vcbuild keybinder.vcproj \"Release|Win32\"",
+			"vcbuild pelet.vcproj \"Release|Win32\"",
+			"vcbuild triumph4php.vcproj \"Release|Win32\"",
 		});
-			
+		
+		if (os.isdir("..\\triumph4php-" .. tag .. "\\dist")) then
+			os.execute("rmdir /s /q " .. "..\\triumph4php-" .. tag .. "\\dist")
+		end
 		batchexecute(destDir, {
-			"mkdir dist",
-			"mkdir dist\\triumph4php-" .. tag,
-			"mkdir dist\\triumph4php-".. tag .. "\\bin",
-			"mkdir dist\\triumph4php-".. tag .. "\\assets",
-			"xcopy /S /Y Release\\*.dll dist\\triumph4php-".. tag .. "\\bin",
-			"copy Release\\triumph4php.exe dist\\triumph4php-".. tag .. "\\bin",
-			"xcopy  /S /Y assets\\* dist\\triumph4php-".. tag .. "\\assets"
+			"mkdir dist\\triumph4php\\bin",
+			"mkdir dist\\triumph4php\\assets",
+			
+			-- careful, dont copy over pelet from this dir, leave the one we just compiled
+			"xcopy /S /Y " .. normalizepath("Release\\wx*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\icu*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\libcurl*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\libmysql*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\soci*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\sqlite*.dll") .. " dist\\triumph4php\\bin",
+			
+			-- copy over keybinder, pelet that we just compiled
+			"xcopy /S /Y " .. "Release\\*.dll  dist\\triumph4php\\bin",
+			"copy Release\\triumph4php.exe dist\\triumph4php\\bin",
+			"xcopy  /S /Y assets\\* dist\\triumph4php\\assets"
 		});
 		
 		-- get the version info from git and populate the version file
 		-- if we have no tags yet, use the -all flag
 		batchexecute(destDir, {
 			string.format("\"%s\" describe --long > dist\\triumph4php\\assets\\version.txt", GIT),
-			string.format("%s a triumph4php-0.4.2.7za triumph4php\\*", SEVENZIP)
+			"cd dist",
+			string.format("%s a triumph4php-%s.7z triumph4php\\*", SEVENZIP, tag)
 		})
 	end
 }

@@ -115,7 +115,7 @@ CMAKE = 'cmake';
 
 -- location of 7-zip, used to unzip downloaded binaries of Triumph
 -- dependencies from the Internet
-SEVENZIP = '7za';
+SEVENZIP = 'C:\\Chocolatey\\bin\\7za';
 
 -- location of wget, used to retrieve some of Triumph
 -- dependencies from the Internet
