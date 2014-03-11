@@ -53,6 +53,7 @@
 #include <features/DocCommentFeatureClass.h>
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
+#include <features/ChangelogFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -275,6 +276,8 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new SyntaxHighlightFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new EditorBehaviorFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new ChangelogFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

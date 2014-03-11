@@ -252,6 +252,12 @@ wxFileName DetectorCacheAsset();
  */
 wxFileName VersionFileAsset();
 
+/**
+ * @return wxFileName the full path to the file that stores the application's 
+ *         ChangeLog file
+ */
+wxFileName ChangeLogFileAsset();
+
 }
 
 #endif

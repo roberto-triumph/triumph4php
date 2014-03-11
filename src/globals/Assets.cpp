@@ -359,3 +359,9 @@ wxFileName t4p::VersionFileAsset() {
 	wxFileName versionFile(asset.GetPath(), wxT("version.txt"));
 	return versionFile;
 }
+
+wxFileName t4p::ChangeLogFileAsset() {
+	wxFileName asset = AssetRootDir();
+	wxFileName changeLogFile(asset.GetPath(), wxT("ChangeLog.md"));
+	return changeLogFile;
+}
