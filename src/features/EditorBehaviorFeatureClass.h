@@ -64,7 +64,6 @@ private:
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAppFileNew(t4p::CodeControlEventClass& event);
 	
-	void OnToggleRectangularSelection(wxCommandEvent& event);
 	void OnToggleWordWrap(wxCommandEvent& event);
 	void OnToggleIndentationGuides(wxCommandEvent& event);
 	void OnToggleWhitespace(wxCommandEvent& event);

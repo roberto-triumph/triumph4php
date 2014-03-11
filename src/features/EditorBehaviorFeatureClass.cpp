@@ -33,10 +33,6 @@ t4p::EditorBehaviorFeatureClass::EditorBehaviorFeatureClass(t4p::AppClass& app)
 
 void t4p::EditorBehaviorFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddSeparator();
-	
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 0, _("Rectangular"), 
-		t4p::BitmapImageAsset(wxT("rectangular-selection")), _("Enable / disable rectangular selection"), wxITEM_NORMAL
-	);
 	toolBar->AddTool(t4p::MENU_BEHAVIOR + 1, _("Word Wrap"), 
 		t4p::BitmapImageAsset(wxT("wrap")), _("Enable / disable word wrap"), wxITEM_NORMAL
 	);
@@ -69,16 +65,6 @@ void t4p::EditorBehaviorFeatureClass::AddViewMenuItems(wxMenu* menu) {
 	menu->Append(t4p::MENU_BEHAVIOR + 4, _("Zoom In"), _("Zoom In"));
 	menu->Append(t4p::MENU_BEHAVIOR + 5, _("Zoom Out"), _("Zoom Out"));
 	menu->Append(t4p::MENU_BEHAVIOR + 6, _("Reset Zoom\tCTRL+0"), _("Reset Zoom"));
-}
-
-void t4p::EditorBehaviorFeatureClass::OnToggleRectangularSelection(wxCommandEvent& event) {
-	App.Preferences.CodeControlOptions.EnableRectangularSelection = !App.Preferences.CodeControlOptions.EnableRectangularSelection;
-	
-	wxConfigBase* config = wxConfigBase::Get(false);
-	App.Preferences.CodeControlOptions.Save(config);
-	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
 void t4p::EditorBehaviorFeatureClass::OnToggleWordWrap(wxCommandEvent& event) {
@@ -337,7 +323,6 @@ BEGIN_EVENT_TABLE(t4p::EditorBehaviorFeatureClass, t4p::FeatureClass)
 	EVT_APP_FILE_NEW(t4p::EditorBehaviorFeatureClass::OnAppFileNew)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EditorBehaviorFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::EditorBehaviorFeatureClass::OnPreferencesSaved)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 0, t4p::EditorBehaviorFeatureClass::OnToggleRectangularSelection)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 1, t4p::EditorBehaviorFeatureClass::OnToggleWordWrap)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 2, t4p::EditorBehaviorFeatureClass::OnToggleIndentationGuides)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 3, t4p::EditorBehaviorFeatureClass::OnToggleWhitespace)
