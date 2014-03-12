@@ -1,4 +1,27 @@
-
+/**
+ * This software is released under the terms of the MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2013 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
 #include <features/DocCommentFeatureClass.h>
 #include <Triumph.h>
 #include <unicode/unistr.h>
@@ -220,7 +243,7 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 			ctrl->Freeze();
 		}
 		wxPoint point = ctrl->PointFromPosition(pos);
-		t4p::DocCommentPanelClass* panel = new t4p::DocCommentPanelClass(ctrl);
+		t4p::DocCommentPanelClass* panel = new t4p::DocCommentPanelClass(ctrl, *this);
 		panel->SetPosition(point);
 		panel->SetText(msg);
 		if (isNativeTag) {
@@ -233,9 +256,13 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 	}
 }
 
+void t4p::DocCommentFeatureClass::OnPhpSiteLinkClick(wxHyperlinkEvent& event) {
+	wxLaunchDefaultBrowser(event.GetURL());
+}
 
-t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent) 
-: DocCommentPanelGeneratedClass(parent) {
+t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent, t4p::DocCommentFeatureClass& feature) 
+: DocCommentPanelGeneratedClass(parent) 
+, Feature(feature) {
 	SetName(wxT("DocComment"));
 	PhpSiteDocs->Hide();
 }
@@ -258,9 +285,11 @@ void t4p::DocCommentPanelClass::OnClose(wxHyperlinkEvent& event) {
 void t4p::DocCommentPanelClass::OnPhpSiteDocs(wxHyperlinkEvent& event) {
 	CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
 	
-	// call skip so that the default link processing takes over
-	// (opening a browser)
-	event.Skip();
+	// post an event instead of handling letting the defauly handling take 
+	// place
+	// this is because in MSW, DoDestroy gets called before the
+	// default handling finishes; and this causes a crash
+	wxPostEvent(&Feature, event);
 }
 
 void t4p::DocCommentPanelClass::OnKeyDown(wxKeyEvent& event) {
@@ -281,4 +310,5 @@ void t4p::DocCommentPanelClass::DoDestroy() {
 BEGIN_EVENT_TABLE(t4p::DocCommentFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_DOC_COMMENT + 0, t4p::DocCommentFeatureClass::OnShowDocComment)
 	EVT_COMMAND(wxID_ANY, t4p::EVT_MOTION_ALT, t4p::DocCommentFeatureClass::OnMotionAlt)
+	EVT_HYPERLINK(ID_PHP_SITE_LINK, t4p::DocCommentFeatureClass::OnPhpSiteLinkClick)
 END_EVENT_TABLE()
