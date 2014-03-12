@@ -1,7 +1,7 @@
 Triumph 4 PHP ChangeLog
 =======================
 
-#Version 0.4.3#
+#Version 0.4.4#
   *	The source code editor now supports multiple selections, virtual space,
     zoom in/out, and displaying of whitespace. (Linux, MSW) 
   * Lint Check no longer generates false positives when using the 
