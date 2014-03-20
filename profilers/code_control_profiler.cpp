@@ -101,8 +101,10 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 		return false;
 	}
 	UnicodeString contents;
-	t4p::FindInFilesClass::FileContents(fileNameString, contents);
-	CodeControl->TrackFile(fileNameString, contents);
+	wxString charset;
+	bool hasSignature = false;
+	t4p::FindInFilesClass::FileContents(fileNameString, contents, charset, hasSignature);
+	CodeControl->TrackFile(fileNameString, contents, charset, hasSignature);
 
 	// add the new file to the  tag cache
 	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();

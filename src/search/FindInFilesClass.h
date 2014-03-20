@@ -263,11 +263,16 @@ public:
 	/**
 	 * Get the file contents from the file and write them to the string
 	 * @param fileName full path of the file to open
-	 * @param content the file contents will be written to this variable
+	 * @param content [out] the file contents will be written to this variable
+	 * @param charset [out] the character set of the file will be written to this variable
+	 * @param hasSignature [out] will be set to true if the content had a unicode
+	 *        BOM (file signature). Note that the returned content will already
+	 *        have the BOM removed from it
 	 * @return OpenErrors reason for content not being set
 	 */
-	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content);
-
+	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content, 
+		wxString& charset, bool& hasSignature);
+	
 private:
 
 	/**
@@ -334,6 +339,7 @@ private:
 	 * Close the associated input streams.
 	 */
 	void CleanupStreams();
+
 };
 
 }

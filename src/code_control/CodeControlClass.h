@@ -157,8 +157,11 @@ public:
 	 *
 	 * @param wxString filename full path of the file to load
 	 * @param contents the file contents
+	 * @param charset the character set the file will be written as when saved
+	 * @param bool TRUE if the file had a file signature BOM marker
 	 */
-	void TrackFile(const wxString& filename, UnicodeString& contents);
+	void TrackFile(const wxString& filename, UnicodeString& contents, const wxString& charset, 
+		bool hasSignature);
 
 	/**
 	 * lets avoid calls like this
@@ -627,6 +630,18 @@ private:
 	 * if true then this control has at least one search marker visible
 	 */
 	bool HasSearchMarkers;
+	
+	/**
+	 * if true, then the file will be written with a file signature 
+	 * BOM marker
+	 */
+	bool HasFileSignature;
+	
+	/**
+	 *  thecharacter set that the file will be written as
+	 * when saved
+	 */
+	wxString Charset;
 
 	DECLARE_EVENT_TABLE()
 };

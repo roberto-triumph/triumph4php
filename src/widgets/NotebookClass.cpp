@@ -330,12 +330,14 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		UnicodeString fileContents;	
 
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
-		t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents);
+		bool hasSignature = false;
+		wxString charset;
+		t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents, charset, hasSignature);
 		if (error == t4p::FindInFilesClass::NONE) {
 
 			// make sure to use a unique ID, other source code depends on this
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
-			newCode->TrackFile(filename, fileContents);
+			newCode->TrackFile(filename, fileContents, charset, hasSignature);
 
 			t4p::CodeControlClass::Mode mode = newCode->GetDocumentMode();
 			int imgId = ImageId(mode);

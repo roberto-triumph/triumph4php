@@ -83,7 +83,9 @@ void t4p::TotalSearchFeatureClass::OpenFileTag(const t4p::FileTagClass& fileTag,
 
 void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::TagClass& tag) {
 	UnicodeString content;
-	t4p::FindInFilesClass::FileContents(tag.FullPath, content);
+	bool hasSignature = false;
+	wxString charset;
+	t4p::FindInFilesClass::FileContents(tag.FullPath, content, charset, hasSignature);
 	int32_t position, 
 			length;
 	bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);

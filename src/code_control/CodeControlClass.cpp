@@ -31,6 +31,7 @@
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <search/FindInFilesClass.h>
 #include <wx/filename.h>
+#include <wx/ffile.h>
 #include <wx/stc/stc.h>
 #include <wx/utils.h>
 #include <wx/tokenzr.h>
@@ -57,6 +58,24 @@ const int t4p::CODE_CONTROL_INDICATOR_FIND = 1;
 // start stealing styles from "asp javascript" we will never use those styles
 const int t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
+static bool SaveFileWithCharset(const wxString& fullPath, const wxString& contents, 
+	const wxString& charset, bool hasSignature) {
+	bool ret = false;
+	
+	wxFFile file(fullPath, wxT("wb"));
+	wxCSConv conv(charset);
+    if (file.IsOpened() && conv.IsOk()) {
+		if (hasSignature) {
+			wxString sig = wxT("\xfeff");
+			file.Write(sig, conv);
+		}
+		
+		ret = file.Write(contents, conv);
+	}
+	return ret;
+		
+}
+
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  t4p::GlobalsClass* globals, t4p::EventSinkClass& eventSink,
 			wxWindowID id, const wxPoint& position, const wxSize& size, long style,
@@ -72,7 +91,9 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 		, DocumentMode(TEXT) 
 		, IsHidden(false) 
 		, IsTouched(false) 
-		, HasSearchMarkers(false) {
+		, HasSearchMarkers(false) 
+		, HasFileSignature(false) 
+		, Charset() {
 	Document = NULL;
 	
 	// we will handle right-click menu ourselves
@@ -85,8 +106,11 @@ t4p::CodeControlClass::~CodeControlClass() {
 	Document->DetachFromControl(this);
 	delete Document;
 }
-void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents) {
+void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents, 
+		const wxString& charset, bool hasSignature) {
 	SetUnicodeText(contents);
+	HasFileSignature = hasSignature;
+	Charset = charset;
 	EmptyUndoBuffer();
 	SetSavePoint();
 	CurrentFilename = filename;
@@ -134,12 +158,15 @@ void t4p::CodeControlClass::Revert() {
 }
 
 void t4p::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
-	UnicodeString contents;	
+	UnicodeString contents;
 
 	// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
-	t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents);
+	bool hasSignature = false;
+	wxString charset;
+	t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents, 
+		charset, hasSignature);
 	if (error == t4p::FindInFilesClass::NONE) {
-		TrackFile(fileName, contents);
+		TrackFile(fileName, contents, charset, hasSignature);
 	}
 	else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
 		t4p::EditorLogError(t4p::ERR_INVALID_FILE, fileName);
@@ -170,13 +197,15 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	if (CodeControlOptions.RemoveTrailingBlankLinesBeforeSave) {
 		RemoveTrailingBlankLines();
 	}
+	
+	// TODO if file has a signature, prepend the file signature (BOM)
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
-		saved = SaveFile(CurrentFilename);
+		saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
 
 		// if file is no changing name then its not changing extension
 		// no need to auto detect the document mode
 	}
-	else if (SaveFile(newFilename)) {
+	else if (SaveFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature)) {
 		CurrentFilename = newFilename;
 		saved = true;
 
@@ -188,6 +217,7 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		Document->FileOpened(newFilename);
 	}
 	if (saved) {
+		SetSavePoint();
 
 		// when saving, update the internal timestamp so that the external mod check logic works correctly
 		wxFileName file(CurrentFilename);
