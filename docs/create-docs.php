@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2012 Roberto Perpuly
+ * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
@@ -85,7 +85,7 @@ foreach (glob(__DIR__ . "/*.md") as $strFile) {
 	// loop though all files, on each file we need to
 	// add the header that tels sculpin to use the
 	// correct layout
-	$header = "---\nlayout: default.html\n---\n";
+	$header = "---\nlayout: fluid.html\n---\n";
 	
 	$helpFile = $destDocRoot . "/source" . DIRECTORY_SEPARATOR . basename($strFile);
 	$contents = file_get_contents($strFile);
