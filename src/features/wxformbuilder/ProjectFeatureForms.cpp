@@ -323,7 +323,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	FlexGridSizer->Add( HelpLink, 0, wxALL, 5 );
 	
 	wxArrayString ProjectsListChoices;
-	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, ProjectsListChoices, wxLB_EXTENDED );
+	ProjectsList = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,200 ), ProjectsListChoices, wxLB_EXTENDED );
 	FlexGridSizer->Add( ProjectsList, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* CrudButtonsSizer;

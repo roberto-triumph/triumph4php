@@ -522,9 +522,6 @@ t4p::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vecto
 	if (!ProjectsList->IsEmpty()) {
 		ProjectsList->SetSelection(0);
 	}
-	this->SetSize(-1, 500);
-	this->Layout();
-	this->Center(wxBOTH);
 }
 
 void t4p::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
