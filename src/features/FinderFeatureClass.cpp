@@ -633,13 +633,36 @@ void t4p::FinderFeatureClass::OnEditFind(wxCommandEvent& event) {
 void t4p::FinderFeatureClass::OnEditFindNext(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-		OnEditFind(event);
-		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
-		FinderPanelClass* panel = (FinderPanelClass*) window;
-		panel->FindNext();
 		
-		// give focus back to code control this is just better user experience	
-		codeControl->SetFocus();
+		// a couple of situations may be possible here
+		// 1. the replace panel is shown
+		// 2. the find panel is shown
+		// 3. neither find or replace panel are shown
+		//
+		// solutions
+		// when the replace panel is shown, use the expression in the replace panel
+		// when the find panel is shown, use the expression in the find panel
+		// when no panel is shown, show the find panel
+		wxWindow* parent = GetMainWindow();
+		wxWindow* replaceWindow = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
+		wxWindow* findWindow = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
+		if (replaceWindow && AuiManager->GetPane(replaceWindow).IsShown()) {
+			ReplacePanelClass* panel = (ReplacePanelClass*) replaceWindow;
+			panel->FindNext();
+			
+			// give focus back to code control this is just better user experience
+			codeControl->SetFocus();
+		}
+		else if (findWindow && AuiManager->GetPane(findWindow).IsShown()) {
+			FinderPanelClass* panel = (FinderPanelClass*) findWindow;
+			panel->FindNext();
+			
+			// give focus back to code control this is just better user experience
+			codeControl->SetFocus();
+		}
+		else {
+			OnEditFind(event);
+		}
 	}
 }
 	
