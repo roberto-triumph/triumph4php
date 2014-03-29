@@ -112,7 +112,15 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
 						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
 						   wxBitmap& searchHitBadBitmap) {
 
-
+	// even though we dont use the lint margin on all languages, we do use
+	// the search hit marker on all languages. we must set the margin mask
+	// for all languages
+	ctrl->SetMarginType(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
+	ctrl->SetMarginWidth(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, 16);
+	ctrl->SetMarginSensitive(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, false);
+	ctrl->SetMarginMask(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
+	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
+	
 	// caret, line, selection, margin colors
 	for (size_t i = 0; i < styles.size(); ++i) {
 		t4p::StylePreferenceClass pref = styles[i];
@@ -192,12 +200,6 @@ static void SetPhpOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& 
 	// need to add the namespace operator here, it was the only way i could get the
 	// ctrl->AutoCompletion to workwith namespaces.
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$\\"));
-
-	ctrl->SetMarginType(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	ctrl->SetMarginWidth(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, 16);
-	ctrl->SetMarginSensitive(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, false);
-	ctrl->SetMarginMask(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 
 	// the annotation styles
 	ctrl->StyleSetForeground(t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION, wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT));
@@ -301,12 +303,6 @@ static void SetPlainTextOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsC
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	ctrl->SetStyleBits(5);
 	ctrl->SetWordChars(wxT("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"));
-
-	ctrl->SetMarginType(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARGIN_SYMBOL);
-	ctrl->SetMarginWidth(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, 16);
-	ctrl->SetMarginSensitive(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, false);
-	ctrl->SetMarginMask(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, ~wxSTC_MASK_FOLDERS);
-	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARGIN, wxSTC_MARK_ARROW, *wxRED, *wxRED);
 }
 
 t4p::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(t4p::AppClass& app)
