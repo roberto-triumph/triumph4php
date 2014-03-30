@@ -25,7 +25,7 @@
  */
 
 /**
- * The goal of this script is to discover all of the URLs that a PHP code igniter project. This means
+ * The goal of this script is to discover all of the URLs for your PHP code igniter projects. This means
  * that it will list all of the URLs that correspond all of the project's controller functions. This script
  * is a bit smarter because it is able to detect default controllers and also read the code igniter
  * config for url suffixes.
