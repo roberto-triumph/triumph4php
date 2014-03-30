@@ -2,7 +2,7 @@
 
 /**
  * The goal of this script is to discover all of the config files for your PHP projects. This means
- * that it will list all of the confi files for all of the projects. This script
+ * that it will list all of the config files for all of the projects. This script
  * will be called via a command line; it is a normal command line script.
  *
  * This script is part of Triumph's Config Detection feature; it enables the editor to have a 
@@ -120,8 +120,8 @@ function detectConfigs($sourceDir, &$doSkip) {
 	// from being deleted.
 	$doSkip = TRUE;
 	
-	// add your logic here; usually it will consist of querying the SQLIte database in $resourceDbFileName
-	// getting all controller - method pairs.
+	// add your logic here; usually it will consist of looking at a project's 
+	// "config" directory and enumerating the files within it.
 	return $allConfigs;
 }
 

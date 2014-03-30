@@ -2,7 +2,7 @@
 
 /**
  * The goal of this script is to discover all of the database connections for your PHP projects. This means
- * that it will list all of the datbase connections that all of the projects use. This script
+ * that it will list all of the database connections that all of the projects use. This script
  * will be called via a command line; it is a normal command line script.
  *
  * This script is part of Triumph's Database Detection feature; it enables the editor to have a 

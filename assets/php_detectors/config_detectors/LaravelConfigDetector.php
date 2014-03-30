@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The goal of this script is to discover all of the config files for your PHP CodeIgniter projects. This means
+ * The goal of this script is to discover all of the config files for your PHP Laravel projects. This means
  * that it will list all of the config files for all of the projects. This script
  * will be called via a command line; it is a normal command line script.
  *
@@ -37,7 +37,7 @@ function parseArgs() {
 
 	if ($help) {
 		$helpMessage = <<<EOF
-The goal of this script is to discover all of the config files for your PHP Code Igniter projects. This means
+The goal of this script is to discover all of the config files for your PHP Laravel projects. This means
 that it will list all of the confi files for all of the projects. This script
 will be called via a command line; it is a normal command line script.
 
@@ -83,7 +83,7 @@ EOF;
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$configTagTable = new Triumph_ConfigTagTable($pdo);
 		$configTagTable->saveConfigTags($arrConfigTags, $sourceDir);
-		echo "Config dectection complete, written to {$outputDbFileName}\n";
+		echo "Config detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrConfigTags)) {
@@ -112,30 +112,37 @@ EOF;
  */
 function detectConfigs($sourceDir, &$doSkip) {
 	$allConfigs = array();
+	
+	
+	// need to check that this detector is able to recognize the directory structure of sourceDir
+	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
+	// by skipping detection, we prevent any detected URLs from the previous detection script
+	// from being deleted.
 	$doSkip = TRUE;
 	
 	// need to check that this detector is able to recognize the directory structure of sourceDir
 	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
 	// by skipping detection, we prevent any detected URLs from the previous detection script
 	// from being deleted.
+	// for laravel, we look for the artisan script. if we don't have the artisan script assume
+	// that this source is not a laravel project.
 	$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-	if (!is_file($sourceDir . 'application/config/database.php')) {	
+	if (!is_file($sourceDir . 'artisan')) {	
 		return $allConfigs;
 	}
 	$doSkip = FALSE;
 	$allConfigs = array(
-		new Triumph_ConfigTag('AutoLoad', realpath($sourceDir . 'application/config/autoload.php')),
-		new Triumph_ConfigTag('Config', realpath($sourceDir . 'application/config/config.php')),
-		new Triumph_ConfigTag('Constants', realpath($sourceDir . 'application/config/constants.php')), 
-		new Triumph_ConfigTag('Database', realpath($sourceDir . 'application/config/database.php')), 
-		new Triumph_ConfigTag('DocTypes', realpath($sourceDir . 'application/config/doctypes.php')),
-		new Triumph_ConfigTag('Foreign Characters', realpath($sourceDir . 'application/config/foreign_chars.php')),
-		new Triumph_ConfigTag('Hooks', realpath($sourceDir . 'application/config/hooks.php')),
-		new Triumph_ConfigTag('Mime Types', realpath($sourceDir . 'application/config/mimes.php')),
-		new Triumph_ConfigTag('Profiler', realpath($sourceDir . 'application/config/profiler.php')),
-		new Triumph_ConfigTag('Routes', realpath($sourceDir . 'application/config/routes.php')),
-		new Triumph_ConfigTag('Smileys', realpath($sourceDir . 'application/config/smileys.php')),
-		new Triumph_ConfigTag('User Agents', realpath($sourceDir . 'application/config/user_agents.php'))
+		new Triumph_ConfigTag('App', realpath($sourceDir . 'app/config/app.php')),
+		new Triumph_ConfigTag('Auth', realpath($sourceDir . 'app/config/auth.php')),
+		new Triumph_ConfigTag('Cache', realpath($sourceDir . 'app/config/cache.php')), 
+		new Triumph_ConfigTag('Compile', realpath($sourceDir . 'app/config/compile.php')), 
+		new Triumph_ConfigTag('Database', realpath($sourceDir . 'app/config/database.php')),
+		new Triumph_ConfigTag('Mail', realpath($sourceDir . 'app/config/mail.php')),
+		new Triumph_ConfigTag('Queue', realpath($sourceDir . 'app/config/queue.php')),
+		new Triumph_ConfigTag('Remote', realpath($sourceDir . 'app/config/remote.php')),
+		new Triumph_ConfigTag('Session', realpath($sourceDir . 'app/config/session.php')),
+		new Triumph_ConfigTag('View', realpath($sourceDir . 'app/config/view.php')),
+		new Triumph_ConfigTag('Workbench', realpath($sourceDir . 'app/config/workbench.php'))
 	);
 	return $allConfigs; 
 }

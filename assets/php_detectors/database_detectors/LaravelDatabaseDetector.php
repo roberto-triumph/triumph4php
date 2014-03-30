@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The goal of this script is to discover all of the database connections for your PHP Code Igniter projects. This means
+ * The goal of this script is to discover all of the database connections for your PHP Laravel projects. This means
  * that it will list all of the database connections that all of the projects use. This script
  * will be called via a command line; it is a normal command line script.
  *
@@ -38,7 +38,7 @@ function parseArgs() {
 
 	if ($help) {
 		$helpMessage = <<<EOF
-The goal of this script is to discover all of the database connections for your PHP Code Igniter projects. This means
+The goal of this script is to discover all of the database connections for your PHP Laravel projects. This means
 that it will list all of the datbase connections that all of the projects use. This script
 will be called via a command line; it is a normal command line script.
 
@@ -85,7 +85,7 @@ EOF;
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$databaseTagTable = new Triumph_DatabaseTagTable($pdo);
 		$databaseTagTable->saveDatabaseTags($arrDatabases, $sourceDir);
-		echo "Database dectection complete, written to {$outputDbFileName}\n";
+		echo "Database detection complete, written to {$outputDbFileName}\n";
 	}
 	else {
 		if (!empty($arrDatabases)) {
@@ -120,60 +120,69 @@ EOF;
  * @return Triumph_DatabaseTag[]      array of Triumph_DatabaseTag instances the detected databases
  */
 function detectDatabases($sourceDir, &$doSkip) {
-	$doSkip = TRUE;
 	$allDatabases = array();
-	$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-	if (!is_file($sourceDir . 'application/config/development/database.php') &&
-		!is_file($sourceDir . 'application/config/database.php')) {
-		return $allDatabases;
-	}
 	
 	// need to check that this detector is able to recognize the directory structure of sourceDir
 	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
 	// by skipping detection, we prevent any detected databases from the previous detection script
 	// from being deleted.
-	$doSkip = FALSE;
-	// need this define so that we can include code igniter files directly
-	define('BASEPATH', '');
+	$doSkip = TRUE;
 	
-	// database config file can be in the environment directory
-	// for now just get the development environment info
-	if (is_file($sourceDir . 'application/config/development/database.php')) {
-		include ($sourceDir . 'application/config/development/database.php');
-		if ($db) {
-			foreach ($db as $groupName => $groupConnection) {
-				if (strcasecmp('mysql', $groupConnection['dbdriver']) == 0) {
-					$tag = tagFromDbArray($groupName, $groupConnection);
+	// for laravel, we look for the artisan script. if we don't have the artisan script assume
+	// that this source is not a laravel project.
+	$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
+	if (!is_file($sourceDir . 'artisan')) {	
+		return $allDatabases;
+	}
+	$doSkip = FALSE;
+	
+	// load the laravel bootstrap
+	$bootstrapFile = $sourceDir . 'bootstrap' . DIRECTORY_SEPARATOR . 'autoload.php';
+	$startFile = $sourceDir . 'bootstrap' . DIRECTORY_SEPARATOR . 'start.php'; 
+	if (is_file($bootstrapFile) && is_file($startFile)) {
+	
+		require $bootstrapFile;
+		$app = require_once $startFile;	
+		$arrDbs = Config::get('database.connections');
+		foreach ($arrDbs as $strConnectionLabel => $arrDb) {
+			if (strcasecmp('mysql', $arrDb['driver']) == 0) {
+			
+				// laravel supports read/write connections, look 
+				// for them
+				
+				if (isset($arrDb['read'])) {
+					$tag = tagFromDbArray($arrDb['read']['host'], $strConnectionLabel . ' read', $arrDb);
+					$allDatabases[] = $tag;
+				}
+				if (isset($arrDb['write'])) {
+				
+					// only add the write db if the host is different
+					$tag = tagFromDbArray($arrDb['write']['host'],  $strConnectionLabel . ' write', $arrDb);	
+					if (strcasecmp($arrDb['read'], $arrDb['write']) != 0) {
+						$allDatabases[] = $tag;
+					}
+				}
+				if (isset($arrDb['host'])) {
+					$tag = tagFromDbArray($arrDb['host'], $strConnectionLabel, $arrDb);
 					$allDatabases[] = $tag;
 				}
 			}
-		}
+		}		
 	}
-	else if (is_file($sourceDir . 'application/config/database.php')) {
-		$db = array();
-		include ($sourceDir . 'application/config/database.php');
-		if ($db) {
-			foreach ($db as $groupName => $groupConnection) {
-				if (\opstring\compare_case('mysql', $groupConnection['dbdriver']) == 0 || 
-					\opstring\compare_case('mysqli', $groupConnection['dbdriver']) == 0) {
-					$tag = tagFromDbArray($groupName, $groupConnection);
-					$allDatabases[] = $tag;
-				}
-			}
-		}
-	}
+	
 	return $allDatabases;
 }
 
-function tagFromDbArray($groupName, $groupConnection) {
+function tagFromDbArray($host, $groupName, $groupConnection) {
 	// port is not there by default
 	$port = 0;
 	if (isset($groupConnection['port'])) {
 		$port = $groupConnection['port'];
 	}
+	
 
 	$tag = new Triumph_DatabaseTag(Triumph_DatabaseTag::DRIVER_MYSQL, 
-		$groupName, $groupConnection['hostname'], 
+		$groupName, $host, 
 		$port, $groupConnection['database'], 
 		'', 
 		$groupConnection['username'], 
