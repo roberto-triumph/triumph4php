@@ -84,15 +84,10 @@ private:
 	void OnTimer(wxTimerEvent& event);
 
 	/**
-	 * when the timer is up then handle the files that are not part of the watched directories
+	 * handle the files that are not part of the watched directories
 	 * ie we will check the file modified times
 	 */
-	void OnPollTimer(wxTimerEvent& event);
-
-	 /**
-	 * prompt the user to reload modified files or save deleted files
-	 */
-	void PollFileModifiedPrompt(const wxFileName& fileName, bool isDeleted);
+	void OpenedCodeControlCheck();
 
 	/**
 	 * special handling for files that are open. For open files that were externally modified
@@ -143,21 +138,11 @@ private:
 	 * directories fail to notify of file changes inside of sub-directories.
 	 */
 	void OnVolumeListComplete(t4p::VolumeListEventClass& event);
-	
-	/**
-	 * when a file has been saved, we set the JustSaved flag
-	 * when a file is saved, update the modified time instead
-	 * of flagging the file as externally changed. we set a flag
-	 * because the file may be in a network drive, and the file's
-	 * mod time may not be accurately known untila bit of time
-	 * after the save ocurred.
-	 */
-	void OnFileSaved(t4p::CodeControlEventClass& event);
 
 	/**
 	 * when the user puts this app in the foreground, check for
 	 * file modifications.  maybe the user went to another editor
-	 * and modified one of the files that is opened in triumph.7
+	 * and modified one of the files that is opened in triumph.
 	 */
 	void OnActivateApp(wxCommandEvent& event);
 
@@ -166,12 +151,6 @@ private:
 	 * event handler we will process the file system watcher events.
 	 */
 	wxTimer Timer;
-
-	/**
-	 * to periodically check the modified time of the opened files that we poll (files outside
-	 * watched directories)
-	 */
-	wxTimer PollTimer;
 
 	/**
 	 * object that will notify us when a file has been modified outside the editor.
@@ -225,31 +204,15 @@ private:
 	std::vector<wxString> LocalVolumes;
 
 	/**
-	 * to periodically check the modified time of the opened files that we poll (files outside
-	 * watched directories).
-	 * Note that the logic will work like this:
+	 * to check the modified time of the opened files that we poll (files outside
+	 * watched directories, or files in network drives).
 	 * 
-	 * 1. this PollTimer runs continuously
-	 * 2. when the timer triggers, OnPollTimer is called
-	 * 3. if the App is not active (user is using another app)
- 	 *    exit the timer handler
-	 * 4. otherwise, we initiate the file modified check action
-	 *    which will read the file last modified time from a background thread
-	 * 5. when the file modified action finishes, ask the user if the file 
-	 *    was modified externally.
+	 * Note that we don't continuously poll, we only poll the files when 
+	 * the user has re-activated the app.  This is because the user might
+	 * have gone to another app to change the file (ie. went to a terminal
+	 * and performed an svn up)
 	 * 
-	 * The reason for checking for file times  in this seemingly convulted way
-	 * a. by checking to see if we are the acitve app, we only check the file time when the user
-	 *    is actively using the editor. for example, when the user leaves 
-	 *    work for the day we dont want to continually poll for file
-	 *    times since the user is not around to answer the questions
-	 * b. a timer is used because we want to perform the file checks at 
-	 *    most once a second
-	 * c. we can use this same logic for local files and files that are 
-	 *    located in a network drive. we wont have to hit the network in
-	 *    the foreground thread (file checking is done in the background)
-	 *    plus we wont hit the network repeatedly many times if the user
-	 *    goes home for the day
+	 * This is how most editors check for file modifications
 	 */
 	std::vector<wxFileName> FilesToPoll;
 
@@ -263,39 +226,17 @@ private:
 	wxDateTime LastWatcherEventTime;
 	
 	/**
-	 * the number of consecutive times that we have polled a file
-	 * and it did not exist.  We use this number to see if a polled
-	 * file was actually deleted.  Some editors delete /swap files 
-	 * when saving, and we want to check more than once to see if 
-	 * a polled file was actually deleted
-	 */
-	int PollDeleteCount;
-
-	/**
-	 * the number of consecutive times that we have polled a file
-	 * and it is seen as modified.  We use this number to see if a polled
-	 * file was actually modified.  We want to ignore file modified
-	 * time updates due to the user saving a file inside the triumph
-	 * editor
-	 */
-	int PollModifiedCount;
-	
-	/**
 	 * will be set to TRUE if the watcher saw an error event.  We may get 
 	 * error events when a project source dir has been deleted. In this case, 
 	 * we want to prompt the user on what action to take
 	 */
 	bool IsWatchError;
-
+	
 	/**
-	 * when a file is saved, we ignore the results of the file modified
-	 * checks that are done in the background; since the user just
-	 * saved the file, the modified time we have in memory is now out of
-	 * date, the modified time is changed, but the user knows about
-	 * the change, so we dont have to  prompt them about
-	 * the file modification.
+	 * flag to prevent multiple modified dialogs during activate app event.
+	 * needed for linux
 	 */
-	bool JustSaved;
+	bool JustReactivated;
 	
 	DECLARE_EVENT_TABLE()
 

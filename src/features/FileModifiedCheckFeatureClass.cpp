@@ -32,7 +32,6 @@
 #include <map>
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
-static int ID_FILE_MODIFIED_POLL = wxNewId();
 static int ID_FILE_MODIFIED_ACTION = wxNewId();
 
 /**
@@ -137,7 +136,6 @@ static std::map<wxString, t4p::CodeControlClass*> OpenedFiles(t4p::NotebookClass
 t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
-, PollTimer(this, ID_FILE_MODIFIED_POLL)
 , FilesExternallyCreated()
 , FilesExternallyModified()
 , FilesExternallyDeleted() 
@@ -151,10 +149,8 @@ t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass&
 , LocalVolumes()
 , FilesToPoll()
 , LastWatcherEventTime() 
-, PollDeleteCount(0)
-, PollModifiedCount(0)
-, IsWatchError(false)
-, JustSaved(false) {
+, IsWatchError(false) 
+, JustReactivated(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
 }
@@ -171,12 +167,10 @@ void t4p::FileModifiedCheckFeatureClass::OnAppReady(wxCommandEvent& event) {
 	StartWatch();
 #endif
 	Timer.Start(250, wxTIMER_CONTINUOUS);
-	PollTimer.Start(1000, wxTIMER_CONTINUOUS);
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnAppExit(wxCommandEvent& event) {
 	Timer.Stop();
-	PollTimer.Stop();
 
 	// unregister ourselves as the event handler from watcher 
 	if (FsWatcher) {
@@ -682,115 +676,59 @@ void t4p::FileModifiedCheckFeatureClass::HandleWatchError() {
 }
 
 
-void t4p::FileModifiedCheckFeatureClass::OnPollTimer(wxTimerEvent& event) {
+void t4p::FileModifiedCheckFeatureClass::OpenedCodeControlCheck() {
 	if (FilesToPoll.empty()) {
 		return;
 	}
-	if (!App.IsActive()) {
-		
-		// dont bother checking for
-		// files as the user wont be around to answer questions
-		return;
-	}	
-	
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
-	if (!ctrl) {
+	t4p::NotebookClass* notebook = GetNotebook();
+	if (notebook->GetPageCount() == 0) {
 		return;
 	}
-	wxFileName ctrlFileName(ctrl->GetFileName());
 	
 	// loop through all of the opened files to get the files to
 	// be checked
 	// for now, we will only check the file that
 	// is being edited (the tab that is selected)
-	bool found = false;
-	for (size_t i = 0; i < FilesToPoll.size(); ++i) {
-		if (ctrlFileName == FilesToPoll[i]) {
-			found = true;
-			break;
+	// only check files that are not already being watcher 
+	// by fs watcher (ie files not in a project, or files in 
+	// a network drive)
+	std::map<wxString, t4p::CodeControlClass*> filesModifiedToPrompt;
+	std::map<wxString, t4p::CodeControlClass*> filesDeletedToPrompt;
+	std::map<wxString, int> filesDeleted;
+	
+	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+		wxFileName ctrlFileName(ctrl->GetFileName());
+		if (std::find(FilesToPoll.begin(), FilesToPoll.end(), ctrlFileName) != FilesToPoll.end()) {
+			
+			// compare the file times
+			bool exists = ctrlFileName.FileExists();
+			wxDateTime newModTime;
+			if (exists) {
+				newModTime = ctrlFileName.GetModificationTime();
+				if (newModTime.IsValid() && !newModTime.IsEqualTo(ctrl->GetFileOpenedDateTime())) {
+					filesModifiedToPrompt[ctrl->GetFileName()] = ctrl;
+				}
+			}
+			else {
+				filesDeletedToPrompt[ctrl->GetFileName()] = ctrl;
+				filesDeleted[ctrl->GetFileName()] = 1;
+			}
 		}
 	}
-	if (!found) {
-		return;
+	if (!filesModifiedToPrompt.empty()) {
+		FilesModifiedPrompt(filesModifiedToPrompt);
 	}
-	PollTimer.Stop();
-
-	bool exists = ctrlFileName.FileExists();
-	bool modified  = false;
-	wxDateTime newModTime;
-	if (exists) {
-		newModTime = ctrlFileName.GetModificationTime();
-		if (newModTime.IsValid() && !newModTime.IsEqualTo(ctrl->GetFileOpenedDateTime())) {
-			modified = true;
-		}
-	}
-
-	if (!exists && PollDeleteCount <= 2) {
-		
-		// files doesnt exist. it may actually, but it may be in
-		// the process of being moved by an external editor.
-		// increment the delete count, and try to read next
-		// timer tick
-		PollDeleteCount++;
-	}
-	else if (!exists && PollDeleteCount > 2) {
-		
-		// we tried to get the modified time but it has
-		// not existed.  assume file was delted.
-		PollFileModifiedPrompt(ctrlFileName, true);
-		PollDeleteCount = 0;
-	}
-	else if (exists && modified && !JustSaved) {
-
-		// file time has been updated; file has been modified
-		PollFileModifiedPrompt(ctrlFileName, false);
-	}
-	else if (exists && modified && JustSaved) {
-
-		// a file was just saved in this editor.  the modified
-		// time changed because this app changed it. set the
-		// file modified time
-		ctrl->UpdateOpenedDateTime(newModTime);
-	}
-	JustSaved = false;
-	PollTimer.Start();
-}
-
-void t4p::FileModifiedCheckFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
-	JustSaved = true;
-}
-
-void t4p::FileModifiedCheckFeatureClass::PollFileModifiedPrompt(const wxFileName& fileName, bool isFileDeleted) {
-	std::map<wxString, t4p::CodeControlClass*> codeControls;
-	std::map<wxString, int> filesToPrompt;
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
-	if (!isFileDeleted && ctrl) {
-
-		// group the modified file with its code control. then we will prompt the user
-		// which files they want to keep/revert
-		filesToPrompt[fileName.GetFullPath()] = 1;
-		codeControls[fileName.GetFullPath()] = ctrl;
-		FilesModifiedPrompt(codeControls);
-	}
-	else if (ctrl) {
-		std::map<wxString, int> deletedFiles;
-		filesToPrompt[fileName.GetFullPath()] = 1;
-		codeControls[fileName.GetFullPath()] = ctrl;
-		FilesDeletedPrompt(codeControls, filesToPrompt);
+	if (!filesDeletedToPrompt.empty()) {
+		FilesDeletedPrompt(filesDeletedToPrompt, filesDeleted);
 	}
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnActivateApp(wxCommandEvent& event) {
-
-	// when user comes back to the app after the app was put in the 
-	// background, check for external file modifications, as the user
-	// might have changed it
-	// don't do this on linux; prevent double modified dialogs popping up
-	// on linux
-	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX) {
-		wxTimerEvent timerEvt;
-		OnPollTimer(timerEvt);
+	if (!JustReactivated) {
+		JustReactivated = true;
+		OpenedCodeControlCheck();
+		JustReactivated = false;
 	}
 }
 
@@ -844,10 +782,8 @@ BEGIN_EVENT_TABLE(t4p::FileModifiedCheckFeatureClass, t4p::FeatureClass)
 	EVT_APP_FILE_OPEN(t4p::FileModifiedCheckFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::FileModifiedCheckFeatureClass::OnAppFileClosed)
 	EVT_TIMER(ID_FILE_MODIFIED_CHECK, t4p::FileModifiedCheckFeatureClass::OnTimer)
-	EVT_TIMER(ID_FILE_MODIFIED_POLL, t4p::FileModifiedCheckFeatureClass::OnPollTimer)
 	EVT_FSWATCHER(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnFsWatcher)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 	EVT_ACTION_VOLUME_LIST(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete)
-	EVT_APP_FILE_SAVED(t4p::FileModifiedCheckFeatureClass::OnFileSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_ACTIVATED, t4p::FileModifiedCheckFeatureClass::OnActivateApp)
 END_EVENT_TABLE()
