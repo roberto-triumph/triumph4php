@@ -420,13 +420,6 @@ void t4p::TagFeatureClass::OnTimerComplete(wxTimerEvent& event) {
 	}
 	codeControl->SetTouched(false);
 	
-	if (!App.IsActive()) {
-		
-		// dont bother reparsing for
-		// files as the user is not currently using the editor
-		return;
-	}
-
 	// builder action could take a while (more than the timer)
 	// stop the timer so that we dont queue up a builder actions before the previous one
 	// finishes
