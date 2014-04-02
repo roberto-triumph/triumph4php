@@ -164,13 +164,25 @@ bool t4p::SourceClass::Contains(const wxString& fullPath) {
 bool t4p::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 
 	// make sure to normalize so that the search can be case sensitive depending on the OS
+	// note: we first compare without normalizing, as normalize() involves file
+	// system calls.  we do this as an optimization, since DirectorySearchClass
+	// calls this method (indeirectly) for every file, it is a pretty critical method
+	// to optimize.
+	// this makes A HUGE differrence on network shares, especiall on MSW.
+
 	wxFileName af;
 	af.AssignDir(fullPath);
-	af.Normalize();
 
 	wxFileName bf(RootDirectory);
+	
+	if (af.GetPathWithSep().Find(bf.GetPathWithSep()) == 0) {
+		return true;
+	}
+	
+	// not a match, normalize in case the OS uses case sensitive
+	// file names.
+	af.Normalize();
 	bf.Normalize();
-
 	return af.GetPathWithSep().Find(bf.GetPathWithSep()) == 0;
 }
 
