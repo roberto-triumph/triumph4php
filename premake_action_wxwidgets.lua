@@ -29,7 +29,7 @@ function prepWxWidgets()
 		wxBuildDir = normalizepath("lib/wxWidgets/build/msw");		
 		wxSamplesDir = normalizepath("lib/wxWidgets/samples");
 		rootPath = normalizepath("");
-		batchexecute(rootDir, {
+		batchexecute(rootPath, {
 			
 			-- wrap around quotes in case path has spaces
 			"\"" .. VSVARS .. "\"",
