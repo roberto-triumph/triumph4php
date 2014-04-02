@@ -238,12 +238,12 @@ void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
 	
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
-	SetSelectionByCharacterPosition(start, end);
+	SetSelectionByCharacterPosition(start, end, true);
 	EnsureCaretVisible();
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 }
 
-void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end) {
+void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end, bool setPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
 	
@@ -253,6 +253,10 @@ void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end) 
 	int byteStart = t4p::CharToUtf8Pos(buf, documentLength, start);
 	int byteEnd = t4p::CharToUtf8Pos(buf, documentLength, end);
 	SetSelection(byteStart, byteEnd);
+
+	if (setPos) {
+		GotoPos(byteStart);
+	}
 	delete[] buf;
 }
 
@@ -645,17 +649,6 @@ void t4p::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
 void t4p::CodeControlClass::MarkSearchHitAndGoto(int lineNumber, int startPos, int endPos, bool goodHit) {
 	MarkSearchHit(lineNumber, goodHit);
 	SetSelectionAndEnsureVisible(startPos, endPos);
-	
-	int byteNumber = 0;
-	int documentLength = GetTextLength();
-	char* buf = new char[documentLength];
-
-	// GET_TEXT  message
-	SendMsg(2182, documentLength, (long)buf);
-	byteNumber = t4p::CharToUtf8Pos(buf, documentLength, startPos);
-	GotoPos(byteNumber);
-
-	delete[] buf;
 }
 
 void t4p::CodeControlClass::ClearSearchMarkers() {

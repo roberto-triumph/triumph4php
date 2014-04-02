@@ -270,8 +270,9 @@ public:
 	 *
 	 * @param int character position of start of selection
 	 * @param int character position of end of selection
+	 * @param bool setPos if TRUE, then the cursor will be set at the start position
 	 */
-	void SetSelectionByCharacterPosition(int start, int end);
+	void SetSelectionByCharacterPosition(int start, int end, bool setPos);
 
 	/**
 	 * handles auto completion. This will differ based upon which document mode is loaded.

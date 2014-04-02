@@ -478,7 +478,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 				finder.GetLastReplacementText(text, matchedText)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
 				codeControl->ReplaceSelection(replaceWithText);
-				codeControl->SetSelectionByCharacterPosition(position, position + replaceWithText.length());
+				codeControl->SetSelectionByCharacterPosition(position, position + replaceWithText.length(), false);
 
 				ShowNextMatch();
 			}

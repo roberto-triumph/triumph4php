@@ -400,9 +400,9 @@ void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 		UnicodeString text = codeControl->GetSafeText();
 		if (codeControl && Finder.GetLastMatch(position, length) &&
 			Finder.GetLastReplacementText(text, replaceText)) {
-			codeControl->SetSelectionByCharacterPosition(position, position + length);
+			codeControl->SetSelectionByCharacterPosition(position, position + length, false);
 			codeControl->ReplaceSelection(t4p::IcuToWx(replaceText));
-			codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length());
+			codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length(), false);
 			Find(true);
 			ReplaceHistory.Save();
 		}
@@ -443,7 +443,7 @@ void t4p::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
 		if (Finder.GetLastMatch(position, length)) {
 			Finder.FindPrevious(codeControl->GetSafeText(), position);
 			if (Finder.GetLastMatch(position, length)) {	
-				codeControl->SetSelectionByCharacterPosition(position, position + length);
+				codeControl->SetSelectionByCharacterPosition(position, position + length, false);
 			}
 		}
 	}
