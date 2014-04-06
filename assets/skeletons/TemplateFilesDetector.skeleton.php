@@ -2,12 +2,12 @@
 
 /**
  * The goal of this script is to discover template files for your PHP projects. This means
- * that given a URL, this script will list all of the template files that are used by the 
+ * that given a triumph call stack, this script will list all of the template files that are used by the 
  * given controller functions. This script will be called via a command line; it is a normal command line script.
  *
  * This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
  * list of all of a project's template files so that the user can easily open / jump to templates. More
- * info can be about Triumph's URL detector feature can be found at 
+ * info can be about Triumph's template files detector feature can be found at 
  * http://docs.triumph4php.com/template-file-detectors/
  */
 
@@ -17,7 +17,7 @@ require_once('bootstrap.php');
 
 /**
  * This function will look at the given program arguments and will validate them.
- * If the required arguments have been passed then it will call the URL detector function,
+ * If the required arguments have been passed then it will call the template detector function,
  * otherwise it will stop the program.
  * This function is called at the end of this script (see last line of this file).
  * The help text below describes the arguments that are needed.
@@ -41,12 +41,12 @@ function parseArgs() {
 	if ($help) {
 		$helpMessage = <<<EOF
 The goal of this script is to discover template files for your PHP projects. This means
-that given a URL, this script will list all of the template files that are used by the 
+that given a triumph call stack, this script will list all of the template files that are used by the 
 given controller functions. This script will be called via a command line; it is a normal command line script.
 
 This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
 list of all of a project's template files so that the user can easily open / jump to templates. More
-info can be about Triumph's URL detector feature can be found at 
+info can be about Triumph's template file detector feature can be found at 
 http://docs.triumph4php.com/template-file-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
@@ -78,7 +78,7 @@ EOF;
 		exit(-1);
 	}
 
-	// call the function that will return all detected URLs
+	// call the function that will return all detected templates
 	$doSkip = TRUE;
 	$arrTemplates = detectTemplates($sourceDir, $detectorDbFileName, $doSkip);
 	if ($doSkip) {
@@ -86,7 +86,7 @@ EOF;
 	}
 	else if ($outputDbFileName) {
 
-		// now send the detected URLs to either STDOUT or store in the 
+		// now send the detected templates to either STDOUT or store in the 
 		// sqlite DB	
 		$pdo = Zend_Db::factory('Pdo_Sqlite', array("dbname" => $outputDbFileName));
 		$templateFileTable = new Triumph_TemplateFileTagTable($pdo);
@@ -110,15 +110,13 @@ EOF;
 
 /**
  * This function will use the resource cache to lookup all controllers and their methods.  Then it
- * will create a Triumph_TemplateFileTag instance for each method; note that the routes file is 
- * also consulted and we will generate URLs for the default controller.
+ * will create a Triumph_TemplateFileTag instance for each method.
  *
  * @param  string $sourceDir            the root directory of the project in question
  * @param  string $detectorDbFileName   the location of the resource cache SQLite file; as created by Triumph
- * @param  string $host                 the hostname of the application; this will be used a the prefix on all URLs
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
- *                                      to detect URLs for the given source directory; this situation
- *                                      is different than zero URLs being detected.
+ *                                      to detect templates for the given source directory; this situation
+ *                                      is different than zero templates being detected.
  * @return Triumph_TemplateFileTag[]  array of Triumph_TemplateFileTag instances the detected template files and their variables
  */
 function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
@@ -129,7 +127,7 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	
 	// need to check that this detector is able to recognize the directory structure of sourceDir
 	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
-	// by skipping detection, we prevent any detected URLs from the previous detection script
+	// by skipping detection, we prevent any detected templates from the previous detection script
 	// from being deleted.
 	$doSkip = TRUE;
 	

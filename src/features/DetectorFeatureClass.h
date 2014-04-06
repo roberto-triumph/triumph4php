@@ -169,7 +169,8 @@ public:
 	/**
 	 * @param detectorTree the wxTreeCtrl that renders the files. pointer will NOT be
 	 *        owned by this class
-	 * @param testButton pointer will NOT be owned by this class
+	 * @param testButton pointer will NOT be owned by this class. this can be NULL. if NULL, 
+	 *        it will be up to the caller to handle the test button event.
 	 * @param addButton pointer will NOT be owned by this class
 	 * @param helpButton pointer will NOT be owned by this class
 	 * @param detector to get the file locations. pointer will NOT be owned by this class
@@ -304,10 +305,6 @@ public:
 	 */
 	void UpdateProjects();
 
-protected:
-
-	void OnChooseUrlButton(wxCommandEvent& event);
-
 private:
 
 	t4p::TemplateFileTagsDetectorClass Detector;
@@ -315,16 +312,24 @@ private:
 	t4p::DetectorTreeHandlerClass Handler;
 
 	/**
-	 * The URL to use for testing the detector
+	 * The class to use for testing the detector
 	 */
 	t4p::UrlTagClass TestUrl;
-
+	
 	/**
 	 * to access the url resource list
 	 */
 	t4p::GlobalsClass& Globals;
 
 	t4p::RunningThreadsClass& RunningThreads;
+	
+	t4p::EventSinkClass& EventSink;
+	
+	void OnChooseUrlButton(wxCommandEvent& event);
+	
+	void OnTestButton(wxCommandEvent& event);
+	
+	void OnCallStackComplete(wxCommandEvent& event);
 };
 
 class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {

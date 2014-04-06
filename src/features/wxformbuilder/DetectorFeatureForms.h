@@ -75,13 +75,14 @@ class TemplateFilesDetectorPanelGeneratedClass : public wxPanel
 		wxButton* TestButton;
 		wxButton* AddButton;
 		wxBitmapButton* HelpButton;
-		wxStaticText* UrlToTestLabel;
+		wxStaticText* UrlLabel;
 		wxTextCtrl* UrlToTest;
 		wxButton* ChooseUrlButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChooseUrlButton( wxCommandEvent& event ) { event.Skip(); }
 		

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * The goal of this script is to discover template files for your PHP Code Igniter projects. This means
+ * The goal of this script is to discover template files for your PHP Laravel projects. This means
  * that given a triumph call stack, this script will list all of the template files that are used by the 
  * given controller functions. This script will be called via a command line; it is a normal command line script.
  *
  * This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
  * list of all of a project's template files so that the user can easily open / jump to templates. More
- * info can be about Triumph's temaplte files detector feature can be found at 
+ * info can be about Triumph's template files detector feature can be found at 
  * http://docs.triumph4php.com/template-file-detectors/
  */
 
@@ -40,13 +40,13 @@ function parseArgs() {
 
 	if ($help) {
 		$helpMessage = <<<EOF
-The goal of this script is to discover template files for your PHP Code Igniter projects. This means
+The goal of this script is to discover template files for your PHP Laravel projects. This means
 that given a triumph call stack, this script will list all of the template files that are used by the 
 given controller functions. This script will be called via a command line; it is a normal command line script.
 
 This script is part of Triumph's Template Files Detection feature; it enables the editor to have a 
 list of all of a project's template files so that the user can easily open / jump to templates. More
-info can be about Triumph's template files detector feature can be found at 
+info can be about Triumph's template file detector feature can be found at 
 http://docs.triumph4php.com/template-file-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
@@ -95,9 +95,9 @@ EOF;
 	}
 	else {
 		if (!empty($arrTemplates)) {
-			echo str_pad("Template File", 100) . str_pad("Variables", 90) . "\n";
+			echo str_pad("Template File", 60) . str_pad("Variables", 90) . "\n";
 			foreach ($arrTemplates as $template) {
-				echo str_pad($template->fullPath, 100);
+				echo str_pad($template->fullPath, 60);
 				echo str_pad(join(',', $template->variables), 90);
 				echo "\n";
 			}
@@ -110,17 +110,16 @@ EOF;
 
 /**
  * This function will use the resource cache to lookup all controllers and their methods.  Then it
- * will create a Triumph_TemplateFile instance for each method.
+ * will create a Triumph_TemplateFileTag instance for each method.
  *
  * @param  string $sourceDir            the root directory of the project in question
  * @param  string $detectorDbFileName   the location of the resource cache SQLite file; as created by Triumph
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect templates for the given source directory; this situation
  *                                      is different than zero templates being detected.
- * @return Triumph_TemplateFile[]     array of Triumph_TemplateFile instances the detected template files and their variables
+ * @return Triumph_TemplateFileTag[]  array of Triumph_TemplateFileTag instances the detected template files and their variables
  */
 function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
-	$doSkip = TRUE;
 	$allTemplates = array();
 	if (!is_file($detectorDbFileName)) {
 		return $allTemplates;
@@ -130,11 +129,12 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
 	// by skipping detection, we prevent any detected templates from the previous detection script
 	// from being deleted.
+	$doSkip = TRUE;
+	
+	// for laravel, we look for the artisan script. if we don't have the artisan script assume
+	// that this source is not a laravel project.
 	$sourceDir = \opstring\ensure_ends_with($sourceDir, DIRECTORY_SEPARATOR);
-	if (!is_file($sourceDir . 'application/config/routes.php') ||
-		!is_file($sourceDir . 'application/config/config.php')) {
-		
-		// this source directory does not contain a code igniter directory.
+	if (!is_file($sourceDir . 'artisan')) {	
 		return $allTemplates;
 	}
 	$doSkip = FALSE;
@@ -150,7 +150,7 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 	
 	// now go through each scope, looking for calls to $this->load->view
 	foreach ($scopes as $scope) {
-	
+		
 		// list of all method calls used to find calls to view method
 		$methodCalls = $callStackTable->getMethodCalls($scope);
 		
@@ -160,62 +160,48 @@ function detectTemplates($sourceDir, $detectorDbFileName, &$doSkip) {
 		$variableCalls = $callStackTable->getVariables($scope);
 
 		foreach ($methodCalls as $destinationVariable => $call) {
-			if (\opstring\compare_case($call->methodName, 'view') == 0 && isset($propertyCalls[$call->objectName])) {
-			
-				// is this view call of a loader object ?
-				$propertyCall = $propertyCalls[$call->objectName];
-				if (\opstring\compare('$this', $propertyCall->objectName) == 0 &&
-					(\opstring\compare('load', $propertyCall->propertyName) == 0 || 
-					\opstring\compare('loader', $propertyCall->propertyName) == 0)) {
-					
+			if (\opstring\compare_case($call->methodName, 'make') == 0 
+				&& \opstring\compare_case($call->objectName, 'View') == 0 ) {
+				
+				// get the function arguments to View::make
+				// the first argument to make is the template file
+				// the second argument is an array of data (the template vars)
+				$template = $variableCalls[$call->functionArguments[0]];
+				$data = $variableCalls[$call->functionArguments[1]];
+				if ($template) {					
 					$currentTemplate = new Triumph_TemplateFileTag();
 					$currentTemplate->variables = array();
 					$currentTemplate->fullPath = '';
+					$currentTemplate->fullPath = $template->scalarValue;
 					
-					if (count($call->functionArguments) >= 1) {
-						
-						// argument 1 of the view method call is the template file
-						// most of the time views are given as relative relatives; starting from the application/views/ directory
-						// for now ignore variable arguments
-						if (isset($variableCalls[$call->functionArguments[0]])) {
-							$variableCall = $variableCalls[$call->functionArguments[0]];
-							if ($variableCall->type == Triumph_CallStack::SCALAR) {
-								$currentTemplate->fullPath = $variableCall->scalarValue;
-										
-								// view file may have an extension; if it has an extension use that; otherwise use the default (.php)
-								if (stripos($currentTemplate->fullPath, '.') === FALSE) {
-									$currentTemplate->fullPath .= '.php';
-								}
-						
-								// not using realpath() so that Triumph can know that a template file has not yet been created
-								// or the programmer has a bug in the project.
-								$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '/', DIRECTORY_SEPARATOR);
-								$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '\\', DIRECTORY_SEPARATOR);
-								$currentTemplate->fullPath = $sourceDir . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
-								
-								// push it now just in case the template does not get any variables
-								$allTemplates[] = $currentTemplate;
-							}
-						}
+					// view file may have an extension; if it has an extension use that; otherwise use the default (.php)
+					if (stripos($currentTemplate->fullPath, '.') === FALSE) {
+						$currentTemplate->fullPath .= '.php';
 					}
-					if (count($call->functionArguments) >= 2 && !empty($currentTemplate->fullPath)) {
-						
-						// argument 2 is an array of template variables
-						if (isset($variableCalls[$call->functionArguments[1]])) {
-							$variableCall = $variableCalls[$call->functionArguments[1]];
-							$arrayKeys = $callStackTable->getArrayKeys($scope, $variableCall->destinationVariable);
-							foreach ($arrayKeys as $key) {
-					
-								// add the siguil here; editor expects us to return variables
-								$currentTemplate->variables[] = '$' . $key;
-							}
-							$allTemplates[count($allTemplates) - 1] = $currentTemplate;
-						}
+			
+					// not using realpath() so that Triumph can know that a template file has not yet been created
+					// or the programmer has a bug in the project.
+					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '/', DIRECTORY_SEPARATOR);
+					$currentTemplate->fullPath = \opstring\replace($currentTemplate->fullPath, '\\', DIRECTORY_SEPARATOR);
+					$currentTemplate->fullPath = $sourceDir . 'app' . DIRECTORY_SEPARATOR . 
+						'views' . DIRECTORY_SEPARATOR . $currentTemplate->fullPath;
+					$allTemplates[] = $currentTemplate;
+				}
+				
+				// argument 2 is an array of template variables
+				if (isset($variableCalls[$call->functionArguments[1]])) {
+					$variableCall = $variableCalls[$call->functionArguments[1]];
+					$arrayKeys = $callStackTable->getArrayKeys($scope, $variableCall->destinationVariable);
+					foreach ($arrayKeys as $key) {
+			
+						// add the siguil here; editor expects us to return variables
+						$currentTemplate->variables[] = '$' . $key;
 					}
+					$allTemplates[count($allTemplates) - 1] = $currentTemplate;
 				}
 			}
 		}
-	}	
+	}
 	return $allTemplates;
 }
 

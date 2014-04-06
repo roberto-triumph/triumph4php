@@ -26,7 +26,7 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	
 	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
-	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
@@ -34,13 +34,13 @@ UrlDetectorPanelGeneratedClass::UrlDetectorPanelGeneratedClass( wxWindow* parent
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
 	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	TopSizer->Add( TestButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	TopSizer->Add( HelpButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
@@ -89,7 +89,7 @@ TemplateFilesDetectorPanelGeneratedClass::TemplateFilesDetectorPanelGeneratedCla
 	
 	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
-	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
@@ -97,25 +97,25 @@ TemplateFilesDetectorPanelGeneratedClass::TemplateFilesDetectorPanelGeneratedCla
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
 	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	TopSizer->Add( TestButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	TopSizer->Add( HelpButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* UrlSizer;
 	UrlSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	UrlToTestLabel = new wxStaticText( this, wxID_ANY, _("URL To Test"), wxDefaultPosition, wxDefaultSize, 0 );
-	UrlToTestLabel->Wrap( -1 );
-	UrlSizer->Add( UrlToTestLabel, 0, wxALL, 5 );
+	UrlLabel = new wxStaticText( this, wxID_ANY, _("Choose URL"), wxDefaultPosition, wxDefaultSize, 0 );
+	UrlLabel->Wrap( -1 );
+	UrlSizer->Add( UrlLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	UrlToTest = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	UrlSizer->Add( UrlToTest, 1, wxALL, 5 );
+	UrlToTest = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	UrlSizer->Add( UrlToTest, 1, wxALL|wxEXPAND, 5 );
 	
 	ChooseUrlButton = new wxButton( this, wxID_ANY, _("Choose URL"), wxDefaultPosition, wxDefaultSize, 0 );
 	UrlSizer->Add( ChooseUrlButton, 0, wxALL, 5 );
@@ -140,6 +140,7 @@ TemplateFilesDetectorPanelGeneratedClass::TemplateFilesDetectorPanelGeneratedCla
 	this->Layout();
 	
 	// Connect Events
+	TestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	ChooseUrlButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnChooseUrlButton ), NULL, this );
 }
@@ -147,6 +148,7 @@ TemplateFilesDetectorPanelGeneratedClass::TemplateFilesDetectorPanelGeneratedCla
 TemplateFilesDetectorPanelGeneratedClass::~TemplateFilesDetectorPanelGeneratedClass()
 {
 	// Disconnect Events
+	TestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnTestButton ), NULL, this );
 	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnAddButton ), NULL, this );
 	ChooseUrlButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( TemplateFilesDetectorPanelGeneratedClass::OnChooseUrlButton ), NULL, this );
 	
@@ -169,7 +171,7 @@ TagDetectorPanelGeneratedClass::TagDetectorPanelGeneratedClass( wxWindow* parent
 	
 	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
-	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
@@ -177,13 +179,13 @@ TagDetectorPanelGeneratedClass::TagDetectorPanelGeneratedClass( wxWindow* parent
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
 	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	TopSizer->Add( TestButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	TopSizer->Add( HelpButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
@@ -232,7 +234,7 @@ DatabaseDetectorPanelGeneratedClass::DatabaseDetectorPanelGeneratedClass( wxWind
 	
 	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
-	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
@@ -240,13 +242,13 @@ DatabaseDetectorPanelGeneratedClass::DatabaseDetectorPanelGeneratedClass( wxWind
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
 	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	TopSizer->Add( TestButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	TopSizer->Add( HelpButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
@@ -295,7 +297,7 @@ ConfigDetectorPanelGeneratedClass::ConfigDetectorPanelGeneratedClass( wxWindow* 
 	
 	ProjectLabel = new wxStaticText( this, wxID_ANY, _("Project To Test"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
-	TopSizer->Add( ProjectLabel, 0, wxALL|wxEXPAND, 5 );
+	TopSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECT_CHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
@@ -303,13 +305,13 @@ ConfigDetectorPanelGeneratedClass::ConfigDetectorPanelGeneratedClass( wxWindow* 
 	TopSizer->Add( ProjectChoice, 1, wxALL|wxEXPAND, 5 );
 	
 	TestButton = new wxButton( this, ID_TEST_DETECTOR_BUTTON, _("Test"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( TestButton, 0, wxALL, 5 );
+	TopSizer->Add( TestButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	AddButton = new wxButton( this, ID_ADD_BUTTON, _("Add"), wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT );
-	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	TopSizer->Add( AddButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
-	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	TopSizer->Add( HelpButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	FlexGridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	

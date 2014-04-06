@@ -317,7 +317,9 @@ t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree
 	, EventSink(eventSink) {
 
 	// Connect Events
-	TestButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
+	if (TestButton) {
+		TestButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
+	}
 	AddButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
 	HelpButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
 	DetectorTree->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
@@ -339,7 +341,9 @@ t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree
 
 t4p::DetectorTreeHandlerClass::~DetectorTreeHandlerClass() {
 	// Connect Events
-	TestButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
+	if (TestButton) {
+		TestButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);	
+	}
 	AddButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnAddButton), NULL, this);
 	HelpButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnHelpButton), NULL, this);
 	DetectorTree->Disconnect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(DetectorTreeHandlerClass::OnTreeItemDelete), NULL, this);
@@ -674,10 +678,12 @@ t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWi
 														t4p::RunningThreadsClass& runningThreads)
 	: TemplateFilesDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
-	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("template-file-detectors")))
+	// null == we will handle the test button in this class
+	, Handler(DetectorTree, NULL, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("template-file-detectors")))
 	, TestUrl()
 	, Globals(globals) 
-	, RunningThreads(runningThreads) {
+	, RunningThreads(runningThreads) 
+	, EventSink(eventSink) {
 	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
 		wxART_TOOLBAR, wxSize(16, 16))));
 
@@ -689,6 +695,12 @@ t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWi
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
 	Connect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+	
+	RunningThreads.AddEventHandler(this->GetEventHandler());
+	this->GetEventHandler()->Connect(t4p::ID_EVENT_ACTION_CALL_STACK, t4p::EVENT_ACTION_COMPLETE, 
+		wxCommandEventHandler(TemplateFileTagsDetectorPanelClass::OnCallStackComplete),
+		NULL, this
+	);
 }
 
 t4p::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelClass() {
@@ -698,14 +710,15 @@ t4p::TemplateFileTagsDetectorPanelClass::~TemplateFileTagsDetectorPanelClass() {
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuRenameDetector), NULL, &Handler);
 	Disconnect(ID_DETECTOR_TREE_DELETE, wxEVT_COMMAND_MENU_SELECTED, 
 		wxCommandEventHandler(DetectorTreeHandlerClass::OnMenuDeleteDetector), NULL, &Handler);
+		
+	RunningThreads.RemoveEventHandler(this->GetEventHandler());
+	Disconnect(t4p::ID_EVENT_ACTION_CALL_STACK, t4p::EVENT_ACTION_COMPLETE, 
+		wxCommandEventHandler(TemplateFileTagsDetectorPanelClass::OnCallStackComplete)
+	);
 }
 
 void t4p::TemplateFileTagsDetectorPanelClass::Init() {
 	Handler.Init();
-}
-
-void t4p::TemplateFileTagsDetectorPanelClass::UpdateProjects() {
-	Handler.UpdateProjects();
 }
 
 void t4p::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
@@ -714,15 +727,88 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& 
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
 		t4p::CallStackActionClass* action = new t4p::CallStackActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
-		action->SetCallStackStart(TestUrl.FileName,
+			action->SetCallStackStart(TestUrl.FileName,
 			t4p::WxToIcu(TestUrl.ClassName),
 			t4p::WxToIcu(TestUrl.MethodName),
-
+			
 			// the selection index is the index of the enabled projects
 			Globals.DetectorCacheDbFileName
 		);
 		action->Init(Globals);
 		RunningThreads.Queue(action);
+	}
+}
+
+void t4p::TemplateFileTagsDetectorPanelClass::UpdateProjects() {
+	Handler.UpdateProjects();
+}
+
+void t4p::TemplateFileTagsDetectorPanelClass::OnTestButton(wxCommandEvent& event) {
+	if (Globals.Environment.Php.NotInstalled()) {
+		t4p::EditorLogError(t4p::ERR_PHP_EXECUTABLE_NONE);
+		return;
+	}
+	
+	// create the command to test the selected detector on the selected
+	// project
+	int projectChoiceIndex = ProjectChoice->GetSelection();
+	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+		wxMessageBox(_("Please choose a project to test the detector on."));
+		return;
+	}
+	t4p::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];
+	if (project.Sources.empty()) {
+		wxMessageBox(_("Selected project does not have any source directories. Please choose another project"));
+		return;
+	}	
+	
+	// make sure that item selected is an actual detector and not a label
+	wxTreeItemId itemId = DetectorTree->GetSelection();
+	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
+		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		: NULL;
+	if (!treeItemData) {
+		wxMessageBox(_("Please choose a detector to test."));
+		return;
+	}
+	
+	wxString fileName;
+	
+	// to get the templates, we first need to build the call stack
+	if (!TestUrl.ClassName.IsEmpty() &&
+		!TestUrl.MethodName.IsEmpty()) {
+		
+		t4p::CallStackActionClass* callStackAction = new t4p::CallStackActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
+		callStackAction->SetCallStackStart(fileName,
+			t4p::WxToIcu(TestUrl.ClassName),
+			t4p::WxToIcu(TestUrl.MethodName),
+			Globals.DetectorCacheDbFileName);
+		RunningThreads.Queue(callStackAction);
+	}
+}
+
+void t4p::TemplateFileTagsDetectorPanelClass::OnCallStackComplete(wxCommandEvent& event) {
+	wxTreeItemId itemId = DetectorTree->GetSelection();
+	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
+		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		: NULL;
+	if (!treeItemData) {
+		return;
+	}
+	int projectChoiceIndex = ProjectChoice->GetSelection();
+	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+		return;
+	}
+	t4p::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];
+	
+	wxString detectorScriptFullPath = treeItemData->Str;
+	if (Detector.CanTest(Globals, project)) {	
+		wxString cmdLine = Detector.TestCommandLine(Globals, project, detectorScriptFullPath);
+
+		// send the command line to a new app command event to start a process
+		wxCommandEvent runEvent(t4p::EVENT_CMD_RUN_COMMAND);
+		runEvent.SetString(cmdLine);
+		EventSink.Publish(runEvent);
 	}
 }
 
@@ -876,7 +962,8 @@ void t4p::DetectorFeatureClass::OnViewTemplateFileDetectors(wxCommandEvent& even
 		SetFocusToOutlineWindow(window);
 	}
 	else {
-		t4p::TemplateFileTagsDetectorPanelClass* panel = new t4p::TemplateFileTagsDetectorPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
+		t4p::TemplateFileTagsDetectorPanelClass* panel = new t4p::TemplateFileTagsDetectorPanelClass(
+			GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL, 
 			App.Globals, App.EventSink, App.RunningThreads);
 		wxBitmap templateFilesBitmap = t4p::BitmapImageAsset(wxT("template-file-detectors"));
 		if (AddOutlineWindow(panel, _("Template Files Detectors"), templateFilesBitmap)) {
