@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/FileModifiedCheckFeatureClass.h>
+#include <actions/FileModifiedCheckActionClass.h>
 #include <Triumph.h>
 #include <globals/Errors.h>
 #include <globals/Events.h>
@@ -210,7 +211,7 @@ void t4p::FileModifiedCheckFeatureClass::OnAppFileOpened(t4p::CodeControlEventCl
 		}
 	}
 	if (doPoll && fileName.FileExists()) {
-		FilesToPoll.push_back(fileName);
+		FilesToPoll.push_back(fileName.GetFullPath());
 	}
 }
 
@@ -220,9 +221,9 @@ void t4p::FileModifiedCheckFeatureClass::OnAppFileClosed(t4p::CodeControlEventCl
 		return;
 	}
 	wxString fileClosed = ctrl->GetFileName();
-	std::vector<wxFileName>::iterator it = FilesToPoll.begin();
+	std::vector<wxString>::iterator it = FilesToPoll.begin();
 	while (it != FilesToPoll.end()) {
-		if (it->GetFullPath() == fileClosed) {
+		if (*it == fileClosed) {
 			it = FilesToPoll.erase(it);
 		}
 		else {
@@ -678,10 +679,12 @@ void t4p::FileModifiedCheckFeatureClass::HandleWatchError() {
 
 void t4p::FileModifiedCheckFeatureClass::OpenedCodeControlCheck() {
 	if (FilesToPoll.empty()) {
+		JustReactivated = false;
 		return;
 	}
 	t4p::NotebookClass* notebook = GetNotebook();
 	if (notebook->GetPageCount() == 0) {
+		JustReactivated = false;
 		return;
 	}
 	
@@ -692,43 +695,64 @@ void t4p::FileModifiedCheckFeatureClass::OpenedCodeControlCheck() {
 	// only check files that are not already being watcher 
 	// by fs watcher (ie files not in a project, or files in 
 	// a network drive)
+	std::vector<t4p::FileModifiedTimeClass> filesToPoll;
+	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+		wxString ctrlFileName = ctrl->GetFileName();
+		if (std::find(FilesToPoll.begin(), FilesToPoll.end(), ctrlFileName) != FilesToPoll.end()) {
+			t4p::FileModifiedTimeClass modTime;
+			modTime.FileName.Assign(ctrlFileName);
+			modTime.ModifiedTime = ctrl->GetFileOpenedDateTime();
+			filesToPoll.push_back(modTime);
+		}
+	}
+	if (!filesToPoll.empty()) {
+		t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass(App.RunningThreads,
+			ID_FILE_MODIFIED_ACTION);
+		action->SetFiles(filesToPoll);
+		App.RunningThreads.Queue(action);
+	}
+	else {
+		JustReactivated = false;
+	}
+}
+
+void t4p::FileModifiedCheckFeatureClass::OnFileModifiedPollComplete(t4p::FilesModifiedEventClass& event) {
+	if (event.Modified.empty() && event.Deleted.empty()) {
+		JustReactivated = false;
+		return;
+	}
+
+	// find the code control object for the modified/delete file
 	std::map<wxString, t4p::CodeControlClass*> filesModifiedToPrompt;
 	std::map<wxString, t4p::CodeControlClass*> filesDeletedToPrompt;
 	std::map<wxString, int> filesDeleted;
-	
+
+	t4p::NotebookClass* notebook = GetNotebook();
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
 		wxFileName ctrlFileName(ctrl->GetFileName());
-		if (std::find(FilesToPoll.begin(), FilesToPoll.end(), ctrlFileName) != FilesToPoll.end()) {
-			
-			// compare the file times
-			bool exists = ctrlFileName.FileExists();
-			wxDateTime newModTime;
-			if (exists) {
-				newModTime = ctrlFileName.GetModificationTime();
-				if (newModTime.IsValid() && !newModTime.IsEqualTo(ctrl->GetFileOpenedDateTime())) {
-					filesModifiedToPrompt[ctrl->GetFileName()] = ctrl;
-				}
-			}
-			else {
-				filesDeletedToPrompt[ctrl->GetFileName()] = ctrl;
-				filesDeleted[ctrl->GetFileName()] = 1;
-			}
+		if (std::find(event.Modified.begin(), event.Modified.end(), ctrl->GetFileName()) != event.Modified.end()) {
+			filesModifiedToPrompt[ctrl->GetFileName()] = ctrl;
 		}
-	}
+		else if (std::find(event.Deleted.begin(), event.Deleted.end(), ctrl->GetFileName()) != event.Deleted.end()) {
+			filesDeletedToPrompt[ctrl->GetFileName()] = ctrl;
+			filesDeleted[ctrl->GetFileName()] = 1;
+		}
+	}	
 	if (!filesModifiedToPrompt.empty()) {
 		FilesModifiedPrompt(filesModifiedToPrompt);
 	}
 	if (!filesDeletedToPrompt.empty()) {
 		FilesDeletedPrompt(filesDeletedToPrompt, filesDeleted);
 	}
+	JustReactivated = false;
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnActivateApp(wxCommandEvent& event) {
 	if (!JustReactivated) {
 		JustReactivated = true;
 		OpenedCodeControlCheck();
-		JustReactivated = false;
 	}
 }
 
@@ -786,4 +810,5 @@ BEGIN_EVENT_TABLE(t4p::FileModifiedCheckFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::FileModifiedCheckFeatureClass::OnPreferencesSaved)
 	EVT_ACTION_VOLUME_LIST(wxID_ANY, t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_ACTIVATED, t4p::FileModifiedCheckFeatureClass::OnActivateApp)
+	EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(ID_FILE_MODIFIED_ACTION, t4p::FileModifiedCheckFeatureClass::OnFileModifiedPollComplete)
 END_EVENT_TABLE()

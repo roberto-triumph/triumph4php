@@ -142,9 +142,17 @@ private:
 	/**
 	 * when the user puts this app in the foreground, check for
 	 * file modifications.  maybe the user went to another editor
-	 * and modified one of the files that is opened in triumph.
+	 * and modified one of the files that is opened in triumph. Note that we
+	 * will check the file modified times in a background thread
 	 */
 	void OnActivateApp(wxCommandEvent& event);
+
+	/**
+	 * After we check the file modified times in a background thread this
+	 * method gets called. here we will prompt the user to reload/close the
+	 * files that were modified outside of triumph
+	 */
+	void OnFileModifiedPollComplete(t4p::FilesModifiedEventClass& event);
 
 	/**
 	 * timer that we will use to see if file system watcher events have been captured. in this timer's
@@ -214,7 +222,7 @@ private:
 	 * 
 	 * This is how most editors check for file modifications
 	 */
-	std::vector<wxFileName> FilesToPoll;
+	std::vector<wxString> FilesToPoll;
 
 	/**
 	 * the last time that we got an event from wxFileSystemWatcher.
