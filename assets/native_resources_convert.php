@@ -35,7 +35,7 @@
  */
 
 // to use Zend Console
-set_include_path(get_include_path() . PATH_SEPARATOR .  realpath(__DIR__ . '/../php_detectors/lib/'));
+set_include_path(get_include_path() . PATH_SEPARATOR .  realpath(__DIR__ . '/php_detectors/lib/'));
 require_once 'Zend/Console/Getopt.php';
 
 $rules = array(
@@ -209,6 +209,14 @@ if ($if) {
 		
 			// insert the 'fully qualified' form
 			$key = $className . '::' . $identifier;
+			$insertStmt->execute(array(
+				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
+				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
+				$isDynamic, $isNative
+			));
+			
+			// insert the 'fully qualified' + namespace form
+			$key =  $namespaceName . $className . '::' . $identifier;
 			$insertStmt->execute(array(
 				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
 				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 

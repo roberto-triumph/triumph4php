@@ -731,20 +731,19 @@ void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 				// when the constructor is called; the matched symbol is the class name and not a method name
 				// here we will look for the constructor
 				// search for all methods of the class
-				UnicodeString className = matches[0].ClassName;
-				wxString constructorResourceSearch = t4p::IcuToWx(className);
-				constructorResourceSearch += wxT("::");
+				UnicodeString constructorSearch = matches[0].FullyQualifiedClassName();
+				constructorSearch += UNICODE_STRING_SIMPLE("::__construct");
 
-				// TODO: get class hierarchy
-				t4p::TagSearchClass search(t4p::WxToIcu(constructorResourceSearch));
-				t4p::TagResultClass* result = search.CreateExactResults();
+				// search project and native tags 
+				t4p::TagResultClass* result = Globals->TagCache.ExactTags(constructorSearch, Globals->AllEnabledSourceDirectories());
+				if (result->Empty()) {
+					delete result;
+					result = Globals->TagCache.ExactNativeTags(constructorSearch);
+				}
 				while (result->More()) {
 					result->Next();
 					t4p::TagClass res = result->Tag;
 					if (t4p::TagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
-						CurrentCallTipResources.push_back(res);
-					}
-					else if (t4p::TagClass::METHOD == res.Type && className == res.Identifier) {
 						CurrentCallTipResources.push_back(res);
 					}
 				}
