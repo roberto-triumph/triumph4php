@@ -34,6 +34,7 @@ t4p::TagDetectorParamsClass::TagDetectorParamsClass()
 	, PhpIncludePath()
 	, ScriptName()
 	, SourceDir()
+	, ResourceDbFileName()
 	, OutputDbFileName() {
 
 }
@@ -44,6 +45,7 @@ wxString t4p::TagDetectorParamsClass::BuildCmdLine() const {
 		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
 		wxT(" ") + wxT("\"") + ScriptName.GetFullPath() + wxT("\"") + 
 		wxT(" --sourceDir=") + wxT("\"") + SourceDir.GetPath() + wxT("\"") + 
+		wxT(" --resourceDbFileName=") + wxT("\"") + ResourceDbFileName.GetFullPath() + wxT("\"") + 
 		wxT(" --outputDbFileName=") + wxT("\"") + OutputDbFileName + wxT("\"");
 	return cmdLine;
 }
@@ -82,6 +84,7 @@ bool t4p::TagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 						params.PhpIncludePath.Assign(t4p::PhpDetectorsBaseAsset());
 						params.ScriptName = scriptName->c_str();
 						params.SourceDir.AssignDir(source->RootDirectory.GetPath());
+						params.ResourceDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 						params.OutputDbFileName = globals.DetectorCacheDbFileName.GetFullPath().c_str();
 						ParamsQueue.push(params);
 					}

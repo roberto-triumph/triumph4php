@@ -168,6 +168,8 @@ CREATE TABLE IF NOT EXISTS resources (
 	is_private INTEGER,
 	
 	-- 1 if this is a method / member / class constant and it has been labeled as static
+	-- this is important, as triumph is smart enough to show only static members / methods
+	-- when a static call is being made
 	is_static INTEGER, 
 	
 	-- 1 if this resource is a 'magic' resource.

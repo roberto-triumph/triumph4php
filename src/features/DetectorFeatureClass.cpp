@@ -175,6 +175,7 @@ wxString t4p::TagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
 	params.ScriptName = detectorScriptFullPath;
+	params.ResourceDbFileName = globals.TagCacheDbFileName;
 	params.SourceDir = source.RootDirectory;
 	return params.BuildCmdLine();
 }

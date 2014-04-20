@@ -4,7 +4,7 @@
  * The goal of this script is to discover all of the 'dynamic' tags for any PHP projects that use the
  * CodeIgniter framework. In a nutshell, Triumph cannot provide Code completion for calling the
  * core CodeIgniter classes within a controller (ie "$this->input" will not trigger code completion").
- * This script will add he CI core objects and libraries to the Triumph tag cache so that 
+ * This script will add the CI core objects and libraries to the Triumph tag cache so that 
  * Triumph can know about them during code completion. It will also
  * detect any user-created libraries as well. This script.
  * will be called via a command line; it is a normal command line script.
@@ -29,6 +29,8 @@ require_once('bootstrap.php');
 function parseArgs() {
 	$rules = array(
 		'sourceDir|d=s' => 'Required. The base directory that the project resides in',
+		'resourceDbFileName|i=s' => 'Required. SQLite file that contains the project\'s files, classes, and methods. This file is created by ' .
+			'Triumph; Triumph performs INSERTs as it indexes a project.',
 		'outputDbFileName|o-s' => 'Optional. If given, the output will be written to the given file. If not given, output goes to STDOUT.',
 		'help|h' => 'This help message'
 	);
@@ -36,6 +38,7 @@ function parseArgs() {
 
 	// trim any quotes
 	$sourceDir = trim($opts->getOption('sourceDir'), " \r\n\t'\"");
+	$resourceDbFileName = trim($opts->getOption('resourceDbFileName'), " \r\n\t'\"");
 	$outputDbFileName = trim($opts->getOption('outputDbFileName'), " \r\n\t'\"");
 	$help = trim($opts->getOption('help'), " \r\n\t'\"");
 
@@ -72,6 +75,12 @@ EOF;
 		echo "sourceDir is not a valid directory. Is \"{$sourceDir}\" a directory? Is it readable? \n";
 		exit(-1);
 	}
+	
+	if (!$resourceDbFileName) {
+		echo "Missing argument: --resourceDbFileName. See --help for details.\n";
+		exit(-1);
+	}
+	
 	if (!extension_loaded('pdo_sqlite') || !extension_loaded('PDO')) {
 		echo "The script " . basename(__FILE__) . " requires the PDO and pdo_sqlite PHP extensions.";
 		exit(-1);
@@ -79,7 +88,7 @@ EOF;
 
 	// call the function that will return all detected URLs
 	$doSkip = TRUE;
-	$arrTags = detectTags($sourceDir, $doSkip);
+	$arrTags = detectTags($sourceDir, $resourceDbFileName, $doSkip);
 	if ($doSkip) {
 		echo "Detector " . basename(__FILE__, '.php') . " cannot detect tags for  {$sourceDir} ... skipping\n";
 	}
@@ -115,12 +124,13 @@ EOF;
 /**
  *
  * @param  string $sourceDir            the root directory of the project in question
+ * @param  string $resourceDbFileName   the location of the resource cache SQLite file; as created by Triumph
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect URLs for the given source directory; this situation
  *                                      is different than zero URLs being detected.
  * @return Triumph_DetectedTag[]         array of Triumph_DetectedTag instances the detected tags
  */
-function detectTags($sourceDir, &$doSkip) {
+function detectTags($sourceDir, $resourceDbFileName, &$doSkip) {
 	$allTags = array();
 	
 	// need to check that this detector is able to recognize the directory structure of sourceDir

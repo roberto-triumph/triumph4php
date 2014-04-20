@@ -106,9 +106,9 @@ class Triumph_Resource {
 	/**
 	 * Create a method resource(a class member). For now this method is assumed to have public access.
 	 */
-	public static function CreateMethod($className, $methodName, $methodArgs, $methodReturnType, $comment) {
+	public static function CreateMethod($className, $methodName, $methodSignature, $methodReturnType, $comment) {
 		$method = new Triumph_Resource();
-		$method->MakeMethod($className, $methodName, $methodArgs, $methodReturnType, $comment);
+		$method->MakeMethod($className, $methodName, $methodSignature, $methodReturnType, $comment);
 		return $method;
 	}
 	
@@ -143,31 +143,15 @@ class Triumph_Resource {
 	/**
 	 * Create a class method. For now this method is assumed to have public access.
 	 */
-	public function MakeMethod($className, $methodName, $methodArgs, $methodReturnType, $comment) {
+	public function MakeMethod($className, $methodName, $methodSignature, $methodReturnType, $comment) {
 		$resource = $className . '::' . $methodName;
-		$signature = 'public function ' . $methodName . '(' . $methodArgs . ')';
 		$this->resource = $resource;
 		$this->className = $className;
 		$this->identifier = $methodName;
 		$this->returnType = $methodReturnType;
-		$this->signature = $signature;
+		$this->signature = $methodSignature;
 		$this->comment = $comment;
 		$this->type = self::TYPE_METHOD;
-	}
-	
-	/**
-	 * Sets the properties so that this resource is a class.
-	 * @return void
-	 */
-	public function MakeClass($className) {
-		$resource = $className;
-		$signature = 'class ' . $className;
- 		$this->resource = $resource;
-		$this->identifier = $className;
-		$this->returnType = '';
-		$this->signature = $resource;
-		$this->comment = '';
-		$this->type = self::TYPE_CLASS;
 	}
 	
 	/**

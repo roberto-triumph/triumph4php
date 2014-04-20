@@ -5,10 +5,11 @@
  * that it will list all of the tags that correspond any properties or methods added to classes at runtime. This script
  * will be called via a command line; it is a normal command line script.
  *
- * This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
- * list of all of a project's urls so that the user can easily open / jump to URLs. More
- * info can be about Triumph's URL detector feature can be found at 
- * http://docs.triumph4php.com/tag-detectors/
+ * This script is part of Triumph's Tag Detection feature; it enhances Triumph's code
+ * completion and call tips because a tag detector is coded to each PHP framework's
+ * dynamic "magic" and Triumph is made aware of new methods/properties that are added
+ * at run-time by a framework. More info can be about Triumph's Tag detector feature can be 
+ * found at http://docs.triumph4php.com/tag-detectors/
  */
 
 // the bootstrap file setups up the include path and autoload mechanism so that
@@ -25,6 +26,8 @@ require_once('bootstrap.php');
 function parseArgs() {
 	$rules = array(
 		'sourceDir|d=s' => 'Required. The base directory that the project resides in',
+		'resourceDbFileName|i=s' => 'Required. SQLite file that contains the project\'s files, classes, and methods. This file is created by ' .
+			'Triumph; Triumph performs INSERTs as it indexes a project.',
 		'outputDbFileName|o-s' => 'Optional. If given, the output will be written to the given file. If not given, output goes to STDOUT.',
 		'help|h' => 'This help message'
 	);
@@ -32,19 +35,21 @@ function parseArgs() {
 
 	// trim any quotes
 	$sourceDir = trim($opts->getOption('sourceDir'), " \r\n\t'\"");
+	$resourceDbFileName = trim($opts->getOption('resourceDbFileName'), " \r\n\t'\"");
 	$outputDbFileName = trim($opts->getOption('outputDbFileName'), " \r\n\t'\"");
 	$help = trim($opts->getOption('help'), " \r\n\t'\"");
 
 	if ($help) {
 		$helpMessage = <<<EOF
- The goal of this script is to discover all of the 'dynamic' tags for your PHP projects. This means
- that it will list all of the tags that correspond any properties or methods added to classes at runtime. This script
- will be called via a command line; it is a normal command line script.
+The goal of this script is to discover all of the 'dynamic' tags for your PHP projects. This means
+that it will list all of the tags that correspond any properties or methods added to classes at runtime. This script
+will be called via a command line; it is a normal command line script.
  
- This script is part of Triumph's Tag Detection feature; it enables the editor to have a 
- list of all of a project's urls so that the user can easily open / jump to URLs. More
- info can be about Triumph's URL detector feature can be found at 
- http://docs.triumph4php.com/tag-detectors/
+This script is part of Triumph's Tag Detection feature; it enhances Triumph's code
+completion and call tips because a tag detector is coded to each PHP framework's
+dynamic "magic" and Triumph is made aware of new methods/properties that are added
+at run-time by a framework. More info can be about Triumph's Tag detector feature can be 
+found at http://docs.triumph4php.com/tag-detectors/
 
 When a required argument is invalid or missing, the program will exit with an error code (-1)
 
@@ -64,6 +69,12 @@ EOF;
 		echo "sourceDir is not a valid directory. Is \"{$sourceDir}\" a directory? Is it readable? \n";
 		exit(-1);
 	}
+	
+	if (!$resourceDbFileName) {
+		echo "Missing argument: --resourceDbFileName. See --help for details.\n";
+		exit(-1);
+	}
+	
 	if (!extension_loaded('pdo_sqlite') || !extension_loaded('PDO')) {
 		echo "The script " . basename(__FILE__) . " requires the PDO and pdo_sqlite PHP extensions.";
 		exit(-1);
@@ -71,7 +82,7 @@ EOF;
 
 	// call the function that will return all detected URLs
 	$doSkip = TRUE;
-	$arrTags = detectTags($sourceDir, $doSkip);
+	$arrTags = detectTags($sourceDir, $resourceDbFileName, $doSkip);
 	if ($doSkip) {
 		echo "Detector " . basename(__FILE__, '.php') . " cannot detect tags for  {$sourceDir} ... skipping\n";
 	}
@@ -107,17 +118,21 @@ EOF;
 /**
  *
  * @param  string $sourceDir            the root directory of the project in question
+ * @param  string $resourceDbFileName   the location of the resource cache SQLite file; as created by Triumph
  * @param  boolean $doSkip              out parameter; if TRUE then this detector does not know how
  *                                      to detect URLs for the given source directory; this situation
  *                                      is different than zero URLs being detected.
  * @return Triumph_Resource[]         array of Triumph_Resource instances the detected tags
  */
-function detectTags($sourceDir, &$doSkip) {
+function detectTags($sourceDir, $resourceDbFileName, &$doSkip) {
 	$allTags = array();
+	if (!is_file($resourceDbFileName)) {
+		return $allTags;
+	}
 	
 	// need to check that this detector is able to recognize the directory structure of sourceDir
 	// if not, then we need to skip detection by returning immediately and setting $doSkip to TRUE.
-	// by skipping detection, we prevent any detected URLs from the previous detection script
+	// by skipping detection, we prevent any detected tags from the previous detection script
 	// from being deleted.
 	$doSkip = TRUE;
 	

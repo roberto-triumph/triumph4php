@@ -48,6 +48,24 @@ function ensure_ends_with($haystack, $needle) {
 }
 
 /**
+ * Makes sure that haystack always starts with needle.  If haystack already
+ * starts with needle, then haystack is returned. If haystack does not start 
+ * with needle, then needle is prepended to haystack. Comparison is case
+ * sensitive.
+ *
+ * @param $haystack the string to search in
+ * @param $needle the character to search for
+ * @return a string that will always have $needle at the beginning
+ */
+function ensure_begins_with($haystack, $needle) {
+	
+	if ($haystack[0] != $needle) {
+		$haystack = $needle . $haystack;
+	}
+	return $haystack;
+}
+
+/**
  * Convenience function that checks whether haystack starts with needle. Comparison
  * is case-sensitive.
  *

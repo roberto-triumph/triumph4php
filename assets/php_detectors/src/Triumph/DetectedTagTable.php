@@ -65,7 +65,9 @@ class Triumph_DetectedTagTable extends Zend_Db_Table_Abstract {
 				'method_name' => $tag->identifier,
 				'return_type' => $tag->returnType,
 				'namespace_name' => $tag->namespaceName,
-				'comment' => $tag->comment
+				'signature' => $tag->signature,
+				'comment' => $tag->comment,
+				'is_static' => $tag->isStatic,
 			));
 			
 			$this->insert(array(
@@ -76,7 +78,9 @@ class Triumph_DetectedTagTable extends Zend_Db_Table_Abstract {
 				'method_name' => $tag->identifier,
 				'return_type' => $tag->returnType,
 				'namespace_name' => $tag->namespaceName,
-				'comment' => $tag->comment
+				'signature' => $tag->signature,
+				'comment' => $tag->comment,
+				'is_static' => $tag->isStatic,
 			));
 		}
 		$this->getAdapter()->commit();

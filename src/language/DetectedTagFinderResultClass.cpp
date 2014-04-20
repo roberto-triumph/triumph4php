@@ -71,7 +71,9 @@ t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
 , Identifier()
 , ReturnType()
 , NamespaceName()
-, Comment() {
+, Signature()
+, Comment() 
+, IsStatic(0) {
 	TagTypes.push_back(t4p::TagClass::MEMBER);
 	TagTypes.push_back(t4p::TagClass::METHOD);
 	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
@@ -87,8 +89,10 @@ bool t4p::DetectedTagExactMemberResultClass::Init(soci::statement* stmt) {
 		stmt->exchange(soci::into(Identifier));
 		stmt->exchange(soci::into(ReturnType));
 		stmt->exchange(soci::into(NamespaceName));
+		stmt->exchange(soci::into(Signature));
 		stmt->exchange(soci::into(Comment));
-
+		stmt->exchange(soci::into(IsStatic));
+		
 		ret = AdoptStatement(stmt, error);
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
@@ -104,10 +108,11 @@ void t4p::DetectedTagExactMemberResultClass::Next() {
 	Tag.Identifier = t4p::CharToIcu(Identifier.c_str());
 	Tag.ReturnType = t4p::CharToIcu(ReturnType.c_str());
 	Tag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
+	Tag.Signature = t4p::CharToIcu(Signature.c_str());
 	Tag.Comment = t4p::CharToIcu(Comment.c_str());
 	Tag.IsPrivate = false;
 	Tag.IsProtected = false;
-	Tag.IsStatic = false;
+	Tag.IsStatic = IsStatic;
 
 	Fetch();
 }
@@ -126,7 +131,7 @@ void t4p::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString
 
 bool t4p::DetectedTagExactMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
-	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
+	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
 
 	sql += "key IN (?";
@@ -192,7 +197,7 @@ void t4p::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeSt
 
 bool t4p::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session, bool doLimit) {
 	std::string sql;
-	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, comment ";
+	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
 
 	// not using LIKE operator here, there are way too many situations where sqlite won't use the index

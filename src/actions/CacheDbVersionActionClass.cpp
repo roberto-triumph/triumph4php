@@ -37,7 +37,7 @@ static const int SCHEMA_VERSION_TAGS = 7;
  * This number must match the number on the schema_version table of the
  * detectors db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_DETECTOR = 6;
+static const int SCHEMA_VERSION_DETECTOR = 8;
 
 t4p::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)

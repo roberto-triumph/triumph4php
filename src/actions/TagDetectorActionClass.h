@@ -62,12 +62,19 @@ public:
 	wxFileName ScriptName;
 
 	/**
-	 * Argument to the URL detector script; the base directory of the project to scan
+	 * Argument to the tag detector script; the base directory of the project to scan
 	 */
 	wxFileName SourceDir;
+	
+	/**
+	 * Argument to the tag detector script; the location of the resource cache SQLite db.
+	 * this db is created when the project is indexed and can be accessed via the 
+	 * GlobalsClass::Projects list
+	 */
+	wxFileName ResourceDbFileName;
 
 	/**
-	 * Argument to the URL detector script; the location of th detectors cache SQLite db.
+	 * Argument to the tag detector script; the location of th detectors cache SQLite db.
 	 * this db is created when the project is indexed and can be accessed via the 
 	 * GlobalsClass::Projects list. This argument is optional; it can be empty in which
 	 * case the script outputs to STDOUT; leaving this argument empty is useful

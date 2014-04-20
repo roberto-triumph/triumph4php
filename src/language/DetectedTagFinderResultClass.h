@@ -83,7 +83,9 @@ protected:
 	std::string Identifier;
 	std::string ReturnType;
 	std::string NamespaceName;
+	std::string Signature;
 	std::string Comment;
+	int IsStatic;
 
 	/**
 	 *  binds the variables to this statement

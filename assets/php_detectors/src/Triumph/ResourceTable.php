@@ -89,4 +89,27 @@ class Triumph_ResourceTable extends Zend_Db_Table_Abstract {
 		return $methods;
 	}
 	
+	public function FindPublicMethodsMembersForClass($className, $sourceDir) {
+		$select = $this->_db->select();
+		$select->from(array('r' => 'resources'), array('class_name', 'identifier', 'signature', 'return_type', 'comment'))
+			->join(array('f' => 'file_items'), 'r.file_item_id = f.file_item_id', array('full_path'))
+			->join(array('s' => 'sources'), 's.source_id = r.source_id', array('directory'))
+		;
+		$select->where("s.directory = ?", $sourceDir)
+			->where('key >= ?', $className . '::')
+			->where('key <= ?', $className  . '::zzzzzz') 
+			->where('type IN(?, ?)', Triumph_Resource::TYPE_METHOD, Triumph_Resource::TYPE_MEMBER)
+			->where('is_private = 0')
+			->where('is_protected = 0');			
+		$stmt = $select->query();
+		$methods = array();
+		while ($row = $stmt->fetch(Zend_Db::FETCH_ASSOC)) {
+			$method = new Triumph_Resource();
+			$method->MakeMethod($row['class_name'], $row['identifier'], $row['signature'], $row['return_type'], $row['comment']);
+			$method->fullPath = $row['full_path'];
+			$methods[] = $method;
+		}
+		return $methods;
+	}
+	
 }

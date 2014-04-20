@@ -195,10 +195,31 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	--
 	namespace_name TEXT NOT NULL COLLATE NOCASE,
 	
+	-- this is the function / method signature. for classes, this is the
+	-- class declaration 
+	-- examples
+	-- 1. function
+	--    string strpos($haystack, $needle, $offset)
+	-- 2. method
+	--    public function __construct()
+	-- 3. class
+	--    class News extends CI_Controller
+	--
+	-- The signatures are re-constituted from an AST representation, they will not
+	-- contain newlines.
+	-- The signature *may* contain the return type, if Triumph is able to determine
+	-- it from the PHPDoc comment.
+	signature TEXT, 
+	
 	--
 	-- Description text that is shown to the user
 	--
-	comment TEXT NOT NULL
+	comment TEXT NOT NULL,
+	
+	-- 1 if this is a method / member / class constant and it has been labeled as static
+	-- this is important, as triumph is smart enough to show only static members / methods
+	-- when a static call is being made
+	is_static INTEGER
 );
 
 
@@ -319,7 +340,7 @@ CREATE INDEX IF NOT EXISTS idxUrlSource ON url_tags(source_id);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(6);
+INSERT INTO schema_version (version_number) VALUES(8);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

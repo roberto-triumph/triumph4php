@@ -63,10 +63,25 @@ class Triumph_DetectedTag {
 	public $returnType;
 	
 	/**
+	 * For a class property; signature will just be the same as resource. For a method or functions, this will have the 
+	 * function arguments.
+	 * @var string
+	 */
+	public $signature;
+	
+	/**
 	 * A friendly message that is displayed to the user when this tag is shown.
 	 * @var string
 	 */
 	public $comment;
+	
+	/**
+	 * Whether this member or method is a static method.
+	 * this is important, as triumph is smart enough to show only static members / methods
+	 * when a static call is being made. Defaults to FALSE
+	 * @var boolean TRUE if this is a static member/method
+	 */
+	public $isStatic;
 		
 	/**
 	 * The type of this resource. One of the type constants.
@@ -108,7 +123,9 @@ class Triumph_DetectedTag {
 		$this->type = $type;
 		$this->className = '';
 		$this->namespaceName = $namespaceName;
+		$this->signature = '';
 		$this->comment = $comment;
+		$this->isStatic = FALSE;
 	}
 
 	/**
