@@ -112,7 +112,7 @@ void t4p::DetectedTagExactMemberResultClass::Next() {
 	Tag.Comment = t4p::CharToIcu(Comment.c_str());
 	Tag.IsPrivate = false;
 	Tag.IsProtected = false;
-	Tag.IsStatic = IsStatic;
+	Tag.IsStatic = IsStatic != 0;
 
 	Fetch();
 }
