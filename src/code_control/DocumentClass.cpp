@@ -298,7 +298,7 @@ t4p::PhpDocumentClass::~PhpDocumentClass() {
 
 
 void t4p::PhpDocumentClass::AttachToControl(CodeControlClass* ctrl) {
-	ctrl->SetModEventMask(wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT);
+	ctrl->SetModEventMask(wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT | wxSTC_MOD_CHANGEMARKER);
 		
 	// using Connect instead of Event tables because call EVT_STC_CALLTIP_CLICK macro
 	// contains a syntax error

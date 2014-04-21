@@ -120,9 +120,11 @@ private:
 	void OnAppReady(wxCommandEvent& event);
 	
 	// bitmaps to show in the margin for search hits
+	// and bookmarks
 	// we load from disk once per feature
 	wxBitmap SearchHitGoodBitmap;
 	wxBitmap SearchHitBadBitmap;
+	wxBitmap BookmarkBitmap;
 
 	DECLARE_EVENT_TABLE()
 };

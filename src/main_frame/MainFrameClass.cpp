@@ -233,9 +233,8 @@ void t4p::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
 		if (wxYES == res) {
 			code->Revert();
 
-			wxCommandEvent reloadEvt(t4p::EVENT_APP_FILE_REVERTED);
-			reloadEvt.SetString(code->GetFileName());
-			App.EventSink.Publish(reloadEvt);
+			t4p::CodeControlEventClass revertEvt(t4p::EVENT_APP_FILE_REVERTED, code);
+			App.EventSink.Publish(revertEvt);
 		}
 	}
 }

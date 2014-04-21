@@ -110,7 +110,7 @@ static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePrefere
  */
 static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, 
 						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
-						   wxBitmap& searchHitBadBitmap) {
+						   wxBitmap& searchHitBadBitmap, wxBitmap& bookmarkBitmap) {
 
 	// even though we dont use the lint margin on all languages, we do use
 	// the search hit marker on all languages. we must set the margin mask
@@ -167,6 +167,7 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
 	// all file types
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, searchHitGoodBitmap); 
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER, searchHitBadBitmap);
+	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_BOOKMARK_MARKER, bookmarkBitmap);
 	SetLexerStyles(ctrl, styles, options);
 }
 
@@ -327,33 +328,33 @@ void t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event)
 
 void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options) {
 	if (t4p::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPhpOptions(ctrl, options, App.Globals);
 	}
 	else if (t4p::CodeControlClass::CSS == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetCssOptions(ctrl, options);
 	}
 	else if (t4p::CodeControlClass::SQL == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetSqlOptions(ctrl, options, App.Globals);
 	}
 	else if (t4p::CodeControlClass::JS == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetJsOptions(ctrl, options);
 	}
 	else if (t4p::CodeControlClass::CONFIG == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
 	}
 	else if (t4p::CodeControlClass::CRONTAB == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
 	}
 	else if (t4p::CodeControlClass::YAML == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 
 		// yaml override; never use tabs for yaml editing since yaml requires spaces
@@ -361,32 +362,32 @@ void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* c
 		ctrl->SetLexer(wxSTC_LEX_YAML);
 	}
 	else if (t4p::CodeControlClass::XML == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
 	}
 	else if (t4p::CodeControlClass::RUBY == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.RubyStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.RubyStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
 	}
 	else if (t4p::CodeControlClass::LUA == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
 	}
 	else if (t4p::CodeControlClass::MARKDOWN == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
 	}
 	else if (t4p::CodeControlClass::BASH == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
 	}
 	else if (t4p::CodeControlClass::DIFF == ctrl->GetDocumentMode()) {
-		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_DIFF);
 	}
@@ -395,7 +396,7 @@ void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* c
 
 		// plain text files don't have a lexer, but we still want to
 		// set a default background and foreground color
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap);
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, BookmarkBitmap);
 	}
 
 	// in wxWidgets 2.9.5, need to set margin after setting the lexer
@@ -414,6 +415,7 @@ void t4p::SyntaxHighlightFeatureClass::OnAppReady(wxCommandEvent& event) {
 	// load the images once at startup
 	SearchHitGoodBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier"));
 	SearchHitBadBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
+	BookmarkBitmap = t4p::AutoCompleteImageAsset(wxT("bookmark"));
 }
 
 t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, t4p::SyntaxHighlightFeatureClass& feature)

@@ -258,6 +258,11 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+	
+#define EVT_APP_FILE_REVERTED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_REVERTED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 
 typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 
@@ -323,8 +328,8 @@ extern const wxEventType EVENT_APP_EXIT;
 extern const wxEventType EVENT_APP_FILE_CREATED;
 
 /**
- * Notification that a file has been reverted (all changed in memory undone). The event will contain
- * the full path of the file that was opened in the GetString() method; 
+ * Notification that a file has been reverted (all changed in memory undone). The event 
+ * is of type CodeControlEventClass
  */
 extern const wxEventType EVENT_APP_FILE_REVERTED;
 

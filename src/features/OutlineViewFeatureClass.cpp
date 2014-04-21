@@ -225,7 +225,7 @@ t4p::OutlineViewFeatureClass::OutlineViewFeatureClass(t4p::AppClass& app)
 }
 
 void t4p::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(t4p::MENU_OUTLINE, _("Outline Current File\tSHIFT+F2"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
+	viewMenu->Append(t4p::MENU_OUTLINE, _("Outline Current File\tCTRL+SHIFT+O"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
 void t4p::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {

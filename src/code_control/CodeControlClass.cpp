@@ -47,6 +47,7 @@ const int t4p::CODE_CONTROL_LINT_RESULT_MARKER = 2;
 const int t4p::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
 const int t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
 const int t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
+const int t4p::CODE_CONTROL_BOOKMARK_MARKER = 5;
 
 // the indicator to show squiggly lines for lint errors
 const int t4p::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
@@ -657,6 +658,46 @@ void t4p::CodeControlClass::ClearSearchMarkers() {
 	HasSearchMarkers = false;
 }
 
+bool t4p::CodeControlClass::BookmarkMarkCurrent(int& lineNumber, int& handle) {
+	int currentLine = GetCurrentLine();
+	int newHandle = MarkerAdd(currentLine, CODE_CONTROL_BOOKMARK_MARKER);
+	if (newHandle != -1) {
+		
+		// we want to return 1-based line numbers, easier for the end user
+		lineNumber = currentLine + 1;
+		handle = newHandle;
+	}
+	return newHandle != -1;
+}
+
+bool t4p::CodeControlClass::BookmarkMarkAt(int lineNumber, int& handle) {
+	
+	// given line is 1-based, scintilla lines are 0-based
+	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
+	if (newHandle != -1) {
+		handle = newHandle;
+	}
+	return newHandle != -1;
+}
+
+int t4p::CodeControlClass::BookmarkGetLine(int handle) {
+	int line = MarkerLineFromHandle(handle);
+	if (line >= 0) {
+		line++;
+	}
+	return line;
+}
+
+void t4p::CodeControlClass::BookmarkClearAll() {
+	MarkerDeleteAll(CODE_CONTROL_BOOKMARK_MARKER);
+}
+
+void t4p::CodeControlClass::BookmarkClearAt(int lineNumber) {
+	
+	// given line is 1-based, scintilla lines are 0-based
+	MarkerDelete(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
+}
+
 void t4p::CodeControlClass::SetCurrentDbTag(const t4p::DatabaseTagClass& currentDbTag) {
 	CurrentDbTag.Copy(currentDbTag);
 	
@@ -821,6 +862,10 @@ void t4p::CodeControlClass::OnTimerComplete(wxTimerEvent& event) {
 	EventSink.Publish(evt);
 }
 
+void t4p::CodeControlClass::OnModified(wxStyledTextEvent& event) {
+	EventSink.Publish(event);
+}
+
 const wxEventType t4p::EVT_MOTION_ALT = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
@@ -830,6 +875,7 @@ BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
 
 	EVT_STC_CHARADDED(wxID_ANY, t4p::CodeControlClass::OnCharAdded)
 	EVT_STC_UPDATEUI(wxID_ANY, t4p::CodeControlClass::OnUpdateUi) 
+	EVT_STC_MODIFIED(wxID_ANY, t4p::CodeControlClass::OnModified)
 
 	EVT_LEFT_DOWN(t4p::CodeControlClass::OnLeftDown)
 	EVT_KEY_DOWN(t4p::CodeControlClass::OnKeyDown)

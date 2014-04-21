@@ -139,7 +139,7 @@ private:
 	 * rebuild the symbiol table, while when we open a file we dont need to re-tag the file
 	 * because it has not changed.
 	 */
-	void OnAppFileReverted(wxCommandEvent& event);
+	void OnAppFileReverted(t4p::CodeControlEventClass& event);
 
 	/**
 	 * when a file is deleted remove it from the tag cache

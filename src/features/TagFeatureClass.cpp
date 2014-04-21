@@ -298,18 +298,9 @@ void t4p::TagFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	event.Skip();
 }
 
-void t4p::TagFeatureClass::OnAppFileReverted(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl = NULL;
-	t4p::NotebookClass* notebook = GetNotebook();
-	bool found = false;
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		codeControl = notebook->GetCodeControl(i);
-		if (codeControl->GetFileName() == event.GetString()) {
-			found = true;
-			break;
-		}
-	}
-	if (found && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
+void t4p::TagFeatureClass::OnAppFileReverted(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* codeControl = event.GetCodeControl();
+	if (codeControl && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// builder action could take a while (more than the timer)
@@ -782,7 +773,7 @@ BEGIN_EVENT_TABLE(t4p::TagFeatureClass, wxEvtHandler)
 
 	EVT_APP_FILE_CLOSED(t4p::TagFeatureClass::OnAppFileClosed)
 	EVT_APP_FILE_OPEN(t4p::TagFeatureClass::OnAppFileOpened)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_REVERTED, t4p::TagFeatureClass::OnAppFileReverted)
+	EVT_APP_FILE_REVERTED(t4p::TagFeatureClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_DELETED, t4p::TagFeatureClass::OnAppFileDeleted)
 	EVT_APP_FILE_RENAMED(t4p::TagFeatureClass::OnAppFileRenamed)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_CREATED,  t4p::TagFeatureClass::OnAppDirCreated)

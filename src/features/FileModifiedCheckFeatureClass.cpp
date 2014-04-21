@@ -563,9 +563,8 @@ void t4p::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, 
 			filesToPrompt[fileName]->Revert();
 
 			// need to notify the app that the file was reloaded
-			wxCommandEvent reloadEvt(t4p::EVENT_APP_FILE_REVERTED);
-			reloadEvt.SetString(fileName);
-			App.EventSink.Publish(reloadEvt);
+			t4p::CodeControlEventClass revertEvt(t4p::EVENT_APP_FILE_REVERTED, filesToPrompt[fileName]);
+			App.EventSink.Publish(revertEvt);
 			revertedFiles.push_back(fileName);
 		}
 	}

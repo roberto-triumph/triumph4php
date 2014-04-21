@@ -63,7 +63,7 @@ extern const int CODE_CONTROL_LINT_RESULT_MARKER;
 extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
 extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
 extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
-
+extern const int CODE_CONTROL_BOOKMARK_MARKER;
 
 // the indicator to show squiggly lines for lint errors
 extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
@@ -374,6 +374,51 @@ public:
 	 * Markings are moved from this window only.
 	 */
 	void ClearSearchMarkers();
+	
+	/**
+	 * Marks a bookmark at the current line.
+	 * @param [out] line number that was bookmarked , 1-based
+	 * @param [out] int the bookmark "handle", used to query the 
+	 *        the line of the bookmark when text has been added/removed
+	 *        from the document
+	 * @return bool TRUE if bookmark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
+	 */
+	bool BookmarkMarkCurrent(int& lineNumber, int& handle);
+	
+	/**
+	 * Marks a bookmark at the given line.
+	 * @param  int line number to be bookmarked , 1-based
+	 * @param [out] int the bookmark "handle", used to query the 
+	 *        the line of the bookmark when text has been added/removed
+	 *        from the document
+	 * @return bool TRUE if bookmark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
+	 */
+	bool BookmarkMarkAt(int lineNumber, int& handle);
+	
+	/**
+	 * @param int the bookmark "handle", used to query the 
+	 *        the line of the bookmark when text has been added/removed
+	 *        from the document
+	 * @return int line number where the bookmark is now located. 1-based
+	 */
+	int BookmarkGetLine(int handle);
+
+	/**
+	 * Remove all markings caused by BookmarkMark().
+	 * Markings are moved from this window only.
+	 */
+	void BookmarkClearAll();
+	
+	/**
+	 * Remove a single marking caused by BookmarkMark() at the
+	 * given line
+	 * Markings are moved from this window only.
+	 *
+	 * @param  bookmark at line number will be removed, 1-based
+	 */
+	void BookmarkClearAt(int lineNumber);
 
 	/**
 	 * Set the connection to use to fetch the SQL table metadata
@@ -530,6 +575,12 @@ private:
 	 * see the comment on the HotspotTimer
 	 */
 	void OnHotspotClick(wxStyledTextEvent& event);
+	
+	/**
+	 * capture the SCN_MODIFIED event, to propagate it
+	 * to the rest of the app
+	 */
+	void OnModified(wxStyledTextEvent& event);
 
 	/**
 	 * when the timer ends then jump to that tag

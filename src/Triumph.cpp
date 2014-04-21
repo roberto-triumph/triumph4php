@@ -54,6 +54,7 @@
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
 #include <features/ChangelogFeatureClass.h>
+#include <features/BookmarkFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -279,7 +280,9 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new ChangelogFeatureClass(*this);
 	Features.push_back(feature);
-
+	feature = new BookmarkFeatureClass(*this);
+	Features.push_back(feature);
+	
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);
 	//Features.push_back(feature);
