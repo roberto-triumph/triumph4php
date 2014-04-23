@@ -80,9 +80,15 @@ void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 		wxDateTime modifiedDateTime;
 		if (exists) {
 			modifiedDateTime = file->FileName.GetModificationTime();
-			if (modifiedDateTime.IsValid() && modifiedDateTime.IsLaterThan(file->ModifiedTime)) {
-				filesModified.push_back(file->FileName);
-				modifiedTimes.push_back(modifiedDateTime);
+			if (modifiedDateTime.IsValid()) {
+
+				// use time span, to compare in seconds and not milli/micro
+				// seconds precision
+				wxTimeSpan span =  modifiedDateTime.Subtract(file->ModifiedTime);
+				if(span.GetSeconds() > 1) {
+					filesModified.push_back(file->FileName);
+					modifiedTimes.push_back(modifiedDateTime);
+				}
 			}
 		}
 		else {

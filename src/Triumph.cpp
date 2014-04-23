@@ -380,8 +380,10 @@ void t4p::AppClass::UpdateConfigModifiedTime() {
 }
 
 void t4p::AppClass::OnActivateApp(wxActivateEvent& event) {
-	wxCommandEvent cmdEvent(t4p::EVENT_APP_ACTIVATED);
-	EventSink.Publish(cmdEvent);
+	if (IsActive()) {
+		wxCommandEvent cmdEvent(t4p::EVENT_APP_ACTIVATED);
+		EventSink.Publish(cmdEvent);
+	}
 }
 
 t4p::AppTimerClass::AppTimerClass(t4p::AppClass& app)

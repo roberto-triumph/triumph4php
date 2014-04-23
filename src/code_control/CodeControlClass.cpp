@@ -36,6 +36,7 @@
 #include <wx/utils.h>
 #include <wx/tokenzr.h>
 #include <unicode/ustring.h>
+#include <sys/stat.h>
 
 // IMPLEMENTATION NOTE:
 // Take care when using positions given by Scintilla.  Scintilla gives positions in bytes while wxString and UnicodeString
@@ -221,8 +222,17 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		SetSavePoint();
 
 		// when saving, update the internal timestamp so that the external mod check logic works correctly
-		wxFileName file(CurrentFilename);
-		FileOpenedDateTime = file.GetModificationTime();
+		// using stat() function instead of wxFileName::GetModificationTime()
+		// it seems that GetFileTimes() win32 function and stat() function
+		// do different things; GetFileTimes() seems to have some caching
+		struct stat buff;
+		const wxCharBuffer cname = CurrentFilename.c_str();
+		if (stat(cname.data(), &buff) >= 0) {
+			FileOpenedDateTime.Set(buff.st_mtime);
+		}
+		else {
+			FileOpenedDateTime = wxDateTime::Now();
+		}
 	}
 	return saved;
 }
