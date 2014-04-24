@@ -429,53 +429,53 @@ t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, t4p::SyntaxHig
 , Globals() 
 , EventSink() 
 , Feature(feature) {
-	for (size_t i = 0; i < CodeControlOptions.PhpStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.PhpStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.PhpStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.PhpStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.PhpStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.PhpStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.SqlStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.SqlStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.SqlStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.SqlStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.SqlStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.SqlStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.CssStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.CssStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.CssStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.CssStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.CssStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.CssStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.JsStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.JsStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.JsStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.JsStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.JsStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.JsStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.ConfigStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.ConfigStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.ConfigStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.ConfigStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.ConfigStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.ConfigStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.CrontabStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.CrontabStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.CrontabStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.CrontabStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.CrontabStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.CrontabStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.YamlStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.YamlStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.YamlStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.YamlStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.YamlStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.YamlStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.RubyStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.RubyStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.RubyStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.RubyStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.RubyStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.RubyStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.LuaStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.LuaStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.LuaStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.LuaStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.LuaStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.LuaStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.MarkdownStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.MarkdownStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.MarkdownStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.MarkdownStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.MarkdownStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.MarkdownStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.BashStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.BashStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.BashStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.BashStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.BashStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.BashStyles[i]);
 	}
-	for (size_t i = 0; i < CodeControlOptions.DiffStyles.size(); ++i) {
-		wxString name = wxString::FromAscii(CodeControlOptions.DiffStyles[i].Name);
-		Styles->Append(wxGetTranslation(name), &CodeControlOptions.DiffStyles[i]);
+	for (size_t i = 0; i < EditedCodeControlOptions.DiffStyles.size(); ++i) {
+		wxString name = wxString::FromAscii(EditedCodeControlOptions.DiffStyles[i].Name);
+		Styles->Append(wxGetTranslation(name), &EditedCodeControlOptions.DiffStyles[i]);
 	}
 	Styles->Select(0);
 	t4p::StylePreferenceClass firstPref = EditedCodeControlOptions.PhpStyles[0];

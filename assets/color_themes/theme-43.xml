@@ -41,6 +41,6 @@
     <currentLine color="#aaccff" />
     <foreground color="#000000" />
     <lineNumber color="#666666" />
-    <selectionBackground color="#Efefff" />
+    <selectionBackground color="#C0C0C0" />
     <selectionForeground color="#000066" />
 </colorTheme>

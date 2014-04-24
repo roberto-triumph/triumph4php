@@ -424,6 +424,8 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
@@ -4788,7 +4790,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#000000"));
@@ -4858,7 +4860,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
@@ -4878,7 +4880,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
@@ -4906,7 +4908,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -4927,7 +4929,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -4949,7 +4951,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -4970,7 +4972,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5015,7 +5017,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5047,7 +5049,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5080,7 +5082,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5104,7 +5106,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5123,7 +5125,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
 static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
@@ -5728,7 +5730,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#5c8198"));
@@ -5798,7 +5800,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5818,7 +5820,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#688046"));
@@ -5846,7 +5848,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5867,7 +5869,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5889,7 +5891,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5910,7 +5912,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5955,7 +5957,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -5987,7 +5989,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6020,7 +6022,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6044,7 +6046,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6063,7 +6065,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
 static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
@@ -6668,7 +6670,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#000080"));
@@ -6738,7 +6740,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6758,7 +6760,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
@@ -6786,7 +6788,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6807,7 +6809,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6829,7 +6831,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6850,7 +6852,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6895,7 +6897,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6927,7 +6929,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6960,7 +6962,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -6984,7 +6986,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -7003,7 +7005,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#FEFCF5"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
-	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#EEEEEE"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
 static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
@@ -9488,7 +9490,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_TAG).Color = wxColour(wxT("#5c8198"));
@@ -9558,7 +9560,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9578,7 +9580,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#5c8198"));
@@ -9606,7 +9608,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 	
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9627,7 +9629,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9649,7 +9651,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9670,7 +9672,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9715,7 +9717,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9747,7 +9749,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9780,7 +9782,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9804,7 +9806,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
 		
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
@@ -9823,7 +9825,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET).BackgroundColor = wxColour(wxT("#ffffff"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
-	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#Efefff"));
+	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
 static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& options) {
