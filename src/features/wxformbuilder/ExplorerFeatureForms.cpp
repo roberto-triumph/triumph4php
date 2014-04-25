@@ -204,3 +204,51 @@ ExplorerOptionsGeneratedPanelClass::ExplorerOptionsGeneratedPanelClass( wxWindow
 ExplorerOptionsGeneratedPanelClass::~ExplorerOptionsGeneratedPanelClass()
 {
 }
+
+ExplorerNewFileGeneratedDialogClass::ExplorerNewFileGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, wxT("Please enter a file name"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	GridSizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	
+	FileNameText = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
+	GridSizer->Add( FileNameText, 1, wxALL|wxEXPAND, 5 );
+	
+	BoxSizer->Add( GridSizer, 1, wxEXPAND, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonSizer->AddButton( ButtonSizerCancel );
+	ButtonSizer->Realize();
+	BoxSizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	FileNameText->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ExplorerNewFileGeneratedDialogClass::OnTextEnter ), NULL, this );
+	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerNewFileGeneratedDialogClass::OnOkButton ), NULL, this );
+}
+
+ExplorerNewFileGeneratedDialogClass::~ExplorerNewFileGeneratedDialogClass()
+{
+	// Disconnect Events
+	FileNameText->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ExplorerNewFileGeneratedDialogClass::OnTextEnter ), NULL, this );
+	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerNewFileGeneratedDialogClass::OnOkButton ), NULL, this );
+	
+}

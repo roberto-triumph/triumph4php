@@ -28,6 +28,7 @@
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
 #include <wx/statbox.h>
+#include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +120,32 @@ class ExplorerOptionsGeneratedPanelClass : public wxPanel
 		
 		ExplorerOptionsGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~ExplorerOptionsGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ExplorerNewFileGeneratedDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class ExplorerNewFileGeneratedDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Label;
+		wxTextCtrl* FileNameText;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnTextEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ExplorerNewFileGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Create a new file"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 450,142 ), long style = wxDEFAULT_DIALOG_STYLE );
+		~ExplorerNewFileGeneratedDialogClass();
 	
 };
 

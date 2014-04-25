@@ -436,7 +436,7 @@ void t4p::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 	menu.Append(ID_EXPLORER_LIST_CREATE_PHP, _("New PHP File"), _("Create a new PHP file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_SQL, _("New SQL File"), _("Create a new SQL file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New CSS File"), _("Create a new CSS file in this directory"), wxITEM_NORMAL);
-	menu.Append(ID_EXPLORER_LIST_CREATE_CSS, _("New JS File"), _("Create a new JS file in this directory"), wxITEM_NORMAL);
+	menu.Append(ID_EXPLORER_LIST_CREATE_JS, _("New JS File"), _("Create a new JS file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_TEXT, _("New text File"), _("Create a new text file in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_CREATE_DIRECTORY, _("New Directory"), _("Create a new directory in this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
@@ -657,7 +657,16 @@ void t4p::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event) {
 
 	// dont allow the parent dir to be renamed
 	if (index > 0) {
-		List->EditLabel(index);
+		wxTextCtrl* ctrl = List->EditLabel(index);
+		
+		// change the selection. select only the file name not the
+		// extension. if the file only has an extension, we
+		// leave it alone (by default the entire string is selected)
+		wxString val = ctrl->GetValue();
+		size_t index = val.find_last_of(wxT('.'));
+		if (index > 0 && index != std::string::npos) {
+			ctrl->SetSelection(0, index);
+		}
 	}
 }
 
@@ -766,39 +775,30 @@ void t4p::ModalExplorerPanelClass::OnListMenuCreateNew(wxCommandEvent& event) {
 	}
 	ext.Replace(wxT("*"), wxT("New File"));
 
-	wxString newName = ::wxGetTextFromUser(_("Please enter a file name"), dialogTitle, ext);
-	wxString forbidden = wxFileName::GetForbiddenChars();
-	if (newName.find_first_of(forbidden, 0) != std::string::npos) {
-		wxMessageBox(_("Please enter valid a file name"));
-		return;
-	}
-	if (newName.IsEmpty()) {
-		return;
-	}
-	wxFileName newFileName(CurrentListDir.GetPath(), newName);
-	if (newFileName.FileExists()) {
-		wxMessageBox(_("File name already exists. Please enter another name."));
-		return;
-	}
-	wxFile file;
-	if (file.Create(newFileName.GetFullPath())) {
+	wxString newName = ext;
+	t4p::ExplorerNewFileDialogClass newFileDialog(NULL, dialogTitle, CurrentListDir.GetPathWithSep(), newName);
+	if (newFileDialog.ShowModal() == wxOK) {
+		wxFileName newFileName(CurrentListDir.GetPath(), newName);
+		wxFile file;
+		if (file.Create(newFileName.GetFullPath())) {
 
-		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-		int newRowNumber = List->GetItemCount();
-		wxListItem column1;
-		column1.SetColumn(0);
-		column1.SetId(newRowNumber);
-		column1.SetImage(ListImageId(newFileName));
-		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
-		column1.SetText(newName);
-		List->InsertItem(column1);
+			// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
+			int newRowNumber = List->GetItemCount();
+			wxListItem column1;
+			column1.SetColumn(0);
+			column1.SetId(newRowNumber);
+			column1.SetImage(ListImageId(newFileName));
+			column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
+			column1.SetText(newName);
+			List->InsertItem(column1);
 
-		// open the new file
-		t4p::OpenFileCommandEventClass evt(newFileName.GetFullPath());
-		Feature.App.EventSink.Publish(evt);
-	}
-	else {
-		wxMessageBox(_("Could not create file: ") + newName);
+			// open the new file
+			t4p::OpenFileCommandEventClass evt(newFileName.GetFullPath());
+			Feature.App.EventSink.Publish(evt);
+		}
+		else {
+			wxMessageBox(_("Could not create file: ") + newName);
+		}
 	}
 }
 
@@ -1382,6 +1382,50 @@ t4p::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int 
 
 	TransferDataToWindow();
 }
+
+
+t4p::ExplorerNewFileDialogClass::ExplorerNewFileDialogClass(wxWindow* parent, const wxString& title, 
+	const wxString& currentDir, wxString& fileName)
+: ExplorerNewFileGeneratedDialogClass(parent, wxID_ANY, title)
+, CurrentDir(currentDir)
+, FileName(fileName) {
+	
+	FileNameText->SetValue(fileName);
+	size_t index = FileName.find_last_of(wxT('.'));
+	FileNameText->SetFocus();
+	FileNameText->SetSelection(0, 0);
+	if (index > 0 && index != std::string::npos) {
+		FileNameText->SetSelection(0, index);
+	}
+	else {
+		FileNameText->SetSelection(0, FileName.Length() - 1);
+	}
+}
+
+void t4p::ExplorerNewFileDialogClass::OnOkButton(wxCommandEvent& event) {
+	wxString newName = FileNameText->GetValue();
+	wxString forbidden = wxFileName::GetForbiddenChars();
+	if (newName.find_first_of(forbidden, 0) != std::string::npos) {
+		wxMessageBox(_("Please enter valid a file name"), _("Error"));
+		return;
+	}
+	if (newName.IsEmpty()) {
+		wxMessageBox(_("Please enter a file name"), _("Error"));
+		return;
+	}
+	wxFileName newFileName(CurrentDir, newName);
+	if (newFileName.FileExists()) {
+		wxMessageBox(_("File name already exists. Please enter another name."), _("Error"));
+		return;
+	}
+	FileName = newName;
+	EndModal(wxOK);
+}
+
+void t4p::ExplorerNewFileDialogClass::OnTextEnter(wxCommandEvent& event) {
+	OnOkButton(event);
+}
+
 
 const wxEventType t4p::EVENT_EXPLORER = wxNewEventType();
 const wxEventType t4p::EVENT_EXPLORER_MODIFY = wxNewEventType();

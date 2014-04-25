@@ -491,6 +491,37 @@ private:
 	t4p::ExplorerFeatureClass& Feature;
 };
 
+/**
+ * Use our own new file dialog; this pretty much just like 
+ * wxGetTextFromUser() except that we will select only the file name and
+ * not the extension.
+ */
+class ExplorerNewFileDialogClass : public ExplorerNewFileGeneratedDialogClass {
+	
+	public:
+	
+	ExplorerNewFileDialogClass(wxWindow* parent, const wxString& title, 
+		const wxString& currentDir, wxString& fileName);
+	
+	protected:
+	
+	void OnOkButton(wxCommandEvent& event);
+	void OnTextEnter(wxCommandEvent& event);
+	
+	private:
+	
+	/**
+	 * the CurrentDir is used to check that the user does not enter
+	 * a file name that already exists in the CurrentDir
+	 */
+	wxString CurrentDir;
+	
+	/**
+	 * the name that was input by the user
+	 */
+	wxString& FileName;
+};
+
 }
 
 #endif
