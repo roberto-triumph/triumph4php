@@ -89,6 +89,7 @@ wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
 	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_XPM);
+	wxUnusedVar(loaded);
 	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return bitmap;
 }
@@ -104,6 +105,7 @@ wxBitmap t4p::BitmapImageAsset(wxString imageName) {
 	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxUnusedVar(loaded);
 	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return bitmap;
 }
@@ -119,6 +121,7 @@ wxIcon t4p::IconImageAsset(wxString imageName) {
 	wxASSERT(iconFile.IsOk());
 	wxIcon icon;
 	bool loaded = icon.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_ICO);
+	wxUnusedVar(loaded);
 	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
 	return icon;
 }
