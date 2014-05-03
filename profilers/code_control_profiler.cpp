@@ -118,7 +118,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true);
 	bool good = workingCache->Update(contents);
 	if (good) {
-		tagFinderlist->TagParser.BuildResourceCacheForFile(fileNameString, contents, false);
+		tagFinderlist->TagParser.BuildResourceCacheForFile(wxT(""), fileNameString, contents, false);
 		Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
 	}
 	else {

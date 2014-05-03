@@ -175,31 +175,9 @@ void t4p::TagParserClass::Close() {
 
 void t4p::TagParserClass::BeginSearch(const wxString& fullPath) {
 
-	// make sure we always insert with the trailing directory separator
-	// to be consistent
-	wxFileName dir;
-	dir.AssignDir(fullPath);
-
-
 	// get (or create) the source ID
 	try {
-		CurrentSourceId = 0;
-		std::string stdFullPath = t4p::WxToChar(dir.GetPathWithSep());
-		soci::statement stmt = (Session->prepare << 
-			"SELECT source_id FROM sources WHERE directory = ?", 
-			soci::into(CurrentSourceId), soci::use(stdFullPath)
-		);
-		if (!stmt.execute(true)) {
-
-			// didn't find the source, create a new row
-			soci::statement stmt = (Session->prepare <<
-				"INSERT INTO sources(directory) VALUES(?)",
-				soci::use(stdFullPath)
-			);
-			stmt.execute(true);
-			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-			CurrentSourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
-		}
+		CurrentSourceId = PersistSource(fullPath);
 		BeginTransaction();
 	} catch (std::exception& e) {
 		
@@ -207,6 +185,40 @@ void t4p::TagParserClass::BeginSearch(const wxString& fullPath) {
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
 	}
+}
+
+int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
+    
+	// make sure we always insert with the trailing directory separator
+	// to be consistent
+	wxFileName dir;
+	dir.AssignDir(sourceDir);
+	int sourceId = 0;
+	try {
+		std::string stdFullPath = t4p::WxToChar(dir.GetPathWithSep());
+		soci::statement stmt = (Session->prepare << 
+		"SELECT source_id FROM sources WHERE directory = ?", 
+		soci::into(sourceId), soci::use(stdFullPath)
+		);
+		if (!stmt.execute(true)) {
+
+			// didn't find the source, create a new row
+			soci::statement stmt = (Session->prepare <<
+			"INSERT INTO sources(directory) VALUES(?)",
+			soci::use(stdFullPath)
+			);
+			stmt.execute(true);
+			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+			sourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
+		} 
+	}
+	catch (std::exception& e) {
+
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxASSERT_MSG(false, e.what());
+	}
+	return sourceId;
 }
 
 void t4p::TagParserClass::BeginTransaction() {
@@ -319,9 +331,9 @@ bool t4p::TagParserClass::Walk(const wxString& fileName) {
 	return false;
 }
 
-void t4p::TagParserClass::BuildResourceCacheForFile(const wxString& fullPath, const UnicodeString& code, bool isNew) {
-	CurrentSourceId = 0;
+void t4p::TagParserClass::BuildResourceCacheForFile(const wxString& sourceDir, const wxString& fullPath, const UnicodeString& code, bool isNew) {
 	BeginTransaction();
+    CurrentSourceId = PersistSource(sourceDir);
 
 	// remove all previous cached resources
 	t4p::FileTagClass fileTag;

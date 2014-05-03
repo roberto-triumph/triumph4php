@@ -99,6 +99,11 @@ private:
 	wxString FileName;
 
 	/**
+	 * the source directory of the file; the project that the file is in
+	 */
+	wxString SourceDir;
+
+	/**
 	 * string that uniquely identifies the file that is being worked on by the background thread.
 	 */
 	wxString FileIdentifier;

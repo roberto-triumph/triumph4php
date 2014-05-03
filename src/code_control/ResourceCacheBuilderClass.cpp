@@ -33,6 +33,7 @@ t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	, TagCacheDbFileName()
 	, Code()
 	, FileName() 
+	, SourceDir()
 	, FileIdentifier()
 	, Version(pelet::PHP_53)
 	, FileIsNew(true) 
@@ -53,6 +54,23 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 	Version = version;
 	FileIsNew = isNew;
 	DoParseTags = doParseTags;
+	SourceDir = wxT("");
+
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
+	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
+		if (project->IsEnabled) {
+			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+				if (source->IsInRootDirectory(FileName)) {
+					SourceDir = source->RootDirectory.GetPathWithSep();
+					break;
+				}
+			}
+		}
+		if (!SourceDir.empty()) {
+			break;
+		}
+	}
 }
 
 void t4p::WorkingCacheBuilderClass::BackgroundWork() {
@@ -84,7 +102,7 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 			// since BuildResourceCacheForFile kills existing tags in the file
 			// we want to keep previous tags if the code contains a syntax error
 			if (DoParseTags) {
-				tagFinderlist->TagParser.BuildResourceCacheForFile(FileName, Code, FileIsNew);
+				tagFinderlist->TagParser.BuildResourceCacheForFile(SourceDir, FileName, Code, FileIsNew);
 			}
 
 			// only send the event if the code passes the lint check

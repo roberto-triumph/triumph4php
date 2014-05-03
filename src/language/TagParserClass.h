@@ -133,12 +133,14 @@ public:
 	 * Note that one of the Init method
 	 * must have been called before a call to this method is made.
 	 * 
-	 * @param const wxString&
-	 * fileName the full path of the file
+     * @param const wxString& sourceDir the source directory that the file is a part of
+     *        this means that the given file must be part of a project.
+     *        source directory must have the ending dir separator
+	 * @param const wxString& fileName the full path of the file
 	 * @param const UnicodeString& code the PHP source code
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
-	void BuildResourceCacheForFile(const wxString& fileName, const UnicodeString& code, bool isNew);
+	void BuildResourceCacheForFile(const wxString& sourceDir, const wxString& fileName, const UnicodeString& code, bool isNew);
 		
 	/**
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
@@ -344,6 +346,12 @@ private:
 	 * Write the file item into the database. The item's FileId member will be set as well.
 	 */
 	void PersistFileTag(t4p::FileTagClass& fileTag);
+
+    /**
+	 * Write the source directory into the database.
+     * @param wxString the source directory.  must have the ending dir separator
+	 */
+	int PersistSource(const wxString& sourceDir);
 
 	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into

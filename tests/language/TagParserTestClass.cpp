@@ -44,7 +44,7 @@ public:
 	}
 
 	void AddFile(const wxFileName& fileName, const UnicodeString& contents) {
-		TagParser.BuildResourceCacheForFile(fileName.GetFullPath(), contents, true);
+		TagParser.BuildResourceCacheForFile(wxT(""), fileName.GetFullPath(), contents, true);
 	}
 
 	wxFileName TestFile(const wxString& subdir, const wxString& name) {

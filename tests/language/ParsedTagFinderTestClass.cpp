@@ -141,7 +141,7 @@ public:
 	 * ParsedTagFinderFileTestClass::Prep method
 	 */
 	void Prep(const UnicodeString& source) {
-		TagParser.BuildResourceCacheForFile(TestFile, source, true);
+		TagParser.BuildResourceCacheForFile(wxT(""), TestFile, source, true);
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
@@ -788,7 +788,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsi
 		"?>\n"
 	);
 	Parse(TestProjectDir + TestFile);
-	TagParser.BuildResourceCacheForFile(TestProjectDir + TestFile, uniCode, false);
+	TagParser.BuildResourceCacheForFile(TestProjectDir, TestProjectDir + TestFile, uniCode, false);
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);
@@ -825,7 +825,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenU
 		"$user = new UserClass();\n"
 	);
 	wxString fileName = wxT("Untitled");
-	TagParser.BuildResourceCacheForFile(fileName, uniCode, true);
+	TagParser.BuildResourceCacheForFile(wxT(""), fileName, uniCode, true);
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUse"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("printUser", Matches[0].Identifier);

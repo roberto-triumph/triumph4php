@@ -123,7 +123,7 @@ public:
 	}
 
 	void Init(const UnicodeString& sourceCode) {
-		TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled"), sourceCode, true);
+		TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled"), sourceCode, true);
 		CompletionSymbolTable.CreateSymbols(sourceCode);
 		Scope.Clear();
 	}
@@ -289,7 +289,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCallFromGlobalFind
 		"<?php class MyClass { function workA() {} function workB() {} } \n"	
 	);
 	Init(sourceCode);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("MyClass.php"), sourceCodeGlobal, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("MyClass.php"), sourceCodeGlobal, true);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
@@ -616,7 +616,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporti
 		"class OtherClass { }\n"
 		"}\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("defines.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("defines.php"), sourceCode, true);
 	
 	// the code under test will import the namespaces
 	sourceCode = t4p::CharToIcu(
@@ -652,7 +652,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"namespace Second; \n"
 		"class MyClass {}"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
 	Scope.AddNamespaceAlias(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
@@ -692,7 +692,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"class MyClass {}  \n"
 		"} \n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 	ToClass(UNICODE_STRING_SIMPLE("Othe"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\Second");
 	Scope.AddNamespaceAlias(UNICODE_STRING_SIMPLE("\\Second"), UNICODE_STRING_SIMPLE("namespace"));
@@ -716,7 +716,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndFunc
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 	
 	// global functions ARE automatically imported
 	ToFunction(UNICODE_STRING_SIMPLE("wor"));
@@ -739,7 +739,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndClas
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 	
 	// classes in the same namespace ARE automatically imported
 	ToClass(UNICODE_STRING_SIMPLE("MyC"));
@@ -762,7 +762,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceGlobalC
 		"namespace First\\Child; \n"
 		"class MyClass {}"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 	
 	ToClass(UNICODE_STRING_SIMPLE("Other"));
 	Scope.NamespaceName = UNICODE_STRING_SIMPLE("\\First\\Child");
@@ -888,7 +888,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 		" function work() {}\n"
 		"}\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled2.php"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled2.php"), sourceCode, true);
 
 	sourceCode = t4p::CharToIcu(
 		"namespace Second { \n"
@@ -1006,7 +1006,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 		"class MyClass extends MyBaseClass { function workA() {} function workB() {} } \n"
 		"$my = new MyClass;\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCodeParent, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled 2"), sourceCodeParent, true);
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
@@ -1026,7 +1026,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
 		"<?php\n"
 		"$pdo = new PDO;\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled 2"), sourceCode, true);
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
@@ -1047,7 +1047,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 		"<?php\n"
 		"$pdo = new PDO;\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled 2"), sourceCode, true);
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
@@ -1065,9 +1065,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 		methodName = "email", 
 		returnType = "CI_Email", 
 		namespaceName = "\\", 
+		signature = "CI_Email email",
 		comment = "";
 		
 	int sourceId = 0;
+	int isStatic = 0;
 	
 	// create the source row
 	std::string stdDir = t4p::WxToChar("");
@@ -1079,12 +1081,13 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 		
 	int type = t4p::TagClass::METHOD;
 	std::string sql = "INSERT INTO detected_tags";
-	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, comment) ";
-	sql += "VALUES(?, ?, ?, ?, ?,?, ?, ?)";
+	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static) ";
+	sql += "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	soci::statement stmt = (DetectedTagSession->prepare << sql, 
 		soci::use(key), soci::use(sourceId), soci::use(type),
 		soci::use(className), soci::use(methodName), soci::use(returnType),
-		soci::use(namespaceName), soci::use(comment)
+		soci::use(namespaceName), soci::use(signature), soci::use(comment),
+		soci::use(isStatic)
 	);
 	stmt.execute(true);
 
@@ -1093,7 +1096,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 		"class CI_Controller {}\n"
 		"$ci = new CI_Controller();\n"
 	);
-	TagFinderList.TagParser.BuildResourceCacheForFile(wxT("untitled 2"), sourceCode, true);
+	TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled 2"), sourceCode, true);
 	Init(sourceCode);
 	ToProperty(UNICODE_STRING_SIMPLE("$ci"), UNICODE_STRING_SIMPLE(""), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
