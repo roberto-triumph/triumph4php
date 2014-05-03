@@ -35,16 +35,8 @@
 #include <wx/aboutdlg.h>
 #include <vector>
 
-int ID_TOOLBAR_SAVE = wxNewId();
-int ID_CUT_LINE = wxNewId();
-int ID_DUPLICATE_LINE = wxNewId();
-int ID_DELETE_LINE = wxNewId();
-int ID_TRANSPOSE_LINE = wxNewId();
-int ID_COPY_LINE = wxNewId();
-int ID_LOWERCASE = wxNewId();
-int ID_UPPERCASE = wxNewId();
-int ID_MENU_MORE = wxNewId();
-int ID_TOOLBAR = wxNewId();
+static int ID_TOOLBAR_SAVE = wxNewId();
+static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
 static int ID_STATUS_BAR_TIMER = wxNewId();
 
@@ -691,24 +683,12 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 			Features[i]->AddCodeControlClassContextMenuItems(&contextMenu);
 		}
 		
-		// no need to delete moreMenu pointer, the contextMenu will delete it for us
-		wxMenu* moreMenu = new wxMenu;
-		moreMenu->Append(ID_CUT_LINE, _("Cut Line\tCTRL+L"));
-		moreMenu->Append(ID_DUPLICATE_LINE, _("Duplicate Line\tCTRL+D"));
-		moreMenu->Append(ID_DELETE_LINE, _("Delete Line\tCTRL+SHIFT+L"));
-		moreMenu->Append(ID_TRANSPOSE_LINE, _("Transpose Line\tCTRL+T"));
-		moreMenu->Append(ID_COPY_LINE, _("Copy Line\tCTRL+SHIFT+T"));
-		moreMenu->Append(ID_LOWERCASE, _("Convert To Lower Case\tCTRL+U"));
-		moreMenu->Append(ID_UPPERCASE, _("Convert To Upper Case\tCTRL+SHIFT+U"));
-		contextMenu.Append(ID_MENU_MORE, _("More"), moreMenu);
 		bool isTextSelected = !codeWindow->GetSelectedText().IsEmpty();
 		contextMenu.Enable(wxID_CUT, isTextSelected);
 		contextMenu.Enable(wxID_COPY, isTextSelected);
 		contextMenu.Enable(wxID_PASTE, codeWindow->CanPaste());
 		contextMenu.Enable(wxID_UNDO, codeWindow->CanUndo());
 		contextMenu.Enable(wxID_REDO, codeWindow->CanRedo());
-		moreMenu->Enable(ID_LOWERCASE, isTextSelected);
-		moreMenu->Enable(ID_UPPERCASE, isTextSelected);
 		PopupMenu(&contextMenu);
 
 		codeWindow->SetAsHidden(false);
@@ -1008,13 +988,6 @@ BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	// in the MainFrameGeneratedClass
 	EVT_MENU(wxID_UNDO, t4p::MainFrameClass::OnUndo)
 	EVT_MENU(wxID_REDO, t4p::MainFrameClass::OnRedo)
-	EVT_MENU(ID_CUT_LINE, t4p::MainFrameClass::OnCutLine)
-	EVT_MENU(ID_DUPLICATE_LINE, t4p::MainFrameClass::OnDuplicateLine)
-	EVT_MENU(ID_DELETE_LINE, t4p::MainFrameClass::OnDeleteLine)
-	EVT_MENU(ID_TRANSPOSE_LINE, t4p::MainFrameClass::OnTransposeLine)
-	EVT_MENU(ID_COPY_LINE, t4p::MainFrameClass::OnCopyLine)
-	EVT_MENU(ID_LOWERCASE, t4p::MainFrameClass::OnLowecase)
-	EVT_MENU(ID_UPPERCASE, t4p::MainFrameClass::OnUppercase)
 	EVT_MENU(ID_TOOLBAR_SAVE, t4p::MainFrameClass::SaveCurrentFile)
 
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass

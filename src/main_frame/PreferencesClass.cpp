@@ -35,6 +35,135 @@
 #include <wx/tokenzr.h>
 #include <wx/wx.h>
 
+// use our own function to convert string to key codes
+// because the wxKeyBinder function does not handle
+// converting  LEFT, RIGHT arrow keys to the correct key code
+static int StringToKeyCode(const wxString& str) {
+	wxString normalized(str);
+	normalized.MakeUpper();
+
+	// function keys
+	if (normalized.StartsWith(wxT("F")) && normalized.Len() > 1) {
+		long n;
+		normalized.Right(normalized.Len() - 1).ToLong(&n);
+		return WXK_F1 + (n - 1);
+	}
+
+	// special keys
+	if (normalized == wxT("BACK")) {
+		return WXK_BACK;
+	}
+	if (normalized == wxT("ENTER")) {
+		return WXK_RETURN;
+	}
+	if (normalized == wxT("RETURN")) {
+		return WXK_RETURN;
+	}
+	if (normalized == wxT("TAB")) {
+		return WXK_TAB;
+	}
+	if (normalized == wxT("ESCAPE")) {
+		return WXK_ESCAPE;
+	}
+	if (normalized == wxT("SPACE")) {
+		return WXK_SPACE;
+	}
+	if (normalized == wxT("DELETE")) {
+		return WXK_DELETE;
+	}
+	if (normalized == wxT("*")) {
+		return WXK_MULTIPLY;
+	}
+	if (normalized == wxT("+")) {
+		return WXK_ADD;
+	}
+	if (normalized == wxT("SEPARATOR")) {
+		return WXK_SEPARATOR;
+	}
+	if (normalized == wxT("-")) {
+		return WXK_SUBTRACT;
+	}
+	if (normalized == wxT(".")) {
+		return WXK_DECIMAL;
+	}
+	if (normalized == wxT("/")) {
+		return WXK_DIVIDE;
+	}
+	if (normalized == wxT("PAGEUP")) {
+		return WXK_PAGEUP;
+	}
+	if (normalized == wxT("PAGEDOWN")) {
+		return WXK_PAGEDOWN;
+	}
+	if (normalized == wxT("LEFT")) {
+		return WXK_LEFT;
+	}
+	if (normalized == wxT("UP")) {
+		return WXK_UP;
+	}
+	if (normalized == wxT("RIGHT")) {
+		return WXK_RIGHT;
+	}
+	if (normalized == wxT("DOWN")) {
+		return WXK_DOWN;
+	}
+	if (normalized == wxT("SELECT")) {
+		return WXK_SELECT;
+	}
+	if (normalized == wxT("PRINT")) {
+		return WXK_PRINT;
+	}
+	if (normalized == wxT("EXECUTE")) {
+		return WXK_EXECUTE;
+	}
+	if (normalized == wxT("SNAPSHOT")) {
+		return WXK_SNAPSHOT;
+	}
+	if (normalized == wxT("INSERT")) {
+		return WXK_INSERT;
+	}
+	if (normalized == wxT("HELP")) {
+		return WXK_HELP;
+	}
+	if (normalized == wxT("CANCEL")) {
+		return WXK_CANCEL;
+	}
+	if (normalized == wxT("MENU")) {
+		return WXK_MENU;
+	}
+	if (normalized == wxT("CAPITAL")) {
+		return WXK_CAPITAL;
+	}
+	if (normalized == wxT("END")) {
+		return WXK_END;
+	}
+	if (normalized == wxT("HOME")) {
+		return WXK_HOME;
+	}
+
+	// it should be an ASCII key...
+    return (int)normalized.GetChar(0);
+}
+
+static int StringToModifiers(const wxString& str) {
+	int mod = 0;
+
+    // case-insensitive, ctrl == CTRL
+    wxString keyModifier(str);
+	keyModifier.MakeUpper();
+	
+    if (keyModifier.Contains(wxT("ALT"))) {
+        mod |= wxACCEL_ALT;
+	}
+    if (keyModifier.Contains(wxT("CTRL"))) {
+        mod |= wxACCEL_CTRL;
+	}
+    if (keyModifier.Contains(wxT("SHIFT"))) {
+        mod |= wxACCEL_SHIFT;
+	}
+    return mod;
+}
+
 /* this function gracefully handles non-existant menus (bindings that are stored in the config but are no longer
  * commands in the app).  This would happen, for example, when functionality is removed.
  (
@@ -270,7 +399,12 @@ t4p::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifi
 }
 
 void t4p::DynamicCmdClass::AddShortcut(const wxString& key) {
-	MenuCmd.AddShortcut(key);
+	wxString strMods = key;
+	wxString strKey = key.AfterLast(wxT('+'));
+	
+	int mods = StringToModifiers(strMods);
+	int keycode = StringToKeyCode(strKey);
+	MenuCmd.AddShortcut(mods, keycode);
 }
 
 wxCmd* t4p::DynamicCmdClass::CloneCommand() const {

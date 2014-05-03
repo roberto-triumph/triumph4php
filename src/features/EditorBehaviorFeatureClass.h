@@ -54,6 +54,8 @@ public:
 	
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 	
+	void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 private:
@@ -71,6 +73,7 @@ private:
 	void OnZoomOut(wxCommandEvent& event);
 	void OnZoomReset(wxCommandEvent& event);
 	void OnEditConvertEols(wxCommandEvent& event);
+	void OnEditorCommand(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
