@@ -24,7 +24,7 @@
  */
 #include <globals/GlobalsClass.h>
 #include <globals/Assets.h>
-
+#include <algorithm>
 
 t4p::GlobalsClass::GlobalsClass()
 	: Environment()
@@ -39,7 +39,8 @@ t4p::GlobalsClass::GlobalsClass()
 	, TagCacheDbFileName(t4p::TagCacheAsset())
 	, DetectorCacheDbFileName(t4p::DetectorCacheAsset()) 
 	, ResourceCacheSession()
-	, DetectorCacheSession() {
+	, DetectorCacheSession()
+	, LocalVolumes() {
 }
 
 void t4p::GlobalsClass::Close() {
@@ -119,6 +120,18 @@ bool t4p::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	return isPhp;
 }
 
+bool t4p::GlobalsClass::IsASourceFile(const wxString& fullPath) const {
+	if (!FileTypes.HasAnyExtension(fullPath)) {
+		return false;
+	}
+	bool isInSource = false;
+	std::vector<t4p::ProjectClass>::const_iterator it;
+	for (it = Projects.begin(); it != Projects.end() && !isInSource; ++it) {
+		isInSource = it->IsASourceFile(fullPath);
+	}
+	return isInSource;
+}
+
 wxString t4p::GlobalsClass::RelativeFileName(const wxString &fullPath, wxString& projectLabel) const {
 	wxString relativeName;
 	std::vector<t4p::ProjectClass>::const_iterator it;
@@ -184,4 +197,17 @@ bool t4p::GlobalsClass::FindDatabaseTagByHash(const wxString& connectionHash, t4
 		}
 	}
 	return found;
+}
+
+bool t4p::GlobalsClass::IsInLocalVolume(const wxFileName& fileName) const {
+	if (fileName.HasVolume()) {
+		wxString vol = fileName.GetVolume();
+		wxString volWithSep = vol + wxT(":\\");
+		return std::find(LocalVolumes.begin(), LocalVolumes.end(), vol) != LocalVolumes.end()
+			|| std::find(LocalVolumes.begin(), LocalVolumes.end(), volWithSep) != LocalVolumes.end();
+	}
+	
+	// if file does not have a volume, then assume file is local (ie. linux
+	// filenames dont have a volume)
+	return true;
 }

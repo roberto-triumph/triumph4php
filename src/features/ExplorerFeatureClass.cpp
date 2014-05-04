@@ -166,7 +166,7 @@ void t4p::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this, GetNotebook());
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -242,7 +242,7 @@ void t4p::ExplorerFeatureClass::OnProjectExploreOpenFile(wxCommandEvent& event) 
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this, GetNotebook());
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -282,8 +282,8 @@ void t4p::ExplorerFeatureClass::OnAppPreferencesSaved(wxCommandEvent& event) {
 void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
-	if (!window) {	
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this);
+	if (!window) {
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, *this, GetNotebook());
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -295,7 +295,8 @@ void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
 	panel->RefreshDir(projectDir);
 }
 
-t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature)
+t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
+	t4p::NotebookClass* notebook)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , CurrentListDir()
 , FilesImageList(NULL)
@@ -303,6 +304,7 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 , Watcher(NULL)
 , Feature(feature) 
 , RunningThreads()
+, Notebook(notebook)
 , FilterChoice(ID_FILTER_ALL) {
 	FilesImageList = new wxImageList(16, 16);
 	
@@ -942,7 +944,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			if (index != wxNOT_FOUND) {
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
-			wxMessageBox(_("A directory with that name already exists"), _("Rename"));			
+			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
 		}
 		else if (!event.Success) {
 			
@@ -952,6 +954,9 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
 			wxMessageBox(_("A file with that name already exists"), _("Rename"));			
+		}
+		else if (event.Success) {
+			RenamePrompt(event.OldFile, event.NewName);
 		}
 	}
 }
@@ -1101,6 +1106,55 @@ void t4p::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 		|| event.GetChangeType() == wxFSW_EVENT_DELETE
 		|| event.GetChangeType() == wxFSW_EVENT_RENAME) {
 		RefreshDir(CurrentListDir);
+	}
+}
+
+void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
+	if (Feature.App.Globals.IsInLocalVolume(oldFile.GetFullPath()) && Feature.App.Globals.IsASourceFile(oldFile.GetFullPath())) {
+		
+		// files in local volumes that are part of projects are watched by the 
+		// FileModifiedCheckFeatureClass; that class will show the rename prompt 
+		return;
+	}
+	
+	// get the code control for the file that was renamed
+	// if the old file is not opened don't bother the user
+	t4p::CodeControlClass* ctrl = Notebook->FindCodeControl(oldFile.GetFullPath());
+	if (!ctrl) {
+		return;
+	}
+	
+	// ask the user whether they want to
+	// 1. open the new file and close the old one
+	// 2. open the new file and keep the old one open
+	// 3. don't open the new one and close the old one 
+	wxArrayString choices;
+	choices.Add(_("Open the new file and close the old one"));
+	choices.Add(_("Open the new file and keep the old one open"));
+	choices.Add(_("Don't open the new one and close the old file"));
+	
+	wxFileName newFile(oldFile.GetPath(), newName);
+	wxSingleChoiceDialog choiceDialog(NULL, 
+			oldFile.GetFullPath() + 
+			_("\nhas been renamed to \n") +
+			newFile.GetFullPath() +
+			_("\nWhat would you like to do?"),
+			_("File Rename"), 
+			choices
+		);
+	choiceDialog.SetWindowStyle(wxCENTER | wxOK);
+	choiceDialog.SetSize(choiceDialog.GetSize().GetWidth(), choiceDialog.GetSize().GetHeight() + 40);
+	if (wxID_OK == choiceDialog.ShowModal()) {
+		int sel = choiceDialog.GetSelection();
+		if (0 == sel || 2 == sel) {
+			Notebook->DeletePage(Notebook->GetPageIndex(ctrl));
+		}
+		if (0 == sel || 1 == sel) {
+			Notebook->LoadPage(newFile.GetFullPath());
+		}
+		if (1 == sel) {
+			ctrl->TreatAsNew();
+		}
 	}
 }
 

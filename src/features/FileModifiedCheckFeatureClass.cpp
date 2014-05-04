@@ -147,7 +147,6 @@ t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass&
 , PathsExternallyModified()
 , PathsExternallyDeleted() 
 , PathsExternallyRenamed()
-, LocalVolumes()
 , FilesToPoll()
 , LastWatcherEventTime() 
 , IsWatchError(false) 
@@ -203,12 +202,7 @@ void t4p::FileModifiedCheckFeatureClass::OnAppFileOpened(t4p::CodeControlEventCl
 
 		// OR it is in a network drive, create a polling for it
 		// since sources from network drives are not added to the watch
-		if (fileName.HasVolume()) {
-			wxString vol = fileName.GetVolume() + wxT(":\\");
-			if (std::find(LocalVolumes.begin(), LocalVolumes.end(), vol) == LocalVolumes.end()) {
-				doPoll = true;
-			}
-		}
+		doPoll = !App.Globals.IsInLocalVolume(fileName);
 	}
 	if (doPoll && fileName.FileExists()) {
 		FilesToPoll.push_back(fileName.GetFullPath());
@@ -264,15 +258,7 @@ void t4p::FileModifiedCheckFeatureClass::StartWatch() {
 		// note that at program start we query for the local hard drives, and
 		// by deduction if the source is not in one of the local hard drives
 		// it means that its in a network drive.
-		bool doAdd = true;
-		wxString sourceVol = sourceDir.GetVolume();
-		wxString volWithSep = sourceVol + wxT(":\\");
-		if (sourceDir.HasVolume()) {
-			std::vector<wxString>::iterator begin = LocalVolumes.begin();
-			std::vector<wxString>::iterator end = LocalVolumes.end();
-			doAdd = std::find(begin, end, sourceVol) != end
-				|| std::find(begin, end, volWithSep) != end;
-		}
+		bool doAdd = App.Globals.IsInLocalVolume(sourceDir);
 		if (doAdd) {
 			int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
 				wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
@@ -286,7 +272,7 @@ void t4p::FileModifiedCheckFeatureClass::StartWatch() {
 }
 
 void t4p::FileModifiedCheckFeatureClass::OnVolumeListComplete(t4p::VolumeListEventClass& event) {
-	LocalVolumes = event.LocalVolumes;
+	App.Globals.LocalVolumes = event.LocalVolumes;
 	StartWatch();
 }
 
@@ -450,30 +436,7 @@ void t4p::FileModifiedCheckFeatureClass::HandleOpenedFiles(std::map<wxString, t4
 		}
 	}
 
-	// check for renames; an opened file rename will be handled as a deletion for now
-	std::map<wxString, wxString>::iterator renamed;
-	std::map<wxString, t4p::CodeControlClass*> openedFilesRenamed;
-	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
-		wxString renamedFrom = renamed->first;
-		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
-			openedFilesDeleted[renamedFrom] = 1;
-		}
-		
-		// check for renames, but check the new paths
-		// if a file was renamed and the new name is an opened file, treat it as modified
-		wxString renamedTo = renamed->second;
-		if (openedFiles.find(renamedTo) != openedFiles.end()) {
-			openedFilesRenamed[renamedTo] = openedFiles[renamedTo];
-		}
-	}
-
-	if (!openedFilesDeleted.empty()) {
-		FilesDeletedPrompt(openedFiles, openedFilesDeleted);
-	}
-	
-	if (!openedFilesRenamed.empty()) {
-		FilesModifiedPrompt(openedFilesRenamed);
-	}
+	FilesRenamedPrompt(openedFiles, pathsRenamed);
 }
 
 void t4p::FileModifiedCheckFeatureClass::HandleNonOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
@@ -609,6 +572,64 @@ void t4p::FileModifiedCheckFeatureClass::FilesDeletedPrompt(std::map<wxString, t
 		message += files;
 		int opts = wxICON_QUESTION | wxCENTRE;
 		wxMessageBox(message, _("Warning"), opts, GetMainWindow());
+	}
+}
+
+void t4p::FileModifiedCheckFeatureClass::FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
+	
+	std::map<wxString, wxString>::iterator renamed;
+	std::map<wxString, t4p::CodeControlClass*> openedFilesRenamed;
+	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
+		wxString renamedFrom = renamed->first;
+		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
+			openedFilesRenamed[renamedFrom] = openedFiles[renamedFrom];
+		}
+		
+		// check for renames, but check the new paths
+		// if a file was renamed and the new name is an opened file, treat it as modified
+		/*wxString renamedTo = renamed->second;
+		if (openedFiles.find(renamedTo) != openedFiles.end()) {
+			openedFilesRenamed[renamedTo] = openedFiles[renamedTo];
+		}*/
+	}
+
+	// ask the user whether they want to
+	// 1. open the new file and close the old one
+	// 2. open the new file and keep the old one open
+	// 3. don't open the new one and close the old one 
+	std::map<wxString, t4p::CodeControlClass*>::iterator renamedCtrl;
+	for (renamedCtrl = openedFilesRenamed.begin(); renamedCtrl != openedFilesRenamed.end(); ++renamedCtrl) {
+		wxArrayString choices;
+		choices.Add(_("Open the new file and close the old one"));
+		choices.Add(_("Open the new file and keep the old one open"));
+		choices.Add(_("Don't open the new one and close the old file"));
+		
+		wxString newFile = pathsRenamed[renamedCtrl->first];
+		wxSingleChoiceDialog choiceDialog(GetMainWindow(), 
+			renamedCtrl->first + 
+			_("\nhas been renamed to \n") +
+			newFile +
+			_("\nWhat would you like to do?"),
+			_("File Rename"), 
+			choices
+		);
+		choiceDialog.SetWindowStyle(wxCENTER | wxOK);
+		choiceDialog.SetSize(choiceDialog.GetSize().GetWidth(), choiceDialog.GetSize().GetHeight() + 40);
+		if (wxID_OK == choiceDialog.ShowModal()) {
+			int sel = choiceDialog.GetSelection();
+			t4p::CodeControlClass* ctrl = renamedCtrl->second;
+			t4p::NotebookClass* notebook = GetNotebook();
+			if (0 == sel || 2 == sel) {
+				notebook->DeletePage(notebook->GetPageIndex(ctrl));
+			}
+			if (0 == sel || 1 == sel) {
+				t4p::OpenFileCommandEventClass openCmd(newFile);
+				App.EventSink.Publish(openCmd);
+			}
+			if (1 == sel) {
+				ctrl->TreatAsNew();
+			}
+		}
 	}
 }
 

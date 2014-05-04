@@ -118,6 +118,16 @@ t4p::CodeControlClass* t4p::NotebookClass::GetCodeControl(size_t pageNumber) con
 	return codeControl;
 }
 
+t4p::CodeControlClass* t4p::NotebookClass::FindCodeControl(const wxString& fullPath) const {
+	for (size_t i = 0; i < GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = GetCodeControl(i);
+		if (ctrl->GetFileName() == fullPath) {
+			return ctrl;
+		}
+	}
+	return NULL;
+}
+
 t4p::CodeControlClass* t4p::NotebookClass::GetCurrentCodeControl() const {
 	return GetCodeControl(GetSelection());
 }

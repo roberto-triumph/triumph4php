@@ -135,7 +135,7 @@ private:
 
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 public:
-	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);
+	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
 	~ModalExplorerPanelClass();
 
 	void RefreshDir(const wxFileName& dir);
@@ -181,6 +181,12 @@ private:
 	 * read directories in the background
 	 */
 	t4p::RunningThreadsClass RunningThreads;
+	
+	/**
+	 * the notebook that contains the opened code controls, used 
+	 * during file renames
+	 */
+	t4p::NotebookClass* Notebook;
 
 	/**
 	 * the currently selected filter menu item
@@ -238,6 +244,8 @@ private:
 	bool OpenIfListFile(const wxString& text);
 
 	int ListImageId(const wxFileName& fileName);
+	
+	void RenamePrompt(const wxFileName& oldFile, const wxString& newName);
 
 	DECLARE_EVENT_TABLE()
 };

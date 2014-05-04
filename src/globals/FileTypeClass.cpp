@@ -228,4 +228,19 @@ bool t4p::FileTypeClass::HasAYamlExtension(const wxString& fullPath) const {
 	return HasExtension(fullPath, YamlFileExtensionsString);
 }
 
-
+bool t4p::FileTypeClass::HasAnyExtension(const wxString& fullPath) const {
+	return HasAPhpExtension(fullPath)
+		|| HasASqlExtension(fullPath)
+		|| HasAJsExtension(fullPath)
+		|| HasACssExtension(fullPath)
+		|| HasAConfigExtension(fullPath)
+		|| HasACrontabExtension(fullPath)
+		|| HasAYamlExtension(fullPath)
+		|| HasAXmlExtension(fullPath)
+		|| HasARubyExtension(fullPath)
+		|| HasALuaExtension(fullPath)
+		|| HasAMarkdownExtension(fullPath)
+		|| HasABashExtension(fullPath)
+		|| HasADiffExtension(fullPath)
+		|| HasAMiscExtension(fullPath);
+}

@@ -187,6 +187,16 @@ public:
 	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
+	 * searches this notebook for the code control that 
+	 * 
+	 * @param file the file to search for. 
+	 * @return tp4::CodeControlClass* the source code control window that contains
+	 *         the contents of the given file, NULL
+	 *         if the given file is not opened in this notebook.
+	 */
+	CodeControlClass* FindCodeControl(const wxString& fullPath) const;
+	
+	/**
 	 * Closes all open pages.
 	 */
 	void CloseAllPages();

@@ -130,6 +130,13 @@ public:
 	bool HasADiffExtension(const wxString& fullPath) const;
 	bool HasAMiscExtension(const wxString& fullPath) const;
 
+	/**
+	 * @params fullPath the look at
+	 * @return boolean TRUE if the given file is any 
+	 *         of the configured file types; ie. if the file
+	 *         is a php OR sql OR js OR css OR .... file
+	 */
+	bool HasAnyExtension(const wxString& fullPath) const;
 };
 
 }

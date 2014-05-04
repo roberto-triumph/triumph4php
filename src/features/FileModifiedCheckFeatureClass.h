@@ -111,6 +111,11 @@ private:
 	void FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
 
 	/**
+	 * prompt the user to open or close the renamed files
+	 */
+	void FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+
+	/**
 	 * when a file has been externally modified / added / deleted we need to
 	 * upate the tag cache
 	 */
@@ -201,15 +206,6 @@ private:
 
 	// key is from path, value is to path
 	std::map<wxString, wxString> PathsExternallyRenamed;
-
-	/**
-	 * List of the local volumes that are mounted and writab;e.
-	 * if any source directories
-	 * are not in one of these voluimes, it means that they are in network drives
-	 * we will not add them to the watch, as watches on network
-	 * directories fail to notify of file changes inside of sub-directories.
-	 */
-	std::vector<wxString> LocalVolumes;
 
 	/**
 	 * to check the modified time of the opened files that we poll (files outside

@@ -138,6 +138,15 @@ public:
 	 * @var session
 	 */
 	soci::session DetectorCacheSession;
+	
+	/**
+	 * List of the local volumes that are mounted and writable.
+	 * if any source directories
+	 * are not in one of these voluimes, it means that they are in network drives
+	 * we will not add them to the watch, as watches on network
+	 * directories fail to notify of file changes inside of sub-directories.
+	 */
+	std::vector<wxString> LocalVolumes;
 
 	GlobalsClass();
 
@@ -187,6 +196,15 @@ public:
 	 * for php files that are NOT in a project. 
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath) const;
+	
+	/**
+	 * @return TRUE if given full path is a file that triumph tracks, as determined by
+	 * the sources directories and any of the configure file extensions.
+	 * Careful, This method will return FALSE 
+	 * for php files that are NOT in a project, or files that triumph
+	 * is not set to look at.
+	 */
+	bool IsASourceFile(const wxString& fullPath) const;
 
 	/**
 	 * removes the source directory from the given full path.
@@ -241,7 +259,20 @@ public:
 	 * will find even tags that are not enabled
 	 */
 	bool FindDatabaseTagByHash(const wxString& connectionHash, t4p::DatabaseTagClass& tag) const;
-
+	
+	/**
+	 * check to see if the given file is located in a local volume.
+	 * Note that this check is quick because the volumes
+	 * are scanned only once at app start.
+	 * 
+	 * @param the file to check
+	 * @return bool if TRUE, it means that the given file is located in one of
+	 *         the system's local volumes (hard drives). If false, then
+	 *         file is located in a network share, read-only, or removable
+	 *         media.
+	 */
+	bool IsInLocalVolume(const wxFileName& fileName) const;
+	
 };
 
 }
