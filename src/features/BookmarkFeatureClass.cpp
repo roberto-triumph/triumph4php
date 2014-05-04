@@ -232,6 +232,9 @@ void t4p::BookmarkFeatureClass::AddBookmarks(const wxFileName& fileName, t4p::Co
 				++it;
 			}
 		}
+		else {
+			++it;
+		}
 	}
 }
 
