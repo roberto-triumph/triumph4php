@@ -210,6 +210,7 @@ private:
 
 	// event handlers for the context menu on the files list
 	void OnListMenuOpen(wxCommandEvent& event);
+	void OnListMenuOpenParent(wxCommandEvent& event);
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
 	void OnListMenuCreateNew(wxCommandEvent& event);
@@ -217,7 +218,6 @@ private:
 	void OnListMenuShell(wxCommandEvent& event);
 	void OnListMenuFileManager(wxCommandEvent& event);
 	void OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event);
-	void OnListKeyDown(wxKeyEvent& event);
 
 	// event handler for the combo box
 	void OnDirectoryEnter(wxCommandEvent& event);

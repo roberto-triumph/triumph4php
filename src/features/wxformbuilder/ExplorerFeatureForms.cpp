@@ -100,7 +100,6 @@ ModalExplorerGeneratedPanelClass::ModalExplorerGeneratedPanelClass( wxWindow* pa
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
 	SourcesList->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
-	List->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemActivated ), NULL, this );
 	List->Connect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemRightClick ), NULL, this );
@@ -117,7 +116,6 @@ ModalExplorerGeneratedPanelClass::~ModalExplorerGeneratedPanelClass()
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ModalExplorerGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
 	SourcesList->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnSourceActivated ), NULL, this );
-	List->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( ModalExplorerGeneratedPanelClass::OnListKeyDown ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemActivated ), NULL, this );
 	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ModalExplorerGeneratedPanelClass::OnListItemRightClick ), NULL, this );

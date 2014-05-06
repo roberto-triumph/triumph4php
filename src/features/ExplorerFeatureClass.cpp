@@ -41,6 +41,7 @@ static int ID_EXPLORER_LIST_ACTION = wxNewId();
 static int ID_EXPLORER_LIST_OPEN = wxNewId();
 static int ID_EXPLORER_LIST_RENAME = wxNewId();
 static int ID_EXPLORER_LIST_DELETE = wxNewId();
+static int ID_EXPLORER_LIST_OPEN_PARENT = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_PHP = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_SQL = wxNewId();
 static int ID_EXPLORER_LIST_CREATE_CSS = wxNewId();
@@ -330,6 +331,15 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 
 	std::vector<wxFileName> sourceDirs = feature.App.Globals.AllEnabledSourceDirectories();	
 	FillSourcesList(sourceDirs);
+
+    wxAcceleratorEntry entries[5];
+    entries[0].Set(wxACCEL_NORMAL, WXK_F2, ID_EXPLORER_LIST_RENAME);
+    entries[1].Set(wxACCEL_NORMAL, WXK_BACK, ID_EXPLORER_LIST_OPEN_PARENT);
+	entries[2].Set(wxACCEL_ALT, WXK_LEFT, ID_EXPLORER_LIST_OPEN_PARENT);
+	entries[3].Set(wxACCEL_NORMAL, WXK_RETURN, ID_EXPLORER_LIST_OPEN);
+	entries[4].Set(wxACCEL_NORMAL, WXK_DELETE, ID_EXPLORER_LIST_DELETE);
+    wxAcceleratorTable table(5, entries);
+    List->SetAcceleratorTable(table);
 }
 
 t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
@@ -410,6 +420,7 @@ void t4p::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
 
 		// cannot delete or rename the parent dir item
 		if (index > 0) {
+            menu.Append(ID_EXPLORER_LIST_OPEN_PARENT, _("Rename\tBACK"), _("Open the parent directory"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_RENAME, _("Rename\tF2"), _("Rename the file"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_DELETE, _("Delete\tDEL"), _("Delete the file"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
@@ -444,35 +455,6 @@ void t4p::ModalExplorerPanelClass::OnListRightDown(wxMouseEvent& event) {
 	menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
 	menu.Append(ID_EXPLORER_LIST_FILE_MANAGER, _("Open File Manager Here"), _("Opens the Operating System's file manager to this directory"), wxITEM_NORMAL);
 	this->PopupMenu(&menu, event.GetPosition());
-}
-
-void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
-	int code = event.GetKeyCode();
-	wxCommandEvent evt;
-	if (WXK_DELETE == code) {
-		OnListMenuDelete(evt);
-	}
-	else if (WXK_F2 == code) {
-		OnListMenuRename(evt);
-	}
-	else if (WXK_RETURN == code) {
-		OnListMenuOpen(evt);
-	}
-	else if (WXK_LEFT == code && event.GetModifiers() == wxMOD_ALT) {
-		
-		// ALT+left == go to parent dir
-		wxFileName curDir;
-		curDir.AssignDir(Directory->GetValue());
-
-		// root directories don't have parents
-		if (curDir.IsOk() && curDir.GetDirCount() > 0) {
-			curDir.RemoveLastDir();
-			RefreshDir(curDir);
-		}
-	}
-	else {
-		event.Skip();
-	}
 }
 
 void t4p::ModalExplorerPanelClass::ShowDir(const wxFileName& currentDir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs,
@@ -1498,6 +1480,7 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass)
 	EVT_MENU(ID_EXPLORER_LIST_OPEN, t4p::ModalExplorerPanelClass::OnListMenuOpen)
+	EVT_MENU(ID_EXPLORER_LIST_OPEN_PARENT, t4p::ModalExplorerPanelClass::OnParentButtonClick)
 	EVT_MENU(ID_EXPLORER_LIST_RENAME, t4p::ModalExplorerPanelClass::OnListMenuRename)
 	EVT_MENU(ID_EXPLORER_LIST_DELETE, t4p::ModalExplorerPanelClass::OnListMenuDelete)
 	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, t4p::ModalExplorerPanelClass::OnListMenuCreateNew)

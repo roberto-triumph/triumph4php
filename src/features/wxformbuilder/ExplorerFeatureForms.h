@@ -61,7 +61,6 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSourceActivated( wxListEvent& event ) { event.Skip(); }
-		virtual void OnListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
 		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }
