@@ -46,6 +46,7 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
+#include <features/FileWatcherFeatureClass.h>
 #include <features/ExplorerFeatureClass.h>
 #include <features/NewUserFeatureClass.h>
 #include <features/VersionUpdateFeatureClass.h>
@@ -263,6 +264,8 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new ConfigFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FileModifiedCheckFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new FileWatcherFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new ExplorerFeatureClass(*this);
 	Features.push_back(feature);

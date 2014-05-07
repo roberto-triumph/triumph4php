@@ -339,7 +339,7 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	entries[3].Set(wxACCEL_NORMAL, WXK_RETURN, ID_EXPLORER_LIST_OPEN);
 	entries[4].Set(wxACCEL_NORMAL, WXK_DELETE, ID_EXPLORER_LIST_DELETE);
     wxAcceleratorTable table(5, entries);
-    List->SetAcceleratorTable(table);
+    //List->SetAcceleratorTable(table);
 }
 
 t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
@@ -1092,12 +1092,6 @@ void t4p::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 }
 
 void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
-	if (Feature.App.Globals.IsInLocalVolume(oldFile.GetFullPath()) && Feature.App.Globals.IsASourceFile(oldFile.GetFullPath())) {
-		
-		// files in local volumes that are part of projects are watched by the 
-		// FileModifiedCheckFeatureClass; that class will show the rename prompt 
-		return;
-	}
 	
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
