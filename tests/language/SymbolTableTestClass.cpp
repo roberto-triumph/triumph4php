@@ -362,6 +362,27 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateMethodCall) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
 }
 
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPrivateStaticMethodCall) {
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"class MyClass { static function workA() {} private static function workBB() {} } \n"
+		"$my = new MyClass;\n"
+	);
+
+	// in this test, make sure that auto completion works for private static methods
+	// when calling a method statically
+	// since we are calling a private method, the scope must be the same
+	// class
+	Init(sourceCode);	
+	ToProperty(UNICODE_STRING_SIMPLE("self"), UNICODE_STRING_SIMPLE("workB"), true, true);
+	Scope.ClassName = UNICODE_STRING_SIMPLE("MyClass");
+	Scope.MethodName = UNICODE_STRING_SIMPLE("workA");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workBB"), ResourceMatches[0].Identifier);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodChain) {
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"

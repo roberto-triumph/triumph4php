@@ -331,11 +331,35 @@ void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 }
 
 std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtCurrentPosition() {
-	return Document->GetTagsAtCurrentPosition();
+	wxString completeStatus;
+	std::vector<t4p::TagClass> tags = Document->GetTagsAtCurrentPosition(completeStatus);
+	if (!completeStatus.IsEmpty()) {
+		wxWindow* window = GetGrandParent();
+
+		// show the auto complete message
+		wxFrame* frame = wxDynamicCast(window, wxFrame);
+		if (frame) {
+			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
+			gauge->SetColumn0Text(completeStatus);
+		}
+	}
+	return tags;
 }
 
 std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtPosition(int pos) {
-	return Document->GetTagsAtPosition(pos);
+	wxString completeStatus;
+	std::vector<t4p::TagClass> tags = Document->GetTagsAtPosition(pos, completeStatus);
+	if (!completeStatus.IsEmpty()) {
+		wxWindow* window = GetGrandParent();
+
+		// show the auto complete message
+		wxFrame* frame = wxDynamicCast(window, wxFrame);
+		if (frame) {
+			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
+			gauge->SetColumn0Text(completeStatus);
+		}
+	}
+	return tags;
 }
 
 void t4p::CodeControlClass::HandleAutoCompletion() {
@@ -354,7 +378,18 @@ void t4p::CodeControlClass::HandleAutoCompletion() {
 }
 
 void t4p::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
-	Document->HandleCallTip(ch, force);
+	wxString completeStatus;
+	Document->HandleCallTip(ch, force, completeStatus);
+	if (!completeStatus.IsEmpty()) {
+		wxWindow* window = GetGrandParent();
+
+		// show the auto complete message
+		wxFrame* frame = wxDynamicCast(window, wxFrame);
+		if (frame) {
+			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
+			gauge->SetColumn0Text(completeStatus);
+		}
+	}
 }
 
 void t4p::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {

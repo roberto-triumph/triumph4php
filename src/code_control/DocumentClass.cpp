@@ -223,17 +223,17 @@ bool t4p::TextDocumentClass::CanAutoComplete() {
 void t4p::TextDocumentClass::HandleAutoCompletion(wxString& completeStatus) {
 }
 
-void t4p::TextDocumentClass::HandleCallTip(wxChar ch, bool force) {
+void t4p::TextDocumentClass::HandleCallTip(wxChar ch, bool force, wxString& status) {
 }
 
-std::vector<t4p::TagClass> t4p::TextDocumentClass::GetTagsAtCurrentPosition() {
+std::vector<t4p::TagClass> t4p::TextDocumentClass::GetTagsAtCurrentPosition(wxString& status) {
 
 	// plain text docs don't have structure
 	std::vector<t4p::TagClass> resources;
 	return resources;
 }
 
-std::vector<t4p::TagClass> t4p::TextDocumentClass::GetTagsAtPosition(int pos) {
+std::vector<t4p::TagClass> t4p::TextDocumentClass::GetTagsAtPosition(int pos, wxString& status) {
 
 	// plain text docs don't have structure
 	std::vector<t4p::TagClass> resources;
@@ -680,7 +680,7 @@ void t4p::PhpDocumentClass::HandleAutoCompletionPhpStatus(
 	}
 }
 
-void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
+void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force, wxString& status) {
 	if (!Globals) {
 		return;
 	}
@@ -718,7 +718,7 @@ void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 		if (currentPos >= 0) {
 			CurrentCallTipResources.clear();
 			CurrentCallTipIndex = 0;
-			std::vector<t4p::TagClass> matches = GetTagsAtPosition(currentPos);
+			std::vector<t4p::TagClass> matches = GetTagsAtPosition(currentPos, status);
 			for (size_t i = 0; i < matches.size(); ++i) {
 				t4p::TagClass tag = matches[i];
 				if (t4p::TagClass::FUNCTION == tag.Type || t4p::TagClass::METHOD == tag.Type) {
@@ -809,14 +809,14 @@ void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force) {
 	}
 }
 
-std::vector<t4p::TagClass> t4p::PhpDocumentClass::GetTagsAtCurrentPosition() {
+std::vector<t4p::TagClass> t4p::PhpDocumentClass::GetTagsAtCurrentPosition(wxString& completeStatus) {
 	
 	// if the cursor is in the middle of an identifier, find the end of the
 	// current identifier; that way we can know the full name of the tag we want
 	// to get
 	int currentPos = Ctrl->GetCurrentPos();
 	int endPos = Ctrl->WordEndPosition(currentPos, true);
-	return GetTagsAtPosition(endPos);
+	return GetTagsAtPosition(endPos, completeStatus);
 }
 
 void t4p::PhpDocumentClass::FileOpened(wxString fileName) {
@@ -868,7 +868,7 @@ std::vector<wxString> t4p::PhpDocumentClass::CollectNearMatchKeywords(wxString t
 	return matchedKeywords;
 }
 
-std::vector<t4p::TagClass> t4p::PhpDocumentClass::GetTagsAtPosition(int posToCheck) {
+std::vector<t4p::TagClass> t4p::PhpDocumentClass::GetTagsAtPosition(int posToCheck, wxString& completeStatus) {
 	UnicodeString code = GetSafeSubstring(0, posToCheck);
 	
 	std::vector<t4p::TagClass> matches;
@@ -904,6 +904,10 @@ std::vector<t4p::TagClass> t4p::PhpDocumentClass::GetTagsAtPosition(int posToChe
 		t4p::SymbolTableMatchErrorClass error;
 		Globals->TagCache.ResourceMatches(Ctrl->GetIdString(), parsedVariable, variableScope, sourceDirs, matches, 
 			doDuckTyping, true, error);
+		if (matches.empty()) {
+			HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable,
+				variableScope, completeStatus);
+		}
 	}
 	return matches;
 }
@@ -984,13 +988,14 @@ void t4p::PhpDocumentClass::OnAutoCompletionSelected(wxStyledTextEvent& event) {
 				wxString selected = event.GetText();
 				int startPos = Ctrl->WordStartPosition(Ctrl->GetCurrentPos(), true);
 				Ctrl->SetSelection(startPos, Ctrl->GetCurrentPos());
+				wxString status;
 				if ((t4p::TagClass::FUNCTION == res.Type || t4p::TagClass::METHOD == res.Type) && !res.HasParameters()) {
 					Ctrl->ReplaceSelection(selected + wxT("()"));
-					HandleCallTip(0, true);
+					HandleCallTip(0, true, status);
 				}
 				else if (t4p::TagClass::FUNCTION == res.Type || t4p::TagClass::METHOD == res.Type) {
 					Ctrl->ReplaceSelection(selected + wxT("("));
-					HandleCallTip(0, true);
+					HandleCallTip(0, true, status);
 				}
 				else {
 					Ctrl->ReplaceSelection(selected);

@@ -93,22 +93,24 @@ public:
 	 * @param bool if true call tip will be activated.
 	 *
 	 */
-	virtual void HandleCallTip(wxChar ch = 0, bool force = false);
+	virtual void HandleCallTip(wxChar ch, bool force, wxString& status);
 
 	/**
 	 * Returns the tags that matched the identifier at the  current position
 	 *
+	 * @param [out] status if there is an error querying for tags, error will be set
 	 * @return tag matches
 	 */
-	virtual std::vector<TagClass> GetTagsAtCurrentPosition();
+	virtual std::vector<TagClass> GetTagsAtCurrentPosition(wxString& status);
 
 	/**
 	 * Returns the tags that matched the identifier in the given position
 	 *
 	 * @param int the character position in the document to check
+	 * @param [out] status if there is an error querying for tags, error will be set
 	 * @return tag matches
 	 */
-	virtual std::vector<TagClass> GetTagsAtPosition(int position);
+	virtual std::vector<TagClass> GetTagsAtPosition(int position, wxString& status);
 
 	/**
 	 * This method will get called when a new file is opened OR when a 
@@ -192,11 +194,11 @@ public:
 	 */
 	void HandleAutoCompletion(wxString& completeStatus);
 
-	void HandleCallTip(wxChar ch = 0, bool force = false);
+	void HandleCallTip(wxChar ch, bool force, wxString& status);
 
-	std::vector<TagClass> GetTagsAtCurrentPosition();
+	std::vector<TagClass> GetTagsAtCurrentPosition(wxString& status);
 
-	std::vector<TagClass> GetTagsAtPosition(int position);
+	std::vector<TagClass> GetTagsAtPosition(int position, wxString& status);
 
 	void FileOpened(wxString fileName);
 

@@ -621,7 +621,8 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 	// and static access checks
 	bool visibilityError = false;
 	bool isStaticCall = IsStaticVariable(parsedVariable);
-	bool isThisCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("$this"), 0) == 0;
+	bool isThisCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("$this"), 0) == 0
+			|| VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0;
 	bool isParentCall = VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0;
 
 	if (!error.HasError()) {
