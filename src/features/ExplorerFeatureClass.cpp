@@ -296,6 +296,17 @@ void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
 	panel->RefreshDir(projectDir);
 }
 
+static void SetExplorerAccelerators(wxListCtrl* ctrl) {
+	wxAcceleratorEntry entries[5];
+    entries[0].Set(wxACCEL_NORMAL, WXK_F2, ID_EXPLORER_LIST_RENAME);
+    entries[1].Set(wxACCEL_NORMAL, WXK_BACK, ID_EXPLORER_LIST_OPEN_PARENT);
+	entries[2].Set(wxACCEL_ALT, WXK_LEFT, ID_EXPLORER_LIST_OPEN_PARENT);
+	entries[3].Set(wxACCEL_NORMAL, WXK_RETURN, ID_EXPLORER_LIST_OPEN);
+	entries[4].Set(wxACCEL_NORMAL, WXK_DELETE, ID_EXPLORER_LIST_DELETE);
+	wxAcceleratorTable table(5, entries);
+    ctrl->SetAcceleratorTable(table);
+}
+
 t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
 	t4p::NotebookClass* notebook)
 : ModalExplorerGeneratedPanelClass(parent, id) 
@@ -332,14 +343,7 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	std::vector<wxFileName> sourceDirs = feature.App.Globals.AllEnabledSourceDirectories();	
 	FillSourcesList(sourceDirs);
 
-    wxAcceleratorEntry entries[5];
-    entries[0].Set(wxACCEL_NORMAL, WXK_F2, ID_EXPLORER_LIST_RENAME);
-    entries[1].Set(wxACCEL_NORMAL, WXK_BACK, ID_EXPLORER_LIST_OPEN_PARENT);
-	entries[2].Set(wxACCEL_ALT, WXK_LEFT, ID_EXPLORER_LIST_OPEN_PARENT);
-	entries[3].Set(wxACCEL_NORMAL, WXK_RETURN, ID_EXPLORER_LIST_OPEN);
-	entries[4].Set(wxACCEL_NORMAL, WXK_DELETE, ID_EXPLORER_LIST_DELETE);
-    wxAcceleratorTable table(5, entries);
-    //List->SetAcceleratorTable(table);
+	SetExplorerAccelerators(List);
 }
 
 t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
@@ -420,7 +424,7 @@ void t4p::ModalExplorerPanelClass::OnListItemRightClick(wxListEvent& event) {
 
 		// cannot delete or rename the parent dir item
 		if (index > 0) {
-            menu.Append(ID_EXPLORER_LIST_OPEN_PARENT, _("Rename\tBACK"), _("Open the parent directory"), wxITEM_NORMAL);
+            menu.Append(ID_EXPLORER_LIST_OPEN_PARENT, _("Open parent directory\tBACK"), _("Open the parent directory"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_RENAME, _("Rename\tF2"), _("Rename the file"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_DELETE, _("Delete\tDEL"), _("Delete the file"), wxITEM_NORMAL);
 			menu.Append(ID_EXPLORER_LIST_SHELL, _("Open Shell Here"), _("Open an external shell to this directory"), wxITEM_NORMAL);
@@ -641,6 +645,11 @@ void t4p::ModalExplorerPanelClass::OnListMenuRename(wxCommandEvent& event) {
 
 	// dont allow the parent dir to be renamed
 	if (index > 0) {
+		
+		// set the null accelerator table, so that the backspace is captured
+		// by the text control
+		List->SetAcceleratorTable(wxNullAcceleratorTable);
+
 		wxTextCtrl* ctrl = List->EditLabel(index);
 		
 		// change the selection. select only the file name not the
@@ -862,9 +871,15 @@ void t4p::ModalExplorerPanelClass::OnListEndLabelEdit(wxListEvent& event) {
 
 		t4p::ExplorerModifyActionClass* action = new t4p::ExplorerModifyActionClass(RunningThreads, ID_EXPLORER_MODIFY);
 		action->SetFileToRename(sourceFile, newName);
-		RunningThreads.Queue(action);		
+		RunningThreads.Queue(action);
+
+		// put back the accelerators for rename / parent
+		SetExplorerAccelerators(List);
 	}
 	else {
+
+		// put back the accelerators for rename / parent
+		SetExplorerAccelerators(List);
 		event.Veto();
 	}
 }
