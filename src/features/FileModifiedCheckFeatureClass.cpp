@@ -212,17 +212,18 @@ void t4p::FileModifiedCheckFeatureClass::OpenedCodeControlCheck() {
 	
 	// loop through all of the opened files to get the files to
 	// be checked
-	// for now, we will only check the file that
-	// is being edited (the tab that is selected)
+	// be careful to skip new buffers since they are not yet
+	// in the file system
 	std::vector<t4p::FileModifiedTimeClass> filesToPoll;
 	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		wxString ctrlFileName = ctrl->GetFileName();
-		
-		t4p::FileModifiedTimeClass modTime;
-		modTime.FileName.Assign(ctrlFileName);
-		modTime.ModifiedTime = ctrl->GetFileOpenedDateTime();
-		filesToPoll.push_back(modTime);
+		if (!ctrl->IsNew()) {
+			wxString ctrlFileName = ctrl->GetFileName();		
+			t4p::FileModifiedTimeClass modTime;
+			modTime.FileName.Assign(ctrlFileName);
+			modTime.ModifiedTime = ctrl->GetFileOpenedDateTime();
+			filesToPoll.push_back(modTime);
+		}
 	}
 	if (!filesToPoll.empty()) {
 		t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass(App.RunningThreads,

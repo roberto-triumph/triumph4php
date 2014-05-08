@@ -84,8 +84,9 @@ void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 
 				// use time span, to compare in seconds and not milli/micro
 				// seconds precision
+				// also, consider files modified in the past as having changed.
 				wxTimeSpan span =  modifiedDateTime.Subtract(file->ModifiedTime);
-				if(span.GetSeconds() > 1) {
+				if(span.GetSeconds() > 1 || span.GetSeconds() < -60) {
 					filesModified.push_back(file->FileName);
 					modifiedTimes.push_back(modifiedDateTime);
 				}

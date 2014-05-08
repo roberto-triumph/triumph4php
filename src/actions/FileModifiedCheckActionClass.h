@@ -89,7 +89,14 @@ extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
  * A class that checks the file modified times and reports whether files have been
  * deleted or modified externally.
  * This class generates a EVENT_ACTION_FILES_MODIFIED with the results of the file checks.
- * note that even if files have not been externally modified the event is still posted.
+ * note that even if files have not been externally modified the event is still posted, but
+ * the modified and deleted vectors will be empty.
+ * Note that this method will consider a file modified even if the a file's new
+ * mod time is BEFORE the file's existing known time.
+ * For example: a file is opened, and mod time is read. then, on
+ * the command line, touch -d  was run to set the file's mod time of a date
+ * in the past.  in this case, file mod check action will consider the file
+ * as having changed.
  */
 class FileModifiedCheckActionClass : public t4p::ActionClass {
 
@@ -98,7 +105,8 @@ public:
 	FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * set the files to be checked.
+	 * set the files to be checked, along with the times that we know
+	 * the files were last modified.
 	 */
 	void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files); 
 
