@@ -33,31 +33,6 @@
 
 static int ID_FILE_MODIFIED_ACTION = wxNewId();
 
-/**
- * @return map of the code controls that have opened files (as opposed to new files being edited)
- *         key is the full path of the file being edited, value is the code control itself
- */
-static std::map<wxString, t4p::CodeControlClass*> OpenedFiles(t4p::NotebookClass* notebook) {
-	std::map<wxString, t4p::CodeControlClass*> openedFiles;
-	if (!notebook) {
-		return openedFiles;
-	}
-	size_t size = notebook->GetPageCount();
-	if (size > 0) {
-
-		// loop through all of the opened files to get the files to
-		// be checked
-		// no need to check new files as they are not yet in the file system
-		for (size_t i = 0; i < size; ++i) {
-			t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-			if (ctrl && !ctrl->IsNew()) {
-				openedFiles[ctrl->GetFileName()] = ctrl;
-			}
-		}
-	}
-	return openedFiles;
-}
-
 t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , JustReactivated(false) {
