@@ -142,7 +142,10 @@ static int StringToKeyCode(const wxString& str) {
 	}
 
 	// it should be an ASCII key...
-    return (int)normalized.GetChar(0);
+	if (!normalized.empty()) {
+		return (int)normalized.GetChar(0);
+	}
+	return 0;
 }
 
 static int StringToModifiers(const wxString& str) {
@@ -162,6 +165,25 @@ static int StringToModifiers(const wxString& str) {
         mod |= wxACCEL_SHIFT;
 	}
     return mod;
+}
+
+void t4p::ShortcutStringToKeyCode(const wxString& str, int& modifiers, int& keyCode) {
+	wxString strMods = str;
+	wxString strKey = str.AfterLast(wxT('+'));
+	modifiers  = StringToModifiers(strMods);
+	keyCode = StringToKeyCode(strKey);
+}
+
+wxString t4p::KeyCodeToShortcutString(int modifiers, int keyCode) {
+	
+	// there is a bug with wxKeyBind::KeyCodeToString
+	// it does not handle non-alphanumerics like [ or /
+	// we check here
+	wxString keyStr = wxKeyBind::KeyCodeToString(keyCode);
+	if (!wxIsalnum(keyCode) && keyCode >= 32 && keyCode < 127) {
+		keyStr << (wxChar)keyCode;
+	}
+	return wxKeyBind::KeyModifierToString(modifiers) + keyStr;
 }
 
 /* this function gracefully handles non-existant menus (bindings that are stored in the config but are no longer
@@ -399,12 +421,10 @@ t4p::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifi
 }
 
 void t4p::DynamicCmdClass::AddShortcut(const wxString& key) {
-	wxString strMods = key;
-	wxString strKey = key.AfterLast(wxT('+'));
-	
-	int mods = StringToModifiers(strMods);
-	int keycode = StringToKeyCode(strKey);
-	MenuCmd.AddShortcut(mods, keycode);
+	int mods = 0;
+	int keyCode = 0;
+	t4p::ShortcutStringToKeyCode(key, mods, keyCode);
+	MenuCmd.AddShortcut(mods, keyCode);
 }
 
 wxCmd* t4p::DynamicCmdClass::CloneCommand() const {

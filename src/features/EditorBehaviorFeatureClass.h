@@ -30,6 +30,63 @@
 #include <globals/CodeControlOptionsClass.h>
 
 namespace t4p {
+
+/**
+ * An EditorKeyboardCommandClass is a key binding that we can tell
+ * scintilla to listen for.  Note that the Cmd, KeyCode and Modifiers
+ * are SCINTILLA numbers and NOT wx Numbers; ie. wxSTC_SCMOD_* instead
+ * of wxACCEL_* and so on.
+ *
+ * See http://www.scintilla.org/ScintillaDoc.html 
+ * under "Key bindings"
+ */
+class EditorKeyboardCommandClass {
+
+public:
+
+	/**
+	 * human-friendly name of the command
+	 */
+	wxString Name;
+
+	/**
+	 * the scintilla command number. one of wxSTC_CMD_*
+	 */
+	int CmdId;
+	
+	/**
+	 * bitwise mask of ALT, CTRL, SHIFT that will trigger
+	 * this command.
+	 * these are scintilla modifiers, not WX modifiers. ie. 
+	 * wxSTC_SCMOD_SHIFT, wxSTC_SCMOD_CTRL, wxSTC_SCMOD_ALT
+	 * This can be zero; if zero it means that we don't have
+	 * a shortcut for this command.
+	 */
+	int Modifiers;
+
+	/**
+	 * key code that will trigger this command.
+	 * this is a scintilla key code, not a WX key code
+	 * key codes > 300 have different values in wxWidgets and
+	 * scintilla. must map them correctly.
+	 * ie. wxSTC_KEY_*
+	 * This can be zero; if zero it means that we don't have
+	 * a shortcut for this command.
+	 */
+	int KeyCode;
+
+	EditorKeyboardCommandClass();
+
+	EditorKeyboardCommandClass(const wxString& name, int cmdId, int modifiers, int keyCode);
+
+	EditorKeyboardCommandClass(const t4p::EditorKeyboardCommandClass& src);
+
+	t4p::EditorKeyboardCommandClass& operator=(const t4p::EditorKeyboardCommandClass& src);
+
+	void Copy(const t4p::EditorKeyboardCommandClass& src);
+
+	bool IsOk() const;
+};
 	
 /**
  * The EditorFeatureClass exposes scintilla features like 
@@ -40,20 +97,15 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 public:
 
 	EditorBehaviorFeatureClass(t4p::AppClass& app);
-	
-	/**
-	 * Handler to save the editor feature preferences.
-	 */
-	void OnPreferencesSaved(wxCommandEvent& event);
+
+	void LoadPreferences(wxConfigBase* config);
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 	void AddEditMenuItems(wxMenu* editMenu);
 	
 	void AddViewMenuItems(wxMenu* viewMenu);
-	
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
+		
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 	
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
@@ -74,7 +126,18 @@ private:
 	void OnZoomReset(wxCommandEvent& event);
 	void OnEditConvertEols(wxCommandEvent& event);
 	void OnEditorCommand(wxCommandEvent& event);
+
+	/**
+	 * Handler to save the editor feature preferences.
+	 */
+	void OnPreferencesSaved(wxCommandEvent& event);
 	
+	/**
+	 * The keyboard commands (shortcuts) assigned to the Scintilla
+	 * control.
+	 */
+	std::vector<t4p::EditorKeyboardCommandClass> KeyboardCommands;
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -95,6 +158,98 @@ protected:
 	void OnIndentUsingSpaces(wxCommandEvent& event);
 	void OnCheckRightMargin(wxCommandEvent& event);
 
+};
+
+/**
+ * The editor command panel allows the user to edit the keyboard commands
+ * that scintilla exposes.
+ * They are separate from menu accelators because menu accelators 
+ * respond to their keystrokes at the application level; meaning that
+ * if we had the "move to next word" command (CTRL+RIGHT)in the menu, then
+ * hitting CTRL+RIGHT in ANY textbox will move the code control, not the
+ * textbox that has focus.
+ */
+class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent the window parent
+	 * @param int id the window ID
+	 * @param commands the scintilla keyboard commands being edited
+	 * @param keyBinder holds the menu shortcuts. will check for duplicates when the user enters a shortcut.
+	 *        this class will NOT own the keyBinder pointer
+	 */
+	EditorCommandPanelClass(wxWindow* parent, int id, std::vector<t4p::EditorKeyboardCommandClass>& commands,
+		wxKeyBinder* keyBinder);
+
+	bool TransferDataFromWindow();
+
+private:
+
+	void FillCommands();
+
+	void OnItemActivated(wxListEvent& event);
+
+	/**
+	 * the commands to be updated after the user clicks the OK button
+	 */
+	std::vector<t4p::EditorKeyboardCommandClass>& Commands;
+
+	/**
+	 * the commands to being edited by the user.
+	 */
+	std::vector<t4p::EditorKeyboardCommandClass> EditedCommands;
+
+	/**
+	 * this class will NOT own the keyBinder pointer
+	 */
+	wxKeyBinder* KeyBinder;
+
+};
+
+/**
+ * the edit dialog will check for (and reject) duplicate menu shortcuts
+ * this class will NOT own the keyBinder pointer
+ */
+class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGeneratedClass {
+
+public:
+
+	/**
+	 * @param parent the window parent
+	 * @param commandName to display to the user
+	 * @param shortcut [out] the new shortcut from the user will be set here
+	 * @param commands the scintilla keyboard commands
+	 * @param keyBinder holds the menu shortcuts this class will NOT own the keyBinder pointer
+	 */
+	KeyboardCommandEditDialogClass(wxWindow* parent, const wxString& commandName, wxString& shortcut,
+		std::vector<t4p::EditorKeyboardCommandClass>& commands,
+		wxKeyBinder* keyBinder);
+
+private:
+
+	void OnOkButton(wxCommandEvent& event);
+	void OnKey(wxKeyEvent& event);
+	void OnEnter(wxCommandEvent& event);
+
+	/**
+	 * to check for (and reject) duplicate shortcuts
+	 */
+	std::vector<t4p::EditorKeyboardCommandClass>& Commands;
+
+	/**
+	 * to check for (and reject) duplicate menu shortcuts
+	 * this class will NOT own this pointer
+	 */
+	wxKeyBinder* KeyBinder;
+
+	/**
+	 * store a copy of the original shortcut, so that the user
+	 * can "assign" the same shortcut without the app telling
+	 * them that it is a dup
+	 */
+	wxString OriginalShortcut;
 };
 
 }

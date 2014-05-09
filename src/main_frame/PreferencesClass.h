@@ -33,6 +33,27 @@
 namespace t4p {
 
 /**
+ * use our own function to convert string to key codes
+ * because the wxKeyBinder function does not handle
+ * converting  LEFT, RIGHT arrow keys to the correct key code
+ * 
+ * See http://sourceforge.net/p/wxcode/patches/39/
+ *
+ * @param string the string representation of a shortcut ie. "CTRL+SHIFT+A"
+ *        modifiers can be case insensitive. CTRL==ctrl
+ * @param [out] the modifiers in the shortcut, bitmask of wxACCEL_*
+ * @param [out] the key code in the shortcut, one of WXK_* constants
+ */
+void ShortcutStringToKeyCode(const wxString& str, int& modifiers, int& keyCode);
+
+/**
+ * @param the modifiers in the shortcut, bitmask of wxACCEL_*
+ * @param the key code in the shortcut, one of WXK_* constants
+ * @return the string representation of a shortcut ie. "CTRL+SHIFT+A"
+ */
+wxString KeyCodeToShortcutString(int modifiers, int keyCode);
+
+/**
  * This is a class that will Triumph will use to manage keyboard shortcuts.  
  * Default functionality of the Keybinder classes is not sufficient because
  * (1) Triumph menus are dynamic; they can be updated or removed when new 

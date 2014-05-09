@@ -24,6 +24,7 @@
  */
 #include <features/EditorBehaviorFeatureClass.h>
 #include <globals/Assets.h>
+#include <main_frame/PreferencesClass.h>
 #include <Triumph.h>
 #include <wx/valgen.h>
 
@@ -91,6 +92,187 @@ static int ID_SUBMENU_TRANSFORM = wxNewId();
 static int ID_SUBMENU_SELECTION = wxNewId();
 static int ID_SUBMENU_CARET = wxNewId();
 
+
+static int WxKeyCodeToSciKeyCode(int wxKeyCode) {
+	int sciKeyCode = 0;
+	bool foundKey = false;
+	for (int j = 0; SciSpecialKeys[j][0] > 0; ++j) {
+		if (SciSpecialKeys[j][0] == wxKeyCode) {
+			sciKeyCode = SciSpecialKeys[j][1];
+			foundKey = true;
+		}
+	}
+	if (!foundKey) {
+		sciKeyCode = wxKeyCode;
+	}
+	return sciKeyCode;
+}
+
+static int SciKeyCodeToWxKeyCode(int sciKeyCode) {
+	int wxKeyCode = 0;
+	bool foundKey = false;
+	for (int j = 0; SciSpecialKeys[j][0] > 0; ++j) {
+		if (SciSpecialKeys[j][1] == sciKeyCode) {
+			wxKeyCode = SciSpecialKeys[j][0];
+			foundKey = true;
+		}
+	}
+	if (!foundKey) {
+		wxKeyCode = sciKeyCode;
+	}
+	return wxKeyCode;
+}
+
+static int WxModifiersToSciModifiers(int wxModifiers) {
+	int stcMods = 0;
+	if (wxModifiers & wxACCEL_SHIFT) {
+		stcMods |= wxSTC_SCMOD_SHIFT;
+	}
+	if (wxModifiers & wxACCEL_CTRL) {
+		stcMods |= wxSTC_SCMOD_CTRL;
+	}
+	if (wxModifiers & wxACCEL_ALT) {
+		stcMods |= wxSTC_SCMOD_ALT;
+	}
+	return stcMods;
+}
+
+static int SciModifiersToWxModifiers(int sciModifiers) {
+	int wxMods = 0;
+	if (sciModifiers & wxSTC_SCMOD_SHIFT) {
+		wxMods |= wxACCEL_SHIFT;
+	}	
+	if (sciModifiers & wxSTC_SCMOD_CTRL) {
+		wxMods |= wxACCEL_CTRL;
+	}
+	if (sciModifiers & wxSTC_SCMOD_ALT) {
+		wxMods |= wxACCEL_ALT;
+	}
+	return wxMods;
+}
+
+static  int SciCommandToMenuId(int cmdId) {
+	for (int i = 0; SciCommands[i][0] > 0; ++i) {
+		if (SciCommands[i][1] == cmdId) {
+			return SciCommands[i][0];
+		}
+	}
+	return 0;
+}
+
+static int MenuIdToSciCommand(int menuId) {
+	for (int i = 0; SciCommands[i][0] > 0; ++i) {
+		if (SciCommands[i][0] == menuId) {
+			return SciCommands[i][1];
+		}
+	}
+	return 0;
+}
+
+static void KeyboardCommandFromString(t4p::EditorKeyboardCommandClass& cmd, const wxString& shortcut) {
+	int wxKeyCode = 0;
+	int wxModifiers = 0;
+	if (!shortcut.empty()) {
+		t4p::ShortcutStringToKeyCode(shortcut, wxModifiers, wxKeyCode);
+	
+		// turn wx keys, modifiers into stc counterparts
+		cmd.KeyCode = WxKeyCodeToSciKeyCode(wxKeyCode);
+		cmd.Modifiers = WxModifiersToSciModifiers(wxModifiers);
+	}
+	else {
+		// empty string == no shortcut
+		cmd.KeyCode = 0;
+		cmd.Modifiers = 0;
+	}
+}
+
+static wxString KeyboardCommandToString(t4p::EditorKeyboardCommandClass& cmd) {
+
+	// turn stc keys, modifiers into wx counterparts
+	// to feed into the keybinder function
+	int wxKeyCode = SciKeyCodeToWxKeyCode(cmd.KeyCode);
+	int wxModifiers = SciModifiersToWxModifiers(cmd.Modifiers);
+	if (wxKeyCode > 0 && wxModifiers > 0) {
+		return t4p::KeyCodeToShortcutString(wxModifiers, wxKeyCode);
+	}
+	return wxT("");
+}
+
+static void PC(std::vector<t4p::EditorKeyboardCommandClass>& commands, const wxString& name, int cmdId, int modifiers, int keyCode) {
+	commands.push_back(t4p::EditorKeyboardCommandClass(name, cmdId, modifiers, keyCode));
+}
+
+static void SetupCommands(std::vector<t4p::EditorKeyboardCommandClass>& cmds) {
+	PC(cmds, _("Cut Line"), wxSTC_CMD_LINECUT, wxSTC_SCMOD_CTRL, 'L');
+	PC(cmds, _("Duplicate Line"), wxSTC_CMD_LINEDUPLICATE,  wxSTC_SCMOD_CTRL, 'D');
+	PC(cmds, _("Delete Line"), wxSTC_CMD_LINEDELETE, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, 'L');
+	PC(cmds, _("Transpose Line"), wxSTC_CMD_LINETRANSPOSE, wxSTC_SCMOD_CTRL, 'T');
+	PC(cmds, _("Copy Line"), wxSTC_CMD_LINECOPY , wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, 'T');
+	PC(cmds, _("Convert To Lower Case"), wxSTC_CMD_LOWERCASE, wxSTC_SCMOD_CTRL, 'U');
+	PC(cmds, _("Convert To Upper Case"), wxSTC_CMD_UPPERCASE, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, 'U');
+	PC(cmds, _("Delete to start of Word"), wxSTC_CMD_DELWORDLEFT, wxSTC_SCMOD_CTRL, wxSTC_KEY_BACK);
+	PC(cmds, _("Delete to end of Word"), wxSTC_CMD_DELWORDRIGHT, wxSTC_SCMOD_CTRL, wxSTC_KEY_DELETE);
+	PC(cmds, _("Delete Line up to cursor"), wxSTC_CMD_DELLINELEFT, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_BACK);
+	PC(cmds, _("Delete Line after cursor"), wxSTC_CMD_DELLINERIGHT, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_DELETE);
+	PC(cmds, _("Duplicate selection"), 2469, /* there is no wxSTC_CMD_SELECTIONDUPLICATE*/ 0, 0);
+	PC(cmds, _("Move selected lines up"), wxSTC_CMD_MOVESELECTEDLINESUP, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_UP);
+	PC(cmds, _("Move selected lines down"), wxSTC_CMD_MOVESELECTEDLINESDOWN, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_DOWN);
+	PC(cmds, _("Expand selection to the end of paragraph"), wxSTC_CMD_PARADOWNEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, ']');
+	PC(cmds, _("Expand selection to the beginning of paragraph"), wxSTC_CMD_PARAUPEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, '[');
+	PC(cmds, _("Expand selection to the beginning of previous word"), wxSTC_CMD_WORDLEFTEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_LEFT);
+	PC(cmds, _("Expand selection to the beginning of next word"), wxSTC_CMD_WORDRIGHTEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, wxSTC_KEY_RIGHT);
+	PC(cmds, _("Expand selection to the end of previous word"), wxSTC_CMD_WORDLEFTENDEXTEND, 0, 0);
+	PC(cmds, _("Expand selection to the end of next word") , wxSTC_CMD_WORDRIGHTENDEXTEND, 0, 0);
+	PC(cmds, _("Expand selection to the previous word segment"), wxSTC_CMD_WORDPARTLEFTEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, '/');
+	PC(cmds, _("Expand selection to the end of next word segment"), wxSTC_CMD_WORDPARTRIGHTEXTEND, wxSTC_SCMOD_CTRL | wxSTC_SCMOD_SHIFT, '\\');
+	PC(cmds, _("Move to next paragraph"), wxSTC_CMD_PARADOWN, wxSTC_SCMOD_CTRL, ']');
+	PC(cmds, _("Move to previous paragraph"), wxSTC_CMD_PARAUP, wxSTC_SCMOD_CTRL, '[');
+	PC(cmds, _("Move to previous word"), wxSTC_CMD_WORDLEFT, wxSTC_SCMOD_CTRL, wxSTC_KEY_LEFT);
+	PC(cmds, _("Move to next word"), wxSTC_CMD_WORDRIGHT, wxSTC_SCMOD_CTRL, wxSTC_KEY_RIGHT);
+	PC(cmds, _("Move to previous word segment"), wxSTC_CMD_WORDPARTLEFT, wxSTC_SCMOD_CTRL, '/');
+	PC(cmds, _("Move to next word segment"), wxSTC_CMD_WORDPARTRIGHT, wxSTC_SCMOD_CTRL, '\\');
+}
+
+t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass() 
+: Name()
+, CmdId(0)
+, Modifiers(0)
+, KeyCode(0) {
+}
+
+t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass(const wxString& name,
+															int cmdId, int modifiers,
+															int keyCode) 
+: Name(name)
+, CmdId(cmdId)
+, Modifiers(modifiers)
+, KeyCode(keyCode) {
+}
+
+t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass(const t4p::EditorKeyboardCommandClass& src)
+: Name()
+, CmdId(0)
+, Modifiers(0)
+, KeyCode(0) {
+	Copy(src);
+}
+
+t4p::EditorKeyboardCommandClass& t4p::EditorKeyboardCommandClass::operator=(const t4p::EditorKeyboardCommandClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::EditorKeyboardCommandClass::Copy(const t4p::EditorKeyboardCommandClass& src) {
+	Name = src.Name;
+	CmdId = src.CmdId;
+	Modifiers = src.Modifiers;
+	KeyCode = src.KeyCode;
+}
+
+bool t4p::EditorKeyboardCommandClass::IsOk() const {
+	return Modifiers > 0 && KeyCode > 0;
+}
+
 /**
  * adds menu items for each of the scintilla keyboard commands
  * to the given menu
@@ -121,21 +303,23 @@ static void AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
 	// not sure what these message do
 	// SCI_DELETEBACKNOTLINE
 	// SCI_DELWORDRIGHTEND
+	// 2469 == there is no wxSTC_CMD_SELECTIONDUPLICATE
 	wxMenu* transformMenu = new wxMenu();
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 10, _("Cut Line\tCTRL+L"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 11, _("Duplicate Line\tCTRL+D"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 12, _("Delete Line\tCTRL+SHIFT+L"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 13, _("Transpose Line\tCTRL+T"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 14, _("Copy Line\tCTRL+SHIFT+T"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 15, _("Convert To Lower Case\tCTRL+U"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 16, _("Convert To Upper Case\tCTRL+Shift+U"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 17, _("Delete Previous Word\tCTRL+BACK"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 18, _("Delete Next Word\tCTRL+DEL"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 19, _("Delete Line up to cursor\tCTRL+SHIFT+BACK"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 20, _("Delete Line after cursor\tCTRL+SHIFT+DEL"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 21, _("Duplicate selection"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 22, _("Move selected lines up\tCTRL+SHIFT+UP"));
-	transformMenu->Append(t4p::MENU_BEHAVIOR + 23, _("Move selected lines down\tCTRL+SHIFT+DOWN"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINECUT), _("Cut Line"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINEDUPLICATE), _("Duplicate Line"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINEDELETE), _("Delete Line"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINETRANSPOSE), _("Transpose Line"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINECOPY), _("Copy Line"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LOWERCASE), _("Convert To Lower Case"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_UPPERCASE), _("Convert To Upper Case"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELWORDLEFT), _("Delete to start of Word"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELWORDRIGHT), _("Delete to end of Word"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELLINELEFT), _("Delete Line up to cursor"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELLINERIGHT), _("Delete Line after cursor"));
+	transformMenu->Append(SciCommandToMenuId(2469), _("Duplicate selection"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_MOVESELECTEDLINESUP), _("Move selected lines up"));
+	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_MOVESELECTEDLINESDOWN), _("Move selected lines down"));
+
 	/*
 	the selection menu exposes the following scintilla commands
 	SCI_PARADOWNEXTEND
@@ -148,14 +332,7 @@ static void AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
 	SCI_WORDPARTRIGHTEXTEND
 	*/
 	wxMenu* selectionMenu = new wxMenu();
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 24, _("Expand selection to the end of paragraph")); //\tCTRL+SHIFT+]
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 25, _("Expand selection to the beginning of paragraph")); // \tCTRL+SHIFT+[
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 26, _("Expand selection to the beginning of previous word\tCTRL+SHIFT+LEFT"));
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 27, _("Expand selection to the beginning of next word\tCTRL+SHIFT+RIGHT"));
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 28, _("Expand selection to the end of previous word"));
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 29, _("Expand selection to the end of next word"));
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 30, _("Expand selection to the previous word segment")); // \tCTRL+SHIFT+/
-	selectionMenu->Append(t4p::MENU_BEHAVIOR + 31, _("Expand selection to the end of next word segment")); // \tCTRL+SHIFT+backslash
+	
 	
 	/*
 	the caret menu exposes the following scintilla commands
@@ -166,71 +343,60 @@ static void AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
 	SCI_WORDPARTLEFT
 	SCI_WORDPARTRIGHT 
 	*/
-		
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARADOWNEXTEND), _("Expand selection to the end of paragraph")); //\tCTRL+SHIFT+]
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARAUPEXTEND), _("Expand selection to the beginning of paragraph")); // \tCTRL+SHIFT+[
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFTEXTEND), _("Expand selection to the beginning of previous word\tCTRL+SHIFT+LEFT"));
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHTEXTEND), _("Expand selection to the beginning of next word\tCTRL+SHIFT+RIGHT"));
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFTENDEXTEND), _("Expand selection to the end of previous word"));
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHTENDEXTEND), _("Expand selection to the end of next word"));
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment")); // \tCTRL+SHIFT+/
+	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment")); // \tCTRL+SHIFT+backslash
+	
 	//?? not sure what these do
 	//SCI_WORDLEFTEND
 	//SCI_WORDRIGHTEND
 	wxMenu* caretMenu = new wxMenu();
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 32, _("Move to next paragraph")); // \tCTRL+]
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 33, _("Move to previous paragraph")); // \tCTRL+[
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 34, _("Move to previous word\tCTRL+LEFT"));
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 35, _("Move to next word\tCTRL+RIGHT"));
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 36, _("Move to previous word segment")); // \tCTRL+/
-	caretMenu->Append(t4p::MENU_BEHAVIOR + 37, _("Move to next word segment")); // \tCTRL+backslash
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARADOWN), _("Move to next paragraph")); // \tCTRL+]
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARAUP), _("Move to previous paragraph")); // \tCTRL+[
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFT), _("Move to previous word\tCTRL+LEFT"));
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHT), _("Move to next word\tCTRL+RIGHT"));
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFT), _("Move to previous word segment")); // \tCTRL+/
+	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHT), _("Move to next word segment")); // \tCTRL+backslash
 	
 	menu->Append(ID_SUBMENU_TRANSFORM, _("Transform text"), transformMenu);
 	menu->Append(ID_SUBMENU_SELECTION, _("Selection"), selectionMenu);
 	menu->Append(ID_SUBMENU_CARET, _("Move caret"), caretMenu);
 	
-	transformMenu->Enable(t4p::MENU_BEHAVIOR + 15, isTextSelected);
-	transformMenu->Enable(t4p::MENU_BEHAVIOR + 16, isTextSelected);
-
+	transformMenu->Enable(SciCommandToMenuId(wxSTC_CMD_LOWERCASE), isTextSelected);
+	transformMenu->Enable(SciCommandToMenuId(wxSTC_CMD_UPPERCASE), isTextSelected);
 }
 
-static void AssignKeyCommands(wxStyledTextCtrl* ctrl, const wxKeyProfile* profile) {
-
-	for (int i = 0; SciCommands[i][0] > 0; ++i) {
-		wxCmd* cmd = profile->GetCmd(SciCommands[i][0]);
-		wxASSERT_MSG(cmd, _("command must be found"));
-		if (cmd) {
-			wxKeyBind* bind = cmd->GetShortcut(0);
-			int keybinderMods = bind->GetModifiers();
-			int wxkey= bind->GetKeyCode();
-			int stcKey = 0;
-			int stcMods = 0;
-			if (keybinderMods & wxACCEL_SHIFT) {
-				stcMods |= wxSTC_SCMOD_SHIFT;
-			}
-			if (keybinderMods & wxACCEL_CTRL) {
-				stcMods |= wxSTC_SCMOD_CTRL;
-			}
-			if (keybinderMods & wxACCEL_ALT) {
-				stcMods |= wxSTC_SCMOD_ALT;
-			}
-			// raw ctrl is only for mac (OSX) which we dont support right now
-			
-			// key codes >300 have different numbers, ie. the key code for PAGEUP is different
-			// in scintilla and wxWidgets.
-			bool foundKey = false;
-			for (int j = 0; SciSpecialKeys[j][0] > 0; ++j) {
-				if (SciSpecialKeys[j][0] == wxkey) {
-					stcKey = SciSpecialKeys[j][1];
-					foundKey = true;
-				}
-			}
-			if (!foundKey) {
-				stcKey = wxkey;
-			}
-			
-			if (stcKey > 0 && stcMods >= 0) {
-				ctrl->CmdKeyAssign(stcKey, stcMods, SciCommands[i][1]);
-			}
+static void AssignKeyCommands(wxStyledTextCtrl* ctrl, const std::vector<t4p::EditorKeyboardCommandClass>& keyboardCommands) {
+	for (size_t i = 0; i < keyboardCommands.size(); ++i) {
+		t4p::EditorKeyboardCommandClass cmd = keyboardCommands[i];
+		if (cmd.CmdId > 0 && cmd.IsOk()) {
+			ctrl->CmdKeyAssign(cmd.KeyCode, cmd.Modifiers, cmd.CmdId);
 		}
 	}
 }
 
 t4p::EditorBehaviorFeatureClass::EditorBehaviorFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+: FeatureClass(app)
+, KeyboardCommands() {
+	
+}
+
+void t4p::EditorBehaviorFeatureClass::LoadPreferences(wxConfigBase* config) {
+	SetupCommands(KeyboardCommands);
+
+	// now read them from the config
+	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {
+		wxString key = wxString::Format(wxT("KeyboardCommands/Cmd-%d"), KeyboardCommands[i].CmdId);
+		wxString storedShortcut;
+		if (config->Read(key, &storedShortcut) && !storedShortcut.empty()) {
+			KeyboardCommandFromString(KeyboardCommands[i], storedShortcut);
+		}
+	}
 }
 
 void t4p::EditorBehaviorFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -246,46 +412,6 @@ void t4p::EditorBehaviorFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	);
 }
 
-void t4p::EditorBehaviorFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
-	std::map<int, wxString> menuItemIds;
-	menuItemIds[t4p::MENU_BEHAVIOR + 4] = wxT("Edit-Zoom In");
-	menuItemIds[t4p::MENU_BEHAVIOR + 5] = wxT("Edit-Zoom Out");
-	menuItemIds[t4p::MENU_BEHAVIOR + 6] = wxT("Edit-Reset Zoom");
-	
-	menuItemIds[t4p::MENU_BEHAVIOR + 10] = wxT("Edit-Cut Line");
-	menuItemIds[t4p::MENU_BEHAVIOR + 11] = wxT("Edit-Duplicate Line");
-	menuItemIds[t4p::MENU_BEHAVIOR + 12] = wxT("Edit-Delete Line");
-	menuItemIds[t4p::MENU_BEHAVIOR + 13] = wxT("Edit-Transpose Line");
-	menuItemIds[t4p::MENU_BEHAVIOR + 14] = wxT("Edit-Copy Line");
-	menuItemIds[t4p::MENU_BEHAVIOR + 15] = wxT("Edit-Convert To Lower Case");
-	menuItemIds[t4p::MENU_BEHAVIOR + 16] = wxT("Edit-Convert To Upper Case");
-	menuItemIds[t4p::MENU_BEHAVIOR + 17] = wxT("Edit-Delete Previous Word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 18] = wxT("Edit-Delete Next Word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 19] = wxT("Edit-Delete Line up to cursor");
-	menuItemIds[t4p::MENU_BEHAVIOR + 20] = wxT("Edit-Delete Line after cursor");
-	menuItemIds[t4p::MENU_BEHAVIOR + 21] = wxT("Edit-Duplicate selection");
-	menuItemIds[t4p::MENU_BEHAVIOR + 22] = wxT("Edit-Move selected lines up");
-	menuItemIds[t4p::MENU_BEHAVIOR + 23] = wxT("Edit-Move selected lines down");
-	
-	menuItemIds[t4p::MENU_BEHAVIOR + 24] = wxT("Edit-Expand selection to the end of paragraph");
-	menuItemIds[t4p::MENU_BEHAVIOR + 25] = wxT("Edit-Expand selection to the beginning of paragraph");
-	menuItemIds[t4p::MENU_BEHAVIOR + 26] = wxT("Edit-Expand selection to the beginning of previous word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 27] = wxT("Edit-Expand selection to the beginning of next word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 28] = wxT("Edit-Expand selection to the end of previous word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 29] = wxT("Edit-Expand selection to the end of next word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 30] = wxT("Edit-Expand selection to the previous word segment");
-	menuItemIds[t4p::MENU_BEHAVIOR + 31] = wxT("Edit-Expand selection to the end of next word segment");
-	
-	menuItemIds[t4p::MENU_BEHAVIOR + 32] = wxT("Edit-Move to next paragraph");
-	menuItemIds[t4p::MENU_BEHAVIOR + 33] = wxT("Edit-Move to previous paragraph");
-	menuItemIds[t4p::MENU_BEHAVIOR + 34] = wxT("Edit-Move to previous word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 35] = wxT("Edit-Move to next word");
-	menuItemIds[t4p::MENU_BEHAVIOR + 36] = wxT("Edit-Move to previous word segment");
-	menuItemIds[t4p::MENU_BEHAVIOR + 37] = wxT("Edit-Move to next word segment");
-	
-	AddDynamicCmd(menuItemIds, shortcuts);
-}
-
 void t4p::EditorBehaviorFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 	wxMenu* subMenu = new wxMenu();
 	subMenu->Append(t4p::MENU_BEHAVIOR + 7, _("Unix (LF)"), _("Convert Line ending to UNIX"));
@@ -293,8 +419,6 @@ void t4p::EditorBehaviorFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
 	subMenu->Append(t4p::MENU_BEHAVIOR + 9, _("Max (CR)"), _("Convert Line ending to MAC"));
 	
 	editMenu->Append(wxID_ANY, _("Convert Line Endings To"), subMenu);
-	
-	AddKeyboardCommands(editMenu, true);
 }
 
 void t4p::EditorBehaviorFeatureClass::AddViewMenuItems(wxMenu* menu) {
@@ -315,25 +439,16 @@ void t4p::EditorBehaviorFeatureClass::AddCodeControlClassContextMenuItems(wxMenu
 	
 	// update the menu accelerators to be the ones configured by the
 	// user
-	// AddKeyboardCommands sets the menu items to have the default
-	// shortcuts, but the user can change them
-	wxKeyBinder* binder = App.Preferences.KeyProfiles.GetSelProfile();
-	wxCmdArray* cmds = binder->GetArray();
-	
-	for (int i = 0; SciCommands[i][0] > 0; ++i) {
-		int menuId = SciCommands[i][0];
+	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {
+		int cmdId = KeyboardCommands[i].CmdId;
+		int menuId = SciCommandToMenuId(cmdId);
 		wxMenuItem* menuItem = menu->FindItem(menuId);
 		if (menuItem) {
-			for (int j = 0; j < cmds->GetCount(); ++j) {
-				wxCmd* cmd = cmds->Item(j);
-				if (cmd->GetId() == menuId) {
-					wxString label = 
-						menuItem->GetItemLabelText()
-						+ wxT("\t") 
-						+ cmd->GetShortcut(0)->GetStr();
-					menuItem->SetItemLabel(label);
-				}
-			}
+			wxString label = 
+				menuItem->GetItemLabelText()
+				+ wxT("\t") 
+				+ KeyboardCommandToString(KeyboardCommands[i]);
+			menuItem->SetItemLabel(label);
 		}
 	}
 }
@@ -422,12 +537,25 @@ void t4p::EditorBehaviorFeatureClass::OnEditConvertEols(wxCommandEvent& event) {
 
 void t4p::EditorBehaviorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	SetFeaturesOnNotebook();
+
+	// write the shortcuts to the config
+	wxConfigBase* config = wxConfig::Get();
+	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {
+		wxString key = wxString::Format(wxT("KeyboardCommands/Cmd-%d"), KeyboardCommands[i].CmdId);
+		wxString storedShortcut = KeyboardCommandToString(KeyboardCommands[i]);
+		config->Write(key, storedShortcut);
+	}
 }
 
 void t4p::EditorBehaviorFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	wxKeyBinder* keyBinder = App.Preferences.KeyProfiles.GetSelProfile();
+
 	t4p::EditorBehaviorPanelClass* panel = new t4p::EditorBehaviorPanelClass(parent, 
 		App.Preferences.CodeControlOptions);
+	t4p::EditorCommandPanelClass* cmdPanel = new t4p::EditorCommandPanelClass(parent,
+		wxID_ANY, KeyboardCommands, keyBinder);
 	parent->AddPage(panel, _("Editor Behavior"));
+	parent->AddPage(cmdPanel, _("Editor Shortcuts"));
 }
 
 void t4p::EditorBehaviorFeatureClass::SetFeaturesOnNotebook() {
@@ -503,8 +631,7 @@ void t4p::EditorBehaviorFeatureClass::SetFeatures(const t4p::CodeControlOptionsC
 	codeCtrl->SetViewWhiteSpace(whitespaceMode);
 	codeCtrl->SetZoom(options.Zoom);
 	
-	const wxKeyProfile* profile = App.Preferences.KeyProfiles.GetSelProfile();
-	AssignKeyCommands(codeCtrl, profile);
+	AssignKeyCommands(codeCtrl, KeyboardCommands);
 }
 
 void t4p::EditorBehaviorFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
@@ -520,21 +647,12 @@ void t4p::EditorBehaviorFeatureClass::OnEditorCommand(wxCommandEvent& event) {
 	if (!ctrl) {
 		return;
 	}
-	bool handled = false;
-	
+
 	// this method handles all scintilla commands
-	// use the menu item ID to lookup the corresponding scintilla command
-	int itemId = event.GetId();
-	for (int i = 0; SciCommands[i][0] > 0; ++i) {
-		if (itemId == SciCommands[i][0]) {
-			ctrl->CmdKeyExecute(SciCommands[i][1]);
-			handled = true;
-			break;
-		}
-	}
-	if (!handled) {
-		event.Skip();
-	}
+	// use the menu item ID is scintilla command to execute
+	int menuId = event.GetId();
+	int cmdId = MenuIdToSciCommand(menuId);
+	ctrl->CmdKeyExecute(cmdId);
 }
 
 t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
@@ -612,6 +730,148 @@ bool t4p::EditorBehaviorPanelClass::TransferDataFromWindow() {
 
 void t4p::EditorBehaviorPanelClass::OnCheckRightMargin(wxCommandEvent& event) {
 	RightMargin->Enable(event.IsChecked());
+}
+
+t4p::EditorCommandPanelClass::EditorCommandPanelClass(wxWindow* parent, int id,
+													  std::vector<t4p::EditorKeyboardCommandClass>& commands,
+													  wxKeyBinder* keyBinder)
+: EditorCommandPanelGeneratedClass(parent, id)
+, Commands(commands)
+, EditedCommands(commands) 
+, KeyBinder(keyBinder) {
+	List->ClearAll();
+	List->InsertColumn(0, _("Command"));
+	List->InsertColumn(1, _("Shortcut"));
+	List->SetColumnWidth(0, 250);
+	List->SetColumnWidth(1, 250);
+	FillCommands();
+}
+
+bool t4p::EditorCommandPanelClass::TransferDataFromWindow() {
+	Commands = EditedCommands;
+	return true;
+}
+
+void t4p::EditorCommandPanelClass::FillCommands() {
+	for (size_t i = 0; i < EditedCommands.size(); ++i) {
+		wxListItem itemName;
+		itemName.SetColumn(0);
+		itemName.SetId(i);
+		itemName.SetText(EditedCommands[i].Name);
+		List->InsertItem(itemName);
+
+		wxListItem itemShortcut;
+		itemShortcut.SetId(i);
+		itemShortcut.SetColumn(1);
+		itemShortcut.SetText(KeyboardCommandToString(EditedCommands[i]));
+		List->SetItem(itemShortcut);
+	}
+	List->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
+	List->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	List->SetColumnWidth(1, wxLIST_AUTOSIZE);
+}
+
+void t4p::EditorCommandPanelClass::OnItemActivated(wxListEvent& event) {
+	int row = event.GetIndex();
+	
+	wxString name = List->GetItemText(row, 0);
+	wxString shortcut = List->GetItemText(row, 1);
+
+	t4p::KeyboardCommandEditDialogClass dialog(this, name, shortcut, EditedCommands, KeyBinder);
+	if (dialog.ShowModal() == wxOK) {
+		KeyboardCommandFromString(EditedCommands[row], shortcut);
+		List->SetItem(row, 1, shortcut);
+	}
+}
+
+t4p::KeyboardCommandEditDialogClass::KeyboardCommandEditDialogClass(wxWindow* parent, const wxString& commandName,
+																	wxString& shortcut,
+																	std::vector<t4p::EditorKeyboardCommandClass>& commands,
+																	wxKeyBinder* keyBinder)
+: KeyboardCommandEditDialogGeneratedClass(parent, wxID_ANY) 
+, Commands(commands) 
+, KeyBinder(keyBinder) 
+, OriginalShortcut(shortcut) {
+	Help->SetLabel(Help->GetLabel() + wxT(" ") + commandName);
+
+	wxTextValidator val(wxFILTER_NONE, &shortcut);
+	Edit->SetValidator(val);
+	TransferDataToWindow();
+}
+
+void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
+	wxString newShortcut = Edit->GetValue();
+	if (newShortcut == OriginalShortcut || newShortcut.empty()) {
+
+		// allow the user to "save" the same shortcut
+		// also, allow the user to remove shortcuts (empty 
+		// string == no shortcut)
+		TransferDataFromWindow();
+		EndModal(wxOK);
+		return;
+	}
+	wxString existingCmd;
+
+	// for a shortcut to be valid, it must not already be assigned to
+	// either the scintilla commands NOR the menu shortcuts
+	bool alreadyExists = false;
+	for (size_t i = 0; i < Commands.size(); ++i) {
+		if (KeyboardCommandToString(Commands[i]) == newShortcut) {
+			alreadyExists = true;
+			existingCmd = Commands[i].Name;
+			break;
+		}
+	}
+	if (!alreadyExists && !newShortcut.empty()) {
+		wxCmd* cmd = KeyBinder->GetCmdBindTo(newShortcut);
+		if (cmd) {
+			alreadyExists = true;
+			existingCmd = cmd->GetName();
+		}
+	}
+	if (alreadyExists) {
+		wxMessageBox(
+			wxString::Format(_("shortcut %s is already defined to %s"), newShortcut.c_str(), existingCmd), 
+			_("Edit Keyboard Command"), 
+			wxCENTRE, this
+		);
+		return;
+	}
+	TransferDataFromWindow();
+	EndModal(wxOK);
+}
+
+void t4p::KeyboardCommandEditDialogClass::OnEnter(wxCommandEvent& event) {
+	OnOkButton(event);
+}
+
+void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
+	int keyCode = event.GetKeyCode();
+	bool hasModifiers = event.HasAnyModifiers();
+	if (hasModifiers && keyCode > 0) {	
+		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
+		Edit->SetInsertionPointEnd();
+	}
+	else if (keyCode > WXK_START && keyCode <=  WXK_SPECIAL20) {
+		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
+		Edit->SetInsertionPointEnd();
+	}
+	else if (hasModifiers && (
+		WXK_BACK == keyCode ||
+		WXK_TAB == keyCode ||	
+		WXK_RETURN == keyCode ||
+		WXK_ESCAPE == keyCode || 	
+		WXK_SPACE == keyCode ||	
+		WXK_DELETE  == keyCode)) {
+		
+		// shortcuts with special chars ie CTRL+TAB
+		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
+		Edit->SetInsertionPointEnd();
+	}
+	else {
+		Edit->Clear();
+		event.Skip();
+	}
 }
 
 BEGIN_EVENT_TABLE(t4p::EditorBehaviorFeatureClass, t4p::FeatureClass)

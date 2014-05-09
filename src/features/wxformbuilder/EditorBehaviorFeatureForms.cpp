@@ -151,3 +151,79 @@ EditorBehaviorPanelGeneratedClass::~EditorBehaviorPanelGeneratedClass()
 	IndentUsingTabs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( EditorBehaviorPanelGeneratedClass::OnIndentUsingSpaces ), NULL, this );
 	
 }
+
+EditorCommandPanelGeneratedClass::EditorCommandPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 1 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText4 = new wxStaticText( this, wxID_ANY, _("You may modify the keyboard commands for the source code editor below.\n\nDouble-click on a command to set the shortcut."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText4->Wrap( -1 );
+	BodySizer->Add( m_staticText4, 1, wxALL|wxEXPAND, 5 );
+	
+	List = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_VRULES );
+	BodySizer->Add( List, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	
+	// Connect Events
+	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( EditorCommandPanelGeneratedClass::OnItemActivated ), NULL, this );
+}
+
+EditorCommandPanelGeneratedClass::~EditorCommandPanelGeneratedClass()
+{
+	// Disconnect Events
+	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( EditorCommandPanelGeneratedClass::OnItemActivated ), NULL, this );
+	
+}
+
+KeyboardCommandEditDialogGeneratedClass::KeyboardCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Help = new wxStaticText( this, wxID_ANY, _("Enter the shortcut for the command "), wxDefaultPosition, wxDefaultSize, 0 );
+	Help->Wrap( -1 );
+	GridSizer->Add( Help, 1, wxALL|wxEXPAND, 5 );
+	
+	Edit = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER|wxTE_PROCESS_TAB );
+	GridSizer->Add( Edit, 0, wxALL|wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	GridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( GridSizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	Edit->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( KeyboardCommandEditDialogGeneratedClass::OnKey ), NULL, this );
+	Edit->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( KeyboardCommandEditDialogGeneratedClass::OnEnter ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( KeyboardCommandEditDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+KeyboardCommandEditDialogGeneratedClass::~KeyboardCommandEditDialogGeneratedClass()
+{
+	// Disconnect Events
+	Edit->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( KeyboardCommandEditDialogGeneratedClass::OnKey ), NULL, this );
+	Edit->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( KeyboardCommandEditDialogGeneratedClass::OnEnter ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( KeyboardCommandEditDialogGeneratedClass::OnOkButton ), NULL, this );
+	
+}
