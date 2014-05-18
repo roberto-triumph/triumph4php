@@ -37,6 +37,60 @@ namespace t4p {
 // forward declaration, defined below
 class ExplorerEventClass;
 class ExplorerModifyEventClass;
+
+class FileListingClass : public wxEvtHandler {
+	
+public:
+
+	wxFileName WorkingDir;
+	std::vector<wxFileName> Files;
+	std::vector<wxFileName> Dirs;
+	int TotalFiles;
+	int TotalSubDirs;
+	
+	FileListingClass(wxEvtHandler& handler);
+	~FileListingClass();
+	
+	void StartRefresh(const wxFileName& dir, const std::vector<wxString>& filterExtensions, bool doHidden);
+	
+	void StartRename(const wxFileName& oldFile, const wxString& newName);
+	
+	void StartDelete(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files);
+		
+	private:
+	
+	// when a file is added/remove update the panel
+	void OnFsWatcher(wxFileSystemWatcherEvent& event);
+	
+	/**
+	 * when the explorer action has finished fetching the files,
+	 * tells the handler that the file listing is up-to-date
+	 */
+	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
+
+	/**
+	 * this object gets its own background thread to
+	 * read directories in the background
+	 */
+	t4p::RunningThreadsClass RunningThreads;
+
+	/**
+	 * this event handler gets notified when the list of files or
+	 * directories has changed
+	 */
+	wxEvtHandler& Handler;
+	
+	/**
+	 * we will watch for new/deleted files and update the panel automatically
+	 * using a pointer because wxFileSystemWatcher::Remove() is buggy on MSW
+	 * we will create a new instance on every directory refresh
+	 * this class will own the pointer
+	 */
+	wxFileSystemWatcher* Watcher;
+	
+	DECLARE_EVENT_TABLE()
+};
+
 /**
  * The explorer feature shows the user the files and directories
  * for all defined projects.  Additionally, it can display folders
@@ -84,18 +138,18 @@ private:
 	 * @param wxCommandEvent& event 
 	 */
 	void OnProjectExplore(wxCommandEvent& event);
+	
+	/**
+	 * Handler for the View .. Explore in Outline menu 
+	 * @param wxCommandEvent& event 
+	 */
+	void OnProjectOutline(wxCommandEvent& event);
 
 	/**
 	 * Handler for the Project .. Explore Open File menu 
 	 * @param wxCommandEvent& event 
 	 */
 	void OnProjectExploreOpenFile(wxCommandEvent& event);
-	
-	/**
-	 * when the explorer action has finished fetching the files,
-	 * display them. this handler will refresh both the left and right panels.
-	 */
-	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
 	
 	/**
 	 * when the explorer tool button is clicked show any open projects
@@ -129,87 +183,32 @@ private:
 	 * the source directories shown in the project menu
 	 */
 	std::vector<t4p::SourceClass> SourceDirs;
-
+	
 	DECLARE_EVENT_TABLE()
 };
 
-class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
-public:
-	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
-	~ModalExplorerPanelClass();
-
-	void RefreshDir(const wxFileName& dir);
+class FileListingWidgetClass : public wxEvtHandler {
 	
-	void ShowDir(const wxFileName& dir, const std::vector<wxFileName>& files, const std::vector<wxFileName>& dirs, int totalFiles, int totalSubDirs);
+	public:
 
-	void FillSourcesList(const std::vector<wxFileName>& sourceDirs);
-
-	void FocusOnSourcesList();
-
+	/**
+	 * this class will not own any of these pointers
+	 */
+	FileListingWidgetClass(wxListCtrl* list, wxImageList* imageList, 
+		t4p::FileListingClass* fileListing, wxEvtHandler* activateHandler, 
+		t4p::ExplorerFeatureClass* feature);
+	~FileListingWidgetClass();
+	
+	void ShowDir();
+	
 private:
 
-	/**
-	 * the directory being shown on the right hand side
-	 */
-	wxFileName CurrentListDir;
-	
-	/**
-	 * will be owned by the list control
-	 */
-	wxImageList* FilesImageList;
-
-	/**
-	 * will be owned by the list control
-	 */
-	wxImageList* SourcesImageList;
-
-	/**
-	 * we will watch for new/deleted files and update the panel automatically
-	 * using a pointer because wxFileSystemWatcher::Remove() is buggy on MSW
-	 * we will create a new instance on every directory change
-	 * this class will own the pointer
-	 */
-	wxFileSystemWatcher* Watcher;
-
-	/**
-	 * to get projects list and tag cache
-	 */
-	t4p::ExplorerFeatureClass& Feature;
-	
-	/**
-	 * this object gets its own background thread to
-	 * read directories in the background
-	 */
-	t4p::RunningThreadsClass RunningThreads;
-	
-	/**
-	 * the notebook that contains the opened code controls, used 
-	 * during file renames
-	 */
-	t4p::NotebookClass* Notebook;
-
-	/**
-	 * the currently selected filter menu item
-	 */
-	int FilterChoice;
-
-	enum ListImages {
-		LIST_FOLDER = t4p::IMGLIST_NONE + 1,
-		LIST_PARENT_FOLDER
-	};
-
-	enum SourceImages {
-		SOURCE_FOLDER
-	};
-
 	// events handlers for the files list
-	void OnListItemActivated(wxListEvent& event);
 	void OnListItemRightClick(wxListEvent& event);
 	void OnListEndLabelEdit(wxListEvent& event);
 	void OnListRightDown(wxMouseEvent& event);
 
 	// event handlers for the context menu on the files list
-	void OnListMenuOpen(wxCommandEvent& event);
 	void OnListMenuOpenParent(wxCommandEvent& event);
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
@@ -217,7 +216,106 @@ private:
 	void OnListMenuCreateDirectory(wxCommandEvent& event);
 	void OnListMenuShell(wxCommandEvent& event);
 	void OnListMenuFileManager(wxCommandEvent& event);
+	
+	// adds files or directories to the list control
+	void ListFiles(const std::vector<wxFileName>& files);
+	void ListDirectories(const std::vector<wxFileName>& dirs);
+
+	int ListImageId(const wxFileName& fileName);
+
+	/**
+	 * the list where the files are drawn onto
+	 */
+	wxListCtrl* List;
+	
+	/**
+	 * will be owned by the list control
+	 */
+	wxImageList* FilesImageList;
+	
+	/**
+	 * the listing model; the object that "backs" the panel and performs
+	 * the actions (in the background). this class will NOT
+	 * own this pointer
+	 */
+	t4p::FileListingClass* FileListing;
+	
+	/**
+	 * the list item activate event will be propagated to this event
+	 * handler.
+	 */
+	wxEvtHandler* ActivateHandler;
+	
+	t4p::ExplorerFeatureClass* Feature;
+
+	enum ListImages {
+		LIST_FOLDER = t4p::IMGLIST_NONE + 1,
+		LIST_PARENT_FOLDER
+	};
+	
+	DECLARE_EVENT_TABLE()
+};
+
+class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
+	public:
+	
+	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
+	~ModalExplorerPanelClass();
+
+	void FillSourcesList(const std::vector<wxFileName>& sourceDirs);
+
+	void FocusOnSourcesList();
+
+	void RefreshDir(const wxFileName& dir);
+	
+	void ShowDir();
+	
+private:
+
+
+	/**
+	 * the listing model; the object that "backs" the panel and performs
+	 * the actions (in the background). this class owns the pointer
+	 */
+	t4p::FileListingClass* FileListing;
+	
+	/**
+	* will be owned by the list control
+	 */
+	wxImageList* FilesImageList;
+	
+	/**
+	 * will be owned by the list control
+	 */
+	wxImageList* SourcesImageList;
+
+	/**
+	 * to get projects list and tag cache
+	 */
+	t4p::ExplorerFeatureClass& Feature;
+	
+	/**
+	 * the notebook that contains the opened code controls, used 
+	 * during file renames
+	 */
+	t4p::NotebookClass* Notebook;
+	
+	/**
+	 * this class will own the pointer
+	 */
+	t4p::FileListingWidgetClass* FileListingWidget;
+
+	/**
+	 * the currently selected filter menu item
+	 */
+	int FilterChoice;
+
+	enum SourceImages {
+		SOURCE_FOLDER
+	};
+
 	void OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event);
+
 
 	// event handler for the combo box
 	void OnDirectoryEnter(wxCommandEvent& event);
@@ -225,27 +323,98 @@ private:
 	// event handlers for the sources list
 	void OnSourceActivated(wxListEvent& event);
 
+	void OnListItemActivated(wxListEvent& event);
+	void OnListMenuOpen(wxCommandEvent& event);
+	
 	// handlers for the buttons
 	void OnParentButtonClick(wxCommandEvent& event);
 	void OnFilterButtonLeftDown(wxMouseEvent& event);
 	void OnFilterMenuCheck(wxCommandEvent& event);
 	void OnRefreshClick(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
-
-	// when a file is added/remove update the panel
-	void OnFsWatcher(wxFileSystemWatcherEvent& event);
-
-	std::vector<wxString> FilterFileExtensions();
-
-	void ListFiles(const std::vector<wxFileName>& files);
-
-	void ListDirectories(const std::vector<wxFileName>& dirs);
-
-	bool OpenIfListFile(const wxString& text);
-
-	int ListImageId(const wxFileName& fileName);
 	
 	void RenamePrompt(const wxFileName& oldFile, const wxString& newName);
+	
+	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
+	void OnFsWatcher(wxFileSystemWatcherEvent& event);
+	bool OpenIfListFile(const wxString& text);
+	
+	std::vector<wxString> FilterFileExtensions();
+
+	DECLARE_EVENT_TABLE()
+};
+
+class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
+	public:
+	
+	ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
+	~ExplorerOutlinePanelClass();
+
+	void RefreshDir(const wxFileName& dir);
+	
+	void FillSourcesList(const std::vector<wxFileName>& sourceDirs);
+	
+	void ShowDir();
+	
+private:
+
+
+	/**
+	 * the listing model; the object that "backs" the panel and performs
+	 * the actions (in the background). this class owns the pointer
+	 */
+	t4p::FileListingClass* FileListing;
+	
+	/**
+	* will be owned by the list control
+	 */
+	wxImageList* FilesImageList;
+	
+	/**
+	 * to get projects list and tag cache
+	 */
+	t4p::ExplorerFeatureClass& Feature;
+	
+	/**
+	 * the notebook that contains the opened code controls, used 
+	 * during file renames
+	 */
+	t4p::NotebookClass* Notebook;
+	
+	/**
+	 * this class will own the pointer
+	 */
+	t4p::FileListingWidgetClass* FileListingWidget;
+
+	/**
+	 * the currently selected filter menu item
+	 */
+	int FilterChoice;
+
+	void OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event);
+
+
+	// event handler for the combo box
+	void OnDirectoryEnter(wxCommandEvent& event);
+	void OnDirectorySelected(wxCommandEvent& event);
+
+	void OnListItemActivated(wxListEvent& event);
+	void OnListMenuOpen(wxCommandEvent& event);
+	
+	// handlers for the buttons
+	void OnParentButtonClick(wxCommandEvent& event);
+	void OnFilterButtonLeftDown(wxMouseEvent& event);
+	void OnFilterMenuCheck(wxCommandEvent& event);
+	void OnRefreshClick(wxCommandEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
+	
+	void RenamePrompt(const wxFileName& oldFile, const wxString& newName);
+	
+	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
+	void OnFsWatcher(wxFileSystemWatcherEvent& event);
+	bool OpenIfListFile(const wxString& text);
+	
+	std::vector<wxString> FilterFileExtensions();
 
 	DECLARE_EVENT_TABLE()
 };

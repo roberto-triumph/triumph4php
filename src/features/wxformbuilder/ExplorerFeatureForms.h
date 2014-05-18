@@ -82,6 +82,43 @@ class ModalExplorerGeneratedPanelClass : public wxPanel
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class ExplorerOutlineGeneratedPanelClass
+///////////////////////////////////////////////////////////////////////////////
+class ExplorerOutlineGeneratedPanelClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxBitmapButton* FilterButton;
+		wxBitmapButton* ParentButton;
+		wxBitmapButton* RefreshButton;
+		wxBitmapButton* HelpButton;
+		wxComboBox* Directory;
+		wxListCtrl* List;
+		wxStaticText* ListLabel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnFilterButtonLeftDown( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnParentButtonClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRefreshClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDirectorySelected( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDirectoryEnter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnListEndLabelEdit( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListItemSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListRightDown( wxMouseEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ExplorerOutlineGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 374,756 ), long style = wxTAB_TRAVERSAL );
+		~ExplorerOutlineGeneratedPanelClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class ExplorerHelpGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
 class ExplorerHelpGeneratedDialogClass : public wxDialog 

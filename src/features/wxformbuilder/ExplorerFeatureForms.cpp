@@ -124,6 +124,95 @@ ModalExplorerGeneratedPanelClass::~ModalExplorerGeneratedPanelClass()
 	
 }
 
+ExplorerOutlineGeneratedPanelClass::ExplorerOutlineGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 2 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	FilterButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( FilterButton, 0, wxALL, 5 );
+	
+	ParentButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	ParentButton->SetToolTip( wxT("Parent directory") );
+	
+	ParentButton->SetToolTip( wxT("Parent directory") );
+	
+	TopSizer->Add( ParentButton, 0, wxALL, 5 );
+	
+	RefreshButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( RefreshButton, 0, wxALL, 5 );
+	
+	HelpButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	
+	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* DirSizer;
+	DirSizer = new wxBoxSizer( wxVERTICAL );
+	
+	Directory = new wxComboBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxTE_PROCESS_ENTER ); 
+	DirSizer->Add( Directory, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	GridSizer->Add( DirSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* FilesPanelSizer;
+	FilesPanelSizer = new wxBoxSizer( wxVERTICAL );
+	
+	List = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_NO_HEADER|wxLC_REPORT );
+	FilesPanelSizer->Add( List, 1, wxEXPAND|wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	ListLabel = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	ListLabel->Wrap( -1 );
+	FilesPanelSizer->Add( ListLabel, 0, wxALL|wxEXPAND, 5 );
+	
+	GridSizer->Add( FilesPanelSizer, 1, wxEXPAND, 5 );
+	
+	BoxSizer->Add( GridSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	// Connect Events
+	FilterButton->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ExplorerOutlineGeneratedPanelClass::OnFilterButtonLeftDown ), NULL, this );
+	ParentButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnParentButtonClick ), NULL, this );
+	RefreshButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnRefreshClick ), NULL, this );
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnHelpButton ), NULL, this );
+	Directory->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnDirectorySelected ), NULL, this );
+	Directory->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemActivated ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemRightClick ), NULL, this );
+	List->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemSelected ), NULL, this );
+	List->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ExplorerOutlineGeneratedPanelClass::OnListRightDown ), NULL, this );
+}
+
+ExplorerOutlineGeneratedPanelClass::~ExplorerOutlineGeneratedPanelClass()
+{
+	// Disconnect Events
+	FilterButton->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ExplorerOutlineGeneratedPanelClass::OnFilterButtonLeftDown ), NULL, this );
+	ParentButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnParentButtonClick ), NULL, this );
+	RefreshButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnRefreshClick ), NULL, this );
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnHelpButton ), NULL, this );
+	Directory->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnDirectorySelected ), NULL, this );
+	Directory->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( ExplorerOutlineGeneratedPanelClass::OnDirectoryEnter ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListEndLabelEdit ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemActivated ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemRightClick ), NULL, this );
+	List->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( ExplorerOutlineGeneratedPanelClass::OnListItemSelected ), NULL, this );
+	List->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ExplorerOutlineGeneratedPanelClass::OnListRightDown ), NULL, this );
+	
+}
+
 ExplorerHelpGeneratedDialogClass::ExplorerHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
