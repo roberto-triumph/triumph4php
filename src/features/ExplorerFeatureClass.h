@@ -195,7 +195,7 @@ class FileListingWidgetClass : public wxEvtHandler {
 	 * this class will not own any of these pointers
 	 */
 	FileListingWidgetClass(wxListCtrl* list, wxImageList* imageList, 
-		t4p::FileListingClass* fileListing, wxEvtHandler* activateHandler, 
+		t4p::FileListingClass* fileListing, wxWindow* parentPanel, 
 		t4p::ExplorerFeatureClass* feature);
 	~FileListingWidgetClass();
 	
@@ -244,16 +244,17 @@ private:
 	 * the list item activate event will be propagated to this event
 	 * handler.
 	 */
-	wxEvtHandler* ActivateHandler;
+	wxEvtHandler* ParentPanel;
 	
+	/**
+	 * this class will not own this pointer
+	 */
 	t4p::ExplorerFeatureClass* Feature;
 
 	enum ListImages {
 		LIST_FOLDER = t4p::IMGLIST_NONE + 1,
 		LIST_PARENT_FOLDER
 	};
-	
-	DECLARE_EVENT_TABLE()
 };
 
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {

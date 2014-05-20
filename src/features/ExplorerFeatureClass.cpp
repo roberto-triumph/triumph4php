@@ -440,22 +440,44 @@ static void SetExplorerAccelerators(wxListCtrl* ctrl) {
 }
 
 t4p::FileListingWidgetClass::FileListingWidgetClass(wxListCtrl* list, wxImageList* imageList, t4p::FileListingClass* fileListing,
-	wxEvtHandler* activateHandler, t4p::ExplorerFeatureClass* feature)
+	wxWindow* parentPanel, t4p::ExplorerFeatureClass* feature)
 : wxEvtHandler()
 , List(list)
 , FilesImageList(imageList) 
 , FileListing(fileListing) 
-, ActivateHandler(activateHandler)
+, ParentPanel(parentPanel)
 , Feature(feature) {
 	List->Connect(wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler(t4p::FileListingWidgetClass::OnListEndLabelEdit), NULL, this);
 	List->Connect(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(t4p::FileListingWidgetClass::OnListItemRightClick), NULL, this);
 	List->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(t4p::FileListingWidgetClass::OnListRightDown), NULL, this);
+
+	ParentPanel->Connect(ID_EXPLORER_LIST_RENAME, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuRename), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_DELETE, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuDelete), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_PHP, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_SQL, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_CSS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_JS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_TEXT, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_CREATE_DIRECTORY, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateDirectory), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_SHELL, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuShell), NULL, this);
+	ParentPanel->Connect(ID_EXPLORER_LIST_FILE_MANAGER, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuFileManager), NULL, this);
 }
 
 t4p::FileListingWidgetClass::~FileListingWidgetClass() {
 	List->Disconnect(wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler(t4p::FileListingWidgetClass::OnListEndLabelEdit), NULL, this);
 	List->Disconnect(wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(t4p::FileListingWidgetClass::OnListItemRightClick), NULL, this);
 	List->Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(t4p::FileListingWidgetClass::OnListRightDown), NULL, this);
+
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_RENAME, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuRename), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_DELETE, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuDelete), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_PHP, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_SQL, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_CSS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_JS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_TEXT, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_DIRECTORY, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateDirectory), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_SHELL, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuShell), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_FILE_MANAGER, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuFileManager), NULL, this);
 }
 
 void t4p::FileListingWidgetClass::ShowDir() {
@@ -1997,17 +2019,4 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(t4p::FileListingClass, wxEvtHandler)
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, t4p::FileListingClass::OnExplorerListComplete)
 	EVT_FSWATCHER(wxID_ANY, t4p::FileListingClass::OnFsWatcher)
-END_EVENT_TABLE()
-
-BEGIN_EVENT_TABLE(t4p::FileListingWidgetClass, wxEvtHandler)
-	EVT_MENU(ID_EXPLORER_LIST_RENAME, t4p::FileListingWidgetClass::OnListMenuRename)
-	EVT_MENU(ID_EXPLORER_LIST_DELETE, t4p::FileListingWidgetClass::OnListMenuDelete)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_PHP, t4p::FileListingWidgetClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_SQL, t4p::FileListingWidgetClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_CSS, t4p::FileListingWidgetClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_JS, t4p::FileListingWidgetClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_TEXT, t4p::FileListingWidgetClass::OnListMenuCreateNew)
-	EVT_MENU(ID_EXPLORER_LIST_CREATE_DIRECTORY, t4p::FileListingWidgetClass::OnListMenuCreateDirectory)
-	EVT_MENU(ID_EXPLORER_LIST_SHELL, t4p::FileListingWidgetClass::OnListMenuShell)
-	EVT_MENU(ID_EXPLORER_LIST_FILE_MANAGER, t4p::FileListingWidgetClass::OnListMenuFileManager)
 END_EVENT_TABLE()
