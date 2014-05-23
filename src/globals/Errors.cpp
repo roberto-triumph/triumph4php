@@ -27,7 +27,7 @@
 #include <wx/log.h>
 #include <wx/intl.h>
 
-static wxString FIX_SEPARATOR = wxT("\n\nFix\n\n");
+static wxString FIX_SEPARATOR = wxT("\n\nPossible Fixes\n\n");
 
 wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 	wxString msg;
@@ -95,6 +95,10 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 		case t4p::ERR_FILE_TOO_LARGE:
 			msg = t4p::MessageWithFix(_("File is too large: ") + extra,
 				_("Triumph cannot handle files larger than 10 MB"));
+			break;
+		case t4p::ERR_INVALID_SETTINGS_DIRECTORY:
+			msg = t4p::MessageWithFix(_("Settings directory does not exist:") + extra,
+				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to Edit ... Preferences and choose a different settings directory."));
 			break;
 		case t4p::WARNING_OTHER:
 			msg = extra;

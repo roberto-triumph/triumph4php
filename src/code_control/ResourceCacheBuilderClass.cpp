@@ -74,6 +74,13 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 }
 
 void t4p::WorkingCacheBuilderClass::BackgroundWork() {
+
+	// tag caches may not exist if the user screwed up and pointed their settings
+	// dir to a non-existing location.
+	if (!TagCacheDbFileName.FileExists()) {
+		return;
+	}
+
 	if (!FileIdentifier.IsEmpty()) {
 		if (FileIsNew) {
 

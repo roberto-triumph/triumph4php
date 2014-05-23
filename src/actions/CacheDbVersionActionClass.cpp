@@ -62,18 +62,21 @@ void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
 		try {
 			
 			// if file does not exist create it
-			
-			std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
-			Session.open(*soci::factory_sqlite3(), stdFilename);
-			int versionNumber = t4p::SqliteSchemaVersion(Session);
-			if (versionNumber != SCHEMA_VERSION_TAGS) {
-				wxString error;
-				bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
-				if (!good) {
-					t4p::EditorLogError(t4p::WARNING_OTHER, error);
+			// if the directory that the sqlite file should be in does not exist
+			// then dont create the dirs.
+			if (wxFileName::DirExists(filename->GetPath())) {
+				std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
+				Session.open(*soci::factory_sqlite3(), stdFilename);
+				int versionNumber = t4p::SqliteSchemaVersion(Session);
+				if (versionNumber != SCHEMA_VERSION_TAGS) {
+					wxString error;
+					bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
+					if (!good) {
+						t4p::EditorLogError(t4p::WARNING_OTHER, error);
+					}
 				}
+				Session.close();
 			}
-			Session.close();
 		} catch (std::exception& e) {
 			wxString msg = wxString::FromAscii(e.what());
 			wxUnusedVar(msg);
@@ -109,17 +112,21 @@ void t4p::DetectorCacheDbVersionActionClass::BackgroundWork() {
 		try {
 
 			// if file does not exist create it
-			std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
-			Session.open(*soci::factory_sqlite3(), stdFilename);
-			int versionNumber = t4p::SqliteSchemaVersion(Session);
-			if (versionNumber != SCHEMA_VERSION_DETECTOR) {
-				wxString error;
-				bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
-				if (!good) {
-					t4p::EditorLogError(t4p::WARNING_OTHER, error);
+			// if the directory that the sqlite file should be in does not exist
+			// then dont create the dirs.
+			if (wxFileName::DirExists(filename->GetPath())) {
+				std::string stdFilename = t4p::WxToChar(filename->GetFullPath());
+				Session.open(*soci::factory_sqlite3(), stdFilename);
+				int versionNumber = t4p::SqliteSchemaVersion(Session);
+				if (versionNumber != SCHEMA_VERSION_DETECTOR) {
+					wxString error;
+					bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
+					if (!good) {
+						t4p::EditorLogError(t4p::WARNING_OTHER, error);
+					}
 				}
+				Session.close();
 			}
-			Session.close();
 		} catch (std::exception& e) {
 			wxString msg = wxString::FromAscii(e.what());
 			wxUnusedVar(msg);

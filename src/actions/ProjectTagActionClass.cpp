@@ -141,8 +141,15 @@ void t4p::ProjectTagInitActionClass::Work(t4p::GlobalsClass &globals) {
 	// the tag cache will own these pointers
 	t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
 	tagFinderList->InitNativeTag(t4p::NativeFunctionsAsset());
-	tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, version);
-	tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
+
+	// tag caches may not exist if the user screwed up and pointed their settings
+	// dir to a non-existing location.
+	if (globals.TagCacheDbFileName.FileExists()) {
+		tagFinderList->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), otherFileExtensions, version);
+	}
+	if (globals.DetectorCacheDbFileName.FileExists()) {
+		tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
+	}
 	globals.TagCache.RegisterGlobal(tagFinderList);
 }
 

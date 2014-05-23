@@ -35,8 +35,13 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	SetStatus(_("Detector Db Init"));
 
 	// open the tag db
-	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), 
-		t4p::WxToChar(globals.DetectorCacheDbFileName.GetFullPath()));
+	// it may not exist if the user screwed up and pointed their settings
+	// dir to a non-existing location.
+	if (!globals.DetectorCacheDbFileName.Exists()) {
+		return;
+	}
+	std::string sqliteFile = t4p::WxToChar(globals.DetectorCacheDbFileName.GetFullPath());
+	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), sqliteFile);
 	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
 	
 	// reload the detected database tags

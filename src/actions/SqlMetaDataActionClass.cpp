@@ -49,6 +49,11 @@ t4p::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(t4p::RunningThreadsC
 void t4p::SqlMetaDataInitActionClass::Work(t4p::GlobalsClass& globals) {
 	
 	// prime the sql resource finder
+	// the tag db may not exist if the user screwed up and pointed their settings
+	// dir to a non-existing location.
+	if (!globals.TagCacheDbFileName.Exists()) {
+		return;
+	}
 	globals.ResourceCacheSession.open(
 		*soci::factory_sqlite3(),
 		t4p::WxToChar(globals.TagCacheDbFileName.GetFullPath())
