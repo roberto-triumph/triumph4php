@@ -43,6 +43,11 @@ Other explorer actions:
   * You can open a command shell to the current directory
   * You can open a Operating system file manager to the current directory
 
+There are two explorer panels that you can use. If you use the panel
+by using the View -> Explore Sources menu then the explorer panel is placed
+at the bottom of the screen (the "Tools" notebook). If you use the panel
+by using the View -> Explorer In Outline then the explorer panel is placed
+at the left-hand side of the screen (the "Outline" notebook). 
 
 
 [Table Of Contents](/#toc) | [Next - Framework Detection](/framework-detection/)

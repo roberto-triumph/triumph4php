@@ -1,8 +1,8 @@
-[Table Of Contents](/#toc) | [Next - PHP Doc Comments](/php-doc-comments/)
+[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)
 
 
 # PHP Code Completion #
-MVC Editor boasts a powerful PHP code completion system.  It is capable of completing 
+triumph4php boasts a powerful PHP code completion system.  It is capable of completing 
 
   * PHP keywords
   * PHP built-in functions, classes, methods, and defines
@@ -120,4 +120,4 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	$my->// autocompletion will show methods of MyClass since $my is documented
 
 
-[Table Of Contents](/#toc) | [Next - PHP Doc Comments](/php-doc-comments/)
+[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)

@@ -1,4 +1,4 @@
-[Table Of Contents](/#toc) | [Next - PHP Code Completion](/php-code-completion/)
+[Table Of Contents](/#toc) | [Next - Keyboard Shortcuts](/keyboard-shortcuts/)
 
 #Total Search#
 
@@ -32,4 +32,4 @@ You can also double-click on an item in the list; in this case the item that
 was double-clicked on will be opened.
 
 
-[Table Of Contents](/#toc) | [Next - PHP Code Completion](/php-code-completion/)
+[Table Of Contents](/#toc) | [Next - Keyboard Shortcuts](/keyboard-shortcuts/)

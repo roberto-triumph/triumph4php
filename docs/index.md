@@ -1,7 +1,7 @@
 # triumph4php manual #
 
 # Introduction #
-The idea for triumph4php was borne out of a need to remove the tediousness out of PHP programming. PHP itself is a 
+The idea for triumph4php was born out of a need to remove the tediousness out of PHP programming. PHP itself is a 
 simple language that is easy to learn; however there currently does not exist an editor that is tailor-made for it.  
 
 # Yet Another Editor? #
@@ -36,7 +36,9 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [New User Wizard](/new-user-wizard/)
   * [Project Management](/projects/)
   * [Total Search](/total-search/)  
+  * [Keyboard Shortcuts] (/keyboard-shortcuts/)
   * [PHP Code Completion](/php-code-completion/)
+  * [Bookmarks] (/bookmarks/)
   * [PHP Doc Comments](/php-doc-comments/)
   * [PHP Linter](/php-linter/)
   * [Database Connections](/database-connections/)

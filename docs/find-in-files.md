@@ -10,7 +10,7 @@ expression.  The full regular expression syntax is described at
 [http://www.unicode.org/reports/tr18/](http://www.unicode.org/reports/tr18/). To the
 left of the find input, there is a popup menu that shows you the regular 
 expression meta-characters that are available.  Clicking on one of them
-will add it to the find expression.
+will add it to the find expression text input.
 
 Find in files is recursive; it will search the given directory and all of its sub-directories.
 By default only PHP files are searched. You can change this at any time by entering
