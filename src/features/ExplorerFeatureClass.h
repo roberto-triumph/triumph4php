@@ -69,6 +69,11 @@ public:
 	void OnExplorerListComplete(t4p::ExplorerEventClass& event);
 
 	/**
+	 * handler for when a file modification (new or delete) was performed
+	 */
+	void OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event);
+
+	/**
 	 * this object gets its own background thread to
 	 * read directories in the background
 	 */

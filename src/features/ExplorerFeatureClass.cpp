@@ -191,6 +191,9 @@ void t4p::FileListingClass::OnExplorerListComplete(t4p::ExplorerEventClass& even
 	wxPostEvent(&Handler, event);
 }
 
+void t4p::FileListingClass::OnExplorerModifyComplete(t4p::ExplorerModifyEventClass& event) {
+	wxPostEvent(&Handler, event);
+}
 
 t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app) 
 	: FeatureClass(app) {
@@ -2018,5 +2021,6 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::FileListingClass, wxEvtHandler)
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, t4p::FileListingClass::OnExplorerListComplete)
+	EVT_EXPLORER_MODIFY_COMPLETE(ID_EXPLORER_MODIFY, t4p::FileListingClass::OnExplorerModifyComplete)
 	EVT_FSWATCHER(wxID_ANY, t4p::FileListingClass::OnFsWatcher)
 END_EVENT_TABLE()
