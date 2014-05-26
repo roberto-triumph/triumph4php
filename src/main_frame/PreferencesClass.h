@@ -178,8 +178,22 @@ public:
 	/**
 	 * Set the config object where the settings are stored on wxConfigBase; after a call to InitConfig()
 	 * any other source code can get the config object using wxConfigBase::Get
+	 * There a couple of scenarios that are accounted for:
+	 *
+	 * 1. config file does not exist: in this case the config object is initialized
+	 *    and the file will be created when the config is flushed
+	 * 2. config file already exists: in this case the config object is initialized
+	 *    with the settings from the file.
+	 * 3. config file does not exist and the config directory is set to a non-existing
+	 *    directory: in this case, the config object is initialized to the 
+	 *    default settings, and this method return false. The config object
+	 *    is initialized to a temporary config file that is only used in this case.
+	 *
+	 * @return bool false if the settings DIRECTORY does not exist, this means that 
+	 *         the config file cannot be written.
+	 *
 	 */
-	static void InitConfig();
+	static bool InitConfig();
 
 	/**
 	 * Set the settings directory.  This will

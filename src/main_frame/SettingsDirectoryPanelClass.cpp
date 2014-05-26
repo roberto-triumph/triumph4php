@@ -117,3 +117,16 @@ void t4p::SettingsDirectoryPanelClass::OnCustomDir(wxCommandEvent& event) {
 	SettingsDirectory->SetPath(wxT(""));
 	SettingsDirectory->Enable(true);
 }
+
+bool t4p::SettingsDirectoryPanelClass::TransferDataFromWindow() {
+	wxWindow::TransferDataFromWindow();
+
+	// if directory is in a custom location check to make sure that 
+	// it exists
+	if (CustomDirectory->GetValue() &&
+		!wxFileName::DirExists(SettingsDirectory->GetPath())) {
+		wxMessageBox(_("Settings directory does not exist."), _("Settings Directory"));
+		return false;
+	}
+	return true;
+}

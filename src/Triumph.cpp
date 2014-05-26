@@ -327,7 +327,11 @@ void t4p::AppClass::DeleteFeatures() {
 void t4p::AppClass::LoadPreferences() {
 
 	// load any settings from .INI files
-	PreferencesClass::InitConfig();
+	bool validConfigDir = PreferencesClass::InitConfig();
+	if (!validConfigDir) {
+		wxFileName configDir = t4p::ConfigDirAsset();
+		t4p::EditorLogError(t4p::ERR_INVALID_SETTINGS_DIRECTORY, configDir.GetPath());
+	}
 	wxConfigBase* config = wxConfigBase::Get();
 	Globals.Environment.LoadFromConfig(config);
 

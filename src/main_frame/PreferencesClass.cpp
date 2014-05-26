@@ -524,12 +524,24 @@ void t4p::PreferencesClass::Save() {
 	config->Flush();
 }
 
-void t4p::PreferencesClass::InitConfig() {
+bool t4p::PreferencesClass::InitConfig() {
 	wxStandardPaths paths = wxStandardPaths::Get();
-	wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
-	wxFileConfig* config = new wxFileConfig(wxT("triumph4php"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+	wxFileName configDir = t4p::ConfigDirAsset();
+	if (configDir.DirExists()) {
+		wxFileName configFileName(configDir.GetPath(), wxT("triumph4php.ini"));
+		
+		// this config will be automatically deleted by wxWidgets at the end
+		wxFileConfig* config = new wxFileConfig(wxT("triumph4php"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
+		wxConfigBase::Set(config);
+		return true;
+	}
+
+	// will not be able to write config file but the app still assumes that
+	// wxConfigBase::Get() will be valid, so lets initialize a throw-away file
+	wxFileName tempConfigFileName(t4p::TempDirAsset().GetPath(), wxT("triumph4php-temp.ini"));
+	wxFileConfig* config = new wxFileConfig(wxT("triumph4php-temp"), wxEmptyString, tempConfigFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxConfigBase::Set(config);
-	// this config will be automatically deleted by wxWidgets at the end
+	return false;
 }
 
 void t4p::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {

@@ -35,6 +35,8 @@ public:
 
 	SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir);
 
+	bool TransferDataFromWindow();
+
 private:
 
 	void OnUserDataDir(wxCommandEvent& event);
