@@ -22,6 +22,14 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
+
+// include boost asio before any other file to prevent
+//
+// fatal error C1189: #error :  WinSock.h has already been included
+//
+// in MSW
+#include <boost/asio.hpp>
+
 #include <Triumph.h>
 #include <wx/cmdline.h>
 #include <wx/fileconf.h>
@@ -56,6 +64,7 @@
 #include <features/EditorBehaviorFeatureClass.h>
 #include <features/ChangelogFeatureClass.h>
 #include <features/BookmarkFeatureClass.h>
+#include <features/DebuggerFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -285,7 +294,9 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new BookmarkFeatureClass(*this);
 	Features.push_back(feature);
-	
+	feature = new DebuggerFeatureClass(*this);
+	Features.push_back(feature);
+
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);
 	//Features.push_back(feature);

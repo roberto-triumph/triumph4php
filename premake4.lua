@@ -44,6 +44,7 @@ dofile "premake_action_curl.lua"
 dofile "premake_action_icu.lua"
 dofile "premake_action_mysql.lua"
 dofile "premake_action_sqlite.lua"
+dofile "premake_action_boost.lua"
 dofile "premake_action_setupdev.lua"
 
 
@@ -213,6 +214,48 @@ function curlconfiguration(config, action)
 	end
 end
 
+-- the boost configuration
+-- for MSW, we use the version we compiled with the boost action
+-- for linux, we use the system wide version
+function boostconfiguration(config, action)	
+	if action == "vs2008" and config == "Debug" then	
+		includedirs { BOOST_DEBUG_INCLUDE_DIR }
+		libdirs { BOOST_DEBUG_LIB_DIR }
+		links { 'libboost_system-vc90-mt-gd-1_55' }
+		
+		-- we dont want asio to use boost.time or boost.regex since we
+		-- don't otherwise use them
+		-- WIN32_LEAN_AND_MEAN to prevent "winsock.h already defined" errors
+		-- when putting wxWidgets and asio together
+		-- _WIN32_WINNT=0x0501 to prevent asio warnings 
+		-- "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately"
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB', 
+			'WIN32_LEAN_AND_MEAN' ,
+			'_WIN32_WINNT=0x0501'
+		}
+	elseif action == "vs2008" and config == "Release" then	
+		includedirs { BOOST_RELEASE_INCLUDE_DIR }
+		libdirs { BOOST_RELEASE_LIB_DIR }
+		links { 'libboost_system-vc90-mt-gd-1_55' }
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB', 
+			'WIN32_LEAN_AND_MEAN', 
+			'_WIN32_WINNT=0x0501'
+		}
+	elseif action == "gmake" or action == "codelite" then
+		includedirs { BOOST_INCLUDE_DIR }
+		libdirs { BOOST_LIB_DIR }
+		links { "boost_system" }
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB'
+		}
+	end
+end
+
 function pickywarnings(action)
 	if action == "vs2008" then
 		flags { "FatalWarnings" }
@@ -274,6 +317,7 @@ solution "triumph4php"
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
 			curlconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 			
 			-- use the local update server in debug  
 			defines { 
@@ -287,6 +331,7 @@ solution "triumph4php"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 			curlconfiguration("Release", _ACTION)
+			boostconfiguration("Release", _ACTION)
 			
 			-- use the public update server in release
 			defines { 

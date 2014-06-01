@@ -86,7 +86,7 @@ function existence(pathsToCheck, extraMessage)
 	end
 end
 
-function existenceOrDownloadExtract(zipFile, downloadUrl, extraMessage)
+function existenceOrDownloadExtract(zipFile, extractedDir, downloadUrl, extraMessage)
 	zipFullPath = normalizepath(zipFile);
 	if (not os.isfile(zipFile)) then
 		print(extraMessage)
@@ -94,13 +94,17 @@ function existenceOrDownloadExtract(zipFile, downloadUrl, extraMessage)
 			WGET,
 			zipFullPath,
 			downloadUrl);
+		batchexecute(normalizepath("lib"), {
+			downloadCmd
+		})	
+	end
+	if (not os.isdir(extractedDir)) then
 		extractCmd = string.format("%s x %s",
 			SEVENZIP, zipFullPath
 		);
 		batchexecute(normalizepath("lib"), {
-			downloadCmd,
 			extractCmd
-		})		
+		})
 	end
 end
 		

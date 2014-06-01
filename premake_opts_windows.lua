@@ -207,6 +207,28 @@ CURL_RELEASE_LIB = CURL_RELEASE_DIR .. '/lib/libcurl.lib'
 CURL_RELEASE_LIB_DIR = CURL_RELEASE_DIR .. '/lib'
 CURL_RELEASE_BIN_DIR = CURL_RELEASE_DIR .. '/bin'
 
+-- will look for boost in these directories
+boostDebugDir = os.getenv("T4P_BOOST_DEBUG_DIR")
+if (not boostDebugDir) then
+	boostDebugDir = "lib/boost_1_55_0/stage/lib";
+	print("Using default dir for boost debug: " .. boostDebugDir)
+end  
+BOOST_DEBUG_INCLUDE_DIR = 'lib/boost_1_55_0/'
+BOOST_DEBUG_LIB = boostDebugDir .. '/libboost_system-vc90-mt-gd-1_55.lib'
+BOOST_DEBUG_LIB_DIR = boostDebugDir
+BOOST_DEBUG_BIN_DIR = boostDebugDir
+
+boostReleaseDir = os.getenv("T4P_BOOST_RELEASE_DIR")
+if (not boostReleaseDir) then
+	boostReleaseDir = "lib/boost_1_55_0/stage/lib";
+	print("Using default dir for boost release: " .. boostReleaseDir)
+end  
+BOOST_RELEASE_INCLUDE_DIR = 'lib/boost_1_55_0'
+BOOST_RELEASE_LIB = boostReleaseDir .. '/libboost_system-vc90-mt-1_55.lib'
+BOOST_RELEASE_LIB_DIR = boostReleaseDir
+BOOST_RELEASE_BIN_DIR = boostReleaseDir
+
+
 -- location of the final lib directory
 -- all of the dependant shared libraries (DLLs) will be placed here
 -- by default this will be the same directory as the directory where

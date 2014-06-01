@@ -23,37 +23,44 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
-function prepMysql()
+function prepBoost()
 	
 	if os.is "windows" then
 	
-		mysqlZip = "lib/mysql-connector-c-noinstall-6.0.2-win32.zip";
-		mysqlDownload = "http://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-noinstall-6.0.2-win32.zip"
-		extractedDir = 'lib/mysql-connector-c-noinstall-6.0.2-win32'
-		existenceOrDownloadExtract(mysqlZip, extractedDir, mysqlDownload, "Downloading libMySQL dependency");
-		mysqlLibPath = normalizepath(MYSQL_LIB_DIR .. "*.dll")
-		batchexecute(normalizepath(""), {
-			"xcopy /S /Y " .. mysqlLibPath  .. " \"Debug\\\"",
-			"xcopy /S /Y " .. mysqlLibPath  .. " \"Release\\\""
+		boostZip = "lib/boost_1_55_0.7z";
+		boostDownload = "http://triumph4php.com/boost_1_55_0.7z"
+		extractedDir = 'lib/boost_1_55_0'
+		existenceOrDownloadExtract(boostZip, extractedDir, boostDownload, "Downloading boost dependency");
+		
+		-- on windows, we compile boost
+		-- we use asio which is a header-only library
+		-- but asio needs boost.system, and boost.system is 
+		-- not header only
+		batchexecute(normalizepath("lib/boost_1_55_0"), {
+
+			-- wrap around quotes in case path has spaces
+			"\"" .. VSVARS .. "\"",
+			'bootstrap.bat',
+			'.\\b2 --with-system --link=shared --variant=debug,release --toolset=msvc-9.0'
 		})
 	else  
 	
-		-- MYSQL_LIB_DIR is already the result of a os.searchpath
-		-- which searched the default locations for the curl library
-		mysqlLi = MYSQL_LIB_DIR
-		if mysqlLi == nil then
+		-- BOOST_LIB_DIR is already the result of a os.searchpath
+		-- which searched the default locations for the boost library
+		boostLib = BOOST_LIB_DIR
+		if boostLib == nil then
 			error (
-				"MySQL client libraries not found.  " .. 
-				"Please install the MySQL client library, or change the location of \n" ..
-				"MYSQL_LIB_DIR in premake_opts_linux.lua.\n" ..
-				"You can install mysql client via your package manager; ie. sudo apt-get install libmysqlclient-dev\n"
+				"Boost libraries not found.  " .. 
+				"Please install the boost libraries, or change the location of \n" ..
+				"BOOST_LIB_DIR in premake_opts_linux.lua.\n" ..
+				"You can install the boost libraries via your package manager; ie. sudo apt-get install libboost-dev\n"
 			)
 		end
 	end
 end
 
 newaction {
-	trigger = "mysql",
-	description = "Fetch the MySQL client library or check for its existence",
-	execute = prepMysql
+	trigger = "boost",
+	description = "Fetch and compile the boost libraries or check for their existence",
+	execute = prepBoost
 }

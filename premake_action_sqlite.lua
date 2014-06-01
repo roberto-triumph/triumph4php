@@ -26,14 +26,16 @@
 function prepSqlite()
 	
 	if os.is "windows" then
-		 sqliteZip = "lib/sqlite-dll-win32-x86-3071300.zip";
-		 sqliteDownload = "http://www.triumph4php.com/blog/wp-content/uploads/2014/01/sqlite-dll-win32-x86-3071300.zip"
-		 existenceOrDownloadExtract(sqliteZip, sqliteDownload, "Downloading SQLITE dependency");
-		
+		sqliteZip = "lib/sqlite-dll-win32-x86-3071300.zip";
+		sqliteDownload = "http://www.triumph4php.com/sqlite-dll-win32-x86-3071300.zip"
+		extractedDir = 'lib/sqlite-dll-win32-x86-3071300'
+		existenceOrDownloadExtract(sqliteZip, extractedDir, sqliteDownload, "Downloading SQLITE dependency");
+
 		--  the amalgamation contains the header files, necessary for compilation
-		 sqliteZip = "lib/sqlite-amalgamation-3071300.zip";
-		 sqliteDownload = "http://www.triumph4php.com/blog/wp-content/uploads/2014/01/sqlite-amalgamation-3071300.zip"
-		 existenceOrDownloadExtract(sqliteZip, sqliteDownload, "Downloading SQLITE dependency");
+		sqliteZip = "lib/sqlite-amalgamation-3071300.zip";
+		sqliteDownload = "http://www.triumph4php.com/sqlite-amalgamation-3071300.zip"
+		extractedDir = 'lib/sqlite-amalgamation-3071300'
+		existenceOrDownloadExtract(sqliteZip, extractedDir, sqliteDownload, "Downloading SQLITE dependency");
 		 
 		 -- copy the sqlite dll into its own dir
 		 --  we dont care if mkdir fails
@@ -43,7 +45,7 @@ function prepSqlite()
 			"copy sqlite3.def sqlite-dll-win32-x86-3071300",
 			"copy sqlite3.dll sqlite-dll-win32-x86-3071300"
 		 });
-		
+
 		-- need to create a .lib file that is needed to build against the sqlite
 		-- driver. the .lib file does not come in the sqlite archive
 		sqliteLibPath = normalizepath(SQLITE_LIB_DIR .. "/*.dll")

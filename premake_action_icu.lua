@@ -29,7 +29,8 @@ function prepIcu()
 		-- getting 4.2 on windows, 4.8 requires a newer visual studio
 		icuZip = "lib/icu4c-4_2_1-src.zip";
 		icuDownload = "http://download.icu-project.org/files/icu4c/4.2.1/icu4c-4_2_1-src.zip"
-		existenceOrDownloadExtract(icuZip, icuDownload, "Downloading ICU dependency");
+		extractedDir = 'lib/icu';
+		existenceOrDownloadExtract(icuZip, extractedDir, icuDownload, "Downloading ICU dependency");
 		
 		-- compile ICU
 		icuPath = normalizepath("lib/icu/source/allinone");
