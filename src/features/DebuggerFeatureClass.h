@@ -28,6 +28,7 @@
 #include <boost/asio.hpp>
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
+#include <language/DbgpEventClass.h>
 #include <features/wxformbuilder/DebuggerFeatureForms.h>
 #include <vector>
 #include <queue>
@@ -61,6 +62,15 @@ protected:
 	 * be able to close the socket properly.
 	 */
 	void BackgroundWork();
+
+	/**
+	 * parses the xdebug xml response into the approprivate DbgpEvent class
+	 * and posts the event.
+	 *
+	 * @param xml the xml response from xdebug
+	 * @param cmd the command that we sent to xdebug 
+	 */
+	void ParseAndPost(const wxString& xml, const std::string& cmd);
 
 	wxString GetLabel() const;
 
@@ -118,6 +128,30 @@ private:
 
 	void OnAppExit(wxCommandEvent& event);
 
+	// below are the handlers for all responses from the debug engine
+	void OnDbgpInit(t4p::DbgpInitEventClass& event);
+	void OnDbgpError(t4p::DbgpErrorEventClass& event);
+	void OnDbgpStatus(t4p::DbgpStatusEventClass& event);
+	void OnDbgpFeatureGet(t4p::DbgpFeatureGetEventClass& event);
+	void OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& event);
+	void OnDbgpContinue(t4p::DbgpContinueEventClass& event);
+	void OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventClass& event);
+	void OnDbgpBreakpointGet(t4p::DbgpBreakpointGetEventClass& event);
+	void OnDbgpBreakpointUpdate(t4p::DbgpBreakpointUpdateEventClass& event);
+	void OnDbgpBreakpointRemove(t4p::DbgpBreakpointRemoveEventClass& event);
+	void OnDbgpBreakpointList(t4p::DbgpBreakpointListEventClass& event);
+	void OnDbgpStackDepth(t4p::DbgpStackDepthEventClass& event);
+	void OnDbgpStackGet(t4p::DbgpStackGetEventClass& event);
+	void OnDbgpContextNames(t4p::DbgpContextNamesEventClass& event);
+	void OnDbgpContextGet(t4p::DbgpContextGetEventClass& event);
+	void OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event);
+	void OnDbgpPropertyValue(t4p::DbgpPropertyValueEventClass& event);
+	void OnDbgpPropertySet(t4p::DbgpPropertySetEventClass& event);
+	void OnDbgpBreak(t4p::DbgpBreakEventClass& event);
+	void OnDbgpEval(t4p::DbgpEvalEventClass& event);
+
+	// this is an additionala debug engine handler, we log the exact
+	// response we get back from the debug engine 
 	void OnDebuggerLog(wxCommandEvent& event);
 
 	t4p::RunningThreadsClass RunningThreads;

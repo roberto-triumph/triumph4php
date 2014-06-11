@@ -313,22 +313,15 @@ static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t
 	if (!GetNodeAttributeString(node, "type", prop.DataType, error)) {
 		return false;
 	}
-	if (!GetNodeAttributeString(node, "facet", prop.Facet, error)) {
-		return false;
-	}
-
+	
+	// more optional response items
+	GetNodeAttributeString(node, "facet", prop.Facet, ignored);
 	GetNodeAttributeInt(node, "size", prop.Size);
 	GetNodeAttributeBool(node, "children", prop.Children);
 	GetNodeAttributeInt(node, "numchildren", prop.NumChildren);
-
-	if (!GetNodeAttributeString(node, "key", prop.Key, error)) {
-		return false;
-	}
-
+	GetNodeAttributeString(node, "key", prop.Key, ignored);
 	GetNodeAttributeInt(node, "address", prop.Address);
-	if (!GetNodeAttributeString(node, "encoding", prop.Encoding, error)) {
-		return false;
-	}
+	GetNodeAttributeString(node, "encoding", prop.Encoding, ignored);
 
 	wxString value;
 	GetNodeText(node, value);
@@ -838,7 +831,7 @@ bool t4p::DbgpBreakpointSetEventClass::FromXml(const wxString& xml, t4p::DbgpXml
 	}
 	Enabled = stateStr.CmpNoCase(wxT("enabled")) == 0;
 
-	if (!GetNodeAttributeString(root, "breakpoint_id", BreakpointId, error)) {
+	if (!GetNodeAttributeString(root, "id", BreakpointId, error)) {
 		return false;
 	}
 	error = t4p::DBGP_XML_ERROR_NONE;
