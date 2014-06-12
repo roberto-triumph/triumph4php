@@ -57,6 +57,9 @@ namespace t4p {
  * EVT_AUITOOLBAR_OVERFLOW_CLICK (all of them)
  * EVT_AUITOOLBAR_RIGHT_CLICK (all of them)
  * EVT_AUITOOLBAR_TOOL_DROPDOWN (all of them)
+ *
+ * The event sink is NOT suitable for inter-thread communication, use EventSinkWithLocker
+ * for communication among theads
  */
 class EventSinkClass {
 
@@ -77,6 +80,13 @@ public:
 	void RemoveAllHandlers();
 
 	/**
+	 * removes a single event handler from the sink. After a call to this method, the
+	 * given handler will no longer be notified of any events.  Note that the
+	 * handler is NOT deleted since this class does not own the pointer.
+	 */
+	void RemoveHandler(wxEvtHandler *handler);
+
+	/**
 	 * Note that the event is processed IMMEDIATELY ie. within the same 
 	 * event loop. This method will not return control until all of the
 	 * handlers have processed the event.
@@ -94,7 +104,63 @@ public:
 
 private:
 
+	/**
+	 * the list of handlers to send events to. this class will NOT
+	 * own these pointers.
+	 */
 	std::vector<wxEvtHandler*> Handlers;
+};
+
+/**
+ * A EventSinkLocker is an event sink that uses a mutex
+ * for all of this operations: PushHandler, RemoveHandler, RemoveAllHandlers,
+ * and Post.
+ *
+ * The event sink is suitable for inter-thread communication.
+ */
+class EventSinkLockerClass {
+
+public:
+
+	EventSinkLockerClass();
+
+	/**
+	 * @param handler will get notified of every event that is published. This class
+	 * will not own the pointer.
+	 */
+	void PushHandler(wxEvtHandler* handler);
+
+	/**
+	 * forget all of the pushed handlers. After a call to this method, further calls
+	 * to Publish() will do nothing.
+	 */
+	void RemoveAllHandlers();
+
+	/**
+	 * removes a single event handler from the sink. After a call to this method, the
+	 * given handler will no longer be notified of any events.  Note that the
+	 * handler is NOT deleted since this class does not own the pointer.
+	 */
+	void RemoveHandler(wxEvtHandler *handler);
+
+	/**
+	 * Note that the event is processed IN THE NEXT EVENT LOOP. 
+	 *
+	 * @param event send the event to all registered handlers
+	 */
+	void Post(wxEvent& event);
+
+private:
+
+	/**
+	 * holds the list of event handlers
+	 */
+	t4p::EventSinkClass EventSink;
+
+	/**
+	 * to guard against simulatenous access of the event sink
+	 */
+	wxMutex Mutex;
 };
 
 // forward declaration to prevent recompilation when CodeControlClass is updated

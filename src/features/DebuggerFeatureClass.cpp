@@ -24,6 +24,7 @@
  */
 #include <features/DebuggerFeatureClass.h>
 #include <globals/Errors.h>
+#include <Triumph.h>
 #include <istream>
 #include <string>
 #include <algorithm>
@@ -77,10 +78,20 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 }
 
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
-	t4p::RunningThreadsClass& runningThreads, int eventId)
-: ActionClass(runningThreads, eventId) 
-, IoService() 
+	t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker)
+: wxEvtHandler()
+, ActionClass(runningThreads, eventId) 
+, Commands()
+, CommandMutex()
+, IoService()
+, EventSinkLocker(eventSinkLocker)
 , Port() {
+	EventSinkLocker.PushHandler(this);
+	Connect(t4p::EVENT_DEBUGGER_CMD, wxThreadEventHandler(t4p::DebuggerServerActionClass::OnCmd));
+}
+
+t4p::DebuggerServerActionClass::~DebuggerServerActionClass() {
+	Disconnect(t4p::EVENT_DEBUGGER_CMD, wxThreadEventHandler(t4p::DebuggerServerActionClass::OnCmd));
 }
 
 void t4p::DebuggerServerActionClass::Init(int port) {
@@ -88,7 +99,19 @@ void t4p::DebuggerServerActionClass::Init(int port) {
 }
 
 void t4p::DebuggerServerActionClass::AddCommand(std::string cmd) {
+	wxMutexLocker locker(CommandMutex);
 	Commands.push(cmd);
+}
+
+std::string t4p::DebuggerServerActionClass::NextCommand() {
+	std::string cmd;
+	wxMutexLocker locker(CommandMutex);
+	if (Commands.empty()) {
+		return cmd;
+	}
+	cmd = Commands.front();
+	Commands.pop();
+	return cmd;
 }
 
 void t4p::DebuggerServerActionClass::BackgroundWork() {
@@ -114,16 +137,21 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 				break;
 			}
 			
-			// xdebug xml
-			ParseAndPost(response, "init");
+			// xdebug responses
+			bool isDebuggerStopped = false;
+			ParseAndPost(response, "init", isDebuggerStopped);
 			Log("response", response);
-
-			SessionWork(socket);
+			if (!isDebuggerStopped) {
+				SessionWork(socket);
+			}
 		}
 		catch (std::exception& e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
+
+	// no longer need to listen for commands
+	EventSinkLocker.RemoveHandler(this);
 }
 
 void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& socket) {
@@ -137,40 +165,56 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 	AddCommand(cmd.BreakpointFile(
 		"C:\\Users\\Roberto\\Documents\\php_projects\\CodeIgniter_p1\\public\\index.php", 82, true
 	));
-	AddCommand(cmd.FeatureGet("supports_async"));
-	AddCommand(cmd.FeatureGet("breakpoint_types"));
-	AddCommand(cmd.FeatureGet("show_hidden"));
 	AddCommand(cmd.Run());
 	AddCommand(cmd.ContextNames(0));
 	AddCommand(cmd.ContextGet(0, 0));
+	AddCommand(cmd.StackGet(0));
 
-	// send the next command and read the debugger engine's resposne
-	while (!Commands.empty()) {
-		std::string cmd = Commands.front();
-		Commands.pop();
-		Log("command", cmd);
+	// send the next command and read the debugger engine's response
+	std::string next;
+	bool done = false;
+	bool isDebuggerStopped = false;
+	while (!done && !isDebuggerStopped && !IsCancelled()) {
+		next = NextCommand();
+		if (!next.empty()) {
+			Log("command", next);
 
-		// +1 == send the null bcoz the dbgp protocol says so
-		int written = boost::asio::write(socket, boost::asio::buffer(cmd.c_str(), cmd.length() + 1), writeError);
+			// +1 == send the null bcoz the dbgp protocol says so
+			int written = boost::asio::write(socket, boost::asio::buffer(next.c_str(), next.length() + 1), writeError);
 
-		if (writeError != boost::system::errc::success) {
-			Log("write error", writeError.message());
-			break;
+			if (writeError != boost::system::errc::success) {
+				Log("write error", writeError.message());
+				done = true;
+				break;
+			}
+
+			std::string response = ReadResponse(socket, streamBuffer, readError);
+			if (readError != boost::system::errc::success) {
+				Log("read error", readError.message());
+				done = true;
+				break;
+			}
+			
+			// xdebug xml
+			Log("response", response);
+			ParseAndPost(response, next, isDebuggerStopped);
 		}
-
-		std::string response = ReadResponse(socket, streamBuffer, readError);
-		if (readError != boost::system::errc::success) {
-			Log("read error", readError.message());
-			break;
+		else {
+			wxThread::Sleep(150);
 		}
-		
-		// xdebug xml
-		Log("response", response);
-		ParseAndPost(response, cmd);
+		if (isDebuggerStopped) {
+			
+			// remove all commands as they will no longer be run
+			// so that commands don't carry over script runs
+			next = NextCommand();
+			while (!next.empty()) {
+				next = NextCommand();
+			}
+		}
 	}
 }
 
-void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std::string& cmd) {
+void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std::string& cmd, bool& isDebuggerStopped) {
 	size_t spacePos = cmd.find(" ");
 	std::string cmdOnly = std::string::npos == spacePos ? cmd : cmd.substr(0, spacePos);
 	std::transform(cmdOnly.begin(), cmdOnly.end(), cmdOnly.begin(), std::tolower);
@@ -200,10 +244,12 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 			PostEvent(featureSetResponse);
 		}
 	}
-	else if ("continue" == cmdOnly) {
+	else if ("run" == cmdOnly || "step_into" == cmdOnly || 
+			"step_over" == cmdOnly || "step_out" == cmdOnly || "stop" == cmdOnly) {
 		t4p::DbgpContinueEventClass continueResponse;
 		if (continueResponse.FromXml(xml, xmlError)) {
 			PostEvent(continueResponse);
+			isDebuggerStopped = t4p::DBGP_STATUS_STOPPING == continueResponse.Status;
 		}
 	}
 	else if ("breakpoint_set" == cmdOnly) {
@@ -304,6 +350,11 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 	}
 }
 
+void t4p::DebuggerServerActionClass::OnCmd(wxThreadEvent& event) {
+	wxString cmd = event.GetString();
+	AddCommand(t4p::WxToChar(cmd));
+}
+
 wxString t4p::DebuggerServerActionClass::GetLabel() const {
 	return wxT("debugger listener");
 }
@@ -321,11 +372,24 @@ void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& 
 
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
-, RunningThreads() {
+, RunningThreads() 
+, EventSinkLocker() {
 }
 
 void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	
+	wxMenu* menu = new wxMenu();
+	menu->AppendCheckItem(t4p::MENU_DEBUGGER + 0, _("Start Listening for Debugger"), 
+			_("Opens a server socket to listen for incoming xdebug connections"));
+	menu->AppendCheckItem(t4p::MENU_DEBUGGER + 1, _("Break at start"),
+		_("When checked, program will halt at the first line"));
+	menu->AppendSeparator();
+	menu->Append(t4p::MENU_DEBUGGER + 2, _("Step Into\tF11"), 
+		_("Run the next command, recursing inside function calls"));
+	menu->Append(t4p::MENU_DEBUGGER + 3, _("Step Over\tF10"),
+		_("Run the next command, without recursing inside function calls"));
+	menu->Append(t4p::MENU_DEBUGGER + 4, _("Step Out\tShift+F11"),
+		_("Run until the end of the current function"));
+	menuBar->Append(menu, _("Debug"));	
 }
 
 void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
@@ -335,7 +399,7 @@ void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
 	DebuggerPanel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER);
 	AddToolsWindow(DebuggerPanel, _("Debugger"));
 
-	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER);
+	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER, EventSinkLocker);
 	action->Init(9000);
 	RunningThreads.Queue(action);
 
@@ -366,6 +430,50 @@ void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	RunningThreads.StopAll();
 }
 
+void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
+}
+
+void t4p::DebuggerFeatureClass::OnBreakAtStart(wxCommandEvent& event) {
+}
+
+void t4p::DebuggerFeatureClass::OnStepInto(wxCommandEvent& event) {
+	t4p::DbgpCommandClass cmd;
+	PostCmd(
+		cmd.StepInto()	
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		cmd.StackGet(0)	
+	);
+}
+
+void t4p::DebuggerFeatureClass::OnStepOver(wxCommandEvent& event) {
+	t4p::DbgpCommandClass cmd;
+	PostCmd(
+		cmd.StepOver()	
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		cmd.StackGet(0)	
+	);
+}
+
+void t4p::DebuggerFeatureClass::OnStepOut(wxCommandEvent& event) {
+	t4p::DbgpCommandClass cmd;
+	PostCmd(
+		cmd.StepOut()	
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		cmd.StackGet(0)	
+	);
+}
 
 void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	wxMessageBox("app id:" + event.AppId, "debugger init");
@@ -380,7 +488,7 @@ void t4p::DebuggerFeatureClass::OnDbgpStatus(t4p::DbgpStatusEventClass& event) {
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureGet(t4p::DbgpFeatureGetEventClass& event) {
-	wxMessageBox(wxString::Format("feature=%d status=", event.Feature) + event.Data, "feature get");
+
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& event) {
@@ -415,15 +523,44 @@ void t4p::DebuggerFeatureClass::OnDbgpStackDepth(t4p::DbgpStackDepthEventClass& 
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& event) {
+	if (event.Stack.empty()) {
+		return;
+	}
 
+	// in this method we will open the file at which execution has 
+	// stopped
+
+	wxString currentFilename = event.Stack[0].Filename;
+
+	// xdebug returns files in form
+	// file://{system name}/c:/wamp/www/index.php
+	// 
+	// we remove the file:/// from the name
+	currentFilename = currentFilename.Mid(8);
+
+	wxFileName name(currentFilename);
+	name.Normalize();
+
+	t4p::OpenFileCommandEventClass openEvt(
+		name.GetFullPath(), -1, -1,
+		event.Stack[0].LineNumber
+	);
+	App.EventSink.Publish(openEvt);
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (ctrl) {
+
+		// if the file was successfully opened then mark
+		// the current line where execution stopped.
+		ctrl->ExecutionMarkAt(event.Stack[0].LineNumber);
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContextNames(t4p::DbgpContextNamesEventClass& event) {
-	wxMessageBox(wxString::Format("names size=%d", event.Names.size()));
+	
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& event) {
-	wxMessageBox(wxString::Format("names size=%d", event.Properties.size()));	
+	
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event) {
@@ -444,6 +581,12 @@ void t4p::DebuggerFeatureClass::OnDbgpBreak(t4p::DbgpBreakEventClass& event) {
 
 void t4p::DebuggerFeatureClass::OnDbgpEval(t4p::DbgpEvalEventClass& event) {
 
+}
+
+void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
+	wxThreadEvent evt(t4p::EVENT_DEBUGGER_CMD, wxID_ANY);
+	evt.SetString(cmd);
+	EventSinkLocker.Post(evt);
 }
 
 t4p::DebuggerLogPanelClass::DebuggerLogPanelClass(wxWindow* parent)
@@ -467,11 +610,18 @@ t4p::DebuggerPanelClass::DebuggerPanelClass(wxWindow* parent, int id)
 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
+const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
 	
+	EVT_MENU(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
+	EVT_MENU(t4p::MENU_DEBUGGER + 1, t4p::DebuggerFeatureClass::OnBreakAtStart)
+	EVT_MENU(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
+	EVT_MENU(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
+	EVT_MENU(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
+
 	EVT_DBGP_INIT(t4p::DebuggerFeatureClass::OnDbgpInit)
 	EVT_DBGP_ERROR(t4p::DebuggerFeatureClass::OnDbgpError)
 	EVT_DBGP_STATUS(t4p::DebuggerFeatureClass::OnDbgpStatus)

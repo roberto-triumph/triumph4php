@@ -64,6 +64,7 @@ extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
 extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
 extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
 extern const int CODE_CONTROL_BOOKMARK_MARKER;
+extern const int CODE_CONTROL_EXECUTION_MARKER;
 
 // the indicator to show squiggly lines for lint errors
 extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
@@ -411,6 +412,16 @@ public:
 	 */
 	void BookmarkClearAll();
 	
+	/**
+	 * Marks the given line as the current line being executed.
+	 * All other marks of this type are removed from this control.
+	 * @param  int line number to be marked, 1-based
+	 * @return bool TRUE if mark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
+	 */
+	bool ExecutionMarkAt(int lineNumber);
+	
+
 	/**
 	 * Remove a single marking caused by BookmarkMark() at the
 	 * given line

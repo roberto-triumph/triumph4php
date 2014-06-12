@@ -168,6 +168,7 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, searchHitGoodBitmap); 
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER, searchHitBadBitmap);
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_BOOKMARK_MARKER, bookmarkBitmap);
+	ctrl->MarkerDefine(t4p::CODE_CONTROL_EXECUTION_MARKER, wxSTC_MARK_ARROW, *wxYELLOW, *wxYELLOW);
 	SetLexerStyles(ctrl, styles, options);
 }
 

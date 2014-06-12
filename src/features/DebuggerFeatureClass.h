@@ -30,6 +30,7 @@
 #include <actions/ActionClass.h>
 #include <language/DbgpEventClass.h>
 #include <features/wxformbuilder/DebuggerFeatureForms.h>
+#include <wx/thread.h>
 #include <vector>
 #include <queue>
 
@@ -40,12 +41,27 @@ class DebuggerPanelClass;
 
 extern const wxEventType EVENT_DEBUGGER_LOG;
 extern const wxEventType EVENT_DEBUGGER_RESPONSE;
+extern const wxEventType EVENT_DEBUGGER_CMD;
 
-class DebuggerServerActionClass : public t4p::ActionClass {
+/**
+ * the debugger server action listens for connections from the 
+ * debug engine (xdebug) in a background thread.  The debugger
+ * server action parses the xdebug responses and publishes
+ * t4p::DBGP_* events.
+ *
+ * This action is a bit different from other actions in that the action
+ * will also listen for events from the main thread. the main thread
+ * will send commands that should be sent over to the debug engine, like
+ * step in, step over, step out. A command is nothing more than a string
+ * that was put together with DbgpCommandClass.
+ */
+class DebuggerServerActionClass : public wxEvtHandler, public t4p::ActionClass {
 
 public:
 
-	DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
+	DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker);
+
+	~DebuggerServerActionClass();
 	
 	/**
 	 * set the port that will be listened on.  this should be the same as the "xdebug.remote_port"
@@ -69,8 +85,10 @@ protected:
 	 *
 	 * @param xml the xml response from xdebug
 	 * @param cmd the command that we sent to xdebug 
+	 * @param [out] isDebuggerStopped will be set to TRUE when the debugger responds
+	 *        that the script has finished running (ie. "step over" the last line of the script)
 	 */
-	void ParseAndPost(const wxString& xml, const std::string& cmd);
+	void ParseAndPost(const wxString& xml, const std::string& cmd, bool& isDebuggerStopped);
 
 	wxString GetLabel() const;
 
@@ -80,15 +98,30 @@ protected:
 	void SessionWork(boost::asio::ip::tcp::socket& socket);
 
 	/**
-	 * adds a command to be sent over to the debug engine.
+	 * adds a command to be sent over to the debug engine. adding is
+	 * done safely by using the mutex.
 	 */
 	void AddCommand(std::string cmd);
+
+	/**
+	 * @return the next command to send, empty string if there are no more commands
+	 *         to send. the command is removed from the queue.
+	 *         this method safely removes from the queue by using the mutex.
+	 */
+	std::string NextCommand();
 
 	/**
 	 * send a log event; this is usually the command we send to xdebug or
 	 * the response we get back
 	 */
 	void Log(const wxString& title, const wxString& msg);
+
+	/**
+	 * handler of the EVENT_DEBUGGER_CMD event. adds the command
+	 * to be sent over to the debug engine after all previously queues
+	 * commands have been sent.
+	 */
+	void OnCmd(wxThreadEvent& event);
 
 	/**
 	 * commands to be sent by triumph to the debugger engine. These strings
@@ -98,10 +131,24 @@ protected:
 	std::queue<std::string> Commands;
 	
 	/**
+	 * prevent simulatenous access to commands list
+	 */
+	wxMutex CommandMutex;
+
+	/**
 	 * the io service listens on the socket for
 	 * information from the debugger engine
 	 */
 	boost::asio::io_service IoService;
+
+	/**
+	 * we use the event sink to get commands from the foreground thread.
+	 * for example, the user clicks the "step out" command the
+	 * foreground thread will post a command to this event sink.
+	 * the server action will listen for the commands an send them to
+	 * the debug engine.
+	 */
+	t4p::EventSinkLockerClass& EventSinkLocker;
 
 	/**
 	 * the port number to listen on.  This is the same port
@@ -124,8 +171,16 @@ public:
 
 private:
 
-	void OnAppReady(wxCommandEvent& event);
+	// handlers for menu items
+	
+	void OnStartDebugger(wxCommandEvent& event);
+	void OnBreakAtStart(wxCommandEvent& event);
+	void OnStepInto(wxCommandEvent& event);
+	void OnStepOver(wxCommandEvent& event);
+	void OnStepOut(wxCommandEvent& event);
 
+	// handlers for 
+	void OnAppReady(wxCommandEvent& event);
 	void OnAppExit(wxCommandEvent& event);
 
 	// below are the handlers for all responses from the debug engine
@@ -150,11 +205,32 @@ private:
 	void OnDbgpBreak(t4p::DbgpBreakEventClass& event);
 	void OnDbgpEval(t4p::DbgpEvalEventClass& event);
 
-	// this is an additionala debug engine handler, we log the exact
-	// response we get back from the debug engine 
+	/**
+	 * this is an additional debug engine handler, we log the exact
+	 * response we get back from the debug engine 
+	 */
 	void OnDebuggerLog(wxCommandEvent& event);
 
+	/**
+	 * send a command to the debug engine.  This is an asynchronous
+	 * operation; we send the command over to the background thread,
+	 * and the background thread sends the command to the debug engine.
+	 *
+	 * @param cmd the command string to send, built by DbgpCommandClass
+	 */
+	void PostCmd(std::string cmd);
+
+	/**
+	 * holds the background thread that the server action is running
+	 * in
+	 */
 	t4p::RunningThreadsClass RunningThreads;
+
+	/**
+	 * this event sink is used to "pass" debug commands such as step out,
+	 * step into and step over, to the background thread.
+	 */
+	t4p::EventSinkLockerClass EventSinkLocker;
 
 	t4p::DebuggerPanelClass* DebuggerPanel;
 
