@@ -248,6 +248,9 @@ public:
 
 	void Append(const wxString& text);
 
+private:
+
+	void OnClearButton(wxCommandEvent& event);
 };
 
 /**
@@ -264,6 +267,22 @@ public:
 private:
 
 	
+};
+
+/**
+ * shows the current run-time stack (the function/method that is being 
+ * run along with all of the functions/methods that called it).
+ */
+class DebuggerStackPanelClass : public DebuggerStackPanelGeneratedClass {
+
+public:
+
+	DebuggerStackPanelClass(wxWindow* parent, int id);
+
+	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
+
+private:
+
 };
 
 }

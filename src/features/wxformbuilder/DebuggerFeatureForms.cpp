@@ -26,6 +26,30 @@ DebuggerPanelGeneratedClass::~DebuggerPanelGeneratedClass()
 {
 }
 
+DebuggerStackPanelGeneratedClass::DebuggerStackPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 1 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, wxT("Stack"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	BodySizer->Add( Label, 0, wxALL, 5 );
+	
+	StackList = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_REPORT );
+	BodySizer->Add( StackList, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+}
+
+DebuggerStackPanelGeneratedClass::~DebuggerStackPanelGeneratedClass()
+{
+}
+
 DebuggerLogPanelGeneratedClass::DebuggerLogPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxFlexGridSizer* GridSizer;
@@ -35,17 +59,31 @@ DebuggerLogPanelGeneratedClass::DebuggerLogPanelGeneratedClass( wxWindow* parent
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	LogLabel = new wxStaticText( this, wxID_ANY, wxT("Log"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	ClearButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( ClearButton, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	LogLabel = new wxStaticText( this, wxID_ANY, wxT("XDebug Log"), wxDefaultPosition, wxDefaultSize, 0 );
 	LogLabel->Wrap( -1 );
-	GridSizer->Add( LogLabel, 0, wxALL, 5 );
+	TopSizer->Add( LogLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	Text = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
 	GridSizer->Add( Text, 1, wxALL|wxEXPAND, 5 );
 	
 	this->SetSizer( GridSizer );
 	this->Layout();
+	
+	// Connect Events
+	ClearButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerLogPanelGeneratedClass::OnClearButton ), NULL, this );
 }
 
 DebuggerLogPanelGeneratedClass::~DebuggerLogPanelGeneratedClass()
 {
+	// Disconnect Events
+	ClearButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerLogPanelGeneratedClass::OnClearButton ), NULL, this );
+	
 }

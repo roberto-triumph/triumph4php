@@ -24,6 +24,7 @@
  */
 #include <features/DebuggerFeatureClass.h>
 #include <globals/Errors.h>
+#include <globals/Assets.h>
 #include <Triumph.h>
 #include <istream>
 #include <string>
@@ -31,6 +32,7 @@
 
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
+static int ID_PANEL_DEBUGGER_STACK = wxNewId();
 
 /**
  * reads a response from the debug engine. engine responses are
@@ -76,6 +78,17 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 	std::getline(is, contents, '\0');
 	return contents;
 }
+
+// xdebug returns files in form
+// file://{system name}/c:/wamp/www/index.php
+// 
+// we remove the file:/// from the name
+static wxFileName ToLocalFilename(wxString xdebugFile) {
+	wxFileName name(xdebugFile.Mid(8)); // 8  = size of "file:///"
+	name.Normalize();
+	return name;
+}
+
 
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
 	t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker)
@@ -530,19 +543,10 @@ void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& even
 	// in this method we will open the file at which execution has 
 	// stopped
 
-	wxString currentFilename = event.Stack[0].Filename;
-
-	// xdebug returns files in form
-	// file://{system name}/c:/wamp/www/index.php
-	// 
-	// we remove the file:/// from the name
-	currentFilename = currentFilename.Mid(8);
-
-	wxFileName name(currentFilename);
-	name.Normalize();
-
+	// turn the filename that Xdebug returns into a local filesystem filename
+	wxFileName currentFilename = ToLocalFilename(event.Stack[0].Filename);
 	t4p::OpenFileCommandEventClass openEvt(
-		name.GetFullPath(), -1, -1,
+		currentFilename.GetFullPath(), -1, -1,
 		event.Stack[0].LineNumber
 	);
 	App.EventSink.Publish(openEvt);
@@ -553,6 +557,17 @@ void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& even
 		// the current line where execution stopped.
 		ctrl->ExecutionMarkAt(event.Stack[0].LineNumber);
 	}
+
+	wxWindow* window = FindOutlineWindow(ID_PANEL_DEBUGGER_STACK);
+	t4p::DebuggerStackPanelClass* stackPanel = NULL;
+	if (window) {
+		stackPanel = (t4p::DebuggerStackPanelClass*) window;
+	}
+	else {
+		stackPanel = new t4p::DebuggerStackPanelClass(GetOutlineNotebook(), ID_PANEL_DEBUGGER_STACK);
+		AddOutlineWindow(stackPanel, _("Stack"));
+	}
+	stackPanel->ShowStack(event.Stack);
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContextNames(t4p::DbgpContextNamesEventClass& event) {
@@ -591,12 +606,16 @@ void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
 
 t4p::DebuggerLogPanelClass::DebuggerLogPanelClass(wxWindow* parent)
 : DebuggerLogPanelGeneratedClass(parent, wxID_ANY) {
-
+	ClearButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("eraser")));
 }
 
 void t4p::DebuggerLogPanelClass::Append(const wxString& text) {
 	Text->AppendText(text);
 	Text->AppendText(wxT("\n"));
+}
+
+void t4p::DebuggerLogPanelClass::OnClearButton(wxCommandEvent& event) {
+	Text->Clear();
 }
 
 t4p::DebuggerPanelClass::DebuggerPanelClass(wxWindow* parent, int id)
@@ -606,6 +625,51 @@ t4p::DebuggerPanelClass::DebuggerPanelClass(wxWindow* parent, int id)
 	Logger = new t4p::DebuggerLogPanelClass(this);
 
 	Notebook->AddPage(Logger, _("Logger"));
+}
+
+t4p::DebuggerStackPanelClass::DebuggerStackPanelClass(wxWindow* parent, int id)
+: DebuggerStackPanelGeneratedClass(parent, id) {
+	StackList->DeleteAllItems();
+	while (StackList->GetColumnCount() > 0) {
+		StackList->DeleteColumn(0);
+	}
+	StackList->AppendColumn(_("Function"));
+	StackList->AppendColumn(_("Line Number"));
+	StackList->AppendColumn(_("Filename"));
+}
+
+void t4p::DebuggerStackPanelClass::ShowStack(const std::vector<t4p::DbgpStackClass>& stack) {
+	StackList->DeleteAllItems();
+
+	std::vector<t4p::DbgpStackClass>::const_iterator it;
+	for (it = stack.begin(); it != stack.end(); ++it) {
+		int newRowNumber = StackList->GetItemCount();
+		wxListItem column1;
+		column1.SetColumn(0);
+		column1.SetId(newRowNumber);
+		column1.SetMask(wxLIST_MASK_TEXT);
+		column1.SetText(it->Where);
+		StackList->InsertItem(column1);
+
+		wxListItem column2;
+		column2.SetColumn(1);
+		column2.SetId(newRowNumber);
+		column2.SetMask(wxLIST_MASK_TEXT);
+		column2.SetText(wxString::Format("%d", it->LineNumber));
+		StackList->SetItem(column2);
+
+		wxFileName fileName = ToLocalFilename(it->Filename);
+		wxListItem column3;
+		column3.SetColumn(2);
+		column3.SetId(newRowNumber);
+		column3.SetMask(wxLIST_MASK_TEXT);
+		column3.SetText(fileName.GetFullPath());
+		StackList->SetItem(column3);
+	}
+
+	StackList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	StackList->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	StackList->SetColumnWidth(2, wxLIST_AUTOSIZE);
 }
 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
