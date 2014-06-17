@@ -765,6 +765,12 @@ public:
 	 */
 	std::string Eval(const wxString& expression);	
 
+	/**
+	 * @return the transaction Id that will be used for the
+	 *         next command.
+	 */
+	std::string CurrentTransactionId() const;
+
 private:
 
 	// all three are used to produce a unique transaction id

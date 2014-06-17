@@ -89,6 +89,21 @@ static wxFileName ToLocalFilename(wxString xdebugFile) {
 	return name;
 }
 
+/**
+t4p::DebuggerCmdBreakpointSetClass::DebuggerCmdBreakpointSetClass(int id,
+																  wxEventType type, 
+																  const std::vector<t4p::DbgpBreakpointClass>& breakpoints,
+																  t4p::DbgpBreakpointClass currentBreakpoint) 
+: wxEvent(id, type)
+, AllBreakpoints(breakpoints) 
+, CurrentBreakpoint(currentBreakpoint) {
+	
+}
+
+wxEvent* t4p::DebuggerCmdBreakpointSetClass::Clone() const {
+	return new t4p::DebuggerCmdBreakpointSetClass(GetId(), GetEventType(), AllBreakpoints, CurrentBreakpoint);
+}
+*/
 
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
 	t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker)
@@ -152,7 +167,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 			
 			// xdebug responses
 			bool isDebuggerStopped = false;
-			ParseAndPost(response, "init", isDebuggerStopped);
+			ParseAndPost(response, "init ", isDebuggerStopped);
 			Log("response", response);
 			if (!isDebuggerStopped) {
 				SessionWork(socket);
@@ -171,17 +186,6 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 	boost::system::error_code readError;
 	boost::system::error_code writeError;
 	boost::asio::streambuf streamBuffer;
-
-	// when starting a debugging session, set the breakpoints that the user
-	// has added and tell the debugger to run the program
-	t4p::DbgpCommandClass cmd;
-	AddCommand(cmd.BreakpointFile(
-		"C:\\Users\\Roberto\\Documents\\php_projects\\CodeIgniter_p1\\public\\index.php", 82, true
-	));
-	AddCommand(cmd.Run());
-	AddCommand(cmd.ContextNames(0));
-	AddCommand(cmd.ContextGet(0, 0));
-	AddCommand(cmd.StackGet(0));
 
 	// send the next command and read the debugger engine's response
 	std::string next;
@@ -373,20 +377,45 @@ wxString t4p::DebuggerServerActionClass::GetLabel() const {
 }
 
 void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& msg) {
-	wxString toLog;
+	wxString toLog;  
 	toLog += title;
 	toLog += wxT(" - ");
 	toLog += msg;
 
-	wxCommandEvent logEvt(t4p::EVENT_DEBUGGER_LOG, GetEventId());
+	wxThreadEvent logEvt(t4p::EVENT_DEBUGGER_LOG, GetEventId());
 	logEvt.SetString(toLog);
 	PostEvent(logEvt);
+}
+
+t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
+: Breakpoint()
+, Handle(0) {
+
+}
+
+t4p::BreakpointWithHandleClass::BreakpointWithHandleClass(const t4p::BreakpointWithHandleClass& src)
+: Breakpoint()
+, Handle(0) {
+	Copy(src);
+}
+
+t4p::BreakpointWithHandleClass& t4p::BreakpointWithHandleClass::operator=(const t4p::BreakpointWithHandleClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::BreakpointWithHandleClass::Copy(const t4p::BreakpointWithHandleClass& src) {
+	Breakpoint = src.Breakpoint;
+	Handle = src.Handle;
 }
 
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , RunningThreads() 
-, EventSinkLocker() {
+, EventSinkLocker() 
+, Cmd()
+, Breakpoints() 
+, IsDebuggerSessionActive(false) {
 }
 
 void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
@@ -402,6 +431,11 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 		_("Run the next command, without recursing inside function calls"));
 	menu->Append(t4p::MENU_DEBUGGER + 4, _("Step Out\tShift+F11"),
 		_("Run until the end of the current function"));
+	menu->Append(t4p::MENU_DEBUGGER + 5, _("Continue\tShift+F10"),
+		_("Run until the next breakpoint"));
+	menu->Append(t4p::MENU_DEBUGGER + 6, _("Continue To Cursor"),
+		_("Run until the code reaches the cursor"));
+
 	menuBar->Append(menu, _("Debug"));	
 }
 
@@ -415,10 +449,9 @@ void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
 	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER, EventSinkLocker);
 	action->Init(9000);
 	RunningThreads.Queue(action);
-
 }
 
-void t4p::DebuggerFeatureClass::OnDebuggerLog(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::OnDebuggerLog(wxThreadEvent& event) {
 	DebuggerPanel->Logger->Append(event.GetString());
 }
 
@@ -443,57 +476,192 @@ void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	RunningThreads.StopAll();
 }
 
+void t4p::DebuggerFeatureClass::OnMarginClick(wxStyledTextEvent& event) {
+	wxObject * object = event.GetEventObject();
+	wxStyledTextCtrl* ctrl = wxDynamicCast(object, wxStyledTextCtrl);
+	if (!ctrl) {
+		return;
+	}
+	if (t4p::CodeControlOptionsClass::MARGIN_MARKERS != event.GetMargin()) {
+
+		// user did not click on the breakpoint margin
+		return;
+	}
+	t4p::CodeControlClass* codeCtrl = (t4p::CodeControlClass*) ctrl;
+	
+	// insert/remove the breakpoint to the line that was clicked on and not
+	// the line where the cursor is
+	// +1 because our breakpoint line numbers start at 1 but scintilla
+	// line number start at zero
+	int lineNumber = ctrl->LineFromPosition(event.GetPosition()) + 1;
+
+	// if the user clicked on a line that already has a breakpoint, then
+	// the user wants to remove the breakpoint
+	bool found = false;
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
+	while (it != Breakpoints.end()) {		
+		if (it->Breakpoint.LineNumber == lineNumber
+			&& it->Breakpoint.Filename == codeCtrl->GetFileName()) {
+			found = true;
+
+			// now if the debugger session is active, we want to remove the breakpoint
+			// from the debugger immediately.
+			if (IsDebuggerSessionActive) {
+				std::vector<t4p::DbgpBreakpointClass> allBreakpoints;
+				t4p::DbgpBreakpointClass breakpointToRemove = it->Breakpoint;
+				PostCmd(
+					Cmd.BreakpointRemove(breakpointToRemove.BreakpointId)
+				);
+			}
+			it = Breakpoints.erase(it);
+
+			codeCtrl->BreakpointRemove(lineNumber);
+		}
+		else {
+			++it;
+		}
+	}
+	
+	// if user clicked on a line that does not have a breakpoint, add the 
+	// breakpoint 
+	if (!found) {
+		t4p::BreakpointWithHandleClass breakpointWithHandle;
+		breakpointWithHandle.Breakpoint.Filename = codeCtrl->GetFileName();	
+		breakpointWithHandle.Breakpoint.LineNumber = lineNumber;
+		breakpointWithHandle.Breakpoint.IsEnabled = true;
+		bool added = codeCtrl->BreakpointMarkAt(breakpointWithHandle.Breakpoint.LineNumber, breakpointWithHandle.Handle);
+		if (added) {
+			
+			// now if the debugger session is active, we want to tell the
+			// debugger of the new breakpoint immediately.
+			if (IsDebuggerSessionActive) {
+				breakpointWithHandle.DbgpTransactionId = Cmd.CurrentTransactionId();
+				PostCmd(
+					Cmd.BreakpointFile(
+						breakpointWithHandle.Breakpoint.Filename, 
+						breakpointWithHandle.Breakpoint.LineNumber, 
+						breakpointWithHandle.Breakpoint.IsEnabled
+					)
+				);
+			}
+
+			Breakpoints.push_back(breakpointWithHandle);
+		}
+	}
+}
+
 void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
+	// TODO
 }
 
 void t4p::DebuggerFeatureClass::OnBreakAtStart(wxCommandEvent& event) {
+	// TODO
 }
 
 void t4p::DebuggerFeatureClass::OnStepInto(wxCommandEvent& event) {
-	t4p::DbgpCommandClass cmd;
 	PostCmd(
-		cmd.StepInto()	
+		Cmd.StepInto()	
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		cmd.StackGet(0)	
+		Cmd.StackGet(0)	
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnStepOver(wxCommandEvent& event) {
-	t4p::DbgpCommandClass cmd;
 	PostCmd(
-		cmd.StepOver()	
+		Cmd.StepOver()	
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		cmd.StackGet(0)	
+		Cmd.StackGet(0)	
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnStepOut(wxCommandEvent& event) {
-	t4p::DbgpCommandClass cmd;
 	PostCmd(
-		cmd.StepOut()	
+		Cmd.StepOut()	
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		cmd.StackGet(0)	
+		Cmd.StackGet(0)	
+	);
+}
+
+void t4p::DebuggerFeatureClass::OnContinue(wxCommandEvent& event) {
+	PostCmd(
+		Cmd.Run()	
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		Cmd.StackGet(0)	
+	);
+}
+
+void t4p::DebuggerFeatureClass::OnContinueToCursor(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+	if (!codeCtrl) {
+		return;
+	}
+	if (codeCtrl->IsNew()) {
+		return;
+	}
+	wxString filename = codeCtrl->GetFileName();
+
+	// scintilla lines are 0-based, xdebug lines are 1-based
+	int lineNumber = codeCtrl->LineFromPosition(codeCtrl->GetCurrentPos()) + 1;
+
+	PostCmd(
+		Cmd.BreakpointRunToCursor(filename, lineNumber)
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		Cmd.StackGet(0)	
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
-	wxMessageBox("app id:" + event.AppId, "debugger init");
+
+	// when starting a debugging session, set the breakpoints that the user
+	// has added and tell the debugger to run the program
+	// there is no "current" breakppoint at the start of the debug session
+	t4p::DbgpBreakpointClass breakpoint;
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
+	for (; it != Breakpoints.end(); ++it) {
+		
+		// save the transaction Id, we will need it so that we can match up
+		// the breakpoint to the breakpoint Id that xdebug returns in the
+		// breakpoint_set response
+		it->DbgpTransactionId = Cmd.CurrentTransactionId();
+		PostCmd(
+			Cmd.BreakpointFile(
+				it->Breakpoint.Filename, 
+				it->Breakpoint.LineNumber, 
+				it->Breakpoint.IsEnabled
+			)
+		);
+	}
+
+	PostCmd(Cmd.Run());
+	PostCmd(Cmd.ContextNames(0));
+	PostCmd(Cmd.ContextGet(0, 0));
+	PostCmd(Cmd.StackGet(0));
+
+	IsDebuggerSessionActive = true;
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
-
+	IsDebuggerSessionActive = false;
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpStatus(t4p::DbgpStatusEventClass& event) {
@@ -509,11 +677,21 @@ void t4p::DebuggerFeatureClass::OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& 
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& event) {
-
+	IsDebuggerSessionActive = t4p::DBGP_STATUS_STARTING == event.Status 
+		|| t4p::DBGP_STATUS_RUNNING == event.Status
+		|| t4p::DBGP_STATUS_BREAK == event.Status;
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventClass& event) {
-
+	
+	// when the debug engine signals that a breakpoint was set, we need to store
+	// the debug engine's breakpoint ID because the ID is needed in case the user
+	// wants to remove the breakpoint.
+	for (size_t i = 0; i < Breakpoints.size(); ++i) {
+		if (Breakpoints[i].DbgpTransactionId == event.TransactionId) {
+			Breakpoints[i].Breakpoint.BreakpointId = event.BreakpointId;
+		}
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpBreakpointGet(t4p::DbgpBreakpointGetEventClass& event) {
@@ -679,12 +857,16 @@ const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
+
+	EVT_STC_MARGINCLICK(wxID_ANY, t4p::DebuggerFeatureClass::OnMarginClick)
 	
 	EVT_MENU(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
 	EVT_MENU(t4p::MENU_DEBUGGER + 1, t4p::DebuggerFeatureClass::OnBreakAtStart)
 	EVT_MENU(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
 	EVT_MENU(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
 	EVT_MENU(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
+	EVT_MENU(t4p::MENU_DEBUGGER + 5, t4p::DebuggerFeatureClass::OnContinue)
+	EVT_MENU(t4p::MENU_DEBUGGER + 6, t4p::DebuggerFeatureClass::OnContinueToCursor)
 
 	EVT_DBGP_INIT(t4p::DebuggerFeatureClass::OnDbgpInit)
 	EVT_DBGP_ERROR(t4p::DebuggerFeatureClass::OnDbgpError)
@@ -707,7 +889,7 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_DBGP_BREAK(t4p::DebuggerFeatureClass::OnDbgpBreak)
 	EVT_DBGP_EVAL(t4p::DebuggerFeatureClass::OnDbgpEval)
 
-	EVT_COMMAND(ID_ACTION_DEBUGGER, t4p::EVENT_DEBUGGER_LOG, t4p::DebuggerFeatureClass::OnDebuggerLog)
+	EVT_DEBUGGER_LOG(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerLog)
 
 END_EVENT_TABLE()
 

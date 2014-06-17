@@ -277,11 +277,20 @@ public:
 	void Save(wxConfigBase* config);
 	
 	/**
-	 * This enum maps numbers to margins.  
+	 * This enum maps numbers to margins. There is a
+	 * special order to this; margin 0 is the left-most
+	 * margin in the scintilla code control, 1 the the 
+	 * second one to the left and so on.
+	 * We want to have the following:
+	 * margin 0 for symbols: search hits, lint errors, breakpoints
+	 * margin 1 for line numbers
+	 * margin 2 for code folding
+	 * this is so that the folding appears closest to the code
 	 */
 	enum MARGINS {
-		MARGIN_LINE_NUMBER = 0,
-		MARGIN_CODE_FOLDING = 1
+		MARGIN_MARKERS = 0,
+		MARGIN_LINE_NUMBER = 1,
+		MARGIN_CODE_FOLDING = 2		
 	};
 	
 	/**

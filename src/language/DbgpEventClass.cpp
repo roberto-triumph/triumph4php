@@ -530,7 +530,7 @@ wxEvent* t4p::DbgpInitEventClass::Clone() const {
 
 bool t4p::DbgpInitEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& error) {
 	wxXmlDocument doc;
-	if (!EnsureXmlRoot(doc, xml, wxT("response"), error)) {
+	if (!EnsureXmlRoot(doc, xml, wxT("init"), error)) {
 		return false;
 	}
 	wxXmlNode* root = doc.GetRoot();
@@ -540,15 +540,14 @@ bool t4p::DbgpInitEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& e
 	if (!GetNodeAttributeString(root, "idekey", IdeKey, error)) {
 		return false;
 	}
-	if (!GetNodeAttributeString(root, "session", Session, error)) {
-		return false;
-	}
-	if (!GetNodeAttributeString(root, "thread", Thread, error)) {
-		return false;
-	}
-	if (!GetNodeAttributeString(root, "parent", Parent, error)) {
-		return false;
-	}
+	
+	// optional
+	t4p::DbgpXmlErrors ignoredError;
+	GetNodeAttributeString(root, "session", Session, ignoredError);
+	GetNodeAttributeString(root, "thread", Thread, error);
+	GetNodeAttributeString(root, "parent", Parent, error);
+		
+
 	if (!GetNodeAttributeString(root, "language", Language, error)) {
 		return false;
 	}
@@ -1622,7 +1621,7 @@ std::string t4p::DbgpCommandClass::Build(const std::string& cmd, const wxString&
 	// transaction id is always included
 	std::string line = cmd;
 	line += " ";
-	line += "-i " + t4p::WxToChar(MachineName + wxString::Format("-%d-%d", Pid, TransactionId));
+	line += "-i " + CurrentTransactionId();
 	if (!args.empty()) {
 		line += " ";
 		line += t4p::WxToChar(args);
@@ -1635,6 +1634,10 @@ std::string t4p::DbgpCommandClass::Build(const std::string& cmd, const wxString&
 	}
 	TransactionId++;
 	return line;
+}
+
+std::string t4p::DbgpCommandClass::CurrentTransactionId() const {
+	return  t4p::WxToChar(MachineName + wxString::Format("-%d-%d", Pid, TransactionId));
 }
 
 wxString t4p::DbgpCommandClass::EscapeArg(const wxString& arg) {

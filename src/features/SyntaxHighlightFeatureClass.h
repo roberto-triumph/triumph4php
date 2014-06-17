@@ -125,6 +125,8 @@ private:
 	wxBitmap SearchHitGoodBitmap;
 	wxBitmap SearchHitBadBitmap;
 	wxBitmap BookmarkBitmap;
+	wxBitmap BreakpointBitmap;
+	wxBitmap ExecutionLineBitmap;
 
 	DECLARE_EVENT_TABLE()
 };
