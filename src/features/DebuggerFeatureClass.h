@@ -239,6 +239,11 @@ class DebuggerFeatureClass : public t4p::FeatureClass {
 
 public:
 
+	/**
+	 * the breakpoints that the user has set.
+	 */
+	std::vector<t4p::BreakpointWithHandleClass> Breakpoints;
+
 	DebuggerFeatureClass(t4p::AppClass& app);
 
 	void AddNewMenu(wxMenuBar* menuBar);
@@ -252,6 +257,59 @@ public:
 	 * See section 7.13 of the xdbgp protocol docs.
 	 */
 	void CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop);
+
+	/**
+	 * Performs all necessary actions to remove the breakpoint.
+	 * Removes it from the breakpoints list
+	 * Removes its marker (in the code control margin)
+	 * Sends the breakpoint_remove command to the debug engine
+	 *  
+	 * issues a debugger command to remove the given breakpoint. 
+	 * The command is asynchronous; this method exits 
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.4 of the xdbgp protocol docs.
+	 */
+	void BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+
+	/**
+	 * Performs all necessary actions to disable the breakpoint.
+	 * disables it in the breakpoints list
+	 * Removes its marker (in the code control margin)
+	 * Sends the breakpoint_update command to the debug engine
+	 *
+	 * Issues a debugger command to disable the given breakpoint.
+	 * The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.3 of the xdbgp protocol docs.
+	*/
+	void BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+
+	/**
+	 * Performs all necessary actions to enable the breakpoint.
+	 * Enables it in the breakpoints list
+	 * Adds its marker (in the code control margin)
+	 * Sends the breakpoint_update command to the debug engine
+	 *
+	 * Issues a debugger command to enable the given breakpoint.
+	 * The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.3 of the xdbgp protocol docs.
+	*/
+	void BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+
+	/**
+	 * Goes to the file and line number of the breakpoint. Opens the file
+	 * if the file is not opened.
+	 *
+	 * @param breakpointWithHandle the breakpoint to go to. 
+	 */
+	void BreakpointGoToSource(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
 
 private:
 
@@ -283,6 +341,8 @@ private:
 	// handlers to begin/stop listening on serveer
 	void OnAppReady(wxCommandEvent& event);
 	void OnAppExit(wxCommandEvent& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	/**
 	 * updates the GUI to alert the user that the script has finished running
@@ -338,11 +398,6 @@ private:
 	 * step into and step over, to the background thread.
 	 */
 	t4p::EventSinkLockerClass EventSinkLocker;
-
-	/**
-	 * the breakpoints that the user has set.
-	 */
-	std::vector<t4p::BreakpointWithHandleClass> Breakpoints;
 
 	/**
 	 * used to build the xdebug commands. using a class-wide instance
@@ -518,6 +573,45 @@ private:
 	t4p::DebuggerVariableNodeClass RootVariable;
 };
 
+/**
+ * shows the user the breakpoints that the user has added; the user can bulk delete / 
+ * bulk disable the breakpoints by using this panel.
+ */
+class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClass {
+
+public:
+
+	DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+
+	/**
+	 * should be called when the user adds a breakpoint. the breakpoint list is redrawn.
+	 */
+	void RefreshList();
+
+private:
+
+	// button click handlers
+	void OnDeleteBreakpoint(wxCommandEvent& event);
+	void OnToggleAllBreakpoints(wxCommandEvent& event);
+
+	// list event handlers
+	void OnItemActivated(wxDataViewEvent& event);
+	void OnItemValueChanged(wxDataViewEvent& event);
+
+
+	/**
+	 * to send the delete/disable breakpoint command to the debug engine
+	 */
+	t4p::DebuggerFeatureClass& Feature;
+
+	/**
+	 * true if all breakpoints are currently enabled. when we toggle,
+	 * we disable if all breakpoints are enabled.
+	 */
+	bool AreAllEnabled;
+
+	DECLARE_EVENT_TABLE()
+};
 
 /**
  * shows the bulk of the debug information
@@ -528,6 +622,7 @@ public:
 
 	t4p::DebuggerLogPanelClass* Logger;
 	t4p::DebuggerVariablePanelClass* VariablePanel;
+	t4p::DebuggerBreakpointPanelClass* BreakpointPanel;
 
 	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 

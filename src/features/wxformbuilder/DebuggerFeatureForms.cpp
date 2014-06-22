@@ -109,7 +109,7 @@ DebuggerVariablePanelGeneratedClass::DebuggerVariablePanelGeneratedClass( wxWind
 	wxBoxSizer* TopSizer;
 	TopSizer = new wxBoxSizer( wxHORIZONTAL );
 	
-	VariablesLabel = new wxStaticText( this, wxID_ANY, wxT("Variables"), wxDefaultPosition, wxDefaultSize, 0 );
+	VariablesLabel = new wxStaticText( this, wxID_ANY, wxT("Local Variables"), wxDefaultPosition, wxDefaultSize, 0 );
 	VariablesLabel->Wrap( -1 );
 	TopSizer->Add( VariablesLabel, 1, wxALL|wxEXPAND, 5 );
 	
@@ -128,4 +128,60 @@ DebuggerVariablePanelGeneratedClass::DebuggerVariablePanelGeneratedClass( wxWind
 
 DebuggerVariablePanelGeneratedClass::~DebuggerVariablePanelGeneratedClass()
 {
+}
+
+DebuggerBreakpointPanelGeneratedClass::DebuggerBreakpointPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 2 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	DeleteBreakpointButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	DeleteBreakpointButton->SetHelpText( wxT("Delete seleted breakpoint") );
+	
+	DeleteBreakpointButton->SetHelpText( wxT("Delete seleted breakpoint") );
+	
+	TopSizer->Add( DeleteBreakpointButton, 0, wxALL, 5 );
+	
+	ToggleAllBreakpointsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	ToggleAllBreakpointsButton->SetHelpText( wxT("Enable or disable all breakpoints") );
+	
+	ToggleAllBreakpointsButton->SetHelpText( wxT("Enable or disable all breakpoints") );
+	
+	TopSizer->Add( ToggleAllBreakpointsButton, 0, wxALL, 5 );
+	
+	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* LabelSizer;
+	LabelSizer = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText6 = new wxStaticText( this, wxID_ANY, wxT("Breakpoints"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText6->Wrap( -1 );
+	LabelSizer->Add( m_staticText6, 0, wxALL, 5 );
+	
+	BodySizer->Add( LabelSizer, 1, wxEXPAND, 5 );
+	
+	BreakpointsList = new wxDataViewListCtrl( this, wxID_ANY );
+	BodySizer->Add( BreakpointsList, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	
+	// Connect Events
+	DeleteBreakpointButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerBreakpointPanelGeneratedClass::OnDeleteBreakpoint ), NULL, this );
+	ToggleAllBreakpointsButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerBreakpointPanelGeneratedClass::OnToggleAllBreakpoints ), NULL, this );
+}
+
+DebuggerBreakpointPanelGeneratedClass::~DebuggerBreakpointPanelGeneratedClass()
+{
+	// Disconnect Events
+	DeleteBreakpointButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerBreakpointPanelGeneratedClass::OnDeleteBreakpoint ), NULL, this );
+	ToggleAllBreakpointsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerBreakpointPanelGeneratedClass::OnToggleAllBreakpoints ), NULL, this );
+	
 }

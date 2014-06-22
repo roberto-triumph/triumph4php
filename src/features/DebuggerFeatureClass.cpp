@@ -373,13 +373,15 @@ void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& 
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
 : Breakpoint()
-, Handle(0) {
+, Handle(0) 
+, DbgpTransactionId() {
 
 }
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass(const t4p::BreakpointWithHandleClass& src)
 : Breakpoint()
-, Handle(0) {
+, Handle(0) 
+, DbgpTransactionId() {
 	Copy(src);
 }
 
@@ -391,14 +393,15 @@ t4p::BreakpointWithHandleClass& t4p::BreakpointWithHandleClass::operator=(const 
 void t4p::BreakpointWithHandleClass::Copy(const t4p::BreakpointWithHandleClass& src) {
 	Breakpoint = src.Breakpoint;
 	Handle = src.Handle;
+	DbgpTransactionId = src.DbgpTransactionId;
 }
 
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
+, Breakpoints() 
 , RunningThreads() 
 , EventSinkLocker() 
 , Cmd()
-, Breakpoints() 
 , IsDebuggerSessionActive(false) {
 }
 
@@ -548,6 +551,8 @@ void t4p::DebuggerFeatureClass::ToggleBreakpointAtLine(t4p::CodeControlClass* co
 			Breakpoints.push_back(breakpointWithHandle);
 		}
 	}
+
+	DebuggerPanel->BreakpointPanel->RefreshList();
 }
 
 void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
@@ -634,6 +639,128 @@ void t4p::DebuggerFeatureClass::CmdPropertyGetChildren(const t4p::DbgpPropertyCl
 	PostCmd(
 		Cmd.PropertyGet(0, 0, prop.FullName, prop.Key)
 	);
+}
+
+void t4p::DebuggerFeatureClass::BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
+	
+	// if the breakpoint is located in an opened file and has a marker
+	// lets remove the marker.  note that the file may not be open and that's
+	// not unexpected.
+	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	if (codeCtrl) {
+		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
+	}
+	
+	// remove the breakpoint from this list
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
+	while (it != Breakpoints.end()) {
+		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
+			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
+			it = Breakpoints.erase(it);
+			break;
+		}
+		else {
+			++it;
+		}
+	}
+
+	PostCmd(
+		Cmd.BreakpointRemove(breakpointWithHandle.Breakpoint.BreakpointId)
+	);
+}
+
+void t4p::DebuggerFeatureClass::BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
+	
+	// if the breakpoint is located in an opened file and has a marker
+	// lets remove the marker.  note that the file may not be open and that's
+	// not unexpected.
+	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	if (codeCtrl) {
+		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
+	}
+	
+	// set the breakpoint as disabled
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
+	while (it != Breakpoints.end()) {
+		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
+			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
+			it->Breakpoint.IsEnabled = false;
+			break;
+		}
+		else {
+			++it;
+		}
+	}
+
+	PostCmd(
+		Cmd.BreakpointDisable(breakpointWithHandle.Breakpoint.BreakpointId)
+	);
+}
+
+void t4p::DebuggerFeatureClass::BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
+	
+	// if the breakpoint is located in an opened file and does not have a marker
+	// lets add the marker.  note that the file may not be open and that's
+	// not unexpected.
+	int newHandle = -1;
+	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	if (codeCtrl) {
+		codeCtrl->BreakpointMarkAt(breakpointWithHandle.Breakpoint.LineNumber, newHandle);
+	}
+	
+	// set the breakpoint as enabled
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
+	while (it != Breakpoints.end()) {
+		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
+			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
+			it->Breakpoint.IsEnabled = true;
+			it->Handle = newHandle;
+			break;
+		}
+		else {
+			++it;
+		}
+	}
+
+	PostCmd(
+		Cmd.BreakpointEnable(breakpointWithHandle.Breakpoint.BreakpointId)
+	);
+}
+
+void t4p::DebuggerFeatureClass::BreakpointGoToSource(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
+	t4p::OpenFileCommandEventClass openEvt(
+		breakpointWithHandle.Breakpoint.Filename, -1, -1,
+		breakpointWithHandle.Breakpoint.LineNumber
+	);
+	App.EventSink.Publish(openEvt);
+}
+
+void t4p::DebuggerFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+	
+	// here we want to add the breakpoint marker if there is a breakpoint
+	// in the opened file
+	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
+	t4p::CodeControlClass* codeCtrl = event.GetCodeControl();
+
+	for (br = Breakpoints.begin(); br != Breakpoints.end(); ++br) {
+		if (br->Breakpoint.Filename == codeCtrl->GetFileName()) {
+			codeCtrl->BreakpointMarkAt(br->Breakpoint.LineNumber, br->Handle);
+		}
+	}
+}
+
+void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
+	
+	// here we want to remove the handles to the breakpoints that
+	// belong to the file being closed.
+	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
+	t4p::CodeControlClass* codeCtrl = event.GetCodeControl();
+
+	for (br = Breakpoints.begin(); br != Breakpoints.end(); ++br) {
+		if (br->Breakpoint.Filename == codeCtrl->GetFileName()) {
+			br->Handle = -1;
+		}
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
@@ -750,13 +877,8 @@ void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& even
 		event.Stack[0].LineNumber
 	);
 	App.EventSink.Publish(openEvt);
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
-	if (ctrl) {
-
-		// if the file was successfully opened then mark
-		// the current line where execution stopped.
-		ctrl->ExecutionMarkAt(event.Stack[0].LineNumber);
-	}
+	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
+	codeCtrl->ExecutionMarkAt(event.Stack[0].LineNumber);
 
 	wxWindow* window = FindOutlineWindow(ID_PANEL_DEBUGGER_STACK);
 	t4p::DebuggerStackPanelClass* stackPanel = NULL;
@@ -838,8 +960,10 @@ t4p::DebuggerPanelClass::DebuggerPanelClass(wxWindow* parent, int id, t4p::Debug
 
 	Logger = new t4p::DebuggerLogPanelClass(this);
 	VariablePanel = new t4p::DebuggerVariablePanelClass(this, wxID_ANY, feature);
+	BreakpointPanel = new t4p::DebuggerBreakpointPanelClass(this, wxID_ANY, feature);
 
 	Notebook->AddPage(VariablePanel, _("Variables"));
+	Notebook->AddPage(BreakpointPanel, _("Breakpoints"));
 	Notebook->AddPage(Logger, _("Logger"));
 }
 
@@ -1175,6 +1299,118 @@ void t4p::DebuggerVariableModelClass::UpdateVariable(const t4p::DbgpPropertyClas
 	}
 }
 
+
+t4p::DebuggerBreakpointPanelClass::DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature)
+: DebuggerBreakpointPanelGeneratedClass(parent, id)
+, Feature(feature) 
+, AreAllEnabled(false) {
+
+	DeleteBreakpointButton->SetBitmap(t4p::BitmapImageAsset(wxT("breakpoint-delete")));
+	ToggleAllBreakpointsButton->SetBitmap(t4p::BitmapImageAsset(wxT("breakpoint-toggle")));
+
+	BreakpointsList->AppendToggleColumn("Enabled");
+	BreakpointsList->AppendTextColumn("File");
+	BreakpointsList->AppendTextColumn("Line Number");
+
+	RefreshList();
+}
+
+void t4p::DebuggerBreakpointPanelClass::RefreshList() {
+	BreakpointsList->DeleteAllItems();
+
+	std::vector<t4p::BreakpointWithHandleClass>::const_iterator br;
+	AreAllEnabled = true;
+	for (br = Feature.Breakpoints.begin(); br != Feature.Breakpoints.end(); ++br) {
+		wxFileName brFile(br->Breakpoint.Filename);
+		
+		wxVector<wxVariant> row;
+		row.push_back(wxVariant(br->Breakpoint.IsEnabled));	
+		row.push_back(wxVariant(brFile.GetFullName()));
+		row.push_back(wxVariant(wxString::Format("%d", br->Breakpoint.LineNumber)));
+
+		BreakpointsList->AppendItem(row);
+
+		if (!br->Breakpoint.IsEnabled) {
+			AreAllEnabled = false;
+		}
+	}
+
+	if (!Feature.Breakpoints.empty()) {
+		BreakpointsList->SelectRow(0);
+	}
+}
+
+void t4p::DebuggerBreakpointPanelClass::OnDeleteBreakpoint(wxCommandEvent& event) {
+	int index = BreakpointsList->GetSelectedRow();
+	if (wxNOT_FOUND == index || index >= (int)Feature.Breakpoints.size()) {
+		return;
+	}
+	t4p::BreakpointWithHandleClass toRemove = Feature.Breakpoints[index];
+	Feature.BreakpointRemove(toRemove);
+
+	// remove from the widget immediately. we can't really acknowledge that
+	// this exact breakpoint was removed by the debug engine since the 
+	// debug engine's response to the breakpoint_remove command does not
+	// return the breakpointId.
+	BreakpointsList->DeleteItem(index);
+}
+
+void t4p::DebuggerBreakpointPanelClass::OnToggleAllBreakpoints(wxCommandEvent& event) {
+	bool newValue = !AreAllEnabled;
+	
+	int row = 0;
+	std::vector<t4p::BreakpointWithHandleClass>::const_iterator it;
+	for (it = Feature.Breakpoints.begin(); it != Feature.Breakpoints.end(); ++it) {
+		if (newValue) {
+			Feature.BreakpointEnable(*it);
+		}
+		else {
+			Feature.BreakpointDisable(*it);
+		}
+
+		// uncheck the enabled flag in the widget
+		BreakpointsList->SetToggleValue(newValue, row, 0);
+		row++;
+	}
+
+	AreAllEnabled = newValue;
+}
+
+void t4p::DebuggerBreakpointPanelClass::OnItemActivated(wxDataViewEvent& event) {
+	int row = BreakpointsList->ItemToRow(event.GetItem());
+	if (wxNOT_FOUND == row) {
+		return;
+	}
+	if (row >= (int)Feature.Breakpoints.size()) {
+		return;
+	}
+	Feature.BreakpointGoToSource(Feature.Breakpoints[row]);
+
+}
+
+void t4p::DebuggerBreakpointPanelClass::OnItemValueChanged(wxDataViewEvent& event) {
+	
+	// only want to see changes to enabled flag
+	if (event.GetColumn() != 0) {
+		return;
+	}
+	int row = BreakpointsList->ItemToRow(event.GetItem());
+	if (wxNOT_FOUND == row) {
+		return;
+	}
+	if (row >= (int)Feature.Breakpoints.size()) {
+		return;
+	}
+	bool isEnabled = BreakpointsList->GetToggleValue(row, 0);
+	if (isEnabled) {
+		Feature.BreakpointEnable(Feature.Breakpoints[row]);
+	}
+	else {
+		Feature.BreakpointDisable(Feature.Breakpoints[row]);
+	}
+}
+
+
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
@@ -1182,6 +1418,8 @@ const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
+	EVT_APP_FILE_OPEN(t4p::DebuggerFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_CLOSED(t4p::DebuggerFeatureClass::OnAppFileClosed)
 
 	EVT_STC_MARGINCLICK(wxID_ANY, t4p::DebuggerFeatureClass::OnMarginClick)
 	
@@ -1221,4 +1459,9 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::DebuggerVariablePanelClass, DebuggerVariablePanelGeneratedClass)
 	EVT_DATAVIEW_ITEM_EXPANDING(wxID_ANY, t4p::DebuggerVariablePanelClass::OnVariableExpanding)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGeneratedClass)
+	EVT_DATAVIEW_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemActivated)
+	EVT_DATAVIEW_ITEM_VALUE_CHANGED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemValueChanged)
 END_EVENT_TABLE()

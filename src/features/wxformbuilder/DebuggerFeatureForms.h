@@ -107,4 +107,29 @@ class DebuggerVariablePanelGeneratedClass : public wxPanel
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerBreakpointPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerBreakpointPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxBitmapButton* DeleteBreakpointButton;
+		wxBitmapButton* ToggleAllBreakpointsButton;
+		wxStaticText* m_staticText6;
+		wxDataViewListCtrl* BreakpointsList;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnDeleteBreakpoint( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnToggleAllBreakpoints( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		DebuggerBreakpointPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~DebuggerBreakpointPanelGeneratedClass();
+	
+};
+
 #endif //__DebuggerFeatureForms__
