@@ -429,6 +429,11 @@ public:
 	 *         will be false on out-of-memory error, invalid line number.
 	 */
 	bool ExecutionMarkAt(int lineNumber);
+
+	/**
+	 * Removes the exection mark from this control.
+	 */
+	void ExecutionMarkRemove();
 	
 	/**
 	 * Put a breakpoint marker at the given line

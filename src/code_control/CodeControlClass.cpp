@@ -759,6 +759,11 @@ bool t4p::CodeControlClass::ExecutionMarkAt(int lineNumber) {
 	return newHandle != -1;
 }
 
+
+void t4p::CodeControlClass::ExecutionMarkRemove() {
+	MarkerDeleteAll(CODE_CONTROL_EXECUTION_MARKER);
+}
+
 bool t4p::CodeControlClass::BreakpointMarkAt(int lineNumber, int& handle) {
 	
 	// given line is 1-based, scintilla lines are 0-based

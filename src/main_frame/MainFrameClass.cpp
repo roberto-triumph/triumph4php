@@ -976,6 +976,10 @@ void t4p::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookE
 	MainFrame->UpdateStatusBar();
 }
 
+void t4p::AppEventListenerForFrameClass::OnAppRequestUserAttention(wxCommandEvent& event) {
+	MainFrame->RequestUserAttention();
+}
+
 
 BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, t4p::MainFrameClass::DisableSave)
@@ -1039,6 +1043,7 @@ BEGIN_EVENT_TABLE(t4p::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::AppEventListenerForFrameClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::AppEventListenerForFrameClass::OnAppReady)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_APP_USER_ATTENTION, t4p::AppEventListenerForFrameClass::OnAppRequestUserAttention)
 	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(t4p::ID_CODE_NOTEBOOK, t4p::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)
 END_EVENT_TABLE()

@@ -24,6 +24,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
 #include <wx/textctrl.h>
+#include <wx/dataview.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -54,6 +55,7 @@ class DebuggerStackPanelGeneratedClass : public wxPanel
 	
 	protected:
 		wxStaticText* Label;
+		wxStaticText* StatusLabel;
 		wxListCtrl* StackList;
 	
 	public:
@@ -83,6 +85,25 @@ class DebuggerLogPanelGeneratedClass : public wxPanel
 		
 		DebuggerLogPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~DebuggerLogPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerVariablePanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerVariablePanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* VariablesLabel;
+		wxStaticText* StatusLabel;
+		wxDataViewCtrl* VariablesList;
+	
+	public:
+		
+		DebuggerVariablePanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~DebuggerVariablePanelGeneratedClass();
 	
 };
 

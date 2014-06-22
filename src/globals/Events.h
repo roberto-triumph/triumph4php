@@ -536,6 +536,12 @@ extern const wxEventType EVENT_CMD_DB_TABLE_DATA_OPEN;
 extern const wxEventType EVENT_CMD_DB_TABLE_DEFINITION_OPEN;
 
 /**
+ * Tell the app to request attention from the user. The app's title
+ * bar in the task bar will blink 
+ */
+extern const wxEventType EVENT_CMD_APP_USER_ATTENTION;
+
+/**
  * The window ID of the Tools Notebook. Use this to connect to the notebook
  * events for the tools notebook
  */

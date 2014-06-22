@@ -243,6 +243,16 @@ public:
 
 	void AddNewMenu(wxMenuBar* menuBar);
 
+	/**
+	 * issues a debugger command to get the children of the given
+	 * property. The command is asynchronous; this method exits 
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.13 of the xdbgp protocol docs.
+	 */
+	void CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop);
+
 private:
 
 	// handlers for menu items
@@ -253,14 +263,32 @@ private:
 	void OnStepOut(wxCommandEvent& event);
 	void OnContinue(wxCommandEvent& event);
 	void OnContinueToCursor(wxCommandEvent& event);
+	void OnToggleBreakpoint(wxCommandEvent& event);
 
-	// when the user clicks on the margin of a code control, add a
-	// breakpoint
+	/**
+	 * turn on or off a debugger breakpoint at the currently 
+	 * focused file at the given line.
+	 *
+	 * @param codeCtrl the code control to toggle the breakpoint from
+	 * @param lineNumber 1-based line number
+	 */
+	void ToggleBreakpointAtLine(t4p::CodeControlClass* codeCtrl, int lineNumber);
+
+	/**
+	 * when the user clicks on the margin of a code control, toggle
+	 * a debugger breakpoint at the line that was clicked on
+	 */
 	void OnMarginClick(wxStyledTextEvent& event);
 
 	// handlers to begin/stop listening on serveer
 	void OnAppReady(wxCommandEvent& event);
 	void OnAppExit(wxCommandEvent& event);
+
+	/**
+	 * updates the GUI to alert the user that the script has finished running
+	 * and that the debugger session has closed.
+	 */
+	void ResetDebugger();
 
 	// below are the handlers for all responses from the debug engine
 	void OnDbgpInit(t4p::DbgpInitEventClass& event);
@@ -351,22 +379,6 @@ private:
 };
 
 /**
- * shows the bulk of the debug information
- */
-class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
-
-public:
-
-	t4p::DebuggerLogPanelClass* Logger;
-
-	DebuggerPanelClass(wxWindow* parent, int id);
-
-private:
-
-	
-};
-
-/**
  * shows the current run-time stack (the function/method that is being 
  * run along with all of the functions/methods that called it).
  */
@@ -378,8 +390,148 @@ public:
 
 	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
 
+	void ClearStack();
+
 private:
 
+};
+
+class DebuggerVariablePanelClass : public DebuggerVariablePanelGeneratedClass {
+
+public:
+
+	DebuggerVariablePanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+
+	void AddVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+
+	void ClearVariables();
+
+	void UpdateVariable(const t4p::DbgpPropertyClass& variable);
+
+private:
+
+	void OnVariableExpanding(wxDataViewEvent& event);
+
+	/**
+	 * we will use the feature to get the entire variable properties when
+	 * a variable is being expanded.
+	 */
+	t4p::DebuggerFeatureClass& Feature;
+
+	DECLARE_EVENT_TABLE()
+};
+
+/**
+ * this class represents a single "node" in the variable data view model. a node is
+ * equal to a single DbgpPropertyClass instance, along with pointers to its parent
+ * property and children properties.
+ * 
+ * A node will own its children.
+ */
+class DebuggerVariableNodeClass {
+
+public:
+
+	t4p::DbgpPropertyClass Property;
+
+	/**
+	 * this instance will not own the parent pointer
+	 */
+	t4p::DebuggerVariableNodeClass* Parent;
+
+	/**
+	 * this instance WILL own the children pointers and
+	 * will delete them 
+	 */
+	std::vector<t4p::DebuggerVariableNodeClass*> Children;
+
+	/**
+	 * this instance will not own the parent pointer
+	 */
+	DebuggerVariableNodeClass(t4p::DebuggerVariableNodeClass* parent);
+
+	/**
+	 * this instance will not own the parent pointer
+	 */
+	DebuggerVariableNodeClass(t4p::DebuggerVariableNodeClass* parent, const t4p::DbgpPropertyClass& prop);
+
+	~DebuggerVariableNodeClass();
+
+	/**
+	 * deletes all of the items in Children, and adds newChildren to the 
+	 * Children vector. This instance will now own the pointers in newChildren.
+	 */
+	void ReplaceChildren(const std::vector<t4p::DbgpPropertyClass>& newChildren, wxDataViewModel* model);
+};
+
+/**
+ * this class is used as the "data view model" it is a requirement
+ * because we are using a wxDataViewCtrl to show variables
+ */
+class DebuggerVariableModelClass : public wxDataViewModel {
+
+public:
+
+	DebuggerVariableModelClass();
+
+	// Override this so the control can query the child items of an item.     
+	virtual unsigned int GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const;
+ 
+	// Override this to indicate the number of columns in the model. 
+	virtual unsigned int GetColumnCount() const;
+ 	
+	// Override this to indicate what type of data is stored in the column specified by col. 
+	virtual wxString GetColumnType(unsigned int col) const;
+ 
+	// Override this to indicate which wxDataViewItem representing the parent of item or an 
+	// invalid wxDataViewItem if the root item is the parent item. 
+	virtual wxDataViewItem GetParent(const wxDataViewItem& item) const;
+
+	virtual bool HasContainerColumns(const wxDataViewItem& item) const;
+ 	
+	 // Override this to indicate the value of item. 
+	virtual void GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const;
+ 
+	// Override this to indicate of item is a container, i.e. if it can have child items. 
+	virtual bool IsContainer(const wxDataViewItem& item) const;
+ 	
+	// This gets called in order to set a value in the data model. 
+	virtual bool SetValue(const wxVariant &variant, const wxDataViewItem &item, unsigned int col);
+ 
+	void SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+
+	/**
+	 * recurses down through the model's nodes until it finds the variable that was updated.
+	 * this method will then remove the found node's children and replace them with the
+	 * given variables children. 
+	 *
+	 * this method is typically called when the user expands a variable to see the variable's
+	 * sub-properties.
+	 *
+	 * @param variable the new variable properties; these come from the debug engine
+	 * @param updatedItem [out] will be set to the item that was updated.
+	 */
+	void UpdateVariable(const t4p::DbgpPropertyClass& variable, wxDataViewItem& updatedItem);
+
+private:
+
+	t4p::DebuggerVariableNodeClass RootVariable;
+};
+
+
+/**
+ * shows the bulk of the debug information
+ */
+class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
+
+public:
+
+	t4p::DebuggerLogPanelClass* Logger;
+	t4p::DebuggerVariablePanelClass* VariablePanel;
+
+	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+
+private:
 };
 
 }

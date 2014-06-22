@@ -130,15 +130,17 @@ static wxXmlNode* GetNodeChild(wxXmlNode* node, const wxString& childName, t4p::
  * @param node the parent node to search in
  * @param contents the node's contents will be written to this variable
  */
-static void GetNodeText(wxXmlNode* node, wxString& contents) {
+static void GetNodeText(wxXmlNode* node, wxString& contents, bool doBase64Decode = true) {
 
 	// dbgp base64 encodes the contents, we must decode it
 	// TODO what about when there are NULLs we would like to 
 	// show them
-	wxString data = node->GetNodeContent();
-	wxMemoryBuffer buf = wxBase64Decode(data);
-	wxString decoded((const char*)buf.GetData(), buf.GetDataLen());
-	contents = decoded;
+	contents = node->GetNodeContent();
+	if (doBase64Decode) {
+		wxMemoryBuffer buf = wxBase64Decode(contents);
+		wxString decoded((const char*)buf.GetData(), buf.GetDataLen());
+		contents = decoded;
+	}
 }
 
 static t4p::DbgpStatus StatusFromString(const wxString& str) {
@@ -299,33 +301,43 @@ static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t
 	if (!GetNodeAttributeString(node, "name", prop.Name, error)) {
 		return false;
 	}
-	if (!GetNodeAttributeString(node, "fullname", prop.FullName, error)) {
+	if (!GetNodeAttributeString(node, "type", prop.DataType, error)) {
 		return false;
 	}
-	
-	// class name is optional
+
+	// class name, full name are optional
 	t4p::DbgpXmlErrors ignored;
+	GetNodeAttributeString(node, "fullname", prop.FullName, ignored);
 	GetNodeAttributeString(node, "classname", prop.ClassName, ignored);
 
 	GetNodeAttributeInt(node, "page", prop.Page);
 	GetNodeAttributeInt(node, "pagesize", prop.PageSize);
-
-	if (!GetNodeAttributeString(node, "type", prop.DataType, error)) {
-		return false;
-	}
 	
 	// more optional response items
 	GetNodeAttributeString(node, "facet", prop.Facet, ignored);
 	GetNodeAttributeInt(node, "size", prop.Size);
-	GetNodeAttributeBool(node, "children", prop.Children);
+	GetNodeAttributeBool(node, "children", prop.HasChildren);
 	GetNodeAttributeInt(node, "numchildren", prop.NumChildren);
 	GetNodeAttributeString(node, "key", prop.Key, ignored);
 	GetNodeAttributeInt(node, "address", prop.Address);
 	GetNodeAttributeString(node, "encoding", prop.Encoding, ignored);
 
 	wxString value;
-	GetNodeText(node, value);
+	GetNodeText(node, value, "base64" == prop.Encoding);
 	prop.Value = value;
+
+	// check to see if this property has child properties
+	wxXmlNode* child = node->GetChildren();
+	while (child) {
+		if (child->GetName().CmpNoCase("property") == 0) {
+			t4p::DbgpPropertyClass childProp;
+			if (!PropertyFromXmlNode(child, childProp, error)) {
+				return false;
+			}
+			prop.ChildProperties.push_back(childProp);
+		}
+		child = child->GetNext();
+	}
 
 	return true;
 }
@@ -423,7 +435,7 @@ t4p::DbgpPropertyClass::DbgpPropertyClass()
 , Facet()
 , ClassName()
 , Constant()
-, Children()
+, HasChildren()
 , Size()
 , Page()
 , PageSize()
@@ -431,7 +443,8 @@ t4p::DbgpPropertyClass::DbgpPropertyClass()
 , Key()
 , Encoding()
 , NumChildren()
-, Value() {
+, Value() 
+, ChildProperties() {
 
 }
 
@@ -442,7 +455,7 @@ t4p::DbgpPropertyClass::DbgpPropertyClass(const t4p::DbgpPropertyClass& src)
 , Facet()
 , ClassName()
 , Constant()
-, Children()
+, HasChildren()
 , Size()
 , Page()
 , PageSize()
@@ -450,7 +463,8 @@ t4p::DbgpPropertyClass::DbgpPropertyClass(const t4p::DbgpPropertyClass& src)
 , Key()
 , Encoding()
 , NumChildren()
-, Value() {
+, Value() 
+, ChildProperties() {
 	Copy(src);
 }
 
@@ -466,7 +480,7 @@ void t4p::DbgpPropertyClass::Copy(const t4p::DbgpPropertyClass& src) {
 	Facet = src.Facet.c_str();
 	ClassName = src.ClassName.c_str();
 	Constant = src.Constant;
-	Children = src.Children;
+	HasChildren = src.HasChildren;
 	Size = src.Size;
 	Page = src.Page;
 	PageSize = src.PageSize;
@@ -475,6 +489,7 @@ void t4p::DbgpPropertyClass::Copy(const t4p::DbgpPropertyClass& src) {
 	Encoding = src.Encoding.c_str();
 	NumChildren = src.NumChildren;
 	Value = src.Value.c_str();
+	ChildProperties = src.ChildProperties;
 }
 
 const wxEventType t4p::EVENT_DBGP_INIT = wxNewEventType();

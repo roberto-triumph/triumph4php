@@ -454,15 +454,22 @@ public:
 	wxString Facet;
 	wxString ClassName;
 	bool Constant;
-	bool Children;
+	bool HasChildren;
 	int Size;
 	int Page;
 	int PageSize;
 	int Address;
 	wxString Key;
 	wxString Encoding;
+
+	// this is all of the children that this property has, counting
+	// the ones that the debug engine did not return because of
+	// maxChildren feature
 	int NumChildren;
 	wxString Value;
+
+	// this may not include all of the children of this property
+	std::vector<t4p::DbgpPropertyClass> ChildProperties;
 
 	DbgpPropertyClass();
 

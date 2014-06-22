@@ -35,9 +35,18 @@ DebuggerStackPanelGeneratedClass::DebuggerStackPanelGeneratedClass( wxWindow* pa
 	BodySizer->SetFlexibleDirection( wxBOTH );
 	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
 	Label = new wxStaticText( this, wxID_ANY, wxT("Stack"), wxDefaultPosition, wxDefaultSize, 0 );
 	Label->Wrap( -1 );
-	BodySizer->Add( Label, 0, wxALL, 5 );
+	TopSizer->Add( Label, 1, wxALL, 5 );
+	
+	StatusLabel = new wxStaticText( this, wxID_ANY, wxT("Status: Debugging session not active"), wxDefaultPosition, wxDefaultSize, 0 );
+	StatusLabel->Wrap( -1 );
+	TopSizer->Add( StatusLabel, 0, wxALL, 5 );
+	
+	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
 	StackList = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_REPORT );
 	BodySizer->Add( StackList, 1, wxALL|wxEXPAND, 5 );
@@ -86,4 +95,37 @@ DebuggerLogPanelGeneratedClass::~DebuggerLogPanelGeneratedClass()
 	// Disconnect Events
 	ClearButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerLogPanelGeneratedClass::OnClearButton ), NULL, this );
 	
+}
+
+DebuggerVariablePanelGeneratedClass::DebuggerVariablePanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	GridSizer->AddGrowableCol( 0 );
+	GridSizer->AddGrowableRow( 1 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	VariablesLabel = new wxStaticText( this, wxID_ANY, wxT("Variables"), wxDefaultPosition, wxDefaultSize, 0 );
+	VariablesLabel->Wrap( -1 );
+	TopSizer->Add( VariablesLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	StatusLabel = new wxStaticText( this, wxID_ANY, wxT("Status: Debugger session active"), wxDefaultPosition, wxDefaultSize, 0 );
+	StatusLabel->Wrap( -1 );
+	TopSizer->Add( StatusLabel, 0, wxALL, 5 );
+	
+	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	VariablesList = new wxDataViewCtrl( this, wxID_ANY );
+	GridSizer->Add( VariablesList, 1, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( GridSizer );
+	this->Layout();
+}
+
+DebuggerVariablePanelGeneratedClass::~DebuggerVariablePanelGeneratedClass()
+{
 }

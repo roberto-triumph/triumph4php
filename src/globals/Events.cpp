@@ -177,7 +177,7 @@ const wxEventType t4p::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
-
+const wxEventType t4p::EVENT_CMD_APP_USER_ATTENTION = wxNewEventType();
 const long t4p::ID_TOOLS_NOTEBOOK = 1003;
 const long t4p::ID_OUTLINE_NOTEBOOK = 1002;
 
