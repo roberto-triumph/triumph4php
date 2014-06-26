@@ -945,6 +945,7 @@ void t4p::DebuggerFeatureClass::ResetDebugger() {
 	if (window) {
 		t4p::DebuggerStackPanelClass* stackPanel = (t4p::DebuggerStackPanelClass*) window;
 		stackPanel->ClearStack();
+		DebuggerPanel->VariablePanel->ClearVariables();
 	}
 }
 
@@ -1058,8 +1059,11 @@ void t4p::DebuggerVariablePanelClass::AddVariables(const std::vector<t4p::DbgpPr
 }
 
 void t4p::DebuggerVariablePanelClass::ClearVariables() {
-
+	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
+	std::vector<t4p::DbgpPropertyClass> emptyVariables;
+	variableModel->SetVariables(emptyVariables);
 	StatusLabel->SetLabel(wxT("Status: Debugging session not active"));
+	this->Layout();
 }
 
 void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxDataViewEvent& event) {
@@ -1098,6 +1102,8 @@ void t4p::DebuggerVariablePanelClass::UpdateVariable(const t4p::DbgpPropertyClas
 	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
 	wxDataViewItem updatedItem;
 	variableModel->UpdateVariable(variable, updatedItem);
+	
+	VariablesList->Expand(updatedItem);
 }
 
 
