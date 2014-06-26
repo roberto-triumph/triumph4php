@@ -222,26 +222,6 @@ static t4p::DbgpFeatures FeatureFromString(const wxString& str) {
 	return t4p::DBGP_FEATURE_UNKNOWN;
 }
 
-static t4p::DbgpContinuations ContinuationFromString(const wxString& str) {
-	wxString lower = str.Lower();
-	if (str == wxT("run")) {
-		return t4p::DBGP_CONTINUE_RUN;
-	}	
-	else if (str == wxT("step_into")) {
-		return t4p::DBGP_CONTINUE_STEP_INTO;
-	}
-	else if (str == wxT("step_over")) {
-		return t4p::DBGP_CONTINUE_STEP_OVER;
-	}
-	else if (str == wxT("step_out")) {
-		return t4p::DBGP_CONTINUE_STEP_OUT;
-	}
-	else if (str == wxT("stop")) {
-		return t4p::DBGP_CONTINUE_STOP;
-	}	
-	return t4p::DBGP_CONTINUE_UNKNOWN;
-}
-
 static bool BreakpointFromXmlNode(wxXmlNode* breakpointNode, t4p::DbgpBreakpointClass& breakpoint, t4p::DbgpXmlErrors& error) {
 	if (!GetNodeAttributeString(breakpointNode, "id", breakpoint.BreakpointId, error)) {
 		return false;
@@ -1264,8 +1244,8 @@ t4p::DbgpEvalEventClass::DbgpEvalEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_EVAL)
 , Command()
 , TransactionId()
-, Success()
-, Property() {
+, Property() 
+, Success() {
 
 }
 

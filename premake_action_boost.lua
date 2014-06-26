@@ -53,7 +53,7 @@ function prepBoost()
 				"Boost libraries not found.  " .. 
 				"Please install the boost libraries, or change the location of \n" ..
 				"BOOST_LIB_DIR in premake_opts_linux.lua.\n" ..
-				"You can install the boost libraries via your package manager; ie. sudo apt-get install libboost-dev\n"
+				"You can install the boost libraries via your package manager; ie. sudo apt-get install libboost-dev libboost-system-dev libasio-dev\n"
 			)
 		end
 	end

@@ -575,8 +575,8 @@ class DbgpBreakEventClass : public wxEvent {
 public:
 
 	wxString Command;
-	bool Success;
 	wxString TransactionId;
+	bool Success;
 	
 	DbgpBreakEventClass();
 
@@ -594,9 +594,9 @@ class DbgpEvalEventClass : public wxEvent {
 public:
 
 	wxString Command;
-	bool Success;
 	wxString TransactionId;
 	t4p::DbgpPropertyClass Property;
+	bool Success;
 	
 	DbgpEvalEventClass();
 

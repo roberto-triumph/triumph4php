@@ -84,7 +84,14 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 // 
 // we remove the file:/// from the name
 static wxFileName ToLocalFilename(wxString xdebugFile) {
-	wxFileName name(xdebugFile.Mid(8)); // 8  = size of "file:///"
+	wxString localFile = xdebugFile.Mid(8); // 8  = size of "file:///"
+	if (!localFile.Contains(":")) {
+		
+		// in linux, filename comes back as "file:///"
+		// we want to keep the last slash
+		localFile = xdebugFile.Mid(7); 
+	}
+	wxFileName name(localFile);
 	name.Normalize();
 	return name;
 }
@@ -181,7 +188,7 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 			Log("command", next);
 
 			// +1 == send the null bcoz the dbgp protocol says so
-			int written = boost::asio::write(socket, boost::asio::buffer(next.c_str(), next.length() + 1), writeError);
+			boost::asio::write(socket, boost::asio::buffer(next.c_str(), next.length() + 1), boost::asio::transfer_all(), writeError);
 
 			if (writeError != boost::system::errc::success) {
 				Log("write error", writeError.message());
@@ -218,8 +225,7 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std::string& cmd, bool& isDebuggerStopped) {
 	size_t spacePos = cmd.find(" ");
 	std::string cmdOnly = std::string::npos == spacePos ? cmd : cmd.substr(0, spacePos);
-	std::transform(cmdOnly.begin(), cmdOnly.end(), cmdOnly.begin(), std::tolower);
-	bool parseError = false;
+	std::transform(cmdOnly.begin(), cmdOnly.end(), cmdOnly.begin(), ::tolower);
 	t4p::DbgpXmlErrors xmlError = t4p::DBGP_XML_ERROR_NONE;
 	if ("init" == cmdOnly) {
 		t4p::DbgpInitEventClass initResponse;
@@ -457,12 +463,19 @@ void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	boost::asio::ip::tcp::resolver::iterator endpointIterator = resolver.resolve(query);
 
 	boost::asio::ip::tcp::socket socket(service);
-	boost::asio::connect(socket, endpointIterator);
-	std::string closeMsg = "close";
-	boost::system::error_code writeError;
-	boost::asio::write(socket, boost::asio::buffer(closeMsg), writeError);
-	socket.close();
-
+	boost::system::error_code error = boost::asio::error::host_not_found;
+	boost::asio::ip::tcp::resolver::iterator end;
+    while (error && endpointIterator != end) {
+      socket.close();
+      socket.connect(*endpointIterator++, error);
+	  if (!error) {
+		std::string closeMsg = "close";
+		boost::system::error_code writeError;
+		boost::asio::write(socket, boost::asio::buffer(closeMsg), boost::asio::transfer_all(), writeError);
+		socket.close();
+		break;
+	  }
+	}
 	RunningThreads.StopAll();
 }
 
@@ -902,6 +915,7 @@ void t4p::DebuggerFeatureClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& 
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event) {
 	DebuggerPanel->VariablePanel->UpdateVariable(event.Property);
+	
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyValue(t4p::DbgpPropertyValueEventClass& event) {
@@ -1058,14 +1072,24 @@ void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxDataViewEvent& event
 		
 		// "object" type nodes have an extra child that holds the classname. xdebug does not 
 		// count that as part of the NumChildren but it does return the extra property
-		if ((node->Property.DataType == "object" && (node->Property.NumChildren + 1) > (int)node->Children.size())
-			|| (node->Property.NumChildren > (int)node->Children.size())
-			) {
-		
-			// when we loaded this property we did not get all of it.
+		// when we loaded this property we did not get all of it.
 			// fetch all of it now
+		int fetchedSize = (int)node->Children.size();
+		if (node->Property.DataType == "object" 
+			&& fetchedSize < node->Property.NumChildren) {
+			
 			Feature.CmdPropertyGetChildren(node->Property);
-			event.Veto();
+		}
+		else if (fetchedSize < node->Property.NumChildren) {
+			Feature.CmdPropertyGetChildren(node->Property);
+		}
+		else if (fetchedSize == node->Property.NumChildren && fetchedSize == 1 
+			&& node->Children[0]->Property.Name.empty()) {
+			
+			// when we fill the data view ctrl, we add an empty node when we get
+			// a property that has children but the debug engine has not returned it
+			// due to hitting the depth limit
+			Feature.CmdPropertyGetChildren(node->Property);
 		}
 	}
 }
@@ -1074,8 +1098,6 @@ void t4p::DebuggerVariablePanelClass::UpdateVariable(const t4p::DbgpPropertyClas
 	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
 	wxDataViewItem updatedItem;
 	variableModel->UpdateVariable(variable, updatedItem);
-
-	VariablesList->Expand(updatedItem);
 }
 
 
@@ -1117,11 +1139,36 @@ static void RecursiveAddNode(t4p::DebuggerVariableNodeClass* parent, const t4p::
 	}
 }
 
+/**
+ * deletes all of the children of node, but not the node itself.
+ * Will also delete descendants of the children.
+ * will also notify the model of the items that were deleted.
+ */
+static void RecursiveDeleteChildren(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model) {
+	wxDataViewItemArray deletedItems;
+	for (size_t i = 0; i < node->Children.size(); ++i) {
+		if (!node->Children[i]->Children.empty()) {
+			RecursiveDeleteChildren(node->Children[i], model);
+		}		
+		wxDataViewItem item = MakeItem(node->Children[i]);
+		deletedItems.Add(item);
+
+		// delete the item itself
+		delete node->Children[i];
+	}
+	node->Children.clear();
+
+	// tell the control that items were removed
+	wxDataViewItem parent = MakeItem(node);
+	model->ItemsDeleted(parent, deletedItems);
+}
+
 void t4p::DebuggerVariableNodeClass::ReplaceChildren(const std::vector<t4p::DbgpPropertyClass>& newChildren, wxDataViewModel* model) {
 	wxDataViewItem rootItem = MakeItem(this);
 	wxDataViewItemArray toRemove;
 	for (size_t i = 0; i < Children.size(); ++i) {
 		toRemove.Add(MakeItem(Children[i]));
+		RecursiveDeleteChildren(Children[i], model);
 		delete Children[i];
 	}
 	Children.clear();
@@ -1134,7 +1181,9 @@ void t4p::DebuggerVariableNodeClass::ReplaceChildren(const std::vector<t4p::Dbgp
 
 t4p::DebuggerVariableModelClass::DebuggerVariableModelClass()
 : RootVariable(NULL) {
-
+	t4p::DebuggerVariableNodeClass* root = new t4p::DebuggerVariableNodeClass(NULL);
+	root->Property.Name = wxT("Local Variables");
+	RootVariable.Children.push_back(root);
 }
 
 unsigned int t4p::DebuggerVariableModelClass::GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const {
@@ -1147,6 +1196,17 @@ unsigned int t4p::DebuggerVariableModelClass::GetChildren(const wxDataViewItem& 
 	}
 	for (size_t i = 0; i < node->Children.size(); ++i) {
 		children.Add(MakeItem(node->Children[i]));
+	}
+	if (node->Children.empty() && node->Property.HasChildren) {
+		
+		// the property has children, but the debugger did not return it
+		// because of the max depth limit.  put an empty node here, so
+		// that the  dataviewctrl shows the expand icon.
+		t4p::DbgpPropertyClass emptyProp;
+		t4p::DebuggerVariableNodeClass* emptyNode = new t4p::DebuggerVariableNodeClass(node, emptyProp);
+		node->Children.push_back(emptyNode);
+		
+		children.Add(MakeItem(node->Children[0]));
 	}
 	return node->Children.size();
 }
@@ -1195,7 +1255,7 @@ bool t4p::DebuggerVariableModelClass::IsContainer(const wxDataViewItem& item) co
 
 	// use the HasChildren property not the chidlren vector because the debug engine may not
 	// have returned the children due to the max depth limit
-	return node->Property.HasChildren;
+	return node->Property.HasChildren || NULL == node->Parent;
 }
 
 bool t4p::DebuggerVariableModelClass::SetValue(const wxVariant& variant, const wxDataViewItem& item, unsigned int col) {
@@ -1207,32 +1267,7 @@ bool t4p::DebuggerVariableModelClass::SetValue(const wxVariant& variant, const w
 }
 
 void t4p::DebuggerVariableModelClass::SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
-	RootVariable.ReplaceChildren(variables, this);
-	Cleared();
-}
-
-/**
- * deletes all of the children of node, but not the node itself.
- * Will also delete descendants of the children.
- * will also notify the model of the items that were deleted.
- */
-static void RecursiveDeleteChildren(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model) {
-	wxDataViewItemArray deletedItems;
-	for (size_t i = 0; i < node->Children.size(); ++i) {
-		if (!node->Children[i]->Children.empty()) {
-			RecursiveDeleteChildren(node->Children[i], model);
-		}		
-		wxDataViewItem item = MakeItem(node->Children[i]);
-		deletedItems.Add(item);
-
-		// delete the item itself
-		delete node->Children[i];
-	}
-	node->Children.clear();
-
-	// tell the control that items were removed
-	wxDataViewItem parent = MakeItem(node);
-	model->ItemsDeleted(parent, deletedItems);
+	RootVariable.Children[0]->ReplaceChildren(variables, this);
 }
 
 static bool UpdateAndNotifyVariable(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model, const t4p::DbgpPropertyClass& updatedVariable,
@@ -1240,8 +1275,6 @@ static bool UpdateAndNotifyVariable(t4p::DebuggerVariableNodeClass* node, wxData
 
 	// first check to see if the udpated variable is a child of this code
 	bool found = false;
-	wxDataViewItemArray itemsAdded;
-	wxDataViewItem parent;
 	std::vector<t4p::DebuggerVariableNodeClass*>::const_iterator nodeIt;
 	for (nodeIt = node->Children.begin(); !found && nodeIt != node->Children.end(); ++nodeIt) {
 
@@ -1252,10 +1285,6 @@ static bool UpdateAndNotifyVariable(t4p::DebuggerVariableNodeClass* node, wxData
 			found = true;
 
 			updatedItem = MakeItem(*nodeIt);
-			parent = updatedItem;
-			for (size_t j = 0; j < (*nodeIt)->Children.size(); ++j) {
-				itemsAdded.Add(MakeItem((*nodeIt)->Children[j]));
-			}
 			break;
 		}
 	}
@@ -1268,18 +1297,9 @@ static bool UpdateAndNotifyVariable(t4p::DebuggerVariableNodeClass* node, wxData
 			found = true;
 
 			updatedItem = MakeItem(node);
-			parent = MakeItem(node);
-			for (size_t j = 0; j < node->Children.size(); ++j) {
-				itemsAdded.Add(MakeItem(node->Children[j]));
-			}
 		}
 	}
-
-	// finally, if this was the node that was updated tell the control
-	if (found) {
-		model->ItemsAdded(parent, itemsAdded);
-	}
-	else {
+	if (!found) {
 		
 		// recursively attempt to find the variable that was updated.
 		for (size_t i = 0; !found && i < node->Children.size(); ++i) {

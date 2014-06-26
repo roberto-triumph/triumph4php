@@ -90,7 +90,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
 		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", normalizepath(WX_CONFIG)) }
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { WX_LIB_DIR }
 		includedirs { WX_INCLUDE_DIRS_RELEASE }
@@ -106,7 +106,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_RELEASE }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
 		buildoptions { string.format("`%s --cxxflags --debug=no --unicode=yes`", normalizepath(WX_CONFIG)) }
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG)) }
 	end
 end
 
