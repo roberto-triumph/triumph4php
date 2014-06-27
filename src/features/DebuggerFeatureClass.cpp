@@ -30,6 +30,18 @@
 #include <string>
 #include <algorithm>
 
+// TODO: fix variables tree expansion
+// TODO: global variables / all contexts
+// TODO: store breakpoints across restarts
+// TODO: debugger toolbar
+// TODO: expression eval
+// TODO: break at program start
+// TODO: show variable preview in wxDataViewCtrl for array/objects
+// TODO: popup for full variable contents
+// TODO: show current line
+// TODO: handle paths that are not found ie. remote
+//       debugging a VM 
+
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
 static int ID_PANEL_DEBUGGER_STACK = wxNewId();
@@ -422,9 +434,9 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 		_("Run the next command, recursing inside function calls"));
 	menu->Append(t4p::MENU_DEBUGGER + 3, _("Step Over\tF10"),
 		_("Run the next command, without recursing inside function calls"));
-	menu->Append(t4p::MENU_DEBUGGER + 4, _("Step Out\tShift+F11"),
+	menu->Append(t4p::MENU_DEBUGGER + 4, _("Step Out\tCTRL+F11"),
 		_("Run until the end of the current function"));
-	menu->Append(t4p::MENU_DEBUGGER + 5, _("Continue\tShift+F10"),
+	menu->Append(t4p::MENU_DEBUGGER + 5, _("Continue\tF5"),
 		_("Run until the next breakpoint"));
 	menu->Append(t4p::MENU_DEBUGGER + 6, _("Continue To Cursor"),
 		_("Run until the code reaches the cursor"));
@@ -801,6 +813,8 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	PostCmd(Cmd.Run());
 	//PostCmd(Cmd.ContextNames(0));
 	//PostCmd(Cmd.ContextGet(0, 0));
+	PostCmd(Cmd.FeatureSet("max_depth", "1"));
+	PostCmd(Cmd.FeatureSet("max_children", "30"));
 	PostCmd(Cmd.StackGet(0));
 
 	IsDebuggerSessionActive = true;
