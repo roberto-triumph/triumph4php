@@ -159,10 +159,11 @@ void t4p::RunBrowserFeatureClass::AddWindows() {
 	BrowserToolbar->Realize();
 
 	AuiManager->AddPane(BrowserToolbar, wxAuiPaneInfo()
-		.ToolbarPane().Top().Row(2).Position(1)
+		.ToolbarPane().Top().Row(2).Position(2)
 		.LeftDockable(false).RightDockable(false)
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
 		.PaneBorder(true).Floatable(false)
+		.MinSize(860, BrowserToolbar->GetSize().GetHeight())
 	);
 }
 

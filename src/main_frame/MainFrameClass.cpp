@@ -61,7 +61,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureClass*>& featu
 	App.RunningThreads.AddEventHandler(this);
 	App.SqliteRunningThreads.AddEventHandler(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, 
-		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT | wxAUI_TB_OVERFLOW);
+		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
@@ -653,10 +653,12 @@ void t4p::MainFrameClass::RealizeToolbar() {
 	ToolBar->Realize();
 	
 	AuiManager.AddPane(ToolBar, wxAuiPaneInfo()
-		.ToolbarPane().Top().Row(1).Position(1)
+		.ToolbarPane().Top()
+		.Row(1).Position(1)
 		.LeftDockable(false).RightDockable(false)
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
 		.PaneBorder(true).Floatable(false)
+		.MinSize(860, ToolBar->GetSize().GetHeight())
 	);
 }
 

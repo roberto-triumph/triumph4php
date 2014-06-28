@@ -233,6 +233,65 @@ public:
 };
 
 /**
+ * holds parameters that are used to configure the
+ * debugger
+ */
+class DebuggerOptionsClass {
+	
+public:
+		
+	/**
+	 * the port that triumph will listen on for incoming xdebug
+	 * connections
+	 */
+	int Port;
+	
+	/**
+	 * The max amount of variable data to initially retrieve
+	 * from xdebug. For example, if MaxChildren=10, then at most
+	 * 10 array key-value pairs will be sent by xdebug during
+	 * the initial load.
+	 */
+	int MaxChildren;
+
+	/**
+	 * The maximum depth that the debugger engine may return when 
+	 * sending arrays or object structures to the IDE. 
+	 */	
+	int MaxDepth;
+	
+	/**
+	 * TRUE if triumph should start listening for debugs connections
+	 * at program start.  By default, the server will be started
+	 * on-demand.
+	 */
+	bool DoListenOnAppReady;
+	
+	/**
+	 * TRUE if the triumph should tell the debugger to stop
+	 * execution at the first line of the script
+	 */
+	bool DoBreakOnStart;
+	
+	/**
+	 * Debugger source mappings are useful when your local 
+	 * copy of your source code is in a different directory 
+	 * in the web  server. Triumph uses the mappings when
+	 * xdebug returns a file path that is not found in the
+	 * local file system
+	 */
+	std::map<wxString, wxString> SourceCodeMappings;
+	
+	DebuggerOptionsClass();
+	
+	DebuggerOptionsClass(const t4p::DebuggerOptionsClass& opts);
+	
+	t4p::DebuggerOptionsClass& operator=(const t4p::DebuggerOptionsClass& opts);
+	
+	void Copy(const t4p::DebuggerOptionsClass& opts);
+};
+
+/**
  * This feature accepts connections from x-debug.
  */
 class DebuggerFeatureClass : public t4p::FeatureClass {
@@ -247,7 +306,13 @@ public:
 	DebuggerFeatureClass(t4p::AppClass& app);
 
 	void AddNewMenu(wxMenuBar* menuBar);
-
+	
+	void AddToolBarItems(wxAuiToolBar* bar);
+	
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
+	
+	void LoadPreferences(wxConfigBase* base);
+	
 	/**
 	 * issues a debugger command to get the children of the given
 	 * property. The command is asynchronous; this method exits 
@@ -315,12 +380,13 @@ private:
 
 	// handlers for menu items
 	void OnStartDebugger(wxCommandEvent& event);
-	void OnBreakAtStart(wxCommandEvent& event);
+	void OnStopDebugger(wxCommandEvent& event);
 	void OnStepInto(wxCommandEvent& event);
 	void OnStepOver(wxCommandEvent& event);
 	void OnStepOut(wxCommandEvent& event);
 	void OnContinue(wxCommandEvent& event);
 	void OnContinueToCursor(wxCommandEvent& event);
+	void OnFinish(wxCommandEvent& event);
 	void OnToggleBreakpoint(wxCommandEvent& event);
 
 	/**
@@ -338,7 +404,7 @@ private:
 	 */
 	void OnMarginClick(wxStyledTextEvent& event);
 
-	// handlers to begin/stop listening on serveer
+	// handlers to begin/stop listening on server
 	void OnAppReady(wxCommandEvent& event);
 	void OnAppExit(wxCommandEvent& event);
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
@@ -349,6 +415,29 @@ private:
 	 * and that the debugger session has closed.
 	 */
 	void ResetDebugger();
+	
+	/**
+	 * starts listening for incoming xdebug connections
+	 * @param doOpenDebuggerPanel if TRUE the debugger panel will
+	 *        be created as well. The panel will be created only
+	 *        if it does not already exist.
+	 */
+	void StartDebugger(bool doOpenDebuggerPanel);
+	
+	/**
+	 * stop listening for incoming xdebug connections.
+	 * note that we stop the server by sending it a "close" message
+	 * since we use synchronous server sockets 
+	 * 
+	 * @param int the port that the server is currently listening
+	 *        on (to send the server the close message)
+	 */
+	void StopDebugger(int port);
+	
+	/**
+	 * handler for saving preferences to disk
+	 */
+	void OnPreferencesSaved(wxCommandEvent& event);
 
 	// below are the handlers for all responses from the debug engine
 	void OnDbgpInit(t4p::DbgpInitEventClass& event);
@@ -404,6 +493,11 @@ private:
 	 * because xdebug commands require a unique "transactionId"
 	 */
 	t4p::DbgpCommandClass Cmd;
+	
+	/**
+	 * configuration options for xdebug
+	 */
+	t4p::DebuggerOptionsClass Options;
 
 	/**
 	 * TRUE if the debugger session is currently being handled.  When
@@ -411,9 +505,27 @@ private:
 	 * the debug engine when the user adds or removes a breakpoint.
 	 */
 	bool IsDebuggerSessionActive;
-
-	t4p::DebuggerPanelClass* DebuggerPanel;
-
+	
+	/**
+	 * TRUE if triumph is listening for incoming xdebug
+	 * connections
+	 */
+	bool IsDebuggerServerActive;
+	
+	/**
+	 * TRUE if the user modified the port number in the preferences
+	 * window. We need to know this so that we can restart the
+	 * debugger server on the new port.
+	 */
+	bool WasDebuggerPortChanged;
+	
+	/**
+	 * The value of the debugger port before it was modified. Used in
+	 * conjunction with WasDebuggerPortChanged to stop the debugger
+	 * server socket when the user changes ports.
+	 */
+	int WasDebuggerPort;
+	
 	DECLARE_EVENT_TABLE()
 };
 
@@ -627,6 +739,45 @@ public:
 	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
 private:
+};
+
+class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
+	
+public:
+	
+	DebuggerOptionsPanelClass(wxWindow* parent, t4p::DebuggerOptionsClass& options, bool& wasDebuggerPortChanged);
+	
+	bool TransferDataFromWindow();
+	
+private:
+
+	// handlers for source code mapping CRUD
+	void OnAddMapping(wxCommandEvent& event);
+	void OnEditMapping(wxCommandEvent& event);
+	void OnDeleteMapping(wxCommandEvent& event);
+
+	/**
+	 * fill the mappings list according to the options
+	 */
+	void FillMappings();
+	
+	
+	/**
+	 * the final set of options that will be 
+	 * edited only when the user hits the OK
+	 * button
+	 */
+	t4p::DebuggerOptionsClass& Options;
+	
+	/**
+	 * the options being edited by the user
+	 */
+	t4p::DebuggerOptionsClass EditedOptions;
+	
+	/**
+	 * will be set to TRUE if the user changed port
+	 */
+	bool& WasDebuggerPortChanged;
 };
 
 }

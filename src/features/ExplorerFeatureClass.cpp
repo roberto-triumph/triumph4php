@@ -247,7 +247,7 @@ void t4p::ExplorerFeatureClass::AddWindows() {
 	ExplorerToolBar->Realize();
 
 	AuiManager->AddPane(ExplorerToolBar, wxAuiPaneInfo()
-		.ToolbarPane().Top().Row(1).Position(2)
+		.ToolbarPane().Top().Row(2).Position(1)
 		.LeftDockable(false).RightDockable(false)
 		.Gripper(false).CaptionVisible(false).CloseButton(false).DockFixed(true)
 		.PaneBorder(true).Floatable(false)

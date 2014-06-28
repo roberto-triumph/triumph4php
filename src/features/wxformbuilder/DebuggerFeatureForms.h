@@ -17,12 +17,16 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
+#include <wx/hyperlink.h>
+#include <wx/spinctrl.h>
+#include <wx/checkbox.h>
+#include <wx/button.h>
 #include <wx/listctrl.h>
+#include <wx/statbox.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/bmpbuttn.h>
-#include <wx/button.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
 
@@ -43,6 +47,45 @@ class DebuggerPanelGeneratedClass : public wxPanel
 		
 		DebuggerPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~DebuggerPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerOptionsPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerOptionsPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxHyperlinkCtrl* HelpLink;
+		wxStaticText* PortLabel;
+		wxSpinCtrl* Port;
+		wxStaticText* MaxChildrenLabel;
+		wxSpinCtrl* MaxChildren;
+		wxStaticText* MaxDepthLabel;
+		wxSpinCtrl* MaxDepth;
+		wxStaticText* DoListenOnAppReadyLabel;
+		wxCheckBox* DoListenOnAppReady;
+		wxStaticText* DoBreakOnStartLabel;
+		wxCheckBox* DoBreakOnStart;
+		wxStaticText* MappingsHelpLabel;
+		wxButton* AddMapping;
+		wxButton* EditMapping;
+		wxButton* DeleteMapping;
+		wxListCtrl* SourceCodeMappings;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnAddMapping( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditMapping( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteMapping( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		DebuggerOptionsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 562,600 ), long style = wxTAB_TRAVERSAL );
+		~DebuggerOptionsPanelGeneratedClass();
 	
 };
 

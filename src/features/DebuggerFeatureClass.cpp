@@ -25,6 +25,7 @@
 #include <features/DebuggerFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <wx/valgen.h>
 #include <Triumph.h>
 #include <istream>
 #include <string>
@@ -33,14 +34,13 @@
 // TODO: fix variables tree expansion
 // TODO: global variables / all contexts
 // TODO: store breakpoints across restarts
-// TODO: debugger toolbar
 // TODO: expression eval
-// TODO: break at program start
 // TODO: show variable preview in wxDataViewCtrl for array/objects
 // TODO: popup for full variable contents
 // TODO: show current line
 // TODO: handle paths that are not found ie. remote
 //       debugging a VM 
+
 
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
@@ -414,22 +414,62 @@ void t4p::BreakpointWithHandleClass::Copy(const t4p::BreakpointWithHandleClass& 
 	DbgpTransactionId = src.DbgpTransactionId;
 }
 
+t4p::DebuggerOptionsClass::DebuggerOptionsClass()
+: Port(9000)
+, MaxChildren(100)
+, MaxDepth(1) 
+, DoListenOnAppReady(false)
+, DoBreakOnStart(false)
+, SourceCodeMappings() {
+	
+}
+
+t4p::DebuggerOptionsClass::DebuggerOptionsClass(const t4p::DebuggerOptionsClass& src)
+: Port(9000)
+, MaxChildren(100)
+, MaxDepth(1) 
+, DoListenOnAppReady(false)
+, DoBreakOnStart(false)
+, SourceCodeMappings() {
+	Copy(src);
+}
+
+t4p::DebuggerOptionsClass& t4p::DebuggerOptionsClass::operator=(const t4p::DebuggerOptionsClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::DebuggerOptionsClass::Copy(const t4p::DebuggerOptionsClass& src) {
+	Port = src.Port;
+	MaxChildren = src.MaxChildren;
+	MaxDepth = src.MaxDepth;
+	DoListenOnAppReady = src.DoListenOnAppReady;
+	DoBreakOnStart = src.DoBreakOnStart;
+	
+	t4p::DeepCopy(SourceCodeMappings, src.SourceCodeMappings);
+}
+
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , Breakpoints() 
 , RunningThreads() 
 , EventSinkLocker() 
 , Cmd()
-, IsDebuggerSessionActive(false) {
+, Options()
+, IsDebuggerSessionActive(false)
+, IsDebuggerServerActive(false) 
+, WasDebuggerPortChanged(false) 
+, WasDebuggerPort(0) {
 }
 
 void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu();
 	menu->AppendCheckItem(t4p::MENU_DEBUGGER + 0, _("Start Listening for Debugger"), 
 			_("Opens a server socket to listen for incoming xdebug connections"));
-	menu->AppendCheckItem(t4p::MENU_DEBUGGER + 1, _("Break at start"),
-		_("When checked, program will halt at the first line"));
+	menu->Append(t4p::MENU_DEBUGGER + 8, _("Stop Listening for Debugger"), 
+		_("Closes the server socket that listens for incoming xdebug connections"));
 	menu->AppendSeparator();
+	
 	menu->Append(t4p::MENU_DEBUGGER + 2, _("Step Into\tF11"), 
 		_("Run the next command, recursing inside function calls"));
 	menu->Append(t4p::MENU_DEBUGGER + 3, _("Step Over\tF10"),
@@ -440,38 +480,108 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 		_("Run until the next breakpoint"));
 	menu->Append(t4p::MENU_DEBUGGER + 6, _("Continue To Cursor"),
 		_("Run until the code reaches the cursor"));
+	menu->Append(t4p::MENU_DEBUGGER + 9, _("Finish Session"),
+		_("Run until the end of the session, ignoring any breakpoints"));
+	
 	menu->AppendSeparator();
 	menu->Append(t4p::MENU_DEBUGGER + 7, _("Toggle Breakpoint\tAlt+F10"), 
 		_("Turn on or off a breakpoint at the current line of source code."));
-	
-	menuBar->Append(menu, _("Debug"));	
+
+	menuBar->Append(menu, _("Debug"));
 }
+
+void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
+	bar->AddSeparator();
+	
+	bar->AddTool(t4p::MENU_DEBUGGER + 0, _("Start Debugger"), t4p::BitmapImageAsset(wxT("debugger-start")), 
+		_("Opens a server socket to listen for incoming xdebug connections"), wxITEM_NORMAL);
+	bar->AddTool(t4p::MENU_DEBUGGER + 9, _("Finish Session"), t4p::BitmapImageAsset(wxT("debugger-finish")),
+		_("Run until the end of the session, ignoring any breakpoints"), wxITEM_NORMAL);
+		
+	bar->AddTool(t4p::MENU_DEBUGGER + 2, _("Step Into"), t4p::BitmapImageAsset(wxT("arrow-step-in")), 
+		_("Run the next command, recursing inside function calls"), wxITEM_NORMAL);
+	bar->AddTool(t4p::MENU_DEBUGGER + 3, _("Step Over"), t4p::BitmapImageAsset(wxT("arrow-step-over")), 
+		_("Run the next command, without recursing inside function calls"), wxITEM_NORMAL);
+	bar->AddTool(t4p::MENU_DEBUGGER + 4, _("Step Out"), t4p::BitmapImageAsset(wxT("arrow-step-out")), 
+		_("Run until the end of the current function"), wxITEM_NORMAL);
+}
+
 
 void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
-
-	DebuggerPanel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
-	AddToolsWindow(DebuggerPanel, _("Debugger"));
-
-	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER, EventSinkLocker);
-	action->Init(9000);
-	RunningThreads.Queue(action);
+	if (Options.DoListenOnAppReady) {
+		StartDebugger(false);
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDebuggerLog(wxThreadEvent& event) {
-	DebuggerPanel->Logger->Append(event.GetString());
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->Logger->Append(event.GetString());
 }
 
 void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	RunningThreads.RemoveEventHandler(this);
+	StopDebugger(Options.Port);
+}
 
+void t4p::DebuggerFeatureClass::LoadPreferences(wxConfigBase* base) {
+	base->Read(wxT("Debugger/Port"), &Options.Port, Options.Port);
+	base->Read(wxT("Debugger/MaxChildren"), &Options.MaxChildren, Options.MaxChildren);
+	base->Read(wxT("Debugger/MaxDepth"), &Options.MaxDepth, Options.MaxDepth);
+	base->Read(wxT("Debugger/DoListenOnAppReady"), &Options.DoListenOnAppReady, Options.DoListenOnAppReady);
+	base->Read(wxT("Debugger/DoBreakOnStart"), &Options.DoBreakOnStart, Options.DoBreakOnStart);
+}
+
+void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+	wxConfigBase* base = wxConfig::Get();
+	
+	base->Write(wxT("Debugger/Port"), Options.Port);
+	base->Write(wxT("Debugger/MaxChildren"), Options.MaxChildren);
+	base->Write(wxT("Debugger/MaxDepth"), Options.MaxDepth);
+	base->Write(wxT("Debugger/DoListenOnAppReady"), Options.DoListenOnAppReady);
+	base->Write(wxT("Debugger/DoBreakOnStart"), Options.DoBreakOnStart);
+	
+	if (WasDebuggerPortChanged) {
+		
+		// need to shutdown the server and listen on the new port
+		StopDebugger(WasDebuggerPort);
+		if (Options.DoListenOnAppReady) {
+			StartDebugger(false);
+		}
+	}
+	WasDebuggerPortChanged = false;
+	WasDebuggerPort = Options.Port;
+}
+
+void t4p::DebuggerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	WasDebuggerPortChanged = false;
+	WasDebuggerPort = Options.Port;
+	t4p::DebuggerOptionsPanelClass* panel =  new t4p::DebuggerOptionsPanelClass(parent, Options, WasDebuggerPortChanged);
+	
+	parent->AddPage(panel, _("Debugger"));
+}
+
+void t4p::DebuggerFeatureClass::OnStopDebugger(wxCommandEvent& event) {
+	StopDebugger(Options.Port);
+}
+
+void t4p::DebuggerFeatureClass::StopDebugger(int port) {
+	
 	// this is our (triumph's) message telling the listener that we should no longer accept
 	// connections. we do it this way because we use synchronous sockets
 	// which we cannot stop from another thread.
 	boost::asio::io_service service;
 	boost::asio::ip::tcp::resolver resolver(service);
-	boost::asio::ip::tcp::resolver::query query("localhost", "9000");
+	
+	wxString wxsPort = wxString::Format("%d", port);
+	std::string strPort = t4p::WxToChar(wxsPort);
+	
+	boost::asio::ip::tcp::resolver::query query("localhost", strPort);
 	boost::asio::ip::tcp::resolver::iterator endpointIterator = resolver.resolve(query);
 
 	boost::asio::ip::tcp::socket socket(service);
@@ -489,6 +599,7 @@ void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	  }
 	}
 	RunningThreads.StopAll();
+	IsDebuggerServerActive = false;
 }
 
 void t4p::DebuggerFeatureClass::OnToggleBreakpoint(wxCommandEvent& event) {
@@ -527,7 +638,7 @@ void t4p::DebuggerFeatureClass::ToggleBreakpointAtLine(t4p::CodeControlClass* co
 	// the user wants to remove the breakpoint
 	bool found = false;
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
-	while (it != Breakpoints.end()) {		
+	while (it != Breakpoints.end()) {
 		if (it->Breakpoint.LineNumber == lineNumber
 			&& it->Breakpoint.Filename == codeCtrl->GetFileName()) {
 			found = true;
@@ -576,63 +687,85 @@ void t4p::DebuggerFeatureClass::ToggleBreakpointAtLine(t4p::CodeControlClass* co
 			Breakpoints.push_back(breakpointWithHandle);
 		}
 	}
-
-	DebuggerPanel->BreakpointPanel->RefreshList();
+	
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (window) {
+		t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+		panel->BreakpointPanel->RefreshList();
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
-	// TODO
+	StartDebugger(true);
 }
 
-void t4p::DebuggerFeatureClass::OnBreakAtStart(wxCommandEvent& event) {
-	// TODO
+void t4p::DebuggerFeatureClass::StartDebugger(bool doOpenDebuggerPanel) {
+	if (IsDebuggerSessionActive) {
+		return;
+	}
+	if (IsDebuggerServerActive) {
+		return;
+	}
+	
+	if (doOpenDebuggerPanel) {
+		wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+		if (!window) {
+			t4p::DebuggerPanelClass* panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+			AddToolsWindow(panel, _("Debugger"));
+		}
+	}
+
+	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER, EventSinkLocker);
+	action->Init(Options.Port);
+	RunningThreads.Queue(action);
+	IsDebuggerServerActive = true;
 }
 
 void t4p::DebuggerFeatureClass::OnStepInto(wxCommandEvent& event) {
 	PostCmd(
-		Cmd.StepInto()	
+		Cmd.StepInto()
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)	
+		Cmd.StackGet(0)
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnStepOver(wxCommandEvent& event) {
 	PostCmd(
-		Cmd.StepOver()	
+		Cmd.StepOver()
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)	
+		Cmd.StackGet(0)
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnStepOut(wxCommandEvent& event) {
 	PostCmd(
-		Cmd.StepOut()	
+		Cmd.StepOut()
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)	
+		Cmd.StackGet(0)
 	);
 }
 
 void t4p::DebuggerFeatureClass::OnContinue(wxCommandEvent& event) {
 	PostCmd(
-		Cmd.Run()	
+		Cmd.Run()
 	);
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)	
+		Cmd.StackGet(0)
 	);
 }
 
@@ -656,9 +789,37 @@ void t4p::DebuggerFeatureClass::OnContinueToCursor(wxCommandEvent& event) {
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)	
+		Cmd.StackGet(0)
 	);
 }
+
+void t4p::DebuggerFeatureClass::OnFinish(wxCommandEvent& event) {
+	
+	// finish is a special command
+	// 1. disable all breakpoints
+	// 2. run to completion
+	// this way, the script ends normally, as opposed to using
+	// the stop command which will stop the script and not let
+	// it finish
+	std::vector<t4p::BreakpointWithHandleClass>::iterator it;
+	for (it = Breakpoints.begin(); it != Breakpoints.end(); ++it) {
+		if (it->Breakpoint.IsEnabled) {
+			PostCmd(
+				Cmd.BreakpointDisable(it->Breakpoint.BreakpointId)
+			);
+		}
+	}
+	PostCmd(
+		Cmd.Run()
+	);
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		Cmd.StackGet(0)
+	);
+}
+
 
 void t4p::DebuggerFeatureClass::CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop) {
 	PostCmd(
@@ -810,14 +971,39 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 		);
 	}
 
-	PostCmd(Cmd.Run());
-	//PostCmd(Cmd.ContextNames(0));
-	//PostCmd(Cmd.ContextGet(0, 0));
-	PostCmd(Cmd.FeatureSet("max_depth", "1"));
-	PostCmd(Cmd.FeatureSet("max_children", "30"));
-	PostCmd(Cmd.StackGet(0));
-
+	// mark the session as having been started
 	IsDebuggerSessionActive = true;
+	
+	// open the debugger panel if its not yet open
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		t4p::DebuggerPanelClass* panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+		AddToolsWindow(panel, _("Debugger"));
+	}
+
+	// set the max children of variables to get at once
+	// we can handle more than the default
+	PostCmd(Cmd.FeatureSet("max_depth", wxString::Format("%d", Options.MaxDepth)));
+	PostCmd(Cmd.FeatureSet("max_children", wxString::Format("%d", Options.MaxChildren)));
+	
+	// now we send commands to the debug engine
+	// if the user wants to break at the first line, we
+	// want to step into the first line.
+	if (Options.DoBreakOnStart) {
+		PostCmd(Cmd.StepInto());
+		PostCmd(Cmd.ContextNames(0));
+		PostCmd(Cmd.ContextGet(0, 0));
+		PostCmd(Cmd.StackGet(0));
+	}
+	else {
+		
+		// we want the script to run until a breakpoint is
+		// hit
+		PostCmd(Cmd.Run());
+		PostCmd(Cmd.ContextNames(0));
+		PostCmd(Cmd.ContextGet(0, 0));
+		PostCmd(Cmd.StackGet(0));
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
@@ -849,7 +1035,7 @@ void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& even
 			Cmd.ContextGet(0, 0)
 		);
 
-		// the script has stopped running, alert the user that the debugger windows
+		// the script has paused execution, alert the user that the debugger windows
 		// are being updated with new script stack trace, variables.
 		if (!App.IsActive()) {
 			wxCommandEvent evt(t4p::EVENT_CMD_APP_USER_ATTENTION);
@@ -924,12 +1110,29 @@ void t4p::DebuggerFeatureClass::OnDbgpContextNames(t4p::DbgpContextNamesEventCla
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& event) {
-	DebuggerPanel->VariablePanel->AddVariables(event.Properties);
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		
+		// not sure if we should create the panel again.
+		// if the panel is not here it means that the user closed it
+		// and wants it closed?
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->VariablePanel->AddVariables(event.Properties);
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event) {
-	DebuggerPanel->VariablePanel->UpdateVariable(event.Property);
-	
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		
+		// not sure if we should create the panel again.
+		// if the panel is not here it means that the user closed it
+		// and wants it closed?
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->VariablePanel->UpdateVariable(event.Property);
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyValue(t4p::DbgpPropertyValueEventClass& event) {
@@ -959,7 +1162,12 @@ void t4p::DebuggerFeatureClass::ResetDebugger() {
 	if (window) {
 		t4p::DebuggerStackPanelClass* stackPanel = (t4p::DebuggerStackPanelClass*) window;
 		stackPanel->ClearStack();
-		DebuggerPanel->VariablePanel->ClearVariables();
+	}
+	
+	wxWindow* panelWindow = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (panelWindow) {
+		t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) panelWindow;
+		panel->VariablePanel->ClearVariables();
 	}
 }
 
@@ -1450,6 +1658,46 @@ void t4p::DebuggerBreakpointPanelClass::OnItemValueChanged(wxDataViewEvent& even
 	}
 }
 
+t4p::DebuggerOptionsPanelClass::DebuggerOptionsPanelClass(wxWindow* parent, t4p::DebuggerOptionsClass& options, 
+	bool& wasDebuggerPortChanged)
+: DebuggerOptionsPanelGeneratedClass(parent, wxID_ANY) 
+, Options(options)
+, EditedOptions(options) 
+, WasDebuggerPortChanged(wasDebuggerPortChanged) {
+	
+	wxGenericValidator portValidator(&EditedOptions.Port);
+	Port->SetValidator(portValidator);
+	wxGenericValidator maxChildrenValidator(&EditedOptions.MaxChildren);
+	MaxChildren->SetValidator(maxChildrenValidator);
+	wxGenericValidator maxDepthValidator(&EditedOptions.MaxDepth);
+	MaxDepth->SetValidator(maxDepthValidator);
+	wxGenericValidator doListenOnAppReadyValidator(&EditedOptions.DoListenOnAppReady);
+	DoListenOnAppReady->SetValidator(doListenOnAppReadyValidator);
+	wxGenericValidator doBreakonStartValidator(&EditedOptions.DoBreakOnStart);
+	DoBreakOnStart->SetValidator(doBreakonStartValidator);
+	FillMappings();
+}
+
+void t4p::DebuggerOptionsPanelClass::FillMappings() {
+}
+
+void t4p::DebuggerOptionsPanelClass::OnAddMapping(wxCommandEvent& event) {
+}
+
+void t4p::DebuggerOptionsPanelClass::OnDeleteMapping(wxCommandEvent& event) {
+}
+
+void t4p::DebuggerOptionsPanelClass::OnEditMapping(wxCommandEvent& event) {
+}
+
+bool t4p::DebuggerOptionsPanelClass::TransferDataFromWindow() {
+	if (!wxWindow::TransferDataFromWindow()) {
+		return false;
+	}
+	WasDebuggerPortChanged = Options.Port != EditedOptions.Port;
+	Options = EditedOptions;
+	return true;
+}
 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
@@ -1458,19 +1706,28 @@ const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::DebuggerFeatureClass::OnPreferencesSaved)
 	EVT_APP_FILE_OPEN(t4p::DebuggerFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::DebuggerFeatureClass::OnAppFileClosed)
 
 	EVT_STC_MARGINCLICK(wxID_ANY, t4p::DebuggerFeatureClass::OnMarginClick)
 	
 	EVT_MENU(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
-	EVT_MENU(t4p::MENU_DEBUGGER + 1, t4p::DebuggerFeatureClass::OnBreakAtStart)
 	EVT_MENU(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
 	EVT_MENU(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
 	EVT_MENU(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
 	EVT_MENU(t4p::MENU_DEBUGGER + 5, t4p::DebuggerFeatureClass::OnContinue)
 	EVT_MENU(t4p::MENU_DEBUGGER + 6, t4p::DebuggerFeatureClass::OnContinueToCursor)
 	EVT_MENU(t4p::MENU_DEBUGGER + 7, t4p::DebuggerFeatureClass::OnToggleBreakpoint)
+	EVT_MENU(t4p::MENU_DEBUGGER + 8, t4p::DebuggerFeatureClass::OnStopDebugger)
+	EVT_MENU(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
+	
+	EVT_TOOL(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
+	EVT_TOOL(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
+	EVT_TOOL(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
+	EVT_TOOL(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
+	EVT_TOOL(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
+	
 
 	EVT_DBGP_INIT(t4p::DebuggerFeatureClass::OnDbgpInit)
 	EVT_DBGP_ERROR(t4p::DebuggerFeatureClass::OnDbgpError)
@@ -1505,3 +1762,4 @@ BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGene
 	EVT_DATAVIEW_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemActivated)
 	EVT_DATAVIEW_ITEM_VALUE_CHANGED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemValueChanged)
 END_EVENT_TABLE()
+
