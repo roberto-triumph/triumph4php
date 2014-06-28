@@ -140,23 +140,23 @@ void t4p::RunBrowserFeatureClass::AddWindows() {
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
 	BrowserToolbar->SetFont(App.Preferences.ApplicationFont);
-    BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
-    wxBitmap browserBitmap = t4p::BitmapImageAsset(wxT("browser-generic"));
+	BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
+	wxBitmap browserBitmap = t4p::BitmapImageAsset(wxT("browser-generic"));
 	wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run-browser"));
 	wxBitmap searchUrlBitmap = t4p::BitmapImageAsset(wxT("search-url-tags"));
 	wxBitmap recentUrlBitmap = t4p::BitmapImageAsset(wxT("recent-urls"));
 
 	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, _("No Browsers Configured"), browserBitmap);
-    BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
+	BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, true);
 	BrowserToolbar->AddSeparator();
-    BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"), recentUrlBitmap);
-    BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
-	
-	
+	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, _("No URLs"), recentUrlBitmap);
+	BrowserToolbar->SetToolDropDown(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, true);
+
+
 	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1, _("Run In Web Browser"), runBitmap);
 	BrowserToolbar->AddTool(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 4, _("Search for URLs..."), searchUrlBitmap);
 	BrowserToolbar->SetOverflowVisible(false);
-    BrowserToolbar->Realize();
+	BrowserToolbar->Realize();
 
 	AuiManager->AddPane(BrowserToolbar, wxAuiPaneInfo()
 		.ToolbarPane().Top().Row(2).Position(1)

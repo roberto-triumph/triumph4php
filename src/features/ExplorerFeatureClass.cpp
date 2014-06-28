@@ -235,17 +235,16 @@ void t4p::ExplorerFeatureClass::AddWindows() {
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
 	ExplorerToolBar->SetFont(App.Preferences.ApplicationFont);
-    ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
-    
+	ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
+
 	wxBitmap bmp = t4p::BitmapImageAsset(wxT("explore"));
 	wxBitmap bmpOpen = t4p::BitmapImageAsset(wxT("explore-open-document"));
-	
-	
+
 	ExplorerToolBar->AddTool(t4p::MENU_EXPLORER + 1, _("Explore Open File"), bmpOpen, _("Open An explorer window in the currently opened file"));
 	ExplorerToolBar->AddTool(t4p::MENU_EXPLORER + 2, _("Explore Projects"), bmp, _("Open An explorer window in the Project Root"));
 	ExplorerToolBar->SetToolDropDown(t4p::MENU_EXPLORER + 2, true);
 	ExplorerToolBar->SetOverflowVisible(false);
-    ExplorerToolBar->Realize();
+	ExplorerToolBar->Realize();
 
 	AuiManager->AddPane(ExplorerToolBar, wxAuiPaneInfo()
 		.ToolbarPane().Top().Row(1).Position(2)
