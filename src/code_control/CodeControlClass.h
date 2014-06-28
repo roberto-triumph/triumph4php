@@ -459,6 +459,14 @@ public:
 	 * Markings are moved from this window only.
 	 */
 	void BreakpointRemoveAll();
+	
+	/**
+	 * @param int the bookmark "handle", used to query the 
+	 *        the line of the breakpoint when text has been added/removed
+	 *        from the document
+	 * @return int line number where the breakpoint is now located. 1-based
+	 */
+	int BreakpointGetLine(int handle);
 
 	/**
 	 * Set the connection to use to fetch the SQL table metadata

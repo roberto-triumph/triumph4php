@@ -475,6 +475,14 @@ private:
 	 * @param cmd the command string to send, built by DbgpCommandClass
 	 */
 	void PostCmd(std::string cmd);
+	
+	/**
+	 * we want to get notified of code changes so that
+	 * if a brerakpoint is now located at a new line
+	 * we update the breakpoints properly
+	 */
+	void OnStyledTextModified(wxStyledTextEvent& event);
+
 
 	/**
 	 * holds the background thread that the server action is running

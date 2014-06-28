@@ -784,6 +784,14 @@ void t4p::CodeControlClass::BreakpointRemoveAll() {
 	MarkerDeleteAll(CODE_CONTROL_BREAKPOINT_MARKER);
 }
 
+int t4p::CodeControlClass::BreakpointGetLine(int handle) {
+	int line = MarkerLineFromHandle(handle);
+	if (line >= 0) {
+		line++;
+	}
+	return line;
+}
+
 void t4p::CodeControlClass::SetCurrentDbTag(const t4p::DatabaseTagClass& currentDbTag) {
 	CurrentDbTag.Copy(currentDbTag);
 	

@@ -33,7 +33,6 @@
 
 // TODO: fix variables tree expansion
 // TODO: global variables / all contexts
-// TODO: store breakpoints across restarts
 // TODO: expression eval
 // TODO: show variable preview in wxDataViewCtrl for array/objects
 // TODO: popup for full variable contents
@@ -41,6 +40,9 @@
 // TODO: handle paths that are not found ie. remote
 //       debugging a VM 
 
+// TODO: not sure how breakpoints react when
+//       file is edited (and breakpoints moves lines) 
+//       but file is then reloaded/discarded
 
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
@@ -106,6 +108,81 @@ static wxFileName ToLocalFilename(wxString xdebugFile) {
 	wxFileName name(localFile);
 	name.Normalize();
 	return name;
+}
+
+static void ConfigLoad(wxConfigBase* config,
+	t4p::DebuggerOptionsClass& options, 
+	std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
+	config->Read(wxT("Debugger/Port"), &options.Port, options.Port);
+	config->Read(wxT("Debugger/MaxChildren"), &options.MaxChildren, options.MaxChildren);
+	config->Read(wxT("Debugger/MaxDepth"), &options.MaxDepth, options.MaxDepth);
+	config->Read(wxT("Debugger/DoListenOnAppReady"), &options.DoListenOnAppReady, options.DoListenOnAppReady);
+	config->Read(wxT("Debugger/DoBreakOnStart"), &options.DoBreakOnStart, options.DoBreakOnStart);
+	
+	wxString groupName;
+	long index;
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(wxT("DebuggerBreakpoint_")) == 0) {
+				t4p::BreakpointWithHandleClass breakpoint;
+				
+				config->Read(groupName + wxT("/Filename"), &breakpoint.Breakpoint.Filename);
+				config->Read(groupName + wxT("/LineNumber"), &breakpoint.Breakpoint.LineNumber);
+				config->Read(groupName + wxT("/IsEnabled"), &breakpoint.Breakpoint.IsEnabled );
+				config->Read(groupName + wxT("/BreakpointType"), &breakpoint.Breakpoint.BreakpointType);
+				config->Read(groupName + wxT("/Exception"), &breakpoint.Breakpoint.Exception);
+				config->Read(groupName + wxT("/Expression"), &breakpoint.Breakpoint.Expression);
+				config->Read(groupName + wxT("/Function"), &breakpoint.Breakpoint.Function);
+				config->Read(groupName + wxT("/HitCondition"), &breakpoint.Breakpoint.HitCondition);
+				config->Read(groupName + wxT("/HitValue"), &breakpoint.Breakpoint.HitValue);
+				
+				breakpoints.push_back(breakpoint);
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+}
+
+static void ConfigStore(wxConfigBase* config,
+	const t4p::DebuggerOptionsClass& options, 
+	const std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
+	
+	config->Write(wxT("Debugger/Port"),options.Port);
+	config->Write(wxT("Debugger/MaxChildren"), options.MaxChildren);
+	config->Write(wxT("Debugger/MaxDepth"), options.MaxDepth);
+	config->Write(wxT("Debugger/DoListenOnAppReady"), options.DoListenOnAppReady);
+	config->Write(wxT("Debugger/DoBreakOnStart"), options.DoBreakOnStart);
+	
+	// delete all previous breakpoints
+	wxString groupName;
+	long index;
+	std::vector<wxString> keysToDelete;
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(wxT("DebuggerBreakpoint_")) == 0) {
+				keysToDelete.push_back(groupName);
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+	for (size_t j = 0; j < keysToDelete.size(); ++j) {
+		config->DeleteGroup(keysToDelete[j]);
+	}
+	
+	std::vector<t4p::BreakpointWithHandleClass>::const_iterator it;
+	int i = 0;
+	for (it = breakpoints.begin(); it != breakpoints.end(); ++it) {
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/Filename", i), it->Breakpoint.Filename);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/LineNumber", i), it->Breakpoint.LineNumber);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/IsEnabled", i), it->Breakpoint.IsEnabled);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/BreakpointType", i), it->Breakpoint.BreakpointType);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/Exception", i), it->Breakpoint.Exception);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/Expression", i), it->Breakpoint.Expression);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/Function", i), it->Breakpoint.Function);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/HitCondition", i), it->Breakpoint.HitCondition);
+		config->Write(wxString::Format("DebuggerBreakpoint_%d/HitValue", i), it->Breakpoint.HitValue);
+		
+		++i;
+	}
+	config->Flush();
 }
 
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
@@ -530,21 +607,12 @@ void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 }
 
 void t4p::DebuggerFeatureClass::LoadPreferences(wxConfigBase* base) {
-	base->Read(wxT("Debugger/Port"), &Options.Port, Options.Port);
-	base->Read(wxT("Debugger/MaxChildren"), &Options.MaxChildren, Options.MaxChildren);
-	base->Read(wxT("Debugger/MaxDepth"), &Options.MaxDepth, Options.MaxDepth);
-	base->Read(wxT("Debugger/DoListenOnAppReady"), &Options.DoListenOnAppReady, Options.DoListenOnAppReady);
-	base->Read(wxT("Debugger/DoBreakOnStart"), &Options.DoBreakOnStart, Options.DoBreakOnStart);
+	ConfigLoad(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* base = wxConfig::Get();
-	
-	base->Write(wxT("Debugger/Port"), Options.Port);
-	base->Write(wxT("Debugger/MaxChildren"), Options.MaxChildren);
-	base->Write(wxT("Debugger/MaxDepth"), Options.MaxDepth);
-	base->Write(wxT("Debugger/DoListenOnAppReady"), Options.DoListenOnAppReady);
-	base->Write(wxT("Debugger/DoBreakOnStart"), Options.DoBreakOnStart);
+	ConfigStore(base, Options, Breakpoints);
 	
 	if (WasDebuggerPortChanged) {
 		
@@ -557,6 +625,29 @@ void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	WasDebuggerPortChanged = false;
 	WasDebuggerPort = Options.Port;
 }
+
+void t4p::DebuggerFeatureClass::OnStyledTextModified(wxStyledTextEvent& event) {
+	int mask = wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT;
+	if (event.GetModificationType() & mask) {
+		
+		// lets update the location of the breakpoints in this file
+		t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
+		if (!ctrl->IsNew()) {
+			wxString ctrlFileName = ctrl->GetFileName();
+			std::vector<t4p::BreakpointWithHandleClass>::iterator it;
+			for (it = Breakpoints.begin(); it != Breakpoints.end(); ++it) {
+				if (it->Breakpoint.Filename == ctrlFileName) {
+					
+					// only update when line >= 1.  if line == 0 then it means
+					// that the entire text has been deleted. this is most likely
+					// scenario when the user reloads the file.
+					it->Breakpoint.LineNumber = ctrl->BreakpointGetLine(it->Handle);
+				}
+			}
+		}
+	}
+}
+
 
 void t4p::DebuggerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	WasDebuggerPortChanged = false;
@@ -693,6 +784,10 @@ void t4p::DebuggerFeatureClass::ToggleBreakpointAtLine(t4p::CodeControlClass* co
 		t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
 		panel->BreakpointPanel->RefreshList();
 	}
+	
+	// store the breakpoints to disk
+	wxConfigBase* base = wxConfig::Get();
+	ConfigStore(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
@@ -853,6 +948,10 @@ void t4p::DebuggerFeatureClass::BreakpointRemove(const t4p::BreakpointWithHandle
 	PostCmd(
 		Cmd.BreakpointRemove(breakpointWithHandle.Breakpoint.BreakpointId)
 	);
+	
+	// store the breakpoints to disk
+	wxConfigBase* base = wxConfig::Get();
+	ConfigStore(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
@@ -881,6 +980,10 @@ void t4p::DebuggerFeatureClass::BreakpointDisable(const t4p::BreakpointWithHandl
 	PostCmd(
 		Cmd.BreakpointDisable(breakpointWithHandle.Breakpoint.BreakpointId)
 	);
+	
+	// store the breakpoints to disk
+	wxConfigBase* base = wxConfig::Get();
+	ConfigStore(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
@@ -911,6 +1014,10 @@ void t4p::DebuggerFeatureClass::BreakpointEnable(const t4p::BreakpointWithHandle
 	PostCmd(
 		Cmd.BreakpointEnable(breakpointWithHandle.Breakpoint.BreakpointId)
 	);
+	
+	// store the breakpoints to disk
+	wxConfigBase* base = wxConfig::Get();
+	ConfigStore(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::BreakpointGoToSource(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
@@ -947,6 +1054,12 @@ void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& even
 			br->Handle = -1;
 		}
 	}
+	
+	// we want to save the breakpoints because the user may  have
+	// added or removed code and now they are located in a different
+	// line number
+	wxConfigBase* config = wxConfig::Get();
+	ConfigStore(config, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
@@ -1709,7 +1822,7 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::DebuggerFeatureClass::OnPreferencesSaved)
 	EVT_APP_FILE_OPEN(t4p::DebuggerFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::DebuggerFeatureClass::OnAppFileClosed)
-
+	EVT_STC_MODIFIED(wxID_ANY, t4p::DebuggerFeatureClass::OnStyledTextModified)
 	EVT_STC_MARGINCLICK(wxID_ANY, t4p::DebuggerFeatureClass::OnMarginClick)
 	
 	EVT_MENU(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
