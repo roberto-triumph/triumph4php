@@ -757,6 +757,7 @@ class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
 
 public:
 
+	// this class will own these 3 panel pointers
 	t4p::DebuggerLogPanelClass* Logger;
 	t4p::DebuggerVariablePanelClass* VariablePanel;
 	t4p::DebuggerBreakpointPanelClass* BreakpointPanel;
@@ -766,6 +767,10 @@ public:
 private:
 };
 
+/**
+ * allows the user to edit the options for
+ * debugger settings
+ */
 class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
 	
 public:
@@ -780,6 +785,7 @@ private:
 	void OnAddMapping(wxCommandEvent& event);
 	void OnEditMapping(wxCommandEvent& event);
 	void OnDeleteMapping(wxCommandEvent& event);
+	void OnListItemActivated(wxListEvent& event);
 
 	/**
 	 * fill the mappings list according to the options
@@ -874,6 +880,27 @@ class DebuggerFullViewDialogClass : public DebuggerFullViewDialogGeneratedClass 
 public:
 
 	DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value);
+};
+
+/**
+ * This class is for adding/edit a local path => remote path
+ * mapping.
+ */
+class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
+	
+public:
+
+	DebuggerMappingDialogClass(wxWindow* parent, wxString& localPath, wxString& remotePath);
+	
+private:
+	
+	void OnCancelButton(wxCommandEvent& event);
+	
+	void OnOkButton(wxCommandEvent& event);
+	
+	wxFileName LocalDir;
+	
+	wxString& LocalPathString;
 };
 
 }

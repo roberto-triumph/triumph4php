@@ -25,6 +25,8 @@
 #include <features/DebuggerFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <widgets/DirPickerValidatorClass.h>
+#include <widgets/ListWidget.h>
 #include <wx/valgen.h>
 #include <Triumph.h>
 #include <istream>
@@ -90,21 +92,127 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 	return contents;
 }
 
-// xdebug returns files in form
-// file://{system name}/c:/wamp/www/index.php
-// 
-// we remove the file:/// from the name
-static wxFileName ToLocalFilename(wxString xdebugFile) {
-	wxString localFile = xdebugFile.Mid(8); // 8  = size of "file:///"
-	if (!localFile.Contains(":")) {
+/**
+ * xdebug returns files in form
+ * file://{system name}/c:/wamp/www/index.php
+ *
+ * we remove the file:/// from the name. 
+ * 
+ * Also, we want to map the name that xdebug returns to a local
+ * path.  this is in case the program being debugged remotely,
+ * for instance the user is using a virtual machine for their
+ * LAMP setup and Triumph is running on a windows machine; 
+ * in this case xdebug will return unix paths (/var/www/index.php)
+ * but we want to translate that to a local path (C:\users\user\projects\index.php)
+ * 
+ */
+static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxString, wxString>& localToRemoteMappings) {
+	wxString remoteFile = xdebugFile.Mid(8); // 8  = size of "file:///"
+	if (!remoteFile.Contains(":")) {
 		
 		// in linux, filename comes back as "file:///"
 		// we want to keep the last slash
-		localFile = xdebugFile.Mid(7); 
+		remoteFile = xdebugFile.Mid(7); 
+	}
+	
+	// check to see if the remote path is inside one of the mappings
+	std::map<wxString, wxString>::const_iterator mapping;
+	wxString localFile;
+	wxString remoteLower(remoteFile);
+	remoteLower.MakeLower();
+	bool foundMapping = false;
+	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
+		
+		// lets make comparison case-insensitive
+		wxString remoteMappingLower(mapping->second);
+		remoteMappingLower.MakeLower();
+		
+		// convert windows backslashes to forward slashes as xdebug does as
+		// well
+		remoteMappingLower.Replace(wxT("\\"), wxT("/"));
+		if (remoteLower.Find(remoteMappingLower) == 0) {
+			
+			// lets perform the mapping. replace the remote 
+			// path with the local path
+			localFile = remoteFile;
+			localFile.Replace(mapping->second, mapping->first);
+			foundMapping = true;
+			break;
+		}
+		
+	}
+	
+	if (!foundMapping) {
+		localFile = remoteFile;
 	}
 	wxFileName name(localFile);
 	name.Normalize();
 	return name;
+}
+
+/**
+ * This is the inverse of ToLocalFilename
+ *
+ * when we send file breakpoints to xdebug, we want the paths
+ * to be paths on the remote system.
+ * 
+ * for instance the user is using a virtual machine for their
+ * LAMP setup and Triumph is running on a windows machine; 
+ * the user add a breakpoint to C:\users\user\projects\index.php
+ * then we want to add a file breakpoint as a 
+ * unix path (/var/www/index.php)
+ * 
+ */
+static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxString, wxString>& localToRemoteMappings) {
+		
+	// check to see if the local path is inside one of the mappings
+	std::map<wxString, wxString>::const_iterator mapping;
+	wxString remoteFile;
+	wxString localLower(localFile);
+	localLower.MakeLower();
+	bool foundMapping = false;
+	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
+		
+		// lets make comparison case-insensitive
+		wxString localMappingLower(mapping->first);
+		localMappingLower.MakeLower();
+		
+		// convert windows backslashes to forward slashes as xdebug does as
+		// well
+		localMappingLower.Replace(wxT("\\"), wxT("/"));
+		if (localLower.Find(localMappingLower) == 0) {
+			
+			// lets perform the mapping. replace the local
+			// path with the remote path
+			remoteFile = localFile;
+			remoteFile.Replace(mapping->first, mapping->second);
+			foundMapping = true;
+			break;
+		}
+		
+	}
+	return foundMapping ? remoteFile : localFile;
+}
+
+/**
+ * @param config the config to delete the groups from.
+ * @param groupNameStart groups that start with this string will be
+ *        deleted from the config. Searches are case-sensitive
+ */
+static void ConfigDeleteGroups(wxConfigBase* config, const wxString& groupNameStart) {
+	long index;
+	wxString groupName;
+	std::vector<wxString> keysToDelete;
+	if (config->GetFirstGroup(groupName, index)) {
+		do {
+			if (groupName.Find(groupNameStart) == 0) {
+				keysToDelete.push_back(groupName);
+			}
+		} while (config->GetNextGroup(groupName, index));
+	}
+	for (size_t j = 0; j < keysToDelete.size(); ++j) {
+		config->DeleteGroup(keysToDelete[j]);
+	}
 }
 
 /**
@@ -138,6 +246,17 @@ static void ConfigLoad(wxConfigBase* config,
 				
 				breakpoints.push_back(breakpoint);
 			}
+			if (groupName.Find(wxT("DebuggerMapping_")) == 0) {
+				wxString localPath;
+				wxString remotePath;
+				
+				config->Read(groupName + wxT("/LocalPath"), &localPath);
+				config->Read(groupName + wxT("/RemotePath"), &remotePath);
+				
+				if (!localPath.IsEmpty() && !remotePath.IsEmpty()) {
+					options.SourceCodeMappings[localPath] = remotePath;
+				}
+			}
 		} while (config->GetNextGroup(groupName, index));
 	}
 }
@@ -157,20 +276,9 @@ static void ConfigStore(wxConfigBase* config,
 	config->Write(wxT("Debugger/DoListenOnAppReady"), options.DoListenOnAppReady);
 	config->Write(wxT("Debugger/DoBreakOnStart"), options.DoBreakOnStart);
 	
-	// delete all previous breakpoints
-	wxString groupName;
-	long index;
-	std::vector<wxString> keysToDelete;
-	if (config->GetFirstGroup(groupName, index)) {
-		do {
-			if (groupName.Find(wxT("DebuggerBreakpoint_")) == 0) {
-				keysToDelete.push_back(groupName);
-			}
-		} while (config->GetNextGroup(groupName, index));
-	}
-	for (size_t j = 0; j < keysToDelete.size(); ++j) {
-		config->DeleteGroup(keysToDelete[j]);
-	}
+	// delete all previous breakpoints and mappings
+	ConfigDeleteGroups(config, wxT("DebuggerBreakpoint_"));
+	ConfigDeleteGroups(config, wxT("DebuggerMapping_"));
 	
 	std::vector<t4p::BreakpointWithHandleClass>::const_iterator it;
 	int i = 0;
@@ -186,6 +294,15 @@ static void ConfigStore(wxConfigBase* config,
 		config->Write(wxString::Format("DebuggerBreakpoint_%d/HitValue", i), it->Breakpoint.HitValue);
 		
 		++i;
+	}
+	
+	i = 0;
+	std::map<wxString, wxString>::const_iterator mapping;
+	for (mapping = options.SourceCodeMappings.begin(); mapping != options.SourceCodeMappings.end(); ++mapping) {
+		config->Write(wxString::Format("DebuggerMapping_%d/LocalPath", i), mapping->first);
+		config->Write(wxString::Format("DebuggerMapping_%d/RemotePath", i), mapping->second);
+		
+		i++;
 	}
 	config->Flush();
 }
@@ -845,7 +962,7 @@ void t4p::DebuggerFeatureClass::ToggleBreakpointAtLine(t4p::CodeControlClass* co
 				breakpointWithHandle.DbgpTransactionId = Cmd.CurrentTransactionId();
 				PostCmd(
 					Cmd.BreakpointFile(
-						breakpointWithHandle.Breakpoint.Filename, 
+						ToRemoteFilename(breakpointWithHandle.Breakpoint.Filename, Options.SourceCodeMappings), 
 						breakpointWithHandle.Breakpoint.LineNumber, 
 						breakpointWithHandle.Breakpoint.IsEnabled
 					)
@@ -1154,7 +1271,7 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 		it->DbgpTransactionId = Cmd.CurrentTransactionId();
 		PostCmd(
 			Cmd.BreakpointFile(
-				it->Breakpoint.Filename, 
+				ToRemoteFilename(it->Breakpoint.Filename, Options.SourceCodeMappings), 
 				it->Breakpoint.LineNumber, 
 				it->Breakpoint.IsEnabled
 			)
@@ -1274,7 +1391,7 @@ void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& even
 	// stopped
 
 	// turn the filename that Xdebug returns into a local filesystem filename
-	wxFileName currentFilename = ToLocalFilename(event.Stack[0].Filename);
+	wxFileName currentFilename = ToLocalFilename(event.Stack[0].Filename, Options.SourceCodeMappings);
 	t4p::OpenFileCommandEventClass openEvt(
 		currentFilename.GetFullPath(), -1, -1,
 		event.Stack[0].LineNumber
@@ -1291,6 +1408,11 @@ void t4p::DebuggerFeatureClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& even
 	else {
 		stackPanel = new t4p::DebuggerStackPanelClass(GetOutlineNotebook(), ID_PANEL_DEBUGGER_STACK);
 		AddOutlineWindow(stackPanel, _("Stack"));
+	}
+	
+	// lets convert remote paths to local paths
+	for (size_t i = 0; i < event.Stack.size(); ++i) {
+		event.Stack[i].Filename = ToLocalFilename(event.Stack[i].Filename, Options.SourceCodeMappings).GetFullPath();
 	}
 	stackPanel->ShowStack(event.Stack);
 }
@@ -1438,7 +1560,8 @@ void t4p::DebuggerStackPanelClass::ShowStack(const std::vector<t4p::DbgpStackCla
 		column2.SetText(wxString::Format("%d", it->LineNumber));
 		StackList->SetItem(column2);
 
-		wxFileName fileName = ToLocalFilename(it->Filename);
+		// file has already been converted to local path
+		wxFileName fileName = it->Filename;
 		wxListItem column3;
 		column3.SetColumn(2);
 		column3.SetId(newRowNumber);
@@ -1884,19 +2007,96 @@ t4p::DebuggerOptionsPanelClass::DebuggerOptionsPanelClass(wxWindow* parent, t4p:
 	DoListenOnAppReady->SetValidator(doListenOnAppReadyValidator);
 	wxGenericValidator doBreakonStartValidator(&EditedOptions.DoBreakOnStart);
 	DoBreakOnStart->SetValidator(doBreakonStartValidator);
+	
+	
+	SourceCodeMappings->DeleteAllColumns();
+	SourceCodeMappings->AppendColumn(_("Local Path"));
+	SourceCodeMappings->AppendColumn(_("Remote Path"));
+	
 	FillMappings();
 }
 
 void t4p::DebuggerOptionsPanelClass::FillMappings() {
+	SourceCodeMappings->DeleteAllItems();
+	
+	std::map<wxString, wxString>::iterator it;
+	int row = 0;
+	for (it = EditedOptions.SourceCodeMappings.begin(); it != EditedOptions.SourceCodeMappings.end(); ++it) {
+		t4p::ListCtrlAdd(SourceCodeMappings, it->first, it->second);
+		++row;
+	}
+	
+	if (SourceCodeMappings->GetItemCount() > 0) {
+		SourceCodeMappings->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
+		SourceCodeMappings->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		SourceCodeMappings->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	}
 }
 
 void t4p::DebuggerOptionsPanelClass::OnAddMapping(wxCommandEvent& event) {
+	wxString local;
+	wxString remote;
+	
+	t4p::DebuggerMappingDialogClass dialog(this, local, remote);
+	if (dialog.ShowModal() == wxOK) {
+		EditedOptions.SourceCodeMappings[local] = remote;
+		
+		t4p::ListCtrlAdd(SourceCodeMappings, local, remote);
+		if (SourceCodeMappings->GetItemCount() == 1) {
+			SourceCodeMappings->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
+		}
+		SourceCodeMappings->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		SourceCodeMappings->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	}
 }
 
 void t4p::DebuggerOptionsPanelClass::OnDeleteMapping(wxCommandEvent& event) {
+	int selected = t4p::ListCtrlSelected(SourceCodeMappings);
+	if (selected == wxNOT_FOUND) {
+		return;
+	}
+	SourceCodeMappings->DeleteItem(selected);
+	
+	std::map<wxString, wxString>::iterator it;
+	int i = 0;
+	for (it = EditedOptions.SourceCodeMappings.begin(); it != EditedOptions.SourceCodeMappings.end(); ++it) {
+		if (i == selected) {
+			EditedOptions.SourceCodeMappings.erase(it);
+			break;
+		}
+		i++;
+	}
 }
 
 void t4p::DebuggerOptionsPanelClass::OnEditMapping(wxCommandEvent& event) {
+	int selected = t4p::ListCtrlSelected(SourceCodeMappings);
+	if (selected == wxNOT_FOUND) {
+		return;
+	}
+	std::map<wxString, wxString>::iterator it;
+	int i = 0;
+	for (it = EditedOptions.SourceCodeMappings.begin(); it != EditedOptions.SourceCodeMappings.end(); ++it) {
+		if (i == selected) {
+			wxString localPath = it->first;
+			wxString remotePath = it->second;
+			t4p::DebuggerMappingDialogClass dialog(this, localPath, remotePath);
+			if (dialog.ShowModal() == wxOK) {
+				EditedOptions.SourceCodeMappings[localPath] = remotePath;
+				
+				t4p::ListCtrlEdit(SourceCodeMappings, localPath, remotePath, i);
+				
+				SourceCodeMappings->SetColumnWidth(0, wxLIST_AUTOSIZE);
+				SourceCodeMappings->SetColumnWidth(1, wxLIST_AUTOSIZE);
+			}
+			break;
+		}
+		i++;
+	}
+}
+
+void t4p::DebuggerOptionsPanelClass::OnListItemActivated(wxListEvent& event) {
+	wxCommandEvent evt;
+	OnEditMapping(evt);
 }
 
 bool t4p::DebuggerOptionsPanelClass::TransferDataFromWindow() {
@@ -1977,6 +2177,53 @@ t4p::DebuggerFullViewDialogClass::DebuggerFullViewDialogClass(wxWindow* parent, 
 	Text->SetValue(value);
 }
 
+
+t4p::DebuggerMappingDialogClass::DebuggerMappingDialogClass(wxWindow* parent, wxString& localPath, wxString& remotePath)
+: DebuggerMappingDialogGeneratedClass(parent, wxID_ANY) 
+, LocalDir() 
+, LocalPathString(localPath) {
+	LocalDir.AssignDir(localPath);
+	t4p::DirPickerValidatorClass localValidator(&LocalDir);
+	LocalPath->SetValidator(localValidator);
+	
+	wxTextValidator remoteValidator(wxFILTER_NONE, &remotePath);
+	RemotePath->SetValidator(remoteValidator);
+	
+	TransferDataToWindow();
+}
+
+void t4p::DebuggerMappingDialogClass::OnCancelButton(wxCommandEvent& event) {
+	EndModal(wxCANCEL);
+}
+
+void t4p::DebuggerMappingDialogClass::OnOkButton(wxCommandEvent& event) {
+	if (!TransferDataFromWindow()) {
+		return;
+	}
+	if (RemotePath->GetValue().IsEmpty()) {
+		wxMessageBox(_("Remote path cannot be empty"), _("Error"));
+		return;
+	}
+	if (LocalPath->GetPath().IsEmpty()) {
+		wxMessageBox(_("Local path cannot be empty"), _("Error"));
+		return;
+	}
+	if (!wxFileName::DirExists(LocalPath->GetPath())) {
+		wxMessageBox(_("Local path must exist and must be a directory"), _("Error"));
+		return;
+	}
+	if (!RemotePath->GetValue().EndsWith(wxT("/"))) {
+		wxMessageBox(_("Remote path must end with a forward slash directory separator '/' "), _("Error"));
+		return;
+	}
+	if (RemotePath->GetValue().Contains(wxT("\\"))) {
+		wxMessageBox(_("Remote path must use forward slash '/'  as directory separators"), _("Error"));
+		return;
+	}
+	EndModal(wxOK);
+}
+
+
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
@@ -2041,6 +2288,3 @@ BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGene
 	EVT_DATAVIEW_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemActivated)
 	EVT_DATAVIEW_ITEM_VALUE_CHANGED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemValueChanged)
 END_EVENT_TABLE()
-
-
-

@@ -94,6 +94,8 @@ DebuggerOptionsPanelGeneratedClass::DebuggerOptionsPanelGeneratedClass( wxWindow
 	
 	wxFlexGridSizer* MappingsSizer;
 	MappingsSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	MappingsSizer->AddGrowableCol( 0 );
+	MappingsSizer->AddGrowableRow( 2 );
 	MappingsSizer->SetFlexibleDirection( wxBOTH );
 	MappingsSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -129,11 +131,13 @@ DebuggerOptionsPanelGeneratedClass::DebuggerOptionsPanelGeneratedClass( wxWindow
 	
 	this->SetSizer( BodySizer );
 	this->Layout();
+	BodySizer->Fit( this );
 	
 	// Connect Events
 	AddMapping->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnAddMapping ), NULL, this );
 	EditMapping->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnEditMapping ), NULL, this );
 	DeleteMapping->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnDeleteMapping ), NULL, this );
+	SourceCodeMappings->Connect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( DebuggerOptionsPanelGeneratedClass::OnListItemActivated ), NULL, this );
 }
 
 DebuggerOptionsPanelGeneratedClass::~DebuggerOptionsPanelGeneratedClass()
@@ -142,6 +146,7 @@ DebuggerOptionsPanelGeneratedClass::~DebuggerOptionsPanelGeneratedClass()
 	AddMapping->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnAddMapping ), NULL, this );
 	EditMapping->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnEditMapping ), NULL, this );
 	DeleteMapping->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerOptionsPanelGeneratedClass::OnDeleteMapping ), NULL, this );
+	SourceCodeMappings->Disconnect( wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler( DebuggerOptionsPanelGeneratedClass::OnListItemActivated ), NULL, this );
 	
 }
 
@@ -337,4 +342,73 @@ DebuggerFullViewDialogGeneratedClass::DebuggerFullViewDialogGeneratedClass( wxWi
 
 DebuggerFullViewDialogGeneratedClass::~DebuggerFullViewDialogGeneratedClass()
 {
+}
+
+DebuggerMappingDialogGeneratedClass::DebuggerMappingDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 1 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("Triumph will use these mappings when setting breakpoints, stepping through source code. These only need to be set for remote debugging, where Triumph is running on a different host than the web server.\n\nLocal path is the path on the machine that is running Triumph.\n\nDebugger path is the path that Xdebug returns in its responses. Note that Xdebug uses forward slash as its directory separator, even on Windows.\n\nMappings are compared in a case-insenstive manner.\n\nTurn on xdebug.remote_log in your php.ini if you have trouble figuring out what these mappings should be."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel->Wrap( 450 );
+	TopSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* FormSizer;
+	FormSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
+	FormSizer->AddGrowableCol( 1 );
+	FormSizer->SetFlexibleDirection( wxBOTH );
+	FormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	LocalPathLabel = new wxStaticText( this, wxID_ANY, wxT("Local Path"), wxDefaultPosition, wxDefaultSize, 0 );
+	LocalPathLabel->Wrap( -1 );
+	FormSizer->Add( LocalPathLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	LocalPath = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE );
+	FormSizer->Add( LocalPath, 1, wxALL|wxEXPAND, 5 );
+	
+	RemotePathLabel = new wxStaticText( this, wxID_ANY, wxT("Remote Path"), wxDefaultPosition, wxDefaultSize, 0 );
+	RemotePathLabel->Wrap( -1 );
+	FormSizer->Add( RemotePathLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	RemotePath = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	FormSizer->Add( RemotePath, 1, wxALL|wxEXPAND, 5 );
+	
+	BodySizer->Add( FormSizer, 1, wxEXPAND, 5 );
+	
+	ButtonSizer = new wxStdDialogButtonSizer();
+	ButtonSizerOK = new wxButton( this, wxID_OK );
+	ButtonSizer->AddButton( ButtonSizerOK );
+	ButtonSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonSizer->AddButton( ButtonSizerCancel );
+	ButtonSizer->Realize();
+	BodySizer->Add( ButtonSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	BodySizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	ButtonSizerCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerMappingDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerMappingDialogGeneratedClass::OnOkButton ), NULL, this );
+}
+
+DebuggerMappingDialogGeneratedClass::~DebuggerMappingDialogGeneratedClass()
+{
+	// Disconnect Events
+	ButtonSizerCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerMappingDialogGeneratedClass::OnCancelButton ), NULL, this );
+	ButtonSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerMappingDialogGeneratedClass::OnOkButton ), NULL, this );
+	
 }

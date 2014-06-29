@@ -30,6 +30,7 @@
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
 #include <wx/dialog.h>
+#include <wx/filepicker.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -81,11 +82,12 @@ class DebuggerOptionsPanelGeneratedClass : public wxPanel
 		virtual void OnAddMapping( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditMapping( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteMapping( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		DebuggerOptionsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 562,600 ), long style = wxTAB_TRAVERSAL );
+		DebuggerOptionsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~DebuggerOptionsPanelGeneratedClass();
 	
 };
@@ -193,6 +195,35 @@ class DebuggerFullViewDialogGeneratedClass : public wxDialog
 		
 		DebuggerFullViewDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Variable Contents"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 511,360 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~DebuggerFullViewDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerMappingDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerMappingDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* HelpLabel;
+		wxStaticText* LocalPathLabel;
+		wxDirPickerCtrl* LocalPath;
+		wxStaticText* RemotePathLabel;
+		wxTextCtrl* RemotePath;
+		wxStdDialogButtonSizer* ButtonSizer;
+		wxButton* ButtonSizerOK;
+		wxButton* ButtonSizerCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		DebuggerMappingDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Debugger Source Code Mapping"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~DebuggerMappingDialogGeneratedClass();
 	
 };
 
