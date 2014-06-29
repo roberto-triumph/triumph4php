@@ -29,6 +29,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -172,6 +173,26 @@ class DebuggerBreakpointPanelGeneratedClass : public wxPanel
 		
 		DebuggerBreakpointPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~DebuggerBreakpointPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerFullViewDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerFullViewDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Label;
+		wxTextCtrl* Text;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+	
+	public:
+		
+		DebuggerFullViewDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Variable Contents"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 511,360 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		~DebuggerFullViewDialogGeneratedClass();
 	
 };
 

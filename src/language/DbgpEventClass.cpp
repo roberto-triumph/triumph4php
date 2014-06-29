@@ -1138,7 +1138,7 @@ t4p::DbgpPropertyValueEventClass::DbgpPropertyValueEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_PROPERTYVALUE)
 , Command()
 , TransactionId()
-, Property() {
+, Value() {
 
 }
 
@@ -1146,7 +1146,7 @@ wxEvent* t4p::DbgpPropertyValueEventClass::Clone() const {
 	t4p::DbgpPropertyValueEventClass* cloned = new t4p::DbgpPropertyValueEventClass();
 	cloned->Command = Command.c_str();
 	cloned->TransactionId = TransactionId.c_str();
-	cloned->Property = Property;
+	cloned->Value = Value;
 	return cloned;
 }
 
@@ -1162,13 +1162,12 @@ bool t4p::DbgpPropertyValueEventClass::FromXml(const wxString& xml, t4p::DbgpXml
 	if (!GetNodeAttributeString(root, "transaction_id", TransactionId, error)) {
 		return false;
 	}
-	wxXmlNode* prop = GetNodeChild(root, "property", error);
-	if (!prop) {
-		return false;
-	}
-	if (!PropertyFromXmlNode(prop, Property, error)) {
-		return false;
-	}
+	
+	t4p::DbgpXmlErrors ignored;
+	wxString encoding;
+	GetNodeAttributeString(root, "encoding", encoding, ignored);
+	bool doDecode = encoding == "base64";
+	GetNodeText(root, Value, doDecode);
 
 	error = t4p::DBGP_XML_ERROR_NONE;
 	return true;

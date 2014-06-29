@@ -537,7 +537,7 @@ public:
 
 	wxString Command;
 	wxString TransactionId;
-	t4p::DbgpPropertyClass Property;
+	wxString Value;
 	
 	DbgpPropertyValueEventClass();
 

@@ -304,3 +304,37 @@ DebuggerBreakpointPanelGeneratedClass::~DebuggerBreakpointPanelGeneratedClass()
 	ToggleAllBreakpointsButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerBreakpointPanelGeneratedClass::OnToggleAllBreakpoints ), NULL, this );
 	
 }
+
+DebuggerFullViewDialogGeneratedClass::DebuggerFullViewDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* Sizer;
+	Sizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	Sizer->AddGrowableCol( 0 );
+	Sizer->AddGrowableRow( 1 );
+	Sizer->SetFlexibleDirection( wxBOTH );
+	Sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	Label = new wxStaticText( this, wxID_ANY, wxT("Variable Contents"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	Sizer->Add( Label, 1, wxALL|wxEXPAND, 5 );
+	
+	Text = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	Sizer->Add( Text, 1, wxALL|wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizer->Realize();
+	Sizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( Sizer );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+}
+
+DebuggerFullViewDialogGeneratedClass::~DebuggerFullViewDialogGeneratedClass()
+{
+}

@@ -34,8 +34,6 @@
 // TODO: fix variables tree expansion
 // TODO: global variables / all contexts
 // TODO: expression eval
-// TODO: show variable preview in wxDataViewCtrl for array/objects
-// TODO: popup for full variable contents
 // TODO: show current line
 // TODO: handle paths that are not found ie. remote
 //       debugging a VM 
@@ -43,7 +41,6 @@
 // TODO: not sure how breakpoints react when
 //       file is edited (and breakpoints moves lines) 
 //       but file is then reloaded/discarded
-
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
 static int ID_PANEL_DEBUGGER_STACK = wxNewId();
@@ -110,6 +107,9 @@ static wxFileName ToLocalFilename(wxString xdebugFile) {
 	return name;
 }
 
+/**
+ * reads debugger options from the given config.
+ */
 static void ConfigLoad(wxConfigBase* config,
 	t4p::DebuggerOptionsClass& options, 
 	std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
@@ -142,6 +142,11 @@ static void ConfigLoad(wxConfigBase* config,
 	}
 }
 
+/**
+ * writes debugger options to the given config.
+ * the config is flushed, meaning that it is persisted to
+ * disk immediately.
+ */
 static void ConfigStore(wxConfigBase* config,
 	const t4p::DebuggerOptionsClass& options, 
 	const std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
@@ -183,6 +188,81 @@ static void ConfigStore(wxConfigBase* config,
 		++i;
 	}
 	config->Flush();
+}
+
+/**
+ * @param node the node to read and turn into a string. 
+ * @return string representation of a variable
+ */
+static wxString VariablePreview(t4p::DebuggerVariableNodeClass* node, int maxPreviewLength) {
+	wxString preview;
+	bool isArrayOrObject = false;
+	wxString enclosingStart;
+	wxString enclosingEnd;
+	if (node->Property.DataType == wxT("array")) {
+		isArrayOrObject = true;
+		enclosingStart = wxT("[");
+		enclosingEnd = wxT("]");
+		
+	}
+	else if (node->Property.DataType == wxT("object")) {
+		isArrayOrObject = true;
+		enclosingStart = wxT("{");
+		enclosingEnd = wxT("}");
+	}
+	
+	if (isArrayOrObject) {
+		if (node->Property.DataType == wxT("array")) {
+			preview += wxString::Format("array(%d) ", node->Children.size());
+		}
+		else if (node->Property.DataType == wxT("object")) {
+			preview += node->Property.ClassName + wxT(" ");
+		}
+		preview += enclosingStart;
+		for (size_t i = 0; i < node->Children.size(); ++i) {
+			
+			// a child could be a key-value pairs, key => objects.
+			// or key => arrays
+			if (node->Children[i]->Property.DataType == wxT("array")) {
+				preview += node->Children[i]->Property.Name + wxT(" => array[ ... ]");
+			}
+			else if (node->Children[i]->Property.DataType == wxT("object")) {
+				preview += node->Children[i]->Property.Name + wxT(" => { ... }");
+			}
+			else if (node->Children[i]->Property.Name.empty()) {
+				
+				// special case for the nodes that have not been retrieved from
+				// the debug engine yet
+				preview += wxT(" ... ");
+			}
+			else {
+				preview += node->Children[i]->Property.Name;
+				preview += wxT(" => ");
+				preview += node->Children[i]->Property.Value;
+			}
+			if (i < (node->Children.size() - 1)) {
+				preview += wxT(", ");
+			}
+		}
+		preview += enclosingEnd;
+	}
+	else {
+		preview = node->Property.Value;
+	}
+	
+	// truncate to desired length
+	bool isTruncated = ((int)preview.length()) > maxPreviewLength;
+	preview = preview.Mid(0, maxPreviewLength);
+	if (isTruncated) {
+		preview += wxT(" ...");
+	}
+	
+	// replace common non-alpha characters
+	preview.Replace(wxT("\t"), wxT("\\t"));
+	preview.Replace(wxT("\r"), wxT("\\r"));
+	preview.Replace(wxT("\n"), wxT("\\n"));
+	preview.Replace(wxT("\v"), wxT("\\v"));
+	return preview;
 }
 
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
@@ -409,10 +489,7 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 		}
 	}
 	else if ("property_value" == cmdOnly) {
-
-		// property_value is exactly the same as property_get except
-		// that it is not bounded in length
-		t4p::DbgpPropertyGetEventClass propertyValueResponse;
+		t4p::DbgpPropertyValueEventClass propertyValueResponse;
 		if (propertyValueResponse.FromXml(xml, xmlError)) {
 			PostEvent(propertyValueResponse);
 		}
@@ -1249,7 +1326,8 @@ void t4p::DebuggerFeatureClass::OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertyValue(t4p::DbgpPropertyValueEventClass& event) {
-
+	t4p::DebuggerFullViewDialogClass dialog(GetMainWindow(), event.Value);
+	dialog.ShowModal();
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpPropertySet(t4p::DbgpPropertySetEventClass& event) {
@@ -1288,6 +1366,18 @@ void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
 	wxThreadEvent evt(t4p::EVENT_DEBUGGER_CMD, wxID_ANY);
 	evt.SetString(cmd);
 	EventSinkLocker.Post(evt);
+}
+
+void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
+	
+	// the command string contains the property full name and 
+	//. key, separated by newline
+	wxString all = event.GetString();
+	wxString key = all.After(wxT('\n'));
+	wxString fullName = all.Before(wxT('\n'));
+	PostCmd(
+		Cmd.PropertyValue(0, 0, fullName, key)
+	);
 }
 
 t4p::DebuggerLogPanelClass::DebuggerLogPanelClass(wxWindow* parent)
@@ -1383,7 +1473,13 @@ t4p::DebuggerVariablePanelClass::DebuggerVariablePanelClass(wxWindow* parent, in
 
 	VariablesList->AppendTextColumn(_("Variable Name"), 0, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
 	VariablesList->AppendTextColumn(_("Variable Type"), 1, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
-	VariablesList->AppendTextColumn(_("Variable Value"), 2, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
+	
+	
+	// renderer is owned by col and col is owned by VariablesList
+	t4p::PreviewTextCustomRendererClass* renderer = new t4p::PreviewTextCustomRendererClass(feature);
+	wxDataViewColumn* col = new wxDataViewColumn(_("Variable Value"), renderer, 2, wxCOL_WIDTH_AUTOSIZE,
+		wxALIGN_LEFT);
+	VariablesList->AppendColumn(col);
 }
 
 void t4p::DebuggerVariablePanelClass::AddVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
@@ -1583,7 +1679,7 @@ void t4p::DebuggerVariableModelClass::GetValue(wxVariant& variant, const wxDataV
 		variant = node->Property.DataType == "object" ? node->Property.ClassName : node->Property.DataType;
 		break;
 	case 2:
-		variant = node->Property.Value;
+		variant = VariablePreview(node, 80);
 		break;
 	}
 }
@@ -1812,9 +1908,79 @@ bool t4p::DebuggerOptionsPanelClass::TransferDataFromWindow() {
 	return true;
 }
 
+t4p::PreviewTextCustomRendererClass::PreviewTextCustomRendererClass(wxEvtHandler& handler)
+: wxDataViewCustomRenderer(wxT("string"), wxDATAVIEW_CELL_ACTIVATABLE) 
+, Contents() 
+, EventHandler(handler) {
+	
+	MagnifierBitmap = t4p::BitmapImageAsset(wxT("magnifier"));
+}
+
+bool t4p::PreviewTextCustomRendererClass::GetValue(wxVariant& variant) const {
+	variant = Contents;
+	return true;
+}
+
+bool t4p::PreviewTextCustomRendererClass::SetValue(const wxVariant& variant) {
+	Contents = variant.GetString();
+	return true;
+}
+
+wxSize t4p::PreviewTextCustomRendererClass::GetSize() const {
+	if (Contents.empty()) {
+		return wxSize(wxDVC_DEFAULT_RENDERER_SIZE, wxDVC_DEFAULT_RENDERER_SIZE);
+	}
+	wxSize size = GetTextExtent(Contents);
+	size.SetWidth(size.GetWidth() + MagnifierBitmap.GetWidth() + 4);
+	return size;
+}
+
+bool t4p::PreviewTextCustomRendererClass::Render(wxRect cell, wxDC* dc, int state) {	
+	if (!Contents.empty()) {
+		dc->DrawBitmap(MagnifierBitmap, cell.GetPosition());
+	}
+	RenderText(Contents, MagnifierBitmap.GetWidth() + 4, cell, dc, state);
+	return true;
+}
+
+bool t4p::PreviewTextCustomRendererClass::ActivateCell(const wxRect& cell,
+		wxDataViewModel* model,
+		const wxDataViewItem& item,
+		unsigned int col,
+		const wxMouseEvent* mouseEvent 
+	) {
+		
+		// need to get the variable's full name and key because that's 
+		// what we need to call xdebug's property_value command. Contents
+		// will have the value.
+		wxCommandEvent evt(t4p::EVENT_DEBUGGER_SHOW_FULL, wxID_ANY);
+		if (item.IsOk()) {
+			t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
+			wxString var = node->Property.FullName + wxT("\n") + node->Property.Key;
+			evt.SetString(var);
+		}
+		
+		// make sure user clicked inside the bitmap
+		if (mouseEvent && mouseEvent->GetX() < (MagnifierBitmap.GetWidth() + 4)) {
+			wxPostEvent(&EventHandler, evt);
+			return true;
+		} 
+		else if (!mouseEvent) {
+			wxPostEvent(&EventHandler, evt);
+			return true;
+		}
+		return true;
+}
+
+t4p::DebuggerFullViewDialogClass::DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value)
+: DebuggerFullViewDialogGeneratedClass(parent, wxID_ANY) {
+	Text->SetValue(value);
+}
+
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
+const wxEventType t4p::EVENT_DEBUGGER_SHOW_FULL = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
@@ -1864,7 +2030,7 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_DBGP_EVAL(t4p::DebuggerFeatureClass::OnDbgpEval)
 
 	EVT_DEBUGGER_LOG(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerLog)
-
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_DEBUGGER_SHOW_FULL, t4p::DebuggerFeatureClass::OnDebuggerShowFull)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::DebuggerVariablePanelClass, DebuggerVariablePanelGeneratedClass)
@@ -1875,4 +2041,6 @@ BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGene
 	EVT_DATAVIEW_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemActivated)
 	EVT_DATAVIEW_ITEM_VALUE_CHANGED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemValueChanged)
 END_EVENT_TABLE()
+
+
 
