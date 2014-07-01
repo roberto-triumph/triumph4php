@@ -399,6 +399,7 @@ private:
 	void OnContinueToCursor(wxCommandEvent& event);
 	void OnFinish(wxCommandEvent& event);
 	void OnToggleBreakpoint(wxCommandEvent& event);
+	void OnGoToExecutingLine(wxCommandEvent& event);
 
 	/**
 	 * turn on or off a debugger breakpoint at the currently 

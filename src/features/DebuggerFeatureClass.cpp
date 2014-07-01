@@ -36,13 +36,10 @@
 // TODO: fix variables tree expansion
 // TODO: global variables / all contexts
 // TODO: expression eval
-// TODO: show current line
-// TODO: handle paths that are not found ie. remote
-//       debugging a VM 
-
 // TODO: not sure how breakpoints react when
 //       file is edited (and breakpoints moves lines) 
 //       but file is then reloaded/discarded
+
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
 static int ID_PANEL_DEBUGGER_STACK = wxNewId();
@@ -753,7 +750,8 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 		_("Run until the code reaches the cursor"));
 	menu->Append(t4p::MENU_DEBUGGER + 9, _("Finish Session"),
 		_("Run until the end of the session, ignoring any breakpoints"));
-	
+	menu->Append(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"),
+		_("Places the cursor in the line where the debugger has stopped at."));	
 	menu->AppendSeparator();
 	menu->Append(t4p::MENU_DEBUGGER + 7, _("Toggle Breakpoint\tAlt+F10"), 
 		_("Turn on or off a breakpoint at the current line of source code."));
@@ -775,6 +773,8 @@ void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
 		_("Run the next command, without recursing inside function calls"), wxITEM_NORMAL);
 	bar->AddTool(t4p::MENU_DEBUGGER + 4, _("Step Out"), t4p::BitmapImageAsset(wxT("arrow-step-out")), 
 		_("Run until the end of the current function"), wxITEM_NORMAL);
+	bar->AddTool(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"), t4p::BitmapImageAsset(wxT("arrow-right")), 
+		_("Places the cursor in the line where the debugger has stopped at."));	
 }
 
 
@@ -1109,6 +1109,14 @@ void t4p::DebuggerFeatureClass::OnFinish(wxCommandEvent& event) {
 	);
 }
 
+void t4p::DebuggerFeatureClass::OnGoToExecutingLine(wxCommandEvent& event) {
+
+	// post the stack get command so that the debugger tells us which
+	// line is being executed next
+	PostCmd(
+		Cmd.StackGet(0)
+	);	
+}
 
 void t4p::DebuggerFeatureClass::CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop) {
 	PostCmd(
@@ -2248,12 +2256,14 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_DEBUGGER + 7, t4p::DebuggerFeatureClass::OnToggleBreakpoint)
 	EVT_MENU(t4p::MENU_DEBUGGER + 8, t4p::DebuggerFeatureClass::OnStopDebugger)
 	EVT_MENU(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
-	
+	EVT_MENU(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)
+
 	EVT_TOOL(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
 	EVT_TOOL(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
 	EVT_TOOL(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
 	EVT_TOOL(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
 	EVT_TOOL(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
+	EVT_TOOL(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)
 	
 
 	EVT_DBGP_INIT(t4p::DebuggerFeatureClass::OnDbgpInit)
