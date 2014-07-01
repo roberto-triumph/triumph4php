@@ -691,7 +691,7 @@ public:
 	// This gets called in order to set a value in the data model. 
 	virtual bool SetValue(const wxVariant &variant, const wxDataViewItem &item, unsigned int col);
  
-	void SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
 
 	/**
 	 * recurses down through the model's nodes until it finds the variable that was updated.

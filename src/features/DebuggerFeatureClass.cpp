@@ -1615,15 +1615,17 @@ t4p::DebuggerVariablePanelClass::DebuggerVariablePanelClass(wxWindow* parent, in
 
 void t4p::DebuggerVariablePanelClass::AddVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
 	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	variableModel->SetVariables(variables);
+	wxDataViewItem updatedItem;
+	variableModel->SetVariables(variables, updatedItem);
 
-	VariablesList->Expand(variableModel->GetParent(wxDataViewItem()));
+	VariablesList->Expand(updatedItem);
 }
 
 void t4p::DebuggerVariablePanelClass::ClearVariables() {
 	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
 	std::vector<t4p::DbgpPropertyClass> emptyVariables;
-	variableModel->SetVariables(emptyVariables);
+	wxDataViewItem updatedItem;
+	variableModel->SetVariables(emptyVariables, updatedItem);
 	StatusLabel->SetLabel(wxT("Status: Debugging session not active"));
 	this->Layout();
 }
@@ -1834,8 +1836,10 @@ bool t4p::DebuggerVariableModelClass::SetValue(const wxVariant& variant, const w
 	return false;
 }
 
-void t4p::DebuggerVariableModelClass::SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
+void t4p::DebuggerVariableModelClass::SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem) {
 	RootVariable.Children[0]->ReplaceChildren(variables, this);
+	updatedItem = MakeItem(RootVariable.Children[0]);
+
 }
 
 static bool UpdateAndNotifyVariable(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model, const t4p::DbgpPropertyClass& updatedVariable,
