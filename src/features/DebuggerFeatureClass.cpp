@@ -175,17 +175,17 @@ static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxStr
 		
 		// lets make comparison case-insensitive
 		wxString localMappingLower(mapping->first);
-		localMappingLower.MakeLower();
-		
-		// convert windows backslashes to forward slashes as xdebug does as
-		// well
-		localMappingLower.Replace(wxT("\\"), wxT("/"));
+		localMappingLower.MakeLower();		
 		if (localLower.Find(localMappingLower) == 0) {
 			
 			// lets perform the mapping. replace the local
 			// path with the remote path
 			remoteFile = localFile;
 			remoteFile.Replace(mapping->first, mapping->second);
+
+			// convert windows backslashes to forward slashes as xdebug does as
+			// well
+			remoteFile.Replace(wxT("\\"), wxT("/"));
 			foundMapping = true;
 			break;
 		}
@@ -2220,6 +2220,7 @@ void t4p::DebuggerMappingDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxMessageBox(_("Remote path must use forward slash '/'  as directory separators"), _("Error"));
 		return;
 	}
+	LocalPathString = LocalDir.GetPathWithSep();
 	EndModal(wxOK);
 }
 
