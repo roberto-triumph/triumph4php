@@ -27,21 +27,27 @@ function prepBoost()
 	
 	if os.is "windows" then
 	
-		boostZip = "lib/boost_1_55_0.7z";
-		boostDownload = "http://triumph4php.com/boost_1_55_0.7z"
-		extractedDir = 'lib/boost_1_55_0'
+		boostZip = "lib/boost_1_46_0.7z";
+		boostDownload = "http://triumph4php.com/boost_1_46_0.7z"
+		extractedDir = 'lib/boost_1_46_0'
 		existenceOrDownloadExtract(boostZip, extractedDir, boostDownload, "Downloading boost dependency");
 		
 		-- on windows, we compile boost
 		-- we use asio which is a header-only library
 		-- but asio needs boost.system, and boost.system is 
 		-- not header only
-		batchexecute(normalizepath("lib/boost_1_55_0"), {
+		boostDebugBinPath = normalizepath(BOOST_DEBUG_BIN_DIR .. "/*.dll")
+		boostReleaseBinPath = normalizepath(BOOST_RELEASE_BIN_DIR .. "/*.dll")
+		rootPath = normalizepath("")
+		batchexecute(normalizepath("lib/boost_1_46_0"), {
 
 			-- wrap around quotes in case path has spaces
 			"\"" .. VSVARS .. "\"",
 			'bootstrap.bat',
-			'.\\b2 --with-system --link=shared --variant=debug,release --toolset=msvc-9.0'
+			'.\\bjam --with-system link=shared runtime-link=shared variant=debug,release toolset=msvc-9.0',
+			"cd " .. rootPath,
+			"xcopy /S /Y " .. boostDebugBinPath .. " \"Debug\\\"",
+			"xcopy /S /Y " .. boostReleaseBinPath .. " \"Release\\\""
 		})
 	else  
 	

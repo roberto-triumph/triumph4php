@@ -221,7 +221,6 @@ function boostconfiguration(config, action)
 	if action == "vs2008" and config == "Debug" then	
 		includedirs { BOOST_DEBUG_INCLUDE_DIR }
 		libdirs { BOOST_DEBUG_LIB_DIR }
-		links { 'libboost_system-vc90-mt-gd-1_55' }
 		
 		-- we dont want asio to use boost.time or boost.regex since we
 		-- don't otherwise use them
@@ -229,21 +228,33 @@ function boostconfiguration(config, action)
 		-- when putting wxWidgets and asio together
 		-- _WIN32_WINNT=0x0501 to prevent asio warnings 
 		-- "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately"
+		-- note 2: 
+		-- define BOOST_ALL_DYN_LINK so that boost does not attempt to link
+		-- against the static version of the libs. boost has some
+		-- #pragma magic that attempts to load in the appropriate version
+		-- of the library
+		-- note 3.
+		-- we don't need to specify a link {} because boost has some
+		-- #pragma magic that attempts to load in the appropriate version
+		-- of the library, AND because boost's shared lib is not
+		-- prefixed with "lib" so "link {}" cannot be used as premake
+		-- always adds the prefix.
 		defines { 
 			'BOOST_DATE_TIME_NO_LIB', 
 			'BOOST_REGEX_NO_LIB', 
 			'WIN32_LEAN_AND_MEAN' ,
-			'_WIN32_WINNT=0x0501'
+			'_WIN32_WINNT=0x0501',
+			'BOOST_ALL_DYN_LINK'
 		}
 	elseif action == "vs2008" and config == "Release" then	
 		includedirs { BOOST_RELEASE_INCLUDE_DIR }
 		libdirs { BOOST_RELEASE_LIB_DIR }
-		links { 'libboost_system-vc90-mt-gd-1_55' }
 		defines { 
 			'BOOST_DATE_TIME_NO_LIB', 
 			'BOOST_REGEX_NO_LIB', 
 			'WIN32_LEAN_AND_MEAN', 
-			'_WIN32_WINNT=0x0501'
+			'_WIN32_WINNT=0x0501',
+			'BOOST_ALL_DYN_LINK'
 		}
 	elseif action == "gmake" or action == "codelite" then
 		includedirs { BOOST_INCLUDE_DIR }
