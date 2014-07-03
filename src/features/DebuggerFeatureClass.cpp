@@ -477,13 +477,28 @@ void t4p::DebuggerFeatureClass::OnDebuggerLog(wxThreadEvent& event) {
 void t4p::DebuggerFeatureClass::OnDebuggerSocketError(wxThreadEvent& event) {
 	IsDebuggerSessionActive = false;
 	IsDebuggerServerActive = false;
+	ResetDebugger();
+	
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->Logger->Append(event.GetString());
+}
 
-	t4p::EditorLogErrorFix(wxT("Socket Error: ") + event.GetString(),
-		wxString::Format(_("Use netstat to find out the process listening on port %s and stop it\n"), Options.Port)
-			+ wxT("OR Go to Edit ... Preferences ... Debugger and choose a different port to listen on.")
-			+ wxT("In this case you will need to change your php.ini setting xdebug.remote_port.")
+void t4p::DebuggerFeatureClass::OnDebuggerListenError(wxThreadEvent& event) {
+	IsDebuggerSessionActive = false;
+	IsDebuggerServerActive = false;
+	ResetDebugger();
+
+	t4p::EditorLogErrorFix(wxString::Format(_("Debugger Error: Could not start listening on port %d"), Options.Port),
+		wxString::Format(_("Use netstat to find out the process listening on port %d and stop it\n"), Options.Port)
+			+ _("OR Go to Edit ... Preferences ... Debugger and choose a different port to listen on.\n")
+			+ _("In this case you will need to change your php.ini setting xdebug.remote_port.")
 		);
 }
+
 
 void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	RunningThreads.RemoveEventHandler(this);
@@ -1979,6 +1994,7 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 
 	EVT_DEBUGGER_LOG(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerLog)
 	EVT_DEBUGGER_SOCKET_ERROR(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerSocketError)
+	EVT_DEBUGGER_LISTEN_ERROR(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerListenError)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_DEBUGGER_SHOW_FULL, t4p::DebuggerFeatureClass::OnDebuggerShowFull)
 END_EVENT_TABLE()
 

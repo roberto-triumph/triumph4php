@@ -334,6 +334,12 @@ private:
 	void OnDebuggerSocketError(wxThreadEvent& event);
 
 	/**
+	 * this is an additional debug engine handler, we log a listen
+	 * error
+	 */
+	void OnDebuggerListenError(wxThreadEvent& event);
+
+	/**
 	 * send a command to the debug engine.  This is an asynchronous
 	 * operation; we send the command over to the background thread,
 	 * and the background thread sends the command to the debug engine.

@@ -108,9 +108,23 @@ std::string t4p::DebuggerServerActionClass::NextCommand() {
 }
 
 void t4p::DebuggerServerActionClass::BackgroundWork() {
+	boost::asio::ip::tcp::acceptor acceptor(IoService);
 	try {
-		boost::asio::ip::tcp::acceptor acceptor(IoService, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), Port), false);
-		while (!IsCancelled()) {
+		acceptor.open(boost::asio::ip::tcp::v4());
+		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), Port));
+		acceptor.listen();
+	} 
+	catch (std::exception& e) {
+		wxThreadEvent errEvt(t4p::EVENT_DEBUGGER_LISTEN_ERROR, GetEventId());
+		errEvt.SetString(e.what());
+		PostEvent(errEvt);
+
+		// cannot bind to port, just let the thread die.
+		return;
+	}
+
+	while (!IsCancelled()) {
+		try {
 			boost::asio::ip::tcp::socket socket(IoService);
 			acceptor.accept(socket);
 
@@ -140,13 +154,12 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 				SessionWork(socket);
 			}
 		}
+		catch (std::exception& e) {
+			wxThreadEvent errEvt(t4p::EVENT_DEBUGGER_SOCKET_ERROR, GetEventId());
+			errEvt.SetString(e.what());
+			PostEvent(errEvt);
+		}
 	}
-	catch (std::exception& e) {
-		wxThreadEvent errEvt(t4p::EVENT_DEBUGGER_SOCKET_ERROR, GetEventId());
-		errEvt.SetString(e.what());
-		PostEvent(errEvt);
-	}
-	
 	// no longer need to listen for commands
 	EventSinkLocker.RemoveHandler(this);
 }
@@ -356,5 +369,6 @@ void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& 
 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_SOCKET_ERROR = wxNewEventType();
+const wxEventType t4p::EVENT_DEBUGGER_LISTEN_ERROR = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
