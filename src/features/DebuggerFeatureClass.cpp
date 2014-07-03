@@ -478,7 +478,11 @@ void t4p::DebuggerFeatureClass::OnDebuggerSocketError(wxThreadEvent& event) {
 	IsDebuggerSessionActive = false;
 	IsDebuggerServerActive = false;
 
-	t4p::EditorLogWarning(t4p::WARNING_OTHER, wxT("Socket Error: ") + event.GetString());
+	t4p::EditorLogErrorFix(wxT("Socket Error: ") + event.GetString(),
+		wxString::Format(_("Use netstat to find out the process listening on port %s and stop it\n"), Options.Port)
+			+ wxT("OR Go to Edit ... Preferences ... Debugger and choose a different port to listen on.")
+			+ wxT("In this case you will need to change your php.ini setting xdebug.remote_port.")
+		);
 }
 
 void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {

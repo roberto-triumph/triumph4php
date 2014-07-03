@@ -52,7 +52,7 @@ enum Errors {
 	ERR_BAD_WEB_BROWSER_EXECUTABLE,
 	ERR_FILE_TOO_LARGE,
 	ERR_INVALID_SETTINGS_DIRECTORY,
-	WARNING_OTHER
+	ERR_TAG_READ
 };
 
 /**
@@ -65,12 +65,29 @@ enum Errors {
 void EditorLogError(Errors error, wxString extra = wxEmptyString);
 
 /**
+ * Wrapper around wxLogError; will format a message specific to the error. The error message will
+ * show up in the "Editor messages" window. Additionally, an appropriate "fix" message will also show up
+ * letting the user know how to avoid the error.
+
+ * Use this when processing is not completed due to the error.
+ */
+void EditorLogErrorFix(wxString error, wxString fix);
+
+/**
  * Wrapper around wxLogWarning; will format a message specific to the error. The error message will
  * show up in the "Editor messages" window. Additionally, an appropriate "fix" message will also show up
  * letting the user know how to avoid the error.
  * Use this when the error, while important, does not stop the processing.
  */
 void EditorLogWarning(Errors error, wxString extra = wxEmptyString);
+
+/**
+ * Wrapper around wxLogWarning; will format a message specific to the error. The error message will
+ * show up in the "Editor messages" window. Additionally, an appropriate "fix" message will also show up
+ * letting the user know how to avoid the error.
+ * Use this when the error, while important, does not stop the processing.
+ */
+void EditorLogWarningFix(wxString warning, wxString fix);
 
 /**
  * Builds a log message that also contains a fix message. When the editor logger sees this; it will

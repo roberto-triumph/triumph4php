@@ -50,7 +50,7 @@ void t4p::TemplateFilesFeatureClass::OnTemplateFilesMenu(wxCommandEvent& event) 
 		ShowPanel();
 	}
 	else {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, 
+		t4p::EditorLogWarningFix("Template Feature", 
 			_("Could not determine template files because no URLs were detected. Template files feature depends on the URL detectors feature."));
 	}
 }

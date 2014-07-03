@@ -318,8 +318,9 @@ void t4p::RunBrowserFeatureClass::OnUrlSearchTool(wxCommandEvent& event) {
 		ShowUrlDialog();
 	}
 	else {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER,
-			_("Could not determine URL routes."));
+		t4p::EditorLogWarningFix(
+			_("Could not determine URL routes."),
+			_("URL detector is not working. Are you using an unsupported framework?"));
 	}
 }
 

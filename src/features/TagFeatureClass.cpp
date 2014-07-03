@@ -95,7 +95,7 @@ void t4p::TagFeatureClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 		IndexingDialog->Start();
 	}
 	else {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Please wait until the running background task ends."));
+		t4p::EditorLogWarningFix(_("Could not start wipe."), _("Please wait until the running background task ends."));
 	}
 }
 
@@ -173,7 +173,7 @@ void t4p::TagFeatureClass::LoadPageFromResource(const wxString& finderQuery, con
 	t4p::TagSearchClass tagSearch(t4p::WxToIcu(finderQuery));
 	wxFileName fileName = tag.FileName();
 	if (!fileName.FileExists()) {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, _("File Not Found:") + fileName.GetFullPath());
+		t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, fileName.GetFullPath());
 		return;
 	}
 	GetNotebook()->LoadPage(tag.GetFullPath());
