@@ -60,6 +60,7 @@ newaction {
 			"SET T4P_CURL_RELEASE_DIR=" .. "..\\triumph4php\\" .. CURL_RELEASE_DIR, 
 			"SET T4P_SOCI_INCLUDE_DIR=" .. "..\\triumph4php\\" .. SOCI_INCLUDE_DIR, 
 			"SET T4P_SOCI_LIB_DIR=" .. "..\\triumph4php\\" .. SOCI_LIB_DIR,
+			"SET T4P_BOOST_RELEASE_DIR=" .. "..\\triumph4php\\" .. BOOST_RELEASE_DIR,
 			"premake4.exe vs2008",
 			"\"" .. VSVARS .. "\"",
 			"cd build\\vs2008",
@@ -82,6 +83,7 @@ newaction {
 			"xcopy /S /Y " .. normalizepath("Release\\libmysql*.dll") .. " dist\\triumph4php\\bin",
 			"xcopy /S /Y " .. normalizepath("Release\\soci*.dll") .. " dist\\triumph4php\\bin",
 			"xcopy /S /Y " .. normalizepath("Release\\sqlite*.dll") .. " dist\\triumph4php\\bin",
+			"xcopy /S /Y " .. normalizepath("Release\\boost*.dll") .. " dist\\triumph4php\\bin",
 			
 			-- copy over keybinder, pelet that we just compiled
 			"xcopy /S /Y " .. "Release\\*.dll  dist\\triumph4php\\bin",
