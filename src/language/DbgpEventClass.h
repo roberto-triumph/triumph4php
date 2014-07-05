@@ -493,6 +493,8 @@ public:
 
 	std::vector<t4p::DbgpPropertyClass> Properties;
 	
+	int ContextId;
+	
 	DbgpContextGetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);

@@ -46,6 +46,8 @@ class DebuggerPanelClass;
  * This event is of type wxCommandEvent, GetString() 
  * will return a concatenation of the DbgpPropertyClass 
  * FullName, newline, Key of the variable to get.
+ * GetInt() will return the variable's contextId, 0
+ * if its a local variable or 1 if its a global variable.
  */
 extern const wxEventType EVENT_DEBUGGER_SHOW_FULL;
 
@@ -180,7 +182,7 @@ public:
 	 *
 	 * See section 7.13 of the xdbgp protocol docs.
 	 */
-	void CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop);
+	void CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop, int contextId);
 
 	/**
 	 * Performs all necessary actions to remove the breakpoint.
@@ -384,6 +386,15 @@ private:
 	 * configuration options for xdebug
 	 */
 	t4p::DebuggerOptionsClass Options;
+	
+	/**
+	 * the name of the last stack that we displayed to
+	 * the user.  We use this so that we can know
+	 * when we are changing scope and need to re-draw
+	 * the variables tree
+	 */
+	wxString CurrentStackFunction;
+	wxString LastStackFunction;
 
 	/**
 	 * TRUE if the debugger session is currently being handled.  When
@@ -455,11 +466,15 @@ public:
 
 	DebuggerVariablePanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
-	void AddVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void ClearLocalVariables();
+	
+	void SetGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
+	void ClearGlobalVariables();
 
-	void ClearVariables();
-
-	void UpdateVariable(const t4p::DbgpPropertyClass& variable);
+	void VariableAddChildren(const t4p::DbgpPropertyClass& variable);
 
 private:
 
@@ -493,15 +508,9 @@ public:
 	t4p::DebuggerVariableNodeClass* Parent;
 
 	/**
-	 * this instance WILL own the children pointers and
-	 * will delete them 
+	 * root node creation
 	 */
-	std::vector<t4p::DebuggerVariableNodeClass*> Children;
-
-	/**
-	 * this instance will not own the parent pointer
-	 */
-	DebuggerVariableNodeClass(t4p::DebuggerVariableNodeClass* parent);
+	DebuggerVariableNodeClass();
 
 	/**
 	 * this instance will not own the parent pointer
@@ -509,12 +518,24 @@ public:
 	DebuggerVariableNodeClass(t4p::DebuggerVariableNodeClass* parent, const t4p::DbgpPropertyClass& prop);
 
 	~DebuggerVariableNodeClass();
+	
+	/**
+	 * this class will own these pointers, do not delete them
+	 */
+	std::vector<t4p::DebuggerVariableNodeClass*> GetChildren() const;
+	
+	void DeleteChildren();
+	
+	size_t ChildrenSize() const;
+	
+private:
 
 	/**
-	 * deletes all of the items in Children, and adds newChildren to the 
-	 * Children vector. This instance will now own the pointers in newChildren.
+	* this instance WILL own the children pointers and
+	 * will delete them 
 	 */
-	void ReplaceChildren(const std::vector<t4p::DbgpPropertyClass>& newChildren, wxDataViewModel* model);
+	std::vector<t4p::DebuggerVariableNodeClass*> Children;
+
 };
 
 /**
@@ -551,8 +572,63 @@ public:
 	// This gets called in order to set a value in the data model. 
 	virtual bool SetValue(const wxVariant &variant, const wxDataViewItem &item, unsigned int col);
  
-	void SetVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
+	/**
+	 * This method will add all of the given properties to the "local variables"
+	 * tree item.
+	 * 
+	 * This method should be called only when there are no local variables 
+	 * being shown (before the first line of a new function (context))
+	 */
+	void SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
+	
+	/**
+	 * This method will "update" all of the given variables to the "local variables"
+	 * Updating is a process where the curent value of a property is looked up, and if
+	 * it is different than the new value then it will be updated.
+	 * 
+	 * This method should only be called while stepping through a function
+	 * and the function (context) does not change. 
+	 * 
+	 * This method does NOT handle new variables. The variable must have already 
+	 * been added by SetLocalVariables()
+	 */
+	void UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
+	
+	/**
+	 * Removes all of the local variables.
+	 * This method should be called when the function (context) being stepped through
+	 * has changed.
+	 */
+	void ClearLocalVariables();
+	
+	/**
+	 * This method will add all of the given properties to the "global variables"
+	 * tree item.
+	 * 
+	 * This method should be called only when there are no global variables 
+	 * being shown (before the first line of a new function (context))
+	 */
+	void SetGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
+	
+	/**
+	 * This method will "update" all of the given variables to the "local variables"
+	 * Updating is a process where the curent value of a property is looked up, and if
+	 * it is different than the new value then it will be updated.
+	 * 
+	 * This method should only be called while stepping through a function
+	 * and the function (context) does not change. 
+	 * 
+	 * This method does NOT handle new variables. The variable must have already 
+	 * been added by SetLocalVariables()
+	 */
+	void UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem);
 
+	/**
+	 * Removes all of the global variables.
+	 * This method should be called when the debugging session has finished.
+	 */
+	void ClearGlobalVariables();
+	
 	/**
 	 * recurses down through the model's nodes until it finds the variable that was updated.
 	 * this method will then remove the found node's children and replace them with the
@@ -564,11 +640,30 @@ public:
 	 * @param variable the new variable properties; these come from the debug engine
 	 * @param updatedItem [out] will be set to the item that was updated.
 	 */
-	void UpdateVariable(const t4p::DbgpPropertyClass& variable, wxDataViewItem& updatedItem);
+	void VariableAddChildren(const t4p::DbgpPropertyClass& variable, wxDataViewItem& updatedItem);
 
 private:
 
-	t4p::DebuggerVariableNodeClass RootVariable;
+	/**
+	 * holds all of the nodes and owns all DebuggerVariableNodeClass pointers
+	 */
+	t4p::DebuggerVariableNodeClass RootLocalVariable;
+	
+	/**
+	 * holds all of the nodes and owns all DebuggerVariableNodeClass pointers
+	 */
+	t4p::DebuggerVariableNodeClass RootGlobalVariable;
+	
+	/**
+	 * the node map allows us to easily get a node that is 
+	 * deeply nested; that way we can update it without iterating
+	 * through the entire tree when a new set of variables
+	 * are set
+	 * Note that the node pointers will NOT be owned by these maps
+	 * they will be owned by RootVariable
+	 */
+	std::map<wxString, t4p::DebuggerVariableNodeClass*> LocalsNodeMap;
+	std::map<wxString, t4p::DebuggerVariableNodeClass*> GlobalsNodeMap;
 };
 
 /**
@@ -717,6 +812,12 @@ private:
 	 * the value to show in the cell
 	 */
 	wxString Contents;
+	
+	/**
+	 * to know if contents have changed; a change
+	 * in contents will be rendered differently
+	 */
+	wxString PreviousContents;
 	
 	/**
 	 * the image to show next to the content. when the user

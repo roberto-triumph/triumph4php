@@ -1061,13 +1061,15 @@ bool t4p::DbgpContextNamesEventClass::FromXml(const wxString& xml, t4p::DbgpXmlE
 
 t4p::DbgpContextGetEventClass::DbgpContextGetEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_CONTEXTGET)
-, Properties() {
+, Properties() 
+, ContextId() {
 
 }
 
 wxEvent* t4p::DbgpContextGetEventClass::Clone() const {
 	t4p::DbgpContextGetEventClass* cloned = new t4p::DbgpContextGetEventClass();
 	cloned->Properties = Properties;
+	cloned->ContextId = ContextId;
 	return cloned;
 }
 
@@ -1089,6 +1091,8 @@ bool t4p::DbgpContextGetEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErr
 		}
 		child = child->GetNext();
 	}
+	
+	GetNodeAttributeInt(root, wxT("context"), ContextId);
 
 	error = t4p::DBGP_XML_ERROR_NONE;
 	return true;
