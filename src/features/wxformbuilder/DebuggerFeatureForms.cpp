@@ -243,7 +243,7 @@ DebuggerVariablePanelGeneratedClass::DebuggerVariablePanelGeneratedClass( wxWind
 	
 	GridSizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
-	VariablesList = new wxDataViewCtrl( this, wxID_ANY );
+	VariablesList = new wxTreeListCtrl( this, wxID_ANY );
 	GridSizer->Add( VariablesList, 1, wxALL|wxEXPAND, 5 );
 	
 	this->SetSizer( GridSizer );

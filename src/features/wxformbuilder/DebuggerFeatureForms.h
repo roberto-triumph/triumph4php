@@ -28,6 +28,7 @@
 #include <wx/icon.h>
 #include <wx/bmpbuttn.h>
 #include <wx/textctrl.h>
+#include <wx/treelist.h>
 #include <wx/dataview.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
@@ -144,7 +145,7 @@ class DebuggerVariablePanelGeneratedClass : public wxPanel
 	protected:
 		wxStaticText* VariablesLabel;
 		wxStaticText* StatusLabel;
-		wxDataViewCtrl* VariablesList;
+		wxTreeListCtrl* VariablesList;
 	
 	public:
 		

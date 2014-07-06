@@ -262,61 +262,60 @@ static void ConfigStore(wxConfigBase* config,
  * @param node the node to read and turn into a string. 
  * @return string representation of a variable
  */
-static wxString VariablePreview(t4p::DebuggerVariableNodeClass* node, int maxPreviewLength) {
+static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPreviewLength) {
 	wxString preview;
 	bool isArrayOrObject = false;
 	wxString enclosingStart;
 	wxString enclosingEnd;
-	if (node->Property.DataType == wxT("array")) {
+	if (prop.DataType == wxT("array")) {
 		isArrayOrObject = true;
 		enclosingStart = wxT("[");
 		enclosingEnd = wxT("]");
 		
 	}
-	else if (node->Property.DataType == wxT("object")) {
+	else if (prop.DataType == wxT("object")) {
 		isArrayOrObject = true;
 		enclosingStart = wxT("{");
 		enclosingEnd = wxT("}");
 	}
 	
 	if (isArrayOrObject) {
-		if (node->Property.DataType == wxT("array")) {
-			preview += wxString::Format("array(%d) ", node->ChildrenSize());
+		if (prop.DataType == wxT("array")) {
+			preview += wxString::Format("array(%d) ", prop.NumChildren);
 		}
-		else if (node->Property.DataType == wxT("object")) {
-			preview += node->Property.ClassName + wxT(" ");
+		else if (prop.DataType == wxT("object")) {
+			preview += prop.ClassName + wxT(" ");
 		}
 		preview += enclosingStart;
-		std::vector<t4p::DebuggerVariableNodeClass*> children = node->GetChildren();
-		for (size_t i = 0; i < children.size(); ++i) {
+		for (size_t i = 0; i < prop.ChildProperties.size(); ++i) {
 			
 			// a child could be a key-value pairs, key => objects.
 			// or key => arrays
-			if (children[i]->Property.DataType == wxT("array")) {
-				preview += children[i]->Property.Name + wxT(" => array[ ... ]");
+			if (prop.ChildProperties[i].DataType == wxT("array")) {
+				preview += prop.ChildProperties[i].Name + wxT(" => array[ ... ]");
 			}
-			else if (children[i]->Property.DataType == wxT("object")) {
-				preview += children[i]->Property.Name + wxT(" => { ... }");
+			else if (prop.ChildProperties[i].DataType == wxT("object")) {
+				preview += prop.ChildProperties[i].Name + wxT(" => { ... }");
 			}
-			else if (children[i]->Property.Name.empty()) {
+			else if (prop.ChildProperties[i].Name.empty()) {
 				
 				// special case for the nodes that have not been retrieved from
 				// the debug engine yet
 				preview += wxT(" ... ");
 			}
 			else {
-				preview += children[i]->Property.Name;
+				preview += prop.ChildProperties[i].Name;
 				preview += wxT(" => ");
-				preview += children[i]->Property.Value;
+				preview += prop.ChildProperties[i].Value;
 			}
-			if (i < (children.size() - 1)) {
+			if (i < (prop.ChildProperties.size() - 1)) {
 				preview += wxT(", ");
 			}
 		}
 		preview += enclosingEnd;
 	}
 	else {
-		preview = node->Property.Value;
+		preview = prop.Value;
 	}
 	
 	// truncate to desired length
@@ -335,33 +334,25 @@ static wxString VariablePreview(t4p::DebuggerVariableNodeClass* node, int maxPre
 }
 
 /**
- * convenience function to make a wxDataViewItem from
- * a DebuggerVariableModeClass pointer
- * @return wxDataViewItem 
- */
-static wxDataViewItem MakeItem(const t4p::DebuggerVariableNodeClass* node) {
-	return wxDataViewItem((void*)node);
-}
-
-/**
  * Returns the DBGP context ID of the given node. context ID is
  * 0 == local variable 1 == global variable
  * @return int the context id
- */
-static int ContextIdFromNode(t4p::DebuggerVariableNodeClass* node) {
+ */ 
+static int ContextIdFromItem(wxTreeListCtrl* ctrl, wxTreeListItem item, wxTreeListItem& localRoot, wxTreeListItem& globalRoot) {
 	
 	// recurse up the parent chain and look for local
 	// or global root
-	if (!node) {
+	if (!item.IsOk()) {
 		return -1;
 	}
-	if (node->Property.Name.Contains("Local Variable")) {
+	wxTreeListItem parent = ctrl->GetItemParent(item);
+	if (parent == localRoot) {
 		return 0;
 	}
-	if (node->Property.Name.Contains("Global Variable")) {
+	if (parent == globalRoot) {
 		return 1;
 	}
-	return ContextIdFromNode(node->Parent);
+	return ContextIdFromItem(ctrl, parent, localRoot, globalRoot);
 }
 
 /**
@@ -372,7 +363,7 @@ static int ContextIdFromNode(t4p::DebuggerVariableNodeClass* node) {
  * @param parent node to add children into
  * @param prop the ChildProperties of this object will be added into parent
  * @param model to notify of the new children
- */
+ 
 static void VariableNodeRecursiveAddChildren(t4p::DebuggerVariableNodeClass* parent, const t4p::DbgpPropertyClass& prop, 
 		wxDataViewModel* model, std::map<wxString, t4p::DebuggerVariableNodeClass*>& nodeMap) {
 	std::vector<t4p::DbgpPropertyClass>::const_iterator childProp;
@@ -384,12 +375,13 @@ static void VariableNodeRecursiveAddChildren(t4p::DebuggerVariableNodeClass* par
 		VariableNodeRecursiveAddChildren(childNode, *childProp, model, nodeMap);
 	}
 }
+*/
 
 /**
  * deletes all of the children of node, but not the node itself.
  * Will also delete descendants of the children.
  * will also notify the model of the items that were deleted.
- */
+ *
 static void VariableNodeRecursiveDeleteChildren(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model,
 		std::map<wxString, t4p::DebuggerVariableNodeClass*>& nodeMap) {
 	std::vector<t4p::DebuggerVariableNodeClass*>::const_iterator childNode;
@@ -412,6 +404,7 @@ static void VariableNodeRecursiveDeleteChildren(t4p::DebuggerVariableNodeClass* 
 	node->DeleteChildren();
 
 }
+*/
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
 : Breakpoint()
@@ -1089,21 +1082,28 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	// if the user wants to break at the first line, we
 	// want to step into the first line.
 	if (Options.DoBreakOnStart) {
+
+		// run stack command first, ContextGet handler needs 
+		// to differentiate when scope function has changed
 		PostCmd(Cmd.StepInto());
+		PostCmd(Cmd.StackGet(0));
 		PostCmd(Cmd.ContextNames(0));
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-		PostCmd(Cmd.StackGet(0));
+		
 	}
 	else {
 		
 		// we want the script to run until a breakpoint is
 		// hit
 		PostCmd(Cmd.Run());
+		
+		// run stack command first, ContextGet handler needs 
+		// to differentiate when scope function has changed
+		PostCmd(Cmd.StackGet(0));
 		PostCmd(Cmd.ContextNames(0));
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-		PostCmd(Cmd.StackGet(0));
 	}
 }
 
@@ -1307,14 +1307,12 @@ void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
 
 void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
 	
-	// the command string contains the property full name and 
-	//. key, separated by newline
-	wxString all = event.GetString();
-	wxString key = all.After(wxT('\n'));
-	wxString fullName = all.Before(wxT('\n'));
+	// the command string contains the property full name 
+	// the int contains the context ID
+	wxString fullName = event.GetString();
 	int contextId = event.GetInt();
 	PostCmd(
-		Cmd.PropertyValue(0, contextId, fullName, key)
+		Cmd.PropertyValue(0, contextId, fullName, wxT("")) // xdebug does not return key property 
 	);
 }
 
@@ -1402,388 +1400,232 @@ void t4p::DebuggerStackPanelClass::ClearStack() {
 
 t4p::DebuggerVariablePanelClass::DebuggerVariablePanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature)
 : DebuggerVariablePanelGeneratedClass(parent, id) 
-, Feature(feature) {
-	wxObjectDataPtr<t4p::DebuggerVariableModelClass> variableModel;
+, Feature(feature) 
+, LocalVariablesRoot()
+, GlobalVariablesRoot() {
+	VariablesList->AppendColumn(_("Variable Name"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	VariablesList->AppendColumn(_("Variable Type"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	VariablesList->AppendColumn(_("Variable Value"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 	
-	// variableModel is ref counted; wxObjectDataPtr decreases
-	// the ref count once it goes out of scope
-	variableModel = new t4p::DebuggerVariableModelClass();
-	VariablesList->AssociateModel(variableModel.get());
+	LocalVariablesRoot = VariablesList->AppendItem(VariablesList->GetRootItem(), _("Local Variables"));
+	GlobalVariablesRoot = VariablesList->AppendItem(VariablesList->GetRootItem(), _("Global Variables"));
+}
 
-	VariablesList->AppendTextColumn(_("Variable Name"), 0, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
-	VariablesList->AppendTextColumn(_("Variable Type"), 1, wxDATAVIEW_CELL_INERT, wxCOL_WIDTH_AUTOSIZE);
+static void AppendTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& parent, const t4p::DbgpPropertyClass& prop) {
+	wxString type = prop.DataType == "object" ? prop.ClassName : prop.DataType;
+	wxString preview = VariablePreview(prop, 80);
 	
+	wxTreeListItem newItem = ctrl->AppendItem(parent, prop.Name);
+	ctrl->SetItemText(newItem, 1, type);
+	ctrl->SetItemText(newItem, 2, preview);
 	
-	// renderer is owned by col and col is owned by VariablesList
-	t4p::PreviewTextCustomRendererClass* renderer = new t4p::PreviewTextCustomRendererClass(feature);
-	wxDataViewColumn* col = new wxDataViewColumn(_("Variable Value"), renderer, 2, wxCOL_WIDTH_AUTOSIZE,
-		wxALIGN_LEFT);
-	VariablesList->AppendColumn(col);
+	wxStringClientData* data = new wxStringClientData(prop.FullName);
+	ctrl->SetItemData(newItem, data);
+	
+	if (prop.ChildProperties.size()) {
+		std::vector<t4p::DbgpPropertyClass>::const_iterator child;
+		for (child = prop.ChildProperties.begin(); child != prop.ChildProperties.end(); ++child) {
+			AppendTreeListItem(ctrl, newItem, *child);
+		}
+	}
+	else if (prop.HasChildren) {
+		
+		// insert a temporary child so that the item has an expand icon
+		// in the tree.
+		// we add an empty node because we know that the property that has children 
+		// its just that the debug engine has not returned it
+		// due to hitting the depth limit 
+		t4p::DbgpPropertyClass tempProp;
+		tempProp.Name = wxT("Loading");
+		AppendTreeListItem(ctrl, newItem, tempProp);
+	}
+}
+
+static void ReplaceTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& item, const t4p::DbgpPropertyClass& prop) {
+	wxString type = prop.DataType == "object" ? prop.ClassName : prop.DataType;
+	wxString preview = VariablePreview(prop, 80);
+	ctrl->SetItemText(item, 0, prop.Name);
+	ctrl->SetItemText(item, 1, type);
+	ctrl->SetItemText(item, 2, preview);
+	
+	wxStringClientData* data = new wxStringClientData(prop.FullName);
+	ctrl->SetItemData(item, data);
+	
+	if (prop.ChildProperties.size()) {
+		std::vector<t4p::DbgpPropertyClass>::const_iterator child;
+		for (child = prop.ChildProperties.begin(); child != prop.ChildProperties.end(); ++child) {
+			AppendTreeListItem(ctrl, item, *child);
+		}
+	}
+	else if (prop.HasChildren) {
+		
+		// insert a temporary child so that the item has an expand icon
+		// in the tree.
+		// we add an empty node because we know that the property that has children 
+		// its just that the debug engine has not returned it
+		// due to hitting the depth limit 
+		t4p::DbgpPropertyClass tempProp;
+		tempProp.Name = wxT("Loading");
+		AppendTreeListItem(ctrl, item, tempProp);
+	}
+}
+
+static wxTreeListItem FindTreeListItemByFullName(wxTreeListCtrl* ctrl, const wxString& fullName) {
+	for (wxTreeListItem item = ctrl->GetFirstItem(); item.IsOk(); item = ctrl->GetNextItem(item)) {
+		wxStringClientData* data = (wxStringClientData*) ctrl->GetItemData(item);
+		if (data && data->GetData() == fullName) {
+			return item;
+		}
+	}
+	return wxTreeListItem();
+}
+
+static void DeleteChildrenTreeListItems(wxTreeListCtrl* ctrl, wxTreeListItem& parent) {
+	wxTreeListItem item = ctrl->GetFirstChild(parent);
+	while (item.IsOk()) {
+		wxTreeListItem toDel(item);
+		item = ctrl->GetNextSibling(item);
+		ctrl->DeleteItem(toDel);
+	}
 }
 
 void t4p::DebuggerVariablePanelClass::SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	wxDataViewItem updatedItem;
-	variableModel->SetLocalVariables(variables, updatedItem);
-
-	VariablesList->Expand(updatedItem);
+	std::vector<t4p::DbgpPropertyClass>::const_iterator it;
+	for (it = variables.begin(); it != variables.end(); ++it) {
+		AppendTreeListItem(VariablesList, LocalVariablesRoot, *it);
+	}
+	VariablesList->Expand(LocalVariablesRoot);;
 }
 
 void t4p::DebuggerVariablePanelClass::UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	wxDataViewItem updatedItem;
-	variableModel->UpdateLocalVariables(variables, updatedItem);
+	std::vector<t4p::DbgpPropertyClass>::const_iterator it;
+	for (it = variables.begin(); it != variables.end(); ++it) {
+		wxTreeListItem item = FindTreeListItemByFullName(VariablesList, it->FullName);
+		if (item.IsOk()) {
+			DeleteChildrenTreeListItems(VariablesList, item);
+			ReplaceTreeListItem(VariablesList, item, *it);
+		}
+		else {
+			AppendTreeListItem(VariablesList, LocalVariablesRoot, *it);
+		}
+	}
 }
 
 void t4p::DebuggerVariablePanelClass::ClearLocalVariables() {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	variableModel->ClearLocalVariables();
-	this->Layout();
+	DeleteChildrenTreeListItems(VariablesList, LocalVariablesRoot);
 }
 
 void t4p::DebuggerVariablePanelClass::SetGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	wxDataViewItem updatedItem;
-	variableModel->SetGlobalVariables(variables, updatedItem);
-
-	VariablesList->Expand(updatedItem);
+	std::vector<t4p::DbgpPropertyClass>::const_iterator it;
+	for (it = variables.begin(); it != variables.end(); ++it) {
+		AppendTreeListItem(VariablesList, GlobalVariablesRoot, *it);
+	}
+	VariablesList->Expand(GlobalVariablesRoot);
+	StatusLabel->SetLabel(wxT("Status: Debugging session active"));
+	this->Layout();
+	
+	VariablesList->SetColumnWidth(0, wxCOL_WIDTH_AUTOSIZE);
+	VariablesList->SetColumnWidth(1, wxCOL_WIDTH_AUTOSIZE);
+	VariablesList->SetColumnWidth(2, wxCOL_WIDTH_AUTOSIZE);
 }
 
 void t4p::DebuggerVariablePanelClass::UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	wxDataViewItem updatedItem;
-	variableModel->UpdateGlobalVariables(variables, updatedItem);
+	std::vector<t4p::DbgpPropertyClass>::const_iterator it;
+	for (it = variables.begin(); it != variables.end(); ++it) {
+		wxTreeListItem item = FindTreeListItemByFullName(VariablesList, it->FullName);
+		if (item.IsOk()) {
+			DeleteChildrenTreeListItems(VariablesList, item);
+			ReplaceTreeListItem(VariablesList, item, *it);
+		}
+		else {
+			AppendTreeListItem(VariablesList, GlobalVariablesRoot, *it);
+		}
+	}
 }
 
 void t4p::DebuggerVariablePanelClass::ClearGlobalVariables() {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	variableModel->ClearGlobalVariables();
+	DeleteChildrenTreeListItems(VariablesList, GlobalVariablesRoot);
+	
 	StatusLabel->SetLabel(wxT("Status: Debugging session not active"));
 	this->Layout();
 }
 
-void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxDataViewEvent& event) {
-	wxDataViewItem item = event.GetItem();
+void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxTreeListEvent& event) {
+	wxTreeListItem item = event.GetItem();
 	if (!item.GetID()) {
 		return;
 	}
- 	t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-	if (node->Property.HasChildren) {
+
+	// "object" type nodes have an extra child that holds the classname. xdebug does not 
+	// count that as part of the NumChildren but it does return the extra property
+	// when we loaded this property we did not get all of it.
+	// fetch all of it now
+	bool doFetch = false;
+	wxTreeListItem child = VariablesList->GetFirstChild(item);
+	if (child.IsOk()) {
+		wxString text = VariablesList->GetItemText(child, 0);
+		if (text == wxT("Loading")) {
+			doFetch = true;
+		}
+	}
+	if (doFetch) {
 		
-		// "object" type nodes have an extra child that holds the classname. xdebug does not 
-		// count that as part of the NumChildren but it does return the extra property
-		// when we loaded this property we did not get all of it.
-			// fetch all of it now
-		int fetchedSize = (int)node->ChildrenSize();
-		int contextId = ContextIdFromNode(node);
-		if (node->Property.DataType == "object" 
-			&& fetchedSize < node->Property.NumChildren) {
-			
-			Feature.CmdPropertyGetChildren(node->Property, contextId);
+		// when we fill the data view ctrl, we add an empty node when we get
+		// a property that has children but the debug engine has not returned it
+		// due to hitting the depth limit
+		int contextId = ContextIdFromItem(VariablesList, item, LocalVariablesRoot, GlobalVariablesRoot);
+		if (contextId >= 0) {
+			wxStringClientData* clientData = (wxStringClientData*)VariablesList->GetItemData(item);
+			if (clientData) {
+				t4p::DbgpPropertyClass prop;
+				prop.FullName = clientData->GetData();
+				Feature.CmdPropertyGetChildren(prop, contextId);
+			}
 		}
-		else if (fetchedSize < node->Property.NumChildren) {
-			Feature.CmdPropertyGetChildren(node->Property, contextId);
-		}
-		else if (fetchedSize == node->Property.NumChildren && fetchedSize == 1 
-			&& node->GetChildren()[0]->Property.Name.empty()) {
-			
-			// when we fill the data view ctrl, we add an empty node when we get
-			// a property that has children but the debug engine has not returned it
-			// due to hitting the depth limit
-			Feature.CmdPropertyGetChildren(node->Property, contextId);
-		}
+	}
+}
+
+void t4p::DebuggerVariablePanelClass::OnVariableActivated(wxTreeListEvent& event) {
+	wxTreeListItem item = event.GetItem();
+	if (!item.IsOk()) {
+		return;
+	}
+	wxStringClientData* data = (wxStringClientData*)VariablesList->GetItemData(item);
+	if (data) {
+		wxString var = data->GetData();
+		wxCommandEvent evt(t4p::EVENT_DEBUGGER_SHOW_FULL, wxID_ANY);
+		evt.SetString(var);
+		evt.SetInt(ContextIdFromItem(VariablesList, item, LocalVariablesRoot, GlobalVariablesRoot));
+		
+		wxPostEvent(&Feature, evt);
 	}
 }
 
 void t4p::DebuggerVariablePanelClass::VariableAddChildren(const t4p::DbgpPropertyClass& variable) {
-	t4p::DebuggerVariableModelClass* variableModel = (t4p::DebuggerVariableModelClass*)VariablesList->GetModel();
-	wxDataViewItem updatedItem;
-	variableModel->VariableAddChildren(variable, updatedItem);
 	
-	VariablesList->Expand(updatedItem);
-}
-
-t4p::DebuggerVariableNodeClass::DebuggerVariableNodeClass()
-: Property()
-, Parent(NULL)
-, Children() {
-
-}
-
-t4p::DebuggerVariableNodeClass::DebuggerVariableNodeClass(t4p::DebuggerVariableNodeClass* parent, 
-														  const t4p::DbgpPropertyClass& prop)
-: Property(prop)
-, Parent(parent)
-, Children() {
-	parent->Children.push_back(this);
-}
-
-t4p::DebuggerVariableNodeClass::~DebuggerVariableNodeClass() {
-	DeleteChildren();
-}
-
-void t4p::DebuggerVariableNodeClass::DeleteChildren() {
-	for (size_t i = 0; i < Children.size(); ++i) {
-		delete Children[i];
-	}
-	Children.clear();
-}
-
-std::vector<t4p::DebuggerVariableNodeClass*> t4p::DebuggerVariableNodeClass::GetChildren() const {
-	return Children;
-}
-
-size_t t4p::DebuggerVariableNodeClass::ChildrenSize() const {
-	return Children.size();
-}
-
-t4p::DebuggerVariableModelClass::DebuggerVariableModelClass()
-: RootLocalVariable()
-, RootGlobalVariable()
-, LocalsNodeMap()
-, GlobalsNodeMap() {
-	RootLocalVariable.Property.Name = wxT("Local Variables");
-	RootLocalVariable.Property.FullName = wxT("Local Variables");
+	// iterate through all variables, lookup by full name
+	wxTreeListItem itemToReplace = FindTreeListItemByFullName(VariablesList, variable.FullName);
 	
-	wxDataViewItem root(MakeItem(NULL));
-	ItemAdded(root, MakeItem(&RootLocalVariable));
+	wxASSERT_MSG(itemToReplce.IsOk(), wxT("item was not found: ") + variable.FullName);
 	
-	RootGlobalVariable.Property.Name = wxT("Global Variables");
-	RootGlobalVariable.Property.FullName = wxT("Global Variables");
+	wxTreeListItem firstChildItem = VariablesList->GetFirstChild(itemToReplace);
 	
-	ItemAdded(root, MakeItem(&RootGlobalVariable));
-}
-
-unsigned int t4p::DebuggerVariableModelClass::GetChildren(const wxDataViewItem& item, wxDataViewItemArray& children) const {
-	t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-	if (!node) {
-		children.Add(MakeItem(&RootLocalVariable));
-		children.Add(MakeItem(&RootGlobalVariable));
-		return children.size();
-	}
-	std::vector<t4p::DebuggerVariableNodeClass*> nodeChildren = node->GetChildren();
-	for (size_t i = 0; i < nodeChildren.size(); ++i) {
-		children.Add(MakeItem(nodeChildren[i]));
-	}
-	if (nodeChildren.empty() && node->Property.HasChildren) {
-		
-		// the property has children, but the debugger did not return it
-		// because of the max depth limit.  put an empty node here, so
-		// that the  dataviewctrl shows the expand icon.
-		t4p::DbgpPropertyClass emptyProp;
-		t4p::DebuggerVariableNodeClass* emptyNode = new t4p::DebuggerVariableNodeClass(node, emptyProp);
-		
-		children.Add(MakeItem(emptyNode));
-	}
-	return node->ChildrenSize();
-}
-
-unsigned int t4p::DebuggerVariableModelClass::GetColumnCount() const {
-	return 3;
-}
-
-wxString t4p::DebuggerVariableModelClass::GetColumnType(unsigned int col) const {
-	return wxT("string");
-}
-
-wxDataViewItem t4p::DebuggerVariableModelClass::GetParent(const wxDataViewItem& item) const {
-	t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-	if (!node) {
-		return wxDataViewItem(0);
-	}
-	return wxDataViewItem(node->Parent);
-}
-
-bool t4p::DebuggerVariableModelClass::HasContainerColumns(const wxDataViewItem& item) const {
-	return true;
-}
-
-void t4p::DebuggerVariableModelClass::GetValue(wxVariant& variant, const wxDataViewItem& item, unsigned int col) const {
-	wxASSERT(item.IsOk());
-	t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-	switch (col) {
-	case 0:
-		variant = node->Property.Name;
-		break;
-	case 1:
-		variant = node->Property.DataType == "object" ? node->Property.ClassName : node->Property.DataType;
-		break;
-	case 2:
-		variant = VariablePreview(node, 80);
-		break;
-	}
-}
-
-bool t4p::DebuggerVariableModelClass::IsContainer(const wxDataViewItem& item) const {
-	if (!item.IsOk()) {
-		return true;
-	}
-	t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-
-	// use the HasChildren property not the chidlren vector because the debug engine may not
-	// have returned the children due to the max depth limit
-	return node->Property.HasChildren || NULL == node->Parent;
-}
-
-bool t4p::DebuggerVariableModelClass::SetValue(const wxVariant& variant, const wxDataViewItem& item, unsigned int col) {
+	wxASSERT_MSG(childItem.IsOk(), wxT("item must have a child ") + variable.FullName);
 	
-	// for now dont allow modifications by the user as the
-	// user would expect the changes to be reflected in the
-	// debug engine (running script variables change)
-	return false;
-}
-
-void t4p::DebuggerVariableModelClass::SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem) {
-	wxASSERT_MSG(RootLocalVariable.Children.empty(), wxT("SetLocalVariables can only be called when local variables are empty"));
-	
-	std::vector<t4p::DbgpPropertyClass>::const_iterator prop;
-	t4p::DebuggerVariableNodeClass* parentNode = &RootLocalVariable;
-	for (prop = variables.begin(); prop != variables.end(); ++prop) {
-		
-		// add the variable itself
-		t4p::DebuggerVariableNodeClass* childNode = new t4p::DebuggerVariableNodeClass(parentNode, *prop);
-		ItemAdded(MakeItem(parentNode), MakeItem(childNode));
-		LocalsNodeMap[childNode->Property.FullName] = childNode;
-		
-		VariableNodeRecursiveAddChildren(childNode, *prop, this, LocalsNodeMap);
-	}
-	
-	updatedItem = MakeItem(parentNode);
-
-}
-
-void t4p::DebuggerVariableModelClass::UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem) {
-	std::vector<t4p::DbgpPropertyClass>::const_iterator prop;
-	for (prop = variables.begin(); prop != variables.end(); ++prop) {
-		std::map<wxString, t4p::DebuggerVariableNodeClass*>::iterator mapItem = LocalsNodeMap.find(prop->FullName);
-		wxASSERT_MSG(mapItem != LocalsNodeMap.end(), wxT("Node") + prop->FullName `+ wxT(" should be in LocalNodeMap"));
-		if (mapItem != LocalsNodeMap.end()) {
-			
-			// we only handle "updates" in this method. the node should be here
-			// because SetLocalVariables should have been called.
-			t4p::DebuggerVariableNodeClass* node = mapItem->second;
-			
-			// the property is already shown, we want to see if
-			// it has changed.
-			if (prop->NumChildren != (int)node->ChildrenSize()) {
-				
-				// the number of children has changed it means that 
-				// the property now has less /more children because
-				// it was modified by the running code
-				node->Property.HasChildren = prop->HasChildren;
-				node->Property.DataType = prop->DataType;
-				
-
-				// tell the control that this item will now have children
-				ItemDeleted(MakeItem(node->Parent), MakeItem(node));
-				ItemAdded(MakeItem(node->Parent), MakeItem(node));
-				ItemChanged(MakeItem(node));
-				
-				VariableNodeRecursiveAddChildren(node, *prop, this, LocalsNodeMap);
-			}
-			else if ((prop->Value != node->Property.Value) 
-				|| (prop->DataType != node->Property.DataType) 
-				|| (prop->NumChildren != node->Property.NumChildren) ) {
-				
-				// the variable is a simple scalar that has changed value
-				// or become initialized
-				node->Property.Copy(*prop);
-				ItemChanged(MakeItem(node));
-			}
+	// we found the item to add children to. note that the item
+	// already has 1 child (the temp "loading")
+	std::vector<t4p::DbgpPropertyClass>::const_iterator child;
+	for (child = variable.ChildProperties.begin(); child != variable.ChildProperties.end(); ++child) {
+		if (child == variable.ChildProperties.begin()) {
+			ReplaceTreeListItem(VariablesList, firstChildItem, *child);
+		}
+		else {
+			AppendTreeListItem(VariablesList, itemToReplace, *child);
 		}
 	}
-}
-
-void t4p::DebuggerVariableModelClass::ClearLocalVariables() {
-	VariableNodeRecursiveDeleteChildren(&RootLocalVariable, this, LocalsNodeMap);
-}
-
-void t4p::DebuggerVariableModelClass::SetGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem) {
-	wxASSERT_MSG(RootGlobalVariable.Children.empty(), wxT("SetGlobalVariables can only be called when global variables are empty"));
-	std::vector<t4p::DbgpPropertyClass>::const_iterator prop;
-	t4p::DebuggerVariableNodeClass* parentNode = &RootGlobalVariable;
-	for (prop = variables.begin(); prop != variables.end(); ++prop) {
-		
-		// add the variable itself
-		t4p::DebuggerVariableNodeClass* childNode = new t4p::DebuggerVariableNodeClass(parentNode, *prop);
-		ItemAdded(MakeItem(parentNode), MakeItem(childNode));
-		
-		GlobalsNodeMap[childNode->Property.FullName] = childNode;
-		
-		// add any children
-		VariableNodeRecursiveAddChildren(childNode, *prop, this, GlobalsNodeMap);
-	}
-	updatedItem = MakeItem(parentNode);
-}
-
-void t4p::DebuggerVariableModelClass::UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables, wxDataViewItem& updatedItem) {
-	std::vector<t4p::DbgpPropertyClass>::const_iterator prop;
-	for (prop = variables.begin(); prop != variables.end(); ++prop) {
-		std::map<wxString, t4p::DebuggerVariableNodeClass*>::iterator mapItem = GlobalsNodeMap.find(prop->FullName);
-		if (mapItem != GlobalsNodeMap.end()) {
-			
-			// we only handle "updates" in this method. the node should be here
-			// because SetLocalVariables should have been called.
-			t4p::DebuggerVariableNodeClass* node = mapItem->second;
-			
-			// the property is already shown, we want to see if
-			// it has changed.
-			if (prop->NumChildren != (int)node->ChildrenSize()) {
-				
-				// the number of children has changed it means that 
-				// the property now has less /more children because
-				// it was modified by the running code
-				
-				// tell the control that this item will now have children
-				ItemDeleted(MakeItem(node->Parent), MakeItem(node));
-				ItemAdded(MakeItem(node->Parent), MakeItem(node));
-				ItemChanged(MakeItem(node));
-				
-				VariableNodeRecursiveAddChildren(node, *prop, this, GlobalsNodeMap);
-			}
-			else if ((prop->Value != node->Property.Value) 
-				|| (prop->DataType != node->Property.DataType) 
-				|| (prop->NumChildren != node->Property.NumChildren) ) {
-				
-				// the variable is a simple scalar that has changed value
-				// or become initialized
-				node->Property.Copy(*prop);
-				ItemChanged(MakeItem(node));
-			}
-		}
-	}
-}
-
-void t4p::DebuggerVariableModelClass::ClearGlobalVariables() {
-	VariableNodeRecursiveDeleteChildren(&RootGlobalVariable, this, GlobalsNodeMap);
-}
-
-void t4p::DebuggerVariableModelClass::VariableAddChildren(const t4p::DbgpPropertyClass& updatedVariable, wxDataViewItem& updatedItem) {
-	std::map<wxString, t4p::DebuggerVariableNodeClass*>::iterator mapItem = LocalsNodeMap.find(updatedVariable.FullName);
-	if (mapItem != LocalsNodeMap.end()) {
-		
-		// we only handle "updates" in this method. the node should be here
-		// because SetLocalVariables should have been called.
-		t4p::DebuggerVariableNodeClass* node = mapItem->second;
-		
-		// the property is already shown, we want to see add sub-items
-		VariableNodeRecursiveDeleteChildren(node, this, LocalsNodeMap);
-		VariableNodeRecursiveAddChildren(node, updatedVariable, this, LocalsNodeMap);
-		
-		updatedItem = MakeItem(node);
-	}
-	else {
-		// cannot really be sure if we are updating a local or global var
-		// since the xdebug response to a property_get does not have the
-		// property's context id.
-		mapItem = GlobalsNodeMap.find(updatedVariable.FullName);
-		if (mapItem != GlobalsNodeMap.end()) {
-			t4p::DebuggerVariableNodeClass* node = mapItem->second;
-			VariableNodeRecursiveDeleteChildren(node, this, GlobalsNodeMap);
-			VariableNodeRecursiveAddChildren(node, updatedVariable, this, GlobalsNodeMap);
-			updatedItem = MakeItem(node);
-		}
-	}
+	
+	// update the parent property preview, since we now know sub-properties
+	VariablesList->SetItemText(itemToReplace, 2, VariablePreview(variable, 80));
 }
 
 t4p::DebuggerBreakpointPanelClass::DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature)
@@ -1810,7 +1652,7 @@ void t4p::DebuggerBreakpointPanelClass::RefreshList() {
 		wxFileName brFile(br->Breakpoint.Filename);
 		
 		wxVector<wxVariant> row;
-		row.push_back(wxVariant(br->Breakpoint.IsEnabled));	
+		row.push_back(wxVariant(br->Breakpoint.IsEnabled));
 		row.push_back(wxVariant(brFile.GetFullName()));
 		row.push_back(wxVariant(wxString::Format("%d", br->Breakpoint.LineNumber)));
 
@@ -2014,85 +1856,6 @@ bool t4p::DebuggerOptionsPanelClass::TransferDataFromWindow() {
 	return true;
 }
 
-t4p::PreviewTextCustomRendererClass::PreviewTextCustomRendererClass(wxEvtHandler& handler)
-: wxDataViewCustomRenderer(wxT("string"), wxDATAVIEW_CELL_ACTIVATABLE) 
-, Contents() 
-, PreviousContents()
-, EventHandler(handler) {
-	
-	MagnifierBitmap = t4p::BitmapImageAsset(wxT("magnifier"));
-}
-
-bool t4p::PreviewTextCustomRendererClass::GetValue(wxVariant& variant) const {
-	variant = Contents;
-	return true;
-}
-
-bool t4p::PreviewTextCustomRendererClass::SetValue(const wxVariant& variant) {
-	PreviousContents = Contents;
-	Contents = variant.GetString();
-	return true;
-}
-
-wxSize t4p::PreviewTextCustomRendererClass::GetSize() const {
-	if (Contents.empty()) {
-		return wxSize(wxDVC_DEFAULT_RENDERER_SIZE, wxDVC_DEFAULT_RENDERER_SIZE);
-	}
-	wxSize size = GetTextExtent(Contents);
-	size.SetWidth(size.GetWidth() + MagnifierBitmap.GetWidth() + 4);
-	return size;
-}
-
-bool t4p::PreviewTextCustomRendererClass::Render(wxRect cell, wxDC* dc, int state) {	
-	bool doRenderChanged = PreviousContents != Contents;
-
-	if (!Contents.empty()) {
-		dc->DrawBitmap(MagnifierBitmap, cell.GetPosition());
-	}
-	
-	if (doRenderChanged) {
-		wxColour oldColor = dc->GetTextBackground();
-		dc->SetTextForeground(*wxRED);
-		RenderText(Contents, MagnifierBitmap.GetWidth() + 4, cell, dc, state);
-		dc->SetTextForeground(oldColor);
-	}
-	else {
-		RenderText(Contents, MagnifierBitmap.GetWidth() + 4, cell, dc, state);
-	}
-	
-	return true;
-}
-
-bool t4p::PreviewTextCustomRendererClass::ActivateCell(const wxRect& cell,
-		wxDataViewModel* model,
-		const wxDataViewItem& item,
-		unsigned int col,
-		const wxMouseEvent* mouseEvent 
-	) {
-		
-		// need to get the variable's full name and key because that's 
-		// what we need to call xdebug's property_value command. Contents
-		// will have the value.
-		wxCommandEvent evt(t4p::EVENT_DEBUGGER_SHOW_FULL, wxID_ANY);
-		if (item.IsOk()) {
-			t4p::DebuggerVariableNodeClass* node = (t4p::DebuggerVariableNodeClass*) item.GetID();
-			wxString var = node->Property.FullName + wxT("\n") + node->Property.Key;
-			evt.SetString(var);
-			evt.SetInt(ContextIdFromNode(node));
-		}
-		
-		// make sure user clicked inside the bitmap
-		if (mouseEvent && mouseEvent->GetX() < (MagnifierBitmap.GetWidth() + 4)) {
-			wxPostEvent(&EventHandler, evt);
-			return true;
-		} 
-		else if (!mouseEvent) {
-			wxPostEvent(&EventHandler, evt);
-			return true;
-		}
-		return true;
-}
-
 t4p::DebuggerFullViewDialogClass::DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value)
 : DebuggerFullViewDialogGeneratedClass(parent, wxID_ANY) {
 	Text->SetValue(value);
@@ -2203,7 +1966,8 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::DebuggerVariablePanelClass, DebuggerVariablePanelGeneratedClass)
-	EVT_DATAVIEW_ITEM_EXPANDING(wxID_ANY, t4p::DebuggerVariablePanelClass::OnVariableExpanding)
+	EVT_TREELIST_ITEM_EXPANDING(wxID_ANY, t4p::DebuggerVariablePanelClass::OnVariableExpanding)
+	EVT_TREELIST_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerVariablePanelClass::OnVariableActivated)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGeneratedClass)

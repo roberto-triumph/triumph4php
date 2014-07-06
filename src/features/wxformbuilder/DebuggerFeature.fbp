@@ -140,7 +140,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -188,7 +188,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxFlexGridSizer" expanded="1">
+            <object class="wxFlexGridSizer" expanded="0">
                 <property name="cols">1</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">0</property>
@@ -919,11 +919,11 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxStaticBoxSizer" expanded="1">
+                    <object class="wxStaticBoxSizer" expanded="0">
                         <property name="id">wxID_ANY</property>
                         <property name="label">Debugger Source Code Mappings</property>
                         <property name="minimum_size"></property>
@@ -931,11 +931,11 @@
                         <property name="orient">wxVERTICAL</property>
                         <property name="permission">none</property>
                         <event name="OnUpdateUI"></event>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxFlexGridSizer" expanded="1">
+                            <object class="wxFlexGridSizer" expanded="0">
                                 <property name="cols">1</property>
                                 <property name="flexible_direction">wxBOTH</property>
                                 <property name="growablecols">0</property>
@@ -1786,7 +1786,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="0">
+        <object class="Panel" expanded="1">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -1834,7 +1834,7 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxFlexGridSizer" expanded="0">
+            <object class="wxFlexGridSizer" expanded="1">
                 <property name="cols">1</property>
                 <property name="flexible_direction">wxBOTH</property>
                 <property name="growablecols">0</property>
@@ -1975,17 +1975,17 @@
                     <property name="proportion">1</property>
                     <object class="CustomControl" expanded="0">
                         <property name="bg"></property>
-                        <property name="class">wxDataViewCtrl</property>
-                        <property name="construction">VariablesList = new wxDataViewCtrl( this, wxID_ANY );</property>
+                        <property name="class">wxTreeListCtrl</property>
+                        <property name="construction">VariablesList = new wxTreeListCtrl( this, wxID_ANY );</property>
                         <property name="context_help"></property>
                         <property name="context_menu">1</property>
-                        <property name="declaration">wxDataViewCtrl* VariablesList;</property>
+                        <property name="declaration">wxTreeListCtrl* VariablesList;</property>
                         <property name="enabled">1</property>
                         <property name="fg"></property>
                         <property name="font"></property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="include">#include &lt;wx/dataview.h&gt;</property>
+                        <property name="include">#include &lt;wx/treelist.h&gt;</property>
                         <property name="maximum_size"></property>
                         <property name="minimum_size"></property>
                         <property name="name">VariablesList</property>
