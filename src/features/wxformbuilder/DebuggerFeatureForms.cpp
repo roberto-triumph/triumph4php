@@ -267,15 +267,19 @@ DebuggerBreakpointPanelGeneratedClass::DebuggerBreakpointPanelGeneratedClass( wx
 	TopSizer = new wxBoxSizer( wxHORIZONTAL );
 	
 	DeleteBreakpointButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	DeleteBreakpointButton->SetToolTip( wxT("Delete Selected Breakpoint") );
 	DeleteBreakpointButton->SetHelpText( wxT("Delete seleted breakpoint") );
 	
+	DeleteBreakpointButton->SetToolTip( wxT("Delete Selected Breakpoint") );
 	DeleteBreakpointButton->SetHelpText( wxT("Delete seleted breakpoint") );
 	
 	TopSizer->Add( DeleteBreakpointButton, 0, wxALL, 5 );
 	
 	ToggleAllBreakpointsButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	ToggleAllBreakpointsButton->SetToolTip( wxT("Toggle All Breakpoints") );
 	ToggleAllBreakpointsButton->SetHelpText( wxT("Enable or disable all breakpoints") );
 	
+	ToggleAllBreakpointsButton->SetToolTip( wxT("Toggle All Breakpoints") );
 	ToggleAllBreakpointsButton->SetHelpText( wxT("Enable or disable all breakpoints") );
 	
 	TopSizer->Add( ToggleAllBreakpointsButton, 0, wxALL, 5 );
