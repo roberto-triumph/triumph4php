@@ -1403,9 +1403,9 @@ t4p::DebuggerVariablePanelClass::DebuggerVariablePanelClass(wxWindow* parent, in
 , Feature(feature) 
 , LocalVariablesRoot()
 , GlobalVariablesRoot() {
-	VariablesList->AppendColumn(_("Variable Name"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
-	VariablesList->AppendColumn(_("Variable Type"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
-	VariablesList->AppendColumn(_("Variable Value"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+	VariablesList->AppendColumn(_("Variable Name"), wxCOL_WIDTH_DEFAULT, wxALIGN_LEFT, wxCOL_RESIZABLE);
+	VariablesList->AppendColumn(_("Variable Type"), wxCOL_WIDTH_DEFAULT, wxALIGN_LEFT, wxCOL_RESIZABLE);
+	VariablesList->AppendColumn(_("Variable Value"), wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxCOL_RESIZABLE);
 	
 	LocalVariablesRoot = VariablesList->AppendItem(VariablesList->GetRootItem(), _("Local Variables"));
 	GlobalVariablesRoot = VariablesList->AppendItem(VariablesList->GetRootItem(), _("Global Variables"));
@@ -1524,8 +1524,8 @@ void t4p::DebuggerVariablePanelClass::SetGlobalVariables(const std::vector<t4p::
 	StatusLabel->SetLabel(wxT("Status: Debugging session active"));
 	this->Layout();
 	
-	VariablesList->SetColumnWidth(0, wxCOL_WIDTH_AUTOSIZE);
-	VariablesList->SetColumnWidth(1, wxCOL_WIDTH_AUTOSIZE);
+	VariablesList->SetColumnWidth(0, wxCOL_WIDTH_DEFAULT);
+	VariablesList->SetColumnWidth(1, wxCOL_WIDTH_DEFAULT);
 	VariablesList->SetColumnWidth(2, wxCOL_WIDTH_AUTOSIZE);
 }
 
