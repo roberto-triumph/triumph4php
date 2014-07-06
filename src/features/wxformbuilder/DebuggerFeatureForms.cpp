@@ -185,6 +185,8 @@ DebuggerStackPanelGeneratedClass::~DebuggerStackPanelGeneratedClass()
 
 DebuggerLogPanelGeneratedClass::DebuggerLogPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
+	this->SetToolTip( wxT("Clear XDebug Log") );
+	
 	wxFlexGridSizer* GridSizer;
 	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );

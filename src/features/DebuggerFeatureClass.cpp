@@ -502,9 +502,9 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	menu->Append(t4p::MENU_DEBUGGER + 9, _("Finish Session"),
 		_("Run until the end of the session, ignoring any breakpoints"));
 	menu->Append(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"),
-		_("Places the cursor in the line where the debugger has stopped at."));	
+		_("Places the cursor in the line where the debugger has stopped at."));
 	menu->AppendSeparator();
-	menu->Append(t4p::MENU_DEBUGGER + 7, _("Toggle Breakpoint\tAlt+F10"), 
+	menu->Append(t4p::MENU_DEBUGGER + 7, _("Toggle Breakpoint\tCTRL+K"), 
 		_("Turn on or off a breakpoint at the current line of source code."));
 
 	menuBar->Append(menu, _("Debug"));
@@ -525,7 +525,7 @@ void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
 	bar->AddTool(t4p::MENU_DEBUGGER + 4, _("Step Out"), t4p::BitmapImageAsset(wxT("arrow-step-out")), 
 		_("Run until the end of the current function"), wxITEM_NORMAL);
 	bar->AddTool(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"), t4p::BitmapImageAsset(wxT("arrow-right")), 
-		_("Places the cursor in the line where the debugger has stopped at."));	
+		_("Places the cursor in the line where the debugger has stopped at."));
 }
 
 
