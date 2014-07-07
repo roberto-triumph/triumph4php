@@ -167,6 +167,8 @@ public:
 
 	void AddNewMenu(wxMenuBar* menuBar);
 	
+	void AddViewMenuItems(wxMenu* menu);
+	
 	void AddToolBarItems(wxAuiToolBar* bar);
 	
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
@@ -235,6 +237,20 @@ public:
 	 * @param breakpointWithHandle the breakpoint to go to. 
 	 */
 	void BreakpointGoToSource(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+	
+	/**
+	 * send a string of code to be executed by Xdebug in the current
+	 * stack and context.
+	 * 
+	 *  The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 8.3 of the xdbgp protocol docs.
+	 * 
+	 * @param wxString code the code to be sent to Xdebug
+	 */
+	void CmdEvaluate(const wxString& code);
 
 private:
 
@@ -249,6 +265,10 @@ private:
 	void OnFinish(wxCommandEvent& event);
 	void OnToggleBreakpoint(wxCommandEvent& event);
 	void OnGoToExecutingLine(wxCommandEvent& event);
+	void OnViewDebuggerVariables(wxCommandEvent& event);
+	void OnViewDebuggerLog(wxCommandEvent& event);
+	void OnViewDebuggerBreakpoints(wxCommandEvent& event);
+	void OnViewDebuggerEval(wxCommandEvent& event);
 
 	/**
 	 * turn on or off a debugger breakpoint at the currently 
@@ -534,6 +554,49 @@ private:
 };
 
 /**
+ * The eval panel allows the user to enter any arbritary expression and
+ * it will get sent to xdebug to be evaluated. User can only enter
+ * 1 expression at a time.
+ * 
+ */
+class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
+
+public:
+	
+	DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+	
+	~DebuggerEvalPanelClass();
+	
+	/**
+	 * append the results of an eval'ed expression into the results
+	 * text area
+	 */
+	void AppendResults(const t4p::DbgpPropertyClass& prop);
+	
+	/**
+	 * appends an error string into the results.  This will usually
+	 * happen when the user enters an invalid expression
+	 */
+	void AppendError(const wxString& error);
+	
+private:
+
+	void OnEvalClick(wxCommandEvent& event);
+	void OnClearClick(wxCommandEvent& event);
+	void OnCode(wxStyledTextEvent& event);
+	void OnCodeKeyDown(wxKeyEvent& event);
+	
+	void PrettyPrint(const t4p::DbgpPropertyClass& prop);
+
+	t4p::DebuggerFeatureClass& Feature;
+	
+	t4p::CodeControlClass* CodeCtrl;
+	
+	wxString InitialCode;
+	
+};
+
+/**
  * shows the bulk of the debug information
  */
 class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
@@ -541,11 +604,18 @@ class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
 public:
 
 	// this class will own these 3 panel pointers
-	t4p::DebuggerLogPanelClass* Logger;
+	t4p::DebuggerLogPanelClass* LogPanel;
 	t4p::DebuggerVariablePanelClass* VariablePanel;
 	t4p::DebuggerBreakpointPanelClass* BreakpointPanel;
+	t4p::DebuggerEvalPanelClass* EvalPanel;
 
 	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+	
+	// bring the various panels to the forefront
+	void SelectLoggerPanel();
+	void SelectVariablePanel();
+	void SelectBreakpointPanel();
+	void SelectEvalPanel();
 
 private:
 };

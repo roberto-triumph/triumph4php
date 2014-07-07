@@ -278,15 +278,15 @@ static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t
 }
 
 static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t4p::DbgpXmlErrors& error) {
-	if (!GetNodeAttributeString(node, "name", prop.Name, error)) {
-		return false;
-	}
+	
+	// name is optional when we parse properties from an eval response
+	// class name, full name are optional
+	t4p::DbgpXmlErrors ignored;
+	
 	if (!GetNodeAttributeString(node, "type", prop.DataType, error)) {
 		return false;
 	}
-
-	// class name, full name are optional
-	t4p::DbgpXmlErrors ignored;
+	GetNodeAttributeString(node, "name", prop.Name, ignored);
 	GetNodeAttributeString(node, "fullname", prop.FullName, ignored);
 	GetNodeAttributeString(node, "classname", prop.ClassName, ignored);
 
@@ -570,7 +570,7 @@ wxEvent* t4p::DbgpErrorEventClass::Clone() const {
 	t4p::DbgpErrorEventClass* cloned = new t4p::DbgpErrorEventClass();
 	cloned->Command = Command.c_str();
 	cloned->TransactionId = TransactionId.c_str();
-	cloned->ErrorCode = ErrorCode.c_str();
+	cloned->ErrorCode = ErrorCode;
 	cloned->AppErrorCode = AppErrorCode.c_str();
 	cloned->Message = Message.c_str();
 	return cloned;
@@ -595,18 +595,18 @@ bool t4p::DbgpErrorEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& 
 		return false;
 	}
 
-	if (!GetNodeAttributeString(errorNode, "code", ErrorCode, error)) {
-		return false;
-	}
-	if (!GetNodeAttributeString(errorNode, "apperr", AppErrorCode, error)) {
-		return false;
-	}
+	GetNodeAttributeInt(errorNode, "code", ErrorCode);
+	
 	wxXmlNode* messageNode = GetNodeChild(errorNode, "message", error);
 	if (!messageNode) {
 		return false;
 	}
-	GetNodeText(messageNode, Message);
+	GetNodeText(messageNode, Message, false);
 
+	t4p::DbgpXmlErrors ignored;
+	GetNodeAttributeString(errorNode, "apperr", AppErrorCode, ignored);
+	
+	
 	error = t4p::DBGP_XML_ERROR_NONE;
 	return true;
 }
@@ -1626,7 +1626,7 @@ std::string t4p::DbgpCommandClass::Build(const std::string& cmd, const wxString&
 	}
 	if (!data.empty()) {
 		line += " ";
-		line += "--";
+		line += "-- ";
 		wxString encoded = wxBase64Encode(data.data(), data.Length());
 		line += t4p::WxToChar(encoded);
 	}

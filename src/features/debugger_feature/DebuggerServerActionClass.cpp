@@ -332,8 +332,17 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 	}
 	else if ("eval" == cmdOnly) {
 		t4p::DbgpEvalEventClass evalResponse;
-		if (evalResponse.FromXml(xml, xmlError)) {
+		if (evalResponse.FromXml(xml, xmlError) 
+			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty())) {
 			PostEvent(evalResponse);
+		}
+		else {
+			
+			// most likely an error response
+			t4p::DbgpErrorEventClass errorResponse;
+			if (errorResponse.FromXml(xml, xmlError)) {
+				PostEvent(errorResponse);
+			}
 		}
 	}
 

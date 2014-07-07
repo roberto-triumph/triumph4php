@@ -96,7 +96,7 @@ public:
 
 	wxString Command;
 	wxString TransactionId;
-	wxString ErrorCode;
+	int ErrorCode;
 	wxString AppErrorCode;
 	wxString Message;
 	

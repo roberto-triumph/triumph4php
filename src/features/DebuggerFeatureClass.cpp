@@ -510,6 +510,17 @@ void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	menuBar->Append(menu, _("Debug"));
 }
 
+void t4p::DebuggerFeatureClass::AddViewMenuItems(wxMenu* menu) {
+	wxMenu* subMenu = new wxMenu();
+	
+	subMenu->Append(t4p::MENU_DEBUGGER + 11, _("Variables"));
+	subMenu->Append(t4p::MENU_DEBUGGER + 12, _("Breakpoints"));
+	subMenu->Append(t4p::MENU_DEBUGGER + 13, _("Eval"));
+	subMenu->Append(t4p::MENU_DEBUGGER + 14, _("Log"));
+	
+	menu->AppendSubMenu(subMenu, _("Debugger"));
+}
+
 void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
 	bar->AddSeparator();
 	
@@ -526,7 +537,7 @@ void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
 		_("Run until the end of the current function"), wxITEM_NORMAL);
 	bar->AddTool(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"), t4p::BitmapImageAsset(wxT("arrow-right")), 
 		_("Places the cursor in the line where the debugger has stopped at."));
-}
+	}
 
 
 void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
@@ -543,7 +554,7 @@ void t4p::DebuggerFeatureClass::OnDebuggerLog(wxThreadEvent& event) {
 		return;
 	}
 	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
-	panel->Logger->Append(event.GetString());
+	panel->LogPanel->Append(event.GetString());
 }
 
 void t4p::DebuggerFeatureClass::OnDebuggerSocketError(wxThreadEvent& event) {
@@ -556,7 +567,7 @@ void t4p::DebuggerFeatureClass::OnDebuggerSocketError(wxThreadEvent& event) {
 		return;
 	}
 	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
-	panel->Logger->Append(event.GetString());
+	panel->LogPanel->Append(event.GetString());
 }
 
 void t4p::DebuggerFeatureClass::OnDebuggerListenError(wxThreadEvent& event) {
@@ -999,6 +1010,12 @@ void t4p::DebuggerFeatureClass::BreakpointEnable(const t4p::BreakpointWithHandle
 	ConfigStore(base, Options, Breakpoints);
 }
 
+void t4p::DebuggerFeatureClass::CmdEvaluate(const wxString& code) {
+	PostCmd(
+		Cmd.Eval(code)
+	);
+}
+
 void t4p::DebuggerFeatureClass::BreakpointGoToSource(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
 	t4p::OpenFileCommandEventClass openEvt(
 		breakpointWithHandle.Breakpoint.Filename, -1, -1,
@@ -1108,8 +1125,25 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
-	IsDebuggerSessionActive = false;
-	ResetDebugger();
+	if (event.Command == "eval") {
+			
+		// errors in eval do not kill the entire debug session
+		wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+		if (!window) {
+		
+			// not sure if we should create the panel again.
+			// if the panel is not here it means that the user closed it
+			// and wants it closed?
+			return;
+		}
+	
+		t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+		panel->EvalPanel->AppendError(event.Message);
+	}
+	else {
+		IsDebuggerSessionActive = false;
+		ResetDebugger();
+	}
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpStatus(t4p::DbgpStatusEventClass& event) {
@@ -1273,7 +1307,16 @@ void t4p::DebuggerFeatureClass::OnDbgpBreak(t4p::DbgpBreakEventClass& event) {
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpEval(t4p::DbgpEvalEventClass& event) {
-
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		
+		// not sure if we should create the panel again.
+		// if the panel is not here it means that the user closed it
+		// and wants it closed?
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->EvalPanel->AppendResults(event.Property);
 }
 
 void t4p::DebuggerFeatureClass::ResetDebugger() {
@@ -1316,6 +1359,58 @@ void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
 	);
 }
 
+void t4p::DebuggerFeatureClass::OnViewDebuggerVariables(wxCommandEvent& event) {
+	wxWindow* panelWindow = FindToolsWindow(ID_PANEL_DEBUGGER);
+	t4p::DebuggerPanelClass* panel;
+	if (panelWindow) {
+		panel = (t4p::DebuggerPanelClass*) panelWindow;
+	}
+	else {
+		panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+		AddToolsWindow(panel, _("Debugger"));
+	}
+	panel->SelectVariablePanel();
+}
+
+void t4p::DebuggerFeatureClass::OnViewDebuggerLog(wxCommandEvent& event) {
+	wxWindow* panelWindow = FindToolsWindow(ID_PANEL_DEBUGGER);
+	t4p::DebuggerPanelClass* panel;
+	if (panelWindow) {
+		panel = (t4p::DebuggerPanelClass*) panelWindow;
+	}
+	else {
+		panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+		AddToolsWindow(panel, _("Debugger"));
+	}
+	panel->SelectLoggerPanel();
+}
+
+void t4p::DebuggerFeatureClass::OnViewDebuggerBreakpoints(wxCommandEvent& event) {
+	wxWindow* panelWindow = FindToolsWindow(ID_PANEL_DEBUGGER);
+	t4p::DebuggerPanelClass* panel;
+	if (panelWindow) {
+		panel = (t4p::DebuggerPanelClass*) panelWindow;
+	}
+	else {
+		panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+		AddToolsWindow(panel, _("Debugger"));
+	}
+	panel->SelectBreakpointPanel();
+}
+
+void t4p::DebuggerFeatureClass::OnViewDebuggerEval(wxCommandEvent& event) {
+	wxWindow* panelWindow = FindToolsWindow(ID_PANEL_DEBUGGER);
+	t4p::DebuggerPanelClass* panel;
+	if (panelWindow) {
+		panel = (t4p::DebuggerPanelClass*) panelWindow;
+	}
+	else {
+		panel = new t4p::DebuggerPanelClass(GetToolsNotebook(), ID_PANEL_DEBUGGER, *this);
+		AddToolsWindow(panel, _("Debugger"));
+	}
+	panel->SelectEvalPanel();
+}
+
 t4p::DebuggerLogPanelClass::DebuggerLogPanelClass(wxWindow* parent)
 : DebuggerLogPanelGeneratedClass(parent, wxID_ANY) {
 	ClearButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("eraser")));
@@ -1334,14 +1429,33 @@ t4p::DebuggerPanelClass::DebuggerPanelClass(wxWindow* parent, int id, t4p::Debug
 : DebuggerPanelGeneratedClass(parent, id) {
 	Notebook->SetWindowStyle(wxAUI_NB_BOTTOM);
 
-	Logger = new t4p::DebuggerLogPanelClass(this);
+	LogPanel = new t4p::DebuggerLogPanelClass(this);
 	VariablePanel = new t4p::DebuggerVariablePanelClass(this, wxID_ANY, feature);
 	BreakpointPanel = new t4p::DebuggerBreakpointPanelClass(this, wxID_ANY, feature);
+	EvalPanel = new t4p::DebuggerEvalPanelClass(this, wxID_ANY, feature);
 
 	Notebook->AddPage(VariablePanel, _("Variables"));
 	Notebook->AddPage(BreakpointPanel, _("Breakpoints"));
-	Notebook->AddPage(Logger, _("Logger"));
+	Notebook->AddPage(EvalPanel, _("Eval"));
+	Notebook->AddPage(LogPanel, _("Logger"));
 }
+
+void t4p::DebuggerPanelClass::SelectLoggerPanel() {
+	Notebook->SetSelection(Notebook->GetPageIndex(LogPanel));
+}
+
+void t4p::DebuggerPanelClass::SelectVariablePanel() {
+	Notebook->SetSelection(Notebook->GetPageIndex(VariablePanel));
+}
+
+void t4p::DebuggerPanelClass::SelectBreakpointPanel() {
+	Notebook->SetSelection(Notebook->GetPageIndex(BreakpointPanel));
+}
+
+void t4p::DebuggerPanelClass::SelectEvalPanel() {
+	Notebook->SetSelection(Notebook->GetPageIndex(EvalPanel));
+}
+
 
 t4p::DebuggerStackPanelClass::DebuggerStackPanelClass(wxWindow* parent, int id)
 : DebuggerStackPanelGeneratedClass(parent, id) {
@@ -1908,6 +2022,139 @@ void t4p::DebuggerMappingDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
+t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature)
+: DebuggerEvalPanelGeneratedClass(parent, id)
+, Feature(feature)
+{
+	CodeCtrl = new t4p::CodeControlClass(
+		ExprCodePanel, 
+		Feature.App.Preferences.CodeControlOptions, 
+		&Feature.App.Globals,
+		Feature.App.EventSink,
+		wxID_ANY
+	);
+	CodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
+	ExprSizer->Add(CodeCtrl, 1, wxALL | wxEXPAND, 5);
+	
+	EvalButton->SetBitmap(t4p::BitmapImageAsset(wxT("debugger-eval")));
+	ClearButton->SetBitmap(t4p::BitmapImageAsset(wxT("eraser")));
+	Splitter->SetSashPosition(0);
+	this->Layout();
+	
+	InitialCode = t4p::CharToWx(
+		"<?php \n"
+		"// enter code here to send to Xdebug to be executed.\n"
+		"// Hitting CTRL+ENTER will execute the code.\n\n"
+	);
+	CodeCtrl->AppendText(InitialCode);
+	
+	t4p::CodeControlEventClass evt(t4p::EVENT_APP_FILE_NEW, CodeCtrl);
+	Feature.App.EventSink.Publish(evt);
+	
+	// we want to capture CTRL+ENTER
+	// so we bind on KeyDown
+	CodeCtrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(t4p::DebuggerEvalPanelClass::OnCodeKeyDown), NULL, this);
+	
+	wxPlatformInfo platform;
+	int os = platform.GetOperatingSystemId();
+	
+	//ATTN: different OSs have different fonts
+	wxString fontName;
+	if (os == wxOS_WINDOWS_NT) {
+		fontName = wxT("Courier New");
+	}
+	else {
+		
+		// default font: some websites say Monospace is a good programming font
+		fontName = wxT("Monospace");
+	}
+	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+				fontName);
+	ExprResult->SetFont(font);
+}
+
+t4p::DebuggerEvalPanelClass::~DebuggerEvalPanelClass() {
+	CodeCtrl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(t4p::DebuggerEvalPanelClass::OnCodeKeyDown), NULL, this);
+}
+
+void t4p::DebuggerEvalPanelClass::AppendResults(const t4p::DbgpPropertyClass& prop) {
+	PrettyPrint(prop);
+	ExprResult->AppendText(wxT("\n"));
+}
+
+void t4p::DebuggerEvalPanelClass::AppendError(const wxString& error) {
+	ExprResult->AppendText(wxT("Error: ") + error);
+	ExprResult->AppendText(wxT("\n"));
+}
+
+void t4p::DebuggerEvalPanelClass::PrettyPrint(const t4p::DbgpPropertyClass& prop) {
+	if (prop.DataType != wxT("object") && prop.DataType != wxT("array")) {
+		ExprResult->AppendText(wxT("   => (") + prop.DataType +wxT(") ") + prop.Value);
+		return;
+	}
+	bool isArray = prop.DataType == wxT("array");
+	if (isArray) {
+		ExprResult->AppendText(wxString::Format(wxT("   => (array[%d]) ["), prop.NumChildren));
+	}
+	else {
+		ExprResult->AppendText(wxT("   => (") + prop.ClassName + wxT(") {"));
+	}
+	for (size_t i = 0; i < prop.ChildProperties.size(); ++i) {
+		wxString childValue = prop.ChildProperties[i].Value;
+		if (prop.ChildProperties[i].DataType == "object") {
+			childValue = prop.ChildProperties[i].ClassName + wxT(" { ... }");
+		}
+		else if (prop.ChildProperties[i].DataType == "array") {
+			childValue = wxString::Format(wxT("(array[%d])"), prop.ChildProperties[i].NumChildren) + wxT(" [ ... ]");
+		}
+		if (i == 0) {
+			ExprResult->AppendText(wxT("\n        ") + prop.ChildProperties[i].Name + wxT(" => ") + childValue);
+		}
+		else {
+			ExprResult->AppendText(wxT("\n      , ") + prop.ChildProperties[i].Name + wxT(" => ") + childValue);
+		}
+	}
+	
+	if (isArray) {
+		ExprResult->AppendText(wxT("\n   ]\n\n"));
+	}
+	else {
+		ExprResult->AppendText(wxT("\n   }\n\n"));
+	}
+}
+
+void t4p::DebuggerEvalPanelClass::OnClearClick(wxCommandEvent& event)
+{
+	ExprResult->Clear();
+}
+
+void t4p::DebuggerEvalPanelClass::OnEvalClick(wxCommandEvent& event)
+{
+	wxString code = CodeCtrl->GetText();
+	if (code.Find(InitialCode) == 0) {
+		code = code.Mid(InitialCode.length());
+	}
+	ExprResult->AppendText(code);
+	ExprResult->AppendText(wxT("\n"));
+	
+	Feature.CmdEvaluate(code);
+}
+
+void t4p::DebuggerEvalPanelClass::OnCodeKeyDown(wxKeyEvent& event) {
+	if (event.GetModifiers() & WXK_ALT && event.GetKeyCode() == WXK_RETURN) {
+		wxString code = CodeCtrl->GetText();
+		if (code.Find(InitialCode) == 0) {
+			code = code.Mid(InitialCode.length());
+		}
+		ExprResult->AppendText(code);
+		ExprResult->AppendText(wxT("\n"));
+		
+		Feature.CmdEvaluate(code);
+	}
+	event.Skip();
+}
+
+
 const wxEventType t4p::EVENT_DEBUGGER_SHOW_FULL = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
@@ -1929,6 +2176,10 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_DEBUGGER + 8, t4p::DebuggerFeatureClass::OnStopDebugger)
 	EVT_MENU(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
 	EVT_MENU(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)
+	EVT_MENU(t4p::MENU_DEBUGGER + 11, t4p::DebuggerFeatureClass::OnViewDebuggerVariables)
+	EVT_MENU(t4p::MENU_DEBUGGER + 12, t4p::DebuggerFeatureClass::OnViewDebuggerBreakpoints)
+	EVT_MENU(t4p::MENU_DEBUGGER + 13, t4p::DebuggerFeatureClass::OnViewDebuggerEval)
+	EVT_MENU(t4p::MENU_DEBUGGER + 14, t4p::DebuggerFeatureClass::OnViewDebuggerLog)
 
 	EVT_TOOL(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
 	EVT_TOOL(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)

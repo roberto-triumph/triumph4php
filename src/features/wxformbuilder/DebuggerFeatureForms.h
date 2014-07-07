@@ -29,6 +29,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/textctrl.h>
 #include <wx/treelist.h>
+#include <wx/splitter.h>
 #include <wx/dataview.h>
 #include <wx/dialog.h>
 #include <wx/filepicker.h>
@@ -151,6 +152,42 @@ class DebuggerVariablePanelGeneratedClass : public wxPanel
 		
 		DebuggerVariablePanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~DebuggerVariablePanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class DebuggerEvalPanelGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class DebuggerEvalPanelGeneratedClass : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxBitmapButton* EvalButton;
+		wxBitmapButton* ClearButton;
+		
+		wxStaticText* StatusLabel;
+		wxSplitterWindow* Splitter;
+		wxPanel* ExprCodePanel;
+		wxBoxSizer* ExprSizer;
+		wxPanel* ExprResultPanel;
+		wxTextCtrl* ExprResult;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnEvalClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClearClick( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		DebuggerEvalPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
+		~DebuggerEvalPanelGeneratedClass();
+		
+		void SplitterOnIdle( wxIdleEvent& )
+		{
+			Splitter->SetSashPosition( 0 );
+			Splitter->Disconnect( wxEVT_IDLE, wxIdleEventHandler( DebuggerEvalPanelGeneratedClass::SplitterOnIdle ), NULL, this );
+		}
 	
 };
 

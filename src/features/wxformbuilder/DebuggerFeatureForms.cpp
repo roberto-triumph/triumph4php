@@ -256,6 +256,79 @@ DebuggerVariablePanelGeneratedClass::~DebuggerVariablePanelGeneratedClass()
 {
 }
 
+DebuggerEvalPanelGeneratedClass::DebuggerEvalPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 1 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	EvalButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	EvalButton->SetToolTip( wxT("Evaluate Expression") );
+	
+	EvalButton->SetToolTip( wxT("Evaluate Expression") );
+	
+	TopSizer->Add( EvalButton, 0, wxALL, 5 );
+	
+	ClearButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	ClearButton->SetToolTip( wxT("Clear Results") );
+	
+	ClearButton->SetToolTip( wxT("Clear Results") );
+	
+	TopSizer->Add( ClearButton, 0, wxALL, 5 );
+	
+	
+	TopSizer->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	StatusLabel = new wxStaticText( this, wxID_ANY, wxT("Debug Session not active"), wxDefaultPosition, wxDefaultSize, 0 );
+	StatusLabel->Wrap( -1 );
+	TopSizer->Add( StatusLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
+	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( DebuggerEvalPanelGeneratedClass::SplitterOnIdle ), NULL, this );
+	
+	ExprCodePanel = new wxPanel( Splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	ExprSizer = new wxBoxSizer( wxVERTICAL );
+	
+	ExprCodePanel->SetSizer( ExprSizer );
+	ExprCodePanel->Layout();
+	ExprSizer->Fit( ExprCodePanel );
+	ExprResultPanel = new wxPanel( Splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* ExprResultSizer;
+	ExprResultSizer = new wxBoxSizer( wxVERTICAL );
+	
+	ExprResult = new wxTextCtrl( ExprResultPanel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	ExprResultSizer->Add( ExprResult, 1, wxALL|wxEXPAND, 5 );
+	
+	ExprResultPanel->SetSizer( ExprResultSizer );
+	ExprResultPanel->Layout();
+	ExprResultSizer->Fit( ExprResultPanel );
+	Splitter->SplitVertically( ExprCodePanel, ExprResultPanel, 0 );
+	BodySizer->Add( Splitter, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	
+	// Connect Events
+	EvalButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerEvalPanelGeneratedClass::OnEvalClick ), NULL, this );
+	ClearButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerEvalPanelGeneratedClass::OnClearClick ), NULL, this );
+}
+
+DebuggerEvalPanelGeneratedClass::~DebuggerEvalPanelGeneratedClass()
+{
+	// Disconnect Events
+	EvalButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerEvalPanelGeneratedClass::OnEvalClick ), NULL, this );
+	ClearButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DebuggerEvalPanelGeneratedClass::OnClearClick ), NULL, this );
+	
+}
+
 DebuggerBreakpointPanelGeneratedClass::DebuggerBreakpointPanelGeneratedClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxFlexGridSizer* BodySizer;

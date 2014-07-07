@@ -195,7 +195,7 @@ TEST(DebugEngineErrorResponse) {
 	CHECK(success);
 	CHECK_EQUAL(wxT("stack_get"), errorEvt.Command);
 	CHECK_EQUAL(wxT("transaction_id"), errorEvt.TransactionId);
-	CHECK_EQUAL(wxT("3"), errorEvt.ErrorCode);
+	CHECK_EQUAL(3, errorEvt.ErrorCode);
 	CHECK_EQUAL(wxT("app specific error code"), errorEvt.AppErrorCode);
 	CHECK_EQUAL(wxT("invalid context name"), errorEvt.Message);
 }
@@ -255,7 +255,7 @@ TEST(CommandGenerationWithData) {
 	expected +=  wxString::Format(" -d %d", stackDepth);
 	expected +=  wxString::Format(" -c %d", contextId);
 	expected +=  " -t " + dataType;
-	expected +=  " --L3Zhci93d3cvc2l0ZS9pbmRleC5waHA="; // base64 encode of expression
+	expected +=  " -- L3Zhci93d3cvc2l0ZS9pbmRleC5waHA="; // base64 encode of expression
 	CHECK_EQUAL(expected, line);
 }
 
