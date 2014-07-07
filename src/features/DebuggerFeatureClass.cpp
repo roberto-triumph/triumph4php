@@ -1720,11 +1720,11 @@ void t4p::DebuggerVariablePanelClass::VariableAddChildren(const t4p::DbgpPropert
 	// iterate through all variables, lookup by full name
 	wxTreeListItem itemToReplace = FindTreeListItemByFullName(VariablesList, variable.FullName);
 	
-	wxASSERT_MSG(itemToReplce.IsOk(), wxT("item was not found: ") + variable.FullName);
+	wxASSERT_MSG(itemToReplace.IsOk(), wxT("item was not found: ") + variable.FullName);
 	
 	wxTreeListItem firstChildItem = VariablesList->GetFirstChild(itemToReplace);
 	
-	wxASSERT_MSG(childItem.IsOk(), wxT("item must have a child ") + variable.FullName);
+	wxASSERT_MSG(firstChildItem.IsOk(), wxT("item must have a child ") + variable.FullName);
 	
 	// we found the item to add children to. note that the item
 	// already has 1 child (the temp "loading")

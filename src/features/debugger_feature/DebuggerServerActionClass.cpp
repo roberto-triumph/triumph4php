@@ -333,7 +333,13 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 	else if ("eval" == cmdOnly) {
 		t4p::DbgpEvalEventClass evalResponse;
 		if (evalResponse.FromXml(xml, xmlError) 
-			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty())) {
+
+			// determine if we actually had an error
+			// we look for properties that either
+			// dont have a name, value, or children
+			// added the children test for windows 
+			// xdebug version 2.1.0
+			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty() || evalResponse.Property.NumChildren)) {
 			PostEvent(evalResponse);
 		}
 		else {
