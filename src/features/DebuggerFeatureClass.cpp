@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/DebuggerFeatureClass.h>
-#include <features/debugger_feature/DebuggerServerActionClass.h>
+#include <actions/DebuggerServerActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <widgets/DirPickerValidatorClass.h>
@@ -34,7 +34,6 @@
 #include <string>
 #include <algorithm>
 
-// TODO: expression eval
 // TODO: not sure how breakpoints react when
 //       file is edited (and breakpoints moves lines) 
 //       but file is then reloaded/discarded
@@ -354,57 +353,6 @@ static int ContextIdFromItem(wxTreeListCtrl* ctrl, wxTreeListItem item, wxTreeLi
 	}
 	return ContextIdFromItem(ctrl, parent, localRoot, globalRoot);
 }
-
-/**
- * adds prop.ChildProperties into the given parent node.
- * Will also notify the wxDataViewModel that the node has new children,
- * so that the GUI is updated (user can see the new nodes)
- * 
- * @param parent node to add children into
- * @param prop the ChildProperties of this object will be added into parent
- * @param model to notify of the new children
- 
-static void VariableNodeRecursiveAddChildren(t4p::DebuggerVariableNodeClass* parent, const t4p::DbgpPropertyClass& prop, 
-		wxDataViewModel* model, std::map<wxString, t4p::DebuggerVariableNodeClass*>& nodeMap) {
-	std::vector<t4p::DbgpPropertyClass>::const_iterator childProp;
-	for (childProp = prop.ChildProperties.begin(); childProp != prop.ChildProperties.end(); ++childProp) {
-		
-		t4p::DebuggerVariableNodeClass* childNode = new t4p::DebuggerVariableNodeClass(parent, *childProp);
-		nodeMap[childProp->FullName] = childNode;
-		model->ItemAdded(MakeItem(parent), MakeItem(childNode));
-		VariableNodeRecursiveAddChildren(childNode, *childProp, model, nodeMap);
-	}
-}
-*/
-
-/**
- * deletes all of the children of node, but not the node itself.
- * Will also delete descendants of the children.
- * will also notify the model of the items that were deleted.
- *
-static void VariableNodeRecursiveDeleteChildren(t4p::DebuggerVariableNodeClass* node, wxDataViewModel* model,
-		std::map<wxString, t4p::DebuggerVariableNodeClass*>& nodeMap) {
-	std::vector<t4p::DebuggerVariableNodeClass*>::const_iterator childNode;
-	std::vector<t4p::DebuggerVariableNodeClass*> children = node->GetChildren();
-	for (childNode = children.begin(); childNode != children.end(); ++childNode) {
-		if ((*childNode)->ChildrenSize() == 0) {
-			VariableNodeRecursiveDeleteChildren(*childNode, model, nodeMap);
-		}
-		wxDataViewItem item = MakeItem(*childNode);
-		
-		std::map<wxString, t4p::DebuggerVariableNodeClass*>::iterator mapItem;
-		mapItem = nodeMap.find((*childNode)->Property.FullName);
-		if (mapItem != nodeMap.end()) {
-			nodeMap.erase(mapItem);
-		}
-		
-		// tell the control that items were removed
-		model->ItemDeleted(MakeItem(node), item);
-	}
-	node->DeleteChildren();
-
-}
-*/
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
 : Breakpoint()

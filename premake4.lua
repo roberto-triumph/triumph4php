@@ -394,11 +394,13 @@ solution "triumph4php"
 			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 		configuration "Release"
 			pickywarnings(_ACTION)
 			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 
 	project "tag_finder_profiler"
 		language "C++"
@@ -472,12 +474,14 @@ solution "triumph4php"
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 		configuration { "Release" }
 			pickywarnings(_ACTION)
 			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 
 	project "find_in_files_profiler"
 		language "C++"

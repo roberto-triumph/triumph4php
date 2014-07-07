@@ -22,7 +22,7 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/debugger_feature/DebuggerServerActionClass.h>
+#include <actions/DebuggerServerActionClass.h>
 #include <globals/String.h>
 
 /**
