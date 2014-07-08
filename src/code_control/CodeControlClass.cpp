@@ -200,12 +200,11 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 	if (CodeControlOptions.RemoveTrailingBlankLinesBeforeSave) {
 		RemoveTrailingBlankLines();
 	}
-	
-	// TODO if file has a signature, prepend the file signature (BOM)
+
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
 		saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
 
-		// if file is no changing name then its not changing extension
+		// if file is not changing name then its not changing extension
 		// no need to auto detect the document mode
 	}
 	else if (SaveFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature)) {
