@@ -1640,7 +1640,7 @@ std::string t4p::DbgpCommandClass::CurrentTransactionId() const {
 
 wxString t4p::DbgpCommandClass::EscapeArg(const wxString& arg) {
 	wxString escaped = arg;
-	if (arg.Contains(wxT("\"")) || arg.Contains(wxT(" "))) {
+	if (arg.Contains(wxT("\"")) || arg.Contains(wxT(" ")) || arg.Contains(wxT("-"))) {
 		escaped.Replace("\"", "\\\"");
 
 		escaped = wxT("\"") + escaped + wxT("\"");
