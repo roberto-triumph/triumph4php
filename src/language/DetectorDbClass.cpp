@@ -57,7 +57,7 @@ void t4p::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
 		Session->once << "DELETE FROM sources WHERE source_id = ? ", soci::use(sourceId);
 		
 	} catch (std::exception& e) {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, wxString::FromAscii(e.what()));
+		t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
 	}
 }
 
@@ -75,7 +75,7 @@ void t4p::DetectorDbClass::Wipe() {
 		Session->once << "DELETE FROM url_tags";
 		Session->once << "DELETE FROM sources";
 	} catch (std::exception& e) {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, wxString::FromAscii(e.what()));
+		t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
 	}
 }
 

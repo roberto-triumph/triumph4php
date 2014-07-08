@@ -105,7 +105,7 @@ std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vecto
 	} catch (std::exception& e) {
 		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
-		t4p::EditorLogError(t4p::WARNING_OTHER, msg);
+		t4p::EditorLogError(t4p::ERR_TAG_READ, msg);
 	}
 	return allConfigTags;
 }

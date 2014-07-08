@@ -24,84 +24,13 @@
  */
 #include <features/EnvironmentFeatureClass.h>
 #include <widgets/NonEmptyTextValidatorClass.h>
+#include <widgets/ListWidget.h>
 #include <Triumph.h>
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <wx/valgen.h>
 
 static int ID_APACHE_FILE_READER = wxNewId();
-
-/**
- * A helper function to add a row into a list control. list control must have 2 columns
- * 
- * @param list the list to add to
- * @param column1Value the value for column 1 
- * @param column2Value the value for column 2
- */
-static void ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
-	int newRowNumber = list->GetItemCount();
-	
-	// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
-	wxListItem column1;
-	column1.SetColumn(0);
-	column1.SetId(newRowNumber);
-	column1.SetText(column1Value);
-	list->InsertItem(column1);
-	
-	wxListItem column2;
-	column2.SetId(newRowNumber);
-	column2.SetColumn(1);
-	column2.SetText(column2Value);
-	list->SetItem(column2);
-}
-
-/**
- * A helper function to edit a list control row's contents
- * 
- * @param list the list to add to
- * @param column1Value the new value for column 1 
- * @param column2Value the new value for column 2
- * @param rowIndex 0-based into of row to change
- */
-static void ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value, int rowIndex) {
-	wxListItem column1;
-	column1.SetColumn(0);
-	column1.SetId(rowIndex);
-	column1.SetText(column1Value);
-	list->SetItem(column1);
-	
-	wxListItem column2;
-	column2.SetId(rowIndex);
-	column2.SetColumn(1);
-	column2.SetText(column2Value);
-	list->SetItem(column2);
-}
-
-/**
- * extract the column values from the given list control
- * @param list the list to extract from
- * @param column1Value will be filled with the contents of (rowIndex, 0)
- * @param column2Value will be filled with the contents of (rowIndex, 1)
- * @param rowIndex the row to get
- */
-static void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
-	
-	// need to set the mask flag; otherwise in MSW the text will not be set
-	// this assumes the given list is set to LC_REPORT mode
-	wxListItem column1,
-		column2;
-	column1.SetColumn(0);
-	column1.SetId(rowIndex);
-	column1.m_mask = wxLIST_MASK_TEXT;
-	column2.SetColumn(1);
-	column2.SetId(rowIndex);
-	column2.m_mask = wxLIST_MASK_TEXT;
-
-	if (list->GetItem(column1) && list->GetItem(column2)) {
-		column1Value = column1.GetText();
-		column2Value = column2.GetText();
-	}
-}
 
 const wxEventType t4p::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 

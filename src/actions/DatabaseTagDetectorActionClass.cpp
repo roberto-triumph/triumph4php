@@ -159,7 +159,7 @@ void t4p::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event)
 		t4p::EditorLogError(t4p::ERR_MISSING_PHP_EXTENSIONS, msg);
 	}
 	else {
-		t4p::EditorLogError(t4p::WARNING_OTHER, event.GetString());
+		t4p::EditorLogErrorFix(event.GetString(), _("There is an unexpected error in the detector. Was it modified?"));
 	}
 	if (ParamsQueue.empty()) {
 		SignalEnd();

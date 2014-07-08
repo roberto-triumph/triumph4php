@@ -531,7 +531,7 @@ std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::v
 	} catch (std::exception& e) {
 		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
-		t4p::EditorLogError(t4p::WARNING_OTHER, msg);
+		t4p::EditorLogError(t4p::ERR_TAG_READ, msg);
 	}
 	return allDbTags;
 }

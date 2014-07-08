@@ -44,11 +44,12 @@
 // This causes problems when Scintilla is handling UTF-8 documents.
 // There is a method called GetSafeSubString() that will help you in this regard.
 
-const int t4p::CODE_CONTROL_LINT_RESULT_MARKER = 2;
-const int t4p::CODE_CONTROL_LINT_RESULT_MARGIN = 2;
-const int t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 3;
-const int t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 4;
-const int t4p::CODE_CONTROL_BOOKMARK_MARKER = 5;
+const int t4p::CODE_CONTROL_LINT_RESULT_MARKER = 1;
+const int t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER = 2;
+const int t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER = 3;
+const int t4p::CODE_CONTROL_BOOKMARK_MARKER = 4;
+const int t4p::CODE_CONTROL_EXECUTION_MARKER = 5;
+const int t4p::CODE_CONTROL_BREAKPOINT_MARKER = 6;
 
 // the indicator to show squiggly lines for lint errors
 const int t4p::CODE_CONTROL_INDICATOR_PHP_LINT = 0;
@@ -408,9 +409,15 @@ void t4p::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 		event.Skip();
 		return;
 	}
-	if (event.GetMargin() == CodeControlOptionsClass::MARGIN_CODE_FOLDING) {
+	if (event.GetMargin() == t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING) {
 		int line = LineFromPosition(event.GetPosition());
 		ToggleFold(line);
+	}
+	else {
+
+		// features will not be interested in  the margin click of the code
+		// folding markers
+		EventSink.Publish(event);
 	}
 }
 
@@ -741,6 +748,48 @@ void t4p::CodeControlClass::BookmarkClearAt(int lineNumber) {
 	
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDelete(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
+}
+
+bool t4p::CodeControlClass::ExecutionMarkAt(int lineNumber) {
+	
+	// given line is 1-based, scintilla lines are 0-based
+	MarkerDeleteAll(CODE_CONTROL_EXECUTION_MARKER);
+	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_EXECUTION_MARKER);
+	EnsureVisible(lineNumber - 1);
+	return newHandle != -1;
+}
+
+
+void t4p::CodeControlClass::ExecutionMarkRemove() {
+	MarkerDeleteAll(CODE_CONTROL_EXECUTION_MARKER);
+}
+
+bool t4p::CodeControlClass::BreakpointMarkAt(int lineNumber, int& handle) {
+	
+	// given line is 1-based, scintilla lines are 0-based
+	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BREAKPOINT_MARKER);
+	if (newHandle != -1) {
+		handle = newHandle;
+	}
+	return newHandle != -1;
+}
+
+void t4p::CodeControlClass::BreakpointRemove(int lineNumber) {
+
+	// given line is 1-based, scintilla lines are 0-based
+	MarkerDelete(lineNumber - 1, CODE_CONTROL_BREAKPOINT_MARKER);
+}
+
+void t4p::CodeControlClass::BreakpointRemoveAll() {
+	MarkerDeleteAll(CODE_CONTROL_BREAKPOINT_MARKER);
+}
+
+int t4p::CodeControlClass::BreakpointGetLine(int handle) {
+	int line = MarkerLineFromHandle(handle);
+	if (line >= 0) {
+		line++;
+	}
+	return line;
 }
 
 void t4p::CodeControlClass::SetCurrentDbTag(const t4p::DatabaseTagClass& currentDbTag) {

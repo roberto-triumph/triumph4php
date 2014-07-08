@@ -162,6 +162,29 @@ CURL_LIB_DIR = os.pathsearch('libcurl.so',
 	"/usr/lib/i386-linux-gnu/"
 );
 
+-- will look for boost in these directories
+BOOST_DEBUG_INCLUDE_DIR = '/usr/lib'
+
+BOOST_DEBUG_LIB_DIR = os.pathsearch('libboost_system.so', 
+	"/usr/lib",
+	"/usr/lib64", 
+	"/usr/lib/x86_64-linux-gnu/",
+	"/usr/lib/i386-linux-gnu/"
+);
+BOOST_DEBUG_LIB =  BOOST_DEBUG_LIB_DIR.. '/libboost_system.so'
+BOOST_DEBUG_BIN_DIR = BOOST_DEBUG_LIB_DIR
+  
+BOOST_RELEASE_INCLUDE_DIR = '/usr/include'
+BOOST_RELEASE_LIB_DIR = os.pathsearch('libboost_system.so', 
+	"/usr/lib",
+	"/usr/lib64", 
+	"/usr/lib/x86_64-linux-gnu/",
+	"/usr/lib/i386-linux-gnu/"
+);
+BOOST_RELEASE_LIB = BOOST_RELEASE_LIB_DIR .. '/libboost_system.so'
+BOOST_RELEASE_BIN_DIR = BOOST_RELEASE_LIB
+
+
 -- location where the makefiles / codelist solution files will be placed
 BUILD_SCRIPTS_DIR = os.getenv("T4P_BUILD_SCRIPTS_DIR");
 if (not BUILD_SCRIPTS_DIR) then

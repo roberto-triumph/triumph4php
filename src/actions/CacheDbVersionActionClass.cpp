@@ -72,7 +72,7 @@ void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
 					wxString error;
 					bool good = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
 					if (!good) {
-						t4p::EditorLogError(t4p::WARNING_OTHER, error);
+						t4p::EditorLogError(t4p::ERR_TAG_READ, error);
 					}
 				}
 				Session.close();
@@ -122,7 +122,7 @@ void t4p::DetectorCacheDbVersionActionClass::BackgroundWork() {
 					wxString error;
 					bool good = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), Session, error);
 					if (!good) {
-						t4p::EditorLogError(t4p::WARNING_OTHER, error);
+						t4p::EditorLogError(t4p::ERR_TAG_READ, error);
 					}
 				}
 				Session.close();

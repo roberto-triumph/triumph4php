@@ -1060,7 +1060,7 @@ void t4p::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event
 		App.Sequences.Build(actions);
 	}
 	else {
-		t4p::EditorLogWarning(t4p::WARNING_OTHER, 
+		t4p::EditorLogWarningFix("Template Error", 
 			_("Need to choose a URL to detect templates for. Template files feature depends on the URL detectors feature."));
 	}
 }

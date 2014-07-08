@@ -29,7 +29,8 @@ function prepMysql()
 	
 		mysqlZip = "lib/mysql-connector-c-noinstall-6.0.2-win32.zip";
 		mysqlDownload = "http://dev.mysql.com/get/Downloads/Connector-C/mysql-connector-c-noinstall-6.0.2-win32.zip"
-		existenceOrDownloadExtract(mysqlZip, mysqlDownload, "Downloading libMySQL dependency");
+		extractedDir = 'lib/mysql-connector-c-noinstall-6.0.2-win32'
+		existenceOrDownloadExtract(mysqlZip, extractedDir, mysqlDownload, "Downloading libMySQL dependency");
 		mysqlLibPath = normalizepath(MYSQL_LIB_DIR .. "*.dll")
 		batchexecute(normalizepath(""), {
 			"xcopy /S /Y " .. mysqlLibPath  .. " \"Debug\\\"",

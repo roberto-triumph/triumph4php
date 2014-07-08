@@ -100,8 +100,10 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 			msg = t4p::MessageWithFix(_("Settings directory does not exist:") + extra,
 				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to Edit ... Preferences and choose a different settings directory."));
 			break;
-		case t4p::WARNING_OTHER:
-			msg = extra;
+		case t4p::ERR_TAG_READ:
+			msg = t4p::MessageWithFix(_("Could not read tag sqlite file:") + extra,
+				_("Does the file exist?\nDo you have access rights?\nRestore the settings directory \nOR go to Edit ... Preferences and choose a different settings directory."));
+			break;
 		default:
 			break;
 	}
@@ -112,8 +114,18 @@ void t4p::EditorLogError(t4p::Errors error, wxString extra) {
 	wxLogError(MessageFromError(error, extra));
 }
 
+void t4p::EditorLogErrorFix(wxString error, wxString fixes) {
+	wxASSERT_MSG(!fixes.empty(), "fixes must be given");
+	wxLogError(t4p::MessageWithFix(error, fixes));
+}
+
 void t4p::EditorLogWarning(t4p::Errors error, wxString extra) {
 	wxLogWarning(MessageFromError(error, extra));
+}
+
+void t4p::EditorLogWarningFix(wxString warning, wxString fixes) {
+	wxASSERT_MSG(!fixes.empty(), "fixes must be given");
+	wxLogWarning(t4p::MessageWithFix(warning, fixes));
 }
 
 wxString t4p::MessageWithFix(wxString message, wxString fix) {

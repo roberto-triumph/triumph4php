@@ -60,10 +60,11 @@ extern const wxEventType EVT_MOTION_ALT;
 // margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
 // margin 2 for lint error markers, margin 3 got search hits
 extern const int CODE_CONTROL_LINT_RESULT_MARKER;
-extern const int CODE_CONTROL_LINT_RESULT_MARGIN;
 extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
 extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
 extern const int CODE_CONTROL_BOOKMARK_MARKER;
+extern const int CODE_CONTROL_EXECUTION_MARKER;
+extern const int CODE_CONTROL_BREAKPOINT_MARKER;
 
 // the indicator to show squiggly lines for lint errors
 extern const int CODE_CONTROL_INDICATOR_PHP_LINT;
@@ -396,6 +397,15 @@ public:
 	 *         will be false on out-of-memory error, invalid line number.
 	 */
 	bool BookmarkMarkAt(int lineNumber, int& handle);
+
+	/**
+	 * Remove a single marking caused by BookmarkMark() at the
+	 * given line
+	 * Markings are moved from this window only.
+	 *
+	 * @param  bookmark at line number will be removed, 1-based
+	 */
+	void BookmarkClearAt(int lineNumber);
 	
 	/**
 	 * @param int the bookmark "handle", used to query the 
@@ -412,13 +422,51 @@ public:
 	void BookmarkClearAll();
 	
 	/**
-	 * Remove a single marking caused by BookmarkMark() at the
-	 * given line
-	 * Markings are moved from this window only.
-	 *
-	 * @param  bookmark at line number will be removed, 1-based
+	 * Marks the given line as the current line being executed.
+	 * All other marks of this type are removed from this control.
+	 * @param  int line number to be marked, 1-based
+	 * @return bool TRUE if mark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
 	 */
-	void BookmarkClearAt(int lineNumber);
+	bool ExecutionMarkAt(int lineNumber);
+
+	/**
+	 * Removes the exection mark from this control.
+	 */
+	void ExecutionMarkRemove();
+	
+	/**
+	 * Put a breakpoint marker at the given line
+	 * @param  int line number to be marked, 1-based
+ 	 * @param [out] int the bookmark "handle", used to query the 
+	 *        the line of the bookmark when text has been added/removed
+	 *        from the document
+	 * @return bool TRUE if mark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
+	 */
+	bool BreakpointMarkAt(int lineNumber, int& handle);
+
+	/**
+	 * Clears the breakpoint marker at the given line
+	 * @param  int line number to be marked, 1-based
+	 * @return bool TRUE if mark was added, false otherwise.
+	 *         will be false on out-of-memory error, invalid line number.
+	 */
+	void BreakpointRemove(int lineNumber);
+	
+	/**
+	 * Remove all markings caused by BreakpointMarkAt().
+	 * Markings are moved from this window only.
+	 */
+	void BreakpointRemoveAll();
+	
+	/**
+	 * @param int the bookmark "handle", used to query the 
+	 *        the line of the breakpoint when text has been added/removed
+	 *        from the document
+	 * @return int line number where the breakpoint is now located. 1-based
+	 */
+	int BreakpointGetLine(int handle);
 
 	/**
 	 * Set the connection to use to fetch the SQL table metadata

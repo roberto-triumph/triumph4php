@@ -37,6 +37,13 @@ void t4p::EventSinkClass::RemoveAllHandlers() {
 	Handlers.clear();
 }
 
+void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {	
+	std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
+	if (it != Handlers.end()) {
+		Handlers.erase(it);
+	}
+}
+
 void t4p::EventSinkClass::Publish(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
 		
@@ -51,6 +58,35 @@ void t4p::EventSinkClass::Post(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
 		wxPostEvent(Handlers[i], event);
 	}
+}
+
+t4p::EventSinkLockerClass::EventSinkLockerClass() 
+: EventSink() 
+, Mutex() {
+}
+
+void t4p::EventSinkLockerClass::PushHandler(wxEvtHandler *handler) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	EventSink.PushHandler(handler);
+}
+
+void t4p::EventSinkLockerClass::RemoveAllHandlers() {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	EventSink.RemoveAllHandlers();
+}
+
+void t4p::EventSinkLockerClass::RemoveHandler(wxEvtHandler *handler) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	EventSink.RemoveHandler(handler);
+}
+
+void t4p::EventSinkLockerClass::Post(wxEvent& event) {
+	wxMutexLocker locker(Mutex);
+	wxASSERT(locker.IsOk());
+	EventSink.Post(event);
 }
 
 t4p::CodeControlEventClass::CodeControlEventClass(wxEventType type, t4p::CodeControlClass* codeControl)
@@ -141,7 +177,7 @@ const wxEventType t4p::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
-
+const wxEventType t4p::EVENT_CMD_APP_USER_ATTENTION = wxNewEventType();
 const long t4p::ID_TOOLS_NOTEBOOK = 1003;
 const long t4p::ID_OUTLINE_NOTEBOOK = 1002;
 

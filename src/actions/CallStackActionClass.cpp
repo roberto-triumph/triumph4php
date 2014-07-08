@@ -59,7 +59,7 @@ void t4p::CallStackActionClass::BackgroundWork() {
 	// build the call stack then save it to a temp file
 	if (CallStack.Build(StartFileName, StartClassName, StartMethodName, Version, lastError)) {
 		if (!DetectorDbFileName.IsOk()) {
-			t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
+			t4p::EditorLogWarning(t4p::ERR_TAG_READ, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
 		}
 		else {
 			std::string stdDbName = t4p::WxToChar(DetectorDbFileName.GetFullPath());
@@ -68,7 +68,7 @@ void t4p::CallStackActionClass::BackgroundWork() {
 			// the DetectorCacheDbVersionActionClass
 			soci::session session(*soci::factory_sqlite3(), stdDbName);
 			if (!CallStack.Persist(session)) {
-				t4p::EditorLogWarning(t4p::WARNING_OTHER, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
+				t4p::EditorLogWarning(t4p::ERR_TAG_READ, _("Could not persist call stack file in ") + DetectorDbFileName.GetFullPath());
 			}
 		}
 	}

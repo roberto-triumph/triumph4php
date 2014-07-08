@@ -77,6 +77,8 @@ private:
 
 	void OnAppFileCreated(wxCommandEvent& event);
 
+	void OnAppRequestUserAttention(wxCommandEvent& event);
+
 	/**
 	 * Need the frame to manipulate it
 	 */

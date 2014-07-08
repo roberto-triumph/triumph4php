@@ -44,6 +44,7 @@ dofile "premake_action_curl.lua"
 dofile "premake_action_icu.lua"
 dofile "premake_action_mysql.lua"
 dofile "premake_action_sqlite.lua"
+dofile "premake_action_boost.lua"
 dofile "premake_action_setupdev.lua"
 
 
@@ -89,7 +90,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
 		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", normalizepath(WX_CONFIG)) }
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { WX_LIB_DIR }
 		includedirs { WX_INCLUDE_DIRS_RELEASE }
@@ -105,7 +106,7 @@ function wxconfiguration(config, action)
 		links { WX_LIBS_RELEASE }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then
 		buildoptions { string.format("`%s --cxxflags --debug=no --unicode=yes`", normalizepath(WX_CONFIG)) }
-		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=no --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG)) }
 	end
 end
 
@@ -213,6 +214,59 @@ function curlconfiguration(config, action)
 	end
 end
 
+-- the boost configuration
+-- for MSW, we use the version we compiled with the boost action
+-- for linux, we use the system wide version
+function boostconfiguration(config, action)	
+	if action == "vs2008" and config == "Debug" then	
+		includedirs { BOOST_DEBUG_INCLUDE_DIR }
+		libdirs { BOOST_DEBUG_LIB_DIR }
+		
+		-- we dont want asio to use boost.time or boost.regex since we
+		-- don't otherwise use them
+		-- WIN32_LEAN_AND_MEAN to prevent "winsock.h already defined" errors
+		-- when putting wxWidgets and asio together
+		-- _WIN32_WINNT=0x0501 to prevent asio warnings 
+		-- "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately"
+		-- note 2: 
+		-- define BOOST_ALL_DYN_LINK so that boost does not attempt to link
+		-- against the static version of the libs. boost has some
+		-- #pragma magic that attempts to load in the appropriate version
+		-- of the library
+		-- note 3.
+		-- we don't need to specify a link {} because boost has some
+		-- #pragma magic that attempts to load in the appropriate version
+		-- of the library, AND because boost's shared lib is not
+		-- prefixed with "lib" so "link {}" cannot be used as premake
+		-- always adds the prefix.
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB', 
+			'WIN32_LEAN_AND_MEAN' ,
+			'_WIN32_WINNT=0x0501',
+			'BOOST_ALL_DYN_LINK'
+		}
+	elseif action == "vs2008" and config == "Release" then	
+		includedirs { BOOST_RELEASE_INCLUDE_DIR }
+		libdirs { BOOST_RELEASE_LIB_DIR }
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB', 
+			'WIN32_LEAN_AND_MEAN', 
+			'_WIN32_WINNT=0x0501',
+			'BOOST_ALL_DYN_LINK'
+		}
+	elseif action == "gmake" or action == "codelite" then
+		includedirs { BOOST_INCLUDE_DIR }
+		libdirs { BOOST_LIB_DIR }
+		links { "boost_system" }
+		defines { 
+			'BOOST_DATE_TIME_NO_LIB', 
+			'BOOST_REGEX_NO_LIB'
+		}
+	end
+end
+
 function pickywarnings(action)
 	if action == "vs2008" then
 		flags { "FatalWarnings" }
@@ -274,6 +328,7 @@ solution "triumph4php"
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
 			curlconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 			
 			-- use the local update server in debug  
 			defines { 
@@ -287,6 +342,7 @@ solution "triumph4php"
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
 			curlconfiguration("Release", _ACTION)
+			boostconfiguration("Release", _ACTION)
 			
 			-- use the public update server in release
 			defines { 
@@ -338,11 +394,13 @@ solution "triumph4php"
 			sociconfiguration("Debug")
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 		configuration "Release"
 			pickywarnings(_ACTION)
 			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 
 	project "tag_finder_profiler"
 		language "C++"
@@ -416,12 +474,14 @@ solution "triumph4php"
 			icuconfiguration("Debug", _ACTION)
 			wxconfiguration("Debug", _ACTION)
 			wxappconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 		configuration { "Release" }
 			pickywarnings(_ACTION)
 			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
 			wxappconfiguration("Release", _ACTION)
+			boostconfiguration("Debug", _ACTION)
 
 	project "find_in_files_profiler"
 		language "C++"
