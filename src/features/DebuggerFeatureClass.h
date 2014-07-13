@@ -474,6 +474,12 @@ public:
 	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
 
 	void ClearStack();
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 
@@ -494,6 +500,12 @@ public:
 	void ClearGlobalVariables();
 
 	void VariableAddChildren(const t4p::DbgpPropertyClass& variable);
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 
@@ -579,6 +591,12 @@ public:
 	 */
 	void AppendError(const wxString& error);
 	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
+	
 private:
 
 	void OnEvalClick(wxCommandEvent& event);
@@ -616,6 +634,12 @@ public:
 	void SelectVariablePanel();
 	void SelectBreakpointPanel();
 	void SelectEvalPanel();
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 };
