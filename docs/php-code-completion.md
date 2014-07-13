@@ -1,4 +1,4 @@
-[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)
+[Table Of Contents](/#toc) | [Next - Debugger](/debugger/)
 
 
 # PHP Code Completion #
@@ -120,4 +120,4 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	$my->// autocompletion will show methods of MyClass since $my is documented
 
 
-[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)
+[Table Of Contents](/#toc) | [Next - Debugger](/debugger/)
