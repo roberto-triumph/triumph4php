@@ -314,6 +314,23 @@ static UnicodeString ScopeString(const UnicodeString& className, const UnicodeSt
 	return className + UNICODE_STRING_SIMPLE("::") + functionName;
 }
 
+
+/**
+ * @return the "scope string" used throughout this class for anonymous functions (closures), in the 
+ *         Variables map and the ScopePositions map
+ *         this in only the "function name" portion of the scope
+ */
+static UnicodeString ScopeStringAnonymousFunction(const UnicodeString& methodName, int anonymousFunctionCount) {
+	// the scope string looks like this:
+	// class::method@@anonymousFunction1
+	//
+	wxString stdAnonymousFunctionPostfix = wxString::Format("@@anonymousFunction_%d", anonymousFunctionCount);
+	UnicodeString anonymousFunctionPostfix = t4p::WxToIcu(stdAnonymousFunctionPostfix);
+	
+	UnicodeString functionName = methodName + anonymousFunctionPostfix;
+	return functionName;
+}
+
 t4p::SymbolTableMatchErrorClass::SymbolTableMatchErrorClass()
 	: ErrorLexeme()
 	, ErrorClass()
@@ -377,12 +394,14 @@ void t4p::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableCla
 }
 
 t4p::SymbolTableClass::SymbolTableClass() 
-	: Parser()
+	: AnyExpressionObserverClass()
+	, Parser()
 	, Variables() {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
 	Parser.SetFunctionObserver(this);
 	Parser.SetVariableObserver(this);
+	Parser.SetExpressionObserver(this);
 }
 
 void t4p::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
@@ -401,6 +420,7 @@ void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, co
 void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 	const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
+	
 	std::vector<t4p::SymbolClass>& methodScope = GetScope(className, methodName);
 
 	// create the $this variable
@@ -500,6 +520,56 @@ void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, co
 	}
 }
 
+void t4p::SymbolTableClass::OnAnyExpression(pelet::ExpressionClass* expr) {
+	if (expr->ExpressionType != pelet::ExpressionClass::CLOSURE) {
+		return;
+	}
+	pelet::ClosureExpressionClass* closure = (pelet::ClosureExpressionClass*)expr;
+	
+	// anonymous functions have their own scope, so we given them their own unique
+	// name.
+	// the scope string looks like this:
+	// class::method@@anonymousFunction1
+	//
+	UnicodeString functionName = ScopeStringAnonymousFunction(
+		closure->Scope.MethodName, closure->Scope.GetAnonymousFunctionCount()
+	);
+
+	// loop through the closure's parameters and add them to the closure scope
+	// we need a "right hand side" for each variable, lets make an empty one
+	// for now
+	pelet::NewInstanceExpressionClass newCallExpr(closure->Scope);
+	for (size_t i = 0; i < closure->Parameters.size(); ++i) {
+		VariableFound(closure->Scope.NamespaceName, closure->Scope.ClassName, functionName,
+			*closure->Parameters[i], &newCallExpr, closure->Parameters[i]->Comment);
+	}
+	
+	// loop through the closure's lexical variables "use" variables and add them to the scope
+	for (size_t i = 0; i < closure->LexicalVars.size(); ++i) {
+		VariableFound(closure->Scope.NamespaceName, closure->Scope.ClassName, functionName,
+			*closure->LexicalVars[i], &newCallExpr, closure->Parameters[i]->Comment);
+	}
+	
+	// loop through the closure's inner statements to get variable assignments
+	for (size_t i = 0; i < closure->Statements.Size(); ++i) {
+		if (closure->Statements.TypeAt(i) == pelet::StatementClass::EXPRESSION) {
+			pelet::ExpressionClass* closureInnerExpr = (pelet::ExpressionClass*)closure->Statements.At(i);
+			if (pelet::ExpressionClass::ASSIGNMENT == closureInnerExpr->ExpressionType) {
+				pelet::AssignmentExpressionClass* assignment = (pelet::AssignmentExpressionClass*)closure->Statements.At(i);
+				VariableFound(expr->Scope.NamespaceName, expr->Scope.ClassName, functionName, 
+					assignment->Destination, assignment->Expression, assignment->Destination.Comment);
+			}
+			else if (pelet::ExpressionClass::ASSIGNMENT_LIST == closureInnerExpr->ExpressionType) {
+				pelet::AssignmentListExpressionClass* assignmentList = (pelet::AssignmentListExpressionClass*)closureInnerExpr;
+				for (size_t i = 0; i < assignmentList->Destinations.size(); ++i) {
+					VariableFound(expr->Scope.NamespaceName, expr->Scope.ClassName, functionName, 
+						assignmentList->Destinations[i], assignmentList->Expression, assignmentList->Destinations[i].Comment);
+				}
+			}
+		}
+	}
+}
+
 void t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	Variables.clear();
 	
@@ -533,7 +603,15 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 		// variables. This is just a SymbolTable search.
 		std::vector<t4p::SymbolClass> scopeSymbols;
 		std::map<UnicodeString, std::vector<t4p::SymbolClass>, t4p::UnicodeStringComparatorClass>::const_iterator it;
-		it = Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
+		
+		// if the scope that we are looking for is an anonymous function, take that into account
+		UnicodeString scopeString;
+		UnicodeString functionName = variableScope.MethodName;
+		if (variableScope.IsAnonymousScope()) {
+			functionName = ScopeStringAnonymousFunction(variableScope.MethodName, variableScope.GetAnonymousFunctionCount());
+		}
+		scopeString = ScopeString(variableScope.ClassName, functionName);
+		it = Variables.find(scopeString);
 		if (it != Variables.end()) {
 			scopeSymbols = it->second;
 		}
@@ -559,8 +637,17 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  t4p::SymbolTableMatchErrorClass& error) const {
 	std::vector<t4p::SymbolClass> scopeSymbols;
+	
+	// if the scope that we are looking for is an anonymous function, take that into account
+	UnicodeString scopeString;
+	UnicodeString functionName = variableScope.MethodName;
+	if (variableScope.IsAnonymousScope()) {
+		functionName = ScopeStringAnonymousFunction(variableScope.MethodName, variableScope.GetAnonymousFunctionCount());
+	}
+	scopeString = ScopeString(variableScope.ClassName, functionName);
+	
 	std::map<UnicodeString, std::vector<t4p::SymbolClass>, UnicodeStringComparatorClass>::const_iterator it = 
-		Variables.find(ScopeString(variableScope.ClassName, variableScope.MethodName));
+		Variables.find(scopeString);
 	if (it != Variables.end()) {
 		scopeSymbols = it->second;
 	}
@@ -846,6 +933,7 @@ void t4p::ScopeFinderClass::FunctionScope(const UnicodeString& namespaceName, co
 		Scope.MethodName = functionName;
 	}
 }
+
 
 void t4p::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos, pelet::ScopeClass& scope) {
 	Scope.Clear();
