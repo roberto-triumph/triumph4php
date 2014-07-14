@@ -8,12 +8,12 @@ detect the following errors:
 
 * Syntax error
 * Uninitialized variable
-* Unknow function/methods
+* Unknown function/methods
 
 #Philosophy#
 The triumph4php linter was built with 2 goals in mind: follow the rules of
 the PHP linter (`php -l`) to the letter; and prevent showing false positives
-whereever possible.  Most IDEs either show too many errors or not enough, 
+where ever possible.  Most IDEs either show too many errors or not enough, 
 leaving you to not use their linter feature.
 
 This philosophy is achieved:
@@ -41,11 +41,11 @@ triumph4php can check that source code conforms to either PHP 5.3
 or PHP 5.4 syntax.  The PHP version can be changed by going to
 Edit ... Preferences then choosing the PHP Lint Check tab.
 
-##Unitialized variables##
+##Uninitialized variables##
 triumph4php can check if a variable is being used before being
 initialized.  Such cases are not labeled as errors by PHP, you
 would need to run the code in order for PHP to raise a warning. triumph4php's
-linter checks for unitialized variables and labels it as an error.
+linter checks for Uninitialized variables and labels it as an error.
 It makes it very easy to spot bugs in the code.
 
 PHP is a very dynamic language, and you can create code in a way
@@ -80,7 +80,7 @@ The functions that triumph4php knows will bring in local variables:
 * include() / include_once()
 
 triumph4php will also not label variables in the global scope as uninitialized;
-this is because most templating systems use global variables that are defined 
+this is because most template systems use global variables that are defined 
 elsewhere; if triumph4php checked variables in the global scope then all
 of you template files would have errors!
 
@@ -93,7 +93,7 @@ right now: during function calls.  For example:
 		logDebug($myVar);
 	}
 
-Here, `$myVar` should be labelled as uninitialized, but triump4php's linter
+Here, `$myVar` should be labeled as uninitialized, but triump4php's linter
 does not do so.  There is a valid reason for this: PHP allows use of
 uninitialized variables that to be passed by reference and initialized
 by the function that is called. An example of this is the preg_match function
@@ -105,7 +105,7 @@ by the function that is called. An example of this is the preg_match function
 In this example, `$arrMatches` is not initialized in the code, but the
 function that is called initializes it.  
 
-Initially, triumph4php's linter had labelled this as an error. 
+Initially, triumph4php's linter had labeled this as an error. 
 However, while testing the linter against various open source projects, there
 was quite a bit of false positives since preg_match is a pretty
 common function and many people use the function like in the example.

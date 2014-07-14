@@ -11,7 +11,7 @@ be scrollable so that you can scroll down to view the entire comment.
 ##Help! I can't get Doc comments to show up##
   * Doc comments only work on files that are inside a [project](/projects/). 
   * Doc comments will be parsed out of the code.  This means that the 
-    file must not have PHP sytax errors.
+    file must not have PHP syntax errors.
   * For methods, the parser must know the class of a variable.  This
     is controlled with either a PHP type hint or a PHP DocBlock comment.
 	The parser can also recognize the class if the variable was instantiated

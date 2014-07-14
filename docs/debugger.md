@@ -2,7 +2,7 @@
 
 Triumph is a full-fledged Xdebug client.  It listens for incoming Xdebug connections and 
 can be used to step through code. Triumph also exposes an "eval" pane that allows you to 
-enter any arbritrary expressions
+enter any arbitrary expressions
 while you are stepping through a script.
 
 #Requirements#
@@ -18,9 +18,10 @@ A bit about how Xdebug debugging works:
    with the debugging client.
 4. Triumph sends commands to enable breakpoints and start the
    script.
-5. The script starts, when it hits a breakpoint then 
+5. The script starts, when it hits a break-point then 
    Xdebug tells the debugging client that the script
-   is paused, what file and what line the script is paused on.
+   is paused. Xdebug also sends the name of file and line number that the script 
+   is paused on.
 6. The user can inspect variables, set new breakpoints, or
    evaluate expressions. These actions are turned into
    Xdebug commands by Triumph.
@@ -29,7 +30,7 @@ A bit about how Xdebug debugging works:
 
 
 #Starting the debugger#
-By default, Triumph will *NOT* start listening for Xdebug connections are startup. You
+By default, Triumph will *NOT* start listening for Xdebug connections on program startup. You
 must click on the "Start Debugger" button in the toolbar.  You can change it so that
 Triumph starts listening for Xdebug connections if you want, but fair warning: this
 will cause Triumph to pause a little bit when exiting (because it has to stop
@@ -76,10 +77,10 @@ max. You can set this value to be higher if need be.
 
 ##Breakpoints Panel##
 The breakpoints panel shows all of the breakpoints that have been set on
-all files.  Each breakpoint has a flag to turn on/off the breakpoint
+all files.  Each break-point has a flag to turn on/off the break-point
 without deleting it. The breakpoints panel has buttons to toggle all
-breakpoints (turn them on or off).  You can double click on a breakpoint
-to open the file that the breakpoint is for.
+breakpoints (turn them on or off).  You can double click on a break-point
+to open the file that the break-point is for.
 
 ##Eval Panel##
 The eval panel allows you to enter any expression to be executed while the script 
@@ -101,21 +102,24 @@ the panel.
 Triumph will display as much of a variable as is configured in  "Max Children
 On Initial Load" and "Max Depth on Initial Load". See below for more info.
 
+*__TIP__: code completion and call tips are also functional in the eval source code
+panel!*
+
 ##Log Panel##
 The log panel shows the exact commands that are sent to Xdebug and the 
 exact responses that Triumph receives.  This is useful when determining if 
-Xdebug is attepmting to connect to Triumph.
+Xdebug is attempting to connect to Triumph.
 
 #True Remote Debugging#
 Triumph can achieve true remote debugging because it allows you to define
-where to look for filepaths that Xdebug is running.  Since Xdebug is running
+where to look for file-paths that Xdebug is running.  Since Xdebug is running
 remotely, it can be running on a remote machine, where the debugged
 script is not on the same location as your dev environment.  Another scenario
 is when you are using a Virtual Machine as a dev environment; you may be
-running ubuntu in a VM that is using a  MSW machine as a host; Triumph
+running Ubuntu in a VM that is using a  MSW machine as a host; Triumph
 can be running on the MSW host and accept commands from Xdebug running in 
-Ubuntu. Triumph will lookup user-defined Source Code mappings to 
-turn Xdebug file paths (in this case linux paths) into paths on the local
+Ubuntu. Triumph will look up user-defined Source Code mappings to 
+turn Xdebug file paths (in this case Linux paths) into paths on the local
 system (in this case Windows paths). 
 
 #Options#
@@ -126,11 +130,11 @@ You can go to Edit ... Preferences to configure a few Xdebug settings.
 - Max Children On Initial Load: The number of "children" that are fetched for each variable. 
   If this number is 100, then initially only the first 100 array key-value pairs are shown, 
   or the first 100 member variables for an object. You can set this to a high number
-  (>= 100 <= 1000) because Triumph cannot currently does not implment paging
+  (>= 100 <= 1000) because Triumph cannot currently does not implement paging
   of children.
 - Max Depth On Initial Load: The number of levels that are fetched for each variable. If 
   this number is 2, then for arrays of objects, we initially load the array's key-value 
-  pairs AND each object's chidren.
+  pairs AND each object's children.
 - Listen On IDE Start: If checked, then Triumph will start listening for Xdebug connections
   when Triumph starts.
 - Break On Script Start: If checked, then Triumph will pause the debugged script at
@@ -148,17 +152,18 @@ You can go to Edit ... Preferences to configure a few Xdebug settings.
   the local path is calculated to be c:\wamp\products\show.php.
 
 #Help! I can't get debugging to work!#
-You should ensure that the following:
+You should ensure the following:
 
 - Xdebug is configured in php.ini (the php.ini that the web server is using)
 - Use `phpinfo()` to confirm that Xdebug is enabled, remote debugging 
   is enabled, and the appropriate remote host, remote port are being used. It 
-  may also be helpful to turn on xdebug logs.
-- Make sure that Triumph is listening on the correct port.  Use `netstat` to
+  may also be helpful to turn on Xdebug logs.
+- Make sure that Triumph is listening on the correct port (the port that is 
+  set in the php.ini `xdebug.remote_port` setting).  Use `netstat` to
   confirm that Triumph is listening for connections. If not, you need to
   click on the "Start Debugger" button.
 - if the above three items check out OK, you can then inspect the 
-  xdebug logs and/or Triumph's debugger log panel to see the contents
+  Xdebug logs and/or Triumph's debugger log panel to see the contents
   being sent back and forth. Specifically, look at the file paths being
   returned by Xdebug or sent over by Triumph, you may need to add a source
   code mapping.

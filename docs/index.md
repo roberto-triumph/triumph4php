@@ -54,5 +54,5 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [Template File Detectors](/template-file-detectors/)
   * [What's next](/what-next/)
 
-# Apendix #
+# Appendix #
   * [Compiling triumph4php](/compiling/)

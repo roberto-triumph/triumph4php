@@ -9,13 +9,13 @@ following:
 1. Check for new versions
 
 	triumph4php can check for new versions of the editor.  Version checking requires an 
-	active internet connection. If enabled, version update checks will be done once a week.
+	active Internet connection. If enabled, version update checks will be done once a week.
 
 2. Location of settings
 
 	The location where triumph4php can be store its settings is configurable.
 	By default, triumph will store its configuration in the user data directory
-	(/home/user/.triumph4php on linux, C:\Users\user\AppData\Roaming\.triumph4php
+	(/home/user/.triumph4php on Linux, C:\Users\user\AppData\Roaming\.triumph4php
 	on windows). You can choose to store the configuration in another directory,
 	or in the same directory as the executable.  Storing the configuration
 	in the same directory as the executable is known as "portable" executable; you
@@ -29,13 +29,13 @@ following:
 	to determine which files contain PHP, SQL, and CSS source code. You can change the 
 	file extensions if desired.
 	
-	Each input can contain 1 or more wilcard strings. 
+	Each input can contain 1 or more wild card strings. 
 	
-	The allowed wildcard characters are:
+	The allowed wild card characters are:
 	
 	* \* : Will match on zero or more characters
 	* ? : Will match on zero or one character
-	* 	; : Separator among multiple wildcards
+	* 	; : Separator among multiple wild cards
 	
 	
 	For example, the value `"*.php;*.phtml` will match files with the extension .php or the 
@@ -49,9 +49,9 @@ following:
 
 	The PHP executable is used by triumph4php when running scripts. It is also used when 
 	running framework detection scripts. If you are running on a Windows PC, choose 
-	php-win.exe. On linux, choose php.
+	php-win.exe. On Linux, choose php.
 	
-	The version dropdown will determine which version of PHP triumph4php will use for source 
+	The version drop-down will determine which version of PHP triumph4php will use for source 
 	code parsing. Choose `Auto` to have triumph4php use the same version as the PHP 
 	executable; or one of the other versions to use have triumph4php use a different version.
 	Choosing PHP 5.4 will enable parsing of traits, it will also parse the `use`

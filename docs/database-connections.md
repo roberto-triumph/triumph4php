@@ -15,7 +15,7 @@ can be enabled or disabled.  When a SQL connection is enabled, several
 things happen:
 
 1. The connection can be used to perform queries 
-2. The database metadata is grabbed from the connection. This allows the
+2. The database meta data is grabbed from the connection. This allows the
    [total search](/total-search/) dialog to show a list of matching
    database tables; the total search dialog is able to quickly
    open a database table or show the database table's schema.

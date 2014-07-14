@@ -10,7 +10,7 @@ type in text that changes the line of the bookmark, the bookmark will update its
 and will point to the new line and not the line that was originally bookmarked. For
 example, let's say you bookmarked the beginning of a  function `printUser` but 
 you end up adding another function `printGroups` before `printUser`. When you cycle
-bookmarks, the bookmark will take you to the beginnin of the `printUser` function.
+bookmarks, the bookmark will take you to the beginning of the `printUser` function.
 
 Bookmarks persist even if you close files. As you cycle through bookmarks, if the
 bookmark is for a file that is not opened the file will be opened.
