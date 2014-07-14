@@ -112,6 +112,8 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 	try {
 		acceptor.open(boost::asio::ip::tcp::v4());
 		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), Port));
+		boost::asio::ip::tcp::acceptor::reuse_address option(true);
+		acceptor.set_option(option);
 		acceptor.listen();
 	} 
 	catch (std::exception& e) {
