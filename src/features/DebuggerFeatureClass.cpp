@@ -41,6 +41,8 @@
 static int ID_PANEL_DEBUGGER = wxNewId();
 static int ID_ACTION_DEBUGGER = wxNewId();
 static int ID_PANEL_DEBUGGER_STACK = wxNewId();
+static int ID_EVAL_PANEL_RUN = wxNewId();
+static int ID_EVAL_PANEL_CODE_COMPLETE = wxNewId();
 
 /**
  * xdebug returns files in form
@@ -2042,9 +2044,16 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 	t4p::CodeControlEventClass evt(t4p::EVENT_APP_FILE_NEW, CodeCtrl);
 	Feature.App.EventSink.Publish(evt);
 	
-	// we want to capture CTRL+ENTER
-	// so we bind on KeyDown
-	CodeCtrl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(t4p::DebuggerEvalPanelClass::OnCodeKeyDown), NULL, this);
+	// we want to capture CTRL+ENTER, CTRL+SPACE
+	// shortcuts 
+	// use an accelerator table so that the code completion works 
+	// inside of this panel and won't get captured by the global menu
+	// shortcuts
+	wxAcceleratorEntry entries[5];
+	entries[0].Set(wxACCEL_CMD, WXK_RETURN, ID_EVAL_PANEL_RUN);
+	entries[1].Set(wxACCEL_CMD, WXK_SPACE, ID_EVAL_PANEL_CODE_COMPLETE);
+	wxAcceleratorTable table(2, entries);
+    CodeCtrl->SetAcceleratorTable(table);
 	
 	wxPlatformInfo platform;
 	int os = platform.GetOperatingSystemId();
@@ -2065,7 +2074,7 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 }
 
 t4p::DebuggerEvalPanelClass::~DebuggerEvalPanelClass() {
-	CodeCtrl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(t4p::DebuggerEvalPanelClass::OnCodeKeyDown), NULL, this);
+	
 }
 
 void t4p::DebuggerEvalPanelClass::ResetStatus(bool active) {
@@ -2130,13 +2139,11 @@ void t4p::DebuggerEvalPanelClass::PrettyPrint(const t4p::DbgpPropertyClass& prop
 	}
 }
 
-void t4p::DebuggerEvalPanelClass::OnClearClick(wxCommandEvent& event)
-{
+void t4p::DebuggerEvalPanelClass::OnClearClick(wxCommandEvent& event) {
 	ExprResult->Clear();
 }
 
-void t4p::DebuggerEvalPanelClass::OnEvalClick(wxCommandEvent& event)
-{
+void t4p::DebuggerEvalPanelClass::OnEvalClick(wxCommandEvent& event) {
 	wxString code = CodeCtrl->GetText();
 	if (code.Find(InitialCode) == 0) {
 		code = code.Mid(InitialCode.length());
@@ -2148,21 +2155,21 @@ void t4p::DebuggerEvalPanelClass::OnEvalClick(wxCommandEvent& event)
 	Feature.CmdEvaluate(code);
 }
 
-void t4p::DebuggerEvalPanelClass::OnCodeKeyDown(wxKeyEvent& event) {
-	if (event.GetModifiers() & WXK_ALT && event.GetKeyCode() == WXK_RETURN) {
-		wxString code = CodeCtrl->GetText();
-		if (code.Find(InitialCode) == 0) {
-			code = code.Mid(InitialCode.length());
-		}
-		code.Trim().Trim(true);
-		ExprResult->AppendText(code);
-		ExprResult->AppendText(wxT("\n"));
-		
-		Feature.CmdEvaluate(code);
+void t4p::DebuggerEvalPanelClass::OnCmdRun(wxCommandEvent& event) {
+	wxString code = CodeCtrl->GetText();
+	if (code.Find(InitialCode) == 0) {
+		code = code.Mid(InitialCode.length());
 	}
-	event.Skip();
+	code.Trim().Trim(true);
+	ExprResult->AppendText(code);
+	ExprResult->AppendText(wxT("\n"));
+	
+	Feature.CmdEvaluate(code);
 }
-
+	
+void t4p::DebuggerEvalPanelClass::OnCmdComplete(wxCommandEvent& event) {
+	CodeCtrl->HandleAutoCompletion();
+}
 
 const wxEventType t4p::EVENT_DEBUGGER_SHOW_FULL = wxNewEventType();
 
@@ -2234,4 +2241,9 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(t4p::DebuggerBreakpointPanelClass, DebuggerBreakpointPanelGeneratedClass)
 	EVT_DATAVIEW_ITEM_ACTIVATED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemActivated)
 	EVT_DATAVIEW_ITEM_VALUE_CHANGED(wxID_ANY, t4p::DebuggerBreakpointPanelClass::OnItemValueChanged)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(t4p::DebuggerEvalPanelClass, DebuggerEvalPanelGeneratedClass)
+	EVT_MENU(ID_EVAL_PANEL_CODE_COMPLETE , t4p::DebuggerEvalPanelClass::OnCmdComplete)
+	EVT_MENU(ID_EVAL_PANEL_RUN, t4p::DebuggerEvalPanelClass::OnCmdRun)
 END_EVENT_TABLE()

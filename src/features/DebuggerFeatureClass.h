@@ -609,7 +609,8 @@ private:
 	void OnEvalClick(wxCommandEvent& event);
 	void OnClearClick(wxCommandEvent& event);
 	void OnCode(wxStyledTextEvent& event);
-	void OnCodeKeyDown(wxKeyEvent& event);
+	void OnCmdRun(wxCommandEvent& event);
+	void OnCmdComplete(wxCommandEvent& event);
 	
 	void PrettyPrint(const t4p::DbgpPropertyClass& prop);
 
@@ -618,6 +619,8 @@ private:
 	t4p::CodeControlClass* CodeCtrl;
 	
 	wxString InitialCode;
+	
+	DECLARE_EVENT_TABLE()
 	
 };
 
