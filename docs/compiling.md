@@ -19,6 +19,7 @@ development between Linux and Windows by generating Codelite / Makefile / Visual
  * [SQLite](http://www.sqlite.org)  triumph4php uses SQLite to store parsed classes and methods.
  * [CURL](http://curl.haxx.se/) triumph4php uses curl to check for new versions of triumph4php
  * [Git Client](http://git-scm.com/): triumph4php uses Git for source control.
+ * [Boost ASIO](http://think-async.com/): triumph4php uses the ASIO library to open socket connections to listen for Xdebug callbacks.
 
 #Development Tools#
    * [codelite](http://codelite.org) - C++ IDE for Linux
@@ -81,7 +82,7 @@ to an hour, depending on your machine's processing power.
     sudo apt-get install libicu48 libicu-dev libicu48-dbg libmysqlclient-dev \
 	                     re2c bison CMake git libtool php5-cli \
 						ia32-libs sqlite3 libsqlite3-dev libsqlite3-0-dbg \
-						libcurl3-dev libgtk2.0-dev
+						libcurl3-dev libgtk2.0-dev libasio-dev libboost-system-dev
 						
 ##Step 2: Download the development tools##
 						
