@@ -1,6 +1,13 @@
 Triumph 4 PHP ChangeLog
 =======================
 
+#Version 5.0.0#
+* Triumph is now a full Xdebug client (Linux, MSW)
+* Triumph can be used for remote Xdebug debugging (Linux, MSW)
+* Code completion and call tips now work inside closures (Linux, MSW)
+* Better error message when the triumph settings directory is not
+  found or is not writable (Linux, MSW)
+
 #Version 0.4.6#
 * Editor colors dialog under Edit -> preferences -> Editor Styles & Colors
   was not saving colors. (Linux, MSW)
