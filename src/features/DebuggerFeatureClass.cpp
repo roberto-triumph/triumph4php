@@ -431,7 +431,7 @@ t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 
 void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* menu = new wxMenu();
-	menu->AppendCheckItem(t4p::MENU_DEBUGGER + 0, _("Start Listening for Debugger"), 
+	menu->Append(t4p::MENU_DEBUGGER + 0, _("Start Listening for Debugger"), 
 			_("Opens a server socket to listen for incoming xdebug connections"));
 	menu->Append(t4p::MENU_DEBUGGER + 8, _("Stop Listening for Debugger"), 
 		_("Closes the server socket that listens for incoming xdebug connections"));
@@ -528,6 +528,15 @@ void t4p::DebuggerFeatureClass::OnDebuggerListenError(wxThreadEvent& event) {
 			+ _("OR Go to Edit ... Preferences ... Debugger and choose a different port to listen on.\n")
 			+ _("In this case you will need to change your php.ini setting xdebug.remote_port.")
 		);
+}
+
+void t4p::DebuggerFeatureClass::OnDebuggerListenStart(wxThreadEvent& event) {
+	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
+	if (!window) {
+		return;
+	}
+	t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
+	panel->LogPanel->Append(wxString::Format("Triumph has started listening on port %d ...", event.GetInt()));
 }
 
 
@@ -2214,6 +2223,7 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_DEBUGGER_LOG(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerLog)
 	EVT_DEBUGGER_SOCKET_ERROR(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerSocketError)
 	EVT_DEBUGGER_LISTEN_ERROR(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerListenError)
+	EVT_DEBUGGER_LISTEN(ID_ACTION_DEBUGGER, t4p::DebuggerFeatureClass::OnDebuggerListenStart)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_DEBUGGER_SHOW_FULL, t4p::DebuggerFeatureClass::OnDebuggerShowFull)
 END_EVENT_TABLE()
 

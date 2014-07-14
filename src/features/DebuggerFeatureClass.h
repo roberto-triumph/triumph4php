@@ -359,6 +359,13 @@ private:
 	 * error
 	 */
 	void OnDebuggerListenError(wxThreadEvent& event);
+	
+	/**
+	 * this is an additional debug engine handler, we log a success
+	 * message when Triumph successfully start listening on
+	 * the port.
+	 */
+	void OnDebuggerListenStart(wxThreadEvent& event);
 
 	/**
 	 * send a command to the debug engine.  This is an asynchronous

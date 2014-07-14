@@ -120,8 +120,16 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 		PostEvent(errEvt);
 
 		// cannot bind to port, just let the thread die.
+		// no longer need to listen for commands
+		// we need to this since this object will be deleted after
+		// we return from this method.
+		EventSinkLocker.RemoveHandler(this);
 		return;
 	}
+	
+	wxThreadEvent startEvt(t4p::EVENT_DEBUGGER_LISTEN, GetEventId());
+	startEvt.SetInt(Port);
+	PostEvent(startEvt);
 
 	while (!IsCancelled()) {
 		try {
@@ -160,6 +168,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 			PostEvent(errEvt);
 		}
 	}
+	
 	// no longer need to listen for commands
 	EventSinkLocker.RemoveHandler(this);
 }
@@ -385,5 +394,6 @@ void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_SOCKET_ERROR = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_LISTEN_ERROR = wxNewEventType();
+const wxEventType t4p::EVENT_DEBUGGER_LISTEN = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();
