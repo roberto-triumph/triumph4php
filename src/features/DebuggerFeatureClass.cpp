@@ -820,11 +820,8 @@ void t4p::DebuggerFeatureClass::OnContinueToCursor(wxCommandEvent& event) {
 	PostCmd(
 		Cmd.BreakpointRunToCursor(filename, lineNumber)
 	);
-
-	// post the stack get command so that the debugger tells us which
-	// line is being executed next
 	PostCmd(
-		Cmd.StackGet(0)
+		Cmd.Run()
 	);
 }
 
@@ -2038,7 +2035,7 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 	InitialCode = t4p::CharToWx(
 		"<?php \n"
 		"// enter code here to send to Xdebug to be executed.\n"
-		"// Hitting CTRL+ENTER will execute the code.\n\n"
+		"// Hitting CTRL+ENTER will execute the code."
 	);
 	CodeCtrl->AppendText(InitialCode);
 	
@@ -2144,6 +2141,7 @@ void t4p::DebuggerEvalPanelClass::OnEvalClick(wxCommandEvent& event)
 	if (code.Find(InitialCode) == 0) {
 		code = code.Mid(InitialCode.length());
 	}
+	code.Trim().Trim(true);
 	ExprResult->AppendText(code);
 	ExprResult->AppendText(wxT("\n"));
 	
@@ -2156,6 +2154,7 @@ void t4p::DebuggerEvalPanelClass::OnCodeKeyDown(wxKeyEvent& event) {
 		if (code.Find(InitialCode) == 0) {
 			code = code.Mid(InitialCode.length());
 		}
+		code.Trim().Trim(true);
 		ExprResult->AppendText(code);
 		ExprResult->AppendText(wxT("\n"));
 		
