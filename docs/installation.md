@@ -27,28 +27,28 @@ The source code is also made available in the same place. You can choose to comp
 need to [compile from source](/compiling/). 
 
 # Installation On MS Windows Systems #
-The Windows verson of triumph4php does not have an installation process; it is available as a standalone executable 
+The Windows version of triumph4php does not have an installation process; it is available as a standalone executable 
 that can be run on its own. Just download the distribution archive, extract, and run the triumph4php binary. The
 downloaded archive is a 7-zip archive (not a regular zip file). On you extract the archive, triumph4php.exe is
 located inside the bin directory.
 
 # Installation On Linux Systems #
-There are debian and RPM archives of triumph4php available at the triumph4php main site. Once downloaded,
-the debian package can be run via `dpkg -i` and the RPM can be installed via `rpm -i`
+There are Debian and RPM archives of triumph4php available at the triumph4php main site. Once downloaded,
+the Debian package can be run via `dpkg -i` and the RPM can be installed via `rpm -i`
 
 ##Installation On Debian-based Systems##
 
     sudo apt-get install libmysqlclient18 sqlite3 libicu48 libcurl3
 	dpkg -i triumph4php_0.4_amd64.deb
 
-##Installation On RedHat-based Systems##
+##Installation On Red Hat-based Systems##
 
     sudo yum install libicu community-mysql-common sqlite
     rpm -iVh triumph4php_0.4-1.fc20.x86_64.rpm
 
 ##Installation On Other Linux Systems##
 
-triumph4php will run on most other linux distributions, but you will need to compile it from source.
+triumph4php will run on most other Linux distributions, but you will need to compile it from source.
 See [compiling](/compiling/) for more info.
 
 [Table Of Contents](/#toc) | [Next - new user wizard](/new-user-wizard/)

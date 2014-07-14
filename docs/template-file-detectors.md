@@ -36,6 +36,6 @@ Detectors ... Run URL Detection.
 
 #Note 5#
 For template file detectors to work, you must have PHP installed.  Also, you must 
-have PDO and PDO Sqlite extensions enabled.
+have PDO and PDO SQLite extensions enabled.
 
 [Table Of Contents](/#toc) | [Next - What Next](/what-next/)

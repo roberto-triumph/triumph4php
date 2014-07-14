@@ -19,11 +19,12 @@ development between Linux and Windows by generating Codelite / Makefile / Visual
  * [SQLite](http://www.sqlite.org)  triumph4php uses SQLite to store parsed classes and methods.
  * [CURL](http://curl.haxx.se/) triumph4php uses curl to check for new versions of triumph4php
  * [Git Client](http://git-scm.com/): triumph4php uses Git for source control.
+ * [Boost ASIO](http://think-async.com/): triumph4php uses the ASIO library to open socket connections to listen for Xdebug callbacks.
 
 #Development Tools#
    * [codelite](http://codelite.org) - C++ IDE for Linux
    * [Visual Studio Express 2008](http://go.microsoft.com/?linkid=7729279‎) - C++ IDE for Windows
-   * [valgrind](http://valgrind.org/) - profiling tools for linux
+   * [valgrind](http://valgrind.org/) - profiling tools for Linux
    * [Dr. Memory](http://www.drmemory.org/) - profiling tools for Windows
    * [Very Sleepy](http://www.codersnotes.com/sleepy) - an easy-to-use profiler for Windows
    * [wxFormBuilder](http://wxformbuilder.org) - This is the WYSIWYG tool for rapid form creation. Currently using version 3.1.57.
@@ -61,9 +62,9 @@ install them.  One nice way to install them is by using Chocolatey for windows
 	
 The setupdev script will download the git submodules, download
 libraries that don't have git repos, and compile all of the 
-dependant libraries.  Note: The setupdev command will take a
+dependent libraries.  Note: The setupdev command will take a
 long time; it may take a good 30 min to an hour depending on your
-internet connection speed and machine processor power.
+Internet connection speed and machine processor power.
 
 ## Step 5: Build triumph4php##
 
@@ -81,7 +82,7 @@ to an hour, depending on your machine's processing power.
     sudo apt-get install libicu48 libicu-dev libicu48-dbg libmysqlclient-dev \
 	                     re2c bison CMake git libtool php5-cli \
 						ia32-libs sqlite3 libsqlite3-dev libsqlite3-0-dbg \
-						libcurl3-dev libgtk2.0-dev
+						libcurl3-dev libgtk2.0-dev libasio-dev libboost-system-dev
 						
 ##Step 2: Download the development tools##
 						
@@ -109,8 +110,8 @@ OR, if you want to use Makefiles
 
     ./premake4 gmake
 	
-Now go into the build/ directory, you should see a either a codelite directory or a
-gmake directory. Open the codelite workspace and compile, or use Make
+Now go into the build/ directory, you should see a either a Codelite directory or a
+gmake directory. Open the Codelite workspace and compile, or use Make
 to compile triumph4php. This will also take a good 30 minutes
 to an hour, depending on your machine's processing power.
 
@@ -140,7 +141,7 @@ and [wxFormBuilder](http://wxformbuilder.org)
 	
 The setupdev script will download the git submodules and compile 
 them.  Note: The setupdev command will take a long time; it may take a 
-good 30 min to an hour depending on your internet connection speed 
+good 30 min to an hour depending on your Internet connection speed 
 and machine processor power.
 
 ## Step 5: Build triumph4php##
@@ -151,8 +152,8 @@ OR, if you want to use Makefiles
 
     ./premake4 gmake
 	
-Now go into the build/ directory, you should see a either a codelite directory or a
-gmake directory. Open the codelite workspace and compile, or use Make
+Now go into the build/ directory, you should see a either a Codelite directory or a
+gmake directory. Open the Codelite workspace and compile, or use Make
 to compile triumph4php. This will also take a good 30 minutes
 to an hour, depending on your machine's processing power.
 

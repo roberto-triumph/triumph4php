@@ -38,6 +38,7 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [Total Search](/total-search/)  
   * [Keyboard Shortcuts](/keyboard-shortcuts/)
   * [PHP Code Completion](/php-code-completion/)
+  * [Debugger](/debugger/)
   * [Bookmarks](/bookmarks/)
   * [PHP Doc Comments](/php-doc-comments/)
   * [PHP Linter](/php-linter/)
@@ -53,5 +54,5 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [Template File Detectors](/template-file-detectors/)
   * [What's next](/what-next/)
 
-# Apendix #
+# Appendix #
   * [Compiling triumph4php](/compiling/)

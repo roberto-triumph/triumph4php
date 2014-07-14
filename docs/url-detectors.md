@@ -28,7 +28,7 @@ You can trigger the URL detection manually by going to Detectors ... Run URL Det
 
 #Note 4#
 For URL detectors to work, you must have PHP installed.  Also, you must 
-have PDO and PDO Sqlite extensions enabled.
+have PDO and PDO SQLite extensions enabled.
 
 
 [Table Of Contents](/#toc) | [Next - Template File Detectors](/template-file-detectors/)

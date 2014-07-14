@@ -359,6 +359,13 @@ private:
 	 * error
 	 */
 	void OnDebuggerListenError(wxThreadEvent& event);
+	
+	/**
+	 * this is an additional debug engine handler, we log a success
+	 * message when Triumph successfully start listening on
+	 * the port.
+	 */
+	void OnDebuggerListenStart(wxThreadEvent& event);
 
 	/**
 	 * send a command to the debug engine.  This is an asynchronous
@@ -474,6 +481,12 @@ public:
 	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
 
 	void ClearStack();
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 
@@ -494,6 +507,12 @@ public:
 	void ClearGlobalVariables();
 
 	void VariableAddChildren(const t4p::DbgpPropertyClass& variable);
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 
@@ -579,12 +598,19 @@ public:
 	 */
 	void AppendError(const wxString& error);
 	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
+	
 private:
 
 	void OnEvalClick(wxCommandEvent& event);
 	void OnClearClick(wxCommandEvent& event);
 	void OnCode(wxStyledTextEvent& event);
-	void OnCodeKeyDown(wxKeyEvent& event);
+	void OnCmdRun(wxCommandEvent& event);
+	void OnCmdComplete(wxCommandEvent& event);
 	
 	void PrettyPrint(const t4p::DbgpPropertyClass& prop);
 
@@ -593,6 +619,8 @@ private:
 	t4p::CodeControlClass* CodeCtrl;
 	
 	wxString InitialCode;
+	
+	DECLARE_EVENT_TABLE()
 	
 };
 
@@ -616,6 +644,12 @@ public:
 	void SelectVariablePanel();
 	void SelectBreakpointPanel();
 	void SelectEvalPanel();
+	
+	/**
+	 * update the label to say the the debugger is / is no longer running
+	 * @param active bool if TRUE status will be set as active
+	 */
+	void ResetStatus(bool active);
 
 private:
 };

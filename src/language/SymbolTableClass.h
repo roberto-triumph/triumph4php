@@ -277,7 +277,8 @@ class SymbolTableClass :
 	public pelet::ClassObserverClass, 
 	public pelet::ClassMemberObserverClass, 
 	public pelet::FunctionObserverClass, 
-	public pelet::VariableObserverClass {
+	public pelet::VariableObserverClass,
+	public pelet::AnyExpressionObserverClass {
 
 public:
 	SymbolTableClass();
@@ -397,7 +398,9 @@ public:
 		
 	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment);
-		
+	
+	void OnAnyExpression(pelet::ExpressionClass* expr);
+	
 	/**
 	 * Set the version that the PHP parser should use.
 	 */
@@ -444,7 +447,7 @@ private:
 	 * 
 	 * @var pelet::ParserClass
 	 */
-	pelet::ParserClass Parser;	
+	pelet::ParserClass Parser;
 	
 	/**
 	 * Holds all variables for the currently parsed piece of code. Each vector will represent its own scope.
@@ -454,12 +457,16 @@ private:
 	 * @var std::map<UnicodeString, vector<t4p::SymbolClass>>
 	 */
 	std::map<UnicodeString, std::vector<t4p::SymbolClass>, UnicodeStringComparatorClass> Variables;
-
 };
 
 /**
  * This class can be used to determine what function or namespace that a
  * particular line of code is in
+ * 
+ * note that for now, anonymous function scopes are only captured when
+ * there is a parse error. this is because we don't want to use
+ * ExpressionObserverClass here since that is kind of slow and 
+ * we use scopefinder on each auto-complete request.
  */ 
 class ScopeFinderClass : 
 	public pelet::ClassObserverClass, 
@@ -467,7 +474,6 @@ class ScopeFinderClass :
 	public pelet::FunctionObserverClass {
 	
 public:
-
 
 	ScopeFinderClass();
 	
@@ -491,7 +497,7 @@ public:
 		int startingPos, int endingPos);
 			
 	void FunctionScope(const UnicodeString& namespaceName, const UnicodeString& functionName, int startingPos, int endingPos);
-	
+
 	/**
 	 * Set the version that the PHP parser should use.
 	 */
@@ -529,6 +535,7 @@ private:
 	 * this will tell us when to stop annotating
 	 */
 	int PosToCheck;
+
 };
 
 }

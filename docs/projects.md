@@ -6,14 +6,14 @@ Projects in triumph4php are defined as the following:
   * A Project is 1 or more sources 
   * A Project has a friendly label
   * A Project can be enabled or disabled; multiple projects may be enabled at any time
-  * A Source is a directory, a set of include wildcards and a set of exclude wilcards. 
+  * A Source is a directory, a set of include wild cards and a set of exclude wild cards. 
 
 A triumph4php source directory is recursive; any sub-directories under the source directory also become 
-part of the Source. Files within a source can be ignored by setting the exclude wildcard;
-any file that matches the include wildcard AND DOES NOT MATCH the exclude wilcard 
+part of the Source. Files within a source can be ignored by setting the exclude wild card;
+any file that matches the include wild card AND DOES NOT MATCH the exclude Willard 
 will be part of the project.
 
-Exclude wildcards are useful to ignore "cache" directories that many PHP frameworks use; 
+Exclude wild cards are useful to ignore "cache" directories that many PHP frameworks use; 
 frameworks place amalgamations (many PHP files concatenated together) for use
 in deployment, but that are not used during development.
 

@@ -314,7 +314,9 @@ void t4p::ProjectFeatureClass::OnCreateNewProject(wxCommandEvent& event) {
 		// if user only disabled projects, no need to prompt since no projects
 		// will be re-tagged
 		wxString msg = wxString::FromAscii(
-			"Would you like to re-tag your newly created project at this time?"
+			"Would you like to re-tag your newly created project at this time?\n"
+			"Tagging a project allows code completion, jump to resource,\n"
+			"and search for resources to work properly."
 		);
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());

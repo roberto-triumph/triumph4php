@@ -29,7 +29,7 @@ this dialog  you can
 
 Why are these different?
 
-These are different because code shortcuts are appled only while the source 
+These are different because code shortcuts are applied only while the source 
 code editor is in focus, while menu shortcuts apply at all times. 
 
 [Table Of Contents](/#toc) | [Next - PHP Code Completion](/php-code-completion/)

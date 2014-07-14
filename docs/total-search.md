@@ -2,7 +2,7 @@
 
 #Total Search#
 
-One of the most useful features on an IDE is the abilty to jump around the
+One of the most useful features on an IDE is the ability to jump around the
 source code without needing to manually opening files.  Once you
 have added your projects, you will be able to jump to any class, method, function
 or file in your class.

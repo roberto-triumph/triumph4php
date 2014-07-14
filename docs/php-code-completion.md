@@ -1,4 +1,4 @@
-[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)
+[Table Of Contents](/#toc) | [Next - Debugger](/debugger/)
 
 
 # PHP Code Completion #
@@ -29,7 +29,7 @@ Behavior dialog.
   * PHP code completion for user-created classes, methods, and functions only 
     work on when you create and enable a [project](/projects/). 
   * Class, method, function names will be parsed out of the code.  This means that 
-	if a file has PHP sytax errors, the class, method, or function might not
+	if a file has PHP syntax errors, the class, method, or function might not
 	be able to be parsed out
   * When code completion fails, look at the status bar, it will contain
     a small message describing why there are no suggestions
@@ -40,16 +40,16 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 ###Code completion on local variables###
 
 	$var = new PDO('localhost');
-	$var-> // autocompletion works
+	$var-> // auto completion works
 	// ...
 	$var = new PDO('localhost');
 	$cpy = $var;
-	$cpy-> // autocompletion works
+	$cpy-> // auto completion works
 
 ###Code completion on function type hints###
 
 	function myFunct(PDO $pdo) {
-		$pdo-> // autocompletion works
+		$pdo-> // auto completion works
 	}
 
 ###Code completion on functions documented with PHPDoc###
@@ -58,7 +58,7 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	function myFunct() { }
 	// ...
 	$pdo = myFunct();
-	$pdo-> // autocompletion works
+	$pdo-> // auto completion works
 
 ###Code completion on class members documented with PHPDoc###
 
@@ -68,7 +68,7 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	}
 	// ...
 	$my = new MyClass();
-	$my->pdo-> // autocompletion works
+	$my->pdo-> // auto completion works
 
 ###Code completion with proper static checks###
 	
@@ -79,8 +79,8 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	}
 	// ...
 	$my = new MyClass();
-	$my-> // autocompletion will show MAX, MIN, and $value
-	MyClass:: // autocompletion will NOT show $value since 
+	$my-> // auto completion will show MAX, MIN, and $value
+	MyClass:: // auto completion will NOT show $value since 
 	          // it cannot be accessed statically
 
 ###Code completion with proper access (public vs. private) checks###
@@ -88,12 +88,12 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	class MyClass {
 		private $MAX;
 		function __construct() {
-			$this-> // autocompletion will show MAX since MAX can be accessed inside of class
+			$this-> // auto completion will show MAX since MAX can be accessed inside of class
 		}
 	}
 	// ...
 	$my = new MyClass();
-	$my-> // autocompletion won't show MAX since MAX is private
+	$my-> // auto completion won't show MAX since MAX is private
 
 ###Code completion with method chains###
 	
@@ -103,21 +103,21 @@ triumph4php is able to determine type (and have 'proper' code completion) in the
 	}
 	// ... 
 	$my = new MyClass();
-	$my->parent()-> // autocompletion will show methods of MyClass since parent is documented
+	$my->parent()-> // auto completion will show methods of MyClass since parent is documented
 
-###Code completion with dynamic autocompletion enabled###
+###Code completion with dynamic auto completion enabled###
 
 	class MyClass {
 		function parent() { /* \*/}
 	}
 	// ... 
 	$my = new MyClass();
-	$my->parent()->pare // autocompletion will show methods that start with "pare" since dynamic autocompletion is enabled
+	$my->parent()->pare // auto completion will show methods that start with "pare" since dynamic auto completion is enabled
 
 ###Code completion on variables documented with PHPDoc###
 	
 	/** @var my MyClass */
-	$my->// autocompletion will show methods of MyClass since $my is documented
+	$my->// auto completion will show methods of MyClass since $my is documented
 
 
-[Table Of Contents](/#toc) | [Next - Bookmarks](/bookmarks/)
+[Table Of Contents](/#toc) | [Next - Debugger](/debugger/)

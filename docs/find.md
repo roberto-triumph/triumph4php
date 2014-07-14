@@ -8,7 +8,7 @@ replace, and replace all in the currently opened file.
 You can find an exact match, a case-insensitive match, or a regular
 expression.  The full regular expression syntax is described at 
 [http://www.unicode.org/reports/tr18/](http://www.unicode.org/reports/tr18/). To the
-left of the find input there is a popup menu that shows you the regular 
+left of the find input there is a pop-up menu that shows you the regular 
 expression meta-characters that are available.  Clicking on one of them
 will add it to the find expression.
 

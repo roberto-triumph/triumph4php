@@ -505,6 +505,52 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[1].Identifier);
 }
 
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosure) {
+
+	// a closure should be its own scope, without being able to access
+	// the variables in the containing function/method
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"function printUser(User $user) {\n"
+		"  $functionOne = 1;\n"
+		"  call_user_func(function() {\n"
+		"    $someName = '';\n"
+		"  });\n"
+		"}\n"
+	);
+	Init(sourceCode);
+	ToVariable(UNICODE_STRING_SIMPLE("$some"));
+	Scope.ClassName = UNICODE_STRING_SIMPLE("");
+	Scope.MethodName = UNICODE_STRING_SIMPLE("printUser");
+	Scope.SetIsAnonymous(true, 0);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$someName"), VariableMatches[0]);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableOutsideClosure) {
+
+	// a closure should be its own scope, without being able to access
+	// the var	iables in the containing function/method
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"function printUser(User $user) {\n"
+		"  $functionOne = 1;\n"
+		"  call_user_func(function() {\n"
+		"    $someName = '';\n"
+		"  });\n"
+		"}\n"
+	);
+	Init(sourceCode);
+	ToVariable(UNICODE_STRING_SIMPLE("$functio"));
+	Scope.ClassName = UNICODE_STRING_SIMPLE("");
+	Scope.MethodName = UNICODE_STRING_SIMPLE("printUser");
+	Scope.SetIsAnonymous(true, 0);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(0, VariableMatches);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -1291,6 +1337,42 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringWithNamespaceOnly) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.MethodName);
 	CHECK_UNISTR_EQUALS("\\First\\Child", Scope.NamespaceName);
 	CHECK_UNISTR_EQUALS("\\First\\Child", Scope.ResolveAlias(UNICODE_STRING_SIMPLE("namespace")));
+}
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleGlobalClosures) {
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"$globalOne = 1;\n"
+		"call_user_func(function() use ($globalOne) {\n"
+		"  $someName = '';\n"
+		"  {CURSOR}"
+		"\n"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, Scope);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.ClassName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.MethodName);
+	CHECK(Scope.IsAnonymousScope());
+	CHECK_EQUAL(0, Scope.GetAnonymousFunctionCount());
+}
+
+TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClosuresInFunctions) {
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"function printUser(User $user) {\n"
+		"  $functionOne = 1;\n"
+		"  call_user_func(function() {\n"
+		"    $someName = '';\n"
+		"    {CURSOR}\n"
+	);
+	int32_t pos;
+	sourceCode = FindCursor(sourceCode, pos);
+	ScopeFinder.GetScopeString(sourceCode, pos, Scope);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), Scope.ClassName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("printUser"), Scope.MethodName);
+	CHECK(Scope.IsAnonymousScope());
+	CHECK_EQUAL(0, Scope.GetAnonymousFunctionCount());
 }
 
 }

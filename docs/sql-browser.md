@@ -2,7 +2,7 @@
 
 # SQL Browser #
 
-triumph4php comes with a sql browser that is geared towards
+triumph4php comes with a SQL browser that is geared towards
 using it during development.
 
 * Click the SQL Browser. It will open a new code tab for
@@ -20,7 +20,7 @@ Code completion works in a SQL browser tab; triumph4php
 can code completion on the table names and column names that were
 fetched from the enabled connections.
 
-A running query can be stopped by closing the sql results
+A running query can be stopped by closing the SQL results
 panel.
 
 #Viewing Results#

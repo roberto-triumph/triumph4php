@@ -112,6 +112,8 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 	try {
 		acceptor.open(boost::asio::ip::tcp::v4());
 		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), Port));
+		boost::asio::ip::tcp::acceptor::reuse_address option(true);
+		acceptor.set_option(option);
 		acceptor.listen();
 	} 
 	catch (std::exception& e) {
@@ -120,8 +122,16 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 		PostEvent(errEvt);
 
 		// cannot bind to port, just let the thread die.
+		// no longer need to listen for commands
+		// we need to this since this object will be deleted after
+		// we return from this method.
+		EventSinkLocker.RemoveHandler(this);
 		return;
 	}
+	
+	wxThreadEvent startEvt(t4p::EVENT_DEBUGGER_LISTEN, GetEventId());
+	startEvt.SetInt(Port);
+	PostEvent(startEvt);
 
 	while (!IsCancelled()) {
 		try {
@@ -160,6 +170,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 			PostEvent(errEvt);
 		}
 	}
+	
 	// no longer need to listen for commands
 	EventSinkLocker.RemoveHandler(this);
 }
@@ -336,10 +347,12 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 
 			// determine if we actually had an error
 			// we look for properties that either
-			// dont have a name, value, or children
+			// dont have a name, value, data type, or children
 			// added the children test for windows 
 			// xdebug version 2.1.0
-			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty() || evalResponse.Property.NumChildren)) {
+			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty() 
+				|| !evalResponse.Property.DataType.empty() 
+				|| evalResponse.Property.NumChildren)) {
 			PostEvent(evalResponse);
 		}
 		else {
@@ -385,5 +398,6 @@ void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& 
 const wxEventType t4p::EVENT_DEBUGGER_LOG = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_SOCKET_ERROR = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_LISTEN_ERROR = wxNewEventType();
+const wxEventType t4p::EVENT_DEBUGGER_LISTEN = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_RESPONSE = wxNewEventType();
 const wxEventType t4p::EVENT_DEBUGGER_CMD = wxNewEventType();

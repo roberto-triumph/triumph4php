@@ -17,12 +17,12 @@ The left hand side of the explorer panel lists all of the source directories
 of all of your enabled projects.  That way, you can view the contents of
 the root directory of your projects quickly.
 
-The top of the explorer panel shows you a textbox that contains the current
+The top of the explorer panel shows you a text box that contains the current
 directory being viewed. You can type in any directory in your file system
 to go to that directory.
 
 The right hand side of the explorer panel shows you the contents of the
-current directory. By default, it will show you subdirectories, and any file
+current directory. By default, it will show you sub directories, and any file
 extension that you have configured in the Edit ... Preferences Project tab. Also, by
 default files with the hidden attribute are not shown.
 

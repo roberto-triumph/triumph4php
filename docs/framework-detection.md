@@ -6,10 +6,11 @@ PHP developers use a framework to aid in the development of their PHP projects. 
 recognizes this and attempts to help developers even more by providing custom-tailored
 experiences based on the PHP framework that a project uses.
 
-**Note: this feature is experimental.  Only CodeIgniter is supported at the moment**
+**Note: this feature is experimental.**
 <a id="supported-frameworks"></a>
 #Supported Frameworks#
-  * Code Igniter 2
+  * CodeIgniter 2
+  * Laravel 4
 
 When triumph4php detects that a project is using a PHP framework, it attempts to:
 
@@ -20,6 +21,6 @@ When triumph4php detects that a project is using a PHP framework, it attempts to
 
 #Note#
 For framework detection to work, you must have PHP installed.  Also, you must 
-have PDO and PDO Sqlite extensions enabled.
+have PDO and PDO SQLite extensions enabled.
 
 [Table Of Contents](/#toc) | [Next - Config Detectors](/config-detectors/)
