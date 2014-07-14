@@ -62,7 +62,7 @@ static bool HasExtension(const wxString& fullPath, const wxString& extensionsStr
 }
 	
 t4p::FileTypeClass::FileTypeClass()
-: PhpFileExtensionsString(wxT("*.php"))
+: PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
 , CssFileExtensionsString(wxT("*.css"))
 , SqlFileExtensionsString(wxT("*.sql"))
 , JsFileExtensionsString(wxT("*.js"))
