@@ -214,8 +214,8 @@ if (not boostDebugDir) then
 	print("Using default dir for boost debug: " .. boostDebugDir)
 end  
 BOOST_DEBUG_INCLUDE_DIR = boostDebugDir
-BOOST_DEBUG_LIB = boostDebugDir .. '/libboost_system-vc90-mt-gd-1_46.lib'
 BOOST_DEBUG_LIB_DIR = boostDebugDir .. '/stage/lib'
+BOOST_DEBUG_LIB = BOOST_DEBUG_LIB_DIR .. '/boost_system-vc90-mt-gd-1_46.lib'
 BOOST_DEBUG_BIN_DIR = boostDebugDir .. '/bin.v2/libs/system/build/msvc-9.0/debug/threading-multi'
 
 boostReleaseDir = os.getenv("T4P_BOOST_RELEASE_DIR")
@@ -224,9 +224,10 @@ if (not boostReleaseDir) then
 	print("Using default dir for boost release: " .. boostReleaseDir)
 end  
 BOOST_RELEASE_INCLUDE_DIR = boostReleaseDir
-BOOST_RELEASE_LIB = boostReleaseDir .. '/libboost_system-vc90-mt-1_46.lib'
 BOOST_RELEASE_LIB_DIR = boostReleaseDir .. '/stage/lib'
+BOOST_RELEASE_LIB = BOOST_RELEASE_LIB_DIR .. '/boost_system-vc90-mt-1_46.lib'
 BOOST_RELEASE_BIN_DIR = boostReleaseDir .. '/bin.v2/libs/system/build/msvc-9.0/release/threading-multi'
+BOOST_RELEASE_DIR = boostReleaseDir 
 
 -- location of the final lib directory
 -- all of the dependant shared libraries (DLLs) will be placed here

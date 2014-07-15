@@ -258,7 +258,7 @@ function boostconfiguration(config, action)
 		}
 	elseif action == "gmake" or action == "codelite" then
 		includedirs { BOOST_INCLUDE_DIR }
-		libdirs { BOOST_LIB_DIR }
+		libdirs { BOOST_RELEASE_LIB_DIR }
 		links { "boost_system" }
 		defines { 
 			'BOOST_DATE_TIME_NO_LIB', 
