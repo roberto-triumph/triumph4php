@@ -70,8 +70,6 @@ newaction {
 			"vcbuild triumph4php.vcproj \"Release|Win32\"",
 		});
 		
-		exit();
-		
 		if (os.isdir("..\\triumph4php-" .. tag .. "\\dist")) then
 			os.execute("rmdir /s /q " .. "..\\triumph4php-" .. tag .. "\\dist")
 		end
