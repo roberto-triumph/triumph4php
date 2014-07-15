@@ -49,16 +49,16 @@ ICU_LIBS_DEBUG = {
 
 ICU_DIR = os.getenv("T4P_ICU_DIR")
 if (not ICU_DIR) then
-	ICU_DIR = "lib/icu"
-	print "Using default location of lib/icu for ICU dir"
+	ICU_DIR = "lib\\icu"
+	print "Using default location of lib\\icu for ICU dir"
 end
 ICU_DIR = trim(ICU_DIR)
 
 -- location where the ICU lib files are located
-ICU_LIB_DIR = ICU_DIR .. "/lib/"
+ICU_LIB_DIR = ICU_DIR .. "\\lib\\"
 
 -- location where the ICU header files are located
-ICU_INCLUDE_DIR = ICU_DIR .. "/include/"
+ICU_INCLUDE_DIR = ICU_DIR .. "\\include\\"
 
 -- location to the wxWidgets libraries. Make sure to copy the
 -- wxWidgets DLLs to the Debug directory, otherwise the wxWidgets library
@@ -93,14 +93,14 @@ WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
 
 WXWIDGETS_DIR = os.getenv("T4P_WXWIDGETS_DIR")
 if (not WXWIDGETS_DIR) then
-	WXWIDGETS_DIR = "lib/wxWidgets"
-	print "Using default location of lib/wxWidgets for wxWidgets dir"
+	WXWIDGETS_DIR = "lib\\wxWidgets"
+	print "Using default location of lib\\wxWidgets for wxWidgets dir"
 end
 WXWIDGETS_DIR = trim(WXWIDGETS_DIR )
 
-WX_LIB_DIR = WXWIDGETS_DIR .. "/lib/vc_dll/"
-WX_INCLUDE_DIRS_DEBUG = { WXWIDGETS_DIR .. "/include/", WXWIDGETS_DIR .. "/lib/vc_dll/mswud/" }
-WX_INCLUDE_DIRS_RELEASE =  { WXWIDGETS_DIR .. "/include/", WXWIDGETS_DIR .. "/lib/vc_dll/mswu/" }
+WX_LIB_DIR = WXWIDGETS_DIR .. "\\lib\\vc_dll\\"
+WX_INCLUDE_DIRS_DEBUG = { WXWIDGETS_DIR .. "\\include\\", WXWIDGETS_DIR .. "\\lib\\vc_dll\\mswud\\" }
+WX_INCLUDE_DIRS_RELEASE =  { WXWIDGETS_DIR .. "\\include\\", WXWIDGETS_DIR .. "\\lib\\vc_dll\\mswu\\" }
 
 -- the styled text control library
 WX_LIB_STC_RELEASE = "wxmsw29u_stc"
@@ -134,14 +134,14 @@ VSVARS = "C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\Common7\\Tools\\
 MYSQL_CONNECTOR_DIR = os.getenv("T4P_MYSQL_CONNECTOR_DIR")
 if (not MYSQL_CONNECTOR_DIR) then
 
-	MYSQL_CONNECTOR_DIR = "lib/mysql-connector-c-noinstall-6.0.2-win32"
+	MYSQL_CONNECTOR_DIR = "lib\\mysql-connector-c-noinstall-6.0.2-win32"
 	print("Using default dir for MySQL Connector: " .. MYSQL_CONNECTOR_DIR)
 end
 MYSQL_CONNECTOR_DIR  = trim(MYSQL_CONNECTOR_DIR)
 
-MYSQL_INCLUDE_DIR = MYSQL_CONNECTOR_DIR .. '/include'
-MYSQL_LIB = MYSQL_CONNECTOR_DIR .. '/lib/libmysql.lib'
-MYSQL_LIB_DIR = MYSQL_CONNECTOR_DIR .. '/lib/'
+MYSQL_INCLUDE_DIR = MYSQL_CONNECTOR_DIR .. '\\include'
+MYSQL_LIB = MYSQL_CONNECTOR_DIR .. '\\lib\\libmysql.lib'
+MYSQL_LIB_DIR = MYSQL_CONNECTOR_DIR .. '\\lib\\'
 MYSQL_LIB_NAME = 'libmysql.lib'
 
 -- On some unit tests, Triumph attempt to connect to a database
@@ -151,36 +151,36 @@ T4P_DB_USER = 'triumph'
 T4P_DB_PASSWORD = ''
 
 -- will look for SQLite in these directories
--- read lib/sqlite/README  for more info
+-- read lib\\sqlite\\README  for more info
 SQLITE_INCLUDE_DIR = os.getenv("T4P_SQLITE_INCLUDE_DIR")
 if (not SQLITE_INCLUDE_DIR) then
-	SQLITE_INCLUDE_DIR = "lib/sqlite-amalgamation-3071300";
+	SQLITE_INCLUDE_DIR = "lib\\sqlite-amalgamation-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_INCLUDE_DIR)
 end
 SQLITE_INCLUDE_DIR = trim(SQLITE_INCLUDE_DIR)
 
 SQLITE_LIB_DIR = os.getenv("T4P_SQLITE_LIB_DIR")
 if (not SQLITE_LIB_DIR) then
-	SQLITE_LIB_DIR = "lib/sqlite-dll-win32-x86-3071300";
+	SQLITE_LIB_DIR = "lib\\sqlite-dll-win32-x86-3071300";
 	print("Using default dir for SQLITE INCLUDE DIR: " .. SQLITE_LIB_DIR)
 end
 SQLITE_LIB_DIR = trim(SQLITE_LIB_DIR)
-SQLITE_LIB = SQLITE_LIB_DIR .. '/sqlite3.lib'
+SQLITE_LIB = SQLITE_LIB_DIR .. '\\sqlite3.lib'
 SQLITE_LIB_NAME = 'sqlite3.lib'
 
 -- will look for SOCI in these directories
 -- so that we can move the SOCI files to an outside dir if we want to
 SOCI_INCLUDE_DIR = os.getenv("T4P_SOCI_INCLUDE_DIR");
 if (not SOCI_INCLUDE_DIR) then
-    SOCI_INCLUDE_DIR = "lib/soci/triumph/include",
-    print "Using default location of lib/soci/triumph/include for SOCI debug include dir"
+    SOCI_INCLUDE_DIR = "lib\\soci\\triumph\\include",
+    print "Using default location of lib\\soci\\triumph\\include for SOCI debug include dir"
 end
 SOCI_INCLUDE_DIR = trim(SOCI_INCLUDE_DIR)
 
 SOCI_LIB_DIR = os.getenv("T4P_SOCI_LIB_DIR");
 if (not SOCI_LIB_DIR) then
-    SOCI_LIB_DIR = 'lib/soci/src/lib/Release';
-    print "Using default location of lib/soci/src/lib/Release for SOCI debug lib dir"
+    SOCI_LIB_DIR = 'lib\\soci\\src\\lib\\Release';
+    print "Using default location of lib\\soci\\src\\lib\\Release for SOCI debug lib dir"
 end
 SOCI_LIB_DIR = trim(SOCI_LIB_DIR);
 
@@ -188,46 +188,46 @@ SOCI_LIB_DIR = trim(SOCI_LIB_DIR);
 -- these are the directories where
 curlDebugDir = os.getenv("T4P_CURL_DEBUG_DIR")
 if (not curlDebugDir) then
-	curlDebugDir = "lib/curl/builds/libcurl-debug-dll-ipv6-sspi";
+	curlDebugDir = "lib\\curl\\builds\\libcurl-debug-dll-ipv6-sspi";
 	print("Using default dir for CURL debug: " .. curlDebugDir)
 end
-CURL_DEBUG_INCLUDE_DIR = curlDebugDir .. '/include'
-CURL_DEBUG_LIB = curlDebugDir .. '/lib/libcurl.lib'
-CURL_DEBUG_LIB_DIR = curlDebugDir .. '/lib'
-CURL_DEBUG_BIN_DIR = curlDebugDir .. '/bin'
+CURL_DEBUG_INCLUDE_DIR = curlDebugDir .. '\\include'
+CURL_DEBUG_LIB = curlDebugDir .. '\\lib\\libcurl.lib'
+CURL_DEBUG_LIB_DIR = curlDebugDir .. '\\lib'
+CURL_DEBUG_BIN_DIR = curlDebugDir .. '\\bin'
 
 CURL_RELEASE_DIR = os.getenv("T4P_CURL_RELEASE_DIR")
 if (not CURL_RELEASE_DIR) then
-	CURL_RELEASE_DIR = "lib/curl/builds/libcurl-release-dll-ipv6-sspi";
+	CURL_RELEASE_DIR = "lib\\curl\\builds\\libcurl-release-dll-ipv6-sspi";
 	print("Using default dir for CURL Release: " .. CURL_RELEASE_DIR)
 end
 CURL_RELEASE_DIR = trim(CURL_RELEASE_DIR)
-CURL_RELEASE_INCLUDE_DIR = CURL_RELEASE_DIR .. '/include'
-CURL_RELEASE_LIB = CURL_RELEASE_DIR .. '/lib/libcurl.lib'
-CURL_RELEASE_LIB_DIR = CURL_RELEASE_DIR .. '/lib'
-CURL_RELEASE_BIN_DIR = CURL_RELEASE_DIR .. '/bin'
+CURL_RELEASE_INCLUDE_DIR = CURL_RELEASE_DIR .. '\\include'
+CURL_RELEASE_LIB = CURL_RELEASE_DIR .. '\\lib\\libcurl.lib'
+CURL_RELEASE_LIB_DIR = CURL_RELEASE_DIR .. '\\lib'
+CURL_RELEASE_BIN_DIR = CURL_RELEASE_DIR .. '\\bin'
 
 -- will look for boost in these directories
 boostDebugDir = os.getenv("T4P_BOOST_DEBUG_DIR")
 if (not boostDebugDir) then
-	boostDebugDir = "lib/boost_1_46_0";
+	boostDebugDir = "lib\\boost_1_46_0";
 	print("Using default dir for boost debug: " .. boostDebugDir)
 end  
 BOOST_DEBUG_INCLUDE_DIR = boostDebugDir
-BOOST_DEBUG_LIB_DIR = boostDebugDir .. '/stage/lib'
-BOOST_DEBUG_LIB = BOOST_DEBUG_LIB_DIR .. '/boost_system-vc90-mt-gd-1_46.lib'
-BOOST_DEBUG_BIN_DIR = boostDebugDir .. '/bin.v2/libs/system/build/msvc-9.0/debug/threading-multi'
+BOOST_DEBUG_LIB = boostDebugDir .. '\\libboost_system-vc90-mt-gd-1_46.lib'
+BOOST_DEBUG_LIB_DIR = boostDebugDir .. '\\stage\\lib'
+BOOST_DEBUG_BIN_DIR = boostDebugDir .. '\\bin.v2\\libs\\system\\build\\msvc-9.0\\debug\\threading-multi'
 
 boostReleaseDir = os.getenv("T4P_BOOST_RELEASE_DIR")
 if (not boostReleaseDir) then
-	boostReleaseDir = "lib/boost_1_46_0/";
+	boostReleaseDir = "lib\\boost_1_46_0";
 	print("Using default dir for boost release: " .. boostReleaseDir)
 end  
 BOOST_RELEASE_INCLUDE_DIR = boostReleaseDir
-BOOST_RELEASE_LIB_DIR = boostReleaseDir .. '/stage/lib'
-BOOST_RELEASE_LIB = BOOST_RELEASE_LIB_DIR .. '/boost_system-vc90-mt-1_46.lib'
-BOOST_RELEASE_BIN_DIR = boostReleaseDir .. '/bin.v2/libs/system/build/msvc-9.0/release/threading-multi'
-BOOST_RELEASE_DIR = boostReleaseDir 
+BOOST_RELEASE_LIB = boostReleaseDir .. '\\libboost_system-vc90-mt-1_46.lib'
+BOOST_RELEASE_LIB_DIR = boostReleaseDir .. '\\stage\\lib'
+BOOST_RELEASE_BIN_DIR = boostReleaseDir .. '\\bin.v2\\libs\\system\\build\\msvc-9.0\\release\\threading-multi'
+BOOST_RELEASE_DIR = boostReleaseDir
 
 -- location of the final lib directory
 -- all of the dependant shared libraries (DLLs) will be placed here
@@ -246,9 +246,9 @@ end
 -- location where the vs solution files will be placed
 BUILD_SCRIPTS_DIR = os.getenv("T4P_BUILD_SCRIPTS_DIR");
 if (not BUILD_SCRIPTS_DIR) then
-    BUILD_SCRIPTS_DIR = 'build/';
+    BUILD_SCRIPTS_DIR = 'build\\';
     if (_ACTION) then
-        BUILD_SCRIPTS_DIR = 'build/' .. _ACTION
+        BUILD_SCRIPTS_DIR = 'build\\' .. _ACTION
     end
     print ("Using default location of " .. BUILD_SCRIPTS_DIR .. " for build scripts location")
 end
@@ -266,7 +266,7 @@ end
 -- relative to the executable location
 T4P_ASSET_DIR = os.getenv("T4P_ASSET_DIR")
 if (not T4P_ASSET_DIR) then
-    T4P_ASSET_DIR = '../assets'
+    T4P_ASSET_DIR = '..\\assets'
     print("Using default location of " .. T4P_ASSET_DIR .. " for assets location")
 end
 

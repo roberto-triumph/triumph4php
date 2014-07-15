@@ -33,13 +33,16 @@ function normalizepath(filepath)
 	if not path.isabsolute(filepath) then
 		filepath = os.getcwd() .. "/" .. filepath
 	end
+	doQuote = string.find(filepath, " ")
 	if os.is "windows" then
 	
 		-- Windows XP doesn't like forward slashes
-		filepath = "\"" .. string.gsub(filepath, "/", "\\") .. "\"";
-	else 
+		filepath = string.gsub(filepath, "/", "\\");
+	end
+	if doQuote then
 		filepath = "\"" .. filepath .. "\"";
 	end
+	
 	return filepath
 end
 

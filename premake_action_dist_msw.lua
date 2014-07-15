@@ -36,9 +36,10 @@ newaction {
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
 		--
-		if os.isdir(destDir) then
-			os.execute("rmdir /s /q " .. destDir)
-		end
+		batchexecute(normalizepath(""), {
+			"rmdir /s /q " .. destDir
+		});
+		
 		batchexecute(normalizepath(""), {
 			string.format("\"%s\" clone %s %s", GIT, ".", destDir),
 			string.format("cd %s", destDir),
@@ -52,15 +53,15 @@ newaction {
 		-- have to re-compile curl, wxWidgets, and SOCI every time we
 		-- release
 		batchexecute(destDir, {
-			"SET T4P_ICU_DIR=" .. "..\\triumph4php\\" .. ICU_DIR,
-			"SET T4P_WXWIDGETS_DIR=" .. "..\\triumph4php\\" .. WXWIDGETS_DIR, 
-			"SET T4P_MYSQL_CONNECTOR_DIR=" .. "..\\triumph4php\\" .. MYSQL_CONNECTOR_DIR,
-			"SET T4P_SQLITE_INCLUDE_DIR=" .. "..\\triumph4php\\" .. SQLITE_INCLUDE_DIR, 
-			"SET T4P_SQLITE_LIB_DIR=" .. "..\\triumph4php\\" .. SQLITE_LIB_DIR,
-			"SET T4P_CURL_RELEASE_DIR=" .. "..\\triumph4php\\" .. CURL_RELEASE_DIR, 
-			"SET T4P_SOCI_INCLUDE_DIR=" .. "..\\triumph4php\\" .. SOCI_INCLUDE_DIR, 
-			"SET T4P_SOCI_LIB_DIR=" .. "..\\triumph4php\\" .. SOCI_LIB_DIR,
-			"SET T4P_BOOST_RELEASE_DIR=" .. "..\\triumph4php\\" .. BOOST_RELEASE_DIR,
+			"SET T4P_ICU_DIR=" .. normalizepath(ICU_DIR),
+			"SET T4P_WXWIDGETS_DIR=" .. normalizepath(WXWIDGETS_DIR), 
+			"SET T4P_MYSQL_CONNECTOR_DIR=" .. normalizepath(MYSQL_CONNECTOR_DIR),
+			"SET T4P_SQLITE_INCLUDE_DIR=" .. normalizepath(SQLITE_INCLUDE_DIR), 
+			"SET T4P_SQLITE_LIB_DIR=" .. normalizepath(SQLITE_LIB_DIR),
+			"SET T4P_CURL_RELEASE_DIR=" .. normalizepath(CURL_RELEASE_DIR), 
+			"SET T4P_SOCI_INCLUDE_DIR=" .. normalizepath(SOCI_INCLUDE_DIR), 
+			"SET T4P_SOCI_LIB_DIR=" .. normalizepath(SOCI_LIB_DIR),
+			"SET T4P_BOOST_RELEASE_DIR=" .. normalizepath(BOOST_RELEASE_DIR),
 			"premake4.exe vs2008",
 			"\"" .. VSVARS .. "\"",
 			"cd build\\vs2008",
@@ -68,6 +69,8 @@ newaction {
 			"vcbuild pelet.vcproj \"Release|Win32\"",
 			"vcbuild triumph4php.vcproj \"Release|Win32\"",
 		});
+		
+		exit();
 		
 		if (os.isdir("..\\triumph4php-" .. tag .. "\\dist")) then
 			os.execute("rmdir /s /q " .. "..\\triumph4php-" .. tag .. "\\dist")
