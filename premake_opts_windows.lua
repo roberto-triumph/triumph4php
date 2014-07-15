@@ -223,6 +223,12 @@ if (not boostReleaseDir) then
 	boostReleaseDir = "lib\\boost_1_46_0";
 	print("Using default dir for boost release: " .. boostReleaseDir)
 end  
+
+-- trim this, seems that when we get it from the environment variable
+-- it comes with an extra space; and that make the distribution script
+-- fail
+boostReleaseDir = trim(boostReleaseDir)
+
 BOOST_RELEASE_INCLUDE_DIR = boostReleaseDir
 BOOST_RELEASE_LIB = boostReleaseDir .. '\\libboost_system-vc90-mt-1_46.lib'
 BOOST_RELEASE_LIB_DIR = boostReleaseDir .. '\\stage\\lib'
