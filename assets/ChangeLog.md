@@ -7,6 +7,8 @@ Triumph 4 PHP ChangeLog
 * Code completion and call tips now work inside closures (Linux, MSW)
 * Better error message when the triumph settings directory is not
   found or is not writable (Linux, MSW)
+* Fixed crash when creating a new file and the explorer panel
+  was active (MSW).
 
 #Version 0.4.6#
 * Editor colors dialog under Edit -> preferences -> Editor Styles & Colors
