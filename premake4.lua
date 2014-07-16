@@ -289,8 +289,10 @@ solution "triumph4php"
 	-- the location of the assets (images, sql scripts, etc)
 	-- we want to control its location so that we build distribution
 	-- packages properly
+	-- make asset have forward slashes on MSW so that Visual studio compile
+	-- does not try to escape the next char
 	defines {
-		string.format("T4P_ASSET_DIR=%s", T4P_ASSET_DIR)
+		string.format("T4P_ASSET_DIR=%s", string.gsub(T4P_ASSET_DIR, '\\', '/'))
 	}
 	configuration "Debug"
 		objdir "Debug"
