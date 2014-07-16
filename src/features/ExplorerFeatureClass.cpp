@@ -150,10 +150,6 @@ void t4p::FileListingClass::StartDelete(const std::vector<wxFileName>& dirs, con
 }
 
 void t4p::FileListingClass::StartRefresh(const wxFileName& dir, const std::vector<wxString>& filterExtensions, bool doHidden) {
-	if (Watcher) {
-		delete Watcher;
-		Watcher = NULL;
-	}
 	t4p::ExplorerFileSystemActionClass* action = new t4p::ExplorerFileSystemActionClass(RunningThreads, ID_EXPLORER_LIST_ACTION);
 	action->Directory(dir, filterExtensions, doHidden);
 	RunningThreads.Queue(action);
@@ -168,7 +164,6 @@ void t4p::FileListingClass::StartRename(const wxFileName& oldFile, const wxStrin
 void t4p::FileListingClass::OnExplorerListComplete(t4p::ExplorerEventClass& event) {
 	Files = event.Files;
 	Dirs = event.SubDirs;
-	WorkingDir = event.Dir;
 	TotalFiles = event.TotalFiles;
 	TotalSubDirs = event.TotalSubDirs;
 
@@ -183,6 +178,10 @@ void t4p::FileListingClass::OnExplorerListComplete(t4p::ExplorerEventClass& even
 		delete Watcher;
 		Watcher = NULL;
 	}
+
+	// storing the new working dir AFTER the comparison to see if
+	// its changed
+	WorkingDir = event.Dir;
 	if (!Watcher) {
 		Watcher = new wxFileSystemWatcher();
 		Watcher->SetOwner(this);
