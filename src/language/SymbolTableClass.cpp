@@ -547,7 +547,7 @@ void t4p::SymbolTableClass::OnAnyExpression(pelet::ExpressionClass* expr) {
 	// loop through the closure's lexical variables "use" variables and add them to the scope
 	for (size_t i = 0; i < closure->LexicalVars.size(); ++i) {
 		VariableFound(closure->Scope.NamespaceName, closure->Scope.ClassName, functionName,
-			*closure->LexicalVars[i], &newCallExpr, closure->Parameters[i]->Comment);
+			*closure->LexicalVars[i], &newCallExpr, closure->LexicalVars[i]->Comment);
 	}
 	
 	// loop through the closure's inner statements to get variable assignments

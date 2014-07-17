@@ -505,7 +505,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("time"), ResourceMatches[1].Identifier);
 }
 
-
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosure) {
 
 	// a closure should be its own scope, without being able to access
@@ -527,6 +526,31 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosure) {
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, VariableMatches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$someName"), VariableMatches[0]);
+}
+
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosureWithLexicalVars) {
+
+	// a closure should have access to the variables that are passed in via the
+	// use statement
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"function printUser(User $user) {\n"
+		"  $functionOne = 1;\n"
+		"  $functionTwo = 2;\n"
+		"  call_user_func(function() use($functionTwo) {\n"
+		"    $someName = '';\n"
+		"  });\n"
+		"}\n"
+	);
+	Init(sourceCode);
+	ToVariable(UNICODE_STRING_SIMPLE("$func"));
+	Scope.ClassName = UNICODE_STRING_SIMPLE("");
+	Scope.MethodName = UNICODE_STRING_SIMPLE("printUser");
+	Scope.SetIsAnonymous(true, 0);
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$functionTwo"), VariableMatches[0]);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableOutsideClosure) {
