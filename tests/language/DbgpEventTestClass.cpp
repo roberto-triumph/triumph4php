@@ -183,7 +183,7 @@ TEST(DebugEngineErrorResponse) {
 		"          transaction_id=\"transaction_id\"> \n"
 		"    <error code=\"3\" \n"
 		"           apperr=\"app specific error code\"> \n"
-		"       <message>aW52YWxpZCBjb250ZXh0IG5hbWU=</message>" // base64 encoded "invalid context name"
+		"       <message>invalid context name</message>" // error messages are not base64 encoded 
 		"    </error> \n"
 		"</response>\n"
 	);
