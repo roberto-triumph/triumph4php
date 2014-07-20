@@ -42,7 +42,7 @@ newaction {
 		cmdStream:close()
 		
 		userRoot = cmdOutput
-		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-0.4"
+		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..tag
 		desktopFile = userRoot .. "/rpmbuild/SPECS/triumph4php.desktop"
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
@@ -61,6 +61,7 @@ newaction {
 			batchexecute(rootDir, {
 			
 				-- clone the project into a new, temp directory
+                string.format("rm -rf %s", workDir),
 				string.format("git clone . %s", workDir),
 				string.format("cd %s", workDir),
 				"git submodule init",
