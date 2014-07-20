@@ -35,11 +35,13 @@ newaction {
 		
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
-		--
-		batchexecute(normalizepath(""), {
-			"rmdir /s /q " .. destDir
-		});
-		
+		-- rmdir fails on MSW if the directory does not exist, we want this
+		-- script to continue if the dest dir does not exist
+		if (os.isdir(destdir)) then
+			batchexecute(normalizepath(""), {
+				"rmdir /s /q " .. destDir
+			});
+		endif
 		batchexecute(normalizepath(""), {
 			string.format("\"%s\" clone %s %s", GIT, ".", destDir),
 			string.format("cd %s", destDir),
