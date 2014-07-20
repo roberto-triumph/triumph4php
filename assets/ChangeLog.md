@@ -1,7 +1,7 @@
 Triumph 4 PHP ChangeLog
 =======================
 
-#Version 0.5.1#
+#Version 0.5.2#
 * Triumph is now a full Xdebug client (Linux, MSW)
 * Triumph can be used for remote Xdebug debugging (Linux, MSW)
 * Code completion and call tips now work inside closures (Linux, MSW)
