@@ -150,6 +150,11 @@ You can go to Edit ... Preferences to configure a few Xdebug settings.
 
   And the script being debugged is located in /var/www/products/show.php then
   the local path is calculated to be c:\wamp\products\show.php.
+  __WARNING__ do note that Xdebug always uses the "real path", in the case
+  of symbolic links Xdebug returns the directory the symlink points to and
+  not the symlink.  For example, if apache is serving /var/www/site, but
+  /var/www/site is actually a symlink to /home/site, then your source code
+  mapping should be "/home/site" and not "/var/www".
 
 #Help! I can't get debugging to work!#
 You should ensure the following:

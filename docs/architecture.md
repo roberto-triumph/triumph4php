@@ -208,3 +208,14 @@ file; it contains the design of widgets.  The cpp and h are generated from
 the design files.  The C++ files in this directory are never manually edited; they are
 always generated when the design changes.
 
+
+##Describe Triumph's architecture in as few words as possible##
+Basically, it goes like this:
+
+User performs an action, like a choosing a menu item or pressing a keyboard
+shortcut.  The features listen for these UI events; the features then modify
+the appropriate globals classes or bring up new dialogs.  The features may also
+trigger new Action instances due to user UI events.
+
+
+
