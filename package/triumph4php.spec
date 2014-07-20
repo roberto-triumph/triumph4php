@@ -1,10 +1,10 @@
 Name:           triumph4php
-Version:        0.4
+Version:        0.5.1
 Release:        1%{?dist}
 Summary:        Open source, cross-platform editor and IDE dedicated exclusively for PHP 
 License:        MIT
 URL:            http://triumph4php.com
-Source0:        triumph4php-0.4
+Source0:        triumph4php-0.5.1
 
 #BuildRequires: glibc.i686 
 BuildRequires: community-mysql-devel
@@ -13,12 +13,15 @@ BuildRequires: gtk2-devel
 BuildRequires: libicu-devel
 BuildRequires: cmake
 BuildRequires: libcurl-devel
+BuildRequires: boost-system
+BuildRequires: asio-devel
 
 Requires: community-mysql      
 Requires: sqlite      
 Requires: curl
 Requires: gtk2  
-Requires: libicu  
+Requires: libicu 
+Requires: boost-system
 
 %description
 Triumph 4 PHP is an IDE where PHP is a first-class citizen. Triumph was 
