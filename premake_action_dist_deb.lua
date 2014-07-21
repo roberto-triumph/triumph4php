@@ -36,12 +36,12 @@ newaction {
 		-- linux distribution: we package a .DEB file
 		--
 		--
-		workDir = path.getabsolute("../triumph4php-0.4")
+		workDir = path.getabsolute("../triumph4php-" .. tag)
 		workLibDir = "/usr/lib/triumph4php"
 		rootDir = normalizepath("./")
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
-		debianControl = path.getabsolute("../debian.control");
+		debianControl = path.getabsolute("./package/debian.control");
 		
 		if (not os.isdir(workDir)) then
 			batchexecute(rootDir, {

@@ -1,0 +1,22 @@
+Source: triumph4php
+Section: devel
+Priority: extra
+Maintainer: roberto <roberto@triumph4php.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Homepage: http://triumph4php.com
+Vcs-Git: https://code.google.com/p/triumph4php
+Vcs-Browser: https://code.google.com/p/triumph4php
+
+Package: triumph4php
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Triumph 4 PHP is a PHP Editor and IDE
+  Triumph 4 PHP is an open source editor and Integrated Development Environment 
+  (IDE) where PHP is a first-class citizen. Triumph was written exclusively 
+  for developing mid to large size web applications that run on the LAMP/WAMP 
+  stack. It saves you time by allowing you to easily navigate through your 
+  project's directory structure, database schema, and class hierarchy, no 
+  matter how deep. Triumph does all of this in a clutter-free, tight 
+  interface that has a native look on either Windows or Linux. Win the battle 
+  against PHP web applications by using Triumph 4 PHP! 
