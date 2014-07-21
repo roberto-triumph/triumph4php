@@ -17,6 +17,7 @@ The following software is required to run triumph4php
 	  - SQLite client library libsqlite3
 	  - ICU libicu
 	  - CURL libcurl
+	  - boost system library libboost-system
 
 # Hardware Requirements #
 triumph4php will take moderate resources on the system.
@@ -36,15 +37,21 @@ located inside the bin directory.
 There are Debian and RPM archives of triumph4php available at the triumph4php main site. Once downloaded,
 the Debian package can be run via `dpkg -i` and the RPM can be installed via `rpm -i`
 
-##Installation On Debian-based Systems##
+##Installation On Ubuntu 12.04##
 
-    sudo apt-get install libmysqlclient18 sqlite3 libicu48 libcurl3
-	dpkg -i triumph4php_0.4_amd64.deb
+    sudo apt-get install libmysqlclient18 sqlite3 libicu48 libcurl3 libboost-system1.46.1
+	sudo dpkg -i triumph4php_0.5.2_ubuntu_12_04_amd64.deb
+
+##Installation On Ubuntu 13.10##
+
+    sudo apt-get install libmysqlclient18 sqlite3 libicu48 libcurl3 libboost-system1.49.1
+	sudo dpkg -i triumph4php_0.5.2_ubuntu_13_10_amd64.deb
+
 
 ##Installation On Red Hat-based Systems##
 
-    sudo yum install libicu community-mysql-common sqlite
-    rpm -iVh triumph4php_0.4-1.fc20.x86_64.rpm
+    sudo yum install libicu community-mysql-common sqlite boost-system
+    sudo rpm -iVh triumph4php-0.5.2-1.fc20.x86_64.rpm
 
 ##Installation On Other Linux Systems##
 

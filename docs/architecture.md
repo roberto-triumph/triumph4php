@@ -92,130 +92,141 @@ Triumph developers also use the following programs.
 ##What editor do I have to use?##
 Because Triumph uses premake, we are able to create Visual Studio solution files
 (including Express editions), GNU Makefiles, CodeLite, and Code::Blocks workspace files. 
-Any code editor that can handle any of those files.
+You can use any source code editor that can handle any of those files.
 
-##Explain Each directory##
+##Describe Triumph's architecture in as few words as possible##
+Basically, it goes like this:
 
-* __ROOT__
-  The root directory of the project contains the build configuration (premake) files.
+Feature ==> Action (optional) ==> Globals
 
-* __Debug, Release__
-  these directories hold the results of compilation (object files).
+Triumph has 3 main subjects: features, actions, and globals.
+A __feature__ is a discrete, user-noticeable functionality (like say, find in files). An
+__action__ is a piece of code that is executed in a background thread.  A __global__
+is the "domain model" of Triumph; for example a class that represents a project, 
+a class that represents a tag (parsed class / methods), and so on.
 
-* __assets__
-  This directory holds images used in Triumph, as well as the SQLite database that
+The user (PHP coder) generates a UI event like a choosing a menu item or pressing a keyboard
+shortcut.  The features listen for UI events; the features then modify
+the appropriate globals classes or bring up new dialogs.  The features may also
+trigger new Action instances due to user UI events.
+
+
+###Example: New Project###
+
+1. PHP code activates the File ... New Project menu
+2. The Project feature responds to the menu event by showing the PHP coder 
+   a dialog where they choose the root of the new project.
+3. Once the PHP coder selects the directory, the Project feature responds
+   by creating a new "global" project, adding it to the projects list, persisting
+   the project in the config file.
+
+###Example: Find In Files###
+
+1. PHP coder activates the Search...Find in files menu
+2. The FindInFiles feature responds to the menu event by showing the find in files dialog.
+3. PHP coder enters the term to search for and what directory to search in.
+3. The FindInFiles feature then creates a new action FindInFilesBackgroundReader to 
+   perform file searching in a background thread.
+4. The FindInFilesBackgroundReader action communicates with the FindInFiles feature
+   by "posting" events to the FindInFiles feature.
+5. The FindInFiles feature responds to the FindInFilesBackgroundReader events by
+   updating the search results panel.
+
+##I just cloned the repo and compiled Triumph. Any pointers about next steps?##
+
+* Look at the tutorial projects; wx_window_tutorial, soci_tutorial, and the others 
+  to understand how each of the different libraries work.
+* Look at src/features/TestFeatureClass.cpp.  This class is a stripped-down, bare-bones
+  feature that shows how you can create toolbar buttons or menu items.
+
+##How is the source organized##
+
+* __ROOT__ of the project contains the build configuration (premake) files.
+
+* __Debug, Release__  hold the results of compilation (object files, executables).
+
+* __assets__  holds images used in Triumph, as well as the SQLite database that
   holds the docs for the native PHP functions.
 
-* __build__
-  This directory holds the results of premake. Here you will find the generated
+* __build__ holds the results of premake. Here you will find the generated
   solution files / Makefiles.
 
-* __docs__
-  This directory contains the user manual.
+* __docs__ contains the user manual, in markdown format.
 
-* __lib__
-  This directory contains the dependant libraries that Triumph uses. This directory
+* __lib__ contains the libraries that Triumph uses. This directory
   is mostly empty in source control; most libraries are brought in via Git 
   sub-modules.
  
-* __package__
-  This directory contains files for generating the final package files (RPM, DEB).
+* __package__ contains files for generating the final package files (RPM, DEB).
 
-* __php_samples__
-  This directory contains PHP files that are useful when testing Triumph.
+* __php_samples__ contains PHP files that are useful when testing Triumph.
   For example, there is a PHP file that contains UTF-8 characters, for
   use in testing to make sure Triumph can render UTF-8 properly.
 
-* __profilers__
-  This directory contains a couple of 1-file programs that exercise 
+* __profilers__ contains a couple of 1-file programs that exercise 
   crucial editor functionality, like PHP parsing entire directory or
   searching of an entire directory. These programs are usually run
   under a profiler like valgrind or Very Sleepy.
 
-* __src__
-  This directory contains the C++ source code.    
+* __src__ contains the C++ source code.    
 
-* __tests__
-  This directory contains Triumph unit tests.  The directory structure
+* __tests__ contains Triumph unit tests.  The directory structure
   mirrors the structure of the src directory. The tests/ directory
   contain the test runner and a couple of fixture classes, and the 
   tests themselves are located inside the sub-directories.
 
-* __tutorials__
-  This directory contains several small 1-file programs that I initially
+* __tutorials__ contains several small 1-file programs that I initially
   used when starting Triumph.  For example, the tutorials directory contains
   a very simple wxWidgets program, a very simple program that uses SOCI, and
   a simple program that uses ICU.  These 1-file programs help when learning
   the libraries and they also aid in debugging; you can quickly test things
   out to see if there is a bug in one of the libraries.
 
-
-##How is the source organized##
-
-* __actions__
-Contains classes that execute logic in background threads. Triumph utilizes
+* __actions__ contains classes that execute logic in background threads. Triumph utilizes
 threads in many places so that we keep the main thread from being too
 busy.
 
-* __code_control__
-Contains classes related to managing and configuring Scintilla. Scintilla handles 
+* __code_control__ contains classes related to managing and configuring Scintilla. Scintilla handles 
 a multitude of languages, but we must configure it to turn functionality on or
 off depending on what language the file contains.
 
-* __features__
-A feature is a distinct, user-noticeable functionality. For example, there is a finder feature which
-takes care of showing the finder panel, there is a project feature that
-takes of showing the projects dialogs. Each features is pretty isolated from
+* __features__ Features are distinct, user-noticeable functionality. For example, there is a 
+finder feature which takes care of showing the finder panel, there is a project feature that
+takes of showing the projects dialogs. Each feature is pretty isolated from
 all others and does not interact directly with another feature.
 
-* __features/wxformbuilder__
-This directory contains files with extension fbp, cpp, and h.  The fbp files are wxformbuilder
-files; they contain the designs of the features, There is 1 fbp file per feature; each feature
-may have multiple panels and dialogs in the same design file.  The cpp and h are generated from 
-the design files.  The C++ files in this directory are never manually edited; they are
-always generated when the design changes.
+* __features/wxformbuilder__ contains files with extensions .fbp, .cpp, or .h.  The 
+.fbp files are wxformbuilder files; they contain the designs of the features. There is 1 
+.fbp file per feature; each feature may have multiple panels and dialogs in the same design 
+file.  The .cpp and .h files are generated from the design files.  The C++ files in this directory 
+are never manually edited; they are always generated when the design changes.
 
-* __globals__
-Globals are classes that are shared between features; globals are the "domain
+* __globals__ holds classes that are shared between features; globals are the "domain
 models" of Triumph.  For example, there is a ProjectClass that contains project
 info (root directory), and there is a TagClass that holds the tag (parsed PHP
 class name / filename).
 
-* __language__
-Anything that is PHP-specific. PHP linters, PHP tag cache, PHP debugger objects
-are all here.
+* __language__ Anything that is PHP-specific is put in this directory. PHP linters, 
+PHP tag cache, and PHP debugger objects are all here.
 
-* __main_frame__
-The main frame is the Triumph's top-level window; it will display all of the 
-toolbars and menus.
+* __main_frame__ The main frame is the Triumph's top-level window; it will display all of the 
+toolbars and menus. Also, the top-level preferences panel is stored in this directory.
 
-* __main_frame/wxformbuilder__
-This directory contains files with extension fbp, cpp, and h.  The fbp file is a wxformbuilder
-file; it contains the design of the main frame.  The cpp and h are generated from 
-the design file.  The C++ files in this directory are never manually edited; they are
-always generated when the design changes.
+* __main_frame/wxformbuilder__ contains files with extension .fbp, .cpp, and .h.  The 
+.fbp file is a wxformbuilder file; it contains the design of the main frame.  The .cpp 
+and .h files are generated from  the design file.  The C++ files in this directory are 
+never manually edited; they are always generated when the design changes.
 
-* __search__
-search and IO-related classes; classes to search a string, recurse a directory.
+* __search__ contains search and IO-related classes; classes to search a string, recurse a directory.
 
-* __widgets__
-UI-specific classes that are shared among many features; for example file picker
-validator, string validators.
+* __widgets__ contains UI-specific classes that are shared among many features; for example file picker
+validators, string validators.
 
-* __widgets/wxformbuilder__
-This directory contains files with extension fbp, cpp, and h.  The fbp file is a wxformbuilder
-file; it contains the design of widgets.  The cpp and h are generated from 
-the design files.  The C++ files in this directory are never manually edited; they are
-always generated when the design changes.
+* __widgets/wxformbuilder__ contains files with extension fb.p, .cpp, and .h.  The 
+.fbp file is a wxformbuilder file; it contains the design of widgets.  The .cpp and 
+.h files are generated from  the design files.  The C++ files in this directory are never 
+manually edited; they are always generated when the design changes.
 
-
-##Describe Triumph's architecture in as few words as possible##
-Basically, it goes like this:
-
-User performs an action, like a choosing a menu item or pressing a keyboard
-shortcut.  The features listen for these UI events; the features then modify
-the appropriate globals classes or bring up new dialogs.  The features may also
-trigger new Action instances due to user UI events.
-
-
-
+##I've got a clear understanding of Triumph's architecture, what now?##
+Stay tuned for docs that will examine the build system, the action (thread pool),
+and the feature system in depth. In the mean, you can ask questions in the [forums](http://support.triumph4php.com/).

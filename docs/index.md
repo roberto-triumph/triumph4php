@@ -56,3 +56,4 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
 
 # Appendix #
   * [Compiling triumph4php](/compiling/)
+  * [triumph4php architecture](/architecture/)

@@ -123,7 +123,7 @@ to an hour, depending on your machine's processing power.
     sudo yum install libicu libicu-devel community-mysql-common \
 	community-mysql-devel re2c bison cmake git php-cli php-pdo \
     glibc.i686 sqlite sqlite-devel libcurl libcurl-devel \
-    gtk2-devel
+    gtk2-devel boost-system asio-devel
 
 ##Step 2: Download the development tools##
 Use your favorite IDE / editor, or get [Codelite](http://codelite.org)
