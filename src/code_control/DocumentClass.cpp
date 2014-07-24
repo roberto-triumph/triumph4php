@@ -694,20 +694,36 @@ void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force, wxString& statu
 	if (force || wxT('(') == ch) {
 		
 		// back up to the last function call "(" then get the function name, do not get the open parenthesis
-		/// we are always going to do the call tip for the nearest function ie. when
+		// we are always going to do the call tip for the nearest function ie. when
 		// a line is  
 		// Func1('hello', Func2('bye'
 		// we are always going to show the call tip for Func2 (if the cursor is after 'bye')
 		// make sure we don't go past the last statement
+		// - But - 
+		// in this case 
+		// Func1('hello, Func2('bye')
+		// we are going to show the call tip for Func1 since Func2 has been 
+		// closed. we need to ignore matching parenthesis
 		bool hasMethodCall = false;
+		
+		// seed matching parens in case the cursor is at a close parens
+		// we show the call tip
+		int matchingParens = 0;
+		int startingPos = currentPos;
 		while (currentPos >= 0) {
 			char c = Ctrl->GetCharAt(currentPos);
 			if (!InCommentOrStringStyle(currentPos)) {
-				if ('(' == c) {
+				if (')' == c && startingPos != currentPos) {
+					matchingParens++;
+				}
+				else if ('(' == c && matchingParens <= 0) {
 					hasMethodCall = true;
 					break;
 				}
-				if (';' == c) {
+				else if ('(' == c) {
+					matchingParens--;
+				}
+				else if (';' == c) {
 					currentPos = -1;
 					break;
 				}
@@ -750,7 +766,7 @@ void t4p::PhpDocumentClass::HandleCallTip(wxChar ch, bool force, wxString& statu
 				delete result;
 			}
 			size_t matchCount = CurrentCallTipResources.size();
-			if (matchCount > 0) {				
+			if (matchCount > 0) {	
 				wxString callTip = PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
 				Ctrl->CallTipShow(Ctrl->GetCurrentPos(), callTip);
 			}
