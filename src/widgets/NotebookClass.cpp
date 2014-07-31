@@ -223,7 +223,7 @@ void t4p::NotebookClass::MarkPageAsNotModified(int windowId) {
 void t4p::NotebookClass::AddTriumphPage(t4p::CodeControlClass::Mode mode) {
 	if (NULL == ImageList) {
 		ImageList = new wxImageList(16, 16);
-		t4p::FillWithFileType(*ImageList);
+		t4p::FileTypeImageList(*ImageList);
 		AssignImageList(ImageList);
 	}
 	wxString format;
@@ -304,7 +304,7 @@ void t4p::NotebookClass::LoadPage() {
 void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 	if (NULL == ImageList) {
 		ImageList = new wxImageList(16, 16);
-		t4p::FillWithFileType(*ImageList);
+		t4p::FileTypeImageList(*ImageList);
 		AssignImageList(ImageList);
 	}
 	

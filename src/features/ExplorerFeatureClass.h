@@ -180,6 +180,13 @@ private:
 	void OnAppProjectCreated(wxCommandEvent& event);
 	
 	/**
+	 * when another feature wants to open a directory, the will send
+	 * a command, and this feature will "open" the directory (show its
+	 * contents).
+	 */
+	void OnCmdDirOpen(wxCommandEvent& event);
+	
+	/**
 	 * toolbar to hold the explorer buttons
 	 */
 	wxAuiToolBar* ExplorerToolBar;

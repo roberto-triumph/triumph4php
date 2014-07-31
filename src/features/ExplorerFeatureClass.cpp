@@ -429,6 +429,12 @@ void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
 	panel->RefreshDir(projectDir);
 }
 
+void t4p::ExplorerFeatureClass::OnCmdDirOpen(wxCommandEvent& event) {
+	
+	// the same for as when an app project is created, for now
+	OnAppProjectCreated(event);
+}
+
 static void SetExplorerAccelerators(wxListCtrl* ctrl) {
 	wxAcceleratorEntry entries[5];
     entries[0].Set(wxACCEL_NORMAL, WXK_F2, ID_EXPLORER_LIST_RENAME);
@@ -837,50 +843,7 @@ void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
 }
 
 int t4p::FileListingWidgetClass::ListImageId(const wxFileName& fileName) {
-	wxString fullPath = fileName.GetFullPath();
-	if (Feature->App.Globals.FileTypes.HasAPhpExtension(fullPath)) {
-		return t4p::IMGLIST_PHP;
-	}
-	if (Feature->App.Globals.FileTypes.HasASqlExtension(fullPath)) {
-		return t4p::IMGLIST_SQL;
-	} 
-	if (Feature->App.Globals.FileTypes.HasACssExtension(fullPath)) {
-		return t4p::IMGLIST_CSS;
-	}
-	if (Feature->App.Globals.FileTypes.HasAJsExtension(fullPath)) {
-		return t4p::IMGLIST_JS;
-	}
-	if (Feature->App.Globals.FileTypes.HasAConfigExtension(fullPath)) {
-		return t4p::IMGLIST_CONFIG;
-	}
-	if (Feature->App.Globals.FileTypes.HasACrontabExtension(fullPath)) {
-		return t4p::IMGLIST_CRONTAB;
-	} 
-	if (Feature->App.Globals.FileTypes.HasAYamlExtension(fullPath)) {
-		return t4p::IMGLIST_YAML;
-	}
-	if (Feature->App.Globals.FileTypes.HasAXmlExtension(fullPath)) {
-		return t4p::IMGLIST_XML;
-	}
-	if (Feature->App.Globals.FileTypes.HasARubyExtension(fullPath)) {
-		return t4p::IMGLIST_RUBY;
-	}
-	if (Feature->App.Globals.FileTypes.HasALuaExtension(fullPath)) {
-		return t4p::IMGLIST_LUA;
-	}
-	if (Feature->App.Globals.FileTypes.HasAMarkdownExtension(fullPath)) {
-		return t4p::IMGLIST_MARKDOWN;
-	} 
-	if (Feature->App.Globals.FileTypes.HasABashExtension(fullPath)) {
-		return t4p::IMGLIST_BASH;
-	}
-	if (Feature->App.Globals.FileTypes.HasADiffExtension(fullPath)) {
-		return t4p::IMGLIST_DIFF;
-	}
-	if (Feature->App.Globals.FileTypes.HasAMiscExtension(fullPath)) {
-		return t4p::IMGLIST_MISC;
-	}
-	return t4p::IMGLIST_NONE;
+	return t4p::FileTypeImageId(Feature->App.Globals.FileTypes, fileName);
 }
 
 t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
@@ -895,7 +858,7 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
 	FilesImageList = new wxImageList(16, 16);
 	
-	t4p::FillWithFileType(*FilesImageList);
+	t4p::FileTypeImageList(*FilesImageList);
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
@@ -1290,7 +1253,7 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
 	FilesImageList = new wxImageList(16, 16);
 	
-	t4p::FillWithFileType(*FilesImageList);
+	t4p::FileTypeImageList(*FilesImageList);
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
@@ -1983,6 +1946,7 @@ BEGIN_EVENT_TABLE(t4p::ExplorerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::ExplorerFeatureClass::OnAppPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::ExplorerFeatureClass::OnAppPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PROJECT_CREATED, t4p::ExplorerFeatureClass::OnAppProjectCreated)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_DIR_OPEN, t4p::ExplorerFeatureClass::OnCmdDirOpen)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass)

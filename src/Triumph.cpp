@@ -65,6 +65,7 @@
 #include <features/ChangelogFeatureClass.h>
 #include <features/BookmarkFeatureClass.h>
 #include <features/DebuggerFeatureClass.h>
+#include <features/FileCabinetFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -295,6 +296,8 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new BookmarkFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new DebuggerFeatureClass(*this);
+	Features.push_back(feature);
+	feature = new FileCabinetFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

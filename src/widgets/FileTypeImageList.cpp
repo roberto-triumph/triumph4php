@@ -23,9 +23,10 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/FileTypeImageList.h>
-#include <globals/Assets.h> 
+#include <globals/Assets.h>
+#include <globals/FileTypeClass.h>
  
-void t4p::FillWithFileType(wxImageList& imgList) {
+void t4p::FileTypeImageList(wxImageList& imgList) {
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-php")));
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-sql")));
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-css")));
@@ -41,4 +42,51 @@ void t4p::FillWithFileType(wxImageList& imgList) {
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-diff")));
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-text")));
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-blank")));
+}
+
+int t4p::FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileName) {
+	wxString fullPath = fileName.GetFullPath();
+	if (fileTypes.HasAPhpExtension(fullPath)) {
+		return t4p::IMGLIST_PHP;
+	}
+	if (fileTypes.HasASqlExtension(fullPath)) {
+		return t4p::IMGLIST_SQL;
+	} 
+	if (fileTypes.HasACssExtension(fullPath)) {
+		return t4p::IMGLIST_CSS;
+	}
+	if (fileTypes.HasAJsExtension(fullPath)) {
+		return t4p::IMGLIST_JS;
+	}
+	if (fileTypes.HasAConfigExtension(fullPath)) {
+		return t4p::IMGLIST_CONFIG;
+	}
+	if (fileTypes.HasACrontabExtension(fullPath)) {
+		return t4p::IMGLIST_CRONTAB;
+	} 
+	if (fileTypes.HasAYamlExtension(fullPath)) {
+		return t4p::IMGLIST_YAML;
+	}
+	if (fileTypes.HasAXmlExtension(fullPath)) {
+		return t4p::IMGLIST_XML;
+	}
+	if (fileTypes.HasARubyExtension(fullPath)) {
+		return t4p::IMGLIST_RUBY;
+	}
+	if (fileTypes.HasALuaExtension(fullPath)) {
+		return t4p::IMGLIST_LUA;
+	}
+	if (fileTypes.HasAMarkdownExtension(fullPath)) {
+		return t4p::IMGLIST_MARKDOWN;
+	} 
+	if (fileTypes.HasABashExtension(fullPath)) {
+		return t4p::IMGLIST_BASH;
+	}
+	if (fileTypes.HasADiffExtension(fullPath)) {
+		return t4p::IMGLIST_DIFF;
+	}
+	if (fileTypes.HasAMiscExtension(fullPath)) {
+		return t4p::IMGLIST_MISC;
+	}
+	return t4p::IMGLIST_NONE;
 }

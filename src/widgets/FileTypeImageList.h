@@ -27,9 +27,16 @@
 #define __T4P_FILETYPEIMAGELIST_H__
 
 #include <wx/imaglist.h>
+#include <wx/filename.h>
 
 namespace t4p {
+
+// forward declaration; declared in another file
+class FileTypeClass;
 	
+/**
+ * The file types that we have an icon for
+ */
 enum Images {
 	IMGLIST_PHP,
 	IMGLIST_SQL,
@@ -52,7 +59,17 @@ enum Images {
  * fills a wxImageList with the images for each of the
  * file types that Triumph supports
  */
-void FillWithFileType(wxImageList& imgList);
+void FileTypeImageList(wxImageList& imgList);
+
+/**
+ * @param fileTypes the configured file type extensions
+ * @param fileName the filename to check
+ * @return int Images enum entry that corresponds with the give
+ *         fileName.
+ *         For example, if fileName is "/home/user/index.php" then
+ *         this function returns t4p::IMGLIST_PHP
+ */
+int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileName);
 
 }
 

@@ -515,8 +515,19 @@ extern const wxEventType EVENT_APP_PROJECT_CREATED;
  * Tell the app to open a new file.
  * Note that the app will do NOTHING if the path is invalid; the feature should
  * make sure the path is valid.
+ * The event is of type t4p::OpenFileCommandEventClass, the full path should be
+ * located in event.GetString()
  */
 extern const wxEventType EVENT_CMD_FILE_OPEN;
+
+/**
+ * Tell the app to open an explorer panel to a directory.
+ * Note that the app will do NOTHING if the path is invalid; the feature should
+ * make sure the path is valid.
+ * The event is of type wxCommandEvent, the full path should be
+ * located in event.GetString()
+ */
+extern const wxEventType EVENT_CMD_DIR_OPEN;
 
 /**
  * Tell the app to run a command. The app will run the command line

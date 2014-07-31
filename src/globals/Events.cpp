@@ -174,6 +174,7 @@ const wxEventType t4p::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_PROJECT_CREATED = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_FILE_OPEN = wxNewEventType();
+const wxEventType t4p::EVENT_CMD_DIR_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();

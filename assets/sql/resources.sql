@@ -30,6 +30,7 @@
 
 -- this table store all "source" directories. a source directory is just a 
 -- directory that contains source code files
+-- each source corresponds to a source directory that the user has added to a project.
 CREATE TABLE IF NOT EXISTS sources (
 	source_id INTEGER PRIMARY KEY,
 	
@@ -245,6 +246,24 @@ CREATE TABLE IF NOT EXISTS db_tables (
 	table_name TEXT NOT NULL COLLATE NOCASE
 );
 
+-- this table stores full paths to files or directories that
+-- the user wants quick access to. These are separate from
+-- projects all together.
+CREATE TABLE IF NOT EXISTS file_cabinet_items (
+	
+	file_cabinet_item_id INTEGER PRIMARY KEY,
+	
+	-- the full name of the file (with the extesion) or if this is a directory
+	-- then name is the name of the last sub-directory
+	name TEXT NOT NULL COLLATE NOCASE,
+	
+	-- this full_path has OS-dependant directory separators
+	-- storing it as case-insensitive because we always want to do case-insensitive lookups
+	-- if this item is a directory, it will end with the directory
+	-- separator
+	full_path TEXT NOT NULL COLLATE NOCASE
+);
+
 --
 -- This table will store any column names that we
 -- detect from the configured database connections
@@ -288,10 +307,13 @@ CREATE INDEX IF NOT EXISTS idxResourceSource ON resources(source_id);
 -- class / methods / functions.
 CREATE INDEX IF NOT EXISTS idxTraitKey ON trait_resources(key);
 
+-- to enable fast lookups for file cabinet items.
+CREATE INDEX IF NOT EXISTS idxFileCabinetName ON file_cabinet_items(name);
+
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(7);
+INSERT INTO schema_version (version_number) VALUES(8);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes
