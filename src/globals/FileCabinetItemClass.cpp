@@ -86,6 +86,7 @@ bool t4p::FileCabinetStoreClass::Store(soci::session& session, t4p::FileCabinetI
 		);
 		stmt.execute(true);
 		
+		item.Id = t4p::SqliteInsertId(stmt);
 		
 		ret = true;
 	} catch (std::exception& e) {

@@ -145,7 +145,7 @@ void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL == response || (wxYES == response && 
-				!SavePage(currentPage))) {
+				!SavePage(currentPage, true))) {
 			vetoed = false;
 			event.Veto();
 		}
@@ -161,7 +161,7 @@ void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 	}
 }
 
-bool t4p::NotebookClass::SavePage(int pageIndex) {
+bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 	CodeControlClass* phpSourceCodeCtrl = GetCodeControl(
 			pageIndex);
 	bool saved = false;
@@ -173,7 +173,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex) {
 		fileDialog.SetFilterIndex(filterIndex);
 		if (wxID_OK == fileDialog.ShowModal()) {
 			wxString newFullPath = fileDialog.GetPath();
-			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath)) {
+			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath, willDestroy)) {
 				wxMessageBox(wxT("Could Not Save File."));
 			}
 			else {
@@ -193,7 +193,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex) {
 		}
 	}
 	else {
-		if (phpSourceCodeCtrl && !phpSourceCodeCtrl->SaveAndTrackFile()) {
+		if (phpSourceCodeCtrl && !phpSourceCodeCtrl->SaveAndTrackFile(wxT(""), willDestroy)) {
 			wxMessageBox(wxT("Could Not Save File."));
 		}
 		else {
@@ -406,7 +406,7 @@ void t4p::NotebookClass::RefreshCodeControlOptions() {
 
 bool t4p::NotebookClass::SaveCurrentPage() {
 	int currentPage = GetSelection();
-	return SavePage(currentPage);
+	return SavePage(currentPage, false);
 }
 
 bool t4p::NotebookClass::SaveCurrentPageAsNew() {
@@ -466,7 +466,7 @@ bool t4p::NotebookClass::SaveAllModifiedPages() {
 		else {
 			wxArrayInt selections = dialog.GetSelections();
 			for (size_t i = 0; i < selections.size(); ++i) {
-				SavePage(modifiedPageIndexes[selections[i]]);
+				SavePage(modifiedPageIndexes[selections[i]], false);
 			}
 		}
 	}
@@ -476,7 +476,7 @@ bool t4p::NotebookClass::SaveAllModifiedPages() {
 void t4p::NotebookClass::SaveAllModifiedPagesWithoutPrompting() {
 	for (size_t i = 0; i < GetPageCount(); i++) {
 		if (IsPageModified(i)) {
-			SavePage(i);
+			SavePage(i, false);
 		}
 	}
 }
@@ -559,7 +559,7 @@ void t4p::NotebookClass::ClosePage(int index) {
 		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL != response) {
-			if (wxYES == response && !SavePage(index)) {
+			if (wxYES == response && !SavePage(index, true)) {
 				//something drastic. dont know how to handle it
 			}
 			DeletePage(index);

@@ -133,6 +133,11 @@ void t4p::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
 	sqlite_api::sqlite3_busy_timeout(backend->conn_, timeoutMs);
 }
 
+int t4p::SqliteInsertId(soci::statement& stmt) {
+	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
+	return sqlite3_last_insert_rowid(backend->session_.conn_);
+}
+
 
 t4p::SqliteFinderClass::SqliteFinderClass() {
 	Session = NULL;

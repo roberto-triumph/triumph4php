@@ -28,6 +28,7 @@
 #include <globals/GlobalsClass.h>
 #include <globals/Errors.h>
 #include <globals/Events.h>
+#include <globals/Assets.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <search/FindInFilesClass.h>
 #include <wx/filename.h>
@@ -35,6 +36,7 @@
 #include <wx/stc/stc.h>
 #include <wx/utils.h>
 #include <wx/tokenzr.h>
+#include <wx/process.h>
 #include <unicode/ustring.h>
 #include <sys/stat.h>
 
@@ -61,6 +63,119 @@ const int t4p::CODE_CONTROL_INDICATOR_FIND = 1;
 // start stealing styles from "asp javascript" we will never use those styles
 const int t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
+namespace t4p {
+
+/**
+ * This class is the process that will copy the contents of
+ * a the code control into a file that the current user does not
+ * have write access to. See the SavePrivilegedFileWithCharset
+ * function for more info.
+ * This class will delete the temp script and temp file that
+ * are created; also, the process will publish the saved event
+ * to the rest of the Triumph application
+ */
+class ElevatedSaveProcessClass : public wxProcess {
+
+public:
+	
+	// the temp file and script temp are used to copy the
+	// contents that the user has edited into the original
+	// file.
+	wxString TempFile;
+	wxString ScriptTempFile;
+	
+	/**
+	 * the code control that the user saved.  after the save is completed,
+	 * we mark the file as having been saved (file is no longer dirty)
+	 * and update the last modified timestamp 
+	 * This class will not own the pointer.
+	 * This pointer may be NULL if the user closes the file right after
+	 * the save.
+	 */
+	t4p::CodeControlClass* CodeCtrl;
+	
+	/**
+	 * After the file is saved, we tell the rest of the Triumph app
+	 * that the file was saved.
+	 */
+	t4p::EventSinkClass& EventSink;
+	
+	ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink);
+	
+	/**
+	 * this method will get called when the save process completes
+	 */
+	void OnTerminate(int pid, int status);
+	
+	/**
+	 * in case of an error, we can get the error from the input and error
+	 * streams to show the user
+	 */
+	wxString GetProcessOutput() const;
+	
+};
+
+}
+
+t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink) 
+: wxProcess(wxPROCESS_REDIRECT)
+, TempFile()
+, ScriptTempFile()
+, CodeCtrl(ctrl)
+, EventSink(eventSink)
+{
+	
+}
+
+void t4p::ElevatedSaveProcessClass::OnTerminate(int pid, int status) {
+	if (status != 0) {
+		wxString error = GetProcessOutput();
+		wxMessageBox(wxT("File could not be saved:") + error);
+		wxRemoveFile(TempFile);
+		return;
+	}
+	if (CodeCtrl) {
+		CodeCtrl->MarkAsSaved();
+		
+		// hmm will never tell the app of file saves in this case
+		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, CodeCtrl);
+		EventSink.Publish(codeControlEvent);
+	}
+	wxRemoveFile(TempFile);
+	wxRemoveFile(ScriptTempFile);
+}
+
+wxString t4p::ElevatedSaveProcessClass::GetProcessOutput() const {
+	wxInputStream* stream = GetInputStream();
+	wxString allOutput;
+	while (IsInputAvailable()) {
+		char ch = stream->GetC();
+		if (isprint(ch) || isspace(ch)) {
+			allOutput.Append(ch);
+		}
+	}
+	stream = GetErrorStream();
+	while (IsErrorAvailable()) {
+		char ch = stream->GetC();
+		if (isprint(ch) || isspace(ch)) {
+			allOutput.Append(ch);
+		}
+	}
+	return allOutput;
+}
+
+/**
+ * saves the given contents into the given file path; 
+ * taking into account UTF-8 BOM signature if desired. The full path
+ * must be writable, else an error will occur.
+ * 
+ * @param fullPath the path to save the file to. If file already exists it will
+ *        be overwritten
+ * @param contents the contents to put in the file
+ * @param charset the character set to save the file as
+ * @param hasSignature if TRUE, then the UTF-8 BOM will be written to the file
+ * @return bool TRUE if file was successfully saved
+ */
 static bool SaveFileWithCharset(const wxString& fullPath, const wxString& contents, 
 	const wxString& charset, bool hasSignature) {
 	bool ret = false;
@@ -77,6 +192,87 @@ static bool SaveFileWithCharset(const wxString& fullPath, const wxString& conten
 	}
 	return ret;
 		
+}
+
+/**
+ * saves the given contents into the given file path; 
+ * taking into account UTF-8 BOM signature if desired. This 
+ * function uses a different save algorithm, it will save the
+ * contents to a temp file and them perform a overwrite the original
+ * file that was opened using elevated privileges (root / administrator)
+ * The move will is done with escalated privileges so files that are read-only 
+ * may be saved; a good example of this is the system hosts file.
+ * 
+ * The mechanics of saving are as follows:
+ * 1. the contents of the code control are saved to a temp file
+ * 2. a temp script is created that echos the contents of the temp file
+ *    into the original file that was opened.  This script is needed 
+ *    because if we use copy / mv the permissions attributes of the
+ *    original file are changed and we want to
+ *    retain the original file permissions.
+ * 3. OS-dependant methods are used to run the script created in
+ *    step (1) with escalated privileges; in linux
+ *    gksu or ksudo are used. Note that at no time does the Triumph process
+ *    attain escalated privileges.
+ * 4. The privilege escalation method will ask the user for their 
+ *    password if needed; note that Triumph never receives the user's 
+ *    password. 
+ * 5. After the script runs, we delete the temp script and the temp file.
+ * 
+ * @param fullPath the path to save the file to. If file already exists it will
+ *        be overwritten.
+ * @param contents the contents to put in the file
+ * @param charset the character set to save the file as
+ * @param hasSignature if TRUE, then the UTF-8 BOM will be written to the file
+ * @param codeCtrl the code control being saved
+ * @param eventSink to notify the rest of the app when the file is saved
+ * @return bool TRUE if external process was started.
+ */
+static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxString& contents, 
+	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
+	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
+	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
+	bool ret = savedTemp;
+	
+	// now copy the contents the temp file to the desired location
+	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
+	// and we want the original file's attributes to not be changed.
+	// dumping the echo into its own script because I could not figure out
+	// how to properly escape
+	// i tried this
+	// 
+	//  gksudo  "sh -c \"echo 'file1' > 'file2' \" "
+	// 
+	// but it did not work
+	// also I tried making this a synchronous process, but the GUI
+	// badly affected
+	wxPlatformInfo platform;
+	if (wxOS_UNIX_LINUX == platform.GetOperatingSystemId()) {
+		
+		wxString scriptContents = wxString::Format(
+			"cat \"%s\" > \"%s\" ",
+			tempFile, fullPath
+		);
+		wxString scriptTempFile = wxFileName::CreateTempFileName("triumph_script");
+		SaveFileWithCharset(scriptTempFile, scriptContents, "", false);
+		
+		// wanted to use mv, but mv will overwrite permissions and ownership
+		// we want to keep the file's original ownership
+		// ie. if a file owned by root is being saved, it should stay
+		// as owned by root and not the current user.
+		wxString cmd = wxString::Format(
+			"gksu --description='%s' \"sh '%s'\"",
+			wxT("Triumph4PHP privilege save"),
+			scriptTempFile
+		);
+		
+		t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
+		proc->TempFile = tempFile;
+		proc->ScriptTempFile = scriptTempFile;
+		int pid = wxExecute(cmd, wxEXEC_ASYNC, proc);
+		ret = pid > 0;
+	}
+	return ret;
 }
 
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
@@ -192,7 +388,7 @@ bool t4p::CodeControlClass::IsNew() const {
 	return CurrentFilename.empty();
 }
 
-bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
+bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDestroy) {
 	bool saved = false;
 	if (CodeControlOptions.TrimTrailingSpaceBeforeSave) {
 		TrimTrailingSpaces();
@@ -201,13 +397,36 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		RemoveTrailingBlankLines();
 	}
 
+	bool isAsyncSave = false;
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
-		saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
-
+		
 		// if file is not changing name then its not changing extension
 		// no need to auto detect the document mode
-	}
-	else if (SaveFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature)) {
+		bool isWritable = wxFileName::IsFileWritable(CurrentFilename);
+		bool doesExist = wxFileName::FileExists(CurrentFilename);
+		
+		if (!doesExist || isWritable) {
+			saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
+		}
+		else {
+			t4p::CodeControlClass* ctrl = willDestroy ? NULL : this;
+			saved = SavePrivilegedFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature, 
+				ctrl, EventSink);
+			isAsyncSave = true;
+		}
+	}	
+	else {
+		bool isWritable = wxFileName::IsFileWritable(newFilename);
+		bool doesExist = wxFileName::FileExists(newFilename);
+		if (!doesExist || isWritable) {
+			saved = SaveFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature);
+		}
+		else {
+			t4p::CodeControlClass* ctrl = willDestroy ? NULL : this;
+			saved = SavePrivilegedFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature,
+				ctrl, EventSink);
+			isAsyncSave = true;
+		}
 		CurrentFilename = newFilename;
 		saved = true;
 
@@ -218,23 +437,27 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename) {
 		// need to notify the document of the new name
 		Document->FileOpened(newFilename);
 	}
-	if (saved) {
-		SetSavePoint();
-
-		// when saving, update the internal timestamp so that the external mod check logic works correctly
-		// using stat() function instead of wxFileName::GetModificationTime()
-		// it seems that GetFileTimes() win32 function and stat() function
-		// do different things; GetFileTimes() seems to have some caching
-		struct stat buff;
-		const wxCharBuffer cname = CurrentFilename.c_str();
-		if (stat(cname.data(), &buff) >= 0) {
-			FileOpenedDateTime.Set(buff.st_mtime);
-		}
-		else {
-			FileOpenedDateTime = wxDateTime::Now();
-		}
+	if (saved && !isAsyncSave) {
+		MarkAsSaved();
 	}
 	return saved;
+}
+
+void t4p::CodeControlClass::MarkAsSaved() {
+	SetSavePoint();
+
+	// when saving, update the internal timestamp so that the external mod check logic works correctly
+	// using stat() function instead of wxFileName::GetModificationTime()
+	// it seems that GetFileTimes() win32 function and stat() function
+	// do different things; GetFileTimes() seems to have some caching
+	struct stat buff;
+	const wxCharBuffer cname = CurrentFilename.c_str();
+	if (stat(cname.data(), &buff) >= 0) {
+		FileOpenedDateTime.Set(buff.st_mtime);
+	}
+	else {
+		FileOpenedDateTime = wxDateTime::Now();
+	}
 }
 
 wxString t4p::CodeControlClass::GetFileName() const {

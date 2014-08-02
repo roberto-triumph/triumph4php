@@ -99,7 +99,30 @@ t4p::StatusBarWithGaugeClass* t4p::MainFrameClass::GetStatusBarWithGauge() {
 void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 	bool destroy = true;
 	if (event.CanVeto()) {
-		destroy = Notebook->SaveAllModifiedPages();
+		
+		// if we have any files that are saved using privilege mode
+		// lets tell the user to save them first.  we don't
+		// want to close the app while the async save process
+		// is running
+		for (size_t i = 0; i < Notebook->GetPageCount(); i++) {
+			t4p::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
+			wxString filename = ctrl->GetFileName();
+			if (!ctrl->IsNew() && ctrl->IsModified() 
+				&& !filename.empty() 
+				&& wxFileName::FileExists(filename)
+				&& !wxFileName::IsFileWritable(filename)) {
+				wxMessageBox(
+					_("You have modified files that need to be saved with escalated privileges.\n") +
+					_("Please save those files or discard the changes before exiting"), 
+					_("Triumph")
+				);
+				destroy = false;
+				break;
+			}
+		}
+		if (destroy) {
+			destroy = Notebook->SaveAllModifiedPages();
+		}
 	}
 	if (destroy) {
 
@@ -152,12 +175,6 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 
 void t4p::MainFrameClass::OnFileSave(wxCommandEvent& event) {
 	Notebook->SaveCurrentPage();
-	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeControl);
-
-	for (size_t i = 0; i < Features.size(); i++) {
-		wxPostEvent(Features[i], codeControlEvent);
-	}
 }
 
 void t4p::MainFrameClass::OnFilePhpNew(wxCommandEvent& event) {

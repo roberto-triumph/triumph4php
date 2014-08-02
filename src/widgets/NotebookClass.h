@@ -96,9 +96,11 @@ public:
 	 * for a filename if the page is a new page.
 	 * 
 	 * @param int pageIndex the index of the page
+	 * @param willDestroy TRUE if the code control will be destroyed right
+	 *        after the save
 	 * @return bool true if the page was saved successfully
 	 */
-	bool SavePage(int pageIndex);
+	bool SavePage(int pageIndex, bool willDestroy);
 	
 	/**
 	 * Saves the current page to a file. This method will prompt the user

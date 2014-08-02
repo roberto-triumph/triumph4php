@@ -64,14 +64,16 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreFile) {
 	CHECK(store.Store(Session, item));
 	
 	// check that it has been inserted in the table
+	int id;
 	std::string name;
 	std::string fullPath;
-	soci::statement stmt = (Session.prepare << "SELECT name, full_path FROM file_cabinet_items",
-		soci::into(name), soci::into(fullPath)
+	soci::statement stmt = (Session.prepare << "SELECT file_cabinet_item_id, name, full_path FROM file_cabinet_items",
+		soci::into(id), soci::into(name), soci::into(fullPath)
 	);
 	stmt.execute(true);
 	CHECK_EQUAL("test.php", name);
 	CHECK_EQUAL(fileToSave, fullPath);
+	CHECK_EQUAL(id, item.Id);
 }
 
 TEST_FIXTURE(FileCabinetFixtureClass, StoreDirectory) {
@@ -95,14 +97,16 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreDirectory) {
 	CHECK(store.Store(Session, item));
 	
 	// check that it has been inserted in the table
+	int id;
 	std::string name;
 	std::string fullPath;
-	soci::statement stmt = (Session.prepare << "SELECT name, full_path FROM file_cabinet_items",
-		soci::into(name), soci::into(fullPath)
+	soci::statement stmt = (Session.prepare << "SELECT file_cabinet_item_id, name, full_path FROM file_cabinet_items",
+		soci::into(id), soci::into(name), soci::into(fullPath)
 	);
 	stmt.execute(true);
 	CHECK_EQUAL("config", name);
 	CHECK_EQUAL(fileToSave, fullPath);
+	CHECK_EQUAL(id, item.Id);
 }
 
 TEST_FIXTURE(FileCabinetFixtureClass, DeleteItem) {

@@ -101,6 +101,14 @@ bool SqliteTables(soci::session& session, std::vector<std::string>& tableNames, 
 void SqliteSetBusyTimeout(soci::session& session, int timeoutMs = 100);
 
 /**
+ * Get the ID of the last insert, useful for auto incremented primary keys
+ * 
+ * @param stmt the insert statement that was executed
+ * @return int the last insert ID, -1 if there's an error
+ */
+int SqliteInsertId(soci::statement& stmt);
+
+/**
  * Generic class that will encapsulate a single query, the prepared statement,
  * and the result. Subclassses will override the Prepare() method and 
  * create a statement for q query.

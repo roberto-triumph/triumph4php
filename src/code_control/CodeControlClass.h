@@ -198,10 +198,22 @@ public:
 	 * the tracking feature will be broken.
 	 *
 	 * @param wxString filename the full path where the contents of the code
-	 * 	control will be saved to.  Existing file will be overwritten.
+	 * 	      control will be saved to. If empty, the existing name is used.
+     *        The existing file will be overwritten if it exists on the disk.
+	 * @param willDestroy TRUE if this code control will be deleted after the file
+	 *        is save (ie. the user will close the file right after the save)
+	 *        we need to know this in case a file is saved asynchronously, we 
+	 *        don't need to track the file in this case
 	 * @return bool true if the file was successfully saved.
 	 */
-	bool SaveAndTrackFile(wxString filename = wxT(""));
+	bool SaveAndTrackFile(wxString filename, bool willDestroy);
+	
+	/**
+	 * mark a code control as having been saved to disk. this will
+	 * read the saved time from the file system, so that we can track
+	 * if the file has had changes while its open
+	 */
+	void MarkAsSaved();
 
 	/**
 	 * Set the options for this document.  This is auto-detected when using the LoadAndTrackFile() method

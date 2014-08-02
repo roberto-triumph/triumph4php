@@ -27,6 +27,7 @@
 #include <search/FinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
+#include <globals/Sqlite.h>
 #include <wx/filename.h>
 #include <wx/ffile.h>
 #include <algorithm>
@@ -36,7 +37,6 @@
 #include <unicode/fmtable.h>
 #include <unicode/numfmt.h>
 #include <soci/soci.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 
 /**
@@ -208,8 +208,7 @@ int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
 			soci::use(stdFullPath)
 			);
 			stmt.execute(true);
-			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-			sourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
+			sourceId = t4p::SqliteInsertId(stmt);
 		} 
 	}
 	catch (std::exception& e) {
@@ -823,8 +822,7 @@ void t4p::TagParserClass::PersistFileTag(t4p::FileTagClass& fileTag) {
 			soci::use(CurrentSourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew)
 		);
 		stmt.execute(true);
-		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
-		fileTag.FileId = sqlite3_last_insert_rowid(backend->session_.conn_);
+		fileTag.FileId = t4p::SqliteInsertId(stmt);
 	} catch (std::exception& e) {
 		
 		// ATTN: at some point bubble these exceptions up?
