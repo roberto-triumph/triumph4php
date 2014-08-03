@@ -31,7 +31,13 @@ static int ID_FILE_CABINET_DELETE = wxNewId();
 
 t4p::FileCabinetFeatureClass::FileCabinetFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
+, Store()
 {
+}
+
+void t4p::FileCabinetFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+	editMenu->Append(t4p::MENU_FILE_CABINET + 1, _("Add Current File to Cabinet"),
+		_("Add Current File to the File Cabinet"), wxITEM_NORMAL);
 }
 
 void t4p::FileCabinetFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -50,12 +56,49 @@ void t4p::FileCabinetFeatureClass::OnViewFileCabinet(wxCommandEvent& event) {
 		panel = new t4p::FileCabinetPanelClass(GetToolsNotebook(), ID_FILE_CABINET_PANEL, *this);
 		AddToolsWindow(panel, _("File Cabinet"), wxT("File cabinet"), t4p::BitmapImageAsset(wxT("file-cabinet")));
 	}
-	
+}
+
+t4p::FileCabinetItemClass t4p::FileCabinetFeatureClass::AddDirectoryToCabinet(const wxString& dir) {
+	t4p::FileCabinetItemClass fileCabinetItem;
+	fileCabinetItem.FileName.AssignDir(dir);
+	Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
+	return fileCabinetItem;
+}
+
+t4p::FileCabinetItemClass t4p::FileCabinetFeatureClass::AddFileToCabinet(const wxString& file) {
+	t4p::FileCabinetItemClass fileCabinetItem;
+	fileCabinetItem.FileName.Assign(file);
+	Store.Store(App.Globals.ResourceCacheSession, fileCabinetItem);
+	return fileCabinetItem;
+}
+
+void t4p::FileCabinetFeatureClass::DeleteCabinetItem(int id) {
+	Store.Delete(App.Globals.ResourceCacheSession, id);
+}
+
+void t4p::FileCabinetFeatureClass::OnEditAddCurrentFileToCabinet(wxCommandEvent& event) {
+	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
+	if (!ctrl || ctrl->IsNew()) {
+		return;
+	}
+	wxWindow* window = FindToolsWindow(ID_FILE_CABINET_PANEL);
+	t4p::FileCabinetPanelClass* panel = NULL;
+	if (window) {
+		panel = (t4p::FileCabinetPanelClass*)window;
+		SetFocusToToolsWindow(panel);
+	}
+	else {
+		panel = new t4p::FileCabinetPanelClass(GetToolsNotebook(), ID_FILE_CABINET_PANEL, *this);
+		AddToolsWindow(panel, _("File Cabinet"), wxT("File cabinet"), t4p::BitmapImageAsset(wxT("file-cabinet")));
+	}
+
+	wxString filename = ctrl->GetFileName();
+	t4p::FileCabinetItemClass fileItem = AddFileToCabinet(filename);
+	panel->AddItemToList(fileItem);
 }
 
 t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature)
 : FileCabinetPanelGeneratedClass(parent, id)
-, Store()
 , SqliteFinder()
 , FileCabinet()
 , Feature(feature) {
@@ -84,43 +127,38 @@ void t4p::FileCabinetPanelClass::FillList() {
 	if (found) {
 		do {
 			FileCabinet.Next();
-			if (FileCabinet.Item.FileName.GetFullName().empty() && 
-				!FileCabinet.Item.FileName.GetDirs().empty()) {
-				wxListItem item;
-				item.SetText(FileCabinet.Item.FileName.GetDirs().back());
-				item.SetImage(LIST_FOLDER);
-				item.SetId(List->GetItemCount());
-				item.SetData(FileCabinet.Item.Id);
-				List->InsertItem(item);
-			}
-			else {
-				wxListItem item;
-				item.SetText(FileCabinet.Item.FileName.GetFullName());
-				item.SetImage(t4p::FileTypeImageId(Feature.App.Globals.FileTypes, FileCabinet.Item.FileName));
-				item.SetId(List->GetItemCount());
-				item.SetData(FileCabinet.Item.Id);
-				List->InsertItem(item);
-			}
+			AddItemToList(FileCabinet.Item);
 		} while (FileCabinet.More());
 	}
 }
+
+void t4p::FileCabinetPanelClass::AddItemToList(const t4p::FileCabinetItemClass& fileItem) {
+	if (fileItem.FileName.GetFullName().empty() && 
+		!fileItem.FileName.GetDirs().empty()) {
+		wxListItem listItem;
+		listItem.SetText(fileItem.FileName.GetDirs().back());
+		listItem.SetImage(LIST_FOLDER);
+		listItem.SetId(List->GetItemCount());
+		listItem.SetData(fileItem.Id);
+		List->InsertItem(listItem);
+	}
+	else {
+		wxListItem listItem;
+		listItem.SetText(fileItem.FileName.GetFullName());
+		listItem.SetImage(t4p::FileTypeImageId(Feature.App.Globals.FileTypes, fileItem.FileName));
+		listItem.SetId(List->GetItemCount());
+		listItem.SetData(fileItem.Id);
+		List->InsertItem(listItem);
+	}
+}
+
 
 void t4p::FileCabinetPanelClass::OnAddDirectoryClick(wxCommandEvent& event) {
 	wxDirDialog dialog(this, _("Choose a directory to add to the File Cabinet"), wxEmptyString,
 		wxDD_DIR_MUST_EXIST);
 	if (dialog.ShowModal() != wxID_CANCEL) {
-		
-		t4p::FileCabinetItemClass fileCabinetItem;
-		fileCabinetItem.FileName.AssignDir(dialog.GetPath());
-		
-		Store.Store(Feature.App.Globals.ResourceCacheSession, fileCabinetItem);
-		
-		wxListItem item;
-		item.SetText(fileCabinetItem.FileName.GetDirs().back());
-		item.SetImage(LIST_FOLDER);
-		item.SetId(List->GetItemCount());
-		item.SetData(fileCabinetItem.Id);
-		List->InsertItem(item);
+		t4p::FileCabinetItemClass fileItem = Feature.AddDirectoryToCabinet(dialog.GetPath());
+		AddItemToList(fileItem);
 	}
 }
 
@@ -128,17 +166,8 @@ void t4p::FileCabinetPanelClass::OnAddFileClick(wxCommandEvent& event) {
 	wxFileDialog dialog(this, _("Choose a file to add to the File Cabinet"), wxEmptyString,
 		wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (dialog.ShowModal() != wxID_CANCEL) {
-		t4p::FileCabinetItemClass fileCabinetItem;
-		fileCabinetItem.FileName.Assign(dialog.GetPath());
-		
-		Store.Store(Feature.App.Globals.ResourceCacheSession, fileCabinetItem);
-		
-		wxListItem item;
-		item.SetText(fileCabinetItem.FileName.GetFullName());
-		item.SetImage(t4p::FileTypeImageId(Feature.App.Globals.FileTypes, fileCabinetItem.FileName));
-		item.SetId(List->GetItemCount());
-		item.SetData(fileCabinetItem.Id);
-		List->InsertItem(item);
+		t4p::FileCabinetItemClass fileItem = Feature.AddFileToCabinet(dialog.GetPath());		
+		AddItemToList(fileItem);
 	}
 }
 
@@ -176,15 +205,15 @@ void t4p::FileCabinetPanelClass::OnListItemDelete(wxCommandEvent& event) {
 	if (index >= 0) {
 		
 		// delete from the database AND the list control
-		long dbId = List->GetItemData(index);
-		Store.Delete(Feature.App.Globals.ResourceCacheSession, dbId);
-		
+		long dbId = List->GetItemData(index);	
+		Feature.DeleteCabinetItem(dbId);
 		List->DeleteItem(index);
 	}
 }
 
 BEGIN_EVENT_TABLE(t4p::FileCabinetFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_FILE_CABINET + 0, t4p::FileCabinetFeatureClass::OnViewFileCabinet)
+	EVT_MENU(t4p::MENU_FILE_CABINET + 1, t4p::FileCabinetFeatureClass::OnEditAddCurrentFileToCabinet)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::FileCabinetPanelClass, FileCabinetPanelGeneratedClass)

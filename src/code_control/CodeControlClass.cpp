@@ -40,6 +40,10 @@
 #include <unicode/ustring.h>
 #include <sys/stat.h>
 
+#if defined(__WXMSW__)
+	#include <Shellapi.h>
+#endif
+
 // IMPLEMENTATION NOTE:
 // Take care when using positions given by Scintilla.  Scintilla gives positions in bytes while wxString and UnicodeString
 // use character positions. Take caution when using methods like GetCurrentPos(), WordStartPosition(), WordEndPosition()
@@ -194,6 +198,87 @@ static bool SaveFileWithCharset(const wxString& fullPath, const wxString& conten
 		
 }
 
+static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const wxString& contents, 
+	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
+	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
+	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
+	bool ret = savedTemp;
+	
+	// now copy the contents the temp file to the desired location
+	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
+	// and we want the original file's attributes to not be changed.
+	// dumping the echo into its own script because I could not figure out
+	// how to properly escape
+	// i tried this
+	// 
+	//  gksudo  "sh -c \"echo 'file1' > 'file2' \" "
+	// 
+	// but it did not work
+	// also I tried making this a synchronous process, but the GUI
+	// badly affected
+	wxString scriptContents = wxString::Format(
+		"cat \"%s\" > \"%s\" ",
+		tempFile, fullPath
+	);
+	wxString scriptTempFile = wxFileName::CreateTempFileName("triumph_script");
+	SaveFileWithCharset(scriptTempFile, scriptContents, "", false);
+	
+	// wanted to use mv, but mv will overwrite permissions and ownership
+	// we want to keep the file's original ownership
+	// ie. if a file owned by root is being saved, it should stay
+	// as owned by root and not the current user.
+	wxString cmd = wxString::Format(
+		"gksu --description='%s' \"sh '%s'\"",
+		wxT("Triumph4PHP privilege save"),
+		scriptTempFile
+	);
+	
+	t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
+	proc->TempFile = tempFile;
+	proc->ScriptTempFile = scriptTempFile;
+	int pid = wxExecute(cmd, wxEXEC_ASYNC, proc);
+	ret = pid > 0;
+	return ret;
+}
+
+static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const wxString& contents, 
+	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
+#if defined(__WXMSW__)
+	wxString tempFile = wxFileName::CreateTempFileName("triumph_file");
+	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
+	bool ret = savedTemp;
+	
+	// now copy the contents the temp file to the desired location
+	// dont use mv or copy so that file attributes (owner, permissions) are not
+	// copied over.
+	wxString scriptContents = wxString::Format(
+		"type \"%s\" > \"%s\" ",
+		tempFile, fullPath
+	);
+	wxFileName scriptTempFile(wxFileName::GetTempDir(), wxT("triumph_elevated_save.bat"));
+	SaveFileWithCharset(scriptTempFile.GetFullPath(), scriptContents, "", false);
+
+	// now create the command to be run
+	HINSTANCE res = ::ShellExecute(NULL, wxT("runas"), scriptTempFile.GetFullPath().fn_str(), NULL, NULL, 0);
+
+	// according to http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153(v=vs.85).aspx
+	// succes is when return value is greater than 32
+	ret = ((int)res) > 32;
+	wxASSERT_MSG(ret, wxString::Format("result code=%d", res));
+	codeCtrl->MarkAsSaved();
+
+	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
+	eventSink.Publish(codeControlEvent);
+	
+	wxRemoveFile(tempFile);
+	wxRemoveFile(scriptTempFile.GetFullPath());
+
+	return ret;
+#else
+	return false;
+#endif
+}
+
 /**
  * saves the given contents into the given file path; 
  * taking into account UTF-8 BOM signature if desired. This 
@@ -230,50 +315,18 @@ static bool SaveFileWithCharset(const wxString& fullPath, const wxString& conten
  */
 static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxString& contents, 
 	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
-	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
-	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
-	bool ret = savedTemp;
-	
-	// now copy the contents the temp file to the desired location
-	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
-	// and we want the original file's attributes to not be changed.
-	// dumping the echo into its own script because I could not figure out
-	// how to properly escape
-	// i tried this
-	// 
-	//  gksudo  "sh -c \"echo 'file1' > 'file2' \" "
-	// 
-	// but it did not work
-	// also I tried making this a synchronous process, but the GUI
-	// badly affected
 	wxPlatformInfo platform;
 	if (wxOS_UNIX_LINUX == platform.GetOperatingSystemId()) {
-		
-		wxString scriptContents = wxString::Format(
-			"cat \"%s\" > \"%s\" ",
-			tempFile, fullPath
-		);
-		wxString scriptTempFile = wxFileName::CreateTempFileName("triumph_script");
-		SaveFileWithCharset(scriptTempFile, scriptContents, "", false);
-		
-		// wanted to use mv, but mv will overwrite permissions and ownership
-		// we want to keep the file's original ownership
-		// ie. if a file owned by root is being saved, it should stay
-		// as owned by root and not the current user.
-		wxString cmd = wxString::Format(
-			"gksu --description='%s' \"sh '%s'\"",
-			wxT("Triumph4PHP privilege save"),
-			scriptTempFile
-		);
-		
-		t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
-		proc->TempFile = tempFile;
-		proc->ScriptTempFile = scriptTempFile;
-		int pid = wxExecute(cmd, wxEXEC_ASYNC, proc);
-		ret = pid > 0;
+		return SavePrivilegedFileWithCharsetLinux(fullPath, contents, 
+			charset, hasSignature, codeCtrl, eventSink);
 	}
-	return ret;
+	else if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
+		return SavePrivilegedFileWithCharsetWindows(fullPath, contents, 
+			charset, hasSignature, codeCtrl, eventSink);
+	}
+	return false;
 }
+
 
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  t4p::GlobalsClass* globals, t4p::EventSinkClass& eventSink,

@@ -422,6 +422,7 @@ void t4p::ExplorerFeatureClass::OnAppProjectCreated(wxCommandEvent& event) {
 	}
 	else {
 		panel = (t4p::ModalExplorerPanelClass*)window;
+		SetFocusToToolsWindow(panel);
 	}
 	wxString dir = event.GetString();
 	wxFileName projectDir;

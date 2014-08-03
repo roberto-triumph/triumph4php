@@ -49,11 +49,33 @@ public:
 	
 	FileCabinetFeatureClass(t4p::AppClass& app);
 
+	void AddEditMenuItems(wxMenu* editMenu);
 	void AddViewMenuItems(wxMenu* viewMenu);
+	
+	/**
+	 * add a file to the file cabinet store (sqlite)
+	 */
+	t4p::FileCabinetItemClass AddFileToCabinet(const wxString& file);
+
+	/**
+	 * add a directory to the file cabinet store (sqlite)
+	 */
+	t4p::FileCabinetItemClass AddDirectoryToCabinet(const wxString& dir);
+
+	/**
+	 * removes the given cabinet item from the file cabinet store (sqlite)
+	 */
+	void DeleteCabinetItem(int id);
 		
 private:
 
 	void OnViewFileCabinet(wxCommandEvent& event);
+	void OnEditAddCurrentFileToCabinet(wxCommandEvent& event);
+
+	/**
+	 * to modify the file cabinet
+	 */
+	t4p::FileCabinetStoreClass Store;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -69,6 +91,11 @@ public:
 	
 	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature);
 
+	/**
+	 * add a file to the file cabinet list
+	 */
+	void AddItemToList(const t4p::FileCabinetItemClass& item);
+
 private:
 
 	// click handlers
@@ -82,11 +109,6 @@ private:
 	 * already stored in the file cabinet
 	 */
 	void FillList();
-
-	/**
-	 * to modify the file cabinet
-	 */
-	t4p::FileCabinetStoreClass Store;
 	
 	/**
 	 * to list the existing files/dirs in the 
