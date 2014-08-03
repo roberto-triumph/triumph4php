@@ -259,6 +259,12 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 	SaveFileWithCharset(scriptTempFile.GetFullPath(), scriptContents, "", false);
 
 	// now create the command to be run
+	// ATTN: not sure if this runs the script synchronously or async, 
+	// it seems that it is asynchronous at this time.
+	// however, ShellExecute does not provide a callback mechanism
+	// this code could be greatly improved, perhaps by usiing ShellExecuteEx
+	// we mark the file as saved here since there is no callback when the 
+	// temp script has completed.
 	HINSTANCE res = ::ShellExecute(NULL, wxT("runas"), scriptTempFile.GetFullPath().fn_str(), NULL, NULL, 0);
 
 	// according to http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153(v=vs.85).aspx
