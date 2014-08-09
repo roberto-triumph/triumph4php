@@ -21,7 +21,7 @@
  *
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
- */
+*/
 #include <globals/FileCabinetItemClass.h>
 #include <globals/String.h>
 
@@ -113,42 +113,23 @@ bool t4p::FileCabinetStoreClass::Delete(soci::session& session, int fileCabinetI
 	return ret;
 }
 
-
-t4p::AllFileCabinetResultClass::AllFileCabinetResultClass() 
-: SqliteResultClass() 
+t4p::FileCabinetBaseResultClass::FileCabinetBaseResultClass()
+: SqliteResultClass()
 , Item() 
 , Id(0)
 , FullPath() {
-	
+
 }
 
-t4p::AllFileCabinetResultClass::~AllFileCabinetResultClass() {
+bool t4p::FileCabinetBaseResultClass::ExchangeAdoptStatement(soci::statement* stmt, wxString& error) {
+	stmt->exchange(soci::into(Id));
+	stmt->exchange(soci::into(FullPath));
+
+	return AdoptStatement(stmt, error);
 }
 
-bool t4p::AllFileCabinetResultClass::Prepare(soci::session& session, bool doLimit) {
-	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items ORDER BY file_cabinet_item_id";
-	if (doLimit) {
-		sql += " LIMIT 100";
-	}
-	
-	wxString error;
-	bool good = false;
-	try {
-		soci::statement* stmt = new soci::statement(session);
-		stmt->prepare(sql);
-		
-		stmt->exchange(soci::into(Id));
-		stmt->exchange(soci::into(FullPath));
-	
-		good = AdoptStatement(stmt, error);
-	} catch (std::exception& e) {
-		error = e.what();
-		wxASSERT_MSG(false, error);
-	}
-	return good;
-}
 
-void t4p::AllFileCabinetResultClass::Next() {
+void t4p::FileCabinetBaseResultClass::Next() {
 	if (FullPath.empty()) {
 		Item.Id = 0;
 		Item.FileName.Assign(wxT(""));
@@ -170,16 +151,36 @@ void t4p::AllFileCabinetResultClass::Next() {
 	Fetch();
 }
 
-t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass() 
-: SqliteResultClass() 
-, Item() 
-, Id(0)
-, FullPath() 
-, QueryId(0) {
+t4p::AllFileCabinetResultClass::AllFileCabinetResultClass() 
+: FileCabinetBaseResultClass()
+{
 	
 }
 
-t4p::SingleFileCabinetResultClass::~SingleFileCabinetResultClass() {
+bool t4p::AllFileCabinetResultClass::Prepare(soci::session& session, bool doLimit) {
+	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items ORDER BY file_cabinet_item_id";
+	if (doLimit) {
+		sql += " LIMIT 100";
+	}
+	
+	wxString error;
+	bool good = false;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		stmt->prepare(sql);	
+		
+		good = ExchangeAdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = e.what();
+		wxASSERT_MSG(false, error);
+	}
+	return good;
+}
+
+t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass() 
+: FileCabinetBaseResultClass()
+, QueryId(0) {
+	
 }
 
 void t4p::SingleFileCabinetResultClass::Init(int id) {
@@ -196,10 +197,8 @@ bool t4p::SingleFileCabinetResultClass::Prepare(soci::session& session, bool doL
 		stmt->prepare(sql);
 		
 		stmt->exchange(soci::use(QueryId));
-		stmt->exchange(soci::into(Id));
-		stmt->exchange(soci::into(FullPath));
-	
-		good = AdoptStatement(stmt, error);
+		
+		good = ExchangeAdoptStatement(stmt, error);
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);
@@ -207,24 +206,68 @@ bool t4p::SingleFileCabinetResultClass::Prepare(soci::session& session, bool doL
 	return good;
 }
 
-void t4p::SingleFileCabinetResultClass::Next() {
-	if (FullPath.empty()) {
-		Item.Id = 0;
-		Item.FileName.Assign(wxT(""));
-	}
-	else if (FullPath[FullPath.length() - 1] == '\\' ||
-			FullPath[FullPath.length() - 1] == '/') {
-		// check of the full path is a directory
-		// check the string ending instead of actually hitting the
-		// disk, don't want to do 100+ disk accesses when
-		// looping through results
+t4p::FileCabinetExactSearchResultClass::FileCabinetExactSearchResultClass() 
+: FileCabinetBaseResultClass()
+, Name() {
 	
-		Item.Id = Id;
-		Item.FileName.AssignDir(FullPath);
+}
+
+void t4p::FileCabinetExactSearchResultClass::Init(const std::string& name) {
+	Name = name;
+}
+
+bool t4p::FileCabinetExactSearchResultClass::Prepare(soci::session& session, bool doLimit) {
+	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items WHERE name = ?";
+	if (doLimit) {
+		sql += " LIMIT 100";
 	}
-	else {
-		Item.Id = Id;
-		Item.FileName.Assign(FullPath);
+	
+	wxString error;
+	bool good = false;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		stmt->prepare(sql);
+		
+		stmt->exchange(soci::use(Name));
+		
+		good = ExchangeAdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = e.what();
+		wxASSERT_MSG(false, error);
 	}
-	Fetch();
+	return good;
+}
+
+t4p::FileCabinetNearMatchResultClass::FileCabinetNearMatchResultClass() 
+: FileCabinetBaseResultClass()
+, Name() {
+	
+}
+
+void t4p::FileCabinetNearMatchResultClass::Init(const std::string& name) {
+	Name = name;
+}
+
+bool t4p::FileCabinetNearMatchResultClass::Prepare(soci::session& session, bool doLimit) {
+	std::string escaped = t4p::SqliteSqlLikeEscape(Name, '^');
+	escaped = "'%" + escaped + "%'";
+	
+	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items ";
+	sql += "WHERE name LIKE " + escaped + " ESCAPE '^' ";
+	if (doLimit) {
+		sql += " LIMIT 100";
+	}
+
+	wxString error;
+	bool good = false;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		stmt->prepare(sql);
+		
+		good = ExchangeAdoptStatement(stmt, error);
+	} catch (std::exception& e) {
+		error = e.what();
+		wxASSERT_MSG(false, error);
+	}
+	return good;
 }

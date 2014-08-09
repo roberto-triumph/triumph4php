@@ -147,6 +147,24 @@ protected:
 private:
 
 	/**
+	 * perform a search on all items using exact, case
+	 * insensitive searches
+	 *
+	 * @param matches the found items will be added to this vector 
+	 * @return bool TRUE if at least 1 match was found
+	 */
+	bool SearchExact(std::vector<t4p::TotalTagResultClass>& matches);
+
+	/**
+	 * performs a search on all items using near-match
+	 * logic
+	 *
+	 * @param matches the found items will be added to this vector
+	 * @return bool TRUE if at least 1 match was found
+	 */
+	bool SearchNearMatch(std::vector<t4p::TotalTagResultClass>& matches);
+	
+	/**
 	 * the thing to search in
 	 */
 	t4p::TagCacheClass TagCache;

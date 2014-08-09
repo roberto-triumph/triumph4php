@@ -28,6 +28,7 @@
 #include <globals/Assets.h>
 #include <language/TagFinderList.h>
 #include <globals/TagList.h>
+#include <globals/FileCabinetItemClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -147,48 +148,75 @@ void t4p::TotalTagSearchActionClass::BackgroundWork() {
 	std::vector<t4p::TotalTagResultClass> matches;
 
 	// do exact match first, if that succeeds then don't bother doing near matches
-	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
-	std::vector<t4p::TagClass> tags = results->Matches();
-	for (size_t i = 0; i < tags.size(); ++i) {
-		t4p::TotalTagResultClass result(tags[i]);
-		matches.push_back(result);
+	bool exactMatches = SearchExact(matches);
+	if (!exactMatches && !exactOnly) {
+		SearchNearMatch(matches);
 	}
-	if (matches.empty() && !exactOnly) {
-		delete results;
-		results = TagCache.NearMatchTags(SearchString, SearchDirs);
-		tags = results->Matches();
-		for (size_t i = 0; i < tags.size(); ++i) {
-			t4p::TotalTagResultClass result(tags[i]);
-			matches.push_back(result);
-		}
-		if (matches.empty()) {
-			t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
-			std::vector<t4p::FileTagClass> files = fileTagResults->Matches();
-			for (size_t i = 0; i < files.size(); ++i) {
-				t4p::TotalTagResultClass result(files[i]);
-				matches.push_back(result);
-			}
-			if (matches.empty()) {
-				delete fileTagResults;
-				fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
-				files = fileTagResults->Matches();
-				for (size_t i = 0; i < files.size(); ++i) {
-					t4p::TotalTagResultClass result(files[i]);
-					matches.push_back(result);
-				}
-			}
-			delete fileTagResults;
-		}
+	
+	if (!IsCancelled()) {
+		t4p::TagSearchClass tagSearch(SearchString);
+
+		// PostEvent will set the correct event ID
+		t4p::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, tagSearch.GetLineNumber(), matches);
+		PostEvent(evt);
+	}
+}
+
+wxString t4p::TotalTagSearchActionClass::GetLabel() const {
+	return wxT("Total Tag Search");
+}
+
+bool t4p::TotalTagSearchActionClass::SearchExact(std::vector<t4p::TotalTagResultClass>& matches) {
+	bool found = false;
+	
+	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);
+	while (results->More()) {
+		results->Next();
+		
+		t4p::TotalTagResultClass result(results->Tag);
+		matches.push_back(result);
+		found = true;
 	}
 	delete results;
 	
+	if (matches.empty()) {
+		t4p::FileTagResultClass* fileTagResults = TagCache.ExactFileTags(SearchString, SearchDirs);
+		while (fileTagResults->More()) {
+			fileTagResults->Next();
+			
+			t4p::TotalTagResultClass result(fileTagResults->FileTag);
+			matches.push_back(result);
+			found = true;
+		}
+		delete fileTagResults;
+	}
+	if (matches.empty()) {
+		t4p::FileCabinetExactSearchResultClass cabinetExactResults;
+		cabinetExactResults.Init(t4p::IcuToChar(SearchString));
+		if (cabinetExactResults.Prepare(Session, true)) {
+			do {
+				cabinetExactResults.Next();
+				if (!cabinetExactResults.Item.IsFile()) {
+					t4p::FileTagClass fileTag;
+					fileTag.FullPath = cabinetExactResults.Item.FileName.GetFullPath();
+					
+					t4p::TotalTagResultClass result(fileTag);
+					matches.push_back(result);
+					found = true;
+				}
+			} while (cabinetExactResults.More());
+		}
+	}
+	
 	// now look for any sql resources (tables)
-	// do an exact match first
-	bool foundExactMatchTable = false;
+	// we want to show the tables even if there's a
+	// class with the same name
 	t4p::ExactSqlResourceTableResultClass exactTableResults;
 	exactTableResults.SetLookup(t4p::IcuToWx(SearchString), "");
 	SqlTagCache.Exec(&exactTableResults);
 	while (exactTableResults.More()) {
+		exactTableResults.Next();
+		
 		t4p::DatabaseTableTagClass tableTag;
 		tableTag.TableName = t4p::CharToWx(exactTableResults.TableName.c_str());
 		tableTag.ConnectionHash = t4p::CharToWx(exactTableResults.Connection.c_str());
@@ -199,40 +227,81 @@ void t4p::TotalTagSearchActionClass::BackgroundWork() {
 		t4p::TotalTagResultClass resultDefinition(tableTag);
 		result.Type = t4p::TotalTagResultClass::TABLE_DEFINITION_TAG;
 		matches.push_back(result);
-		exactTableResults.Next();
-		foundExactMatchTable = true;
-	}
-	if (!foundExactMatchTable) {
+		
+		found = true;
+	}	
+	return found;
+}
 
-		// if we did not find an exact match on the table names
-		// then do a near match
-		t4p::SqlResourceTableResultClass tableResults;
-		tableResults.SetLookup(t4p::IcuToWx(SearchString), "");
-		SqlTagCache.Exec(&tableResults);
-		while (tableResults.More()) {
-			t4p::DatabaseTableTagClass tableTag;
-			tableTag.TableName = t4p::CharToWx(tableResults.TableName.c_str());
-			tableTag.ConnectionHash = t4p::CharToWx(tableResults.Connection.c_str());
+bool t4p::TotalTagSearchActionClass::SearchNearMatch(std::vector<t4p::TotalTagResultClass>& matches) {
+	bool found = false;
+	t4p::TagResultClass* results = TagCache.NearMatchTags(SearchString, SearchDirs);
+	while (results->More()) {
+		results->Next();
+		
+		t4p::TotalTagResultClass result(results->Tag);
+		matches.push_back(result);
+		found = true;
+	}
+	
+	delete results;
+	if (matches.empty()) {
+		t4p::FileTagResultClass* fileTagResults = TagCache.NearMatchFileTags(SearchString, SearchDirs);
+		while (fileTagResults->More()) {
+			fileTagResults->Next();
 			
-			t4p::TotalTagResultClass result(tableTag);
+			t4p::TotalTagResultClass result(fileTagResults->FileTag);
 			matches.push_back(result);
-			
-			t4p::TotalTagResultClass resultDefinition(tableTag);
-			result.Type = t4p::TotalTagResultClass::TABLE_DEFINITION_TAG;
-			matches.push_back(result);
-			tableResults.Next();
+			found = true;
+		}
+		delete fileTagResults;
+	}			
+	if (matches.empty()) {
+		t4p::FileCabinetNearMatchResultClass cabinetNearMatchResults;
+		cabinetNearMatchResults.Init(t4p::IcuToChar(SearchString));
+		if (cabinetNearMatchResults.Prepare(Session, true)) {
+			do {
+				cabinetNearMatchResults.Next();
+				if (!cabinetNearMatchResults.Item.IsDir()) {
+					t4p::FileTagClass fileTag;
+					fileTag.FullPath = cabinetNearMatchResults.Item.FileName.GetFullPath();
+					
+					t4p::TotalTagResultClass result(fileTag);
+					matches.push_back(result);
+					
+					found = true;
+				}
+			} while (cabinetNearMatchResults.More());
 		}
 	}
-	if (!IsCancelled()) {
-		t4p::TagSearchClass tagSearch(SearchString);
+	
+	// now look for any sql resources (tables)
+	// we want to 
 
-		// PostEvent will set the correct event ID
-		t4p::TotalTagSearchCompleteEventClass evt(wxID_ANY, SearchString, tagSearch.GetLineNumber(), matches);
-		PostEvent(evt);
+	// if we did not find an exact match on the table names
+	// then do a near match table names even if we
+	// find classes
+	t4p::SqlResourceTableResultClass tableResults;
+	tableResults.SetLookup(t4p::IcuToWx(SearchString), "");
+	SqlTagCache.Exec(&tableResults);
+	while (tableResults.More()) {
+		tableResults.Next();
+		
+		t4p::DatabaseTableTagClass tableTag;
+		tableTag.TableName = t4p::CharToWx(tableResults.TableName.c_str());
+		tableTag.ConnectionHash = t4p::CharToWx(tableResults.Connection.c_str());
+		
+		t4p::TotalTagResultClass result(tableTag);
+		matches.push_back(result);
+		
+		t4p::TotalTagResultClass resultDefinition(tableTag);
+		result.Type = t4p::TotalTagResultClass::TABLE_DEFINITION_TAG;
+		matches.push_back(result);
+		
+		found = true;
 	}
-}
-wxString t4p::TotalTagSearchActionClass::GetLabel() const {
-	return wxT("Total Tag Search");
+	
+	return found;
 }
 
 const wxEventType t4p::EVENT_TOTAL_TAG_SEARCH_COMPLETE = wxNewEventType();

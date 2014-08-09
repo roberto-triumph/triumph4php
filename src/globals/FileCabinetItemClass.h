@@ -110,40 +110,40 @@ public:
 };
 
 /**
- * The FileCabinetResultClass reads all of the records
- * that are stored in file_cabinet table of the 
- * sqlite file.
- * Results are returned in the order that they were 
- * added to the cabinet, oldest first.
+ * Base class for file cabinet results. This class translates
+ * a sql query into a FileCabinetItemclass instance.
+ *
  */
-class AllFileCabinetResultClass : public t4p::SqliteResultClass {
+class FileCabinetBaseResultClass : public t4p::SqliteResultClass {
 
-	public:
+public:
 
 	/**
 	 * the current item of the result set. This is populated
 	 * after each time the Next() method is called.
 	 */
 	t4p::FileCabinetItemClass Item;
-
-	AllFileCabinetResultClass();
-	~AllFileCabinetResultClass();
 	
-	/**
-	 * build the SQL to query the file_cabinet table and execute it.
-	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 * @return bool subclasses should return TRUE if there is at least one result
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
+	FileCabinetBaseResultClass();
+	
 	/**
 	 * advance to the next row. in this method we will fill the Item instance
 	 * from the current DB row.
 	 */
 	void Next();
 
+protected:
+
+	/**
+	 * prepare the statement by binding the sql result columns 
+	 * and adopting the statement
+	 * 
+	 * @param stmt the statement to execute; it must has 2 columns, file_cabinet_item_id and full_path
+	 * @param error string filled when there is a sql error
+	 * @return bool TRUE if statement was executed successfully
+	 */
+	bool ExchangeAdoptStatement(soci::statement* stmt, wxString& error);
+	
 private:
 
 	/**
@@ -155,6 +155,30 @@ private:
 	 * the variable that is bound to the full_path column of the result set
 	 */
 	std::string FullPath;
+	
+};
+
+/**
+ * The FileCabinetResultClass reads all of the records
+ * that are stored in file_cabinet table of the 
+ * sqlite file.
+ * Results are returned in the order that they were 
+ * added to the cabinet, oldest first.
+ */
+class AllFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
+
+	public:
+
+	AllFileCabinetResultClass();
+	
+	/**
+	 * build the SQL to query the file_cabinet table and execute it.
+	 *
+	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool subclasses should return TRUE if there is at least one result
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
 };
 
 /**
@@ -162,18 +186,11 @@ private:
  * that is stored in file_cabinet table of the 
  * sqlite file. The record is chosen by ID
  */
-class SingleFileCabinetResultClass : public t4p::SqliteResultClass {
+class SingleFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
 
 	public:
 
-	/**
-	 * the current item of the result set. This is populated
-	 * after each time the Next() method is called.
-	 */
-	t4p::FileCabinetItemClass Item;
-
 	SingleFileCabinetResultClass();
-	~SingleFileCabinetResultClass();
 	
 	/**
 	 * @param int id the file_cabinet_id to search for
@@ -188,29 +205,85 @@ class SingleFileCabinetResultClass : public t4p::SqliteResultClass {
 	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
 	bool Prepare(soci::session& session, bool doLimit);
-
-	/**
-	 * advance to the next row. in this method we will fill the Item instance 
-	 * from the current DB row.
-	 */
-	void Next();
-
-private:
-
-	/**
-	 * the variable that is bound to the file_cabinet_item_id column of the result set
-	 */
-	int Id;
 	
-	/**
-	 * the variable that is bound to the full_path column of the result set
-	 */
-	std::string FullPath;
+	
+private:
 	
 	/**
 	 * the ID to query for
 	 */
 	int QueryId;
+};
+
+/**
+ * The FileCabinetExactSearchResultClass searches for
+ * a file cabinet item by its name. search is done
+ * case-insensitive, but the entire item name
+ * must match. The item's name is the file name (including
+ * extension) or the name of the last directory
+ */
+class FileCabinetExactSearchResultClass : public t4p::FileCabinetBaseResultClass {
+
+	public:
+
+	FileCabinetExactSearchResultClass();
+	
+	/**
+	 * @param string name the to search for
+	 */
+	void Init(const std::string& name);
+	
+	/**
+	 * build the SQL to query the file_cabinet table and execute it.
+	 *
+	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool subclasses should return TRUE if there is at least one result
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+	
+	
+private:
+	
+	/**
+	 * the name to query for
+	 */
+	std::string Name;
+};
+
+/**
+ * The FileCabinetNearMatchResultClass searches for
+ * a file cabinet item by its name. search is done
+ * case-insensitive, the given string must be a 
+ * substring of the item's full path
+ */
+class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
+
+	public:
+
+	FileCabinetNearMatchResultClass();
+	
+	/**
+	 * @param string name the to search for
+	 */
+	void Init(const std::string& name);
+	
+	/**
+	 * build the SQL to query the file_cabinet table and execute it.
+	 *
+	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool subclasses should return TRUE if there is at least one result
+	 */
+	bool Prepare(soci::session& session, bool doLimit);
+	
+	
+private:
+	
+	/**
+	 * the name to query for
+	 */
+	std::string Name;
 };
 
 }
