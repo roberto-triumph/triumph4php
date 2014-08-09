@@ -196,7 +196,7 @@ bool t4p::TotalTagSearchActionClass::SearchExact(std::vector<t4p::TotalTagResult
 		if (cabinetExactResults.Prepare(Session, true)) {
 			do {
 				cabinetExactResults.Next();
-				if (!cabinetExactResults.Item.IsFile()) {
+				if (cabinetExactResults.Item.IsFile()) {
 					t4p::FileTagClass fileTag;
 					fileTag.FullPath = cabinetExactResults.Item.FileName.GetFullPath();
 					
@@ -262,7 +262,7 @@ bool t4p::TotalTagSearchActionClass::SearchNearMatch(std::vector<t4p::TotalTagRe
 		if (cabinetNearMatchResults.Prepare(Session, true)) {
 			do {
 				cabinetNearMatchResults.Next();
-				if (!cabinetNearMatchResults.Item.IsDir()) {
+				if (cabinetNearMatchResults.Item.IsFile()) {
 					t4p::FileTagClass fileTag;
 					fileTag.FullPath = cabinetNearMatchResults.Item.FileName.GetFullPath();
 					
