@@ -155,6 +155,10 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 			wxMessageBox(wxT("Custom settings directory must exist."), wxT("Error"));
 			return false;
 		}
+		if (!wxFileName::IsDirWritable(settingsDir)) {
+			wxMessageBox(wxT("Custom settings directory is not writable."), wxT("Error"));
+			return false;
+		}
 	}
 	wxStandardPaths paths = wxStandardPaths::Get();
 	if (ApplicationDirectory->GetValue()) {
@@ -175,6 +179,10 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 				return false;
 			}
 		}
+		if (!tempDir.IsDirWritable()) {
+			wxMessageBox(wxT("Settings directory is not writable: ") + tempDir.GetPath(), wxT("Error"));
+			return false;
+		}
 		ConfigFileDir = tempDir;
 	}
 	else if (CustomDirectory->GetValue()) {
@@ -193,6 +201,10 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 				wxMessageBox(wxT("Could not create directory: ") + tempDir.GetPath(), wxT("Error"));
 				return false;
 			}
+		}
+		else if (!tempDir.IsDirWritable()) {
+			wxMessageBox(wxT("Settings directory is not writable: ") + tempDir.GetPath(), wxT("Error"));
+			return false;
 		}
 		ConfigFileDir = tempDir;
 	}

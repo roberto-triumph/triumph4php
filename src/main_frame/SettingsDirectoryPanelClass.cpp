@@ -98,6 +98,10 @@ void t4p::SettingsDirectoryPanelClass::OnUserDataDir(wxCommandEvent& event) {
 			return;
 		}
 	}
+	else if (!userDir.IsDirWritable()) {
+		wxMessageBox(wxT("Directory is not writable: ") + userDir.GetPath(), wxT("Error"));
+		return;
+	}
 }
 
 void t4p::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
@@ -111,6 +115,10 @@ void t4p::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
 			return;
 		}
 	}
+	else if (!appDir.IsDirWritable()) {
+		wxMessageBox(wxT("Directory is not writable: ") + appDir.GetPath(), wxT("Error"));
+		return;
+	}
 }
 
 void t4p::SettingsDirectoryPanelClass::OnCustomDir(wxCommandEvent& event) {
@@ -121,11 +129,13 @@ void t4p::SettingsDirectoryPanelClass::OnCustomDir(wxCommandEvent& event) {
 bool t4p::SettingsDirectoryPanelClass::TransferDataFromWindow() {
 	wxWindow::TransferDataFromWindow();
 
-	// if directory is in a custom location check to make sure that 
-	// it exists
-	if (CustomDirectory->GetValue() &&
-		!wxFileName::DirExists(SettingsDirectory->GetPath())) {
+	// make sure new settings dir exists and is writable
+	if (!wxFileName::DirExists(SettingsDirectory->GetPath())) {
 		wxMessageBox(_("Settings directory does not exist."), _("Settings Directory"));
+		return false;
+	}
+	if (!wxFileName::IsDirWritable(SettingsDirectory->GetPath())) {
+		wxMessageBox(_("Settings directory is not writable."), _("Settings Directory"));
 		return false;
 	}
 	return true;
