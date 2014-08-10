@@ -23,11 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/SyntaxHighlightFeatureClass.h>
-#include <code_control/DocumentClass.h>
 #include <Triumph.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>
+#include <language/Keywords.h>
 
 //------------------------------------------------------------------------
 // setting the various wxStyledTextCtrl options
@@ -192,10 +192,9 @@ static void SetPhpOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& 
 	// and JavaScript are common for HTML. For HTML, key word set 0 is for HTML,
 	// 1 is for JavaScript and 2 is for VBScript, 3 is for Python, 4 is for PHP
 	// and 5 is for SGML and DTD keywords
-	t4p::PhpDocumentClass doc(&globals);
-	ctrl->SetKeyWords(0, doc.GetHtmlKeywords());
-	ctrl->SetKeyWords(1, doc.GetJavascriptKeywords());
-	ctrl->SetKeyWords(4, doc.GetPhpKeywords());
+	ctrl->SetKeyWords(0, t4p::KeywordsHtmlAll());
+	ctrl->SetKeyWords(1, t4p::KEYWORDS_JAVASCRIPT);
+	ctrl->SetKeyWords(4, t4p::KeywordsPhpAll(globals.Environment.Php.Version));
 
 	ctrl->AutoCompStops(wxT("!@#$%^&*()_+-=[]{}|;'\",./<?"));
 	ctrl->AutoCompSetSeparator('\n');
@@ -227,9 +226,7 @@ static void SetSqlOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& 
 	// 5 = default as per scintilla docs. set it because it may have been set by SetPhpOptions()
 	ctrl->SetStyleBits(5);
 
-	t4p::DatabaseTagClass emptyTag;
-	t4p::SqlDocumentClass doc(&globals, emptyTag);
-	ctrl->SetKeyWords(0, doc.GetMySqlKeywords());
+	ctrl->SetKeyWords(0, t4p::KEYWORDS_MYSQL);
 	ctrl->SetKeyWords(1, wxT(""));
 	ctrl->SetKeyWords(2, wxT(""));
 	ctrl->SetKeyWords(3, wxT(""));
@@ -256,9 +253,8 @@ static void SetCssOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& 
 	// keywords 0 => CSS 1 keywords
 	// keywords 1 => Pseudo classes
 	// keywords 2 => CSS 2 keywords but we will pass all keywords in 0
-	t4p::CssDocumentClass doc;
-	ctrl->SetKeyWords(0,  doc.GetCssKeywords());
-	ctrl->SetKeyWords(1,  doc.GetCssPseudoClasses());
+	ctrl->SetKeyWords(0,  t4p::KEYWORDS_CSS);
+	ctrl->SetKeyWords(1,  t4p::KEYWORDS_CSS_PSEUDOCLASSES);
 	ctrl->SetKeyWords(2, wxT(""));
 
 	ctrl->AutoCompStops(wxT("!@#$%^&*()_+-=[]\\{}|;'\",/?`"));
@@ -287,8 +283,7 @@ static void SetJsOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& o
 	// keywords 3 => Global classes and typedefs
 	// keywords 4 => Preprocessor definitions
 
-	t4p::JsDocumentClass doc;
-	ctrl->SetKeyWords(0, doc.GetJsKeywords());
+	ctrl->SetKeyWords(0, t4p::KEYWORDS_JAVASCRIPT);
 	ctrl->SetKeyWords(1, wxT(""));
 	ctrl->SetKeyWords(2, wxT(""));
 
@@ -332,39 +327,39 @@ void t4p::SyntaxHighlightFeatureClass::OnPreferencesSaved(wxCommandEvent& event)
 }
 
 void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options) {
-	if (t4p::CodeControlClass::PHP == ctrl->GetDocumentMode()) {
+	if (t4p::FILE_TYPE_PHP == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPhpOptions(ctrl, options, App.Globals);
 	}
-	else if (t4p::CodeControlClass::CSS == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_CSS == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetCssOptions(ctrl, options);
 	}
-	else if (t4p::CodeControlClass::SQL == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_SQL == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetSqlOptions(ctrl, options, App.Globals);
 	}
-	else if (t4p::CodeControlClass::JS == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_JS == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetJsOptions(ctrl, options);
 	}
-	else if (t4p::CodeControlClass::CONFIG == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_CONFIG == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
 	}
-	else if (t4p::CodeControlClass::CRONTAB == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_CRONTAB == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
 	}
-	else if (t4p::CodeControlClass::YAML == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_YAML == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
@@ -373,37 +368,37 @@ void t4p::SyntaxHighlightFeatureClass::ApplyPreferences(t4p::CodeControlClass* c
 		ctrl->SetUseTabs(false);
 		ctrl->SetLexer(wxSTC_LEX_YAML);
 	}
-	else if (t4p::CodeControlClass::XML == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_XML == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
 	}
-	else if (t4p::CodeControlClass::RUBY == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_RUBY == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.RubyStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
 	}
-	else if (t4p::CodeControlClass::LUA == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_LUA == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
 	}
-	else if (t4p::CodeControlClass::MARKDOWN == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_MARKDOWN == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
 	}
-	else if (t4p::CodeControlClass::BASH == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_BASH == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
 	}
-	else if (t4p::CodeControlClass::DIFF == ctrl->GetDocumentMode()) {
+	else if (t4p::FILE_TYPE_DIFF == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
@@ -518,7 +513,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	PhpCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	PhpCodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
+	PhpCodeCtrl->SetFileType(t4p::FILE_TYPE_PHP);
 	PreviewNotebook->AddPage(PhpCodeCtrl, _("PHP"));
 	wxString txt = t4p::CharToWx(
 		"<?php\n"
@@ -547,7 +542,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	SqlCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	SqlCodeCtrl->SetDocumentMode(t4p::CodeControlClass::SQL);
+	SqlCodeCtrl->SetFileType(t4p::FILE_TYPE_SQL);
 	txt =  t4p::CharToWx(
 		" -- table to store users\n"
 		"CREATE TABLE my_users(\n"
@@ -563,7 +558,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	CssCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	CssCodeCtrl->SetDocumentMode(t4p::CodeControlClass::CSS);
+	CssCodeCtrl->SetFileType(t4p::FILE_TYPE_CSS);
 	txt =  t4p::CharToWx(
 		" /* render users nicely */\n"
 		".user {\n"
@@ -578,7 +573,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	JsCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
-	JsCodeCtrl->SetDocumentMode(t4p::CodeControlClass::JS);
+	JsCodeCtrl->SetFileType(t4p::FILE_TYPE_JS);
 	txt =  t4p::CharToWx(
 		" /* represents a logged-in user */\n"
 		"function myFunction() {\n"

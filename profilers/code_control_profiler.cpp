@@ -213,7 +213,7 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 	, App(app) {
 	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
-	Ctrl->SetDocumentMode(t4p::CodeControlClass::PHP);
+	Ctrl->SetFileType(t4p::FILE_TYPE_PHP);
 	CreateMenu();
 }
 

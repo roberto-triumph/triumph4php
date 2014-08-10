@@ -30,6 +30,7 @@
 #include <widgets/FilePickerValidatorClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <language/Keywords.h>
 #include <Triumph.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
@@ -37,6 +38,7 @@
 #include <wx/wupdlock.h>
 #include <wx/clipbrd.h>
 #include <wx/sstream.h>
+#include <algorithm>
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();
@@ -52,7 +54,6 @@ static const int ID_GRID_COPY_ROW_SQL = wxNewId();
 static const int ID_GRID_COPY_ROW_PHP = wxNewId();
 static const int ID_GRID_COPY_ALL = wxNewId();
 static const int ID_GRID_OPEN_IN_EDITOR = wxNewId();
-
 
 /**
  * @param grid the grid to put the results in. any previous grid values are cleared. this function will not own the pointer
@@ -112,6 +113,21 @@ static void FillGridWithResults(wxGrid* grid, t4p::SqlResultClass* results) {
 
 	// unfreeze the grid
 	grid->EndBatch();
+}
+
+/**
+ * check to see if the give pos is at a SQL comment or SQL string
+ */
+static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
+	int style = ctrl->GetStyleAt(posToCheck);
+	int prevStyle = ctrl->GetStyleAt(posToCheck - 1);
+
+	// dont match braces inside strings or comments. for some reason when styling line comments (//)
+	// the last character is styled as default but the characters before are styled correctly (wxSTC_SQL_COMMENTLINE)
+	// so lets check the previous character in that case
+	return wxSTC_SQL_COMMENT == style || wxSTC_SQL_COMMENTDOC == style || wxSTC_SQL_COMMENTLINE == prevStyle
+		|| wxSTC_SQL_COMMENTLINEDOC == prevStyle || wxSTC_SQL_QUOTEDIDENTIFIER == style || wxSTC_SQL_STRING == style
+		|| wxSTC_SQL_CHARACTER == style;
 }
 
 t4p::QueryCompleteEventClass::QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId)
@@ -818,13 +834,6 @@ void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 	}
 }
 
-void t4p::SqlBrowserPanelClass::SetCurrentInfo(const t4p::DatabaseTagClass& databaseTag) {
-	Query.DatabaseTag.Copy(databaseTag);
-	if (CodeControl) {
-		CodeControl->SetCurrentDbTag(databaseTag);
-	}
-}
-
 void t4p::SqlBrowserPanelClass::LinkToCodeControl(t4p::CodeControlClass* codeControl) {
 	CodeControl = codeControl;
 	
@@ -832,8 +841,12 @@ void t4p::SqlBrowserPanelClass::LinkToCodeControl(t4p::CodeControlClass* codeCon
 	size_t sel = (size_t)Connections->GetSelection();
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	if (sel >= 0 && sel < dbTags.size()) {
-		CodeControl->SetCurrentDbTag(dbTags[sel]);
+		Feature->SetCurrentInfo(dbTags[sel]);
 	}
+}
+
+int t4p::SqlBrowserPanelClass::SelectedConnectionIndex() {
+	return Connections->GetSelection();
 }
 
 bool t4p::SqlBrowserPanelClass::IsLinkedToCodeControl(t4p::CodeControlClass* codeControl) {
@@ -854,7 +867,7 @@ void t4p::SqlBrowserPanelClass::FillConnectionList() {
 	this->Layout();
 	if (!Connections->IsEmpty()) {
 		Connections->SetSelection(0);
-		SetCurrentInfo(dbTags[0]);
+		Feature->SetCurrentInfo(dbTags[0]);
 	}
 }
 
@@ -862,7 +875,7 @@ void t4p::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
 	size_t sel = (size_t)event.GetSelection();
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
 	if (sel >= 0 && sel < dbTags.size()) {
-		SetCurrentInfo(dbTags[sel]);
+		Feature->SetCurrentInfo(dbTags[sel]);
 	}
 }
 
@@ -1019,10 +1032,22 @@ void t4p::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
 }
 
 t4p::SqlBrowserFeatureClass::SqlBrowserFeatureClass(t4p::AppClass& app) 
-	: FeatureClass(app) {
+	: FeatureClass(app) 
+	, SqlCodeCompletionProvider(app.Globals) 
+	, SqlBraceMatchStyler() {
 }
 
 t4p::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
+}
+
+void t4p::SqlBrowserFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+	event.GetCodeControl()->RegisterCompletionProvider(&SqlCodeCompletionProvider);
+	event.GetCodeControl()->RegisterBraceMatchStyler(&SqlBraceMatchStyler);
+}
+
+
+void t4p::SqlBrowserFeatureClass::SetCurrentInfo(const t4p::DatabaseTagClass& databaseTag) {
+	SqlCodeCompletionProvider.SetDbTag(databaseTag);	
 }
 
 void t4p::SqlBrowserFeatureClass::DetectMetadata() {
@@ -1062,7 +1087,7 @@ void  t4p::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) 
 		}
 	}
 	
-	t4p::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), t4p::CodeControlClass::SQL);
+	t4p::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), t4p::FILE_TYPE_SQL);
 	CreateResultsPanel(ctrl);
 	ctrl->SetFocus();
 }
@@ -1084,7 +1109,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserFeatureClass::CreateResultsPanel(t4p::
 
 void t4p::SqlBrowserFeatureClass::OnRun(wxCommandEvent& event) {
 	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
-	if (ctrl && ctrl->GetDocumentMode() == t4p::CodeControlClass::SQL) {
+	if (ctrl && ctrl->GetFileType() == t4p::FILE_TYPE_SQL) {
 		
 		// look for results panel that corresponds to the current code control
 		wxAuiNotebook* notebook = GetToolsNotebook();
@@ -1172,6 +1197,12 @@ void t4p::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEven
 					
 					// we found the panel bring it to the forefront and run the query
 					SetFocusToToolsWindow(toolsWindow);
+					
+					int sel = panel->SelectedConnectionIndex();
+					std::vector<t4p::DatabaseTagClass> allDbTags = App.Globals.AllEnabledDatabaseTags();
+					if (sel >= 0 && sel < (int)allDbTags.size()) {
+						SqlCodeCompletionProvider.SetDbTag(allDbTags[sel]);
+					}
 					break;
 				}
 			}
@@ -1351,7 +1382,7 @@ void t4p::SqlBrowserFeatureClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEven
 }
 
 void t4p::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
-	GetNotebook()->AddTriumphPage(t4p::CodeControlClass::SQL);
+	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_SQL);
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 		ctrl->SetText(sql);
@@ -1359,7 +1390,7 @@ void t4p::SqlBrowserFeatureClass::NewSqlBuffer(const wxString& sql) {
 }
 
 void t4p::SqlBrowserFeatureClass::NewTextBuffer(const wxString& text) {
-	GetNotebook()->AddTriumphPage(t4p::CodeControlClass::TEXT);
+	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_TEXT);
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
 		ctrl->SetText(text);
@@ -1990,6 +2021,115 @@ void t4p::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
+t4p::SqlCodeCompletionProviderClass::SqlCodeCompletionProviderClass(t4p::GlobalsClass& globals)
+: CodeCompletionProviderClass() 
+, Globals(globals) {
+}
+
+std::vector<wxString> t4p::SqlCodeCompletionProviderClass::HandleAutoCompletionMySql(const UnicodeString& word) {
+	std::vector<wxString> autoCompleteList;
+	if (word.length() < 1) {
+		return autoCompleteList;
+	 }
+	wxString symbol = t4p::IcuToWx(word);
+	symbol = symbol.Lower();
+	
+	t4p::KeywordsTokenizeMatch(t4p::KEYWORDS_MYSQL, symbol, autoCompleteList);
+	for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+		
+		// make keywords uppercase for SQL keywords
+		autoCompleteList[i].MakeUpper();
+	}
+	
+	// look at the meta data
+	if (!CurrentDbTag.Label.isEmpty()) {
+		UnicodeString error;
+		std::vector<UnicodeString> results = Globals.SqlResourceFinder.FindTables(CurrentDbTag, word);
+		for (size_t i = 0; i < results.size(); i++) {
+			wxString s = t4p::IcuToWx(results[i]);
+			autoCompleteList.push_back(s);
+		}
+		results = Globals.SqlResourceFinder.FindColumns(CurrentDbTag, word);
+		for (size_t i = 0; i < results.size(); i++) {
+			wxString s = t4p::IcuToWx(results[i]);
+			autoCompleteList.push_back(s);
+		}
+	}
+	return autoCompleteList;
+}
+
+void t4p::SqlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+	int currentPos = ctrl->GetCurrentPos();
+	int startPos = ctrl->WordStartPosition(currentPos, true);
+	int endPos = ctrl->WordEndPosition(currentPos, true);
+	UnicodeString symbol = 	ctrl->GetSafeSubstring(startPos, endPos);
+	
+	std::vector<wxString> autoCompleteList = HandleAutoCompletionMySql(symbol);
+	if (!autoCompleteList.empty()) {
+		
+		// scintilla needs the keywords sorted.
+		std::sort(autoCompleteList.begin(), autoCompleteList.end());
+		wxString list;
+		for (size_t i = 0; i < autoCompleteList.size(); ++i) {
+			list += autoCompleteList[i];
+			if (i < (autoCompleteList.size() - 1)) {
+				list += (wxChar)ctrl->AutoCompGetSeparator();
+			}
+		}
+		ctrl->AutoCompSetMaxWidth(0);
+		int wordLength = currentPos - startPos;
+		ctrl->AutoCompShow(wordLength, list);
+	}
+}
+
+void t4p::SqlCodeCompletionProviderClass::SetDbTag(const t4p::DatabaseTagClass& dbTag) {
+	CurrentDbTag.Copy(dbTag);
+}
+
+bool t4p::SqlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
+	return t4p::FILE_TYPE_SQL == type;
+}
+
+t4p::SqlBraceMatchStylerClass::SqlBraceMatchStylerClass()
+: BraceMatchStylerClass() {
+	
+}
+
+bool t4p::SqlBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
+	return t4p::FILE_TYPE_SQL == type;
+}
+
+void t4p::SqlBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
+	if (!InCommentOrStringStyle(ctrl, posToCheck)) {
+		wxChar c1 = ctrl->GetCharAt(posToCheck),
+		            c2 = ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c1 || wxT(')') == c1) {
+			posToCheck = posToCheck;
+		}
+		else if (wxT('(') == c2 || wxT(')') == c2) {
+			posToCheck = posToCheck - 1;
+		}
+		else  {
+			posToCheck = -1;
+		}
+		if (posToCheck >= 0) {
+			int pos = ctrl->BraceMatch(posToCheck);
+			if (wxSTC_INVALID_POSITION == pos) {
+				ctrl->BraceBadLight(posToCheck);
+			}
+			else {
+				ctrl->BraceHighlight(posToCheck, pos);
+			}
+		}
+		else {
+			ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+		}
+	}
+	else {
+		ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
+	}
+}
+
 BEGIN_EVENT_TABLE(t4p::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_MENU(t4p::MENU_SQL + 0, t4p::SqlBrowserFeatureClass::OnSqlBrowserToolsMenu)	
 	EVT_MENU(t4p::MENU_SQL + 1, t4p::SqlBrowserFeatureClass::OnSqlConnectionMenu)
@@ -2001,6 +2141,8 @@ BEGIN_EVENT_TABLE(t4p::SqlBrowserFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::SqlBrowserFeatureClass::OnAppExit)
 	EVT_APP_DB_TABLE_DATA_OPEN(t4p::SqlBrowserFeatureClass::OnCmdTableDataOpen)
 	EVT_APP_DB_TABLE_DEFINITION_OPEN(t4p::SqlBrowserFeatureClass::OnCmdTableDefinitionOpen)
+	EVT_APP_FILE_NEW(t4p::SqlBrowserFeatureClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(t4p::SqlBrowserFeatureClass::OnAppFileOpened)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::SqlBrowserPanelClass, SqlBrowserPanelGeneratedClass)
@@ -2028,5 +2170,4 @@ BEGIN_EVENT_TABLE(t4p::TableDefinitionPanelClass, TableDefinitionPanelGeneratedC
 	EVT_QUERY_COMPLETE(ID_SQL_TABLE_INDICES, t4p::TableDefinitionPanelClass::OnIndexSqlComplete)
 	EVT_QUERY_COMPLETE(ID_SQL_TABLE_CREATE, t4p::TableDefinitionPanelClass::OnCreateSqlComplete)
 END_EVENT_TABLE()
-
 

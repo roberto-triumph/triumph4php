@@ -178,19 +178,19 @@ void t4p::MainFrameClass::OnFileSave(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::OnFilePhpNew(wxCommandEvent& event) {
-	Notebook->AddTriumphPage(t4p::CodeControlClass::PHP);
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 }
 
 void t4p::MainFrameClass::OnFileSqlNew(wxCommandEvent& event) {
-	Notebook->AddTriumphPage(t4p::CodeControlClass::SQL);
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_SQL);
 }
 
 void t4p::MainFrameClass::OnFileCssNew(wxCommandEvent& event) {
-	Notebook->AddTriumphPage(t4p::CodeControlClass::CSS);
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_CSS);
 }
 
 void t4p::MainFrameClass::OnFileTextNew(wxCommandEvent& event) {
-	Notebook->AddTriumphPage(t4p::CodeControlClass::TEXT);
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_TEXT);
 }
 
 void t4p::MainFrameClass::OnFileOpen(wxCommandEvent& event) {

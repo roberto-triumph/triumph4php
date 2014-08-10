@@ -527,11 +527,6 @@ public:
 	void OnQueryComplete(t4p::QueryCompleteEventClass& event);
 	
 	/**
-	 * signal to this panel that the user changed the connection.
-	 */
-	void SetCurrentInfo(const DatabaseTagClass& info);
-	
-	/**
 	 * Sets the connection label and the result label.
 	 * This is how the user knows what connection is being used by this panel.
 	 */
@@ -565,6 +560,11 @@ public:
 	 *  fill the connection list with the configured, enabled connections
 	 */
 	void FillConnectionList();
+	
+	/**
+	 * @return int the index of the selected connection of this panel
+	 */
+	int SelectedConnectionIndex();
 
 private:
 	
@@ -779,7 +779,48 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * the sql code completion provider will provide SQL-related suggestions
+ *  (table names, column names, sql keywords) for the user when the user is edting SQL
+ */
+class SqlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 
+public:
+
+	SqlCodeCompletionProviderClass(t4p::GlobalsClass& globals);
+	
+	bool DoesSupport(t4p::FileType type);
+	
+	virtual void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
+	
+	void SetDbTag(const t4p::DatabaseTagClass& dbTag);
+	
+private:
+
+	std::vector<wxString> HandleAutoCompletionMySql(const UnicodeString& word);	
+	
+	/**
+	 * the connection to fetch database metadata for (auto completion)
+	 */
+	t4p::DatabaseTagClass CurrentDbTag;
+	
+	/**
+	 * to get the connection to the tags database (sqlite)
+	 */
+	t4p::GlobalsClass& Globals;
+};
+
+class SqlBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
+
+public:
+
+	SqlBraceMatchStylerClass();
+	
+	bool DoesSupport(t4p::FileType type);
+	
+	void Style(t4p::CodeControlClass* ctrl, int posToCheck);
+};
+ 
 /**
  * This is a feature to manage SQL connections and make queries to the database.
  */
@@ -808,6 +849,13 @@ public:
 	
 	void NewTextBuffer(const wxString& text);
 	
+	/**
+	 * signal to the feature that the user changed the connection.
+	 * sql code completion will use the given connection info
+	 * to get tables and column names
+	 */
+	void SetCurrentInfo(const DatabaseTagClass& info);
+	
 private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
@@ -823,6 +871,8 @@ private:
 	void OnCmdTableDataOpen(t4p::OpenDbTableCommandEventClass& event);
 	
 	void OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandEventClass& event);
+	
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * synchronize the SQL query tab in the code control notebook with
@@ -852,6 +902,17 @@ private:
 	 * Saves the user-created infos using the global config.
 	 */
 	void SavePreferences();
+	
+	/**
+	 * used to show the user suggestions of sql tables, columns
+	 * and keywords
+	 */
+	t4p::SqlCodeCompletionProviderClass SqlCodeCompletionProvider;
+	
+	/**
+	 * to style sql parenthesis ()
+	 */
+	t4p::SqlBraceMatchStylerClass SqlBraceMatchStyler;
 	
 	DECLARE_EVENT_TABLE()
 };

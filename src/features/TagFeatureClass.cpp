@@ -113,7 +113,17 @@ void t4p::TagFeatureClass::OnJump(wxCommandEvent& event) {
 		int endPos = codeControl->WordEndPosition(currentPos, true);
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
-		std::vector<t4p::TagClass> matches = codeControl->GetTagsAtCurrentPosition();
+		wxString matchError;
+		std::vector<t4p::TagClass> matches = App.Globals.TagCache.GetTagsAtPosition(
+			codeControl->GetIdString(), codeControl->GetSafeText(), endPos, 
+			App.Globals.AllEnabledSourceDirectories(),
+			App.Globals,
+			matchError
+		);
+		if (!matchError.empty()) {
+			GetStatusBarWithGauge()->SetColumn0Text(matchError);
+		}
+		
 		t4p::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
@@ -271,7 +281,7 @@ void t4p::TagFeatureClass::OnActionComplete(t4p::ActionEventClass& event) {
 
 void t4p::TagFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	t4p::CodeControlClass* codeControl = event.GetCodeControl();
-	if (codeControl && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
+	if (codeControl && codeControl->GetFileType() == t4p::FILE_TYPE_PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// builder action could take a while (more than the timer)
@@ -300,7 +310,7 @@ void t4p::TagFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 
 void t4p::TagFeatureClass::OnAppFileReverted(t4p::CodeControlEventClass& event) {
 	t4p::CodeControlClass* codeControl = event.GetCodeControl();
-	if (codeControl && codeControl->GetDocumentMode() == t4p::CodeControlClass::PHP) {
+	if (codeControl && codeControl->GetFileType() == t4p::FILE_TYPE_PHP) {
 		UnicodeString text = codeControl->GetSafeText();
 
 		// builder action could take a while (more than the timer)
@@ -433,10 +443,23 @@ void t4p::TagFeatureClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
 		return;
 	}
 	int pos = event.GetPosition();
+	
+	// if the cursor is in the middle of an identifier, find the end of the
+	// current identifier; that way we can know the full name of the tag we want
+	// to get
 	int endPos = ctrl->WordEndPosition(pos, true);
-	std::vector<t4p::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
+	wxString matchError;
+	std::vector<t4p::TagClass> matches = App.Globals.TagCache.GetTagsAtPosition(
+		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
+		App.Globals.AllEnabledSourceDirectories(),
+		App.Globals,
+		matchError
+	);
 	if (!matches.empty() && !matches[0].GetFullPath().IsEmpty()) {
 		LoadPageFromResource(wxT(""), matches[0]);
+	}
+	else if (!matchError.empty()) {
+		GetStatusBarWithGauge()->SetColumn0Text(matchError);
 	}
 }
 

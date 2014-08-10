@@ -37,61 +37,6 @@
 int ID_CLOSE_ALL_TABS = wxNewId();
 int ID_CLOSE_TAB = wxNewId();
 
-/**
- * convert a code control document mode to a 
- * image list number; to determine what image
- * to show in the notebook tab based on the document
- * mode.
- */
-static int ImageId(t4p::CodeControlClass::Mode mode) {
-	int imgId = t4p::IMGLIST_NONE;
-	switch (mode) {
-	case t4p::CodeControlClass::TEXT:
-		imgId = t4p::IMGLIST_MISC;
-		break;
-	case t4p::CodeControlClass::SQL:
-		imgId = t4p::IMGLIST_SQL;
-		break;
-	case t4p::CodeControlClass::CSS:
-		imgId = t4p::IMGLIST_CSS;
-		break;
-	case t4p::CodeControlClass::PHP:
-		imgId = t4p::IMGLIST_PHP;
-		break;
-	case t4p::CodeControlClass::JS:
-		imgId = t4p::IMGLIST_JS;
-		break;
-	case t4p::CodeControlClass::CONFIG:
-		imgId = t4p::IMGLIST_CONFIG;
-		break;
-	case t4p::CodeControlClass::CRONTAB:
-		imgId = t4p::IMGLIST_CRONTAB;
-		break;
-	case t4p::CodeControlClass::YAML:
-		imgId = t4p::IMGLIST_YAML;
-		break;
-	case t4p::CodeControlClass::XML:
-		imgId = t4p::IMGLIST_XML;
-		break;
-	case t4p::CodeControlClass::RUBY:
-		imgId = t4p::IMGLIST_RUBY;
-		break;
-	case t4p::CodeControlClass::LUA:
-		imgId = t4p::IMGLIST_LUA;
-		break;
-	case t4p::CodeControlClass::MARKDOWN:
-		imgId = t4p::IMGLIST_MARKDOWN;
-		break;
-	case t4p::CodeControlClass::BASH:
-		imgId = t4p::IMGLIST_BASH;
-		break;
-	case t4p::CodeControlClass::DIFF:
-		imgId = t4p::IMGLIST_DIFF;
-		break;
-	}
-	return imgId;
-}
-
 t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style)
 	: wxAuiNotebook(parent, id, pos, size, style)
@@ -167,7 +112,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 	bool saved = false;
 	if (phpSourceCodeCtrl && phpSourceCodeCtrl->IsNew()) {
 		wxString fileFilter = CreateWildcardString();
-		int filterIndex = WilcardIndex(phpSourceCodeCtrl->GetDocumentMode());
+		int filterIndex = WilcardIndex(phpSourceCodeCtrl->GetFileType());
 		wxFileDialog fileDialog(this, wxT("Save a File"), wxT(""), wxT(""), 
 				fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 		fileDialog.SetFilterIndex(filterIndex);
@@ -220,63 +165,63 @@ void t4p::NotebookClass::MarkPageAsNotModified(int windowId) {
 		SetPageText(pageNumber, filename);
 	}
 }
-void t4p::NotebookClass::AddTriumphPage(t4p::CodeControlClass::Mode mode) {
+void t4p::NotebookClass::AddTriumphPage(t4p::FileType type) {
 	if (NULL == ImageList) {
 		ImageList = new wxImageList(16, 16);
 		t4p::FileTypeImageList(*ImageList);
 		AssignImageList(ImageList);
 	}
 	wxString format;
-	switch (mode) {
-		case t4p::CodeControlClass::TEXT:
+	switch (type) {
+		case t4p::FILE_TYPE_TEXT:
 			format = _("Untitled %d.txt");
 			break;
-		case t4p::CodeControlClass::SQL:
+		case t4p::FILE_TYPE_SQL:
 			format = _("Untitled %d.sql");
 			break;
-		case t4p::CodeControlClass::CSS:
+		case t4p::FILE_TYPE_CSS:
 			format = _("Untitled %d.css");
 			break;
-		case t4p::CodeControlClass::PHP:
+		case t4p::FILE_TYPE_PHP:
 			format = _("Untitled %d.php");
 			break;
-		case t4p::CodeControlClass::JS:
+		case t4p::FILE_TYPE_JS:
 			format = _("Untitled %d.js");
 			break;
-		case t4p::CodeControlClass::CONFIG:
+		case t4p::FILE_TYPE_CONFIG:
 			format = _("Untitled %d.conf");
 			break;
-		case t4p::CodeControlClass::CRONTAB:
+		case t4p::FILE_TYPE_CRONTAB:
 			format = _("Untitled %d");
 			break;
-		case t4p::CodeControlClass::YAML:
+		case t4p::FILE_TYPE_YAML:
 			format = _("Untitled %d.yml");
 			break;
-		case t4p::CodeControlClass::XML:
+		case t4p::FILE_TYPE_XML:
 			format = _("Untitled %d.xml");
 			break;
-		case t4p::CodeControlClass::RUBY:
+		case t4p::FILE_TYPE_RUBY:
 			format = _("Untitled %d.rb");
 			break;
-		case t4p::CodeControlClass::LUA:
+		case t4p::FILE_TYPE_LUA:
 			format = _("Untitled %d.lua");
 			break;
-		case t4p::CodeControlClass::MARKDOWN:
+		case t4p::FILE_TYPE_MARKDOWN:
 			format = _("Untitled %d.md");
 			break;
-		case t4p::CodeControlClass::BASH:
+		case t4p::FILE_TYPE_BASH:
 			format = _("Untitled %d.sh");
 			break;
-		case t4p::CodeControlClass::DIFF:
+		case t4p::FILE_TYPE_DIFF:
 			format = _("Untitled %d.diff");
 			break;
 	}
 	
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
-	page->SetDocumentMode(mode);
+	page->SetFileType(type);
 	
-	int imgId = ImageId(mode);
+	int imgId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(format));
 	
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, imgId);
 
@@ -349,8 +294,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents, charset, hasSignature);
 
-			t4p::CodeControlClass::Mode mode = newCode->GetDocumentMode();
-			int imgId = ImageId(mode);
+			int imgId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(filename));
 			
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
@@ -419,7 +363,7 @@ bool t4p::NotebookClass::SaveCurrentPageAsNew() {
 		}
 		else {
 	 		wxString fileFilter = CreateWildcardString();
-			int filterIndex = WilcardIndex(codeCtrl->GetDocumentMode());
+			int filterIndex = WilcardIndex(codeCtrl->GetFileType());
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
 					fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			fileDialog.SetFilterIndex(filterIndex);
@@ -659,17 +603,17 @@ wxString t4p::NotebookClass::CreateWildcardString() const {
 	return fileFilter;
 }
 
-int t4p::NotebookClass::WilcardIndex(t4p::CodeControlClass::Mode mode) {
-	if (t4p::CodeControlClass::PHP == mode) {
+int t4p::NotebookClass::WilcardIndex(t4p::FileType type) {
+	if (t4p::FILE_TYPE_PHP == type) {
 		return 0;
 	}
-	else if (t4p::CodeControlClass::CSS == mode) {
+	else if (t4p::FILE_TYPE_CSS == type) {
 		return 1;
 	}
-	else if (t4p::CodeControlClass::SQL == mode) {
+	else if (t4p::FILE_TYPE_SQL == type) {
 		return 2;
 	}
-	else if (t4p::CodeControlClass::JS == mode) {
+	else if (t4p::FILE_TYPE_JS == type) {
 		return 3;
 	}
 	return 4;

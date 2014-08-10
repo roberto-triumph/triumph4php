@@ -123,7 +123,7 @@ public:
 	 * Create a new source code control, and selects it.
 	 * @param mode the type of document the control will edit
 	 */
-	void AddTriumphPage(t4p::CodeControlClass::Mode mode);
+	void AddTriumphPage(t4p::FileType type);
 	
 	/**
 	 * Prompts the user to pick an existing file and loads the contents of the
@@ -275,7 +275,7 @@ private:
 	 * @return the wildcard  index according to the given mode
 	 * the index is suitable to pass to the wxFileDialog::SetFilterIndex method
 	 */
-	int WilcardIndex(CodeControlClass::Mode mode);
+	int WilcardIndex(t4p::FileType type);
 
 	/**
 	 * will use the close source code event to re-trigger project indexing.

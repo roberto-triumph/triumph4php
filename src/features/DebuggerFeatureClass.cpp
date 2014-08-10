@@ -2026,7 +2026,7 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 		Feature.App.EventSink,
 		wxID_ANY
 	);
-	CodeCtrl->SetDocumentMode(t4p::CodeControlClass::PHP);
+	CodeCtrl->SetFileType(t4p::FILE_TYPE_PHP);
 	ExprSizer->Add(CodeCtrl, 1, wxALL | wxEXPAND, 5);
 	
 	EvalButton->SetBitmap(t4p::BitmapImageAsset(wxT("debugger-eval")));

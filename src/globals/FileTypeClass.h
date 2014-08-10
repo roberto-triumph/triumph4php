@@ -32,6 +32,54 @@
 namespace t4p {
 
 /**
+ * This mode flag controls what settings are used for syntax highlighting, margins,
+ * and code folding.  It also controls how Auto code completion should be handled
+ * if at all.
+ * The CodeControlClass will auto-detect the correct mode based on file name, but it
+ * can be changed via the SetDocumentMode() method.
+ */
+enum FileType {
+
+	/**
+	 * No code completion, ever. No syntax highlight, ever.  This is the default mode
+	 * for anything that's not one of the types below.
+	 */
+	FILE_TYPE_TEXT,
+
+	/**
+	 * The full functionality code completion, call tips, syntax highlighting, the works
+	 */
+	FILE_TYPE_PHP,
+
+	/**
+	 * Code completion and SQL syntax highlighting
+	 */
+	FILE_TYPE_SQL,
+
+	/**
+	 * CSS style sheets (pure CSS files only)
+	 */
+	FILE_TYPE_CSS,
+
+	/**
+	 * Javascript (pure JS files only)
+	 */
+	FILE_TYPE_JS,
+	
+	// the rest of the document types are only slightly supported
+	// syntax highlighting works but not much else
+	FILE_TYPE_CONFIG,
+	FILE_TYPE_CRONTAB,
+	FILE_TYPE_YAML,
+	FILE_TYPE_XML,
+	FILE_TYPE_RUBY,
+	FILE_TYPE_LUA,
+	FILE_TYPE_MARKDOWN,
+	FILE_TYPE_BASH,
+	FILE_TYPE_DIFF
+};
+
+/**
  * This class holds the wildcards for all of the 
  * different file types that are treated specially by 
  * Triumph. There is one class total, not one class per

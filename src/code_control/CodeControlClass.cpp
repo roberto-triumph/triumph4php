@@ -23,7 +23,6 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/CodeControlClass.h>
-#include <code_control/DocumentClass.h>
 #include <globals/String.h>
 #include <globals/GlobalsClass.h>
 #include <globals/Errors.h>
@@ -333,6 +332,51 @@ static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxStri
 	return false;
 }
 
+t4p::CodeCompletionItemClass::CodeCompletionItemClass()
+: Label()
+, Code() {
+	
+}
+
+t4p::CodeCompletionItemClass::CodeCompletionItemClass(const t4p::CodeCompletionItemClass& src)
+: Label()
+, Code() {
+	Copy(src);
+}
+
+t4p::CodeCompletionItemClass& t4p::CodeCompletionItemClass::operator=(const t4p::CodeCompletionItemClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::CodeCompletionItemClass::Copy(const t4p::CodeCompletionItemClass& src) {
+	Label = src.Label;
+	Code = src.Code;
+}
+
+t4p::CodeCompletionProviderClass::CodeCompletionProviderClass() {
+	
+}
+
+t4p::CodeCompletionProviderClass::~CodeCompletionProviderClass() {
+	
+}
+
+t4p::CallTipProviderClass::CallTipProviderClass() {
+	
+}
+
+t4p::CallTipProviderClass::~CallTipProviderClass() {
+	
+}
+
+t4p::BraceMatchStylerClass::BraceMatchStylerClass() {
+	
+}
+
+t4p::BraceMatchStylerClass::~BraceMatchStylerClass() {
+	
+}
 
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
 											  t4p::GlobalsClass* globals, t4p::EventSinkClass& eventSink,
@@ -341,18 +385,19 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 		: wxStyledTextCtrl(parent, id, position, size, style, name)
 		, CodeControlOptions(options)
 		, CurrentFilename()
-		, CurrentDbTag()
+		, CompletionProviders()
+		, CallTipProviders()
+		, BraceMatchStylers()
 		, HotspotTimer(this)
 		, Globals(globals)
 		, EventSink(eventSink)
 		, WordHighlightIsWordHighlighted(false)
-		, DocumentMode(TEXT) 
+		, Type(t4p::FILE_TYPE_TEXT) 
 		, IsHidden(false) 
 		, IsTouched(false) 
 		, HasSearchMarkers(false) 
 		, HasFileSignature(false) 
 		, Charset() {
-	Document = NULL;
 	
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
@@ -361,8 +406,6 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 }
 
 t4p::CodeControlClass::~CodeControlClass() {
-	Document->DetachFromControl(this);
-	delete Document;
 }
 void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents, 
 		const wxString& charset, bool hasSignature) {
@@ -376,11 +419,7 @@ void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& c
 	if (file.IsOk()) {
 		FileOpenedDateTime = file.GetModificationTime();
 	}
-	AutoDetectDocumentMode();
-
-	// order is important; calling FileOpened after document type is detected so that
-	// the proper callback is used
-	Document->FileOpened(filename);
+	AutoDetectFileType();
 }
 
 void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
@@ -460,7 +499,7 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
 		
 		// if file is not changing name then its not changing extension
-		// no need to auto detect the document mode
+		// no need to auto detect the file type
 		bool isWritable = wxFileName::IsFileWritable(CurrentFilename);
 		bool doesExist = wxFileName::FileExists(CurrentFilename);
 		
@@ -491,10 +530,7 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 
 		// if the file extension changed let's update the code control appropriate
 		// for example if a .txt file was saved as a .sql file
-		AutoDetectDocumentMode();
-
-		// need to notify the document of the new name
-		Document->FileOpened(newFilename);
+		AutoDetectFileType();
 	}
 	if (saved && !isAsyncSave) {
 		MarkAsSaved();
@@ -612,41 +648,18 @@ void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	}
 }
 
-std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtCurrentPosition() {
-	wxString completeStatus;
-	std::vector<t4p::TagClass> tags = Document->GetTagsAtCurrentPosition(completeStatus);
-	if (!completeStatus.IsEmpty()) {
-		wxWindow* window = GetGrandParent();
-
-		// show the auto complete message
-		wxFrame* frame = wxDynamicCast(window, wxFrame);
-		if (frame) {
-			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
-			gauge->SetColumn0Text(completeStatus);
-		}
-	}
-	return tags;
-}
-
-std::vector<t4p::TagClass> t4p::CodeControlClass::GetTagsAtPosition(int pos) {
-	wxString completeStatus;
-	std::vector<t4p::TagClass> tags = Document->GetTagsAtPosition(pos, completeStatus);
-	if (!completeStatus.IsEmpty()) {
-		wxWindow* window = GetGrandParent();
-
-		// show the auto complete message
-		wxFrame* frame = wxDynamicCast(window, wxFrame);
-		if (frame) {
-			t4p::StatusBarWithGaugeClass* gauge = (t4p::StatusBarWithGaugeClass*)frame->GetStatusBar();
-			gauge->SetColumn0Text(completeStatus);
-		}
-	}
-	return tags;
-}
-
 void t4p::CodeControlClass::HandleAutoCompletion() {
 	wxString completeStatus;
-	Document->HandleAutoCompletion(completeStatus);
+	std::vector<t4p::CodeCompletionItemClass> suggestions;
+	
+	std::vector<t4p::CodeCompletionProviderClass*>::const_iterator completionProvider;
+	completionProvider = CompletionProviders.begin();
+	for (; completionProvider != CompletionProviders.end(); ++completionProvider) {
+		if ((*completionProvider)->DoesSupport(Type)) {
+			(*completionProvider)->Provide(this, suggestions, completeStatus);
+		}
+	}
+	
 	if (!completeStatus.IsEmpty()) {
 		wxWindow* window = GetGrandParent();
 
@@ -661,7 +674,13 @@ void t4p::CodeControlClass::HandleAutoCompletion() {
 
 void t4p::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 	wxString completeStatus;
-	Document->HandleCallTip(ch, force, completeStatus);
+	std::vector<t4p::CallTipProviderClass*>::const_iterator tipProvider; 
+	tipProvider = CallTipProviders.begin();
+	for (; tipProvider != CallTipProviders.end(); ++tipProvider) {
+		if ((*tipProvider)->DoesSupport(Type)) {
+			(*tipProvider)->ProvideTip(this, ch, force, completeStatus);
+		}
+	}
 	if (!completeStatus.IsEmpty()) {
 		wxWindow* window = GetGrandParent();
 
@@ -679,8 +698,14 @@ void t4p::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 		event.Skip();
 		return;
 	}
-
-	Document->MatchBraces(GetCurrentPos());
+	
+	std::vector<t4p::BraceMatchStylerClass*>::const_iterator styler;
+	styler = BraceMatchStylers.begin();
+	for (; styler != BraceMatchStylers.end(); ++styler) {
+		if ((*styler)->DoesSupport(Type)) {
+			(*styler)->Style(this, GetCurrentPos());
+		}
+	}
 	HandleCallTip(0, false);
 	event.Skip();
 }
@@ -702,89 +727,63 @@ void t4p::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	}
 }
 
-void t4p::CodeControlClass::AutoDetectDocumentMode() {
+void t4p::CodeControlClass::AutoDetectFileType() {
 	wxString fileName = GetFileName();
 	if (Globals->FileTypes.HasAPhpExtension(fileName)) {
-		DocumentMode = PHP;
+		Type = t4p::FILE_TYPE_PHP;
 	}
 	else if (Globals->FileTypes.HasASqlExtension(fileName)) {
-		DocumentMode = SQL;
+		Type = t4p::FILE_TYPE_SQL;
 	}
 	else if (Globals->FileTypes.HasACssExtension(fileName)) {
-		DocumentMode = CSS;
+		Type = t4p::FILE_TYPE_CSS;
 	}
 	else if (Globals->FileTypes.HasAJsExtension(fileName)) {
-		DocumentMode = JS;
+		Type = t4p::FILE_TYPE_JS;
 	}
 	else if (Globals->FileTypes.HasAConfigExtension(fileName)) {
-		DocumentMode = CONFIG;
+		Type = t4p::FILE_TYPE_CONFIG;
 	}
 	else if (Globals->FileTypes.HasACrontabExtension(fileName)) {
-		DocumentMode = CRONTAB;
+		Type = t4p::FILE_TYPE_CRONTAB;
 	}
 	else if (Globals->FileTypes.HasAYamlExtension(fileName)) {
-		DocumentMode = YAML;
+		Type = t4p::FILE_TYPE_YAML;
 	}
 	else if (Globals->FileTypes.HasAXmlExtension(fileName)) {
-		DocumentMode = XML;
+		Type = t4p::FILE_TYPE_XML;
 	}
 	else if (Globals->FileTypes.HasARubyExtension(fileName)) {
-		DocumentMode = RUBY;
+		Type = t4p::FILE_TYPE_RUBY;
 	}
 	else if (Globals->FileTypes.HasALuaExtension(fileName)) {
-		DocumentMode = LUA;
+		Type = t4p::FILE_TYPE_LUA;
 	}
 	else if (Globals->FileTypes.HasAMarkdownExtension(fileName)) {
-		DocumentMode = MARKDOWN;
+		Type = t4p::FILE_TYPE_MARKDOWN;
 	}
 	else if (Globals->FileTypes.HasABashExtension(fileName)) {
-		DocumentMode = BASH;
+		Type = t4p::FILE_TYPE_BASH;
 	}
 	else if (Globals->FileTypes.HasADiffExtension(fileName)) {
-		DocumentMode = DIFF;
+		Type = t4p::FILE_TYPE_DIFF;
 	}
 	else {
-		DocumentMode = TEXT;
+		Type = t4p::FILE_TYPE_TEXT;
 	}
 	ApplyPreferences();
 }
 
 void t4p::CodeControlClass::ApplyPreferences() {
-	if (Document) {
-		
-		// need this here so that any events are not propagated while the object is
-		// being destructed (valgrind found this error)
-		Document->DetachFromControl(this);
-		delete Document;
-		Document = NULL;
-	}
-	if (t4p::CodeControlClass::SQL == DocumentMode) {
-		Document = new t4p::SqlDocumentClass(Globals, CurrentDbTag);
-		Document->SetControl(this);
-	}
-	else if (t4p::CodeControlClass::PHP == DocumentMode) {
-		Document = new t4p::PhpDocumentClass(Globals);
-		Document->SetControl(this);
-	}
-	else if (t4p::CodeControlClass::CSS == DocumentMode) {
-		Document = new t4p::CssDocumentClass();
-		Document->SetControl(this);
-	}
-	else if (t4p::CodeControlClass::JS == DocumentMode) {
-		Document = new t4p::JsDocumentClass();
-		Document->SetControl(this);
-	}
-	else {
-		Document = new t4p::TextDocumentClass();
-		Document->SetControl(this);
-	}
+	SetModEventMask(wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT | wxSTC_MOD_CHANGEMARKER);
+	ClearRegisteredImages();
 }
 
 UnicodeString t4p::CodeControlClass::WordAtCurrentPos() {
 	int pos = WordStartPosition(GetCurrentPos(), true);
 	int endPos = WordEndPosition(GetCurrentPos(), true);
 	
-	UnicodeString word = Document->GetSafeSubstring(pos, endPos);
+	UnicodeString word = GetSafeSubstring(pos, endPos);
 	return word;
 }
 
@@ -815,7 +814,27 @@ void t4p::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 }
 
 UnicodeString t4p::CodeControlClass::GetSafeText() {
-	return Document->GetSafeText();
+	// copied from the implementation of GetText method in stc.cpp 
+	int len  = GetTextLength();
+	wxMemoryBuffer mbuf(len + 1);   // leave room for the null...
+	char* buf = (char*)mbuf.GetWriteBuf(len + 1);
+	
+	SendMsg(2182, len + 1, (long)buf);
+	mbuf.UngetWriteBuf(len);
+	mbuf.AppendByte(0);
+	UnicodeString str(' ', len, 0);
+	int32_t written = 0;
+	UErrorCode error = U_ZERO_ERROR;
+	u_strFromUTF8(str.getBuffer(len + 1), len, &written, (const char*)mbuf, len, &error);
+	str.releaseBuffer(written);
+	assert(U_SUCCESS(error));
+	return str;
+}
+
+UnicodeString t4p::CodeControlClass::GetSafeSubstring(int startPos, int endPos) {
+	wxString s = GetTextRange(startPos, endPos);
+	UnicodeString ret = t4p::WxToIcu(s);
+	return ret;
 }
 
 void t4p::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
@@ -1073,22 +1092,13 @@ int t4p::CodeControlClass::BreakpointGetLine(int handle) {
 	return line;
 }
 
-void t4p::CodeControlClass::SetCurrentDbTag(const t4p::DatabaseTagClass& currentDbTag) {
-	CurrentDbTag.Copy(currentDbTag);
-	
-	// if SQL document is active we need to change the currentInfo in that object
-	// but since C++ does has poor RTTI we dont know what type Document pointer currently is
-	// for now just refresh everything which will update CurrentDbTag
+void t4p::CodeControlClass::SetFileType(t4p::FileType type) {
+	Type = type;
 	ApplyPreferences();
 }
 
-void t4p::CodeControlClass::SetDocumentMode(Mode mode) {
-	DocumentMode = mode;
-	ApplyPreferences();
-}
-
-t4p::CodeControlClass::Mode t4p::CodeControlClass::GetDocumentMode() {
-	return DocumentMode;
+t4p::FileType t4p::CodeControlClass::GetFileType() {
+	return Type;
 }
 
 int t4p::CodeControlClass::LineFromCharacter(int charPos) {
@@ -1134,7 +1144,7 @@ void t4p::CodeControlClass::TrimTrailingSpaces() {
 }
 
 void t4p::CodeControlClass::RemoveTrailingBlankLines() {
-	if (DocumentMode != PHP) {
+	if (t4p::FILE_TYPE_PHP == Type) {
 		return;
 	}
 
@@ -1209,7 +1219,7 @@ void t4p::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
 		event.Skip();
 		return;
 	}
-	if (PHP != DocumentMode) {
+	if (t4p::FILE_TYPE_PHP != Type) {
 		event.Skip();
 		return;
 	}
@@ -1241,6 +1251,22 @@ void t4p::CodeControlClass::OnModified(wxStyledTextEvent& event) {
 	EventSink.Publish(event);
 }
 
+void t4p::CodeControlClass::RegisterCompletionProvider(t4p::CodeCompletionProviderClass* provider) {
+	CompletionProviders.push_back(provider);
+}
+
+void t4p::CodeControlClass::RegisterCallTipProvider(t4p::CallTipProviderClass* provider) {
+	CallTipProviders.push_back(provider);
+}
+
+void t4p::CodeControlClass::RegisterBraceMatchStyler(t4p::BraceMatchStylerClass* styler) {
+	BraceMatchStylers.push_back(styler);
+}
+
+void t4p::CodeControlClass::PropagateToEventSink(wxStyledTextEvent& event) {
+	EventSink.Publish(event);
+}
+
 const wxEventType t4p::EVT_MOTION_ALT = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
@@ -1256,5 +1282,7 @@ BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
 	EVT_KEY_DOWN(t4p::CodeControlClass::OnKeyDown)
 	EVT_MOTION(t4p::CodeControlClass::OnMotion)
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, t4p::CodeControlClass::OnHotspotClick)
+	EVT_STC_CALLTIP_CLICK(wxID_ANY, t4p::CodeControlClass::PropagateToEventSink)
+	EVT_STC_AUTOCOMP_SELECTION(wxID_ANY, t4p::CodeControlClass::PropagateToEventSink)
 	EVT_TIMER(wxID_ANY, t4p::CodeControlClass::OnTimerComplete)
 END_EVENT_TABLE()

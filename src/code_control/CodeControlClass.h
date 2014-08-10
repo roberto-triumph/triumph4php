@@ -29,6 +29,7 @@
 #include <search/FinderClass.h>
 #include <globals/TagClass.h>
 #include <globals/DatabaseTagClass.h>
+#include <globals/FileTypeClass.h>
 #include <pelet/ParserClass.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
@@ -36,18 +37,18 @@
 
 #include <vector>
 
-/**
- * The source code editor.
- */
 namespace t4p {
 
 // some forward declarations to prevent re-compilation as much as possible
 // Since this file is included by many features whenever a change to any included header
 // files is maded most features have to be re-compiled.
-class TextDocumentClass;
 class TagCacheClass;
 class EventSinkClass;
 class GlobalsClass;
+
+
+// forward declaration, defined below
+class CodeControlClass;
 
 /**
  * this event is generating by a code control when the user hovers over an
@@ -76,6 +77,151 @@ extern const int CODE_CONTROL_INDICATOR_FIND;
 // start stealing styles from "asp javascript" we will never use those styles
 extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
 
+/**
+ * A single item that the CodeCompletionProvider has suggested
+ * based on the user input
+ */
+class CodeCompletionItemClass {
+	
+public:
+
+	/**
+	 * the string that will be shown to the user
+	 */
+	wxString Label;
+	
+	/**
+	 * the string that will be added to the document
+	 */
+	wxString Code;
+	
+	CodeCompletionItemClass();
+	
+	CodeCompletionItemClass(const t4p::CodeCompletionItemClass& src);
+	
+	t4p::CodeCompletionItemClass& operator=(const t4p::CodeCompletionItemClass& src);
+	
+	void Copy(const t4p::CodeCompletionItemClass& src);
+};
+
+/**
+ * CodeControl instances will query CodeCompletionProviders to
+ * get the code completion suggestions to show the user.
+ * 
+ * Whenever the user triggers code completion, the code control
+ * will loop through all of its providers, calling the provide()
+ * method.  Then, the code control will show the collected suggestions
+ * to the user.
+ */
+class CodeCompletionProviderClass {
+	
+public:
+
+	CodeCompletionProviderClass();
+	
+	virtual ~CodeCompletionProviderClass();
+	
+	/**
+	 * Sub-classes will implmement this method so that 
+	 * the code control can avoid querying the provider
+	 * in case they do not support the file's language.
+	 * We do this because we want to be quick during code
+	 * completion and we want to cut un-necessary calls
+	 * 
+	 * @return bool TRUE if this completion provider can 
+	 *         add suggestions for the given file type
+	 */
+	virtual bool DoesSupport(t4p::FileType type) = 0;
+
+	/**
+	 * The code control will call this method when the user triggers
+	 * code completion.  This call happens in the main (GUI) thread,
+	 * so it needs to be fast to avoid "white-screens".
+	 * 
+	 * Sub classes can implement their own logic for auto completion.
+	 * This method may be called in response to a user keypress; speed is
+	 * crucial here. Subclasses will need to invoke the AutoCompleteShow() method
+	 * of the wxSTC control.
+	 * 
+	 * @param ctrl the control that contains the code. used to get the current position
+	 *        as well as the source code text
+	 * @param suggestions sub-classes will implement this method to add suggestions
+	 *        to show the user. Implementations of this method will call
+	 *        suggestions.push_back() (or equivalent methods)
+	 * @param completeStatus any errors to show the user; these are useful so that
+	 *        the user knows why completion did not suggest any items
+	 */
+	virtual void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions,
+		wxString& completeStatus) = 0;
+};
+
+/**
+ * Code control instances will query call tip providers when
+ * the user triggers a call tip
+ */
+class CallTipProviderClass {
+
+	public:
+
+	CallTipProviderClass();
+	virtual ~CallTipProviderClass();
+	
+	/**
+	 * Sub-classes will implmement this method so that 
+	 * the code control can avoid querying the provider
+	 * in case they do not support the file's language.
+	 * We do this because we want to be quick during code
+	 * completion and we want to cut un-necessary calls
+	 * 
+	 * @return bool TRUE if this completion provider can 
+	 *         add suggestions for the given file type
+	 */
+	virtual bool DoesSupport(t4p::FileType type) = 0;
+	
+	/**
+	 * 
+	 * @param ch the last character that the user typed in
+	 *        providers can use this to automatically show/hide
+	 *        the tip.
+	 * @param force TRUE if the user forced the tip
+	 * @param status any errors to show the user; these are useful so that
+	 *        the user knows why completion did not suggest any items
+	 */
+	virtual void ProvideTip(t4p::CodeControlClass* ctrl, wxChar ch, bool force, wxString& status) = 0;
+};
+
+/**
+ * code control instances will call brace match providers
+ * to decorate matching braces.
+ */
+class BraceMatchStylerClass {
+	
+public:
+
+	BraceMatchStylerClass();
+	virtual ~BraceMatchStylerClass();
+	
+	/**
+	 * Sub-classes will implmement this method so that 
+	 * the code control can avoid querying the provider
+	 * in case they do not support the file's language.
+	 * We do this because we want to be quick during code
+	 * completion and we want to cut un-necessary calls
+	 * 
+	 * @return bool TRUE if this completion provider can 
+	 *         add suggestions for the given file type
+	 */
+	virtual bool DoesSupport(t4p::FileType type) = 0;
+	
+	/**
+	 * If char at position (pos +1) is a brace, highlight the brace
+	 * Otherwise, remove all brace highlights
+	 * 
+	 * @param ctrl the control to style
+	 * @param int posToCheck SCINTILLA position (byte offset) to look in
+	 */
+	virtual void Style(t4p::CodeControlClass* ctrl, int postToCheck) = 0;
+};
 
 /**
  * source code control with the following enhancements.
@@ -86,54 +232,6 @@ extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
 class CodeControlClass : public wxStyledTextCtrl {
 
 public:
-
-	/**
-	 * This mode flag controls what settings are used for syntax highlighting, margins,
-	 * and code folding.  It also controls how Auto code completion should be handled
-	 * if at all.
-	 * The CodeControlClass will auto-detect the correct mode based on file name, but it
-	 * can be changed via the SetDocumentMode() method.
-	 */
-	enum Mode {
-
-		/**
-		 * No code completion, ever. No syntax highlight, ever.  This is the default mode
-		 * for anything that's not PHP or SQL.
-		 */
-		TEXT,
-
-		/**
-		 * The full functionality code completion, call tips, syntax highlighting, the works
-		 */
-		PHP,
-
-		/**
-		 * Code completion and SQL syntax highlighting
-		 */
-		SQL,
-
-		/**
-		 * CSS style sheets (pure CSS files only)
-		 */
-		CSS,
-
-		/**
-		 * Javascript (pure JS files only)
-		 */
-		JS,
-		
-		// the rest of the document types are not slightly supported
-		// syntax highlighting works but not much else
-		CONFIG,
-		CRONTAB,
-		YAML,
-		XML,
-		RUBY,
-		LUA,
-		MARKDOWN,
-		BASH,
-		DIFF
-	};
 
 	/**
 	 * Constructor. 
@@ -216,18 +314,18 @@ public:
 	void MarkAsSaved();
 
 	/**
-	 * Set the options for this document.  This is auto-detected when using the LoadAndTrackFile() method
+	 * Set the options for this file.  This is auto-detected when using the LoadAndTrackFile() method
 	 * and will most likely not need to be called.
 	 *
-	 * @param Mode a document mode; changes will take place immediately (causing a repaint)
+	 * @param type a file type; changes will take place immediately (causing a repaint)
 	 */
-	void SetDocumentMode(Mode mode);
+	void SetFileType(t4p::FileType type);
 
 	/**
-	 * @return the current document mode that this code control is using.  it could be the one
-	 * set by SetDocumentMode() or it could have been detected.
+	 * @return the current file type that this code control is using.  it could be the one
+	 * set by SetFileType() or it could have been detected.
 	 */
-	Mode GetDocumentMode();
+	t4p::FileType GetFileType();
 
 	/**
 	 * Reload the file from this.  This method does nothing if this control was NOT loaded
@@ -286,9 +384,36 @@ public:
 	 * @param bool setPos if TRUE, then the cursor will be set at the start position
 	 */
 	void SetSelectionByCharacterPosition(int start, int end, bool setPos);
+	
+	/**
+	 * @param provider the provider to register with this code control. After 
+	 *        a provider is added, the code control will query the provider
+	 *        to get suggestions whenever the user triggers code completion.
+	 *        The given pointer will not be owned by this class; the provider
+	 *        should have at least the same lifetime as this code control.
+	 */
+	void RegisterCompletionProvider(t4p::CodeCompletionProviderClass* provider);
+	
+	/**
+	 * @param provider the provider to register with this code control. After 
+	 *        a provider is added, the code control will query the provider
+	 *        to get contents whenever the user triggers a call tip.
+	 *        The given pointer will not be owned by this class; the provider
+	 *        should have at least the same lifetime as this code control.
+	 */
+	void RegisterCallTipProvider(t4p::CallTipProviderClass* provider);
+	
+	/**
+	 * @param styler the styler to register with this code control. After 
+	 *        a styler is added, the code control will query the styler
+	 *        to highlight matching braces during update UI events.
+	 *        The given pointer will not be owned by this class; the styler
+	 *        should have at least the same lifetime as this code control.
+	 */
+	void RegisterBraceMatchStyler(t4p::BraceMatchStylerClass* styler);
 
 	/**
-	 * handles auto completion. This will differ based upon which document mode is loaded.
+	 * handles auto completion. This will differ based upon which file type is loaded.
 	 */
 	void HandleAutoCompletion();
 
@@ -301,31 +426,6 @@ public:
 	 *
 	 */
 	void HandleCallTip(wxChar ch = 0, bool force = false);
-
-	/**
-	 * Returns the tags that match the identifier located at the current cursor position.
-	 * For example, if the document holds:
-	 *
-	 * <?php pretty_print(array(1, 2, 3)) ?>
-	 *
-	 * and the cursor is in position 8, this method returns the tags for the "pretty_print" function.
-	 *
-	 * @return tag matches
-	 */
-	std::vector<TagClass> GetTagsAtCurrentPosition();
-
-	/**
-	 * Returns the tags that match the identifier located at the given cursor position.
-	 * For example, if the document holds:
-	 *
-	 * <?php pretty_print(array(1, 2, 3)) ?>
-	 *
-	 * and the cursor given is 8, this method returns the tags for the "pretty_print" function.
-	 *
-	 * @param pos character position, zero-based
-	 * @return tag matches
-	 */
-	std::vector<TagClass> GetTagsAtPosition(int pos);
 
 	/**
 	 * Applies the current prefernces to this window. This method should be called when the CodeControlOptions class
@@ -341,6 +441,18 @@ public:
 	 * @return UnicodeString
 	 */
 	UnicodeString GetSafeText();
+	
+	/**
+	 * Use this method whenever you need to get a UnicodeString that is being calculated from Scintilla
+	 * positions (GetCurrentPos(), GetWordStart(), etc...)
+	 * Scintilla uses UTF-8 encoding and the positions it returns are byte offsets not character offsets.
+	 * The method can be given integers where to put the resulting character indices if needed.
+	 *
+	 * @param int startPos byte offset
+	 * @param int endPos byte offset, EXCLUSIVE the character at endPos will NOT be included
+	 *
+	 */
+	UnicodeString GetSafeSubstring(int startPos, int endPos);
 
 	/**
 	 * Put an arrow in the margin of the line where the parse error ocurred.
@@ -481,11 +593,6 @@ public:
 	int BreakpointGetLine(int handle);
 
 	/**
-	 * Set the connection to use to fetch the SQL table metadata
-	 */
-	void SetCurrentDbTag(const DatabaseTagClass& other);
-
-	/**
 	 * Calculate the line number from the given CHARACTER position. Scintilla's
 	 * LineFromPosition() works on bytes.
 	 * 
@@ -573,9 +680,9 @@ private:
 //------------------------------------------------------------------------
 
 	/**
-	 * Determine the correct document Mode and sets it (causing a repaint)
+	 * Determine the correct file type (based on extension) and sets it (causing a repaint)
 	 */
-	void AutoDetectDocumentMode();
+	void AutoDetectFileType();
 
 	/**
 	 * indents if the given char is a new line character.  Handles windows and unix line endings.
@@ -657,16 +764,38 @@ private:
 	 * This method will only modify PHP files.
 	 */
 	void RemoveTrailingBlankLines();
+	
+	/**
+	 * this method will publish events to the EventSink
+	 * its easier to just publish to the event sink
+	 * since features are automatically connected to the
+	 * event sink; otherwise each feature would have to 
+	 * connect to the wxStyledTextCtrl events manually
+	 */
+	void PropagateToEventSink(wxStyledTextEvent& event);
 
 	/*
 	* The file that was loaded.
 	*/
 	wxString CurrentFilename;
-
+	
 	/**
-	 * The connection to use to fetch the SQL table metadata.
+	 *  used to get auto completion suggestions. 
+	 *  this class will not own these pointers.
 	 */
-	DatabaseTagClass CurrentDbTag;
+	std::vector<t4p::CodeCompletionProviderClass*> CompletionProviders;
+	
+	/**
+	 *  used to get call tip contents. 
+	 *  this class will not own these pointers.
+	 */
+	std::vector<t4p::CallTipProviderClass*> CallTipProviders;
+	
+	/**
+	 *  used to style brace matching. 
+	 *  this class will not own these pointers.
+	 */
+	std::vector<t4p::BraceMatchStylerClass*> BraceMatchStylers;
 
 	/**
 	 * we will handle hotspot clicks in a timer.  This is because if we handle
@@ -698,14 +827,6 @@ private:
 	EventSinkClass& EventSink;
 
 	/**
-	 * This is the current specialization (document type) that is being used. This
-	 * pointer can be changed at any moment; the lifetime of the pointer may BE LESS
-	 * than the code control.
-	 * This object owns this pointer and will need to delete it.
-	 */
-	TextDocumentClass* Document;
-
-	/**
 	 * TRUE if the user double clicked a word and that word is not highlighted.
 	 * @var bool
 	 */
@@ -722,9 +843,9 @@ private:
 	/**
 	 * The current rendering options being used.
 	 * Each language will have its own options.
-	 * @var Mode
+	 * @var Type
 	 */
-	Mode DocumentMode;
+	t4p::FileType Type;
 
 	/**
 	 * If TRUE, then this code control is treated as hidden and call tips 

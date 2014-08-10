@@ -396,6 +396,24 @@ public:
 		SymbolTableMatchErrorClass& error);
 	
 	/**
+	 * Returns the tags that matched the identifier in the given position
+	 *
+	 * @param fileName the symbol table of this registered file will be searched
+	 * @param code the code of the document being checked
+	 * @param int the character position in the document to check
+	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
+	 * @param globals to get the PHP version (to parse the code)
+	 * @param [out] status if there is an error querying for tags, error will be set. this is a human-friendly
+	 *        error message
+	 * @return tag matches
+	 */
+	std::vector<TagClass> GetTagsAtPosition(
+		const wxString& fileName, 
+		const UnicodeString& code, int posToCheck,
+		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
+		wxString& status);
+		
+	/**
 	 * print the tag cache to stdout. Really only useful for debugging and not much else
 	 */
 	void Print();

@@ -408,7 +408,7 @@ protected:
 	  * @param mode the document mode that the control will be editing
 	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
-	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::CodeControlClass::Mode mode) const;
+	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
 
 	/**
 	 * This is a helper method that will add each of the given menu items as a 

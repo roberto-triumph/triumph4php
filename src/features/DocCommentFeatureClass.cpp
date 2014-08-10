@@ -167,8 +167,8 @@ void t4p::DocCommentFeatureClass::OnMotionAlt(wxCommandEvent& event) {
 }
 
 void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, int pos) {
-	int documentMode = ctrl->GetDocumentMode();
-	if (documentMode != t4p::CodeControlClass::PHP) {
+	t4p::FileType type = ctrl->GetFileType();
+	if (type != t4p::FILE_TYPE_PHP) {
 		return;
 	}
 	
@@ -177,7 +177,13 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 	// to get
 	int endPos = ctrl->WordEndPosition(pos, true);
 	pos = ctrl->WordStartPosition(pos, true);
-	std::vector<t4p::TagClass> matches = ctrl->GetTagsAtPosition(endPos);
+	wxString matchError;
+	std::vector<t4p::TagClass> matches = App.Globals.TagCache.GetTagsAtPosition(
+		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
+		App.Globals.AllEnabledSourceDirectories(),
+		App.Globals,
+		matchError
+	);
 	wxString msg;
 	bool hasMatches = false;
 	bool hasContent = false;
@@ -226,7 +232,10 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 			msg += NiceDocText(tag.Comment);
 		}
 	}
-	if (!hasMatches) {
+	if (!hasMatches && !matchError.empty()) {
+		GetStatusBarWithGauge()->SetColumn0Text(matchError);
+	}
+	else if (!hasMatches) {
 		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No match for %s"), ctrl->GetTextRange(pos, endPos).c_str()));
 	}
 	else if (!hasContent) {

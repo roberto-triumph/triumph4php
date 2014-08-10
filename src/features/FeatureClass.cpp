@@ -221,9 +221,9 @@ wxWindow* t4p::FeatureClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
 
-t4p::CodeControlClass* t4p::FeatureClass::CreateCodeControl(const wxString& tabName, t4p::CodeControlClass::Mode mode) const {
+t4p::CodeControlClass* t4p::FeatureClass::CreateCodeControl(const wxString& tabName, t4p::FileType type) const {
 	t4p::NotebookClass* notebook = GetNotebook();
-	notebook->AddTriumphPage(mode);
+	notebook->AddTriumphPage(type);
 	if (!tabName.IsEmpty()) {
 		notebook->SetPageText(notebook->GetSelection(), tabName);
 	}

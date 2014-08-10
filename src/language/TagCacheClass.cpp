@@ -33,6 +33,95 @@
 
 #include <algorithm>
 
+/**
+ * Fills completeStatus with a human-friendly version of the symbol table error
+ */
+static void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error, 
+	const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
+	const pelet::ScopeClass& variableScope, 
+	const std::vector<t4p::TagClass>& autoCompletionResourceMatches,
+	wxString& completeStatus) {
+	if (lastExpression.isEmpty()) {
+		completeStatus = _("Nothing to complete");
+	}
+	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedVariable.ChainList.size() <= 1) {
+		completeStatus = _("No matching variables for: ");
+		completeStatus += t4p::IcuToWx(lastExpression);
+		completeStatus +=  _(" in scope: ");
+		completeStatus += t4p::IcuToWx(variableScope.ClassName);
+		completeStatus += _("::");
+		completeStatus += t4p::IcuToWx(variableScope.MethodName);
+	}
+	else if (parsedVariable.ChainList.size() == 1) {
+		completeStatus = _("No matching class, function, define, or keyword for: \"");
+		completeStatus += t4p::IcuToWx(lastExpression);
+		completeStatus += wxT("\"");
+	}
+	else if (autoCompletionResourceMatches.empty()) {
+		if (t4p::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
+			completeStatus = _("parent not valid for scope: ");
+			completeStatus += t4p::IcuToWx(variableScope.ClassName);
+			completeStatus += _("::");
+			completeStatus += t4p::IcuToWx(variableScope.MethodName);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
+			completeStatus = _("Cannot access protected or private static member \"");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR == error.Type) {
+			completeStatus = _("Could not resolve type for \"");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+			completeStatus += wxT("\"");
+		}
+		else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
+			if (!parsedVariable.ChainList.empty() &&
+				parsedVariable.ChainList[0].Name == UNICODE_STRING_SIMPLE("$this")) {
+				completeStatus = _("No public, protected, or private member matches for \"");
+			}
+			else {
+				completeStatus = _("No public member matches for \"");
+			}
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE == error.Type) {
+			completeStatus = _("No static member matches for \"");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::VISIBILITY_ERROR == error.Type) {
+			completeStatus = _("Cannot access protected or private member \"");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+			completeStatus += _("\" in class: ");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+			completeStatus = _("Cannot use object operator for array returned by \"");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+			completeStatus += _("::");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type) {
+			completeStatus = _("Cannot use object operator for array variable ");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+			completeStatus = _("Cannot use object operator for primitive returned by \"");
+			completeStatus += t4p::IcuToWx(error.ErrorClass);
+			completeStatus += _("::");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+		}
+		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
+			completeStatus = _("Cannot use object operator for primitive variable \"");
+			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
+		}
+	}
+}
+
 t4p::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, 
 																		  const wxString& fileName,
 																		  const wxString& fileIdentifier, t4p::WorkingCacheClass* cache)
@@ -539,4 +628,49 @@ bool t4p::TagCacheClass::HasDir(const wxString& dir) {
 		found = TagFinderList->TagFinder.HasDir(dir);
 	}	
 	return found;
+}
+
+std::vector<t4p::TagClass> t4p::TagCacheClass::GetTagsAtPosition(
+		const wxString& fileName, 
+		const UnicodeString& code, int posToCheck, 
+		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
+		wxString& status) {
+	std::vector<t4p::TagClass> matches;
+	pelet::LexicalAnalyzerClass lexer;
+	pelet::ParserClass parser;
+	t4p::ScopeFinderClass scopeFinder;
+	pelet::ScopeClass variableScope;
+	pelet::VariableClass parsedVariable(variableScope);
+
+	lexer.SetVersion(globals.Environment.Php.Version);
+	parser.SetVersion(globals.Environment.Php.Version);
+	scopeFinder.SetVersion(globals.Environment.Php.Version);
+	
+	UnicodeString codeUntilPos(code, 0, posToCheck);
+	
+	UnicodeString lastExpression = lexer.LastExpression(codeUntilPos);
+	UnicodeString resourceName;
+	bool doDuckTyping = true;
+	if (!lastExpression.isEmpty()) {
+		scopeFinder.GetScopeString(codeUntilPos, posToCheck, variableScope);
+		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
+			variableScope.ClassName.isEmpty() &&
+			variableScope.MethodName.isEmpty()) {
+
+			// the expression is a namespace name outside a class or method.  this is 
+			// most likely a namespace in the "use" statement
+			// namespace in a use statement is always fully qualified, even if it does
+			// not begin with a backslash
+			lastExpression = UNICODE_STRING_SIMPLE("\\") + lastExpression;
+		}
+		parser.ParseExpression(lastExpression, parsedVariable);
+		t4p::SymbolTableMatchErrorClass error;
+		ResourceMatches(fileName, parsedVariable, variableScope, sourceDirs, matches, 
+			doDuckTyping, true, error);
+		if (matches.empty()) {
+			HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable, 
+				variableScope, matches, status);
+		}
+	}
+	return matches;
 }
