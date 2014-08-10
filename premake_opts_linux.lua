@@ -135,7 +135,8 @@ MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.so',
 );
 if (not MYSQL_LIB_DIR) then
 	print("libmsysqlclient.so NOT FOUND. Please install libmysqlclient.so or change\n".. 
-		"the directories being searched by modifying premake_opts_linux.lua")
+		"the directories being searched by modifying premake_opts_linux.lua.\n" ..
+		"See docs/compiling.md for info about installing dependencies on linux.")
 	os.exit(-1)
 end
 
@@ -158,6 +159,13 @@ SQLITE_LIB_DIR = os.pathsearch('libsqlite3.so',
 	"/usr/lib/i386-linux-gnu/"
 );
 
+if (not SQLITE_LIB_DIR) then
+	print("libsqlite3.so NOT FOUND. Please install libsqlite3.so or change\n".. 
+		"the directories being searched by modifying premake_opts_linux.lua.\n" ..
+		"See docs/compiling.md for info about installing dependencies on linux.")
+	os.exit(-1)
+end
+
 -- will look for CURL in these directories
 CURL_INCLUDE_DIR = '/usr/include/'
 CURL_LIB_NAME = 'libcurl.so'
@@ -168,28 +176,40 @@ CURL_LIB_DIR = os.pathsearch('libcurl.so',
 	"/usr/lib/i386-linux-gnu/"
 );
 
--- will look for boost in these directories
-BOOST_DEBUG_INCLUDE_DIR = '/usr/lib'
+if (not CURL_LIB_DIR) then
+	print("libcurl.so NOT FOUND. Please install libcurl.so or change\n".. 
+		"the directories being searched by modifying premake_opts_linux.lua.\n" ..
+		"See docs/compiling.md for info about installing dependencies on linux."
+	)
+	os.exit(-1)
+end
 
+-- will look for boost in these directories
+-- dont bother looking for debug version of boost for now
+-- assume release libs are installed
+BOOST_DEBUG_INCLUDE_DIR = '/usr/include'
 BOOST_DEBUG_LIB_DIR = os.pathsearch('libboost_system.so', 
 	"/usr/lib",
 	"/usr/lib64", 
 	"/usr/lib/x86_64-linux-gnu/",
 	"/usr/lib/i386-linux-gnu/"
 );
-BOOST_DEBUG_LIB =  BOOST_DEBUG_LIB_DIR.. '/libboost_system.so'
-BOOST_DEBUG_BIN_DIR = BOOST_DEBUG_LIB_DIR
-  
-BOOST_RELEASE_INCLUDE_DIR = '/usr/include'
-BOOST_RELEASE_LIB_DIR = os.pathsearch('libboost_system.so', 
-	"/usr/lib",
-	"/usr/lib64", 
-	"/usr/lib/x86_64-linux-gnu/",
-	"/usr/lib/i386-linux-gnu/"
-);
-BOOST_RELEASE_LIB = BOOST_RELEASE_LIB_DIR .. '/libboost_system.so'
-BOOST_RELEASE_BIN_DIR = BOOST_RELEASE_LIB
 
+if (not BOOST_DEBUG_LIB_DIR) then
+	print("libboost_system.so NOT FOUND. Please install libboost_system.so or change\n".. 
+		"the directories being searched by modifying premake_opts_linux.lua.\n" ..
+		"See docs/compiling.md for info about installing dependencies on linux.")
+	os.exit(-1)
+end
+
+BOOST_DEBUG_LIB = BOOST_DEBUG_LIB_DIR.. '/libboost_system.so'
+BOOST_DEBUG_BIN_DIR = BOOST_DEBUG_LIB_DIR
+
+-- same version for release as debug
+BOOST_RELEASE_INCLUDE_DIR = BOOST_DEBUG_INCLUDE_DIR
+BOOST_RELEASE_LIB_DIR = BOOST_DEBUG_LIB_DIR
+BOOST_RELEASE_LIB = BOOST_DEBUG_LIB
+BOOST_RELEASE_BIN_DIR = BOOST_DEBUG_BIN_DIR
 
 -- location where the makefiles / codelist solution files will be placed
 BUILD_SCRIPTS_DIR = os.getenv("T4P_BUILD_SCRIPTS_DIR");
