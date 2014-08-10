@@ -89,8 +89,8 @@ function wxconfiguration(config, action)
 		flags { "Unicode" }
 		links { WX_LIBS_DEBUG }
 	elseif config == "Debug" and (action == "gmake" or action == "codelite") then
-		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", normalizepath(WX_CONFIG)) }
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG)) }
+		buildoptions { string.format("`%s --cxxflags --debug=yes --unicode=yes`", normalizepath(WX_CONFIG_DEBUG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs core,base,net,xml`", normalizepath(WX_CONFIG_DEBUG)) }
 	elseif config == "Release" and action ==  "vs2008" then
 		libdirs { WX_LIB_DIR }
 		includedirs { WX_INCLUDE_DIRS_RELEASE }
@@ -121,7 +121,7 @@ function wxappconfiguration(config, action)
 	end
 
 	if config == "Debug" and (action == "gmake" or action == "codelite") then
-		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc,richtext,html,xml`", normalizepath(WX_CONFIG)) }
+		linkoptions { string.format("`%s --debug=yes --unicode=yes --libs aui,adv,stc,richtext,html,xml`", normalizepath(WX_CONFIG_DEBUG)) }
 	elseif config == "Debug" and action ==  "vs2008" then
 		links { WX_LIBS_WINDOW_DEBUG, WX_LIB_STC_DEBUG }
 	elseif config == "Release" and (action == "gmake" or action == "codelite") then

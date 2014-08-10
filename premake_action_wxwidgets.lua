@@ -56,19 +56,33 @@ function prepWxWidgets()
 	else 
 
 		-- build wxWidgets using make
-		wxBuild = normalizepath("lib/wxWidgets/triumph/")
+        -- remove libs that we don't use
+		wxInstallDebug = normalizepath("lib/wxWidgets/triumph_debug/")
+        wxBuildDebug = normalizepath("lib/wxWidgets/triumph_build_debug")
+		wxInstallRelease = normalizepath("lib/wxWidgets/triumph/")
+        wxBuildRelease = normalizepath("lib/wxWidgets/triumph_build")
+		
 		batchexecute('lib/wxWidgets', {
-			"mkdir -p " .. wxBuild,
-			"./configure --enable-debug --with-gtk --enable-unicode --prefix=" .. wxBuild,
+			"mkdir -p " .. wxBuildDebug,
+			"mkdir -p " .. wxBuildRelease,
+			"cd " .. wxBuildDebug,
+			"../configure " .. 
+				"--enable-debug --without-libjpeg --without-libtiff " ..
+				"--without-zlib --with-gtk --enable-unicode " ..
+				"--prefix=" .. wxInstallDebug,
+			"make",
+			"make install",
+
+			-- now build the release version
+			"cd " .. wxBuildRelease,
+			"../configure " .. 
+				"--without-libjpeg --without-libtiff " ..
+				"--without-zlib --with-gtk --enable-unicode " ..
+				"--prefix=" .. wxInstallRelease,
 			"make",
 			"make install"
 		})
 		
-		print(WX_CONFIG .. " --version")
-		if 0 ~= os.execute(WX_CONFIG .. " --version") then
-			error "Could not execute wx-config. Change the location of WX_CONFIG in premake_opts_linux.lua.\n"
-		end
-
 		-- copy wxWidgets libraries to the same dir as our executable
 		-- use the wx-config to get the location of the libraries
 		cmd = WX_CONFIG .. ' --prefix'
@@ -76,10 +90,13 @@ function prepWxWidgets()
 		cmdOutput = cmdStream:read("*l")
 		cmdStream:close()
 		
-		libDir = cmdOutput .. '/lib'
+		debugLibDir = wxInstallDebug .. '/lib'
+		releaseLibDir = wxInstallRelease .. '/lib'
 		batchexecute(normalizepath(""), {
-			"cp -r " .. libDir .. "/*.so* Debug/",
-			"cp -r " .. libDir .. "/*.so* Release/"
+			"mkdir -p Debug",
+			"mkdir -p Release",
+			"cp -r " .. debugLibDir .. "/*.so* Debug/",
+			"cp -r " .. releaseLibDir .. "/*.so* Release/"
 		});
 		end
 end

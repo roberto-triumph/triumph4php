@@ -82,7 +82,8 @@ to an hour, depending on your machine's processing power.
     sudo apt-get install libicu48 libicu-dev libicu48-dbg libmysqlclient-dev \
 	                     re2c bison CMake git libtool php5-cli \
 						ia32-libs sqlite3 libsqlite3-dev libsqlite3-0-dbg \
-						libcurl3-dev libgtk2.0-dev libasio-dev libboost-system-dev
+						libcurl3-dev libgtk2.0-dev libasio-dev libboost-system-dev \
+						libpng-dev libnotify-dev libexpat1-dev
 						
 ##Step 2: Download the development tools##
 						
@@ -123,7 +124,8 @@ to an hour, depending on your machine's processing power.
     sudo yum install libicu libicu-devel community-mysql-common \
 	community-mysql-devel re2c bison cmake git php-cli php-pdo \
     glibc.i686 sqlite sqlite-devel libcurl libcurl-devel \
-    gtk2-devel boost-system asio-devel
+    gtk2-devel boost-system asio-devel \
+	libpng-devel libnotify-devel expat-devel
 
 ##Step 2: Download the development tools##
 Use your favorite IDE / editor, or get [Codelite](http://codelite.org)

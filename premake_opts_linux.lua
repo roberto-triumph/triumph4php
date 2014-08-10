@@ -64,7 +64,13 @@ ICU_CONFIG = 'icu-config'
 WX_CONFIG = os.getenv("T4P_WXCONFIG")
 if (not WX_CONFIG) then
     WX_CONFIG = 'lib/wxWidgets/triumph/bin/wx-config'
-    print "Using default location of lib/wxWidgets/triumph/bin/wx-config for wxWidgets dir"
+    print "Using default location of lib/wxWidgets/triumph/bin/wx-config for wxWidgets release dir"
+end
+
+WX_CONFIG_DEBUG = os.getenv("T4P_WXCONFIG_DEBUG")
+if (not WX_CONFIG_DEBUG) then
+    WX_CONFIG_DEBUG = 'lib/wxWidgets/triumph_debug/bin/wx-config'
+    print "Using default location of lib/wxWidgets/triumph_debug/bin/wx-config for wxWidgets debug dir"
 end
 
 -- location of the Git executable. this is used by the
