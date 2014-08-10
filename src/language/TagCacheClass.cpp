@@ -170,12 +170,14 @@ t4p::WorkingCacheClass::WorkingCacheClass()
 bool t4p::WorkingCacheClass::Update(const UnicodeString& code) {
 	pelet::LintResultsClass results;
 
-	// check for syntax so that only 'good' code modifies the cache
 	// allow empty code to be valid; that way code completion works
 	// on newly created files
 	bool ret = false;
-	if (code.isEmpty() || Parser.LintString(code, results)) {
+	if (!code.isEmpty()) {
 		SymbolTable.CreateSymbols(code);
+		ret = true;
+	}
+	else if (code.isEmpty()) {
 		ret = true;
 	}
 	return ret;

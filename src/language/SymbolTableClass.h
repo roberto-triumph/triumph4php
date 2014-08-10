@@ -443,11 +443,26 @@ private:
 	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::TagClass& tag) const;
 
 	/**
+	 * Tokenizes the code (using the Lexer instance) and accumulates all variables from the final scope. This function
+	 * only uses a lexer, so it can be given invalid code; however it is a very naive
+	 * algorithm as it does not account for namespaces, anonymous methods, and multiple
+	 * constructs in a single file (ie class declaration followed by a function declaration). 
+	 * This method is used as a fallback when the code cannot be parsed due to a syntax error
+	 */
+	void CreateSymbolsFromTokens();
+	
+	/**
 	 * The parser.
 	 * 
 	 * @var pelet::ParserClass
 	 */
 	pelet::ParserClass Parser;
+	
+	/**
+	 * The lexer. we use a pure-token approach when
+	 * we are given invalid PHP code
+	 */
+	pelet::LexicalAnalyzerClass Lexer;
 	
 	/**
 	 * Holds all variables for the currently parsed piece of code. Each vector will represent its own scope.

@@ -265,6 +265,22 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithPredefinedVariab
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$_POST"), VariableMatches[0]);
 }
 
+TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithInvalidSyntax) {
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"$globalOne = 1;\n"
+		" function work() { \n"
+		"   $functionVar = 2;"
+	);
+	Init(sourceCode);	
+	ToVariable(UNICODE_STRING_SIMPLE("$func"));
+	Scope.MethodName = UNICODE_STRING_SIMPLE("work");
+	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(1, VariableMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$functionVar"), VariableMatches[0]);
+}
+
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"

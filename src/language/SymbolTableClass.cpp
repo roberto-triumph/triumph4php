@@ -396,6 +396,7 @@ void t4p::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableCla
 t4p::SymbolTableClass::SymbolTableClass() 
 	: AnyExpressionObserverClass()
 	, Parser()
+	, Lexer()
 	, Variables() {
 	Parser.SetClassObserver(this);
 	Parser.SetClassMemberObserver(this);
@@ -573,9 +574,13 @@ void t4p::SymbolTableClass::OnAnyExpression(pelet::ExpressionClass* expr) {
 void t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	Variables.clear();
 	
-	// for now ignore parse errors
+	// if the given code has a syntax error, use a naive algorithm as fallback
+	// that way we show results to the user if at all possible
 	pelet::LintResultsClass results;
-	Parser.ScanString(code, results);
+	bool good = Parser.ScanString(code, results);
+	if (!good && Lexer.OpenString(code)) {
+		CreateSymbolsFromTokens();
+	}
 }
 
 void t4p::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
@@ -585,7 +590,79 @@ void t4p::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
 	pelet::LintResultsClass results;
 	if (wxFileName::FileExists(fileName)) {
 		wxFFile file(fileName, wxT("rb"));
-		Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName), results);
+		bool good = Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName), results);
+		
+		// if the given file has a syntax error, use a naive algorithm as fallback
+		// that way we show results to the user if at all possible
+		if (!good) {
+			wxFFile lexFile(fileName, wxT("rb"));
+			if (Lexer.OpenFile(lexFile.fp())) {
+				CreateSymbolsFromTokens();
+			}
+		}
+	}
+}
+
+void t4p::SymbolTableClass::CreateSymbolsFromTokens() {
+	Variables.clear();
+	UnicodeString currentClass;
+	UnicodeString currentMethod;
+	UnicodeString variable;
+
+	// note that this is a very naive way of getting variables, it is 
+	// as a way to help the user a bit while editing code while the 
+	// code is in a bad state
+	int token = Lexer.NextToken();
+	bool addedLastToken = false;
+	while (token != pelet::T_END) {
+		addedLastToken = false;
+		if (pelet::T_CLASS == token) {
+			token = Lexer.NextToken();
+			currentClass.remove();
+			Lexer.GetLexeme(currentClass);
+		}				
+		else if (pelet::T_FUNCTION == token) {
+			token = Lexer.NextToken();
+			currentMethod.remove();
+			Lexer.GetLexeme(currentMethod);
+		}
+		else if (pelet::T_VARIABLE == token) {
+			variable.remove();
+			if (Lexer.GetLexeme(variable)) {
+				bool found = false;
+				std::vector<t4p::SymbolClass>& scope = GetScope(currentClass, currentMethod);
+				for (size_t i = 0; i < scope.size(); ++i) {
+					if (scope[i].Variable == variable) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					t4p::SymbolClass variableSymbol(variable, t4p::SymbolClass::SCALAR);
+					scope.push_back(variableSymbol);
+					addedLastToken = true;
+				}
+			}
+		}
+		token = Lexer.NextToken();
+	}
+	
+	// final step: if the last token was a variable, then we want to remove it
+	// because this indicates that the statement is not complete. if we were to leave
+	// it, the user would see the last symbol (what they are typing in) as a 
+	// choice and that does not look good.
+	// scenario:
+	// user creates a new php file
+	// user types in 
+	//  <?php 
+	//     function work($place) {
+	//        $pl
+	//
+	// then we user attempts to complete on "$pl" we should
+	// remove "$pl" as a choice because they probably are going to type in "$place" 
+	if (addedLastToken) {
+		std::vector<t4p::SymbolClass>& scope = GetScope(currentClass, currentMethod);
+		scope.pop_back();
 	}
 }
 
@@ -874,6 +951,7 @@ void t4p::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& 
 
 void t4p::SymbolTableClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
+	Lexer.SetVersion(version);
 }
 
 t4p::ScopeFinderClass::ScopeFinderClass() 
