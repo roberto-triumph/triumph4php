@@ -300,10 +300,10 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 		// oddity. int linux sometimes we get rename events where the old and new paths
 		// are the same. in this case, lets treat them as modifications
 		if (rename->first == rename->second) {
-			std::map<wxString, wxString>::iterator toDeleteRename = rename;
-			++rename;
 			PathsExternallyModified[rename->first] = 1;
-			pathsRenamed.erase(toDeleteRename);
+			std::map<wxString, wxString>::iterator toErase = rename;
+			rename++;
+			pathsRenamed.erase(toErase->first);
 		}
 		else {
 			++rename;
