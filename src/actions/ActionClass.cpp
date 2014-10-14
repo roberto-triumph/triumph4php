@@ -160,8 +160,12 @@ void* t4p::ThreadActionClass::Entry() {
 			// signal the start of this action
 			t4p::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
 			action->PostEvent(evt);
-
-			action->BackgroundWork();
+			
+			try {
+				action->BackgroundWork();
+			} catch (std::exception& e) {
+				wxASSERT_MSG(true, e.what());
+			}
 			ActionComplete(action);
 		}
 		else if (action) {
