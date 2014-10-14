@@ -101,6 +101,9 @@ public:
 
 	/**
 	 * Opens the SQLite resource db file, or creates it if it does not exist.
+	 * This method clones data structures (extensions string vectors) where necessary, so that this
+	 * TagFinderList instance can be used from a separate thread than where globals
+	 * resides
 	 *
 	 * @param resourceDbFileName the full path to the SQLite resources database.
 	 *        If this full path does not exist it will be created.
@@ -113,6 +116,9 @@ public:
 
 	/**
 	 * same as InitGlobalTag() but it takes ownership of an existing session
+	 * This method clones data structures (extensions string vectors) where necessary, so that this
+	 * TagFinderList instance can be used from a separate thread than where globals
+	 * resides
 	 * @param session this object will own the pointer and delete it 
 	 */
 	void AdoptGlobalTag(soci::session* session, const std::vector<wxString>& phpFileExtensions, 

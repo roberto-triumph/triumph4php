@@ -96,7 +96,7 @@ private:
 class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
 public:
 
-	VariableLinterWalkerClass();
+	VariableLinterWalkerClass(t4p::TagCacheClass& tagCache);
 	
 	virtual bool Walk(const wxString& file);
 	
@@ -387,11 +387,11 @@ void ProfileParserOnLargeProject() {
 }
 
 
-VariableLinterWalkerClass::VariableLinterWalkerClass() 
+VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCache) 
 	: WithErrors(0)
 	, WithNoErrors(0)
 	, Options()
-	, Linter() {
+	, Linter(tagCache) {
 	
 	Options.CheckGlobalScope = false;
 	Options.Version = pelet::PHP_54;
@@ -425,6 +425,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 void ProfileVariableLintOnLargeProject() {
 	printf("*******\n");
 	t4p::DirectorySearchClass search;
+	t4p::TagCacheClass tagCache;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
 		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
@@ -432,7 +433,7 @@ void ProfileVariableLintOnLargeProject() {
 		return;
 	}
 	time = wxGetLocalTimeMillis();
-	VariableLinterWalkerClass walker;
+	VariableLinterWalkerClass walker(tagCache);
 	while (search.More()) {
 		search.Walk(walker);
 	}

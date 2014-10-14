@@ -23,9 +23,52 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language/PhpVariableLintClass.h>
+#include <language/TagCacheClass.h>
 #include <globals/String.h>
 #include <wx/ffile.h>
 #include <algorithm>
+
+/**
+ * this function will check to see if an argument is passed by reference. The
+ * function 
+ * 
+ * @param tag the function tag; it contains the function signature, the function
+ *        signature contains a '&' if an argument is pass-by-reference
+ * @param argIndex the argument to check. 0 == first argument
+ * @return bool if TRUE, argument argIndex is passed by reference
+ */
+static bool IsFunctionArgumentByReference(const t4p::TagClass& tag, int argIndex) {
+	bool isRef = false;
+	int32_t start = tag.Signature.indexOf('(');
+	int32_t next = tag.Signature.indexOf(',', start);
+	int arg = 0;
+	while (next >= 0) {
+		if (arg == argIndex) {
+			
+			// this is the argument that we want to 
+			// check
+			UnicodeString variable;
+			tag.Signature.extract(start, (next - start + 1), variable);
+			if (variable.indexOf('&') >= 0) {
+				isRef = true;
+			}
+			
+			// only need to check 1 variable
+			break;
+		}
+		arg++;
+		
+		// find the end of the next variable
+		start = next;
+		next = tag.Signature.indexOf(',', start + 1);
+		if (next < 0) {
+			
+			// last argument, look for the ending )
+			next = tag.Signature.indexOf(')', next + 1);
+		}
+	}	
+	return isRef;
+}
 
 t4p::PhpVariableLintResultClass::PhpVariableLintResultClass()
 : VariableName()
@@ -81,9 +124,10 @@ t4p::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass()
 
 }
 
-t4p::PhpVariableLintClass::PhpVariableLintClass()
+t4p::PhpVariableLintClass::PhpVariableLintClass(t4p::TagCacheClass& tagCache)
 : ExpressionObserverClass()
 , Errors()
+, TagCache(tagCache)
 , ScopeVariables()
 , PredefinedVariables()
 , HasExtractCall(false)
@@ -525,22 +569,58 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	}
 		
 	// check the function parameters
+	// note that function call arguments may themselves be function calls, we
+	// need to check all of them
 	for (size_t i = 0; i < var->ChainList.size(); ++i) {
 		if (var->ChainList[i].IsFunction) {
+			t4p::TagClass functionTag;
+			if (var->ChainList[i].Name == UNICODE_STRING_SIMPLE("preg_match") || var->ChainList[i].Name == UNICODE_STRING_SIMPLE("\\preg_match")) {
+				int hhh = 0;
+				hhh++;
+			}
+			if (i == 0) {
+				std::vector<t4p::TagClass> matches = TagCache.ExactFunction(var->ChainList[i].Name);
+				if (matches.size() == 1) {
+					functionTag = matches[0];
+				}
+			}
+			else {
+				std::vector<t4p::TagClass> matches = TagCache.ExactMethod(var->ChainList[i].Name, var->ChainList[i].IsStatic);
+				if (matches.size() == 1) {
+					functionTag = matches[0];
+				}
+			}
+			
 			std::vector<pelet::ExpressionClass*>::const_iterator it;
+			int argIndex = 0;
 			for (it = var->ChainList[i].CallArguments.begin(); it != var->ChainList[i].CallArguments.end(); ++it) {
 				if ((*it)->ExpressionType == pelet::ExpressionClass::VARIABLE) {
 					pelet::VariableClass* argVar = (pelet::VariableClass*)*it;
-					if (!argVar->ChainList.empty() && !argVar->ChainList[0].IsFunction) {
-						ScopeVariables[argVar->ChainList[0].Name] = 1;
+					if (argVar->ChainList.size() == 1 && !argVar->ChainList[0].IsFunction) {
+						
+						// check to see if the argument is passed-by-reference. a 
+						// variable passed by reference could be counted as initialized
+						// by the function being called; we want to not label these
+						// arguments as uninitialized.
+						// we get the called function's signature via the tag cache
+						// one of the main questions becomes: how do we
+						// know which method to query? for now, we will query using the
+						// method name using exact searching. if the method is found, then
+						// we know for sure its the right now.  if we find many matches, 
+						// then a method can be in any number of classes; it
+						// becomes really hard to know which method to pick.
+						if (IsFunctionArgumentByReference(functionTag, argIndex)) {
+							ScopeVariables[argVar->ChainList[0].Name] = 1;
+						}
 					}
 				}
+				argIndex++;
 				CheckExpression(*it);
 			}
 		}
 	}
 
-	// check for array accesees ie $user[$name]
+	// check for array accesses ie $user[$name]
 	for (size_t i = 0; i < var->ChainList.size(); ++i) {
 		if (var->ChainList[i].IsArrayAccess && var->ChainList[i].ArrayAccess) {
 			CheckExpression(var->ChainList[i].ArrayAccess);

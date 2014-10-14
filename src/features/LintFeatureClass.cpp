@@ -69,7 +69,7 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(t4p::TagCacheClass& 
 , Options(options)
 , Parser() 	
 , VariableLinterOptions()
-, VariableLinter()
+, VariableLinter(tagCache)
 , IdentifierLinter(tagCache)
 , LastResults()
 , VariableResults()
@@ -246,13 +246,6 @@ void t4p::LintBackgroundSingleFileClass::BackgroundWork() {
 		t4p::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
 		PostEvent(lintResultsEvent);
 	}
-	/*
-	if (!search.More() && !IsCancelled()) {
-		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
-		int errorFiles = ParserDirectoryWalker.WithErrors;
-		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
-		PostEvent(summaryEvent);
-	}*/
 }
 
 wxString t4p::LintBackgroundSingleFileClass::GetLabel() const {

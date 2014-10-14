@@ -31,6 +31,10 @@
 #include <globals/String.h>
 
 namespace t4p {
+	
+
+// forward declaration
+class TagCacheClass;
 
 /**
  * name and position of an uninitialized variable
@@ -122,7 +126,7 @@ class PhpVariableLintClass :
 
 public:
 
-	PhpVariableLintClass();
+	PhpVariableLintClass(t4p::TagCacheClass& tagCache);
 
 	/**
 	 * Set the version that the PHP parser should use. This method should be
@@ -197,6 +201,13 @@ private:
 	 * errors found so far
 	 */
 	std::vector<t4p::PhpVariableLintResultClass> Errors;
+	
+	/**
+	 * the tag cache is used to lookup function signatures in order to
+	 * check if an argument is passed by reference;pass-by-reference
+	 * variables are not tagged as uninitialized
+	 */
+	t4p::TagCacheClass& TagCache;
 
 	/**
 	 * variables found in the current scope

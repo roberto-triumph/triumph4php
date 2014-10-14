@@ -62,8 +62,12 @@ void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName,
 									   const std::vector<wxString>& miscFileExtensions,
 									   pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	TagParser.PhpFileExtensions = phpFileExtensions;
-	TagParser.MiscFileExtensions = miscFileExtensions;
+	
+	// make sure to clone files and strings so
+	// that this cache object can be used
+	// in a background thread
+	t4p::DeepCopy(TagParser.PhpFileExtensions, phpFileExtensions);
+	t4p::DeepCopy(TagParser.MiscFileExtensions, miscFileExtensions);
 	TagDbSession = new soci::session;
 	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
 	if (IsTagFinderInit) {
@@ -78,8 +82,12 @@ void t4p::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
 												 const std::vector<wxString>& miscFileExtensions,
 												 pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	TagParser.PhpFileExtensions = phpFileExtensions;
-	TagParser.MiscFileExtensions = miscFileExtensions;
+	
+	// make sure to clone files and strings so
+	// that this cache object can be used
+	// in a background thread
+	t4p::DeepCopy(TagParser.PhpFileExtensions, phpFileExtensions);
+	t4p::DeepCopy(TagParser.MiscFileExtensions, miscFileExtensions);
 	TagDbSession = globalSession;
 	IsTagFinderInit = NULL != globalSession;
 	if (IsTagFinderInit) {

@@ -89,8 +89,6 @@ public:
 		while (search.More()) {
 			tagFinderList->Walk(search);
 		}
-		
-		// need to code it so that gcc does not think that good is an unused variable in release mode
 		TagCache.RegisterGlobal(tagFinderList);
 	}
 };

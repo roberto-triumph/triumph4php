@@ -24,34 +24,75 @@
  */
 #include <UnitTest++.h>
 #include <language/PhpVariableLintClass.h>
+#include <language/TagCacheClass.h>
+#include <language/TagFinderList.h>
+#include <globals/Assets.h>
 #include <globals/String.h>
 #include <TriumphChecks.h>
+#include <FileTestFixtureClass.h>
+#include <SqliteTestFixtureClass.h>
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+#include <soci/soci.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
 /**
  * fixture for the PHP lint tests. Will create a
  * linter, default it to suer PHP 5.3 syntax
  */
-class PhpVariableLintTestFixtureClass {
+class PhpVariableLintTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
 public:
 
+	t4p::TagCacheClass TagCache;
+	std::vector<wxString> PhpFileExtensions;
+	std::vector<wxString> MiscFileExtensions;
 	t4p::PhpVariableLintOptionsClass Options;
 	t4p::PhpVariableLintClass Lint;
 	std::vector<t4p::PhpVariableLintResultClass> Results;
 	bool HasError;
 
 	PhpVariableLintTestFixtureClass() 
-	: Options()
-	, Lint() 
+	: FileTestFixtureClass(wxT("variable_lint")) 
+	, SqliteTestFixtureClass()
+	, TagCache()
+	, PhpFileExtensions()
+	, MiscFileExtensions()
+	, Options()
+	, Lint(TagCache) 
 	, Results()
 	, HasError(false) {
 		Options.Version = pelet::PHP_53;
+		PhpFileExtensions.push_back(wxT("*.php"));
 	}
 
 	void Parse(const UnicodeString& code) {
 		Lint.SetOptions(Options);
 		HasError = Lint.ParseString(code, Results);
+	}
+	
+	void SetupFile(const wxString& fileName, const wxString& contents) {
+
+		// make the cache consume the file; to prime it with the resources because the
+		// call stack wont work without the cache
+		CreateSubDirectory(wxT("src"));
+		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
+	}
+
+	void BuildCache(bool includeNativeFunctions = false) {
+		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
+		CreateDatabase(*session, t4p::ResourceSqlSchemaAsset()); 
+
+		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
+		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		if (includeNativeFunctions) {
+			tagFinderList->InitNativeTag(t4p::NativeFunctionsAsset());
+		}
+		t4p::DirectorySearchClass search;
+		search.Init(TestProjectDir + wxT("src"));
+		while (search.More()) {
+			tagFinderList->Walk(search);
+		}
+		TagCache.RegisterGlobal(tagFinderList);
 	}
 
 };
@@ -444,7 +485,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 	CHECK_UNISTR_EQUALS("$b", Results[2].VariableName);
 	CHECK_EQUAL(10, Results[2].LineNumber);
 }
-/*
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
@@ -465,6 +506,29 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
+
+	// test that when an argument is passed by reference, it is NOT counted
+	// as uninitialized, since the function being called can
+	// set the variable's value
+	UnicodeString code = t4p::CharToIcu(
+		"<?php \n"
+		"function myFunc($a, &$b) {\n"
+		"  $a = $a + 99;\n"
+		"  $b->work();\n"
+		"}\n"
+		"\n"
+		"function myBFunc($a) {\n"
+		"  myFunc($a, $x);\n"
+		"  $sum = $a + $x;\n"
+		"}"
+	);
+	SetupFile(wxT("test.php"), t4p::IcuToWx(code));
+	BuildCache(true);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 
@@ -481,13 +545,15 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 		"  myFunc(myFunc($a), myFunc2(myFunc3($x)));\n"
 		"}"
 	);
+	SetupFile(wxT("test.php"), t4p::IcuToWx(code));
+	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
 	CHECK_EQUAL(7, Results[0].LineNumber);
 }
-*/
+
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 
