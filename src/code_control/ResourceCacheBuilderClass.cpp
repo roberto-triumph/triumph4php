@@ -28,13 +28,14 @@
 #include <globals/GlobalsClass.h>
 
 t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
-															t4p::RunningThreadsClass& runningThreads, int eventId)
+	t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCacheDbFileName()
 	, Code()
 	, FileName() 
 	, SourceDir()
 	, FileIdentifier()
+	, PreviousSymbolTable()
 	, Version(pelet::PHP_53)
 	, FileIsNew(true) 
 	, DoParseTags(true) {
@@ -55,6 +56,11 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 	FileIsNew = isNew;
 	DoParseTags = doParseTags;
 	SourceDir = wxT("");
+	
+	t4p::WorkingCacheClass* workingCache = globals.TagCache.GetWorking(fileIdentifier);
+	if (workingCache) {
+		PreviousSymbolTable.Copy(workingCache->SymbolTable);
+	}
 
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator source;
@@ -100,8 +106,8 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 		tagFinderlist->InitGlobalTag(TagCacheDbFileName, phpFileExtensions, miscFileExtensions, Version);
 
 		t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
-		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true);
-		bool good = workingCache->Update(Code);
+		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true, PreviousSymbolTable);
+		bool good = workingCache->Update(Code, PreviousSymbolTable);
 		if (good && !IsCancelled()) {
 
 			// parse any tags from the source code

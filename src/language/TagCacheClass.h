@@ -80,31 +80,43 @@ public:
 	WorkingCacheClass();
 
 	/**
+	 * This method accepts the previously created symbol table, so that in case the given code
+	 * has a syntax error, we can use the previously built table's variables; that way code completion
+	 * can work even on files that contain syntax errors.
+	 * In the case the give code has a syntax error this symbol table is built by using the
+	 * previous table's variables, then tokenizing the given code to add any additional
+	 * variables not found in the previous table.
+	 * 
 	 * @param fileName the full path to the file being parsed
 	 * @param fileIdentifier  A unique, *non-empty* identifier string. 
 	 * @param isNew TRUE if the user is editing a new file
 	 * @param version the PHP version that the parser will check against
 	 * @param createSymbols if TRUE then the symbol table is built from the file
 	 *        if this is true then fileName must be a valid full path
+	 * @param previousSymbolTable used when code has a syntax error.
 	 */
-	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version, bool createSymbols);
+	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version, 
+		bool createSymbols, const t4p::SymbolTableClass& previousSymbolTable);
 
 	/**
 	 * Will parse the resources and determine type information for the given text 
 	 * and store the results into the this cache.
 	 * 
+	 * This method accepts the previously created symbol table, so that in case the given code
+	 * has a syntax error, we can use the previously built table's variables; that way code completion
+	 * can work even on files that contain syntax errors.
+	 * In the case the give code has a syntax error this symbol table is built by using the
+	 * previous table's variables, then tokenizing the given code to add any additional
+	 * variables not found in the previous table.
+	 * 
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
+	 * @param previousSymbolTable used when code has a syntax error.
 	 * @return bool TRUE if code did not contain a syntax error
 	 */
-	bool Update(const UnicodeString& code);
+	bool Update(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable);
 
 private:
 
-	/**
-	 * will run code through a lint check and choose not to update the cache if 
-	 * the code is not valid.
-	 */
-	pelet::ParserClass Parser;
 };
 
 /**
@@ -167,6 +179,16 @@ public:
 	 * @param fileName unique identifier for a file
 	 */
 	void RemoveWorking(const wxString& fileName);
+	
+	/**
+	 * Get the working cache for a file. This should only be used as a last-resort;
+	 * it is preferred to use the other accessor methods instead ie. ExactTags, et al.
+	 *
+	 * @param fileName the file to update. This is the name given to the RegisterWorking() method
+	 * @return cache of the file; NULL if the cache for fileName does not exist. This class
+	 *         retains ownership of the pointer; the returned pointer must NOT be deleted.
+	 */
+	t4p::WorkingCacheClass* GetWorking(const wxString& fileName);
 
 	/**
 	 * Set the global cache. After a call
@@ -181,6 +203,9 @@ public:
 	 * Set the global cache using the default settings (from Asset). After a call
 	 * to this method, the cache is available for use by 
 	 * the ExpressionCompletionMatches and ResourceMatches methods
+	 * This method clones data structures where necessary, so that this
+	 * TagCache can be used from a separate thread than where globals
+	 * resides
 	 */
 	void RegisterDefault(t4p::GlobalsClass& globals);
 	

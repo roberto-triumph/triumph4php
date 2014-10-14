@@ -107,6 +107,15 @@ private:
 	 * string that uniquely identifies the file that is being worked on by the background thread.
 	 */
 	wxString FileIdentifier;
+	
+	/**
+	 * We keep a copy of the previously-generated symbol table; so that
+	 * if the current version of the file syntax errors we can use
+	 * the previous symbol table's variables as a starting point. Ultimately,
+	 * we want code completion to be possible even when the current file 
+	 * has syntax errors.
+	 */
+	t4p::SymbolTableClass PreviousSymbolTable;
 
 	/**
 	 * The version of PHP to check against

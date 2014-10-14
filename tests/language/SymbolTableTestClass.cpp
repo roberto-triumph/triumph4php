@@ -124,7 +124,8 @@ public:
 
 	void Init(const UnicodeString& sourceCode) {
 		TagFinderList.TagParser.BuildResourceCacheForFile(wxT(""), wxT("untitled"), sourceCode, true);
-		CompletionSymbolTable.CreateSymbols(sourceCode);
+		t4p::SymbolTableClass emptyTable;
+		CompletionSymbolTable.CreateSymbols(sourceCode, emptyTable);
 		Scope.Clear();
 	}
 
@@ -279,6 +280,39 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithInvalidSyntax) {
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
 	CHECK_VECTOR_SIZE(1, VariableMatches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$functionVar"), VariableMatches[0]);
+}
+
+TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPreviousSymbol) {
+	
+	// this rather involved test exercises the code that will use a previous
+	// symbol table's variables to aid in code completion when the code
+	// has a syntax error.
+	
+	// step 1 build a (correct) symbol table
+	UnicodeString sourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {} } \n"
+		"$my = new MyClass;\n"
+	);
+	Init(sourceCode);	
+	
+	// step 2: create a new symbol table
+	// seed it with invalid code, but make it the table that was built above
+	UnicodeString invalidSourceCode = t4p::CharToIcu(
+		"<?php\n"
+		"class MyClass { function workA() {} function workB() {}  \n"
+		"$my = new MyClass;\n"
+	);
+	t4p::SymbolTableClass updatedSymbolTable;
+	updatedSymbolTable.CreateSymbols(invalidSourceCode, CompletionSymbolTable);
+	
+	// step 3: perform code completion
+	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
+	updatedSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
+		VariableMatches, ResourceMatches, DoDuckTyping, Error);
+	CHECK_VECTOR_SIZE(2, ResourceMatches);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), ResourceMatches[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), ResourceMatches[1].Identifier);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithMethodCall) {

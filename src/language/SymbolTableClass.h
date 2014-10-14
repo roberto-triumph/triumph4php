@@ -284,19 +284,41 @@ public:
 	SymbolTableClass();
 	
 	/**
+	 * copies src's variables into this table
+	 * Copy is a deep copy
+	 */
+	void Copy(const t4p::SymbolTableClass& src);
+	
+	/**
 	 * Builds symbols for the given source code. After symbols are created, lookups can be performed. 
+	 * This method accepts the previously created symbol table, so that in case the given code
+	 * has a syntax error, we can use the previously built table's variables; that way code completion
+	 * can work even on files that contain syntax errors.
+	 * In the case the give code has a syntax error this symbol table is built by using the
+	 * previous table's variables, then tokenizing the given code to add any additional
+	 * variables not found in the previous table.
 	 * 
 	 * @param UnicodeString code the code to analyze
+	 * @param previousSymbolTable used when code has a syntax error.
+	 * @return bool TRUE if the code is valid PHP (no syntax errors)
 	 */
-	void CreateSymbols(const UnicodeString& code);
+	bool CreateSymbols(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable);
 	
 
 	/**
 	 * Builds symbols for the given source code file. After symbols are created, lookups can be performed. 
+	 * This method accepts the previously created symbol table, so that in case the given code
+	 * has a syntax error, we can use the previously built table's variables; that way code completion
+	 * can work even on files that contain syntax errors.
+	 * In the case the give code has a syntax error this symbol table is built by using the
+	 * previous table's variables, then tokenizing the given code to add any additional
+	 * variables not found in the previous table.
 	 * 
 	 * @param wxString full path to the file that contains the code to analyze
+	 * @param previousSymbolTable used when code in fileName has a syntax error
+	 * @return bool TRUE if the code in fileName is valid PHP (no syntax errors)
 	 */
-	void CreateSymbolsFromFile(const wxString& fileName);
+	bool CreateSymbolsFromFile(const wxString& fileName, const t4p::SymbolTableClass& previousSymbolTable);
 
 	/**
 	 * This is the entry point into the code completion functionality; it will take a parsed expression (symbol)
@@ -354,9 +376,9 @@ public:
 	 * parsedExpression.ChainList[0] = "->func1()"
 	 * parsedExpression.ChainList[1] = "->prop2"
 	 * 
-	 * This method will return The tag that represents the "prop2" property of ClassA, wher ClassA is the return type of func1() method.
+	 * This method will return The tag that represents the "prop2" property of ClassA, where ClassA is the return type of func1() method.
 	 * In this case, the tag object for "ClassA::prop2" will be matched.
-	 * None of the given resourc finders pointers will be owned by this class.
+	 * None of the given resource finders pointers will be owned by this class.
 	 *
 	 * @param parsedVariable the varaible to resolve. This is usually the result of the pelet::ParserClass::ParseExpression
 	 * @param variableScope the scope where parsed expression is located.  The scope let's us know which variables are
@@ -448,8 +470,11 @@ private:
 	 * algorithm as it does not account for namespaces, anonymous methods, and multiple
 	 * constructs in a single file (ie class declaration followed by a function declaration). 
 	 * This method is used as a fallback when the code cannot be parsed due to a syntax error
+	 * 
+	 * @param previousSymbolTable use the previous symbol table to get the variable's
+	 *        types.
 	 */
-	void CreateSymbolsFromTokens();
+	void CreateSymbolsFromTokens(const t4p::SymbolTableClass& previousSymbolTable);
 	
 	/**
 	 * The parser.

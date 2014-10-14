@@ -405,6 +405,10 @@ t4p::SymbolTableClass::SymbolTableClass()
 	Parser.SetExpressionObserver(this);
 }
 
+void t4p::SymbolTableClass::Copy(const t4p::SymbolTableClass& src) {
+	Variables = src.Variables;
+}
+
 void t4p::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 	const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
 	t4p::SymbolClass symbol(variableName, t4p::SymbolClass::SCALAR);
@@ -571,7 +575,7 @@ void t4p::SymbolTableClass::OnAnyExpression(pelet::ExpressionClass* expr) {
 	}
 }
 
-void t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
+bool t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable) {
 	Variables.clear();
 	
 	// if the given code has a syntax error, use a naive algorithm as fallback
@@ -579,32 +583,37 @@ void t4p::SymbolTableClass::CreateSymbols(const UnicodeString& code) {
 	pelet::LintResultsClass results;
 	bool good = Parser.ScanString(code, results);
 	if (!good && Lexer.OpenString(code)) {
-		CreateSymbolsFromTokens();
+		CreateSymbolsFromTokens(previousSymbolTable);
 	}
+	return good;
 }
 
-void t4p::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName) {
+bool t4p::SymbolTableClass::CreateSymbolsFromFile(const wxString& fileName, const t4p::SymbolTableClass& previousSymbolTable) {
 	Variables.clear();
 	
 	// for now ignore parse errors
 	pelet::LintResultsClass results;
+	bool good = false;
 	if (wxFileName::FileExists(fileName)) {
 		wxFFile file(fileName, wxT("rb"));
-		bool good = Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName), results);
+		good = Parser.ScanFile(file.fp(), t4p::WxToIcu(fileName), results);
 		
 		// if the given file has a syntax error, use a naive algorithm as fallback
 		// that way we show results to the user if at all possible
 		if (!good) {
 			wxFFile lexFile(fileName, wxT("rb"));
 			if (Lexer.OpenFile(lexFile.fp())) {
-				CreateSymbolsFromTokens();
+				CreateSymbolsFromTokens(previousSymbolTable);
 			}
 		}
 	}
+	return good;
 }
 
-void t4p::SymbolTableClass::CreateSymbolsFromTokens() {
+void t4p::SymbolTableClass::CreateSymbolsFromTokens(const t4p::SymbolTableClass& previousSymbolTable) {
 	Variables.clear();
+	Variables = previousSymbolTable.Variables;
+	
 	UnicodeString currentClass;
 	UnicodeString currentMethod;
 	UnicodeString variable;
@@ -674,7 +683,7 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 															  std::vector<t4p::TagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
 															  t4p::SymbolTableMatchErrorClass& error) const {
-	if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
+		if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
 
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.

@@ -178,7 +178,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionString(const Unico
 
 			}
 		}
-		ctrl->AutoCompSetMaxWidth(0);
+			ctrl->AutoCompSetMaxWidth(0);
 		int currentPos = ctrl->GetCurrentPos();
 		int startPos = ctrl->WordStartPosition(currentPos, true);
 		int wordLength = currentPos - startPos;
@@ -447,7 +447,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhpStatus(
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
 		}
 		else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
-			completeStatus = _("Cannot use object operator for array returned by \"");
+			completeStatus = _("Cannot use object operator for array returned by ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
@@ -457,13 +457,13 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhpStatus(
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 		}
 		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
-			completeStatus = _("Cannot use object operator for primitive returned by \"");
+			completeStatus = _("Cannot use object operator for primitive returned by ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 		}
 		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
-			completeStatus = _("Cannot use object operator for primitive variable \"");
+			completeStatus = _("Cannot use object operator for primitive variable ");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 		}
 	}

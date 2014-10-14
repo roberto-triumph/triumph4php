@@ -292,7 +292,8 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass;
 
 	// here file identifier == file name because file name exists and is unique
-	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true);
+	t4p::SymbolTableClass emptyTable;
+	workingCache->Init(fileName.GetFullPath(), fileName.GetFullPath(), false, version, true, emptyTable);
 	bool newlyRegistered = TagCache.RegisterWorking(fileName.GetFullPath(), workingCache);
 
 	wxFFile file(fileName.GetFullPath(), wxT("rb"));

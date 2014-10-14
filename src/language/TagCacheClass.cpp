@@ -162,20 +162,18 @@ const wxEventType t4p::EVENT_TAG_FINDER_LIST_COMPLETE = wxNewEventType();
 t4p::WorkingCacheClass::WorkingCacheClass()
 	: SymbolTable()
 	, FileName() 
-	, IsNew(true)
-	, Parser() {
+	, IsNew(true) {
 
 }
 
-bool t4p::WorkingCacheClass::Update(const UnicodeString& code) {
+bool t4p::WorkingCacheClass::Update(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable) {
 	pelet::LintResultsClass results;
 
 	// allow empty code to be valid; that way code completion works
 	// on newly created files
 	bool ret = false;
 	if (!code.isEmpty()) {
-		SymbolTable.CreateSymbols(code);
-		ret = true;
+		ret = SymbolTable.CreateSymbols(code, previousSymbolTable);
 	}
 	else if (code.isEmpty()) {
 		ret = true;
@@ -184,14 +182,15 @@ bool t4p::WorkingCacheClass::Update(const UnicodeString& code) {
 }
 
 void t4p::WorkingCacheClass::Init(const wxString& fileName, 
-										const wxString& fileIdentifier, bool isNew, pelet::Versions version, bool createSymbols) {
+										const wxString& fileIdentifier, bool isNew, pelet::Versions version, 
+										bool createSymbols,
+										const t4p::SymbolTableClass& previousSymbolTable) {
 	FileName = fileName;
 	FileIdentifier = fileIdentifier;
 	IsNew = isNew;
-	Parser.SetVersion(version);
 	SymbolTable.SetVersion(version);
 	if (createSymbols) {
-		SymbolTable.CreateSymbolsFromFile(fileName);
+		SymbolTable.CreateSymbolsFromFile(fileName, previousSymbolTable);
 	}
 }
 
@@ -228,6 +227,14 @@ void t4p::TagCacheClass::RemoveWorking(const wxString& fileName) {
 		delete it->second;
 		WorkingCaches.erase(it);
 	}
+}
+
+t4p::WorkingCacheClass* t4p::TagCacheClass::GetWorking(const wxString& fileName) {
+	std::map<wxString, t4p::WorkingCacheClass*>::iterator it = WorkingCaches.find(fileName);
+	if (it != WorkingCaches.end()) {
+		return it->second;
+	}
+	return NULL;
 }
 
 void t4p::TagCacheClass::RegisterGlobal(t4p::TagFinderListClass* cache) {

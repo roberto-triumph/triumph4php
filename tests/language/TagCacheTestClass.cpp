@@ -81,8 +81,9 @@ public:
 
 	t4p::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
 		t4p::WorkingCacheClass* cache = new t4p::WorkingCacheClass();
-		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
-		cache->Update(code);
+		t4p::SymbolTableClass emptyTable;
+		cache->Init(fileName, fileName, true, pelet::PHP_53, false, emptyTable);
+		cache->Update(code, emptyTable);
 		return cache;
 	}
 
@@ -183,8 +184,9 @@ public:
 
 	t4p::WorkingCacheClass* CreateWorkingCache(const wxString& fileName, const UnicodeString& code) {
 		t4p::WorkingCacheClass* cache = new t4p::WorkingCacheClass();
-		cache->Init(fileName, fileName, true, pelet::PHP_53, false);
-		cache->Update(code);
+		t4p::SymbolTableClass emptyTable;
+		cache->Init(fileName, fileName, true, pelet::PHP_53, false, emptyTable);
+		cache->Update(code, emptyTable);
 		return cache;
 	}
 
