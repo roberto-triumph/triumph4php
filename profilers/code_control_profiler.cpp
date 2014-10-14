@@ -114,9 +114,10 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 		Globals->Environment.Php.Version
 	);
 	
+	t4p::SymbolTableClass emptyTable;
 	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
-	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true);
-	bool good = workingCache->Update(contents);
+	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true, emptyTable);
+	bool good = workingCache->Update(contents, emptyTable);
 	if (good) {
 		tagFinderlist->TagParser.BuildResourceCacheForFile(wxT(""), fileNameString, contents, false);
 		Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
