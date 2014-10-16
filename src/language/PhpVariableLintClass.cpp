@@ -24,6 +24,7 @@
  */
 #include <language/PhpVariableLintClass.h>
 #include <language/TagCacheClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/String.h>
 #include <wx/ffile.h>
 #include <algorithm>
@@ -68,6 +69,57 @@ static bool IsFunctionArgumentByReference(const t4p::TagClass& tag, int argIndex
 		}
 	}	
 	return isRef;
+}
+
+/**
+ * @param functionName the function or method to look up. If its a function, it 
+ *        needs to be a fully qualified function name.
+ * @param isMethod TRUE if the search should be restricted to methods (from all classes)
+ * @param isStatic TRUE if the search should be restriced to static methods ('::')
+ * @param functionTag the TagClass that was found; will contain the function signature
+ * @return bool TRUE if functionName was found ONLY ONCE in the tag cache
+ */
+static bool LookupFunction(t4p::TagCacheClass& tagCache, const UnicodeString& functionName, bool isMethod, bool isStatic, t4p::TagClass& functionTag) {
+	bool found = false;
+	std::vector<t4p::TagClass> matches;
+	if (!isMethod) {
+		matches = tagCache.ExactFunction(functionName);
+		if (matches.size() == 1) {
+			functionTag = matches[0];
+			found = true;
+		}
+	}
+	else {
+		matches = tagCache.ExactMethod(functionName, isStatic);
+		if (matches.size() == 1) {
+			functionTag = matches[0];
+			found = true;
+		}
+	}
+	if (!found) {
+		
+		// as a last resort, check to see if this is a native function
+		// in PHP, native functions do not need to be fully qualified
+		UnicodeString unqualifiedName;
+		t4p::TagResultClass* result = NULL;
+		int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+		if (pos >= 0) {		
+			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
+			result = tagCache.ExactNativeTags(unqualifiedName);
+		}
+		else {
+			result = tagCache.ExactNativeTags(functionName);
+		}
+		if (result) {
+			matches = result->Matches();			
+			delete result;
+		}
+		if (matches.size() == 1) {
+			functionTag = matches[0];
+			found = true;
+		}
+	}
+	return found;
 }
 
 t4p::PhpVariableLintResultClass::PhpVariableLintResultClass()
@@ -574,22 +626,8 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	for (size_t i = 0; i < var->ChainList.size(); ++i) {
 		if (var->ChainList[i].IsFunction) {
 			t4p::TagClass functionTag;
-			if (var->ChainList[i].Name == UNICODE_STRING_SIMPLE("preg_match") || var->ChainList[i].Name == UNICODE_STRING_SIMPLE("\\preg_match")) {
-				int hhh = 0;
-				hhh++;
-			}
-			if (i == 0) {
-				std::vector<t4p::TagClass> matches = TagCache.ExactFunction(var->ChainList[i].Name);
-				if (matches.size() == 1) {
-					functionTag = matches[0];
-				}
-			}
-			else {
-				std::vector<t4p::TagClass> matches = TagCache.ExactMethod(var->ChainList[i].Name, var->ChainList[i].IsStatic);
-				if (matches.size() == 1) {
-					functionTag = matches[0];
-				}
-			}
+			bool isMethod = i > 0;
+			bool foundFunctionTag = LookupFunction(TagCache, var->ChainList[i].Name, isMethod, var->ChainList[i].IsStatic, functionTag);
 			
 			std::vector<pelet::ExpressionClass*>::const_iterator it;
 			int argIndex = 0;
@@ -609,7 +647,7 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 						// we know for sure its the right now.  if we find many matches, 
 						// then a method can be in any number of classes; it
 						// becomes really hard to know which method to pick.
-						if (IsFunctionArgumentByReference(functionTag, argIndex)) {
+						if (foundFunctionTag && IsFunctionArgumentByReference(functionTag, argIndex)) {
 							ScopeVariables[argVar->ChainList[0].Name] = 1;
 						}
 					}
