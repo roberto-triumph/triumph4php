@@ -232,6 +232,9 @@ static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const w
 		scriptTempFile
 	);
 	
+	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
+	eventSink.Publish(codeControlEvent);
+	
 	t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
 	proc->TempFile = tempFile;
 	proc->ScriptTempFile = scriptTempFile;
@@ -534,6 +537,9 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 	}
 	if (saved && !isAsyncSave) {
 		MarkAsSaved();
+		
+		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, this);
+		EventSink.Publish(codeControlEvent);		
 	}
 	return saved;
 }
