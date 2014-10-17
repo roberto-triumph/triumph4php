@@ -230,6 +230,11 @@ void t4p::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::Ternary
 	}
 }
 
+void t4p::PhpIdentifierLintClass::ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression) {
+	CheckExpression(expression->Expression1);
+	CheckClassName(expression->ClassName, expression);	
+}
+
 void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 	
 	// nothing as scalars cannot be undefined
@@ -344,6 +349,9 @@ void t4p::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) 
 		break;
 	case pelet::ExpressionClass::UNARY_VARIABLE_OPERATION:
 		ExpressionUnaryVariableOperationFound((pelet::UnaryVariableOperationClass*)expr);
+		break;
+	case pelet::ExpressionClass::INSTANCEOF_OPERATION:
+		ExpressionInstanceOfOperationFound((pelet::InstanceOfOperationClass*)expr);
 		break;
 	case pelet::ExpressionClass::VARIABLE:
 		CheckVariable((pelet::VariableClass*)expr);

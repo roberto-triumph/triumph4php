@@ -148,6 +148,8 @@ public:
 	void ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression);
 
 	void ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression);
+	
+	void ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression);
 
 	void ExpressionScalarFound(pelet::ScalarExpressionClass* expression);
 

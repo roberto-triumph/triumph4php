@@ -352,6 +352,10 @@ void t4p::PhpVariableLintClass::ExpressionTernaryOperationFound(pelet::TernaryOp
 	}
 }
 
+void t4p::PhpVariableLintClass::ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression) {
+	CheckExpression(expression->Expression1);
+}
+
 void t4p::PhpVariableLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
 	
 	// nothing as scalars cannot be undefined
@@ -414,13 +418,29 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 	for (size_t i = 0; i < expr->Parameters.size(); ++i) {
 		pelet::VariableClass* param = expr->Parameters[i];
 		if (!param->ChainList.empty()) {
-			closureScopeVariables[param->ChainList[0].Name] = 1;
+			UnicodeString paramName = param->ChainList[0].Name;
+			if (paramName.indexOf('&') == 0) {
+				paramName.remove(0, 1);
+				
+				// if this is a parameter passed by reference, then add
+				// it to the function scope
+				ScopeVariables[paramName] = 1;
+			}
+			closureScopeVariables[paramName] = 1;
 		}
 	}
 	for (size_t i = 0; i < expr->LexicalVars.size(); ++i) {
 		pelet::VariableClass* param = expr->LexicalVars[i];
 		if (!param->ChainList.empty()) {
-			closureScopeVariables[param->ChainList[0].Name] = 1;
+			UnicodeString paramName = param->ChainList[0].Name;
+			if (paramName.indexOf('&') == 0) {
+				paramName.remove(0, 1);
+				
+				// if this is a parameter passed by reference, then add
+				// it to the function scope
+				ScopeVariables[paramName] = 1;
+			}
+			closureScopeVariables[paramName] = 1;
 		}
 	}
 
@@ -436,8 +456,15 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 	HasIncludeCall = false;
 
 	for (size_t i = 0; i < expr->Statements.Size(); ++i) {
-		if (pelet::StatementClass::EXPRESSION == expr->Statements.TypeAt(i)) {
+		pelet::StatementClass::Types stmtType = expr->Statements.TypeAt(i);
+		if (pelet::StatementClass::EXPRESSION == stmtType) {
 			CheckExpression((pelet::ExpressionClass*)expr->Statements.At(i));
+		}
+		else if (pelet::StatementClass::STATIC_VARIABLE_DECLARATION == stmtType) {
+			StatementStaticVariablesFound((pelet::StaticVariableStatementClass*)expr->Statements.At(i));
+		}
+		else if (pelet::StatementClass::GLOBAL_VARIABLE_DECLARATION == stmtType) {
+			StatementGlobalVariablesFound((pelet::GlobalVariableStatementClass*)expr->Statements.At(i));
 		}
 	}
 	
@@ -536,6 +563,9 @@ void t4p::PhpVariableLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 		break;
 	case pelet::ExpressionClass::TERNARY_OPERATION:
 		ExpressionTernaryOperationFound((pelet::TernaryOperationClass*)expr);
+		break;
+	case pelet::ExpressionClass::INSTANCEOF_OPERATION:
+		ExpressionInstanceOfOperationFound((pelet::InstanceOfOperationClass*)expr);
 		break;
 	case pelet::ExpressionClass::UNARY_OPERATION:
 		ExpressionUnaryOperationFound((pelet::UnaryOperationClass*)expr);
