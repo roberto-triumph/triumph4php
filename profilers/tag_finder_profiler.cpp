@@ -28,8 +28,9 @@
 #include <language/SymbolTableClass.h>
 #include <language/TagCacheClass.h>
 #include <language/PhpVariableLintClass.h>
-#include <search/DirectorySearchClass.h>
+#include <language/TagFinderList.h>
 #include <language/ParsedTagFinderClass.h>
+#include <search/DirectorySearchClass.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
@@ -143,7 +144,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		FileName = wxT("/home/roberto/workspace/triumph4php/php_detectors/lib/Zend/Config.php");
-		DirName = wxT("/home/roberto/public_html/tci_umbrellaservices");
+		DirName = wxT("/home/roberto/public_html/wordpress");
 		DbFileName = wxT("resource.db");
 	}
 	std::string test;
@@ -426,6 +427,10 @@ void ProfileVariableLintOnLargeProject() {
 	printf("*******\n");
 	t4p::DirectorySearchClass search;
 	t4p::TagCacheClass tagCache;
+	wxFileName nativeDbFileName = t4p::NativeFunctionsAsset();
+	t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass();
+	tagFinderList->InitNativeTag(nativeDbFileName);
+	tagCache.RegisterGlobal(tagFinderList);
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
 		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
