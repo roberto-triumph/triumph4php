@@ -67,6 +67,12 @@ public:
 
 	void Parse(const UnicodeString& code) {
 		Lint.SetOptions(Options);
+		
+		// create the file, so that we can index it 
+		// and the tags get parsed from it
+		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
+		BuildCache(true);
+	
 		HasError = Lint.ParseString(code, Results);
 	}
 	
@@ -523,8 +529,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
 		"  $sum = $a + $x;\n"
 		"}"
 	);
-	SetupFile(wxT("test.php"), t4p::IcuToWx(code));
-	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 	CHECK_VECTOR_SIZE(0, Results);
@@ -638,6 +642,26 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	CHECK_EQUAL(4, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
 	CHECK_EQUAL(4, Results[1].LineNumber);
+}
+
+
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
+	
+	// test that when a closure uses variables that are passed by 
+	// reference, the linter does NOT label them as un-initialized
+	UnicodeString code = t4p::CharToIcu(
+		"function myFunc($c, $d) {\n"
+		"  $a = $c[$d];\n"
+		"  $zz = function($i, $j) use ($c, $d, &$f) {\n"
+		"      $a[$c] = array($i => $d, 2 => $j); \n"
+		"      $f = true;\n"
+		"   };\n"
+		"  print $f;\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {

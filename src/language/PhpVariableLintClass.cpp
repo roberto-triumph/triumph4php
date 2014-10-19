@@ -419,8 +419,7 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 		pelet::VariableClass* param = expr->Parameters[i];
 		if (!param->ChainList.empty()) {
 			UnicodeString paramName = param->ChainList[0].Name;
-			if (paramName.indexOf('&') == 0) {
-				paramName.remove(0, 1);
+			if (param->IsReference) {
 				
 				// if this is a parameter passed by reference, then add
 				// it to the function scope
@@ -433,8 +432,7 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 		pelet::VariableClass* param = expr->LexicalVars[i];
 		if (!param->ChainList.empty()) {
 			UnicodeString paramName = param->ChainList[0].Name;
-			if (paramName.indexOf('&') == 0) {
-				paramName.remove(0, 1);
+			if (param->IsReference) {
 				
 				// if this is a parameter passed by reference, then add
 				// it to the function scope
