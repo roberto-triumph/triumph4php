@@ -28,6 +28,22 @@
 #include <wx/filename.h>
 #include <algorithm>
 
+
+/**
+ * @param sources the source directories to check
+ * @return bool TRUE if ALL of the given sources exist on disk AND
+ *         there is at least 1 source in the vector
+ */
+static bool AllSourcesExist(const std::vector<t4p::SourceClass>& sources) {
+	for (size_t i = 0; i < sources.size(); ++i) {
+		if (!sources[i].RootDirectory.DirExists()) {
+			return false;
+		}
+	}
+	return !sources.empty();
+	
+}
+
 t4p::SourceClass::SourceClass()  
 	: RootDirectory()
 	, IncludeWildcards() 
@@ -273,43 +289,38 @@ bool t4p::DirectorySearchClass::Init(const std::vector<t4p::SourceClass>& source
 	}
 	InitSources.clear();
 	MatchedFiles.clear();
+	
+	if (!AllSourcesExist(sources)) {
+		return false;
+	}
+	Sources = sources;
 
-	size_t total = 0;
-	for (size_t i = 0; i < sources.size(); ++i) {
-		t4p::SourceClass source = sources[i];
+	for (size_t i = 0; i < Sources.size(); ++i) {
+		t4p::SourceClass source = Sources[i];
 		wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
 		if (wxDir::Exists(pathWithSeparator)) {
-			total++;
 			InitSources.push_back(pathWithSeparator);
 			if (RECURSIVE == mode) {
 				Directories.push(pathWithSeparator);
 			}
-			else {
+		}
+	}
+	
+	if (PRECISE == mode) {
+		for (size_t i = 0; i < Sources.size(); ++i) {
+			t4p::SourceClass source = Sources[i];
+			wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
+			
 
-				// put the source in the list so that when we are walking through
-				// the files we know when we have started to walk a new source dir
-				// do it after we push the files, since CurrentFiles is a stack we want
-				// the source dir to be popped first
-				EnumerateAllFiles(pathWithSeparator);
-				CurrentFiles.push(pathWithSeparator);
-			}
+			// put the source in the list so that when we are walking through
+			// the files we know when we have started to walk a new source dir
+			// do it after we push the files, since CurrentFiles is a stack we want
+			// the source dir to be popped first
+			// need to make sure to enumerate files once Sources has been set,
+			// as Sources contains the wildcards that we want to use
+			EnumerateAllFiles(pathWithSeparator);
+			CurrentFiles.push(pathWithSeparator);
 		}
-	}
-	if (sources.empty() || total < sources.size()) {
-		while (!CurrentFiles.empty()) {
-			CurrentFiles.pop();
-		}
-		while (!Directories.empty()) {
-			Directories.pop();
-		}
-		InitSources.clear();
-		return false;
-	}
-	Sources.clear();
-	for (size_t i = 0; i < sources.size(); ++i) {
-		t4p::SourceClass srcCopy;
-		srcCopy.Copy(sources[i]);
-		Sources.push_back(srcCopy);
 	}
 	HasCalledBegin = false;
 	HasCalledEnd = false;
@@ -439,7 +450,9 @@ void t4p::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 			if (!filename.IsEmpty()) {
 				wxString fullPath = path + filename;
 				TotalFileCount++;
-				CurrentFiles.push(fullPath);
+				if (MatchesWildcards(fullPath)) {
+					CurrentFiles.push(fullPath);
+				}
 			}
 			next = dir.GetNext(&filename);
 		}
@@ -458,7 +471,7 @@ bool t4p::DirectorySearchClass::MatchesWildcards(const wxString &fullPath) {
 	return matches;
 }
 
-void t4p::DirectorySearchClass::AddFiles(wxDir& dir) {
+void t4p::DirectorySearchClass::AddSubDirectories(wxDir& dir) {
 	int flags =  wxDIR_DIRS;
 	if (DoHiddenFiles) {
 		flags |=  wxDIR_HIDDEN;
@@ -477,7 +490,7 @@ void t4p::DirectorySearchClass::AddFiles(wxDir& dir) {
 	}
 }
 
-void t4p::DirectorySearchClass::AddSubDirectories(wxDir& dir) {
+void t4p::DirectorySearchClass::AddFiles(wxDir& dir) {
 	int flags =  wxDIR_FILES;
 	if (DoHiddenFiles) {
 		flags |=  wxDIR_HIDDEN;

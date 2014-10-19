@@ -164,53 +164,82 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 	return allResults;
 }
 
-t4p::LintBackgroundFileReaderClass::LintBackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, 
+t4p::LintActionClass::LintActionClass(t4p::RunningThreadsClass& runningThreads, 
 																		int eventId,
 																		const t4p::LintFeatureOptionsClass& options)
-	: BackgroundFileReaderClass(runningThreads, eventId)
+	: ActionClass(runningThreads, eventId)
 	, TagCache()
-	, ParserDirectoryWalker(TagCache, options) {
+	, ParserDirectoryWalker(TagCache, options)
+	, Sources()
+	, Search()
+	, FilesCompleted(0) 
+	, FilesTotal(0) {
 		
 }
 
-bool t4p::LintBackgroundFileReaderClass::InitDirectoryLint(std::vector<t4p::SourceClass> sources,
+bool t4p::LintActionClass::InitDirectoryLint(std::vector<t4p::SourceClass> sources,
 																 t4p::GlobalsClass& globals) {
 	bool good = false;
-	if (Init(sources)) {
-		TagCache.RegisterDefault(globals);
-		ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
-		ParserDirectoryWalker.ResetTotals();
-		good = true;
-	}
+	Sources = sources;
+	TagCache.RegisterDefault(globals);
+	ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
+	ParserDirectoryWalker.ResetTotals();
+	
+	SetStatus(_("Lint Check"));
+	SetProgressMode(t4p::ActionClass::DETERMINATE);
+	good = true;
 	return good;
 }
 
-bool t4p::LintBackgroundFileReaderClass::BackgroundFileRead(DirectorySearchClass &search) {
-	bool error = search.Walk(ParserDirectoryWalker);
-	std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
-	if (error && !lintErrors.empty()) {
-		t4p::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
-		PostEvent(lintResultsEvent);
+void t4p::LintActionClass::BackgroundWork() {
+	
+	if (Search.Init(Sources, t4p::DirectorySearchClass::PRECISE)) {
+		FilesCompleted = 0;
+		FilesTotal = Search.GetTotalFileCount();
+		SetStatus(_("Lint Check"));
+		IterateDirectory();
 	}
-	if (!search.More() && !IsCancelled()) {
+	
+	if (!IsCancelled()) {
+		
+		// send an event with summary of errors totals
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
 		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
 		PostEvent(summaryEvent);
 	}
-	return !error;
+}	
+
+void t4p::LintActionClass::IterateDirectory() {
+	while (!IsCancelled() && Search.More()) {
+		bool error = Search.Walk(ParserDirectoryWalker);
+		std::vector<pelet::LintResultsClass> lintErrors = ParserDirectoryWalker.GetLastErrors();
+		if (error && !lintErrors.empty()) {
+			t4p::LintResultsEventClass lintResultsEvent(GetEventId(), lintErrors);
+			PostEvent(lintResultsEvent);
+		}
+		
+		// we will try to send at most 100 events, this is in case we have big
+		// projects with 10,000+ files we dont want to flood the system with events
+		// that will barely be noticeable in the gauge.
+		FilesCompleted++;
+		double newProgress = (FilesCompleted * 1.0) / FilesTotal;
+		int newProgressWhole = (int)floor(newProgress * 100);
+
+		// we dont want to send the progress=0 event more than once
+		if (newProgressWhole < 1) {
+			newProgressWhole = 1;
+		}
+		SetPercentComplete(newProgressWhole);
+	}
 }
 
-bool t4p::LintBackgroundFileReaderClass::BackgroundFileMatch(const wxString& file) {
-	return true;
-}
-
-void t4p::LintBackgroundFileReaderClass::LintTotals(int& totalFiles, int& errorFiles) {
+void t4p::LintActionClass::LintTotals(int& totalFiles, int& errorFiles) {
 	totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 	errorFiles = ParserDirectoryWalker.WithErrors;
 }
 
-wxString t4p::LintBackgroundFileReaderClass::GetLabel() const {
+wxString t4p::LintActionClass::GetLabel() const {
 	return wxT("Lint Directories");
 }
 
@@ -464,7 +493,7 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 		return;
 	}
 	if (App.Globals.HasSources()) {
-		t4p::LintBackgroundFileReaderClass* reader = new t4p::LintBackgroundFileReaderClass(App.RunningThreads, ID_LINT_READER, Options);
+		t4p::LintActionClass* reader = new t4p::LintActionClass(App.RunningThreads, ID_LINT_READER, Options);
 		std::vector<t4p::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
@@ -609,7 +638,15 @@ void t4p::LintFeatureClass::OnLintComplete(t4p::ActionEventClass& event) {
 
 void t4p::LintFeatureClass::OnLintProgress(t4p::ActionProgressEventClass& event) {
 	t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
-	gauge->IncrementGauge(ID_LINT_RESULTS_GAUGE, StatusBarWithGaugeClass::INDETERMINATE_MODE);
+	if (event.PercentComplete == 0) {
+			
+			// the start, turn the gauge into determinate mode
+			gauge->SwitchMode(ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);
+	}
+	gauge->UpdateGauge(ID_LINT_RESULTS_GAUGE, event.PercentComplete);
+	if (!event.Message.IsEmpty()) {
+		gauge->RenameGauge(ID_LINT_RESULTS_GAUGE, event.Message);
+	}
 }
 
 void t4p::LintFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {

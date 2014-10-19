@@ -209,7 +209,7 @@ private:
  * This class will allow us to perform parsing on an entire directory
  * in a background thread.
  */
-class LintBackgroundFileReaderClass : public BackgroundFileReaderClass {
+class LintActionClass : public t4p::ActionClass {
 
 public:	
 
@@ -220,7 +220,7 @@ public:
 	 * @param options flags to control how strict linter will be
 	 * @see t4p::ActionClass class
 	 */
-	LintBackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId,
+	LintActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const t4p::LintFeatureOptionsClass& options);
 	
 	/**
@@ -248,24 +248,43 @@ public:
 protected:
 
 	/**
-	 * Will parse the current file. 
-	 * @return TRUE if file had ZERO parse errors
+	 * Will iterate through each source and parse it for errors
 	 */
-	bool BackgroundFileRead(DirectorySearchClass& search);
+	void BackgroundWork();
+	
+private:
+
+	/**
+	 * Will iterate the entire set of files in DirectorySearch.
+	 * Will send events 1) on errors and 2) progress
+	 */
+	void IterateDirectory();
+
 	
 	/**
-	 * 
-	 * will do nothing for now
+	 * needed by PhpIdentifierLintClass in order to find
+	 * function/class names
 	 */
-	bool BackgroundFileMatch(const wxString& file);
-
-private:
-	
-	// needed by PhpIdentifierLintClass in order to find
-	// function/class names
 	t4p::TagCacheClass TagCache;
 
+	/**
+	 * performs the lint logic on a single file
+	 */
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
+	
+	/**
+	 * The directories to be parsed for errors
+	 */
+	 std::vector<t4p::SourceClass> Sources;
+	 
+	 /**
+	  * used to recurse through directories
+	  */
+	 t4p::DirectorySearchClass Search;
+	
+	// to show progress
+	int FilesCompleted;
+	int FilesTotal;
 };
 
 /**
