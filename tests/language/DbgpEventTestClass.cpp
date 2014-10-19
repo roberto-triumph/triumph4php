@@ -231,7 +231,7 @@ TEST(CommandGenerationWithArgs) {
 
 	std::string line = cmd.BreakpointFile(filename, lineNumber, enabled);
 	std::string expected = "breakpoint_set";
-	expected += " -i " + wxString::Format("triumph-%d-%d", pid, 0);
+	expected += " -i " + wxString::Format("triumph-%ld-%d", pid, 0);
 	expected += " -t line -f /var/www/site/index.php -n 40 -s enabled";
 	CHECK_EQUAL(expected, line);
 }
@@ -250,7 +250,7 @@ TEST(CommandGenerationWithData) {
 	std::string line = cmd.PropertySet(stackDepth, contextId, propertyName, dataType, expression);
 
 	std::string expected = "property_set";
-	expected += " -i " + wxString::Format("triumph-%d-%d", pid, 0);
+	expected += " -i " + wxString::Format("triumph-%ld-%d", pid, 0);
 	expected += " -n \"$x[\\\"a b\\\"]\"";  // quotes must be escaped
 	expected +=  wxString::Format(" -d %d", stackDepth);
 	expected +=  wxString::Format(" -c %d", contextId);
