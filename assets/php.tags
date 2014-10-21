@@ -2543,10 +2543,10 @@ sec		0;"	p	class:MongoTimestamp
 inc		0;"	p	class:MongoTimestamp
 __construct		0;"	f	S: function __construct($sec = time(), $inc)	class:MongoTimestamp
 __toString		0;"	f	S:string function __toString()	class:MongoTimestamp
-0;"	c	i:MongoCollection
-chunks		0;"	p	class:
-filesName		0;"	p	class:	a:protected
-chunksName		0;"	p	class:	a:protected
+MongoGridFS		0;"	c	i:MongoCollection
+chunks		0;"	p	class:MongoGridFS
+filesName		0;"	p	class:MongoGridFS	a:protected
+chunksName		0;"	p	class:MongoGridFS	a:protected
 __construct		0;"	f	S: function __construct($db, $prefix = "fs", $chunks = "fs")	class:MongoGridFS
 delete		0;"	f	S:bool|array function delete($id)	class:MongoGridFS
 drop		0;"	f	S:array function drop()	class:MongoGridFS
@@ -7330,6 +7330,8 @@ gmp_popcount		0;"	f	S:int function gmp_popcount($a)
 gmp_pow		0;"	f	S:GMP function gmp_pow($base, $exp)
 gmp_powm		0;"	f	S:GMP function gmp_powm($base, $exp, $mod)
 gmp_prob_prime		0;"	f	S:int function gmp_prob_prime($a, $reps = 10)
+gmp_random_bits		0;"	f	S:GMP function gmp_random_bits($bits)
+gmp_random_range		0;"	f	S:GMP function gmp_random_range($min, $max)
 gmp_random		0;"	f	S:GMP function gmp_random($limiter = 20)
 gmp_root		0;"	f	S:GMP function gmp_root($a, $nth)
 gmp_rootrem		0;"	f	S:array function gmp_rootrem($a, $nth)
@@ -10907,6 +10909,13 @@ CURLOPT_WRITEHEADER		0;"	d
 CURLOPT_SSL_VERIFYHOST		0;"	d
 CURLOPT_COOKIEFILE		0;"	d
 CURLOPT_SSLVERSION		0;"	d
+CURL_SSLVERSION_DEFAULT		0;"	d
+CURL_SSLVERSION_TLSv1		0;"	d
+CURL_SSLVERSION_SSLv2		0;"	d
+CURL_SSLVERSION_SSLv3		0;"	d
+CURL_SSLVERSION_TLSv1_0		0;"	d
+CURL_SSLVERSION_TLSv1_1		0;"	d
+CURL_SSLVERSION_TLSv1_2		0;"	d
 CURLOPT_TIMECONDITION		0;"	d
 CURLOPT_TIMEVALUE		0;"	d
 CURLOPT_CUSTOMREQUEST		0;"	d

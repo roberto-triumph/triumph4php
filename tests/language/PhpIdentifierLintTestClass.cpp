@@ -280,6 +280,26 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeProperty) {
+	
+	// test that we don't flag native properties 
+	// as unkown, we should always find them if we are guaranteed
+	// to know the type involved
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"function doPrint($a) {} \n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"$a = PDO::PARAM_INT;\n"
+	);
+
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache(true);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 

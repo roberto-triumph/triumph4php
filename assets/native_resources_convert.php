@@ -187,8 +187,11 @@ if ($if) {
 			}
 		}
 		else if ('o' == $kind) {
+		
+			// class constants are always static
 			$type = RESOURCE_CLASS_CONSTANT;
 			$className = $extensions['class'];
+			$extensions['access'] = 'static';
 		}
 		else if ('p' == $kind) {
 			$type = RESOURCE_MEMBER;
@@ -249,7 +252,7 @@ echo "done\n";
 function initOutputPdo(PDO $outputPdo) {
 	// TODO: this does not work; PDO cannot execute multiple queries
 	// at once.
-	$outputPdo->query(file_get_contents(__DIR__ . './sql/resources.sql'));
+	$outputPdo->query(file_get_contents(__DIR__ . '/./sql/resources.sql'));
 	
 	// delete any existing resources, since the generated file will only 
 	// contain the native functions it is safe to truncate the tables
