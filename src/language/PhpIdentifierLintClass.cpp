@@ -424,7 +424,13 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			// check for array accesees ie $user[$name]
 			CheckExpression(var->ChainList[i].ArrayAccess);
 		}
-		else if (!prop.IsArrayAccess) {
+		else if (!prop.IsArrayAccess && prop.IsStatic) {
+				
+			// only check for static properties (and constants)
+			// for now
+			// testing for instance properties results in many false 
+			// positives when the analyzed code deals with serializing
+			// and unserializing data from strings (json_encode)
 			std::vector<t4p::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
 			if (tags.empty()) {
 				t4p::PhpIdentifierLintResultClass lintResult;
@@ -574,32 +580,31 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 }
 
 void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
+	// only check for static properties (and constants)
+	// for now
+	// testing for instance properties results in many false 
+	// positives when the analyzed code deals with serializing
+	// and unserializing data from strings (json_encode)
+	if (!propertyProp.IsStatic) {
+		return;
+	}
+	if (propertyProp.Name.isEmpty()) {
+		return;
+	}
+			
 	bool isUnknown = false;
 	
-	// check out little cache, different maps depending on static vs instances methods
+	// check our internal class cache, if not found
+	// then query the tags db and cache the value
 	if (propertyProp.IsStatic && FoundStaticProperties.find(propertyProp.Name) != FoundStaticProperties.end()) {
 		isUnknown = false;
 	}
 	else if (propertyProp.IsStatic && NotFoundStaticProperties.find(propertyProp.Name) != NotFoundStaticProperties.end()) {
 		isUnknown = true;
 	}
-	else if (!propertyProp.IsStatic && FoundProperties.find(propertyProp.Name) != FoundProperties.end()) {
-		isUnknown = false;
-	}
-	else if (!propertyProp.IsStatic && NotFoundProperties.find(propertyProp.Name) != NotFoundProperties.end()) {
-		isUnknown = true;
-	}
 	else {
 		std::vector<t4p::TagClass> tags = TagCache.ExactProperty(propertyProp.Name, propertyProp.IsStatic);
-		if (!tags.empty() && !propertyProp.IsStatic) {
-			FoundProperties[propertyProp.Name] = 1;
-			isUnknown = false;
-		}
-		else if (tags.empty() && !propertyProp.IsStatic) {
-			NotFoundProperties[propertyProp.Name] = 1;
-			isUnknown = true;
-		}
-		else if (!tags.empty() && propertyProp.IsStatic) {
+		if (!tags.empty() && propertyProp.IsStatic) {
 			FoundStaticProperties[propertyProp.Name] = 1;
 			isUnknown = false;
 		}
