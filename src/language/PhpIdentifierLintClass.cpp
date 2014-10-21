@@ -531,38 +531,53 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 
 void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var) {
 
+	// skip empty methods or "variable methods names
+	// it $this->$methodName()
+	if (methodProp.Name.isEmpty() ||
+		methodProp.Name[0] == '$') {
+		return;
+	}
+	
 	// magic methods, constructors are always put in the cache automatically above
 	// this same code will work for those also
+	bool isStaticCall = methodProp.IsStatic;
+	if (isStaticCall && var->ChainList.size() == 2) {
+		
+		// check for calls to the base class
+		// ie parent::baseMethod()
+		// these calls are NOT static
+		isStaticCall = var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) != 0;
+	}
 
 	bool isUnknown = false;
 	// check out little cache, different maps depending on static vs instances methods
-	if (methodProp.IsStatic && FoundStaticMethods.find(methodProp.Name) != FoundStaticMethods.end()) {
+	if (isStaticCall && FoundStaticMethods.find(methodProp.Name) != FoundStaticMethods.end()) {
 		isUnknown = false;
 	}
-	else if (methodProp.IsStatic && NotFoundStaticMethods.find(methodProp.Name) != NotFoundStaticMethods.end()) {
+	else if (isStaticCall && NotFoundStaticMethods.find(methodProp.Name) != NotFoundStaticMethods.end()) {
 		isUnknown = true;
 	}
-	else if (!methodProp.IsStatic && FoundMethods.find(methodProp.Name) != FoundMethods.end()) {
+	else if (!isStaticCall && FoundMethods.find(methodProp.Name) != FoundMethods.end()) {
 		isUnknown = false;
 	}
-	else if (!methodProp.IsStatic && NotFoundMethods.find(methodProp.Name) != NotFoundMethods.end()) {
+	else if (!isStaticCall && NotFoundMethods.find(methodProp.Name) != NotFoundMethods.end()) {
 		isUnknown = true;
 	}
 	else {
-		std::vector<t4p::TagClass> tags = TagCache.ExactMethod(methodProp.Name, methodProp.IsStatic);
-		if (!tags.empty() && !methodProp.IsStatic) {
+		std::vector<t4p::TagClass> tags = TagCache.ExactMethod(methodProp.Name, isStaticCall);
+		if (!tags.empty() && !isStaticCall) {
 			FoundMethods[methodProp.Name] = 1;
 			isUnknown = false;
 		}
-		else if (tags.empty() && !methodProp.IsStatic) {
+		else if (tags.empty() && !isStaticCall) {
 			NotFoundMethods[methodProp.Name] = 1;
 			isUnknown = true;
 		}
-		else if (!tags.empty() && methodProp.IsStatic) {
+		else if (!tags.empty() && isStaticCall) {
 			FoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = false;
 		}
-		else if (tags.empty() && methodProp.IsStatic) {
+		else if (tags.empty() && isStaticCall) {
 			NotFoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = true;
 		}
@@ -580,6 +595,7 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 }
 
 void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
+	
 	// only check for static properties (and constants)
 	// for now
 	// testing for instance properties results in many false 
@@ -627,9 +643,14 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 
 
 void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression) {
-	if (className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||
+	
+	// some class names are never unknown
+	if (className.isEmpty() ||
+		className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||
 		className.compare(UNICODE_STRING_SIMPLE("self")) == 0 ||
-		className.compare(UNICODE_STRING_SIMPLE("static")) == 0) {
+		className.compare(UNICODE_STRING_SIMPLE("static")) == 0 ||
+		className.caseCompare(UNICODE_STRING_SIMPLE("stdClass"), 0) == 0 ||
+		className.caseCompare(UNICODE_STRING_SIMPLE("\\stdClass"), 0) == 0) {
 		return;
 	}
 	if (FoundClasses.find(className) != FoundClasses.end()) {

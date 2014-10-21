@@ -210,6 +210,35 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
 	CHECK_EQUAL(false, HasError);
 }
 
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
+
+	// test that the "parent" keyword is never seen as an unknown class
+	// and that the method is not treated as a static method call
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  public function work($d) { \n"
+		"    return true;\n"
+		"  }\n"
+		"}\n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"class NextClass extends \\Util\\MyClass { \n"
+		"  public const MAX = 100; \n"
+		"   function work($d) { \n"
+		"     return parent::work($d);\n"
+		"   }\n"
+		"}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
 
 	// test that the "__constructor" method is never seen as an unknown class
@@ -236,7 +265,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
 
-	// test that the "magic" method is never seen as an unknown class
+	// test that the "magic" method is never seen as an unknown method
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"  
 		"namespace Util; \n"
