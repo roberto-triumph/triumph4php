@@ -232,16 +232,6 @@ public:
 	 * @return bool TRUE if sources is not empty
 	 */
 	bool InitDirectoryLint(std::vector<t4p::SourceClass> sources, t4p::GlobalsClass& globals);
-	
-	/**
-	 * Return a summary of the number of files that were lint'ed.
-	 * Only use this method after the EVENT_ACTION_COMPLETE event is dispatched.
-	 * (ie don't call this while the background thread is running).
-	 *
-	 * @param totalFiles the number of files checked will be set here
-	 * @param erroFiles the number of files with lint errors will be set here
-	 */
-	void LintTotals(int& totalFiles, int& errorFiles);
 
 	wxString GetLabel() const;
 	

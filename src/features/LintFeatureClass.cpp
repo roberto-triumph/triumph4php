@@ -41,6 +41,14 @@ const int ID_LINT_READER = wxNewId();
 const int ID_LINT_READER_SAVE = wxNewId();
 const int ID_LINT_ERROR_PANEL = wxNewId();
 
+/**
+ * the maximum amount of errored files to tolerate.
+ * Any more files than this anf we risk having too
+ * many error instances in memory. Also, there is 
+ * way the user is going through every single file
+ */
+const int MAX_LINT_ERROR_FILES = 100;
+
 t4p::LintResultsEventClass::LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults)
 	: wxEvent(eventId, t4p::EVENT_LINT_ERROR) 
 	, LintResults(lintResults) {
@@ -231,12 +239,14 @@ void t4p::LintActionClass::IterateDirectory() {
 			newProgressWhole = 1;
 		}
 		SetPercentComplete(newProgressWhole);
+		if (ParserDirectoryWalker.WithErrors > MAX_LINT_ERROR_FILES) {
+			
+			// too many files with errors, something is not
+			// right, just exit so that we don't
+			// attempt to show the user thousands of errors
+			break;
+		}
 	}
-}
-
-void t4p::LintActionClass::LintTotals(int& totalFiles, int& errorFiles) {
-	totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
-	errorFiles = ParserDirectoryWalker.WithErrors;
 }
 
 wxString t4p::LintActionClass::GetLabel() const {
@@ -366,6 +376,11 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 	if (0 == ErrorFiles) {
 		this->Label->SetLabel(
 			wxString::Format(_("No errors found; checked %d files"), TotalFiles)
+		);
+	}
+	else if (ErrorFiles > MAX_LINT_ERROR_FILES) {
+		this->Label->SetLabel(
+			wxString::Format(_("Found more than %d files with errors; stopping lint check"), MAX_LINT_ERROR_FILES)
 		);
 	}
 	else {
