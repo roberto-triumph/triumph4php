@@ -192,10 +192,12 @@ if ($if) {
 			$type = RESOURCE_CLASS_CONSTANT;
 			$className = $extensions['class'];
 			$extensions['access'] = 'static';
+			$signature = $extensions['signature'];
 		}
 		else if ('p' == $kind) {
 			$type = RESOURCE_MEMBER;
 			$className = $extensions['class'];
+			$signature = $extensions['signature'];
 		}
 		// 'v' kind super global variables there is no type for them...
 		
