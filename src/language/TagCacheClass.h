@@ -343,6 +343,24 @@ public:
 	 * @return std::vector<t4p::TagClass> matched resources. will be either files or classes
 	 */
 	std::vector<t4p::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
+	
+	/**
+	 * prepares the given result against the global tag cache
+	 * 
+	 * @param result the statement to prepare
+	 * @param doLimit if TRUE the query will have a limit added to it
+	 * @return bool TRUE if the result was successfully prepared
+	 */
+	bool GlobalPrepare(t4p::SqliteResultClass& result, bool doLimit);
+	
+	/**
+	 * prepares the given result against the native tag cache
+	 * 
+	 * @param result the statement to execute
+	 * @param doLimit if TRUE the query will have a limit added to it
+	 * @return bool TRUE if the result was successfully prepared
+	 */
+	bool NativePrepare(t4p::SqliteResultClass& result, bool doLimit);
 
 	/**
 	 * gets all tags for a single class

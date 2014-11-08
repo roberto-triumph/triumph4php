@@ -180,7 +180,7 @@ void t4p::FileCabinetPanelClass::OnListItemActivated(wxListEvent& event) {
 	int fileCabinetItemId = (int) listItem.GetData();
 	
 	t4p::SingleFileCabinetResultClass result;
-	result.Init(fileCabinetItemId);
+	result.SetId(fileCabinetItemId);
 	bool found = SqliteFinder.Exec(&result);
 	if (found) {
 		

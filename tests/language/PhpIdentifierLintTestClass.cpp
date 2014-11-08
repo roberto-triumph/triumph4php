@@ -26,6 +26,7 @@
 #include <language/PhpIdentifierLintClass.h>
 #include <language/TagCacheClass.h>
 #include <language/TagFinderList.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
@@ -56,7 +57,7 @@ public:
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()
-	, Lint(TagCache) 
+	, Lint() 
 	, Results()
 	, HasError(false) {
 		Lint.SetVersion(pelet::PHP_53);
@@ -90,6 +91,7 @@ public:
 			tagFinderList->Walk(search);
 		}
 		TagCache.RegisterGlobal(tagFinderList);
+		Lint.Init(TagCache);
 	}
 };
 
@@ -390,14 +392,14 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
 	);
 
 	UnicodeString code = t4p::CharToIcu(
-		"  $a = new MyClass();\n"
+		"  $a = new \\MyClass();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
 	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
-	CHECK_UNISTR_EQUALS("MyClass", Results[0].Identifier);
+	CHECK_UNISTR_EQUALS("\\MyClass", Results[0].Identifier);
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
 }
 

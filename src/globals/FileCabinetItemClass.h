@@ -135,14 +135,22 @@ public:
 protected:
 
 	/**
-	 * prepare the statement by binding the sql result columns 
-	 * and adopting the statement
+	 * binds the sql result columns to this item
 	 * 
 	 * @param stmt the statement to execute; it must has 2 columns, file_cabinet_item_id and full_path
-	 * @param error string filled when there is a sql error
 	 * @return bool TRUE if statement was executed successfully
 	 */
-	bool ExchangeAdoptStatement(soci::statement* stmt, wxString& error);
+	void DoBind(soci::statement& stmt);
+	
+	
+	/**
+	 * binds the sql result columns to this item and executes
+	 * the statement
+	 * 
+	 * @param stmt the statement to execute; it must has 2 columns, file_cabinet_item_id and full_path
+	 * @return bool TRUE if statement was executed successfully
+	 */
+	bool BindAndExecute(soci::statement& stmt);
 	
 private:
 
@@ -170,15 +178,17 @@ class AllFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
 	public:
 
 	AllFileCabinetResultClass();
+
+protected:
 	
 	/**
-	 * build the SQL to query the file_cabinet table and execute it.
+	 * build the SQL to query the file_cabinet table and prepares it.
 	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param stmt the statement to prepare and bind input parameters to.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
-	bool Prepare(soci::session& session, bool doLimit);
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 };
 
 /**
@@ -195,16 +205,18 @@ class SingleFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
 	/**
 	 * @param int id the file_cabinet_id to search for
 	 */
-	void Init(int id);
+	void SetId(int id);
+
+protected:
 	
 	/**
-	 * build the SQL to query the file_cabinet table and execute it.
+	 * build the SQL to query the file_cabinet table and prepares it.
 	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param stmt the statement to prepare and bind input parameters to.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
-	bool Prepare(soci::session& session, bool doLimit);
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 	
 	
 private:
@@ -231,16 +243,18 @@ class FileCabinetExactSearchResultClass : public t4p::FileCabinetBaseResultClass
 	/**
 	 * @param string name the to search for
 	 */
-	void Init(const std::string& name);
+	void SetName(const std::string& name);
+
+protected:
 	
 	/**
-	 * build the SQL to query the file_cabinet table and execute it.
+	 * build the SQL to query the file_cabinet table and prepares it.
 	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param stmt the statement to prepare and bind input parameters to.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
-	bool Prepare(soci::session& session, bool doLimit);
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 	
 	
 private:
@@ -266,16 +280,18 @@ class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
 	/**
 	 * @param string name the to search for
 	 */
-	void Init(const std::string& name);
+	void SetName(const std::string& name);
+
+protected:
 	
 	/**
-	 * build the SQL to query the file_cabinet table and execute it.
+	 * build the SQL to query the file_cabinet table and prepares it.
 	 *
-	 * @param session the connection.  must be around for as long as this result is alive.
+	 * @param stmt the statement to prepare and bind input parameters to.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
 	 * @return bool subclasses should return TRUE if there is at least one result
 	 */
-	bool Prepare(soci::session& session, bool doLimit);
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 	
 	
 private:

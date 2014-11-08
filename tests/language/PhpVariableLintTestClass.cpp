@@ -58,7 +58,7 @@ public:
 	, PhpFileExtensions()
 	, MiscFileExtensions()
 	, Options()
-	, Lint(TagCache) 
+	, Lint() 
 	, Results()
 	, HasError(false) {
 		Options.Version = pelet::PHP_53;
@@ -72,6 +72,7 @@ public:
 		// and the tags get parsed from it
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 		BuildCache(true);
+		Lint.Init(TagCache);
 	
 		HasError = Lint.ParseString(code, Results);
 	}
@@ -549,8 +550,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 		"  myFunc(myFunc($a), myFunc2(myFunc3($x)));\n"
 		"}"
 	);
-	SetupFile(wxT("test.php"), t4p::IcuToWx(code));
-	BuildCache(true);
+	SetupFile(wxT("test.php"), t4p::IcuToWx(code));	
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);

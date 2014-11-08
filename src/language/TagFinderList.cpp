@@ -62,6 +62,7 @@ void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName,
 									   const std::vector<wxString>& miscFileExtensions,
 									   pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
+	wxASSERT_MSG(!TagDbSession, wxT("tag finder can only be initialized once"));
 	
 	// make sure to clone files and strings so
 	// that this cache object can be used
@@ -82,6 +83,7 @@ void t4p::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
 												 const std::vector<wxString>& miscFileExtensions,
 												 pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
+	wxASSERT_MSG(!TagDbSession, wxT("tag finder can only be initialized once"));
 	
 	// make sure to clone files and strings so
 	// that this cache object can be used
@@ -116,7 +118,9 @@ void t4p::TagFinderListClass::AdoptDetectorTag(soci::session* session) {
 }
 
 void t4p::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) {
-	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
+	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("native tag finder can only be initialized once"));
+	wxASSERT_MSG(!NativeDbSession, wxT("native tag finder can only be initialized once"));
+	
 	NativeDbSession = new soci::session;
 	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
 	if (IsNativeTagFinderInit) {
@@ -125,7 +129,9 @@ void t4p::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) 
 }
 
 void t4p::TagFinderListClass::AdoptNativeTag(soci::session* session) {
-	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("tag finder can only be initialized once"));
+	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("native tag finder can only be initialized once"));
+	wxASSERT_MSG(!NativeDbSession, wxT("native tag finder can only be initialized once"));
+	
 	IsNativeTagFinderInit = NULL != session;
 	NativeDbSession = session;
 	if (IsNativeTagFinderInit) {

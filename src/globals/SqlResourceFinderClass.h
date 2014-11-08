@@ -112,26 +112,34 @@ public:
 	 * set the (partial) name to lookup
 	 */
 	void SetLookup(const wxString& lookup, const std::string& connectionHash);
-		
-	/**
-	 * prepares and runs the query
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
+	
 	/**
 	 * get the next result. the result can be read from the
 	 * TableName, Connection members
 	 */
 	void Next();
+
+protected:
+		
+	/**
+	 * build the SQL to query for tables and bind the input
+	 * parameters.
+	 *
+	 * @param stmt the statement to prepare and bind input parameters to.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool TRUE if the statement was prepared
+	 *         successfully.  A false here means a connection failure or bad sql
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 * binds the statement result to
+	 * the class members
+	 */
+	void DoBind(soci::statement& stmt);
 	
 private:
 
-	/**
-	 * adopts the statement and binds the statement result to
-	 * the class members
-	 */
-	bool Init(soci::statement* stmt);
-	
 	std::string Lookup;
 	
 	std::string LookupEnd;
@@ -161,25 +169,33 @@ public:
 	 * set the (partial) name to lookup
 	 */
 	void SetLookup(const wxString& lookup, const std::string& connectionHash);
-		
-	/**
-	 * prepares and runs the query
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
+	
 	/**
 	 * get the next result. the result can be read from the
 	 * TableName, Connection members
 	 */
 	void Next();
 	
-private:
-
+protected:
+		
 	/**
-	 * adopts the statement and binds the statement result to
-	 * the class members
+	 * build the SQL to query for tables and bind the input
+	 * parameters.
+	 *
+	 * @param stmt the statement to prepare and bind input parameters to.
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 * @return bool TRUE if the statement was prepared
+	 *         successfully.  A false here means a connection failure or bad sql
 	 */
-	bool Init(soci::statement* stmt);
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 * binds the output columns to the TableName string instance
+	 * variable
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
 	
 	std::string Lookup;
 		
@@ -205,24 +221,26 @@ public:
 	void SetLookup(const wxString& lookup, const std::string& connectionHash);
 		
 	/**
-	 * prepares and runs the query
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
-	/**
 	 * get the next result. the result can be read from the
 	 * ColumnName member
 	 */
 	void Next();
 
-private:
+protected:
 
+	/**
+	 * prepares and binds the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
 	/**
 	 * adopts the statement and binds the statement result to
 	 * the class members
 	 */
-	bool Init(soci::statement* stmt);
-	
+	void DoBind(soci::statement& stmt);
+
+private:
+
 	std::string Lookup;
 	
 	std::string LookupEnd;

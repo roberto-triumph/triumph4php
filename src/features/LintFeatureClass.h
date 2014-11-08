@@ -146,7 +146,13 @@ public:
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass(t4p::TagCacheClass& tagCache, const t4p::LintFeatureOptionsClass& options);
+	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options);
+	
+	/**
+	 * initializes the linters  with the tag cache.  The linters use the
+	 * tag cache to lookup classes, functions, methods.
+	 */
+	void Init(t4p::TagCacheClass& tagCache);
 	
 	/**
 	 * This is the method where the parsing will take place. Will return true

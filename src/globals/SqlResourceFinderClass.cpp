@@ -264,7 +264,7 @@ void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const s
 	ConnectionHash = connectionHash;
 }
 
-bool t4p::SqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
@@ -284,29 +284,18 @@ bool t4p::SqlResourceTableResultClass::Prepare(soci::session& session, bool doLi
 		sql += "LIMIT 100";
 	}
 	
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
-	stmt->exchange(soci::use(Lookup));
-	stmt->exchange(soci::use(LookupEnd));
+	stmt.prepare(sql);
+	stmt.exchange(soci::use(Lookup));
+	stmt.exchange(soci::use(LookupEnd));
 	if (!ConnectionHash.empty()) {
-		stmt->exchange(soci::use(ConnectionHash));
+		stmt.exchange(soci::use(ConnectionHash));
 	}
-	return Init(stmt);
+	return true;
 }
 
-bool t4p::SqlResourceTableResultClass::Init(soci::statement* stmt) {
-	wxString error;
-	bool ret = false;
-	try {
-		stmt->exchange(soci::into(TableName));
-		stmt->exchange(soci::into(Connection));
-		
-		ret = AdoptStatement(stmt, error);
-	} catch (std::exception& e) {
-		error = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, error);
-	}
-	return ret;
+void t4p::SqlResourceTableResultClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(TableName));
+	stmt.exchange(soci::into(Connection));
 }
 
 void t4p::SqlResourceTableResultClass::Next() {
@@ -327,7 +316,7 @@ void t4p::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, co
 	ConnectionHash = connectionHash;
 }
 
-bool t4p::ExactSqlResourceTableResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::ExactSqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT table_name, connection_label ";
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name = ? ";
@@ -341,28 +330,17 @@ bool t4p::ExactSqlResourceTableResultClass::Prepare(soci::session& session, bool
 		sql += "LIMIT 100";
 	}
 	
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
-	stmt->exchange(soci::use(Lookup));
+	stmt.prepare(sql);
+	stmt.exchange(soci::use(Lookup));
 	if (!ConnectionHash.empty()) {
-		stmt->exchange(soci::use(ConnectionHash));
+		stmt.exchange(soci::use(ConnectionHash));
 	}
-	return Init(stmt);
+	return true;
 }
 
-bool t4p::ExactSqlResourceTableResultClass::Init(soci::statement* stmt) {
-	wxString error;
-	bool ret = false;
-	try {
-		stmt->exchange(soci::into(TableName));
-		stmt->exchange(soci::into(Connection));
-		
-		ret = AdoptStatement(stmt, error);
-	} catch (std::exception& e) {
-		error = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, error);
-	}
-	return ret;
+void t4p::ExactSqlResourceTableResultClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(TableName));
+	stmt.exchange(soci::into(Connection));
 }
 
 void t4p::ExactSqlResourceTableResultClass::Next() {
@@ -384,7 +362,7 @@ void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const 
 	ConnectionHash = connectionHash;
 }
 
-bool t4p::SqlResourceColumnResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::SqlResourceColumnResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
@@ -399,27 +377,16 @@ bool t4p::SqlResourceColumnResultClass::Prepare(soci::session& session, bool doL
 		sql += "LIMIT 100";
 	}
 	
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
-	stmt->exchange(soci::use(Lookup));
-	stmt->exchange(soci::use(LookupEnd));
-	stmt->exchange(soci::use(ConnectionHash));
+	stmt.prepare(sql);
+	stmt.exchange(soci::use(Lookup));
+	stmt.exchange(soci::use(LookupEnd));
+	stmt.exchange(soci::use(ConnectionHash));
 	
-	return Init(stmt);
+	return true;
 }
 
-bool t4p::SqlResourceColumnResultClass::Init(soci::statement* stmt) {
-	wxString error;
-	bool ret = false;
-	try {
-		stmt->exchange(soci::into(ColumnName));
-		
-		ret = AdoptStatement(stmt, error);
-	} catch (std::exception& e) {
-		error = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, error);
-	}
-	return ret;
+void t4p::SqlResourceColumnResultClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(ColumnName));
 }
 
 void t4p::SqlResourceColumnResultClass::Next() {

@@ -81,12 +81,19 @@ void t4p::PhpIdentifierLintResultClass::Copy(const t4p::PhpIdentifierLintResultC
 }
 
 
-t4p::PhpIdentifierLintClass::PhpIdentifierLintClass(t4p::TagCacheClass& tagCache)
+t4p::PhpIdentifierLintClass::PhpIdentifierLintClass()
 : ExpressionObserverClass()
 , Errors()
 , Parser() 
 , File()
-, TagCache(tagCache)
+, ClassLookup()
+, MethodLookup()
+, PropertyLookup()
+, FunctionLookup()
+, NativeClassLookup()
+, NativeMethodLookup()
+, NativePropertyLookup()
+, NativeFunctionLookup()
 , FoundClasses()
 , FoundMethods()
 , FoundProperties()
@@ -103,6 +110,17 @@ t4p::PhpIdentifierLintClass::PhpIdentifierLintClass(t4p::TagCacheClass& tagCache
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
 	Parser.SetFunctionObserver(this);
+}
+
+void t4p::PhpIdentifierLintClass::Init(t4p::TagCacheClass& tagCache) {
+	tagCache.GlobalPrepare(ClassLookup, true);
+	tagCache.GlobalPrepare(MethodLookup, true);
+	tagCache.GlobalPrepare(PropertyLookup, true);
+	tagCache.GlobalPrepare(FunctionLookup, true);
+	tagCache.NativePrepare(NativeClassLookup, true);
+	tagCache.NativePrepare(NativeMethodLookup, true);
+	tagCache.NativePrepare(NativePropertyLookup, true);
+	tagCache.NativePrepare(NativeFunctionLookup, true);
 }
 
 void t4p::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
@@ -127,7 +145,6 @@ bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 
 	AddMagicMethods(FoundMethods);
 	AddMagicMethods(FoundStaticMethods);
-	
 
 	File = t4p::WxToIcu(fileName.GetFullPath());
 	pelet::LintResultsClass lintResult;
@@ -431,16 +448,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			// testing for instance properties results in many false 
 			// positives when the analyzed code deals with serializing
 			// and unserializing data from strings (json_encode)
-			std::vector<t4p::TagClass> tags = TagCache.ExactProperty(prop.Name, prop.IsStatic);
-			if (tags.empty()) {
-				t4p::PhpIdentifierLintResultClass lintResult;
-				lintResult.File = File;
-				lintResult.LineNumber = var->LineNumber;
-				lintResult.Pos = var->Pos;
-				lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY;
-				lintResult.Identifier = prop.Name;
-				Errors.push_back(lintResult);
-			}
+			CheckPropertyName(prop, var);
 		}
 		
 	}
@@ -468,7 +476,8 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 	bool isUnknown = false;
 	bool foundInMap = false;
-	if (pos >= 0) {		
+	wxString error;
+	if (pos >= 0) {
 		functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
 	}
 	if (!unqualifiedName.isEmpty() && FoundFunctions.find(unqualifiedName) != FoundFunctions.end()) {
@@ -479,10 +488,12 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		isUnknown = true;
 		foundInMap = true;
 	}
-	else if (!unqualifiedName.isEmpty()) {
+	else if (!unqualifiedName.isEmpty() && NativeFunctionLookup.IsOk()) {
+	
 		// not found in our little cache. lookup in the big cache
-		t4p::TagResultClass* result = TagCache.ExactNativeTags(unqualifiedName);
-		if (result && !result->Empty()) {
+		NativeFunctionLookup.Set(unqualifiedName);
+		NativeFunctionLookup.ReExec(error);
+		if (NativeFunctionLookup.Found()) {
 			FoundFunctions[unqualifiedName] = 1;
 			isUnknown = false;
 			foundInMap = true;
@@ -490,9 +501,6 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		else {
 			NotFoundFunctions[unqualifiedName] = 1;
 			isUnknown = true;
-		}
-		if (result) {
-			delete result;
 		}
 	}
 	if (!foundInMap && !isUnknown) {
@@ -507,8 +515,20 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		}
 		else {
 			// not found in our little cache. lookup in the big cache
-			std::vector<t4p::TagClass> tags = TagCache.ExactFunction(functionName);
-			if (!tags.empty()) {
+			FunctionLookup.Set(functionName);
+			NativeFunctionLookup.Set(functionName);
+			FunctionLookup.ReExec(error);
+			wxASSERT_MSG(error.empty(), error);
+			
+			bool isFound = FunctionLookup.Found();
+			if (!isFound) {
+				wxString error;
+				NativeFunctionLookup.ReExec(error);
+				wxASSERT_MSG(error.empty(), error);
+				isFound = NativeFunctionLookup.Found();
+			}
+			
+			if (isFound) {
 				FoundFunctions[functionName] = 1;
 				isUnknown = false;
 			}
@@ -550,6 +570,7 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 	}
 
 	bool isUnknown = false;
+	wxString error;
 	// check out little cache, different maps depending on static vs instances methods
 	if (isStaticCall && FoundStaticMethods.find(methodProp.Name) != FoundStaticMethods.end()) {
 		isUnknown = false;
@@ -564,20 +585,30 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 		isUnknown = true;
 	}
 	else {
-		std::vector<t4p::TagClass> tags = TagCache.ExactMethod(methodProp.Name, isStaticCall);
-		if (!tags.empty() && !isStaticCall) {
+		bool found = false;
+		if (MethodLookup.IsOk()) {
+			MethodLookup.Set(methodProp.Name, isStaticCall);
+			MethodLookup.ReExec(error);
+			found = MethodLookup.Found();
+		}
+		if (!found && NativeMethodLookup.IsOk()) {
+			NativeMethodLookup.Set(methodProp.Name, isStaticCall);
+			NativeMethodLookup.ReExec(error);
+			found = NativeMethodLookup.Found();
+		}
+		if (found && !isStaticCall) {
 			FoundMethods[methodProp.Name] = 1;
 			isUnknown = false;
 		}
-		else if (tags.empty() && !isStaticCall) {
+		else if (!found && !isStaticCall) {
 			NotFoundMethods[methodProp.Name] = 1;
 			isUnknown = true;
 		}
-		else if (!tags.empty() && isStaticCall) {
+		else if (found && isStaticCall) {
 			FoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = false;
 		}
-		else if (tags.empty() && isStaticCall) {
+		else if (!found && isStaticCall) {
 			NotFoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = true;
 		}
@@ -609,6 +640,7 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 	}
 			
 	bool isUnknown = false;
+	wxString error;
 	
 	// check our internal class cache, if not found
 	// then query the tags db and cache the value
@@ -619,12 +651,22 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 		isUnknown = true;
 	}
 	else {
-		std::vector<t4p::TagClass> tags = TagCache.ExactProperty(propertyProp.Name, propertyProp.IsStatic);
-		if (!tags.empty() && propertyProp.IsStatic) {
+		bool found = false;
+		if (PropertyLookup.IsOk()) {
+			PropertyLookup.Set(propertyProp.Name, propertyProp.IsStatic);
+			PropertyLookup.ReExec(error);
+			found = PropertyLookup.Found();
+		}
+		if (!found && NativePropertyLookup.IsOk()) {
+			NativePropertyLookup.Set(propertyProp.Name, propertyProp.IsStatic);
+			NativePropertyLookup.ReExec(error);
+			found = NativePropertyLookup.Found();
+		}
+		if (found && propertyProp.IsStatic) {
 			FoundStaticProperties[propertyProp.Name] = 1;
 			isUnknown = false;
 		}
-		else if (tags.empty() && propertyProp.IsStatic) {
+		else if (!found && propertyProp.IsStatic) {
 			NotFoundStaticProperties[propertyProp.Name] = 1;
 			isUnknown = true;
 		}
@@ -657,12 +699,23 @@ void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className,
 		return;
 	}
 	bool isUnknown = false;
+	wxString error;
 	if (NotFoundClasses.find(className) != NotFoundClasses.end()) {
 		isUnknown = true;
 	}
 	else {
-		std::vector<t4p::TagClass> tags = TagCache.ExactClass(className);
-		if (tags.empty()) {
+		bool found = false;
+		if (ClassLookup.IsOk()) {
+			ClassLookup.Set(className);
+			ClassLookup.ReExec(error);
+			found = ClassLookup.Found();
+		}
+		if (!found && NativeClassLookup.IsOk()) {
+			NativeClassLookup.Set(className);
+			NativeClassLookup.ReExec(error);
+			found = NativeClassLookup.Found();
+		}
+		if (!found) {
 			isUnknown = true;
 			NotFoundClasses[className] = 1;
 		}

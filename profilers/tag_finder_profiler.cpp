@@ -28,6 +28,7 @@
 #include <language/SymbolTableClass.h>
 #include <language/TagCacheClass.h>
 #include <language/PhpVariableLintClass.h>
+#include <language/PhpIdentifierLintClass.h>
 #include <language/TagFinderList.h>
 #include <language/ParsedTagFinderClass.h>
 #include <search/DirectorySearchClass.h>
@@ -109,6 +110,7 @@ private:
 
 	t4p::PhpVariableLintOptionsClass Options;
 	t4p::PhpVariableLintClass Linter;
+	t4p::PhpIdentifierLintClass IdentifierLinter;
 };
 
 
@@ -392,19 +394,24 @@ VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCach
 	: WithErrors(0)
 	, WithNoErrors(0)
 	, Options()
-	, Linter(tagCache) {
+	, Linter() 
+	, IdentifierLinter() {
 	
 	Options.CheckGlobalScope = false;
 	Options.Version = pelet::PHP_54;
 	Linter.SetOptions(Options);
+	IdentifierLinter.SetVersion(pelet::PHP_54);
+	Linter.Init(tagCache);
+	IdentifierLinter.Init(tagCache);
 }
 
 bool VariableLinterWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		std::vector<t4p::PhpVariableLintResultClass> results;
+		std::vector<t4p::PhpIdentifierLintResultClass> identifierResults;
 		std::string stdFile(file.ToAscii());
-		if (Linter.ParseFile(wxFileName(file), results)) {
-			UFILE *out = u_finit(stdout, NULL, NULL);
+		UFILE *out = u_finit(stdout, NULL, NULL);
+		if (Linter.ParseFile(wxFileName(file), results)) {			
 			for (size_t i = 0; i < results.size(); ++i) {
 				u_fprintf(out, "unitialized variable `%S` on file %S around line %d\n", 
 					results[i].VariableName.getTerminatedBuffer(),
@@ -412,11 +419,24 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 					results[i].LineNumber);
 			
 			}
-			u_fclose(out);
-			WithErrors++;
+		}
+		if (IdentifierLinter.ParseFile(wxFileName(file), identifierResults)) {
+			for (size_t i = 0; i < identifierResults.size(); ++i) {
+				u_fprintf(out, "unknown %d `%S` on file %S around line %d\n", 
+					identifierResults[i].Type,
+					identifierResults[i].Identifier.getTerminatedBuffer(),
+					identifierResults[i].File.getTerminatedBuffer(),				
+					identifierResults[i].LineNumber);
+			}
+		}
+		
+		u_fclose(out);
+		
+		if (results.empty() && identifierResults.empty()) {
+			WithNoErrors++;
 		}
 		else {
-			WithNoErrors++;
+			WithErrors++;
 		}
 		return true;
 	}
@@ -428,8 +448,14 @@ void ProfileVariableLintOnLargeProject() {
 	t4p::DirectorySearchClass search;
 	t4p::TagCacheClass tagCache;
 	wxFileName nativeDbFileName = t4p::NativeFunctionsAsset();
+	wxFileName tagDbFileName("/home/roberto/.triumph4php/tags.db");
+	std::vector<wxString> phpFileExtensions;
+	phpFileExtensions.push_back(wxT("*.php"));
+	std::vector<wxString> miscFileExtensions;
+	
 	t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass();
 	tagFinderList->InitNativeTag(nativeDbFileName);
+	tagFinderList->InitGlobalTag(tagDbFileName, phpFileExtensions, miscFileExtensions, pelet::PHP_54);
 	tagCache.RegisterGlobal(tagFinderList);
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {

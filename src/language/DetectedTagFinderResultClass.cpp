@@ -31,23 +31,23 @@ t4p::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
 
 }
 
-bool t4p::DetectedTagTotalCountResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::DetectedTagTotalCountResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql;
 	sql += "SELECT COUNT(*) FROM detected_tags";
 
 	bool ret = false;
 	try {
-		soci::statement stmt = (session.prepare << sql, 
-			soci::into(TotalCount)
-		);
-		stmt.execute(true);
-		ret = true;
+		stmt.prepare(sql);
 	} catch (std::exception& e) {
 		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
 		wxASSERT_MSG(false, msg);
 	}
 	return ret;
+}
+
+void t4p::DetectedTagTotalCountResultClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(TotalCount));
 }
 
 void t4p::DetectedTagTotalCountResultClass::Next() {
@@ -79,26 +79,23 @@ t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
 	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
 }
 
-bool t4p::DetectedTagExactMemberResultClass::Init(soci::statement* stmt) {
+void t4p::DetectedTagExactMemberResultClass::DoBind(soci::statement&  stmt) {
 	wxString error;
-	bool ret = false;
 	try {
-		stmt->exchange(soci::into(Key));
-		stmt->exchange(soci::into(Type));
-		stmt->exchange(soci::into(ClassName));
-		stmt->exchange(soci::into(Identifier));
-		stmt->exchange(soci::into(ReturnType));
-		stmt->exchange(soci::into(NamespaceName));
-		stmt->exchange(soci::into(Signature));
-		stmt->exchange(soci::into(Comment));
-		stmt->exchange(soci::into(IsStatic));
-		
-		ret = AdoptStatement(stmt, error);
+		stmt.exchange(soci::into(Key));
+		stmt.exchange(soci::into(Type));
+		stmt.exchange(soci::into(ClassName));
+		stmt.exchange(soci::into(Identifier));
+		stmt.exchange(soci::into(ReturnType));
+		stmt.exchange(soci::into(NamespaceName));
+		stmt.exchange(soci::into(Signature));
+		stmt.exchange(soci::into(Comment));
+		stmt.exchange(soci::into(IsStatic));
+	
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
 	}
-	return ret;
 }
 
 void t4p::DetectedTagExactMemberResultClass::Next() {
@@ -129,7 +126,7 @@ void t4p::DetectedTagExactMemberResultClass::Set(const std::vector<UnicodeString
 	}
 }
 
-bool t4p::DetectedTagExactMemberResultClass::Prepare(soci::session &session, bool doLimit) {
+bool t4p::DetectedTagExactMemberResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
@@ -157,20 +154,19 @@ bool t4p::DetectedTagExactMemberResultClass::Prepare(soci::session &session, boo
 	if (doLimit) {
 		sql += " LIMIT 100";
 	}
-
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
+	
+	stmt.prepare(sql);
 
 	for (size_t i = 0; i < Keys.size(); i++) {
-		stmt->exchange(soci::use(Keys[i]));
+		stmt.exchange(soci::use(Keys[i]));
 	}
 	for (size_t i = 0; i < TagTypes.size(); i++) {
-		stmt->exchange(soci::use(TagTypes[i]));
+		stmt.exchange(soci::use(TagTypes[i]));
 	}
 	for (size_t i = 0; i < SourceDirectories.size(); i++) {
-		stmt->exchange(soci::use(SourceDirectories[i]));
+		stmt.exchange(soci::use(SourceDirectories[i]));
 	}
-	return Init(stmt);
+	return true;
 }
 
 t4p::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass() 
@@ -195,7 +191,7 @@ void t4p::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeSt
 	}
 }
 
-bool t4p::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session, bool doLimit) {
+bool t4p::DetectedTagNearMatchMemberResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql;
 	sql += "SELECT key, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static ";
 	sql += "FROM detected_tags LEFT JOIN sources ON (sources.source_id = detected_tags.source_id) WHERE ";
@@ -230,17 +226,16 @@ bool t4p::DetectedTagNearMatchMemberResultClass::Prepare(soci::session &session,
 		sql += " LIMIT 100";
 	}
 
-	soci::statement* stmt = new soci::statement(session);
-	stmt->prepare(sql);
+	stmt.prepare(sql);
 
 	for (size_t i = 0; i < Keys.size(); i++) {
-		stmt->exchange(soci::use(Keys[i]));
+		stmt.exchange(soci::use(Keys[i]));
 	}
 	for (size_t i = 0; i < TagTypes.size(); i++) {
-		stmt->exchange(soci::use(TagTypes[i]));
+		stmt.exchange(soci::use(TagTypes[i]));
 	}
 	for (size_t i = 0; i < SourceDirectories.size(); i++) {
-		stmt->exchange(soci::use(SourceDirectories[i]));
+		stmt.exchange(soci::use(SourceDirectories[i]));
 	}
-	return Init(stmt);
+	return true;
 }

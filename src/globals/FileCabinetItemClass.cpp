@@ -121,11 +121,9 @@ t4p::FileCabinetBaseResultClass::FileCabinetBaseResultClass()
 
 }
 
-bool t4p::FileCabinetBaseResultClass::ExchangeAdoptStatement(soci::statement* stmt, wxString& error) {
-	stmt->exchange(soci::into(Id));
-	stmt->exchange(soci::into(FullPath));
-
-	return AdoptStatement(stmt, error);
+void t4p::FileCabinetBaseResultClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(Id));
+	stmt.exchange(soci::into(FullPath));
 }
 
 
@@ -157,7 +155,7 @@ t4p::AllFileCabinetResultClass::AllFileCabinetResultClass()
 	
 }
 
-bool t4p::AllFileCabinetResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items ORDER BY file_cabinet_item_id";
 	if (doLimit) {
 		sql += " LIMIT 100";
@@ -166,10 +164,8 @@ bool t4p::AllFileCabinetResultClass::Prepare(soci::session& session, bool doLimi
 	wxString error;
 	bool good = false;
 	try {
-		soci::statement* stmt = new soci::statement(session);
-		stmt->prepare(sql);	
-		
-		good = ExchangeAdoptStatement(stmt, error);
+		stmt.prepare(sql);
+		good = true;
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);
@@ -183,22 +179,19 @@ t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass()
 	
 }
 
-void t4p::SingleFileCabinetResultClass::Init(int id) {
+void t4p::SingleFileCabinetResultClass::SetId(int id) {
 	QueryId = id;
 }
 
-bool t4p::SingleFileCabinetResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::SingleFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items WHERE file_cabinet_item_id = ?";
 
 	wxString error;
 	bool good = false;
 	try {
-		soci::statement* stmt = new soci::statement(session);
-		stmt->prepare(sql);
-		
-		stmt->exchange(soci::use(QueryId));
-		
-		good = ExchangeAdoptStatement(stmt, error);
+		stmt.prepare(sql);
+		stmt.exchange(soci::use(QueryId));
+		good = true;
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);
@@ -212,11 +205,11 @@ t4p::FileCabinetExactSearchResultClass::FileCabinetExactSearchResultClass()
 	
 }
 
-void t4p::FileCabinetExactSearchResultClass::Init(const std::string& name) {
+void t4p::FileCabinetExactSearchResultClass::SetName(const std::string& name) {
 	Name = name;
 }
 
-bool t4p::FileCabinetExactSearchResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::FileCabinetExactSearchResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items WHERE name = ?";
 	if (doLimit) {
 		sql += " LIMIT 100";
@@ -225,12 +218,9 @@ bool t4p::FileCabinetExactSearchResultClass::Prepare(soci::session& session, boo
 	wxString error;
 	bool good = false;
 	try {
-		soci::statement* stmt = new soci::statement(session);
-		stmt->prepare(sql);
-		
-		stmt->exchange(soci::use(Name));
-		
-		good = ExchangeAdoptStatement(stmt, error);
+		stmt.prepare(sql);
+		stmt.exchange(soci::use(Name));
+		good = true;
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);
@@ -244,11 +234,11 @@ t4p::FileCabinetNearMatchResultClass::FileCabinetNearMatchResultClass()
 	
 }
 
-void t4p::FileCabinetNearMatchResultClass::Init(const std::string& name) {
+void t4p::FileCabinetNearMatchResultClass::SetName(const std::string& name) {
 	Name = name;
 }
 
-bool t4p::FileCabinetNearMatchResultClass::Prepare(soci::session& session, bool doLimit) {
+bool t4p::FileCabinetNearMatchResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string escaped = t4p::SqliteSqlLikeEscape(Name, '^');
 	escaped = "'%" + escaped + "%'";
 	
@@ -261,10 +251,8 @@ bool t4p::FileCabinetNearMatchResultClass::Prepare(soci::session& session, bool 
 	wxString error;
 	bool good = false;
 	try {
-		soci::statement* stmt = new soci::statement(session);
-		stmt->prepare(sql);
-		
-		good = ExchangeAdoptStatement(stmt, error);
+		stmt.prepare(sql);
+		good = true;
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);

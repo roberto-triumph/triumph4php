@@ -27,7 +27,9 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <globals/String.h>
+#include <globals/Sqlite.h>
 #include <wx/filename.h>
 
 namespace t4p {
@@ -98,7 +100,16 @@ class PhpIdentifierLintClass :
 
 public:
 
-	PhpIdentifierLintClass(t4p::TagCacheClass& tagCache);
+	PhpIdentifierLintClass();
+	
+	/**
+	 * prepares the internal cache used for function lookups. This needs
+	 * to be called before any file is checked.
+	 * the tag cache is used to lookup function, class, method or property
+	 * names
+	 * @param tagCache the tag dbs
+	 */
+	void Init(t4p::TagCacheClass& tagCache);
 
 	/**
 	 * Set the version that the PHP parser should use. This method should be
@@ -122,6 +133,10 @@ public:
 	 */
 	bool ParseString(const UnicodeString& code, std::vector<t4p::PhpIdentifierLintResultClass>& errors);
 
+	// these methods are callbacks from the parser
+	// whenever we see an expression or statement, we 
+	// will check it to see if it contains undefined
+	// variables
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 
@@ -192,8 +207,20 @@ private:
 
 	/**
 	 * used to lookup classes, functions, methods
+	 * use this to lookup into the tag cache
+	 * we keep an instance stored as a class
+	 * variable so that we prepare the statement once
+	 * during the time we parse the ENTIRE set 
+	 * of files
 	 */
-	t4p::TagCacheClass& TagCache;
+	t4p::ClassLookupClass ClassLookup;
+	t4p::MethodLookupClass MethodLookup;
+	t4p::PropertyLookupClass PropertyLookup;
+	t4p::FunctionLookupClass FunctionLookup;
+	t4p::ClassLookupClass NativeClassLookup;
+	t4p::MethodLookupClass NativeMethodLookup;
+	t4p::PropertyLookupClass NativePropertyLookup;
+	t4p::FunctionLookupClass NativeFunctionLookup;
 
 	/**
 	 * caching results of methods and function lookups, will 
@@ -240,14 +267,42 @@ private:
 	 *        created and appended to the Errors vector.
 	 */
 	void CheckArrayDefinition(pelet::ArrayExpressionClass* expr);
-
-	void CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var);
-
+	
+	/**
+	 * lookup the class name in the tag cache; if it is not found
+	 * then add an error
+	 * @param className the name of the class to look up,
+	 * @param expression the parent expression, used to get line number to populate the
+	 *        error string
+	 */
+	void CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression);
+	
+	/**
+	 * lookup the method in the tag cache; if it is not found
+	 * then add an error
+	 * @param methodProp the name of the method to look up,
+	 * @param var the parent variable expression, used to get line number to populate the
+	 *        error string
+	 */
 	void CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var);
 
+	/**
+	 * lookup the property in the tag cache; if it is not found
+	 * then add an error
+	 * @param propertyProp the name of the function to look up,
+	 * @param var the parent variable expression, used to get line number to populate the
+	 *        error string
+	 */
 	void CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var);
 
-	void CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression);
+	/**
+	 * lookup the function in the tag cache; if it is not found
+	 * then add an error
+	 * @param functionProp the name of the function to look up,
+	 * @param var the parent variable expression, used to get line number to populate the
+	 *        error string
+	 */
+	void CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var);
 
 };
 

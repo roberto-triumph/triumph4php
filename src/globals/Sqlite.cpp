@@ -154,8 +154,13 @@ void t4p::SqliteFinderClass::ClearSession() {
 	Session = NULL;
 }
 
+bool t4p::SqliteFinderClass::Prepare(t4p::SqliteResultClass* result, bool doLimit) {
+	bool ret = result->Init(*Session, doLimit);
+	return ret;
+}
+
 bool t4p::SqliteFinderClass::Exec(t4p::SqliteResultClass* result) {
-	bool ret = result->Prepare(*Session, true);
+	bool ret = result->Exec(*Session, true);
 	return ret;
 }
 
@@ -164,7 +169,8 @@ bool t4p::SqliteFinderClass::IsInit() const {
 }
 
 t4p::SqliteResultClass::SqliteResultClass() 
-: IsEmpty(true) {
+: IsEmpty(true) 
+, IsFetched(false) {
 	Stmt = NULL;
 }
 
@@ -172,41 +178,48 @@ t4p::SqliteResultClass::~SqliteResultClass() {
 	if (Stmt) {
 		delete Stmt;
 	}
-}	
-
-bool t4p::SqliteResultClass::Empty() const {
-	return IsEmpty;
 }
 
-bool t4p::SqliteResultClass::More() const {
-	return !IsEmpty && NULL != Stmt;
+bool t4p::SqliteResultClass::Init(soci::session& session, bool doLimit) {
+	bool good = false;
+	try {
+		soci::statement* stmt = new soci::statement(session);
+		Stmt = stmt;
+		DoPrepare(*stmt, doLimit);
+		DoBind(*stmt);
+		Stmt->define_and_bind();
+		good = true;
+		
+	} catch (std::exception& exception) {
+		
+	}
+	return good;
 }
 
-bool t4p::SqliteResultClass::Fetch() {
+bool t4p::SqliteResultClass::IsOk() const {
+	return Stmt != NULL;
+}
+
+bool t4p::SqliteResultClass::Exec(soci::session& session, bool doLimit) {
+	bool prepped = Stmt != NULL;
 	if (!Stmt) {
+		prepped = Init(session, doLimit);
+	}
+	if (!prepped) {
 		return false;
 	}
-	bool more = Stmt->fetch();
-	if (!more) {
-		delete Stmt;
-		Stmt = NULL;
-	}
-	return more;
-}
 
-bool t4p::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& error)  {
-	Stmt = stmt;
 	IsEmpty = true;
+	IsFetched = false;
+	wxString error;
 	try {
-		Stmt->define_and_bind();
 		bool hasData = Stmt->execute(true);
 		if (hasData) {
 			IsEmpty = false;
 		}
 		else {
 			IsEmpty = true;
-			delete Stmt;
-			Stmt = NULL;
+			IsFetched = true;
 		}
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what()); 
@@ -215,4 +228,46 @@ bool t4p::SqliteResultClass::AdoptStatement(soci::statement* stmt, wxString& err
 		Stmt = NULL;
 	}
 	return !IsEmpty;
+}
+
+bool t4p::SqliteResultClass::Empty() const {
+	return IsEmpty;
+}
+
+bool t4p::SqliteResultClass::More() const {
+	return !IsEmpty && !IsFetched;
+}
+
+bool t4p::SqliteResultClass::Fetch() {
+	if (!Stmt || IsFetched) {
+		return false;
+	}
+	bool more = Stmt->fetch();
+	if (!more) {
+		IsFetched = true;
+	}
+	return more;
+}
+
+bool t4p::SqliteResultClass::ReExec(wxString& error)  {
+	IsEmpty = true;
+	IsFetched = false;
+	if (!Stmt) {
+		return false;
+	}
+	try {
+		bool hasData = Stmt->execute(true);
+		if (hasData) {
+			IsEmpty = false;
+		}
+		else {
+			IsEmpty = true;
+		}
+	} catch (std::exception& e) {
+		error = t4p::CharToWx(e.what()); 
+		wxASSERT_MSG(false, error);
+		delete Stmt;
+		Stmt = NULL;
+	}
+	return IsEmpty;
 }

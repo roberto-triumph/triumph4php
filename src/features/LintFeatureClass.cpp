@@ -71,19 +71,24 @@ wxEvent* t4p::LintResultsSummaryEventClass::Clone() const {
 }
 
 
-t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(t4p::TagCacheClass& tagCache, const t4p::LintFeatureOptionsClass& options) 
+t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options) 
 : WithErrors(0)
 , WithNoErrors(0) 
 , Options(options)
 , Parser() 	
 , VariableLinterOptions()
-, VariableLinter(tagCache)
-, IdentifierLinter(tagCache)
+, VariableLinter()
+, IdentifierLinter()
 , LastResults()
 , VariableResults()
 , IdentifierResults()
 {
 	VariableLinterOptions.CheckGlobalScope = Options.CheckGlobalScopeVariables;
+}
+
+void t4p::ParserDirectoryWalkerClass::Init(t4p::TagCacheClass& tagCache) {
+	VariableLinter.Init(tagCache);
+	IdentifierLinter.Init(tagCache);
 }
 
 void t4p::ParserDirectoryWalkerClass::ResetTotals() {
@@ -177,7 +182,7 @@ t4p::LintActionClass::LintActionClass(t4p::RunningThreadsClass& runningThreads,
 																		const t4p::LintFeatureOptionsClass& options)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
-	, ParserDirectoryWalker(TagCache, options)
+	, ParserDirectoryWalker(options)
 	, Sources()
 	, Search()
 	, FilesCompleted(0) 
@@ -192,6 +197,7 @@ bool t4p::LintActionClass::InitDirectoryLint(std::vector<t4p::SourceClass> sourc
 	TagCache.RegisterDefault(globals);
 	ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
 	ParserDirectoryWalker.ResetTotals();
+	ParserDirectoryWalker.Init(TagCache);
 	
 	SetStatus(_("Lint Check"));
 	SetProgressMode(t4p::ActionClass::DETERMINATE);
@@ -259,7 +265,7 @@ t4p::LintBackgroundSingleFileClass::LintBackgroundSingleFileClass(t4p::RunningTh
 	: ActionClass(runningThreads, eventId)
 	, FileName()
 	, TagCache()
-	, ParserDirectoryWalker(TagCache, options) {
+	, ParserDirectoryWalker(options) {
 		
 }
 
@@ -273,6 +279,7 @@ bool t4p::LintBackgroundSingleFileClass::Init(const wxFileName& fileName, t4p::G
 		TagCache.RegisterDefault(globals);
 		ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
 		ParserDirectoryWalker.ResetTotals();
+		ParserDirectoryWalker.Init(TagCache);
 		good = true;
 	}
 	return good;

@@ -240,7 +240,7 @@ public:
 	int GetLineNumber() const;
 	
 	/**
-	 * Returns the tag type that was given in the Prepare() methods. 
+	 * Returns the tag type that was given in the Exec() methods. 
 	 * @return ResourceTypes
 	 */
 	TagSearchClass::ResourceTypes GetResourceType() const;
@@ -327,12 +327,6 @@ public:
 
 	TagResultClass();
 
-	/**
-	 * @param stmt this object will own the statement pointer
-	 * @return bool TRUE if there is at least one result
-	 */
-	bool Init(soci::statement* stmt);
-
 	// TODO: remove this method
 	std::vector<t4p::TagClass> Matches();
 
@@ -344,6 +338,11 @@ public:
 
 protected:
 
+	/**
+	 * bind the sql columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
 	// variables to bind to the statement
 	int Id;
 	int FileTagId;
@@ -377,14 +376,6 @@ public:
 	FileTagResultClass();
 
 	/**
-	 * in this method subclasses will build the SQL and execute it.
-	 *
-	 * @param session the connection
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
-	/**
 	 * @param filePart the file name to search for
 	 */
 	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
@@ -398,6 +389,21 @@ public:
 	 * resulting row.
 	 */
 	void Next();
+
+protected:
+
+	/**
+	 * this method builds the SQL and prepares it.
+	 *
+	 * @param stmt the statement to prepare
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+
+	/**
+	 * bind the sql columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
 
 private:
 
@@ -443,15 +449,6 @@ public:
 	t4p::TraitTagClass TraitTag;
 
 	TraitTagResultClass();
-
-	/**
-	 * in this method subclasses will build the SQL and execute it.
-	 *
-	 * @param session the connection
-	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 */
-	bool Prepare(soci::session& session, bool doLimit);
-
 	/**
 	 * @param classNames the class names that we want to search for, can be either class names
 	 *                   or fully qualified class names
@@ -468,6 +465,21 @@ public:
 	 */
 	void Next();
 
+protected:
+
+	/**
+	 * build the SQL and prepare it.
+	 *
+	 * @param stmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
 private:
 
 	/**
@@ -508,11 +520,11 @@ public:
 
 	ExactMemberTagResultClass();
 
-	bool Prepare(soci::session& session, bool doLimit);
-	
 	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
 protected:
+
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	std::vector<std::string> Keys;
 
@@ -529,7 +541,9 @@ public:
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
-	bool Prepare(soci::session& session, bool doLimit);
+protected:
+
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 private:
 
@@ -539,6 +553,405 @@ private:
 	// if set, matches will be restricted to this file
 	int FileItemId;
 };
+
+/**
+ * A class that we use to query the tag cache 
+ * to see if a function exists. This is to be used when
+ * needing to do many function lookups; as you can just
+ * prepare the query once and execute it over and over again.
+ * Note that this lookup class does not fetch any strings
+ * from the db, thereby preventing memory allocations.
+ */
+class FunctionLookupClass : public t4p::SqliteResultClass {
+	
+public:
+	
+	FunctionLookupClass();
+	
+	/**
+	 *  Set the function to lookup
+	 */
+	void Set(const UnicodeString& functionName);
+	
+	bool Found();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the function was found in the cache
+	 */
+	void Next();
+	
+private:
+
+	/**
+	 *  bound to the prepared statement as an input 
+	 */
+	std::string FunctionName;
+	int TagType;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+};
+
+/**
+ * A class that we use to query the tag cache 
+ * to see if a class exists. This is to be used when
+ * needing to do many class name lookups; as you can just
+ * prepare the query once and execute it over and over again.
+ * Note that this lookup class does not fetch any strings
+ * from the db, thereby preventing memory allocations.
+ */
+class ClassLookupClass : public t4p::SqliteResultClass {
+	
+public:
+	
+	ClassLookupClass();
+	
+	/**
+	 * Set the name to lookup. The name can be fully qualified with 
+	 * a namespace or not.
+	 * 
+	 * @param className the class name to lookup. 
+	 */
+	void Set(const UnicodeString& className);
+	
+	/**
+	 * @return boolean if TRUE it means that the class was found by the last call
+	 * to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the class was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 *  bound to the prepared statement as an input 
+	 */
+	std::string ClassName;
+	int TagType;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+};
+
+/**
+ * A class that we use to query the tag cache 
+ * to see if a method exists. This is to be used when
+ * needing to do many method lookups; as you can just
+ * prepare the query once and execute it over and over again.
+ * Note that this lookup class does not fetch any strings
+ * from the db, thereby preventing memory allocations.
+ */
+class MethodLookupClass : public t4p::SqliteResultClass {
+	
+public:
+	
+	MethodLookupClass();
+	
+	/**
+	 * Set the method name to lookup. Note that this class will search 
+	 * for a method across ALL classes
+	 * 
+	 * @param methodName the method name (only, not including the class name) to look up
+	 * @param isStatic TRUE if only static methods should be searched
+	 */
+	void Set(const UnicodeString& methodName, bool isStatic);
+	
+	/**
+	 * @return boolean if TRUE it means that the method was found by the last call
+	 * to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the method was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 * bound to the prepared statement as an input 
+	 * see comment in DoPrepare for the reasoning
+	 * behing there being IsStaticTrue and IsStaticFalse
+	 */
+	std::string MethodName;
+	int TagType;
+	int IsStaticTrue;
+	int IsStaticFalse;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+};
+
+/**
+ * A class that we use to query the tag cache 
+ * to see if a property exists. This is to be used when
+ * needing to do many property lookups; as you can just
+ * prepare the query once and execute it over and over again.
+ * Note that this lookup class does not fetch any strings
+ * from the db, thereby preventing memory allocations.
+ */
+class PropertyLookupClass : public t4p::SqliteResultClass {
+	
+public:
+	
+	PropertyLookupClass();
+	
+	/**
+	 * Set the property name to lookup. Note that all properties across ALL classes
+	 * are searched.
+	 * 
+	 * @param methodName the property name to look up
+	 * @param isStatic TRUE if only static properties should be searched.
+	 */
+	void Set(const UnicodeString& propertyName, bool isStatic);
+	
+	/**
+	 * @return boolean if TRUE it means that the property was found by the last call
+	 * to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the property was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 * bound to the prepared statement as an input 
+	 * see comment in DoPrepare for the reasoning
+	 * behing there being IsStaticTrue and IsStaticFalse
+	 */
+	std::string PropertyName;
+	int TagTypeMember;
+	int TagTypeConstant;
+	int IsStaticTrue;
+	int IsStaticFalse;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+};
+
+/**
+ * A class that we use to query the tag cache 
+ * for a function's signature. Only looks up
+ * functions, not methods. This is to be used when
+ * needing to do many function lookups; as you can just
+ * prepare the query once and execute it over and over again
+ */
+class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
+	
+public:
+
+	/**
+	 * the function;s signature that was found in the db
+	 */
+	UnicodeString Signature;
+	
+	FunctionSignatureLookupClass();
+	
+	/**
+	 *  Set the function to lookup
+	 */
+	void Set(const UnicodeString& functionName);
+	
+	/**
+	 * @return bool TRUE if the signature was found
+	 * by the last call to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the function was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 *  bound to the prepared statement as an input 
+	 */
+	std::string FunctionName;
+	int TagType;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+	
+	/**
+	 * bound to the prepared statment as an output
+	 */
+	std::string StdSignature;
+};
+
+
+/**
+ * A class that we use to query the tag cache 
+ * for a method's signature. Only looks up
+ * methods, not functions. This is to be used when
+ * needing to do many method lookups; as you can just
+ * prepare the query once and execute it over and over again
+ */
+class MethodSignatureLookupClass : public t4p::SqliteResultClass {
+	
+public:
+
+	/**
+	 * the method's signature that was found in the db
+	 */
+	UnicodeString Signature;
+	
+	MethodSignatureLookupClass();
+	
+	/**
+	 *  Set the function to lookup
+	 * @param methodName fully qualified class '::' method name
+	 * @params isStatic if TRUE only static methods will be searched
+	 */
+	void Set(const UnicodeString& methodName, bool isStatic);
+	
+	/**
+	 * @return bool TRUE if the method was found
+	 *         by the last call to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the function was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 *  bound to the prepared statement as an input 
+	 */
+	std::string MethodName;
+	int IsStatic;
+	int TagType;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+	
+	/**
+	 * bound to the prepared statment as an output
+	 */
+	std::string StdSignature;
+};
+
 
 /**
  * The ParsedTagFinderClass is used to locate source code artifacts (classes, functions, methods, and files). The 

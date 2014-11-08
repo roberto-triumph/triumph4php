@@ -38,10 +38,10 @@
  * @param argIndex the argument to check. 0 == first argument
  * @return bool if TRUE, argument argIndex is passed by reference
  */
-static bool IsFunctionArgumentByReference(const t4p::TagClass& tag, int argIndex) {
+static bool IsFunctionArgumentByReference(const UnicodeString& signature, int argIndex) {
 	bool isRef = false;
-	int32_t start = tag.Signature.indexOf('(');
-	int32_t next = tag.Signature.indexOf(',', start);
+	int32_t start = signature.indexOf('(');
+	int32_t next = signature.indexOf(',', start);
 	int arg = 0;
 	while (next >= 0) {
 		if (arg == argIndex) {
@@ -49,7 +49,7 @@ static bool IsFunctionArgumentByReference(const t4p::TagClass& tag, int argIndex
 			// this is the argument that we want to 
 			// check
 			UnicodeString variable;
-			tag.Signature.extract(start, (next - start + 1), variable);
+			signature.extract(start, (next - start + 1), variable);
 			if (variable.indexOf('&') >= 0) {
 				isRef = true;
 			}
@@ -61,65 +61,14 @@ static bool IsFunctionArgumentByReference(const t4p::TagClass& tag, int argIndex
 		
 		// find the end of the next variable
 		start = next;
-		next = tag.Signature.indexOf(',', start + 1);
+		next = signature.indexOf(',', start + 1);
 		if (next < 0) {
 			
 			// last argument, look for the ending )
-			next = tag.Signature.indexOf(')', next + 1);
+			next = signature.indexOf(')', next + 1);
 		}
 	}	
 	return isRef;
-}
-
-/**
- * @param functionName the function or method to look up. If its a function, it 
- *        needs to be a fully qualified function name.
- * @param isMethod TRUE if the search should be restricted to methods (from all classes)
- * @param isStatic TRUE if the search should be restriced to static methods ('::')
- * @param functionTag the TagClass that was found; will contain the function signature
- * @return bool TRUE if functionName was found ONLY ONCE in the tag cache
- */
-static bool LookupFunction(t4p::TagCacheClass& tagCache, const UnicodeString& functionName, bool isMethod, bool isStatic, t4p::TagClass& functionTag) {
-	bool found = false;
-	std::vector<t4p::TagClass> matches;
-	if (!isMethod) {
-		matches = tagCache.ExactFunction(functionName);
-		if (matches.size() == 1) {
-			functionTag = matches[0];
-			found = true;
-		}
-	}
-	else {
-		matches = tagCache.ExactMethod(functionName, isStatic);
-		if (matches.size() == 1) {
-			functionTag = matches[0];
-			found = true;
-		}
-	}
-	if (!found) {
-		
-		// as a last resort, check to see if this is a native function
-		// in PHP, native functions do not need to be fully qualified
-		UnicodeString unqualifiedName;
-		t4p::TagResultClass* result = NULL;
-		int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
-		if (pos >= 0) {		
-			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
-			result = tagCache.ExactNativeTags(unqualifiedName);
-		}
-		else {
-			result = tagCache.ExactNativeTags(functionName);
-		}
-		if (result) {
-			matches = result->Matches();			
-			delete result;
-		}
-		if (matches.size() == 1) {
-			functionTag = matches[0];
-			found = true;
-		}
-	}
-	return found;
 }
 
 t4p::PhpVariableLintResultClass::PhpVariableLintResultClass()
@@ -176,10 +125,9 @@ t4p::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass()
 
 }
 
-t4p::PhpVariableLintClass::PhpVariableLintClass(t4p::TagCacheClass& tagCache)
+t4p::PhpVariableLintClass::PhpVariableLintClass()
 : ExpressionObserverClass()
 , Errors()
-, TagCache(tagCache)
 , ScopeVariables()
 , PredefinedVariables()
 , HasExtractCall(false)
@@ -187,7 +135,10 @@ t4p::PhpVariableLintClass::PhpVariableLintClass(t4p::TagCacheClass& tagCache)
 , HasIncludeCall(false)
 , Parser() 
 , Options()
-, File() {
+, File() 
+, FunctionSignatureLookup()
+, MethodSignatureLookup()
+, NativeFunctionSignatureLookup() {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
@@ -212,6 +163,12 @@ t4p::PhpVariableLintClass::PhpVariableLintClass(t4p::TagCacheClass& tagCache)
 	for (int i = 0; i < 14; ++i) {
 		PredefinedVariables[variables[i]] = 1;
 	}
+}
+
+void t4p::PhpVariableLintClass::Init(t4p::TagCacheClass& tagCache) {
+	tagCache.GlobalPrepare(FunctionSignatureLookup, true);
+	tagCache.GlobalPrepare(MethodSignatureLookup, true);
+	tagCache.NativePrepare(NativeFunctionSignatureLookup, true);
 }
 
 void t4p::PhpVariableLintClass::SetOptions(const t4p::PhpVariableLintOptionsClass& options) {
@@ -536,6 +493,69 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentL
 	}
 }
 
+/**
+ * @param functionName the function or method to look up. If its a function, it 
+ *        needs to be a fully qualified function name.
+ * @param isMethod TRUE if the search should be restricted to methods (from all classes)
+ * @param isStatic TRUE if the search should be restriced to static methods ('::')
+ * @param functionTag the TagClass that was found; will contain the function signature
+ * @return bool TRUE if functionName was found ONLY ONCE in the tag cache
+ */
+bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const UnicodeString& functionName, bool isMethod, bool isStatic) {
+	bool found = false;
+	
+	// calling IsOk() on the lookup classes to account for the possibility of
+	// them not being initialized; only really occurs during unit tests
+	// since some unit tests dont create sqlite dbs
+	wxString error;
+	if (!isMethod) {		
+		FunctionSignatureLookup.Set(functionName);
+		FunctionSignatureLookup.ReExec(error);
+		if (FunctionSignatureLookup.IsOk() && FunctionSignatureLookup.Found()) {
+			FunctionSignatureLookup.Next();
+			signature =  FunctionSignatureLookup.Signature;
+			found = true;
+		}
+	}
+	else if (MethodSignatureLookup.IsOk()) {
+		MethodSignatureLookup.Set(functionName, isStatic);
+		MethodSignatureLookup.ReExec(error);
+		if (MethodSignatureLookup.Found()) {
+			MethodSignatureLookup.Next();
+			signature =  MethodSignatureLookup.Signature;
+			found = true;
+		}
+	}
+	if (!found && NativeFunctionSignatureLookup.IsOk()) {
+		
+		// as a last resort, check to see if this is a native function
+		// in PHP, native functions do not need to be fully qualified
+		UnicodeString unqualifiedName;
+		bool hasSet = false;
+		int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+		if (pos >= 0) {		
+			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
+			NativeFunctionSignatureLookup.Set(unqualifiedName);
+			hasSet = true;
+			
+		}
+		else {
+			NativeFunctionSignatureLookup.Set(functionName);
+			hasSet = true;
+		}
+		if (hasSet) {
+			NativeFunctionSignatureLookup.ReExec(error);
+			if (NativeFunctionSignatureLookup.Found()) {
+				NativeFunctionSignatureLookup.Next();
+				signature = NativeFunctionSignatureLookup.Signature;
+				found = true;
+			}
+		}
+	}
+	return found;
+}
+
+
 void t4p::PhpVariableLintClass::CheckExpression(pelet::ExpressionClass* expr) {
 	switch (expr->ExpressionType) {
 	case pelet::ExpressionClass::ARRAY:
@@ -653,9 +673,9 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	// need to check all of them
 	for (size_t i = 0; i < var->ChainList.size(); ++i) {
 		if (var->ChainList[i].IsFunction) {
-			t4p::TagClass functionTag;
+			UnicodeString functionSignature;
 			bool isMethod = i > 0;
-			bool foundFunctionTag = LookupFunction(TagCache, var->ChainList[i].Name, isMethod, var->ChainList[i].IsStatic, functionTag);
+			bool foundFunctionTag = LookupSignature(functionSignature, var->ChainList[i].Name, isMethod, var->ChainList[i].IsStatic);
 			
 			std::vector<pelet::ExpressionClass*>::const_iterator it;
 			int argIndex = 0;
@@ -675,7 +695,7 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 						// we know for sure its the right now.  if we find many matches, 
 						// then a method can be in any number of classes; it
 						// becomes really hard to know which method to pick.
-						if (foundFunctionTag && IsFunctionArgumentByReference(functionTag, argIndex)) {
+						if (foundFunctionTag && IsFunctionArgumentByReference(functionSignature, argIndex)) {
 							ScopeVariables[argVar->ChainList[0].Name] = 1;
 						}
 					}

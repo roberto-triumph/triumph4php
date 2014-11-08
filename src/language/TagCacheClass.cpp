@@ -438,6 +438,26 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::NearMatchClassesOrFiles(const Uni
 	return matches;
 }
 
+bool t4p::TagCacheClass::GlobalPrepare(t4p::SqliteResultClass& result, bool doLimit) {
+	if (!TagFinderList) {
+		return false;
+	}
+	if (!TagFinderList->IsTagFinderInit) {
+		return false;
+	}
+	return TagFinderList->TagFinder.Prepare(&result, doLimit);
+}
+
+bool t4p::TagCacheClass::NativePrepare(t4p::SqliteResultClass& result, bool doLimit) {
+	if (!TagFinderList) {
+		return false;
+	}
+	if (!TagFinderList->IsNativeTagFinderInit) {
+		return false;
+	}
+	return TagFinderList->NativeTagFinder.Prepare(&result, doLimit);
+}
+
 std::vector<t4p::ParsedTagFinderClass*> t4p::TagCacheClass::AllFinders() {
 	std::vector<t4p::ParsedTagFinderClass*> allTagFinders;
 	if (TagFinderList) {

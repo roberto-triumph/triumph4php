@@ -27,6 +27,7 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
+#include <language/ParsedTagFinderClass.h>
 #include <wx/filename.h>
 #include <globals/String.h>
 
@@ -126,7 +127,18 @@ class PhpVariableLintClass :
 
 public:
 
-	PhpVariableLintClass(t4p::TagCacheClass& tagCache);
+	PhpVariableLintClass();
+	
+	/**
+	 * prepares the internal cache used for function lookups. This needs
+	 * to be called before any file is checked.
+	 * the tag cache is used to lookup function signatures in order to
+	 * check if an argument is passed by reference;pass-by-reference
+	 * variables are not tagged as uninitialized
+	 * 
+	 * @param tagCache the tag dbs
+	 */
+	void Init(t4p::TagCacheClass& tagCache);
 
 	/**
 	 * Set the version that the PHP parser should use. This method should be
@@ -135,6 +147,8 @@ public:
 	void SetOptions(const t4p::PhpVariableLintOptionsClass& options);
 
 	/**
+	 * Init() method should be called before a file is parsed
+	 * 
 	 * @param fileName the file to parse and report errors on.
 	 * @param errors any uninitialized variable errors will be 
 	 *        appended to this parameter.
@@ -143,6 +157,8 @@ public:
 	bool ParseFile(const wxFileName& fileName, std::vector<t4p::PhpVariableLintResultClass>& errors);
 
 	/**
+	 * Init() method should be called before a string is parsed
+	 *  
 	 * @param code the string to parse and report errors on
 	 * @param errors any uninitialized variable errors will be 
 	 *        appended to this parameter.
@@ -150,6 +166,10 @@ public:
 	 */
 	bool ParseString(const UnicodeString& code, std::vector<t4p::PhpVariableLintResultClass>& errors);
 
+	// these methods are callbacks from the parser
+	// whenever we see an expression or statement, we 
+	// will check it to see if it contains undefined
+	// variables
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 
@@ -205,13 +225,6 @@ private:
 	std::vector<t4p::PhpVariableLintResultClass> Errors;
 	
 	/**
-	 * the tag cache is used to lookup function signatures in order to
-	 * check if an argument is passed by reference;pass-by-reference
-	 * variables are not tagged as uninitialized
-	 */
-	t4p::TagCacheClass& TagCache;
-
-	/**
 	 * variables found in the current scope
 	 */
 	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass> ScopeVariables;
@@ -258,6 +271,16 @@ private:
 	 * code is being parsed
 	 */
 	UnicodeString File;
+	
+	/**
+	 * used to query the tag cache for function / method
+	 * signatures. This allows us to prepare the query only once
+	 * and execute it many times, where as if we use tag cache helper
+	 * methods they prepare the queries each time that they are called
+	 */
+	 t4p::FunctionSignatureLookupClass FunctionSignatureLookup;
+	 t4p::MethodSignatureLookupClass MethodSignatureLookup;
+	 t4p::FunctionSignatureLookupClass NativeFunctionSignatureLookup;
 
 	/**
 	 * @param var the expression to check. A Check  will be
@@ -285,6 +308,11 @@ private:
 	 */
 	void CheckArrayDefinition(pelet::ArrayExpressionClass* expr);
 
+	/**
+	 * looks up a function or method signature by using the prepared
+	 * statements; looks in all caches; native global, and detected
+	 */
+	bool LookupSignature(UnicodeString& signature, const UnicodeString& functionName, bool isMethod, bool isStatic);
 };
 
 }

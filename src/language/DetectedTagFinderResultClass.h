@@ -37,11 +37,15 @@ public:
 
 	DetectedTagTotalCountResultClass();
 
-	bool Prepare(soci::session& session, bool doLimit);
-
 	int GetTotalCount() const;
 
 	void Next();
+
+protected:
+
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	void DoBind(soci::statement& stmt);
 
 private:
 
@@ -59,14 +63,16 @@ public:
 
 	DetectedTagExactMemberResultClass();
 
-	bool Prepare(soci::session& session, bool doLimit);
-
 	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
 		const std::vector<wxFileName>& sourceDirectories);
 
 	void Next();
 
 protected:
+
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+
+	void DoBind(soci::statement& stmt);
 	
 	std::vector<std::string> Keys;
 
@@ -87,12 +93,6 @@ protected:
 	std::string Comment;
 	int IsStatic;
 
-	/**
-	 *  binds the variables to this statement
-	 * @param stmt this class will own the pointer
-	 * @return bool TRUE if there was at least one result
-	 */
-	bool Init(soci::statement* stmt);
 };
 
 class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMemberResultClass {
@@ -101,11 +101,12 @@ public:
 
 	DetectedTagNearMatchMemberResultClass();
 
-	bool Prepare(soci::session& session, bool doLimit);
-
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
 		const std::vector<wxFileName>& sourceDirectories);
 
+protected:
+	
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
 private:
 
 	std::string KeyUpper;
