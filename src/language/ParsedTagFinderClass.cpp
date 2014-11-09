@@ -1323,7 +1323,8 @@ t4p::MethodSignatureLookupClass::MethodSignatureLookupClass()
 : t4p::SqliteResultClass() 
 , Signature()
 , MethodName()
-, IsStatic(0)
+, IsStaticTrue(0)
+, IsStaticFalse(0)
 , TagType(0)
 , Id(0) 
 , StdSignature() {
@@ -1332,23 +1333,34 @@ t4p::MethodSignatureLookupClass::MethodSignatureLookupClass()
 
 void t4p::MethodSignatureLookupClass::Set(const UnicodeString& methodName, bool isStatic) {
 	MethodName = t4p::IcuToChar(methodName);
-	IsStatic = isStatic ? 1 : 0;
+	if (isStatic) {
+		IsStaticTrue = 1;
+		IsStaticFalse = 1;
+	}
+	else {
+		IsStaticTrue = 1;
+		IsStaticFalse = 0;
+	}
 }
 	
 bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	std::string sql = "SELECT id, signature FROM resources WHERE key = ? AND type = ?";
-	if (IsStatic) {
-		sql += " AND is_static = ?";
-	}
+	
+	// we use two conditions for is_static
+	// because the semantics of the query are that
+	// if we don't want static methods, then we want to query
+	// for both static and instance methods.  Further, we 
+	// don't want the query to change when the isStatic flag changes
+	// otherwise we would need to re-prepare the statement (and negate
+	// any performance improvement)
+	std::string sql = "SELECT id, signature FROM resources WHERE key = ? AND type = ? AND is_static IN(?, ?)";
 	bool good = false;
 	wxString error;
 	try {	
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(MethodName));
 		stmt.exchange(soci::use(TagType));
-		if (IsStatic) {
-			stmt.exchange(soci::use(IsStatic));
-		}
+		stmt.exchange(soci::use(IsStaticTrue));
+		stmt.exchange(soci::use(IsStaticFalse));
 
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());

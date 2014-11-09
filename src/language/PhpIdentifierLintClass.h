@@ -252,6 +252,14 @@ private:
      *   }
 	 */
 	bool HasMethodExistsCalled;
+	
+	/**
+	 * the name of the class that is being parsed.
+	 * we keep this around to test when checking static
+	 * methods; static calls to methods of the current
+	 * class are not really static
+	 */
+	UnicodeString CurrentClassName;
 
 	/**
 	 * @param var the expression to check. A Check  will be

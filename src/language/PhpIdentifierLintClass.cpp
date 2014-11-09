@@ -106,7 +106,8 @@ t4p::PhpIdentifierLintClass::PhpIdentifierLintClass()
 , NotFoundFunctions()
 , NotFoundStaticMethods()
 , NotFoundStaticProperties()
-, HasMethodExistsCalled(false) {
+, HasMethodExistsCalled(false)
+, CurrentClassName() {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
@@ -123,6 +124,7 @@ void t4p::PhpIdentifierLintClass::Init(t4p::TagCacheClass& tagCache) {
 	tagCache.NativePrepare(NativePropertyLookup, true);
 	tagCache.NativePrepare(NativeFunctionLookup, true);
 	HasMethodExistsCalled = false;
+	CurrentClassName = UNICODE_STRING_SIMPLE("");
 }
 
 void t4p::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
@@ -145,6 +147,7 @@ bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 	NotFoundStaticMethods.clear();
 	NotFoundStaticProperties.clear();
 	HasMethodExistsCalled = false;
+	CurrentClassName = UNICODE_STRING_SIMPLE("");
 
 	AddMagicMethods(FoundMethods);
 	AddMagicMethods(FoundStaticMethods);
@@ -176,6 +179,7 @@ bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 	NotFoundFunctions.clear();
 	NotFoundStaticMethods.clear();
 	NotFoundStaticProperties.clear();
+	CurrentClassName = UNICODE_STRING_SIMPLE("");
 
 	// magic methods, never unknown 
 	AddMagicMethods(FoundMethods);
@@ -202,12 +206,14 @@ void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
 	HasMethodExistsCalled = false;
+	CurrentClassName = className;
 }
 
 void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
 											const UnicodeString& comment, const int lineNumber) {
 	HasMethodExistsCalled = false;
+	CurrentClassName = UNICODE_STRING_SIMPLE("");
 }
 
 void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
@@ -575,9 +581,26 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 	if (isStaticCall && var->ChainList.size() == 2) {
 		
 		// check for calls to the base class
-		// ie parent::baseMethod()
 		// these calls are NOT static
-		isStaticCall = var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) != 0;
+		//
+		// parent::baseMethod()
+		// self::method()
+		// class MyClass {  
+		//    function mm() { MyClass::mm(); } 
+		// }
+		
+		UnicodeString unqualifiedClassName;
+		int32_t pos = var->ChainList[0].Name.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
+		if (pos >= 0) {
+			var->ChainList[0].Name.extract(pos + 1, var->ChainList[0].Name.length() - pos - 1, unqualifiedClassName);
+		}
+		else {
+			unqualifiedClassName = var->ChainList[0].Name;
+		}
+	
+		isStaticCall = var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) != 0
+			&& var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) != 0
+			&& unqualifiedClassName.caseCompare(CurrentClassName, 0) != 0;
 	}
 
 	bool isUnknown = false;

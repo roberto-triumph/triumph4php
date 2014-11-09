@@ -42,6 +42,11 @@ static bool IsFunctionArgumentByReference(const UnicodeString& signature, int ar
 	bool isRef = false;
 	int32_t start = signature.indexOf('(');
 	int32_t next = signature.indexOf(',', start);
+	if (next < 0) {
+			
+		// only 1 argument, look for the ending )
+		next = signature.indexOf(')', next + 1);
+	}
 	int arg = 0;
 	while (next >= 0) {
 		if (arg == argIndex) {

@@ -535,6 +535,30 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
 	CHECK_VECTOR_SIZE(0, Results);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceMethodArguments) {
+
+	// test that when an argument to a method is passed by reference, it is NOT counted
+	// as uninitialized, since the method being called can
+	// set the variable's value
+	UnicodeString code = t4p::CharToIcu(
+		"<?php \n"
+		"class MyClass {\n"
+		"  function myFunc(&$b) {\n"
+		"    $b = 28;\n"
+		"  }\n"
+		"}"
+		"\n"
+		"function myBFunc($a) {\n"
+		"  $obj = new MyClass();\n"
+		"  $obj->myFunc($x);\n"
+		"  $sum = $a + $x;\n"
+		"}"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
+
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 
 	// test that arguments to calling function are checked

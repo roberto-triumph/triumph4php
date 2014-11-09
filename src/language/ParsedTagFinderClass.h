@@ -935,10 +935,13 @@ protected:
 private:
 
 	/**
-	 *  bound to the prepared statement as an input 
+	 * bound to the prepared statement as an input 
+	 * see comment in DoPrepare for the reasoning
+	 * behing there being IsStaticTrue and IsStaticFalse
 	 */
 	std::string MethodName;
-	int IsStatic;
+	int IsStaticTrue;
+	int IsStaticFalse;
 	int TagType;
 	
 	/**

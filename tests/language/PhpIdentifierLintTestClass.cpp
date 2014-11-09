@@ -212,7 +212,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
 	CHECK_EQUAL(false, HasError);
 }
 
-
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
 
 	// test that the "parent" keyword is never seen as an unknown class
@@ -235,6 +234,31 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
 		"   }\n"
 		"}\n"
 	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, SameClassReference) {
+
+	// test that the static calls to the same class are treated as
+	// instance calls
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"namespace Util; \n"
+		"class MyClass {\n"
+		"  public function work($d) { \n"
+		"    return true;\n"
+		"  }\n"
+		"\n"
+		"  public function aliasWork($d) {\n"
+		"     return MyClass::work($d);\n"
+		"  }\n"
+		"}\n"
+	);
+
+	UnicodeString code = t4p::WxToIcu(cacheCode);
 	SetupFile(wxT("MyClass.php"), cacheCode);
 	BuildCache();
 	Parse(code);
@@ -375,6 +399,32 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 	CHECK_UNISTR_EQUALS("NyClass", Results[0].Identifier);
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
 }
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCode) {
+
+	// class name resolution should look properly
+	// look at namespaces; when a piece of code does 
+	// not declare a namespace then it should 
+	// treat relative namespaces as absolute namespaces
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"namespace util {\n "
+		"\n"
+		"class MyClass {} \n"
+		"\n"
+		"}\n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"  $a = new Util\\MyClass();\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(0, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
+
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
 
