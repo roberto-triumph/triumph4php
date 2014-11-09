@@ -133,6 +133,7 @@ t4p::PhpVariableLintClass::PhpVariableLintClass()
 , HasExtractCall(false)
 , HasEvalCall(false)
 , HasIncludeCall(false)
+, HasIndirectVariable(false)
 , Parser() 
 , Options()
 , File() 
@@ -183,6 +184,7 @@ bool t4p::PhpVariableLintClass::ParseFile(const wxFileName& fileName,
 	HasExtractCall = false;
 	HasEvalCall = false;
 	HasIncludeCall = false;
+	HasIndirectVariable = false;
 	File = t4p::WxToIcu(fileName.GetFullPath());
 	
 	pelet::LintResultsClass lintResult;
@@ -228,6 +230,7 @@ void t4p::PhpVariableLintClass::MethodFound(const UnicodeString& namespaceName, 
 	HasExtractCall = false;
 	HasEvalCall = false;
 	HasIncludeCall = false;
+	HasIndirectVariable = false;
 }
 
 void t4p::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
@@ -237,6 +240,7 @@ void t4p::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName
 	HasExtractCall = false;
 	HasEvalCall = false;
 	HasIncludeCall = false;
+	HasIndirectVariable = false;
 }
 
 void t4p::PhpVariableLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
@@ -252,6 +256,14 @@ void t4p::PhpVariableLintClass::ExpressionVariableFound(pelet::VariableClass* ex
 }
 
 void t4p::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
+	
+	// if an assigned variable is an indirect or variable variable
+	// like so " $$name = '123'; "
+	// we turn off uninitialized varaible checks
+	//because we don't want to label false positives.
+	if (expression->Destination.IsIndirect) {
+		HasIndirectVariable = true;
+	}
 	
 	// check any array accesses in the destination variable
 	// ie $user[$name]
@@ -622,11 +634,16 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	if (var->ChainList.empty()) {
 		return;
 	}
+	if (HasIndirectVariable) {
+		
+		// an indirect assignment was found, lets not check for uninitialized
+		// variables in this scope; we don't want to show false positives.
+		return;
+	}
 
 	// TODO:
 	// more checks that would be great to implement
 	//  1. variable inside interporlated strings  "this is your name: {$name}"
-	//  2. variable variables  "$obj->{$methodName}"
 	//
 	// note that a "variable" could also be a static method call
 	// ie "User::all()", but this does not contain a variable so

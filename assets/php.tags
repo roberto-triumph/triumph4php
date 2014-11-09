@@ -1005,12 +1005,19 @@ RAR_HOST_BEOS		0;"	d
 rar_wrapper_cache_stats		0;"	f	S:string function rar_wrapper_cache_stats()
 RarArchive		0;"	c
 close		0;"	f	S:bool function close($rarfile)	class:RarArchive
+rar_close		0;"	f	S:bool function rar_close($rarfile)
 getComment		0;"	f	S:string function getComment($rarfile)	class:RarArchive
+rar_comment_get		0;"	f	S:string function rar_comment_get($rarfile)
 getEntries		0;"	f	S:RarArchive function getEntries($rarfile)	class:RarArchive
+rar_list		0;"	f	S:RarArchive function rar_list($rarfile)
 getEntry		0;"	f	S:RarEntry function getEntry($entryname, $rarfile)	class:RarArchive
+rar_entry_get		0;"	f	S:RarEntry function rar_entry_get($entryname, $rarfile)
 isBroken		0;"	f	S:bool function isBroken($rarfile)	class:RarArchive
+rar_broken_is		0;"	f	S:bool function rar_broken_is($rarfile)
 isSolid		0;"	f	S:bool function isSolid($rarfile)	class:RarArchive
+rar_solid_is		0;"	f	S:bool function rar_solid_is($rarfile)
 open		0;"	f	S:RarArchive function open($filename, $password = NULL, $volume_callback = NULL)	class:RarArchive	a:static
+rar_open		0;"	f	S:RarArchive function rar_open($filename, $password = NULL, $volume_callback = NULL)
 setAllowBroken		0;"	f	S:bool function setAllowBroken($allow_broken, $rarfile)	class:RarArchive
 __toString		0;"	f	S:RarArchive function __toString()	class:RarArchive
 RarEntry		0;"	c
@@ -2186,21 +2193,31 @@ ingres_set_environment		0;"	f	S:bool function ingres_set_environment($link, $opt
 ingres_unbuffered_query		0;"	f	S:mixed function ingres_unbuffered_query($link, $query, $params, $types)
 maxdb->affected_rows		0;"	p	class:PDOException	S: PDOException::maxdb->affected_rows
 maxdb_affected_rows		0;"	f	S:int function maxdb_affected_rows($link)
+affected_rows		0;"	f	S:int function affected_rows($link)	class:maxdb
 maxdb_autocommit		0;"	f	S:bool function maxdb_autocommit($link, $mode)
+auto_commit		0;"	f	S:bool function auto_commit($link, $mode)	class:maxdb
 maxdb_bind_param		0;"	f	S: function maxdb_bind_param()
 maxdb_bind_result		0;"	f	S: function maxdb_bind_result()
 maxdb_change_user		0;"	f	S:bool function maxdb_change_user($link, $user, $password, $database)
+change_user		0;"	f	S:bool function change_user($link, $user, $password, $database)	class:maxdb
 maxdb_character_set_name		0;"	f	S:string function maxdb_character_set_name($link)
+character_set_name		0;"	f	S:string function character_set_name($link)	class:maxdb
 maxdb_client_encoding		0;"	f	S: function maxdb_client_encoding()
 maxdb_close_long_data		0;"	f	S: function maxdb_close_long_data()
+close_long_data		0;"	f	S: function close_long_data()	class:maxdb
 maxdb_close		0;"	f	S:bool function maxdb_close($link)
+close		0;"	f	S:bool function close($link)	class:maxdb
 maxdb_commit		0;"	f	S:bool function maxdb_commit($link)
+commit		0;"	f	S:bool function commit($link)	class:maxdb
 maxdb_connect_errno		0;"	f	S:int function maxdb_connect_errno()
 maxdb_connect_error		0;"	f	S:string function maxdb_connect_error()
 maxdb_connect		0;"	f	S:resource function maxdb_connect($host, $username, $passwd, $dbname, $port, $socket)
+__construct		0;"	f	S:resource function __construct($host, $username, $passwd, $dbname, $port, $socket)	class:maxdb
 maxdb_data_seek		0;"	f	S:bool function maxdb_data_seek($result, $offset)
+data_seek		0;"	f	S:bool function data_seek($result, $offset)	class:maxdb_result
 maxdb_debug		0;"	f	S:void function maxdb_debug($debug)
 maxdb_disable_reads_from_master		0;"	f	S:void function maxdb_disable_reads_from_master($link)
+disable_reads_from_master		0;"	f	S:void function disable_reads_from_master($link)	class:maxdb
 maxdb_disable_rpl_parse		0;"	f	S:bool function maxdb_disable_rpl_parse($link)
 maxdb_dump_debug_info		0;"	f	S:bool function maxdb_dump_debug_info($link)
 maxdb_embedded_connect		0;"	f	S:resource function maxdb_embedded_connect($dbname)
@@ -2208,105 +2225,168 @@ maxdb_enable_reads_from_master		0;"	f	S:bool function maxdb_enable_reads_from_ma
 maxdb_enable_rpl_parse		0;"	f	S:bool function maxdb_enable_rpl_parse($link)
 maxdb->errno		0;"	p	class:PDOException	S: PDOException::maxdb->errno
 maxdb_errno		0;"	f	S:int function maxdb_errno($link)
+errno		0;"	f	S:int function errno($link)	class:maxdb
 maxdb->error		0;"	p	class:PDOException	S: PDOException::maxdb->error
 maxdb_error		0;"	f	S:string function maxdb_error($link)
+error		0;"	f	S:string function error($link)	class:maxdb
 maxdb_escape_string		0;"	f	S: function maxdb_escape_string()
 maxdb_execute		0;"	f	S: function maxdb_execute()
 maxdb_fetch_array		0;"	f	S:mixed function maxdb_fetch_array($result, $resulttype)
+fetch_array		0;"	f	S:mixed function fetch_array($result, $resulttype)	class:maxdb_result
 maxdb_fetch_assoc		0;"	f	S:array function maxdb_fetch_assoc($result)
+fetch_assoc		0;"	f	S:array function fetch_assoc($result)	class:maxdb_result
 maxdb_fetch_field_direct		0;"	f	S:mixed function maxdb_fetch_field_direct($result, $fieldnr)
+fetch_field_direct		0;"	f	S:mixed function fetch_field_direct($result, $fieldnr)	class:maxdb_result
 maxdb_fetch_field		0;"	f	S:mixed function maxdb_fetch_field($result)
+fetch_field		0;"	f	S:mixed function fetch_field($result)	class:maxdb_result
 maxdb_fetch_fields		0;"	f	S:mixed function maxdb_fetch_fields($result)
+fetch_fields		0;"	f	S:mixed function fetch_fields($result)	class:maxdb_result
 maxdb_result->lengths		0;"	p	class:PDOException	S: PDOException::maxdb_result->lengths
 maxdb_fetch_lengths		0;"	f	S:array function maxdb_fetch_lengths($result)
+lengths		0;"	f	S:array function lengths($result)	class:maxdb_result
 maxdb_fetch_object		0;"	f	S:object function maxdb_fetch_object($result)
+fetch_object		0;"	f	S:object function fetch_object($result)	class:maxdb_result
 maxdb_fetch_row		0;"	f	S:mixed function maxdb_fetch_row($result)
+fetch_row		0;"	f	S:mixed function fetch_row($result)	class:maxdb_result
 maxdb_fetch		0;"	f	S: function maxdb_fetch()
 maxdb_field_count		0;"	f	S:int function maxdb_field_count($link)
+field_count		0;"	f	S:int function field_count($link)	class:maxdb
 maxdb_field_seek		0;"	f	S:bool function maxdb_field_seek($result, $fieldnr)
+field_seek		0;"	f	S:bool function field_seek($result, $fieldnr)	class:maxdb_result
 maxdb_result->current_field		0;"	p	class:PDOException	S: PDOException::maxdb_result->current_field
 maxdb_field_tell		0;"	f	S:int function maxdb_field_tell($result)
+current_field		0;"	f	S:int function current_field($result)	class:maxdb_result
 maxdb_free_result		0;"	f	S:void function maxdb_free_result($result)
+free		0;"	f	S:void function free($result)	class:maxdb_result
 maxdb_get_client_info		0;"	f	S:string function maxdb_get_client_info()
 maxdb_get_client_version		0;"	f	S:int function maxdb_get_client_version()
 maxdb->host_info		0;"	p	class:PDOException	S: PDOException::maxdb->host_info
 maxdb_get_host_info		0;"	f	S:string function maxdb_get_host_info($link)
+get_host_info		0;"	f	S:string function get_host_info($link)	class:maxdb
 maxdb_get_metadata		0;"	f	S: function maxdb_get_metadata()
 maxdb->protocol_version		0;"	p	class:PDOException	S: PDOException::maxdb->protocol_version
 maxdb_get_proto_info		0;"	f	S:string function maxdb_get_proto_info($link)
+protocol_version		0;"	f	S:string function protocol_version($link)	class:maxdb
 maxdb->server_info		0;"	p	class:PDOException	S: PDOException::maxdb->server_info
 maxdb_get_server_info		0;"	f	S:string function maxdb_get_server_info($link)
+server_info		0;"	f	S:string function server_info($link)	class:maxdb
 maxdb->server_version		0;"	p	class:PDOException	S: PDOException::maxdb->server_version
 maxdb_get_server_version		0;"	f	S:int function maxdb_get_server_version($link)
+server_version		0;"	f	S:int function server_version($link)	class:maxdb
 maxdb->info		0;"	p	class:PDOException	S: PDOException::maxdb->info
 maxdb_info		0;"	f	S:string function maxdb_info($link)
+info		0;"	f	S:string function info($link)	class:maxdb
 maxdb_init		0;"	f	S:resource function maxdb_init()
 maxdb->insert_id		0;"	p	class:PDOException	S: PDOException::maxdb->insert_id
 maxdb_insert_id		0;"	f	S:mixed function maxdb_insert_id($link)
+insert_id		0;"	f	S:mixed function insert_id($link)	class:maxdb
 maxdb_kill		0;"	f	S:bool function maxdb_kill($link, $processid)
+kill		0;"	f	S:bool function kill($link, $processid)	class:maxdb
 maxdb_master_query		0;"	f	S:bool function maxdb_master_query($link, $query)
 maxdb_more_results		0;"	f	S:bool function maxdb_more_results($link)
+more_results		0;"	f	S:bool function more_results($link)	class:maxdb
 maxdb_multi_query		0;"	f	S:bool function maxdb_multi_query($link, $query)
+multi_query		0;"	f	S:bool function multi_query($link, $query)	class:maxdb
 maxdb_next_result		0;"	f	S:bool function maxdb_next_result($link)
+next_result		0;"	f	S:bool function next_result($link)	class:maxdb
 maxdb_result->field_count		0;"	p	class:PDOException	S: PDOException::maxdb_result->field_count
 maxdb_num_fields		0;"	f	S:int function maxdb_num_fields($result)
+field_count		0;"	f	S:int function field_count($result)	class:maxdb_result
 maxdb->num_rows		0;"	p	class:PDOException	S: PDOException::maxdb->num_rows
 maxdb_num_rows		0;"	f	S:int function maxdb_num_rows($result)
+num_rows		0;"	f	S:int function num_rows($result)	class:maxdb
 maxdb_options		0;"	f	S:bool function maxdb_options($link, $option, $value)
+options		0;"	f	S:bool function options($link, $option, $value)	class:maxdb
 maxdb_param_count		0;"	f	S: function maxdb_param_count()
 maxdb_ping		0;"	f	S:bool function maxdb_ping($link)
+ping		0;"	f	S:bool function ping($link)	class:maxdb
 maxdb_prepare		0;"	f	S:maxdb_stmt function maxdb_prepare($link, $query)
+prepare		0;"	f	S:maxdb_stmt function prepare($link, $query)	class:maxdb
 maxdb_query		0;"	f	S:mixed function maxdb_query($link, $query, $resultmode)
+query		0;"	f	S:mixed function query($link, $query, $resultmode)	class:maxdb
 maxdb_real_connect		0;"	f	S:bool function maxdb_real_connect($link, $hostname, $username, $passwd, $dbname, $port, $socket)
+real_connect		0;"	f	S:bool function real_connect($link, $hostname, $username, $passwd, $dbname, $port, $socket)	class:maxdb
 maxdb_real_escape_string		0;"	f	S:string function maxdb_real_escape_string($link, $escapestr)
+real_escape_string		0;"	f	S:string function real_escape_string($link, $escapestr)	class:maxdb
 maxdb_real_query		0;"	f	S:bool function maxdb_real_query($link, $query)
+real_query		0;"	f	S:bool function real_query($link, $query)	class:maxdb
 maxdb_report		0;"	f	S:bool function maxdb_report($flags)
 maxdb_rollback		0;"	f	S:bool function maxdb_rollback($link)
+rollback		0;"	f	S:bool function rollback($link)	class:maxdb
 maxdb_rpl_parse_enabled		0;"	f	S:int function maxdb_rpl_parse_enabled($link)
 maxdb_rpl_probe		0;"	f	S:bool function maxdb_rpl_probe($link)
 maxdb_rpl_query_type		0;"	f	S:int function maxdb_rpl_query_type($link)
+rpl_query_type		0;"	f	S:int function rpl_query_type($link)	class:maxdb
 maxdb_select_db		0;"	f	S:bool function maxdb_select_db($link, $dbname)
+select_db		0;"	f	S:bool function select_db($link, $dbname)	class:maxdb
 maxdb_send_long_data		0;"	f	S: function maxdb_send_long_data()
 maxdb_send_query		0;"	f	S:bool function maxdb_send_query($link, $query)
+send_query		0;"	f	S:bool function send_query($link, $query)	class:maxdb
 maxdb_server_end		0;"	f	S:void function maxdb_server_end()
 maxdb_server_init		0;"	f	S:bool function maxdb_server_init($server, $groups)
 maxdb_set_opt		0;"	f	S: function maxdb_set_opt()
 maxdb->sqlstate		0;"	p	class:PDOException	S: PDOException::maxdb->sqlstate
 maxdb_sqlstate		0;"	f	S:string function maxdb_sqlstate($link)
+sqlstate		0;"	f	S:string function sqlstate($link)	class:maxdb
 maxdb_ssl_set		0;"	f	S:bool function maxdb_ssl_set($link, $key, $cert, $ca, $capath, $cipher)
+ssl_set		0;"	f	S:bool function ssl_set($link, $key, $cert, $ca, $capath, $cipher)	class:maxdb
 maxdb_stat		0;"	f	S:string function maxdb_stat($link)
+stat		0;"	f	S:string function stat($link)	class:maxdb
 maxdb_stmt->affected_rows		0;"	p	class:PDOException	S: PDOException::maxdb_stmt->affected_rows
 maxdb_stmt_affected_rows		0;"	f	S:int function maxdb_stmt_affected_rows($stmt)
+affected_rows		0;"	f	S:int function affected_rows($stmt)	class:maxdb_stmt
 maxdb_stmt_bind_param		0;"	f	S:bool function maxdb_stmt_bind_param($stmt, $types, &$var1, &$..., &$var)
+bind_param		0;"	f	S:bool function bind_param($stmt, $types, &$var1, &$..., &$var)	class:maxdb_stmt
 maxdb_stmt_bind_result		0;"	f	S:bool function maxdb_stmt_bind_result($stmt, &$var1, &$...)
+bind_result		0;"	f	S:bool function bind_result($stmt, &$var1, &$...)	class:maxdb_stmt
 maxdb_stmt_close_long_data		0;"	f	S:bool function maxdb_stmt_close_long_data($stmt, $param_nr)
+close_long_data		0;"	f	S:bool function close_long_data($stmt, $param_nr)	class:maxdb_stmt
 maxdb_stmt_close		0;"	f	S:bool function maxdb_stmt_close($stmt)
+close		0;"	f	S:bool function close($stmt)	class:maxdb_stmt
 maxdb_stmt_data_seek		0;"	f	S:bool function maxdb_stmt_data_seek($statement, $offset)
+data_seek		0;"	f	S:bool function data_seek($statement, $offset)	class:maxdb_stmt
 maxdb_stmt->errno		0;"	p	class:PDOException	S: PDOException::maxdb_stmt->errno
 maxdb_stmt_errno		0;"	f	S:int function maxdb_stmt_errno($stmt)
+errno		0;"	f	S:int function errno($stmt)	class:maxdb_stmt
 maxdb_stmt->error		0;"	p	class:PDOException	S: PDOException::maxdb_stmt->error
 maxdb_stmt_error		0;"	f	S:string function maxdb_stmt_error($stmt)
+error		0;"	f	S:string function error($stmt)	class:maxdb_stmt
 maxdb_stmt_execute		0;"	f	S:bool function maxdb_stmt_execute($stmt)
+execute		0;"	f	S:bool function execute($stmt)	class:maxdb_stmt
 maxdb_stmt_fetch		0;"	f	S:bool function maxdb_stmt_fetch($stmt)
+fetch		0;"	f	S:bool function fetch($stmt)	class:maxdb_stmt
 maxdb_stmt_free_result		0;"	f	S:void function maxdb_stmt_free_result($stmt)
+free_result		0;"	f	S:void function free_result($stmt)	class:maxdb_stmt
 maxdb_stmt_init		0;"	f	S:object function maxdb_stmt_init($link)
+stmt_init		0;"	f	S:object function stmt_init($link)	class:maxdb
 maxdb_stmt->num_rows		0;"	p	class:PDOException	S: PDOException::maxdb_stmt->num_rows
 maxdb_stmt_num_rows		0;"	f	S:int function maxdb_stmt_num_rows($stmt)
+num_rows		0;"	f	S:int function num_rows($stmt)	class:maxdb_stmt
 maxdb_stmt->param_count		0;"	p	class:PDOException	S: PDOException::maxdb_stmt->param_count
 maxdb_stmt_param_count		0;"	f	S:int function maxdb_stmt_param_count($stmt)
+param_count		0;"	f	S:int function param_count($stmt)	class:maxdb_stmt
 maxdb_stmt_prepare		0;"	f	S:mixed function maxdb_stmt_prepare($stmt, $query)
+prepare		0;"	f	S:mixed function prepare($stmt, $query)	class:maxdb_stmt
 maxdb_stmt_reset		0;"	f	S:bool function maxdb_stmt_reset($stmt)
+reset		0;"	f	S:bool function reset($stmt)	class:maxdb_stmt
 maxdb_stmt_result_metadata		0;"	f	S:resource function maxdb_stmt_result_metadata($stmt)
+result_metadata		0;"	f	S:resource function result_metadata($stmt)	class:maxdb_stmt
 maxdb_stmt_send_long_data		0;"	f	S:bool function maxdb_stmt_send_long_data($stmt, $param_nr, $data)
+send_long_data		0;"	f	S:bool function send_long_data($stmt, $param_nr, $data)	class:maxdb_stmt
 maxdb_stmt_sqlstate		0;"	f	S:string function maxdb_stmt_sqlstate($stmt)
 maxdb_stmt_store_result		0;"	f	S:object function maxdb_stmt_store_result($stmt)
+store_result		0;"	f	S:object function store_result($stmt)	class:maxdb_stmt
 maxdb_store_result		0;"	f	S:object function maxdb_store_result($link)
+store_result		0;"	f	S:object function store_result($link)	class:maxdb
 maxdb->thread_id		0;"	p	class:PDOException	S: PDOException::maxdb->thread_id
 maxdb_thread_id		0;"	f	S:int function maxdb_thread_id($link)
+thread_id		0;"	f	S:int function thread_id($link)	class:maxdb
 maxdb_thread_safe		0;"	f	S:bool function maxdb_thread_safe()
 maxdb_use_result		0;"	f	S:resource function maxdb_use_result($link)
+use_result		0;"	f	S:resource function use_result($link)	class:maxdb
 maxdb->warning_count		0;"	p	class:PDOException	S: PDOException::maxdb->warning_count
 maxdb_warning_count		0;"	f	S:int function maxdb_warning_count($link)
+warning_count		0;"	f	S:int function warning_count($link)	class:maxdb
 MONGO_STREAMS		0;"	d
 MONGO_SUPPORTS_STREAMS		0;"	d
 MONGO_SUPPORTS_SSL		0;"	d
@@ -2902,86 +2982,148 @@ mysqli->thread_id		0;"	p	class:mysqli	S: mysqli::mysqli->thread_id
 mysqli->warning_count		0;"	p	class:mysqli	S: mysqli::mysqli->warning_count
 mysqli->affected_rows		0;"	p	class:mysqli	S: mysqli::mysqli->affected_rows
 $affected_rows		0;"	f	S:int function $affected_rows($link)	class:mysqli
+mysqli_affected_rows		0;"	f	S:int function mysqli_affected_rows($link)
 autocommit		0;"	f	S:bool function autocommit($mode, $link)	class:mysqli
+mysqli_autocommit		0;"	f	S:bool function mysqli_autocommit($mode, $link)
 begin_transaction		0;"	f	S:bool function begin_transaction($flags, $name, $link)	class:mysqli
+mysqli_begin_transaction		0;"	f	S:bool function mysqli_begin_transaction($flags, $name, $link)
 change_user		0;"	f	S:bool function change_user($user, $password, $database, $link)	class:mysqli
+mysqli_change_user		0;"	f	S:bool function mysqli_change_user($user, $password, $database, $link)
 character_set_name		0;"	f	S:string function character_set_name($link)	class:mysqli
+mysqli_character_set_name		0;"	f	S:string function mysqli_character_set_name($link)
 mysqli->client_info		0;"	p	class:mysqli	S: mysqli::mysqli->client_info
 $client_info		0;"	f	S:string function $client_info($link)	class:mysqli
+mysqli_get_client_info		0;"	f	S:string function mysqli_get_client_info($link)
 mysqli->client_version		0;"	p	class:mysqli	S: mysqli::mysqli->client_version
 $client_version		0;"	f	S:int function $client_version($link)	class:mysqli
+mysqli_get_client_version		0;"	f	S:int function mysqli_get_client_version($link)
 close		0;"	f	S:bool function close($link)	class:mysqli
+mysqli_close		0;"	f	S:bool function mysqli_close($link)
 commit		0;"	f	S:bool function commit($flags, $name, $link)	class:mysqli
+mysqli_commit		0;"	f	S:bool function mysqli_commit($flags, $name, $link)
 mysqli->connect_errno		0;"	p	class:mysqli	S: mysqli::mysqli->connect_errno
 $connect_errno		0;"	f	S:int function $connect_errno()	class:mysqli
+mysqli_connect_errno		0;"	f	S:int function mysqli_connect_errno()
 mysqli->connect_error		0;"	p	class:mysqli	S: mysqli::mysqli->connect_error
 $connect_error		0;"	f	S:string function $connect_error()	class:mysqli
+mysqli_connect_error		0;"	f	S:string function mysqli_connect_error()
 __construct		0;"	f	S:mysqli function __construct($host = ini_get("mysqli.default_host"), $username = ini_get("mysqli.default_user"), $passwd = ini_get("mysqli.default_pw"), $dbname = "", $port = ini_get("mysqli.default_port"), $socket = ini_get("mysqli.default_socket"))	class:mysqli
+mysqli_connect		0;"	f	S:mysqli function mysqli_connect($host = ini_get("mysqli.default_host"), $username = ini_get("mysqli.default_user"), $passwd = ini_get("mysqli.default_pw"), $dbname = "", $port = ini_get("mysqli.default_port"), $socket = ini_get("mysqli.default_socket"))
 debug		0;"	f	S:bool function debug($message)	class:mysqli
+mysqli_debug		0;"	f	S:bool function mysqli_debug($message)
 dump_debug_info		0;"	f	S:bool function dump_debug_info($link)	class:mysqli
+mysqli_dump_debug_info		0;"	f	S:bool function mysqli_dump_debug_info($link)
 mysqli->errno		0;"	p	class:mysqli	S: mysqli::mysqli->errno
 $errno		0;"	f	S:int function $errno($link)	class:mysqli
+mysqli_errno		0;"	f	S:int function mysqli_errno($link)
 mysqli->error_list		0;"	p	class:mysqli	S: mysqli::mysqli->error_list
 $error_list		0;"	f	S:array function $error_list($link)	class:mysqli
+mysqli_error_list		0;"	f	S:array function mysqli_error_list($link)
 mysqli->error		0;"	p	class:mysqli	S: mysqli::mysqli->error
 $error		0;"	f	S:string function $error($link)	class:mysqli
+mysqli_error		0;"	f	S:string function mysqli_error($link)
 mysqli->field_count		0;"	p	class:mysqli	S: mysqli::mysqli->field_count
 $field_count		0;"	f	S:int function $field_count($link)	class:mysqli
+mysqli_field_count		0;"	f	S:int function mysqli_field_count($link)
 get_charset		0;"	f	S:object function get_charset($link)	class:mysqli
+mysqli_get_charset		0;"	f	S:object function mysqli_get_charset($link)
 get_client_info		0;"	f	S:string function get_client_info($link)	class:mysqli
+mysqli_get_client_info		0;"	f	S:string function mysqli_get_client_info($link)
 mysqli_get_client_stats		0;"	f	S:array function mysqli_get_client_stats()
 mysqli->client_version		0;"	p	class:mysqli	S: mysqli::mysqli->client_version
 mysqli_get_client_version		0;"	f	S:int function mysqli_get_client_version($link)
+$client_version		0;"	f	S:int function $client_version($link)	class:mysqli
 get_connection_stats		0;"	f	S:array function get_connection_stats($link)	class:mysqli
+mysqli_get_connection_stats		0;"	f	S:array function mysqli_get_connection_stats($link)
 mysqli->host_info		0;"	p	class:mysqli	S: mysqli::mysqli->host_info
 $host_info		0;"	f	S:string function $host_info($link)	class:mysqli
+mysqli_get_host_info		0;"	f	S:string function mysqli_get_host_info($link)
 mysqli->protocol_version		0;"	p	class:mysqli	S: mysqli::mysqli->protocol_version
 $protocol_version		0;"	f	S:int function $protocol_version($link)	class:mysqli
+mysqli_get_proto_info		0;"	f	S:int function mysqli_get_proto_info($link)
 mysqli->server_info		0;"	p	class:mysqli	S: mysqli::mysqli->server_info
 $server_info		0;"	f	S:string function $server_info($link)	class:mysqli
+mysqli_get_server_info		0;"	f	S:string function mysqli_get_server_info($link)
 mysqli->server_version		0;"	p	class:mysqli	S: mysqli::mysqli->server_version
 $server_version		0;"	f	S:int function $server_version($link)	class:mysqli
+mysqli_get_server_version		0;"	f	S:int function mysqli_get_server_version($link)
 get_warnings		0;"	f	S:mysqli_warning function get_warnings($link)	class:mysqli
+mysqli_get_warnings		0;"	f	S:mysqli_warning function mysqli_get_warnings($link)
 mysqli->info		0;"	p	class:mysqli	S: mysqli::mysqli->info
 $info		0;"	f	S:string function $info($link)	class:mysqli
+mysqli_info		0;"	f	S:string function mysqli_info($link)
 init		0;"	f	S:mysqli function init()	class:mysqli
+mysqli_init		0;"	f	S:mysqli function mysqli_init()
 mysqli->insert_id		0;"	p	class:mysqli	S: mysqli::mysqli->insert_id
 $insert_id		0;"	f	S:mixed function $insert_id($link)	class:mysqli
+mysqli_insert_id		0;"	f	S:mixed function mysqli_insert_id($link)
 kill		0;"	f	S:bool function kill($processid, $link)	class:mysqli
+mysqli_kill		0;"	f	S:bool function mysqli_kill($processid, $link)
 more_results		0;"	f	S:bool function more_results($link)	class:mysqli
+mysqli_more_results		0;"	f	S:bool function mysqli_more_results($link)
 multi_query		0;"	f	S:bool function multi_query($query, $link)	class:mysqli
+mysqli_multi_query		0;"	f	S:bool function mysqli_multi_query($query, $link)
 next_result		0;"	f	S:bool function next_result($link)	class:mysqli
+mysqli_next_result		0;"	f	S:bool function mysqli_next_result($link)
 options		0;"	f	S:bool function options($option, $value, $link)	class:mysqli
+mysqli_options		0;"	f	S:bool function mysqli_options($option, $value, $link)
 ping		0;"	f	S:bool function ping($link)	class:mysqli
+mysqli_ping		0;"	f	S:bool function mysqli_ping($link)
 poll		0;"	f	S:int function poll(&$read, &$error, &$reject, $sec, $usec)	class:mysqli	a:static
+mysqli_poll		0;"	f	S:int function mysqli_poll(&$read, &$error, &$reject, $sec, $usec)
 prepare		0;"	f	S:mysqli_stmt function prepare($query, $link)	class:mysqli
+mysqli_prepare		0;"	f	S:mysqli_stmt function mysqli_prepare($query, $link)
 query		0;"	f	S:mixed function query($query, $resultmode = MYSQLI_STORE_RESULT, $link)	class:mysqli
+mysqli_query		0;"	f	S:mixed function mysqli_query($query, $resultmode = MYSQLI_STORE_RESULT, $link)
 real_connect		0;"	f	S:bool function real_connect($host, $username, $passwd, $dbname, $port, $socket, $flags, $link)	class:mysqli
+mysqli_real_connect		0;"	f	S:bool function mysqli_real_connect($host, $username, $passwd, $dbname, $port, $socket, $flags, $link)
 real_escape_string		0;"	f	S:string function real_escape_string($escapestr, $link)	class:mysqli
+mysqli_real_escape_string		0;"	f	S:string function mysqli_real_escape_string($escapestr, $link)
 real_query		0;"	f	S:bool function real_query($query, $link)	class:mysqli
+mysqli_real_query		0;"	f	S:bool function mysqli_real_query($query, $link)
 reap_async_query		0;"	f	S:mysqli_result function reap_async_query($link)	class:mysqli
+mysqli_reap_async_query		0;"	f	S:mysqli_result function mysqli_reap_async_query($link)
 refresh		0;"	f	S:int function refresh($options, $link)	class:mysqli
+mysqli_refresh		0;"	f	S:int function mysqli_refresh($options, $link)
 release_savepoint		0;"	f	S:bool function release_savepoint($name, $link)	class:mysqli
+mysqli_release_savepoint		0;"	f	S:bool function mysqli_release_savepoint($name, $link)
 rollback		0;"	f	S:bool function rollback($flags, $name, $link)	class:mysqli
+mysqli_rollback		0;"	f	S:bool function mysqli_rollback($flags, $name, $link)
 rpl_query_type		0;"	f	S:int function rpl_query_type($query, $link)	class:mysqli
+mysqli_rpl_query_type		0;"	f	S:int function mysqli_rpl_query_type($query, $link)
 savepoint		0;"	f	S:bool function savepoint($name, $link)	class:mysqli
+mysqli_savepoint		0;"	f	S:bool function mysqli_savepoint($name, $link)
 select_db		0;"	f	S:bool function select_db($dbname, $link)	class:mysqli
+mysqli_select_db		0;"	f	S:bool function mysqli_select_db($dbname, $link)
 send_query		0;"	f	S:bool function send_query($query, $link)	class:mysqli
+mysqli_send_query		0;"	f	S:bool function mysqli_send_query($query, $link)
 set_charset		0;"	f	S:bool function set_charset($charset, $link)	class:mysqli
+mysqli_set_charset		0;"	f	S:bool function mysqli_set_charset($charset, $link)
 set_local_infile_default		0;"	f	S:void function set_local_infile_default($link)	class:mysqli
+mysqli_set_local_infile_default		0;"	f	S:void function mysqli_set_local_infile_default($link)
 set_local_infile_handler		0;"	f	S:bool function set_local_infile_handler($link, $read_func)	class:mysqli
+mysqli_set_local_infile_handler		0;"	f	S:bool function mysqli_set_local_infile_handler($link, $read_func)
 mysqli->sqlstate		0;"	p	class:mysqli	S: mysqli::mysqli->sqlstate
 $sqlstate		0;"	f	S:string function $sqlstate($link)	class:mysqli
+mysqli_sqlstate		0;"	f	S:string function mysqli_sqlstate($link)
 ssl_set		0;"	f	S:bool function ssl_set($key, $cert, $ca, $capath, $cipher, $link)	class:mysqli
+mysqli_ssl_set		0;"	f	S:bool function mysqli_ssl_set($key, $cert, $ca, $capath, $cipher, $link)
 stat		0;"	f	S:string function stat($link)	class:mysqli
+mysqli_stat		0;"	f	S:string function mysqli_stat($link)
 stmt_init		0;"	f	S:mysqli_stmt function stmt_init($link)	class:mysqli
+mysqli_stmt_init		0;"	f	S:mysqli_stmt function mysqli_stmt_init($link)
 store_result		0;"	f	S:mysqli_result function store_result($option)	class:mysqli
+mysqli_store_result		0;"	f	S:mysqli_result function mysqli_store_result($option)
 mysqli->thread_id		0;"	p	class:mysqli	S: mysqli::mysqli->thread_id
 $thread_id		0;"	f	S:int function $thread_id($link)	class:mysqli
+mysqli_thread_id		0;"	f	S:int function mysqli_thread_id($link)
 thread_safe		0;"	f	S:bool function thread_safe()	class:mysqli
+mysqli_thread_safe		0;"	f	S:bool function mysqli_thread_safe()
 use_result		0;"	f	S:mysqli_result function use_result($link)	class:mysqli
+mysqli_use_result		0;"	f	S:mysqli_result function mysqli_use_result($link)
 mysqli->warning_count		0;"	p	class:mysqli	S: mysqli::mysqli->warning_count
 $warning_count		0;"	f	S:int function $warning_count($link)	class:mysqli
+mysqli_warning_count		0;"	f	S:int function mysqli_warning_count($link)
 mysqli_stmt		0;"	c
 mysqli_stmt->affected_rows		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->affected_rows
 mysqli_stmt->errno		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->errno
@@ -2994,40 +3136,67 @@ mysqli_stmt->param_count		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->p
 mysqli_stmt->sqlstate		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->sqlstate
 mysqli_stmt->affected_rows		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->affected_rows
 $affected_rows		0;"	f	S:int function $affected_rows($stmt)	class:mysqli_stmt
+mysqli_stmt_affected_rows		0;"	f	S:int function mysqli_stmt_affected_rows($stmt)
 attr_get		0;"	f	S:int function attr_get($attr, $stmt)	class:mysqli_stmt
+mysqli_stmt_attr_get		0;"	f	S:int function mysqli_stmt_attr_get($attr, $stmt)
 attr_set		0;"	f	S:bool function attr_set($attr, $mode, $stmt)	class:mysqli_stmt
+mysqli_stmt_attr_set		0;"	f	S:bool function mysqli_stmt_attr_set($attr, $mode, $stmt)
 bind_param		0;"	f	S:bool function bind_param($types, &$var1, &$..., $stmt)	class:mysqli_stmt
+mysqli_stmt_bind_param		0;"	f	S:bool function mysqli_stmt_bind_param($types, &$var1, &$..., $stmt)
 bind_result		0;"	f	S:bool function bind_result(&$var1, &$..., $stmt)	class:mysqli_stmt
+mysqli_stmt_bind_result		0;"	f	S:bool function mysqli_stmt_bind_result(&$var1, &$..., $stmt)
 close		0;"	f	S:bool function close($stmt)	class:mysqli_stmt
+mysqli_stmt_close		0;"	f	S:bool function mysqli_stmt_close($stmt)
 data_seek		0;"	f	S:void function data_seek($offset, $stmt)	class:mysqli_stmt
+mysqli_stmt_data_seek		0;"	f	S:void function mysqli_stmt_data_seek($offset, $stmt)
 mysqli_stmt->errno		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->errno
 $errno		0;"	f	S:int function $errno($stmt)	class:mysqli_stmt
+mysqli_stmt_errno		0;"	f	S:int function mysqli_stmt_errno($stmt)
 mysqli_stmt->error_list		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->error_list
 $error_list		0;"	f	S:array function $error_list($stmt)	class:mysqli_stmt
+mysqli_stmt_error_list		0;"	f	S:array function mysqli_stmt_error_list($stmt)
 mysqli_stmt->error		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->error
 $error		0;"	f	S:string function $error($stmt)	class:mysqli_stmt
+mysqli_stmt_error		0;"	f	S:string function mysqli_stmt_error($stmt)
 execute		0;"	f	S:bool function execute($stmt)	class:mysqli_stmt
+mysqli_stmt_execute		0;"	f	S:bool function mysqli_stmt_execute($stmt)
 fetch		0;"	f	S:bool function fetch($stmt)	class:mysqli_stmt
+mysqli_stmt_fetch		0;"	f	S:bool function mysqli_stmt_fetch($stmt)
 mysqli_stmt->field_count		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->field_count
 $field_count		0;"	f	S:int function $field_count($stmt)	class:mysqli_stmt
+mysqli_stmt_field_count		0;"	f	S:int function mysqli_stmt_field_count($stmt)
 free_result		0;"	f	S:void function free_result($stmt)	class:mysqli_stmt
+mysqli_stmt_free_result		0;"	f	S:void function mysqli_stmt_free_result($stmt)
 get_result		0;"	f	S:mysqli_result function get_result($stmt)	class:mysqli_stmt
+mysqli_stmt_get_result		0;"	f	S:mysqli_result function mysqli_stmt_get_result($stmt)
 get_warnings		0;"	f	S:object function get_warnings($stmt)	class:mysqli_stmt
+mysqli_stmt_get_warnings		0;"	f	S:object function mysqli_stmt_get_warnings($stmt)
 mysqli_stmt->insert_id		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->insert_id
 $insert_id		0;"	f	S:mixed function $insert_id($stmt)	class:mysqli_stmt
+mysqli_stmt_insert_id		0;"	f	S:mixed function mysqli_stmt_insert_id($stmt)
 more_results		0;"	f	S:bool function more_results($stmt)	class:mysqli_stmt
+mysqli_stmt_more_results		0;"	f	S:bool function mysqli_stmt_more_results($stmt)
 next_result		0;"	f	S:bool function next_result($stmt)	class:mysqli_stmt
+mysqli_stmt_next_result		0;"	f	S:bool function mysqli_stmt_next_result($stmt)
 mysqli_stmt->num_rows		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->num_rows
 $num_rows		0;"	f	S:int function $num_rows($stmt)	class:mysqli_stmt
+mysqli_stmt_num_rows		0;"	f	S:int function mysqli_stmt_num_rows($stmt)
 mysqli_stmt->param_count		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->param_count
 $param_count		0;"	f	S:int function $param_count($stmt)	class:mysqli_stmt
+mysqli_stmt_param_count		0;"	f	S:int function mysqli_stmt_param_count($stmt)
 prepare		0;"	f	S:bool function prepare($query, $stmt)	class:mysqli_stmt
+mysqli_stmt_prepare		0;"	f	S:bool function mysqli_stmt_prepare($query, $stmt)
 reset		0;"	f	S:bool function reset($stmt)	class:mysqli_stmt
+mysqli_stmt_reset		0;"	f	S:bool function mysqli_stmt_reset($stmt)
 result_metadata		0;"	f	S:mysqli_result function result_metadata($stmt)	class:mysqli_stmt
+mysqli_stmt_result_metadata		0;"	f	S:mysqli_result function mysqli_stmt_result_metadata($stmt)
 send_long_data		0;"	f	S:bool function send_long_data($param_nr, $data, $stmt)	class:mysqli_stmt
+mysqli_stmt_send_long_data		0;"	f	S:bool function mysqli_stmt_send_long_data($param_nr, $data, $stmt)
 mysqli_stmt->sqlstate		0;"	p	class:mysqli_stmt	S: mysqli_stmt::mysqli_stmt->sqlstate
 $sqlstate		0;"	f	S:string function $sqlstate($stmt)	class:mysqli_stmt
+mysqli_stmt_sqlstate		0;"	f	S:string function mysqli_stmt_sqlstate($stmt)
 store_result		0;"	f	S:bool function store_result($stmt)	class:mysqli_stmt
+mysqli_stmt_store_result		0;"	f	S:bool function mysqli_stmt_store_result($stmt)
 mysqli_result		0;"	c
 mysqli_result->current_field		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->current_field
 mysqli_result->field_count		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->field_count
@@ -3035,23 +3204,38 @@ mysqli_result->lengths		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_resul
 mysqli_result->num_rows		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->num_rows
 mysqli_result->current_field		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->current_field
 $current_field		0;"	f	S:int function $current_field($result)	class:mysqli_result
+mysqli_field_tell		0;"	f	S:int function mysqli_field_tell($result)
 data_seek		0;"	f	S:bool function data_seek($offset, $result)	class:mysqli_result
+mysqli_data_seek		0;"	f	S:bool function mysqli_data_seek($offset, $result)
 fetch_all		0;"	f	S:mixed function fetch_all($resulttype = MYSQLI_NUM, $result)	class:mysqli_result
+mysqli_fetch_all		0;"	f	S:mixed function mysqli_fetch_all($resulttype = MYSQLI_NUM, $result)
 fetch_array		0;"	f	S:mixed function fetch_array($resulttype = MYSQLI_BOTH, $result)	class:mysqli_result
+mysqli_fetch_array		0;"	f	S:mixed function mysqli_fetch_array($resulttype = MYSQLI_BOTH, $result)
 fetch_assoc		0;"	f	S:array function fetch_assoc($result)	class:mysqli_result
+mysqli_fetch_assoc		0;"	f	S:array function mysqli_fetch_assoc($result)
 fetch_field_direct		0;"	f	S:object function fetch_field_direct($fieldnr, $result)	class:mysqli_result
+mysqli_fetch_field_direct		0;"	f	S:object function mysqli_fetch_field_direct($fieldnr, $result)
 fetch_field		0;"	f	S:object function fetch_field($result)	class:mysqli_result
+mysqli_fetch_field		0;"	f	S:object function mysqli_fetch_field($result)
 fetch_fields		0;"	f	S:array function fetch_fields($result)	class:mysqli_result
+mysqli_fetch_fields		0;"	f	S:array function mysqli_fetch_fields($result)
 fetch_object		0;"	f	S:object function fetch_object($class_name = "stdClass", $params, $result)	class:mysqli_result
+mysqli_fetch_object		0;"	f	S:object function mysqli_fetch_object($class_name = "stdClass", $params, $result)
 fetch_row		0;"	f	S:mixed function fetch_row($result)	class:mysqli_result
+mysqli_fetch_row		0;"	f	S:mixed function mysqli_fetch_row($result)
 mysqli_result->field_count		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->field_count
 $field_count		0;"	f	S:int function $field_count($result)	class:mysqli_result
+mysqli_num_fields		0;"	f	S:int function mysqli_num_fields($result)
 field_seek		0;"	f	S:bool function field_seek($fieldnr, $result)	class:mysqli_result
+mysqli_field_seek		0;"	f	S:bool function mysqli_field_seek($fieldnr, $result)
 free		0;"	f	S:void function free($result)	class:mysqli_result
+mysqli_free_result		0;"	f	S:void function mysqli_free_result($result)
 mysqli_result->lengths		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->lengths
 $lengths		0;"	f	S:array function $lengths($result)	class:mysqli_result
+mysqli_fetch_lengths		0;"	f	S:array function mysqli_fetch_lengths($result)
 mysqli_result->num_rows		0;"	p	class:mysqli_result	S: mysqli_result::mysqli_result->num_rows
 $num_rows		0;"	f	S:int function $num_rows($result)	class:mysqli_result
+mysqli_num_rows		0;"	f	S:int function mysqli_num_rows($result)
 mysqli_driver		0;"	c
 client_info		0;"	p	class:mysqli_driver	S: mysqli_driver::client_info
 client_version		0;"	p	class:mysqli_driver	S: mysqli_driver::client_version
@@ -3060,9 +3244,12 @@ embedded		0;"	p	class:mysqli_driver	S: mysqli_driver::embedded
 reconnect		0;"	p	class:mysqli_driver	S: mysqli_driver::reconnect
 report_mode		0;"	p	class:mysqli_driver	S: mysqli_driver::report_mode
 embedded_server_end		0;"	f	S:void function embedded_server_end()	class:mysqli_driver
+mysqli_embedded_server_end		0;"	f	S:void function mysqli_embedded_server_end()
 embedded_server_start		0;"	f	S:bool function embedded_server_start($start, $arguments, $groups)	class:mysqli_driver
+mysqli_embedded_server_start		0;"	f	S:bool function mysqli_embedded_server_start($start, $arguments, $groups)
 mysqli_driver->report_mode		0;"	p	class:mysqli_driver	S: mysqli_driver::mysqli_driver->report_mode
 $report_mode		0;"	f	S:bool function $report_mode($flags)	class:mysqli_driver
+mysqli_report		0;"	f	S:bool function mysqli_report($flags)
 mysqli_warning		0;"	c
 message		0;"	p	class:mysqli_warning	S: mysqli_warning::message
 sqlstate		0;"	p	class:mysqli_warning	S: mysqli_warning::sqlstate
@@ -3080,6 +3267,7 @@ mysqli_bind_result		0;"	f	S: function mysqli_bind_result()
 mysqli_client_encoding		0;"	f	S: function mysqli_client_encoding()
 mysqli_connect		0;"	f	S: function mysqli_connect()
 disable_reads_from_master		0;"	f	S:bool function disable_reads_from_master($link)	class:mysqli
+mysqli_disable_reads_from_master		0;"	f	S:bool function mysqli_disable_reads_from_master($link)
 mysqli_disable_rpl_parse		0;"	f	S:bool function mysqli_disable_rpl_parse($link)
 mysqli_enable_reads_from_master		0;"	f	S:bool function mysqli_enable_reads_from_master($link)
 mysqli_enable_rpl_parse		0;"	f	S:bool function mysqli_enable_rpl_parse($link)
@@ -3096,6 +3284,7 @@ mysqli_rpl_parse_enabled		0;"	f	S:int function mysqli_rpl_parse_enabled($link)
 mysqli_rpl_probe		0;"	f	S:bool function mysqli_rpl_probe($link)
 mysqli_send_long_data		0;"	f	S: function mysqli_send_long_data()
 set_opt		0;"	f	S: function set_opt()	class:mysqli
+mysqli_set_opt		0;"	f	S: function mysqli_set_opt()
 mysqli_slave_query		0;"	f	S:bool function mysqli_slave_query($link, $query)
 MYSQLND_MS_MASTER_SWITCH		0;"	d
 MYSQLND_MS_SLAVE_SWITCH		0;"	d
@@ -3624,45 +3813,73 @@ SQLITE_AUTH		0;"	d
 SQLITE_ROW		0;"	d
 SQLITE_DONE		0;"	d
 sqlite_array_query		0;"	f	S:array function sqlite_array_query($dbhandle, $query, $result_type = SQLITE_BOTH, $decode_binary = true)
+arrayQuery		0;"	f	S:array function arrayQuery($dbhandle, $query, $result_type = SQLITE_BOTH, $decode_binary = true)	class:SQLiteDatabase
 sqlite_busy_timeout		0;"	f	S:void function sqlite_busy_timeout($dbhandle, $milliseconds)
+busyTimeout		0;"	f	S:void function busyTimeout($dbhandle, $milliseconds)	class:SQLiteDatabase
 sqlite_changes		0;"	f	S:int function sqlite_changes($dbhandle)
+changes		0;"	f	S:int function changes($dbhandle)	class:SQLiteDatabase
 sqlite_close		0;"	f	S:void function sqlite_close($dbhandle)
 sqlite_column		0;"	f	S:mixed function sqlite_column($result, $index_or_name, $decode_binary = true)
+column		0;"	f	S:mixed function column($result, $index_or_name, $decode_binary = true)	class:SQLiteResult
 sqlite_create_aggregate		0;"	f	S:void function sqlite_create_aggregate($dbhandle, $function_name, $step_func, $finalize_func, $num_args = -1)
+createAggregate		0;"	f	S:void function createAggregate($dbhandle, $function_name, $step_func, $finalize_func, $num_args = -1)	class:SQLiteDatabase
 sqlite_create_function		0;"	f	S:void function sqlite_create_function($dbhandle, $function_name, $callback, $num_args = -1)
+createFunction		0;"	f	S:void function createFunction($dbhandle, $function_name, $callback, $num_args = -1)	class:SQLiteDatabase
 sqlite_current		0;"	f	S:array function sqlite_current($result, $result_type = SQLITE_BOTH, $decode_binary = true)
+current		0;"	f	S:array function current($result, $result_type = SQLITE_BOTH, $decode_binary = true)	class:SQLiteResult
 sqlite_error_string		0;"	f	S:string function sqlite_error_string($error_code)
 sqlite_escape_string		0;"	f	S:string function sqlite_escape_string($item)
 sqlite_exec		0;"	f	S:bool function sqlite_exec($dbhandle, $query, &$error_msg)
+exec		0;"	f	S:bool function exec($dbhandle, $query, &$error_msg)	class:SQLiteDatabase
 sqlite_factory		0;"	f	S:SQLiteDatabase function sqlite_factory($filename, $mode = 0666, &$error_message)
 sqlite_fetch_all		0;"	f	S:array function sqlite_fetch_all($result, $result_type = SQLITE_BOTH, $decode_binary = true)
+fetchAll		0;"	f	S:array function fetchAll($result, $result_type = SQLITE_BOTH, $decode_binary = true)	class:SQLiteResult
 sqlite_fetch_array		0;"	f	S:array function sqlite_fetch_array($result, $result_type = SQLITE_BOTH, $decode_binary = true)
+fetch		0;"	f	S:array function fetch($result, $result_type = SQLITE_BOTH, $decode_binary = true)	class:SQLiteResult
 sqlite_fetch_column_types		0;"	f	S:array function sqlite_fetch_column_types($table_name, $dbhandle, $result_type = SQLITE_ASSOC)
+fetchColumnTypes		0;"	f	S:array function fetchColumnTypes($table_name, $dbhandle, $result_type = SQLITE_ASSOC)	class:SQLiteDatabase
 sqlite_fetch_object		0;"	f	S:object function sqlite_fetch_object($result, $class_name, $ctor_params, $decode_binary = true)
+fetchObject		0;"	f	S:object function fetchObject($result, $class_name, $ctor_params, $decode_binary = true)	class:SQLiteResult
 sqlite_fetch_single		0;"	f	S:string function sqlite_fetch_single($result, $decode_binary = true)
+fetchSingle		0;"	f	S:string function fetchSingle($result, $decode_binary = true)	class:SQLiteResult
 sqlite_fetch_string		0;"	f	S: function sqlite_fetch_string()
 sqlite_field_name		0;"	f	S:string function sqlite_field_name($result, $field_index)
+fieldName		0;"	f	S:string function fieldName($result, $field_index)	class:SQLiteResult
 sqlite_has_more		0;"	f	S:bool function sqlite_has_more($result)
 sqlite_has_prev		0;"	f	S:bool function sqlite_has_prev($result)
+hasPrev		0;"	f	S:bool function hasPrev($result)	class:SQLiteResult
 sqlite_key		0;"	f	S:int function sqlite_key()
+key		0;"	f	S:int function key()	class:SQLiteResult
 sqlite_last_error		0;"	f	S:int function sqlite_last_error($dbhandle)
+lastError		0;"	f	S:int function lastError($dbhandle)	class:SQLiteDatabase
 sqlite_last_insert_rowid		0;"	f	S:int function sqlite_last_insert_rowid($dbhandle)
+lastInsertRowid		0;"	f	S:int function lastInsertRowid($dbhandle)	class:SQLiteDatabase
 sqlite_libencoding		0;"	f	S:string function sqlite_libencoding()
 sqlite_libversion		0;"	f	S:string function sqlite_libversion()
 sqlite_next		0;"	f	S:bool function sqlite_next($result)
+next		0;"	f	S:bool function next($result)	class:SQLiteResult
 sqlite_num_fields		0;"	f	S:int function sqlite_num_fields($result)
+numFields		0;"	f	S:int function numFields($result)	class:SQLiteResult
 sqlite_num_rows		0;"	f	S:int function sqlite_num_rows($result)
+numRows		0;"	f	S:int function numRows($result)	class:SQLiteResult
 sqlite_open		0;"	f	S:resource function sqlite_open($filename, $mode = 0666, &$error_message)
 sqlite_popen		0;"	f	S:resource function sqlite_popen($filename, $mode = 0666, &$error_message)
 sqlite_prev		0;"	f	S:bool function sqlite_prev($result)
+prev		0;"	f	S:bool function prev($result)	class:SQLiteResult
 sqlite_query		0;"	f	S:SQLiteResult function sqlite_query($dbhandle, $query, $result_type = SQLITE_BOTH, &$error_msg)
+query		0;"	f	S:SQLiteResult function query($dbhandle, $query, $result_type = SQLITE_BOTH, &$error_msg)	class:SQLiteDatabase
 sqlite_rewind		0;"	f	S:bool function sqlite_rewind($result)
+rewind		0;"	f	S:bool function rewind($result)	class:SQLiteResult
 sqlite_seek		0;"	f	S:bool function sqlite_seek($result, $rownum)
+seek		0;"	f	S:bool function seek($result, $rownum)	class:SQLiteResult
 sqlite_single_query		0;"	f	S:array function sqlite_single_query($db, $query, $first_row_only, $decode_binary)
+singleQuery		0;"	f	S:array function singleQuery($db, $query, $first_row_only, $decode_binary)	class:SQLiteDatabase
 sqlite_udf_decode_binary		0;"	f	S:string function sqlite_udf_decode_binary($data)
 sqlite_udf_encode_binary		0;"	f	S:string function sqlite_udf_encode_binary($data)
 sqlite_unbuffered_query		0;"	f	S:SQLiteUnbuffered function sqlite_unbuffered_query($dbhandle, $query, $result_type = SQLITE_BOTH, &$error_msg)
+unbufferedQuery		0;"	f	S:SQLiteUnbuffered function unbufferedQuery($dbhandle, $query, $result_type = SQLITE_BOTH, &$error_msg)	class:SQLiteDatabase
 sqlite_valid		0;"	f	S:bool function sqlite_valid($result)
+valid		0;"	f	S:bool function valid($result)	class:SQLiteResult
 SQLITE3_ASSOC		0;"	d
 SQLITE3_NUM		0;"	d
 SQLITE3_BOTH		0;"	d
@@ -3999,21 +4216,34 @@ RFC3339		0;"	o	class:DateTime	a:const	S:const DateTime::RFC3339
 RSS		0;"	o	class:DateTime	a:const	S:const DateTime::RSS
 W3C		0;"	o	class:DateTime	a:const	S:const DateTime::W3C
 add		0;"	f	S:DateTime function add($interval, $object)	class:DateTime
+date_add		0;"	f	S:DateTime function date_add($interval, $object)
 __construct		0;"	f	S:DateTime function __construct($time = "now", $timezone)	class:DateTime
+date_create		0;"	f	S:DateTime function date_create($time = "now", $timezone)
 createFromFormat		0;"	f	S:DateTime function createFromFormat($format, $time, $timezone)	class:DateTime	a:static
+date_create_from_format		0;"	f	S:DateTime function date_create_from_format($format, $time, $timezone)
 getLastErrors		0;"	f	S:array function getLastErrors()	class:DateTime	a:static
+date_get_last_errors		0;"	f	S:array function date_get_last_errors()
 modify		0;"	f	S:DateTime function modify($modify, $object)	class:DateTime
+date_modify		0;"	f	S:DateTime function date_modify($modify, $object)
 __set_state		0;"	f	S:DateTime function __set_state($array)	class:DateTime	a:static
 setDate		0;"	f	S:DateTime function setDate($year, $month, $day, $object)	class:DateTime
+date_date_set		0;"	f	S:DateTime function date_date_set($year, $month, $day, $object)
 setISODate		0;"	f	S:DateTime function setISODate($year, $week, $day = 1, $object)	class:DateTime
+date_isodate_set		0;"	f	S:DateTime function date_isodate_set($year, $week, $day = 1, $object)
 setTime		0;"	f	S:DateTime function setTime($hour, $minute, $second, $object)	class:DateTime
+date_time_set		0;"	f	S:DateTime function date_time_set($hour, $minute, $second, $object)
 setTimestamp		0;"	f	S:DateTime function setTimestamp($unixtimestamp, $object)	class:DateTime
+date_timestamp_set		0;"	f	S:DateTime function date_timestamp_set($unixtimestamp, $object)
 setTimezone		0;"	f	S:object function setTimezone($timezone, $object)	class:DateTime
+date_timezone_set		0;"	f	S:object function date_timezone_set($timezone, $object)
 sub		0;"	f	S:DateTime function sub($interval, $object)	class:DateTime
+date_sub		0;"	f	S:DateTime function date_sub($interval, $object)
 DateTimeImmutable		0;"	c
 add		0;"	f	S:DateTimeImmutable function add($interval)	class:DateTimeImmutable
 __construct		0;"	f	S:DateTimeImmutable function __construct($time = "now", $timezone)	class:DateTimeImmutable
+date_create_immutable		0;"	f	S:DateTimeImmutable function date_create_immutable($time = "now", $timezone)
 createFromFormat		0;"	f	S:DateTimeImmutable function createFromFormat($format, $time, $timezone)	class:DateTimeImmutable	a:static
+date_create_immutable_from_format		0;"	f	S:DateTimeImmutable function date_create_immutable_from_format($format, $time, $timezone)
 createFromMutable		0;"	f	S:DateTimeImmutable function createFromMutable($datetime)	class:DateTimeImmutable	a:static
 getLastErrors		0;"	f	S:array function getLastErrors()	class:DateTimeImmutable	a:static
 modify		0;"	f	S:DateTimeImmutable function modify($modify)	class:DateTimeImmutable
@@ -4026,11 +4256,17 @@ setTimezone		0;"	f	S:DateTimeImmutable function setTimezone($timezone)	class:Dat
 sub		0;"	f	S:DateTimeImmutable function sub($interval)	class:DateTimeImmutable
 DateTimeInterface		0;"	c
 diff		0;"	f	S:DateInterval function diff($datetime2, $absolute = false, $datetime1)	class:DateTime
+diff		0;"	f	S:DateInterval function diff($datetime2, $absolute = false, $datetime1)	class:DateTimeImmutable
 format		0;"	f	S:string function format($format, $object)	class:DateTime
+format		0;"	f	S:string function format($format, $object)	class:DateTimeImmutable
 getOffset		0;"	f	S:int function getOffset($object)	class:DateTime
+getOffset		0;"	f	S:int function getOffset($object)	class:DateTimeImmutable
 getTimestamp		0;"	f	S:int function getTimestamp($object)	class:DateTime
+getTimestamp		0;"	f	S:int function getTimestamp($object)	class:DateTimeImmutable
 getTimezone		0;"	f	S:DateTimeZone function getTimezone($object)	class:DateTime
+getTimezone		0;"	f	S:DateTimeZone function getTimezone($object)	class:DateTimeImmutable
 __wakeup		0;"	f	S: function __wakeup()	class:DateTime
+__wakeup		0;"	f	S: function __wakeup()	class:DateTimeImmutable
 DateTimeZone		0;"	c
 AFRICA		0;"	o	class:DateTimeZone	a:const	S:const DateTimeZone::AFRICA
 AMERICA		0;"	o	class:DateTimeZone	a:const	S:const DateTimeZone::AMERICA
@@ -4047,12 +4283,19 @@ ALL		0;"	o	class:DateTimeZone	a:const	S:const DateTimeZone::ALL
 ALL_WITH_BC		0;"	o	class:DateTimeZone	a:const	S:const DateTimeZone::ALL_WITH_BC
 PER_COUNTRY		0;"	o	class:DateTimeZone	a:const	S:const DateTimeZone::PER_COUNTRY
 __construct		0;"	f	S:DateTimeZone function __construct($timezone)	class:DateTimeZone
+timezone_open		0;"	f	S:DateTimeZone function timezone_open($timezone)
 getLocation		0;"	f	S:array function getLocation($object)	class:DateTimeZone
+timezone_location_get		0;"	f	S:array function timezone_location_get($object)
 getName		0;"	f	S:string function getName($object)	class:DateTimeZone
+timezone_name_get		0;"	f	S:string function timezone_name_get($object)
 getOffset		0;"	f	S:int function getOffset($datetime, $object)	class:DateTimeZone
+timezone_offset_get		0;"	f	S:int function timezone_offset_get($datetime, $object)
 getTransitions		0;"	f	S:array function getTransitions($timestamp_begin, $timestamp_end, $object)	class:DateTimeZone
+timezone_transitions_get		0;"	f	S:array function timezone_transitions_get($timestamp_begin, $timestamp_end, $object)
 listAbbreviations		0;"	f	S:array function listAbbreviations()	class:DateTimeZone	a:static
+timezone_abbreviations_list		0;"	f	S:array function timezone_abbreviations_list()
 listIdentifiers		0;"	f	S:array function listIdentifiers($what = DateTimeZone::ALL, $country)	class:DateTimeZone	a:static
+timezone_identifiers_list		0;"	f	S:array function timezone_identifiers_list($what = DateTimeZone::ALL, $country)
 DateInterval		0;"	c
 y		0;"	p	class:DateInterval	S: DateInterval::y
 m		0;"	p	class:DateInterval	S: DateInterval::m
@@ -4210,10 +4453,14 @@ FILEINFO_CONTINUE		0;"	d
 FILEINFO_PRESERVE_ATIME		0;"	d
 FILEINFO_RAW		0;"	d
 finfo_buffer		0;"	f	S:string function finfo_buffer($finfo, $string, $options = FILEINFO_NONE, $context)
+buffer		0;"	f	S:string function buffer($finfo, $string, $options = FILEINFO_NONE, $context)	class:finfo
 finfo_close		0;"	f	S:bool function finfo_close($finfo)
 finfo_file		0;"	f	S:string function finfo_file($finfo, $file_name, $options = FILEINFO_NONE, $context)
+file		0;"	f	S:string function file($finfo, $file_name, $options = FILEINFO_NONE, $context)	class:finfo
 finfo_open		0;"	f	S:resource function finfo_open($options = FILEINFO_NONE, $magic_file)
+__construct		0;"	f	S:resource function __construct($options = FILEINFO_NONE, $magic_file)	class:finfo
 finfo_set_flags		0;"	f	S:bool function finfo_set_flags($finfo, $options)
+set_flags		0;"	f	S:bool function set_flags($finfo, $options)	class:finfo
 mime_content_type		0;"	f	S:string function mime_content_type($filename)
 SEEK_SET		0;"	d
 SEEK_CUR		0;"	d
@@ -4518,69 +4765,128 @@ INTL_IDNA_VARIANT_UTS46		0;"	d
 IDNA_ERROR_CONTEXTJ		0;"	d
 Collator		0;"	c
 asort		0;"	f	S:bool function asort(&$arr, $sort_flag, $coll)	class:Collator
+collator_asort		0;"	f	S:bool function collator_asort(&$arr, $sort_flag, $coll)
 compare		0;"	f	S:int function compare($str1, $str2, $coll)	class:Collator
+collator_compare		0;"	f	S:int function collator_compare($str1, $str2, $coll)
 __construct		0;"	f	S: function __construct($locale)	class:Collator
 create		0;"	f	S:Collator function create($locale)	class:Collator	a:static
+collator_create		0;"	f	S:Collator function collator_create($locale)
 getAttribute		0;"	f	S:int function getAttribute($attr, $coll)	class:Collator
+collator_get_attribute		0;"	f	S:int function collator_get_attribute($attr, $coll)
 getErrorCode		0;"	f	S:int function getErrorCode($coll)	class:Collator
+collator_get_error_code		0;"	f	S:int function collator_get_error_code($coll)
 getErrorMessage		0;"	f	S:string function getErrorMessage($coll)	class:Collator
+collator_get_error_message		0;"	f	S:string function collator_get_error_message($coll)
 getLocale		0;"	f	S:string function getLocale($type, $coll)	class:Collator
+collator_get_locale		0;"	f	S:string function collator_get_locale($type, $coll)
 getSortKey		0;"	f	S:string function getSortKey($str, $coll)	class:Collator
+collator_get_sort_key		0;"	f	S:string function collator_get_sort_key($str, $coll)
 getStrength		0;"	f	S:int function getStrength($coll)	class:Collator
+collator_get_strength		0;"	f	S:int function collator_get_strength($coll)
 setAttribute		0;"	f	S:bool function setAttribute($attr, $val, $coll)	class:Collator
+collator_set_attribute		0;"	f	S:bool function collator_set_attribute($attr, $val, $coll)
 setStrength		0;"	f	S:bool function setStrength($strength, $coll)	class:Collator
+collator_set_strength		0;"	f	S:bool function collator_set_strength($strength, $coll)
 sortWithSortKeys		0;"	f	S:bool function sortWithSortKeys(&$arr, $coll)	class:Collator
+collator_sort_with_sort_keys		0;"	f	S:bool function collator_sort_with_sort_keys(&$arr, $coll)
 sort		0;"	f	S:bool function sort(&$arr, $sort_flag, $coll)	class:Collator
+collator_sort		0;"	f	S:bool function collator_sort(&$arr, $sort_flag, $coll)
 NumberFormatter		0;"	c
 create		0;"	f	S:NumberFormatter function create($locale, $style, $pattern)	class:NumberFormatter	a:static
+numfmt_create		0;"	f	S:NumberFormatter function numfmt_create($locale, $style, $pattern)
 formatCurrency		0;"	f	S:string function formatCurrency($value, $currency, $fmt)	class:NumberFormatter
+numfmt_format_currency		0;"	f	S:string function numfmt_format_currency($value, $currency, $fmt)
 format		0;"	f	S:string function format($value, $type, $fmt)	class:NumberFormatter
+numfmt_format		0;"	f	S:string function numfmt_format($value, $type, $fmt)
 getAttribute		0;"	f	S:int function getAttribute($attr, $fmt)	class:NumberFormatter
+numfmt_get_attribute		0;"	f	S:int function numfmt_get_attribute($attr, $fmt)
 getErrorCode		0;"	f	S:int function getErrorCode($fmt)	class:NumberFormatter
+numfmt_get_error_code		0;"	f	S:int function numfmt_get_error_code($fmt)
 getErrorMessage		0;"	f	S:string function getErrorMessage($fmt)	class:NumberFormatter
+numfmt_get_error_message		0;"	f	S:string function numfmt_get_error_message($fmt)
 getLocale		0;"	f	S:string function getLocale($type, $fmt)	class:NumberFormatter
+numfmt_get_locale		0;"	f	S:string function numfmt_get_locale($type, $fmt)
 getPattern		0;"	f	S:string function getPattern($fmt)	class:NumberFormatter
+numfmt_get_pattern		0;"	f	S:string function numfmt_get_pattern($fmt)
 getSymbol		0;"	f	S:string function getSymbol($attr, $fmt)	class:NumberFormatter
+numfmt_get_symbol		0;"	f	S:string function numfmt_get_symbol($attr, $fmt)
 getTextAttribute		0;"	f	S:string function getTextAttribute($attr, $fmt)	class:NumberFormatter
+numfmt_get_text_attribute		0;"	f	S:string function numfmt_get_text_attribute($attr, $fmt)
 parseCurrency		0;"	f	S:float function parseCurrency($value, &$currency, &$position, $fmt)	class:NumberFormatter
+numfmt_parse_currency		0;"	f	S:float function numfmt_parse_currency($value, &$currency, &$position, $fmt)
 parse		0;"	f	S:mixed function parse($value, $type, &$position, $fmt)	class:NumberFormatter
+numfmt_parse		0;"	f	S:mixed function numfmt_parse($value, $type, &$position, $fmt)
 setAttribute		0;"	f	S:bool function setAttribute($attr, $value, $fmt)	class:NumberFormatter
+numfmt_set_attribute		0;"	f	S:bool function numfmt_set_attribute($attr, $value, $fmt)
 setPattern		0;"	f	S:bool function setPattern($pattern, $fmt)	class:NumberFormatter
+numfmt_set_pattern		0;"	f	S:bool function numfmt_set_pattern($pattern, $fmt)
 setSymbol		0;"	f	S:bool function setSymbol($attr, $value, $fmt)	class:NumberFormatter
+numfmt_set_symbol		0;"	f	S:bool function numfmt_set_symbol($attr, $value, $fmt)
 setTextAttribute		0;"	f	S:bool function setTextAttribute($attr, $value, $fmt)	class:NumberFormatter
+numfmt_set_text_attribute		0;"	f	S:bool function numfmt_set_text_attribute($attr, $value, $fmt)
 Locale		0;"	c
 acceptFromHttp		0;"	f	S:string function acceptFromHttp($header)	class:Locale	a:static
+locale_accept_from_http		0;"	f	S:string function locale_accept_from_http($header)
 canonicalize		0;"	f	S:string function canonicalize($locale)	class:Locale	a:static
+locale_canonicalize		0;"	f	S:string function locale_canonicalize($locale)
 composeLocale		0;"	f	S:string function composeLocale($subtags)	class:Locale	a:static
+locale_compose		0;"	f	S:string function locale_compose($subtags)
 filterMatches		0;"	f	S:bool function filterMatches($langtag, $locale, $canonicalize = false)	class:Locale	a:static
+locale_filter_matches		0;"	f	S:bool function locale_filter_matches($langtag, $locale, $canonicalize = false)
 getAllVariants		0;"	f	S:array function getAllVariants($locale)	class:Locale	a:static
+locale_get_all_variants		0;"	f	S:array function locale_get_all_variants($locale)
 getDefault		0;"	f	S:string function getDefault()	class:Locale	a:static
+locale_get_default		0;"	f	S:string function locale_get_default()
 getDisplayLanguage		0;"	f	S:string function getDisplayLanguage($locale, $in_locale)	class:Locale	a:static
+locale_get_display_language		0;"	f	S:string function locale_get_display_language($locale, $in_locale)
 getDisplayName		0;"	f	S:string function getDisplayName($locale, $in_locale)	class:Locale	a:static
+locale_get_display_name		0;"	f	S:string function locale_get_display_name($locale, $in_locale)
 getDisplayRegion		0;"	f	S:string function getDisplayRegion($locale, $in_locale)	class:Locale	a:static
+locale_get_display_region		0;"	f	S:string function locale_get_display_region($locale, $in_locale)
 getDisplayScript		0;"	f	S:string function getDisplayScript($locale, $in_locale)	class:Locale	a:static
+locale_get_display_script		0;"	f	S:string function locale_get_display_script($locale, $in_locale)
 getDisplayVariant		0;"	f	S:string function getDisplayVariant($locale, $in_locale)	class:Locale	a:static
+locale_get_display_variant		0;"	f	S:string function locale_get_display_variant($locale, $in_locale)
 getKeywords		0;"	f	S:array function getKeywords($locale)	class:Locale	a:static
+locale_get_keywords		0;"	f	S:array function locale_get_keywords($locale)
 getPrimaryLanguage		0;"	f	S:string function getPrimaryLanguage($locale)	class:Locale	a:static
+locale_get_primary_language		0;"	f	S:string function locale_get_primary_language($locale)
 getRegion		0;"	f	S:string function getRegion($locale)	class:Locale	a:static
+locale_get_region		0;"	f	S:string function locale_get_region($locale)
 getScript		0;"	f	S:string function getScript($locale)	class:Locale	a:static
+locale_get_script		0;"	f	S:string function locale_get_script($locale)
 lookup		0;"	f	S:string function lookup($langtag, $locale, $canonicalize = false, $default)	class:Locale	a:static
+locale_lookup		0;"	f	S:string function locale_lookup($langtag, $locale, $canonicalize = false, $default)
 parseLocale		0;"	f	S:array function parseLocale($locale)	class:Locale	a:static
+locale_parse		0;"	f	S:array function locale_parse($locale)
 setDefault		0;"	f	S:bool function setDefault($locale)	class:Locale	a:static
+locale_set_default		0;"	f	S:bool function locale_set_default($locale)
 Normalizer		0;"	c
 isNormalized		0;"	f	S:bool function isNormalized($input, $form = Normalizer::FORM_C)	class:Normalizer	a:static
+normalizer_is_normalized		0;"	f	S:bool function normalizer_is_normalized($input, $form = Normalizer::FORM_C)
 normalize		0;"	f	S:string function normalize($input, $form = Normalizer::FORM_C)	class:Normalizer	a:static
+normalizer_normalize		0;"	f	S:string function normalizer_normalize($input, $form = Normalizer::FORM_C)
 MessageFormatter		0;"	c
 create		0;"	f	S:MessageFormatter function create($locale, $pattern)	class:MessageFormatter	a:static
+__construct		0;"	f	S:MessageFormatter function __construct($locale, $pattern)	class:MessageFormatter
 formatMessage		0;"	f	S:string function formatMessage($locale, $pattern, $args)	class:MessageFormatter	a:static
+msgfmt_format_message		0;"	f	S:string function msgfmt_format_message($locale, $pattern, $args)
 format		0;"	f	S:string function format($args, $fmt)	class:MessageFormatter
+msgfmt_format		0;"	f	S:string function msgfmt_format($args, $fmt)
 getErrorCode		0;"	f	S:int function getErrorCode($fmt)	class:MessageFormatter
+msgfmt_get_error_code		0;"	f	S:int function msgfmt_get_error_code($fmt)
 getErrorMessage		0;"	f	S:string function getErrorMessage($fmt)	class:MessageFormatter
+msgfmt_get_error_message		0;"	f	S:string function msgfmt_get_error_message($fmt)
 getLocale		0;"	f	S:string function getLocale($formatter)	class:MessageFormatter
+msgfmt_get_locale		0;"	f	S:string function msgfmt_get_locale($formatter)
 getPattern		0;"	f	S:string function getPattern($fmt)	class:MessageFormatter
+msgfmt_get_pattern		0;"	f	S:string function msgfmt_get_pattern($fmt)
 parseMessage		0;"	f	S:array function parseMessage($locale, $pattern, $source, $value)	class:MessageFormatter	a:static
+msgfmt_parse_message		0;"	f	S:array function msgfmt_parse_message($locale, $pattern, $source, $value)
 parse		0;"	f	S:array function parse($value, $fmt)	class:MessageFormatter
+msgfmt_parse		0;"	f	S:array function msgfmt_parse($value, $fmt)
 setPattern		0;"	f	S:bool function setPattern($pattern, $fmt)	class:MessageFormatter
+msgfmt_set_pattern		0;"	f	S:bool function msgfmt_set_pattern($pattern, $fmt)
 IntlCalendar		0;"	c
 FIELD_ERA		0;"	o	class:IntlCalendar	a:const	S:const IntlCalendar::FIELD_ERA
 FIELD_YEAR		0;"	o	class:IntlCalendar	a:const	S:const IntlCalendar::FIELD_YEAR
@@ -4636,7 +4942,9 @@ getActualMinimum		0;"	f	S:int function getActualMinimum($field, $cal)	class:Intl
 getAvailableLocales		0;"	f	S:array function getAvailableLocales()	class:IntlCalendar	a:static
 getDayOfWeekType		0;"	f	S:int function getDayOfWeekType($dayOfWeek, $cal)	class:IntlCalendar
 getErrorCode		0;"	f	S:int function getErrorCode($calendar)	class:IntlCalendar
+intlcal_get_error_code		0;"	f	S:int function intlcal_get_error_code($calendar)
 getErrorMessage		0;"	f	S:string function getErrorMessage($calendar)	class:IntlCalendar
+intlcal_get_error_message		0;"	f	S:string function intlcal_get_error_message($calendar)
 getFirstDayOfWeek		0;"	f	S:int function getFirstDayOfWeek($cal)	class:IntlCalendar
 getGreatestMinimum		0;"	f	S:int function getGreatestMinimum($field, $cal)	class:IntlCalendar
 getKeywordValuesForLocale		0;"	f	S:Iterator function getKeywordValuesForLocale($key, $locale, $commonlyUsed)	class:IntlCalendar	a:static
@@ -4680,7 +4988,9 @@ getDisplayName		0;"	f	S:string function getDisplayName($isDaylight, $style, $loc
 getDSTSavings		0;"	f	S:integer function getDSTSavings()	class:IntlTimeZone
 getEquivalentID		0;"	f	S:string function getEquivalentID($zoneId, $index)	class:IntlTimeZone	a:static
 getErrorCode		0;"	f	S:integer function getErrorCode()	class:IntlTimeZone
+intltz_get_error_code		0;"	f	S:integer function intltz_get_error_code()
 getErrorMessage		0;"	f	S:string function getErrorMessage()	class:IntlTimeZone
+intltz_get_error_message		0;"	f	S:string function intltz_get_error_message()
 getGMT		0;"	f	S:IntlTimeZone function getGMT()	class:IntlTimeZone	a:static
 getID		0;"	f	S:string function getID()	class:IntlTimeZone
 getOffset		0;"	f	S:integer function getOffset($date, $local, &$rawOffset, &$dstOffset)	class:IntlTimeZone
@@ -4691,33 +5001,60 @@ toDateTimeZone		0;"	f	S:DateTimeZone function toDateTimeZone()	class:IntlTimeZon
 useDaylightTime		0;"	f	S:bool function useDaylightTime()	class:IntlTimeZone
 IntlDateFormatter		0;"	c
 create		0;"	f	S:IntlDateFormatter function create($locale, $datetype, $timetype, $timezone = NULL, $calendar = NULL, $pattern = "")	class:IntlDateFormatter	a:static
+datefmt_create		0;"	f	S:IntlDateFormatter function datefmt_create($locale, $datetype, $timetype, $timezone = NULL, $calendar = NULL, $pattern = "")
 format		0;"	f	S:string function format($value, $fmt)	class:IntlDateFormatter
+datefmt_format		0;"	f	S:string function datefmt_format($value, $fmt)
 formatObject		0;"	f	S:string function formatObject($object, $format = NULL, $locale = NULL)	class:IntlDateFormatter	a:static
+datefmt_format_object		0;"	f	S:string function datefmt_format_object($object, $format = NULL, $locale = NULL)
 getCalendar		0;"	f	S:int function getCalendar($fmt)	class:IntlDateFormatter
+datefmt_get_calendar		0;"	f	S:int function datefmt_get_calendar($fmt)
 getDateType		0;"	f	S:int function getDateType($fmt)	class:IntlDateFormatter
+datefmt_get_datetype		0;"	f	S:int function datefmt_get_datetype($fmt)
 getErrorCode		0;"	f	S:int function getErrorCode($fmt)	class:IntlDateFormatter
+datefmt_get_error_code		0;"	f	S:int function datefmt_get_error_code($fmt)
 getErrorMessage		0;"	f	S:string function getErrorMessage($fmt)	class:IntlDateFormatter
+datefmt_get_error_message		0;"	f	S:string function datefmt_get_error_message($fmt)
 getLocale		0;"	f	S:string function getLocale($which, $fmt)	class:IntlDateFormatter
+datefmt_get_locale		0;"	f	S:string function datefmt_get_locale($which, $fmt)
 getPattern		0;"	f	S:string function getPattern($fmt)	class:IntlDateFormatter
+datefmt_get_pattern		0;"	f	S:string function datefmt_get_pattern($fmt)
 getTimeType		0;"	f	S:int function getTimeType($fmt)	class:IntlDateFormatter
+datefmt_get_timetype		0;"	f	S:int function datefmt_get_timetype($fmt)
 getTimeZoneId		0;"	f	S:string function getTimeZoneId($fmt)	class:IntlDateFormatter
+datefmt_get_timezone_id		0;"	f	S:string function datefmt_get_timezone_id($fmt)
 getCalendarObject		0;"	f	S:IntlCalendar function getCalendarObject()	class:IntlDateFormatter
+datefmt_get_calendar_object		0;"	f	S:IntlCalendar function datefmt_get_calendar_object()
 getTimeZone		0;"	f	S:IntlTimeZone function getTimeZone()	class:IntlDateFormatter
+datefmt_get_timezone		0;"	f	S:IntlTimeZone function datefmt_get_timezone()
 isLenient		0;"	f	S:bool function isLenient($fmt)	class:IntlDateFormatter
+datefmt_is_lenient		0;"	f	S:bool function datefmt_is_lenient($fmt)
 localtime		0;"	f	S:array function localtime($value, &$position, $fmt)	class:IntlDateFormatter
+datefmt_localtime		0;"	f	S:array function datefmt_localtime($value, &$position, $fmt)
 parse		0;"	f	S:int function parse($value, &$position, $fmt)	class:IntlDateFormatter
+datefmt_parse		0;"	f	S:int function datefmt_parse($value, &$position, $fmt)
 setCalendar		0;"	f	S:bool function setCalendar($which, $fmt)	class:IntlDateFormatter
+datefmt_set_calendar		0;"	f	S:bool function datefmt_set_calendar($which, $fmt)
 setLenient		0;"	f	S:bool function setLenient($lenient, $fmt)	class:IntlDateFormatter
+datefmt_set_lenient		0;"	f	S:bool function datefmt_set_lenient($lenient, $fmt)
 setPattern		0;"	f	S:bool function setPattern($pattern, $fmt)	class:IntlDateFormatter
+datefmt_set_pattern		0;"	f	S:bool function datefmt_set_pattern($pattern, $fmt)
 setTimeZoneId		0;"	f	S:bool function setTimeZoneId($zone, $fmt)	class:IntlDateFormatter
+datefmt_set_timezone_id		0;"	f	S:bool function datefmt_set_timezone_id($zone, $fmt)
 setTimeZone		0;"	f	S:boolean function setTimeZone($zone)	class:IntlDateFormatter
+datefmt_set_timezone		0;"	f	S:boolean function datefmt_set_timezone($zone)
 ResourceBundle		0;"	c
 count		0;"	f	S:int function count($r)	class:ResourceBundle
+resourcebundle_count		0;"	f	S:int function resourcebundle_count($r)
 create		0;"	f	S:ResourceBundle function create($locale, $bundlename, $fallback)	class:ResourceBundle	a:static
+resourcebundle_create		0;"	f	S:ResourceBundle function resourcebundle_create($locale, $bundlename, $fallback)
 getErrorCode		0;"	f	S:int function getErrorCode($r)	class:ResourceBundle
+resourcebundle_get_error_code		0;"	f	S:int function resourcebundle_get_error_code($r)
 getErrorMessage		0;"	f	S:string function getErrorMessage($r)	class:ResourceBundle
+resourcebundle_get_error_message		0;"	f	S:string function resourcebundle_get_error_message($r)
 get		0;"	f	S:mixed function get($index, $r)	class:ResourceBundle
+resourcebundle_get		0;"	f	S:mixed function resourcebundle_get($index, $r)
 getLocales		0;"	f	S:array function getLocales($bundlename)	class:ResourceBundle
+resourcebundle_locales		0;"	f	S:array function resourcebundle_locales($bundlename)
 Spoofchecker		0;"	c
 SINGLE_SCRIPT_CONFUSABLE		0;"	o	class:Spoofchecker	a:const	S:const Spoofchecker::SINGLE_SCRIPT_CONFUSABLE
 MIXED_SCRIPT_CONFUSABLE		0;"	o	class:Spoofchecker	a:const	S:const Spoofchecker::MIXED_SCRIPT_CONFUSABLE
@@ -4737,12 +5074,19 @@ REVERSE		0;"	o	class:Transliterator	a:const	S:const Transliterator::REVERSE
 id		0;"	p	class:Transliterator	S: Transliterator::id
 __construct		0;"	f	S: function __construct()	class:Transliterator
 create		0;"	f	S:Transliterator function create($id, $direction)	class:Transliterator	a:static
+transliterator_create		0;"	f	S:Transliterator function transliterator_create($id, $direction)
 createFromRules		0;"	f	S:Transliterator function createFromRules($rules, $direction, $id)	class:Transliterator	a:static
+transliterator_create_from_rules		0;"	f	S:Transliterator function transliterator_create_from_rules($rules, $direction, $id)
 createInverse		0;"	f	S:Transliterator function createInverse()	class:Transliterator
+transliterator_create_inverse		0;"	f	S:Transliterator function transliterator_create_inverse()
 getErrorCode		0;"	f	S:int function getErrorCode()	class:Transliterator
+transliterator_get_error_code		0;"	f	S:int function transliterator_get_error_code()
 getErrorMessage		0;"	f	S:string function getErrorMessage()	class:Transliterator
+transliterator_get_error_message		0;"	f	S:string function transliterator_get_error_message()
 listIDs		0;"	f	S:array function listIDs()	class:Transliterator	a:static
+transliterator_list_ids		0;"	f	S:array function transliterator_list_ids()
 transliterate		0;"	f	S:string function transliterate($subject, $start, $end, $transliterator)	class:Transliterator
+transliterator_transliterate		0;"	f	S:string function transliterator_transliterate($subject, $start, $end, $transliterator)
 IntlBreakIterator		0;"	c
 DONE		0;"	o	class:IntlBreakIterator	a:const	S:const IntlBreakIterator::DONE
 WORD_NONE		0;"	o	class:IntlBreakIterator	a:const	S:const IntlBreakIterator::WORD_NONE
@@ -4774,7 +5118,9 @@ current		0;"	f	S:ReturnType function current()	class:IntlBreakIterator
 first		0;"	f	S:ReturnType function first()	class:IntlBreakIterator
 following		0;"	f	S:ReturnType function following($"offset")	class:IntlBreakIterator
 getErrorCode		0;"	f	S:ReturnType function getErrorCode()	class:IntlBreakIterator
+intl_get_error_code		0;"	f	S:ReturnType function intl_get_error_code()
 getErrorMessage		0;"	f	S:ReturnType function getErrorMessage()	class:IntlBreakIterator
+intl_get_error_message		0;"	f	S:ReturnType function intl_get_error_message()
 getLocale		0;"	f	S:ReturnType function getLocale($"locale_type")	class:IntlBreakIterator
 getPartsIterator		0;"	f	S:ReturnType function getPartsIterator($"key_type")	class:IntlBreakIterator
 getText		0;"	f	S:ReturnType function getText()	class:IntlBreakIterator
@@ -4885,6 +5231,7 @@ getAvailable		0;"	f	S:array function getAvailable()	class:UConverter	a:static
 getDestinationEncoding		0;"	f	S:string function getDestinationEncoding()	class:UConverter
 getDestinationType		0;"	f	S:integer function getDestinationType()	class:UConverter
 getErrorCode		0;"	f	S:integer function getErrorCode()	class:UConverter
+intl_get_error_code		0;"	f	S:integer function intl_get_error_code()
 getErrorMessage		0;"	f	S:string function getErrorMessage()	class:UConverter
 getSourceEncoding		0;"	f	S:string function getSourceEncoding()	class:UConverter
 getSourceType		0;"	f	S:integer function getSourceType()	class:UConverter
@@ -5219,108 +5566,209 @@ cairo_svg_surface_restrict_to_version		0;"	f	S:void function cairo_svg_surface_r
 cairo_svg_version_to_string		0;"	f	S:string function cairo_svg_version_to_string($version)
 Cairo		0;"	c
 availableFonts		0;"	f	S:array function availableFonts()	class:Cairo	a:static
+cairo_available_fonts		0;"	f	S:array function cairo_available_fonts()
 availableSurfaces		0;"	f	S:array function availableSurfaces()	class:Cairo	a:static
+cairo_available_surfaces		0;"	f	S:array function cairo_available_surfaces()
 statusToString		0;"	f	S:string function statusToString($status)	class:Cairo	a:static
+cairo_status_to_string		0;"	f	S:string function cairo_status_to_string($status)
 version		0;"	f	S:int function version()	class:Cairo	a:static
+cairo_version		0;"	f	S:int function cairo_version()
 versionString		0;"	f	S:string function versionString()	class:Cairo	a:static
+cairo_version_string		0;"	f	S:string function cairo_version_string()
 CairoContext		0;"	c
 appendPath		0;"	f	S:void function appendPath($path, $context)	class:CairoContext
+cairo_append_path		0;"	f	S:void function cairo_append_path($path, $context)
 arc		0;"	f	S:void function arc($x, $y, $radius, $angle1, $angle2, $context)	class:CairoContext
+cairo_arc		0;"	f	S:void function cairo_arc($x, $y, $radius, $angle1, $angle2, $context)
 arcNegative		0;"	f	S:void function arcNegative($x, $y, $radius, $angle1, $angle2, $context)	class:CairoContext
+cairo_arc_negative		0;"	f	S:void function cairo_arc_negative($x, $y, $radius, $angle1, $angle2, $context)
 clip		0;"	f	S:void function clip($context)	class:CairoContext
+cairo_clip		0;"	f	S:void function cairo_clip($context)
 clipExtents		0;"	f	S:array function clipExtents($context)	class:CairoContext
+cairo_clip_extents		0;"	f	S:array function cairo_clip_extents($context)
 clipPreserve		0;"	f	S:void function clipPreserve($context)	class:CairoContext
+cairo_clip_preserve		0;"	f	S:void function cairo_clip_preserve($context)
 clipRectangleList		0;"	f	S:array function clipRectangleList($context)	class:CairoContext
+cairo_clip_rectangle_list		0;"	f	S:array function cairo_clip_rectangle_list($context)
 closePath		0;"	f	S:void function closePath($context)	class:CairoContext
+cairo_close_path		0;"	f	S:void function cairo_close_path($context)
 __construct		0;"	f	S: function __construct($surface)	class:CairoContext
 copyPage		0;"	f	S:void function copyPage($context)	class:CairoContext
+cairo_copy_page		0;"	f	S:void function cairo_copy_page($context)
 copyPath		0;"	f	S:CairoPath function copyPath($context)	class:CairoContext
+cairo_copy_path		0;"	f	S:CairoPath function cairo_copy_path($context)
 copyPathFlat		0;"	f	S:CairoPath function copyPathFlat($context)	class:CairoContext
+cairo_copy_path_flat		0;"	f	S:CairoPath function cairo_copy_path_flat($context)
 curveTo		0;"	f	S:void function curveTo($x1, $y1, $x2, $y2, $x3, $y3, $context)	class:CairoContext
+cairo_curve_to		0;"	f	S:void function cairo_curve_to($x1, $y1, $x2, $y2, $x3, $y3, $context)
 deviceToUser		0;"	f	S:array function deviceToUser($x, $y, $context)	class:CairoContext
+cairo_device_to_user		0;"	f	S:array function cairo_device_to_user($x, $y, $context)
 deviceToUserDistance		0;"	f	S:array function deviceToUserDistance($x, $y, $context)	class:CairoContext
+cairo_device_to_user_distance		0;"	f	S:array function cairo_device_to_user_distance($x, $y, $context)
 fill		0;"	f	S:void function fill($context)	class:CairoContext
+cairo_fill		0;"	f	S:void function cairo_fill($context)
 fillExtents		0;"	f	S:array function fillExtents($context)	class:CairoContext
+cairo_fill_extents		0;"	f	S:array function cairo_fill_extents($context)
 fillPreserve		0;"	f	S:void function fillPreserve($context)	class:CairoContext
+cairo_fill_preserve		0;"	f	S:void function cairo_fill_preserve($context)
 fontExtents		0;"	f	S:array function fontExtents($context)	class:CairoContext
+cairo_font_extents		0;"	f	S:array function cairo_font_extents($context)
 getAntialias		0;"	f	S:int function getAntialias($context)	class:CairoContext
+cairo_get_antialias		0;"	f	S:int function cairo_get_antialias($context)
 getCurrentPoint		0;"	f	S:array function getCurrentPoint($context)	class:CairoContext
+cairo_get_current_point		0;"	f	S:array function cairo_get_current_point($context)
 getDash		0;"	f	S:array function getDash($context)	class:CairoContext
+cairo_get_dash		0;"	f	S:array function cairo_get_dash($context)
 getDashCount		0;"	f	S:int function getDashCount($context)	class:CairoContext
+cairo_get_dash_count		0;"	f	S:int function cairo_get_dash_count($context)
 getFillRule		0;"	f	S:int function getFillRule($context)	class:CairoContext
+cairo_get_fill_rule		0;"	f	S:int function cairo_get_fill_rule($context)
 getFontFace		0;"	f	S:void function getFontFace($context)	class:CairoContext
+cairo_get_font_face		0;"	f	S:void function cairo_get_font_face($context)
 getFontMatrix		0;"	f	S:void function getFontMatrix($context)	class:CairoContext
+cairo_get_font_matrix		0;"	f	S:void function cairo_get_font_matrix($context)
 getFontOptions		0;"	f	S:void function getFontOptions($context)	class:CairoContext
+cairo_get_font_options		0;"	f	S:void function cairo_get_font_options($context)
 getGroupTarget		0;"	f	S:void function getGroupTarget($context)	class:CairoContext
+cairo_get_group_target		0;"	f	S:void function cairo_get_group_target($context)
 getLineCap		0;"	f	S:int function getLineCap($context)	class:CairoContext
+cairo_get_line_cap		0;"	f	S:int function cairo_get_line_cap($context)
 getLineJoin		0;"	f	S:int function getLineJoin($context)	class:CairoContext
+cairo_get_line_join		0;"	f	S:int function cairo_get_line_join($context)
 getLineWidth		0;"	f	S:float function getLineWidth($context)	class:CairoContext
+cairo_get_line_width		0;"	f	S:float function cairo_get_line_width($context)
 getMatrix		0;"	f	S:void function getMatrix($context)	class:CairoContext
+cairo_get_matrix		0;"	f	S:void function cairo_get_matrix($context)
 getMiterLimit		0;"	f	S:float function getMiterLimit($context)	class:CairoContext
+cairo_get_miter_limit		0;"	f	S:float function cairo_get_miter_limit($context)
 getOperator		0;"	f	S:int function getOperator($context)	class:CairoContext
+cairo_get_operator		0;"	f	S:int function cairo_get_operator($context)
 getScaledFont		0;"	f	S:void function getScaledFont($context)	class:CairoContext
+cairo_get_scaled_font		0;"	f	S:void function cairo_get_scaled_font($context)
 getSource		0;"	f	S:void function getSource($context)	class:CairoContext
+cairo_get_source		0;"	f	S:void function cairo_get_source($context)
 getTarget		0;"	f	S:void function getTarget($context)	class:CairoContext
+cairo_get_target		0;"	f	S:void function cairo_get_target($context)
 getTolerance		0;"	f	S:float function getTolerance($context)	class:CairoContext
+cairo_get_tolerance		0;"	f	S:float function cairo_get_tolerance($context)
 glyphPath		0;"	f	S:void function glyphPath($glyphs, $context)	class:CairoContext
+cairo_glyph_path		0;"	f	S:void function cairo_glyph_path($glyphs, $context)
 hasCurrentPoint		0;"	f	S:bool function hasCurrentPoint($context)	class:CairoContext
+cairo_has_current_point		0;"	f	S:bool function cairo_has_current_point($context)
 identityMatrix		0;"	f	S:void function identityMatrix($context)	class:CairoContext
+cairo_identity_matrix		0;"	f	S:void function cairo_identity_matrix($context)
 inFill		0;"	f	S:bool function inFill($x, $y, $context)	class:CairoContext
+cairo_in_fill		0;"	f	S:bool function cairo_in_fill($x, $y, $context)
 inStroke		0;"	f	S:bool function inStroke($x, $y, $context)	class:CairoContext
+cairo_in_stroke		0;"	f	S:bool function cairo_in_stroke($x, $y, $context)
 lineTo		0;"	f	S:void function lineTo($x, $y, $context)	class:CairoContext
+cairo_line_to		0;"	f	S:void function cairo_line_to($x, $y, $context)
 mask		0;"	f	S:void function mask($pattern, $context)	class:CairoContext
+cairo_mask		0;"	f	S:void function cairo_mask($pattern, $context)
 maskSurface		0;"	f	S:void function maskSurface($surface, $x, $y, $context)	class:CairoContext
+cairo_mask_surface		0;"	f	S:void function cairo_mask_surface($surface, $x, $y, $context)
 moveTo		0;"	f	S:void function moveTo($x, $y, $context)	class:CairoContext
+cairo_move_to		0;"	f	S:void function cairo_move_to($x, $y, $context)
 newPath		0;"	f	S:void function newPath($context)	class:CairoContext
+cairo_new_path		0;"	f	S:void function cairo_new_path($context)
 newSubPath		0;"	f	S:void function newSubPath($context)	class:CairoContext
+cairo_new_sub_path		0;"	f	S:void function cairo_new_sub_path($context)
 paint		0;"	f	S:void function paint($context)	class:CairoContext
+cairo_paint		0;"	f	S:void function cairo_paint($context)
 paintWithAlpha		0;"	f	S:void function paintWithAlpha($alpha, $context)	class:CairoContext
+cairo_paint_with_alpha		0;"	f	S:void function cairo_paint_with_alpha($alpha, $context)
 pathExtents		0;"	f	S:array function pathExtents($context)	class:CairoContext
+cairo_path_extents		0;"	f	S:array function cairo_path_extents($context)
 popGroup		0;"	f	S:void function popGroup($context)	class:CairoContext
+cairo_pop_group		0;"	f	S:void function cairo_pop_group($context)
 popGroupToSource		0;"	f	S:void function popGroupToSource($context)	class:CairoContext
+cairo_pop_group_to_source		0;"	f	S:void function cairo_pop_group_to_source($context)
 pushGroup		0;"	f	S:void function pushGroup($context)	class:CairoContext
+cairo_push_group		0;"	f	S:void function cairo_push_group($context)
 pushGroupWithContent		0;"	f	S:void function pushGroupWithContent($content, $context)	class:CairoContext
+cairo_push_group_with_content		0;"	f	S:void function cairo_push_group_with_content($content, $context)
 rectangle		0;"	f	S:void function rectangle($x, $y, $width, $height, $context)	class:CairoContext
+cairo_rectangle		0;"	f	S:void function cairo_rectangle($x, $y, $width, $height, $context)
 relCurveTo		0;"	f	S:void function relCurveTo($x1, $y1, $x2, $y2, $x3, $y3, $context)	class:CairoContext
+cairo_rel_curve_to		0;"	f	S:void function cairo_rel_curve_to($x1, $y1, $x2, $y2, $x3, $y3, $context)
 relLineTo		0;"	f	S:void function relLineTo($x, $y, $context)	class:CairoContext
+cairo_rel_line_to		0;"	f	S:void function cairo_rel_line_to($x, $y, $context)
 relMoveTo		0;"	f	S:void function relMoveTo($x, $y, $context)	class:CairoContext
+cairo_rel_move_to		0;"	f	S:void function cairo_rel_move_to($x, $y, $context)
 resetClip		0;"	f	S:void function resetClip($context)	class:CairoContext
+cairo_reset_clip		0;"	f	S:void function cairo_reset_clip($context)
 restore		0;"	f	S:void function restore($context)	class:CairoContext
+cairo_restore		0;"	f	S:void function cairo_restore($context)
 rotate		0;"	f	S:void function rotate($angle, $context)	class:CairoContext
+cairo_rotate		0;"	f	S:void function cairo_rotate($angle, $context)
 save		0;"	f	S:void function save($context)	class:CairoContext
+cairo_save		0;"	f	S:void function cairo_save($context)
 scale		0;"	f	S:void function scale($x, $y, $context)	class:CairoContext
+cairo_scale		0;"	f	S:void function cairo_scale($x, $y, $context)
 selectFontFace		0;"	f	S:void function selectFontFace($family, $slant, $weight, $context)	class:CairoContext
+cairo_select_font_face		0;"	f	S:void function cairo_select_font_face($family, $slant, $weight, $context)
 setAntialias		0;"	f	S:void function setAntialias($antialias, $context)	class:CairoContext
+cairo_set_antialias		0;"	f	S:void function cairo_set_antialias($antialias, $context)
 setDash		0;"	f	S:void function setDash($dashes, $offset, $context)	class:CairoContext
+cairo_set_dash		0;"	f	S:void function cairo_set_dash($dashes, $offset, $context)
 setFillRule		0;"	f	S:void function setFillRule($setting, $context)	class:CairoContext
+cairo_set_fill_rule		0;"	f	S:void function cairo_set_fill_rule($setting, $context)
 setFontFace		0;"	f	S:void function setFontFace($fontface, $context)	class:CairoContext
+cairo_set_font_face		0;"	f	S:void function cairo_set_font_face($fontface, $context)
 setFontMatrix		0;"	f	S:void function setFontMatrix($matrix, $context)	class:CairoContext
+cairo_set_font_matrix		0;"	f	S:void function cairo_set_font_matrix($matrix, $context)
 setFontOptions		0;"	f	S:void function setFontOptions($fontoptions, $context)	class:CairoContext
+cairo_set_font_options		0;"	f	S:void function cairo_set_font_options($fontoptions, $context)
 setFontSize		0;"	f	S:void function setFontSize($size, $context)	class:CairoContext
+cairo_set_font_size		0;"	f	S:void function cairo_set_font_size($size, $context)
 setLineCap		0;"	f	S:void function setLineCap($setting, $context)	class:CairoContext
+cairo_set_line_cap		0;"	f	S:void function cairo_set_line_cap($setting, $context)
 setLineJoin		0;"	f	S:void function setLineJoin($setting, $context)	class:CairoContext
+cairo_set_line_join		0;"	f	S:void function cairo_set_line_join($setting, $context)
 setLineWidth		0;"	f	S:void function setLineWidth($width, $context)	class:CairoContext
+cairo_set_line_width		0;"	f	S:void function cairo_set_line_width($width, $context)
 setMatrix		0;"	f	S:void function setMatrix($matrix, $context)	class:CairoContext
+cairo_set_matrix		0;"	f	S:void function cairo_set_matrix($matrix, $context)
 setMiterLimit		0;"	f	S:void function setMiterLimit($limit, $context)	class:CairoContext
+cairo_set_miter_limit		0;"	f	S:void function cairo_set_miter_limit($limit, $context)
 setOperator		0;"	f	S:void function setOperator($setting, $context)	class:CairoContext
+cairo_set_operator		0;"	f	S:void function cairo_set_operator($setting, $context)
 setScaledFont		0;"	f	S:void function setScaledFont($scaledfont, $context)	class:CairoContext
+cairo_set_scaled_font		0;"	f	S:void function cairo_set_scaled_font($scaledfont, $context)
 setSource		0;"	f	S:void function setSource($pattern, $context)	class:CairoContext
+cairo_set_source		0;"	f	S:void function cairo_set_source($pattern, $context)
 setSourceRGB		0;"	f	S:void function setSourceRGB($red, $green, $blue, $context, $pattern)	class:CairoContext
+cairo_set_source		0;"	f	S:void function cairo_set_source($red, $green, $blue, $context, $pattern)
 setSourceRGBA		0;"	f	S:void function setSourceRGBA($red, $green, $blue, $alpha, $context, $pattern)	class:CairoContext
+cairo_set_source		0;"	f	S:void function cairo_set_source($red, $green, $blue, $alpha, $context, $pattern)
 setSourceSurface		0;"	f	S:void function setSourceSurface($surface, $x, $y, $context)	class:CairoContext
+cairo_set_source_surface		0;"	f	S:void function cairo_set_source_surface($surface, $x, $y, $context)
 setTolerance		0;"	f	S:void function setTolerance($tolerance, $context)	class:CairoContext
+cairo_set_tolerance		0;"	f	S:void function cairo_set_tolerance($tolerance, $context)
 showPage		0;"	f	S:void function showPage($context)	class:CairoContext
+cairo_show_page		0;"	f	S:void function cairo_show_page($context)
 showText		0;"	f	S:void function showText($text, $context)	class:CairoContext
+cairo_show_text		0;"	f	S:void function cairo_show_text($text, $context)
 status		0;"	f	S:int function status($context)	class:CairoContext
+cairo_status		0;"	f	S:int function cairo_status($context)
 stroke		0;"	f	S:void function stroke($context)	class:CairoContext
+cairo_stroke		0;"	f	S:void function cairo_stroke($context)
 strokeExtents		0;"	f	S:array function strokeExtents($context)	class:CairoContext
+cairo_stroke_extents		0;"	f	S:array function cairo_stroke_extents($context)
 strokePreserve		0;"	f	S:void function strokePreserve($context)	class:CairoContext
+cairo_stroke_preserve		0;"	f	S:void function cairo_stroke_preserve($context)
 textExtents		0;"	f	S:array function textExtents($text, $context)	class:CairoContext
+cairo_text_extents		0;"	f	S:array function cairo_text_extents($text, $context)
 textPath		0;"	f	S:void function textPath($string, $context, $text)	class:CairoContext
+cairo_text_path		0;"	f	S:void function cairo_text_path($string, $context, $text)
 transform		0;"	f	S:void function transform($matrix, $context)	class:CairoContext
+cairo_transform		0;"	f	S:void function cairo_transform($matrix, $context)
 translate		0;"	f	S:void function translate($x, $y, $context)	class:CairoContext
+cairo_translate		0;"	f	S:void function cairo_translate($x, $y, $context)
 userToDevice		0;"	f	S:array function userToDevice($x, $y, $context)	class:CairoContext
+cairo_user_to_device		0;"	f	S:array function cairo_user_to_device($x, $y, $context)
 userToDeviceDistance		0;"	f	S:array function userToDeviceDistance($x, $y, $context)	class:CairoContext
+cairo_user_to_device_distance		0;"	f	S:array function cairo_user_to_device_distance($x, $y, $context)
 CairoException		0;"	c	i:Exception
 message		0;"	p	class:CairoException	a:protected	S:protected CairoException::message
 code		0;"	p	class:CairoException	a:protected	S:protected CairoException::code
@@ -5355,23 +5803,28 @@ INVALID_STRIDE		0;"	o	class:CairoStatus	a:const	S:const CairoStatus::INVALID_STR
 CairoSurface		0;"	c
 __construct		0;"	f	S: function __construct()	class:CairoSurface
 copyPage		0;"	f	S:void function copyPage($context)	class:CairoSurface
+cairo_copy_page		0;"	f	S:void function cairo_copy_page($context)
 createSimilar		0;"	f	S:void function createSimilar($other, $content, $width, $height)	class:CairoSurface
 finish		0;"	f	S:void function finish()	class:CairoSurface
 flush		0;"	f	S:void function flush()	class:CairoSurface
 getContent		0;"	f	S:int function getContent()	class:CairoSurface
 getDeviceOffset		0;"	f	S:array function getDeviceOffset()	class:CairoSurface
 getFontOptions		0;"	f	S:void function getFontOptions($context)	class:CairoSurface
+cairo_get_font_options		0;"	f	S:void function cairo_get_font_options($context)
 getType		0;"	f	S:int function getType()	class:CairoSurface
 markDirty		0;"	f	S:void function markDirty()	class:CairoSurface
 markDirtyRectangle		0;"	f	S:void function markDirtyRectangle($x, $y, $width, $height)	class:CairoSurface
 setDeviceOffset		0;"	f	S:void function setDeviceOffset($x, $y)	class:CairoSurface
 setFallbackResolution		0;"	f	S:void function setFallbackResolution($x, $y)	class:CairoSurface
 showPage		0;"	f	S:void function showPage($context)	class:CairoSurface
+cairo_show_page		0;"	f	S:void function cairo_show_page($context)
 status		0;"	f	S:int function status($context)	class:CairoSurface
+cairo_status		0;"	f	S:int function cairo_status($context)
 writeToPng		0;"	f	S:void function writeToPng($file)	class:CairoSurface
 CairoSvgSurface		0;"	c	i:CairoSurface
 __construct		0;"	f	S: function __construct($file, $width, $height)	class:CairoSvgSurface
 getVersions		0;"	f	S:array function getVersions()	class:CairoSvgSurface	a:static
+cairo_svg_surface_get_versions		0;"	f	S:array function cairo_svg_surface_get_versions()
 restrictToVersion		0;"	f	S:void function restrictToVersion($version)	class:CairoSvgSurface
 versionToString		0;"	f	S:string function versionToString($version)	class:CairoSvgSurface	a:static
 CairoImageSurface		0;"	c	i:CairoSurface
@@ -5416,20 +5869,24 @@ CairoFontFace		0;"	c
 __construct		0;"	f	S: function __construct()	class:CairoFontFace
 getType		0;"	f	S:int function getType()	class:CairoFontFace
 status		0;"	f	S:int function status($fontface)	class:CairoFontFace
+cairo_font_face_status		0;"	f	S:int function cairo_font_face_status($fontface)
 CairoFontOptions		0;"	c
 __construct		0;"	f	S: function __construct()	class:CairoFontOptions
 equal		0;"	f	S:bool function equal($other)	class:CairoFontOptions
 getAntialias		0;"	f	S:int function getAntialias($context)	class:CairoFontOptions
+cairo_get_antialias		0;"	f	S:int function cairo_get_antialias($context)
 getHintMetrics		0;"	f	S:int function getHintMetrics()	class:CairoFontOptions
 getHintStyle		0;"	f	S:int function getHintStyle()	class:CairoFontOptions
 getSubpixelOrder		0;"	f	S:int function getSubpixelOrder()	class:CairoFontOptions
 hash		0;"	f	S:int function hash()	class:CairoFontOptions
 merge		0;"	f	S:void function merge($other)	class:CairoFontOptions
 setAntialias		0;"	f	S:void function setAntialias($antialias, $context)	class:CairoFontOptions
+cairo_set_antialias		0;"	f	S:void function cairo_set_antialias($antialias, $context)
 setHintMetrics		0;"	f	S:void function setHintMetrics($hint_metrics)	class:CairoFontOptions
 setHintStyle		0;"	f	S:void function setHintStyle($hint_style)	class:CairoFontOptions
 setSubpixelOrder		0;"	f	S:void function setSubpixelOrder($subpixel_order)	class:CairoFontOptions
 status		0;"	f	S:int function status($context)	class:CairoFontOptions
+cairo_status		0;"	f	S:int function cairo_status($context)
 CairoFontSlant		0;"	c
 NORMAL		0;"	o	class:CairoFontSlant	a:const	S:const CairoFontSlant::NORMAL
 ITALIC		0;"	o	class:CairoFontSlant	a:const	S:const CairoFontSlant::ITALIC
@@ -5447,13 +5904,18 @@ __construct		0;"	f	S: function __construct($font_face, $matrix, $ctm, $options)	
 extents		0;"	f	S:array function extents()	class:CairoScaledFont
 getCtm		0;"	f	S:CairoMatrix function getCtm()	class:CairoScaledFont
 getFontFace		0;"	f	S:void function getFontFace($context)	class:CairoScaledFont
+cairo_get_font_face		0;"	f	S:void function cairo_get_font_face($context)
 getFontMatrix		0;"	f	S:void function getFontMatrix($context)	class:CairoScaledFont
+cairo_get_font_matrix		0;"	f	S:void function cairo_get_font_matrix($context)
 getFontOptions		0;"	f	S:void function getFontOptions($context)	class:CairoScaledFont
+cairo_get_font_options		0;"	f	S:void function cairo_get_font_options($context)
 getScaleMatrix		0;"	f	S:void function getScaleMatrix()	class:CairoScaledFont
 getType		0;"	f	S:int function getType()	class:CairoScaledFont
 glyphExtents		0;"	f	S:array function glyphExtents($glyphs)	class:CairoScaledFont
 status		0;"	f	S:int function status($context)	class:CairoScaledFont
+cairo_status		0;"	f	S:int function cairo_status($context)
 textExtents		0;"	f	S:array function textExtents($text, $context)	class:CairoScaledFont
+cairo_text_extents		0;"	f	S:array function cairo_text_extents($text, $context)
 CairoToyFontFace		0;"	c	i:CairoFontFace
 CairoPatternType		0;"	c
 SOLID		0;"	o	class:CairoPatternType	a:const	S:const CairoPatternType::SOLID
@@ -5463,9 +5925,12 @@ RADIAL		0;"	o	class:CairoPatternType	a:const	S:const CairoPatternType::RADIAL
 CairoPattern		0;"	c
 __construct		0;"	f	S: function __construct()	class:CairoPattern
 getMatrix		0;"	f	S:void function getMatrix($context)	class:CairoPattern
+cairo_get_matrix		0;"	f	S:void function cairo_get_matrix($context)
 getType		0;"	f	S:int function getType()	class:CairoPattern
 setMatrix		0;"	f	S:void function setMatrix($matrix, $context)	class:CairoPattern
+cairo_set_matrix		0;"	f	S:void function cairo_set_matrix($matrix, $context)
 status		0;"	f	S:int function status($context)	class:CairoPattern
+cairo_status		0;"	f	S:int function cairo_status($context)
 CairoGradientPattern		0;"	c	i:CairoPattern
 addColorStopRgb		0;"	f	S:void function addColorStopRgb($offset, $red, $green, $blue)	class:CairoGradientPattern
 addColorStopRgba		0;"	f	S:void function addColorStopRgba($offset, $red, $green, $blue, $alpha)	class:CairoGradientPattern
@@ -5539,17 +6004,25 @@ ROUND		0;"	o	class:CairoLineJoin	a:const	S:const CairoLineJoin::ROUND
 BEVEL		0;"	o	class:CairoLineJoin	a:const	S:const CairoLineJoin::BEVEL
 CairoMatrix		0;"	c
 __construct		0;"	f	S:object function __construct($xx = 1.0, $yx = 0.0, $xy = 0.0, $yy = 1.0, $x0 = 0.0, $y0 = 0.0)	class:CairoMatrix
+cairo_matrix_init		0;"	f	S:object function cairo_matrix_init($xx = 1.0, $yx = 0.0, $xy = 0.0, $yy = 1.0, $x0 = 0.0, $y0 = 0.0)
 initIdentity		0;"	f	S:object function initIdentity()	class:CairoMatrix	a:static
+cairo_matrix_init_identity		0;"	f	S:object function cairo_matrix_init_identity()
 initRotate		0;"	f	S:object function initRotate($radians)	class:CairoMatrix	a:static
+cairo_matrix_init_rotate		0;"	f	S:object function cairo_matrix_init_rotate($radians)
 initScale		0;"	f	S:object function initScale($sx, $sy)	class:CairoMatrix	a:static
+cairo_matrix_init_scale		0;"	f	S:object function cairo_matrix_init_scale($sx, $sy)
 initTranslate		0;"	f	S:object function initTranslate($tx, $ty)	class:CairoMatrix	a:static
+cairo_matrix_init_translate		0;"	f	S:object function cairo_matrix_init_translate($tx, $ty)
 invert		0;"	f	S:void function invert()	class:CairoMatrix
 multiply		0;"	f	S:CairoMatrix function multiply($matrix1, $matrix2)	class:CairoMatrix	a:static
 rotate		0;"	f	S:void function rotate($sx, $sy, $context, $angle)	class:CairoMatrix
+cairo_rotate		0;"	f	S:void function cairo_rotate($sx, $sy, $context, $angle)
 scale		0;"	f	S:void function scale($sx, $sy, $context)	class:CairoMatrix
+cairo_matrix_scale		0;"	f	S:void function cairo_matrix_scale($sx, $sy, $context)
 transformDistance		0;"	f	S:array function transformDistance($dx, $dy)	class:CairoMatrix
 transformPoint		0;"	f	S:array function transformPoint($dx, $dy)	class:CairoMatrix
 translate		0;"	f	S:void function translate($tx, $ty, $context, $x, $y)	class:CairoMatrix
+cairo_translate		0;"	f	S:void function cairo_translate($tx, $ty, $context, $x, $y)
 CairoOperator		0;"	c
 CLEAR		0;"	o	class:CairoOperator	a:const	S:const CairoOperator::CLEAR
 SOURCE		0;"	o	class:CairoOperator	a:const	S:const CairoOperator::SOURCE
@@ -9486,6 +9959,7 @@ Lua		0;"	c
 LUA_VERSION		0;"	o	class:Lua	a:const	S:const Lua::LUA_VERSION
 assign		0;"	f	S:mixed function assign($name, $value)	class:Lua
 call		0;"	f	S:mixed function call($lua_func, $args, $use_self)	class:Lua
+__call		0;"	f	S:mixed function __call($lua_func, $args, $use_self)	class:Lua
 __construct		0;"	f	S: function __construct($lua_script_file = NULL)	class:Lua
 eval		0;"	f	S:mixed function eval($statements)	class:Lua
 getVersion		0;"	f	S:string function getVersion()	class:Lua
@@ -10348,26 +10822,45 @@ stream_wrapper_unregister		0;"	f	S:bool function stream_wrapper_unregister($prot
 tidy		0;"	c
 tidy->errorBuffer		0;"	p	class:tidy	S: tidy::tidy->errorBuffer
 body		0;"	f	S:tidyNode function body($object)	class:tidy
+tidy_get_body		0;"	f	S:tidyNode function tidy_get_body($object)
 cleanRepair		0;"	f	S:bool function cleanRepair($object)	class:tidy
+tidy_clean_repair		0;"	f	S:bool function tidy_clean_repair($object)
 __construct		0;"	f	S: function __construct($filename, $config, $encoding, $use_include_path)	class:tidy
 diagnose		0;"	f	S:bool function diagnose($object)	class:tidy
+tidy_diagnose		0;"	f	S:bool function tidy_diagnose($object)
 tidy->errorBuffer		0;"	p	class:tidy	S: tidy::tidy->errorBuffer
 $errorBuffer		0;"	f	S:string function $errorBuffer($tidy)	class:tidy
+tidy_get_error_buffer		0;"	f	S:string function tidy_get_error_buffer($tidy)
 getConfig		0;"	f	S:array function getConfig($object)	class:tidy
+tidy_get_config		0;"	f	S:array function tidy_get_config($object)
 getHtmlVer		0;"	f	S:int function getHtmlVer($object)	class:tidy
+tidy_get_html_ver		0;"	f	S:int function tidy_get_html_ver($object)
 getOpt		0;"	f	S:mixed function getOpt($option, $object)	class:tidy
+tidy_getopt		0;"	f	S:mixed function tidy_getopt($option, $object)
 getOptDoc		0;"	f	S:string function getOptDoc($optname, $object)	class:tidy
+tidy_get_opt_doc		0;"	f	S:string function tidy_get_opt_doc($optname, $object)
 getRelease		0;"	f	S:string function getRelease()	class:tidy
+tidy_get_release		0;"	f	S:string function tidy_get_release()
 getStatus		0;"	f	S:int function getStatus($object)	class:tidy
+tidy_get_status		0;"	f	S:int function tidy_get_status($object)
 head		0;"	f	S:tidyNode function head($object)	class:tidy
+tidy_get_head		0;"	f	S:tidyNode function tidy_get_head($object)
 html		0;"	f	S:tidyNode function html($object)	class:tidy
+tidy_get_html		0;"	f	S:tidyNode function tidy_get_html($object)
 isXhtml		0;"	f	S:bool function isXhtml($object)	class:tidy
+tidy_is_xhtml		0;"	f	S:bool function tidy_is_xhtml($object)
 isXml		0;"	f	S:bool function isXml($object)	class:tidy
+tidy_is_xml		0;"	f	S:bool function tidy_is_xml($object)
 parseFile		0;"	f	S:tidy function parseFile($filename, $config, $encoding, $use_include_path = false)	class:tidy
+tidy_parse_file		0;"	f	S:tidy function tidy_parse_file($filename, $config, $encoding, $use_include_path = false)
 parseString		0;"	f	S:tidy function parseString($input, $config, $encoding)	class:tidy
+tidy_parse_string		0;"	f	S:tidy function tidy_parse_string($input, $config, $encoding)
 repairFile		0;"	f	S:string function repairFile($filename, $config, $encoding, $use_include_path = false)	class:tidy
+tidy_repair_file		0;"	f	S:string function tidy_repair_file($filename, $config, $encoding, $use_include_path = false)
 repairString		0;"	f	S:string function repairString($data, $config, $encoding)	class:tidy
+tidy_repair_string		0;"	f	S:string function tidy_repair_string($data, $config, $encoding)
 root		0;"	f	S:tidyNode function root($object)	class:tidy
+tidy_get_root		0;"	f	S:tidyNode function tidy_get_root($object)
 tidyNode		0;"	c
 value		0;"	p	class:tidyNode	S: tidyNode::value
 name		0;"	p	class:tidyNode	S: tidyNode::name
@@ -11147,6 +11640,7 @@ name		0;"	p	class:CURLFile	S: CURLFile::name
 mime		0;"	p	class:CURLFile	S: CURLFile::mime
 postname		0;"	p	class:CURLFile	S: CURLFile::postname
 __construct		0;"	f	S:CURLFile function __construct($filename, $mimetype, $postname)	class:CURLFile
+curl_file_create		0;"	f	S:CURLFile function curl_file_create($filename, $mimetype, $postname)
 getFilename		0;"	f	S:string function getFilename()	class:CURLFile
 getMimeType		0;"	f	S:string function getMimeType()	class:CURLFile
 getPostFilename		0;"	f	S:string function getPostFilename()	class:CURLFile
@@ -11545,6 +12039,7 @@ echo		0;"	f	S:bool function echo($workload)	class:GearmanClient
 error		0;"	f	S:string function error()	class:GearmanClient
 getErrno		0;"	f	S:int function getErrno()	class:GearmanClient
 jobStatus		0;"	f	S:array function jobStatus($job_handle)	class:GearmanClient
+gearman_job_status		0;"	f	S:array function gearman_job_status($job_handle)
 ping		0;"	f	S:bool function ping($workload)	class:GearmanClient
 removeOptions		0;"	f	S:bool function removeOptions($options)	class:GearmanClient
 returnCode		0;"	f	S:int function returnCode()	class:GearmanClient
@@ -11594,6 +12089,7 @@ functionName		0;"	f	S:string function functionName()	class:GearmanTask
 isKnown		0;"	f	S:bool function isKnown()	class:GearmanTask
 isRunning		0;"	f	S:bool function isRunning()	class:GearmanTask
 jobHandle		0;"	f	S:string function jobHandle()	class:GearmanTask
+gearman_job_handle		0;"	f	S:string function gearman_job_handle()
 recvData		0;"	f	S:array function recvData($data_len)	class:GearmanTask
 returnCode		0;"	f	S:int function returnCode()	class:GearmanTask
 sendData		0;"	f	S:int function sendData($data)	class:GearmanTask
@@ -12694,20 +13190,35 @@ stomp_connect_error		0;"	f	S:string function stomp_connect_error()
 stomp_version		0;"	f	S:string function stomp_version()
 Stomp		0;"	c
 abort		0;"	f	S:bool function abort($transaction_id, $headers, $link)	class:Stomp
+stomp_abort		0;"	f	S:bool function stomp_abort($transaction_id, $headers, $link)
 ack		0;"	f	S:bool function ack($msg, $headers, $link)	class:Stomp
+stomp_ack		0;"	f	S:bool function stomp_ack($msg, $headers, $link)
 begin		0;"	f	S:bool function begin($transaction_id, $headers, $link)	class:Stomp
+stomp_begin		0;"	f	S:bool function stomp_begin($transaction_id, $headers, $link)
 commit		0;"	f	S:bool function commit($transaction_id, $headers, $link)	class:Stomp
+stomp_commit		0;"	f	S:bool function stomp_commit($transaction_id, $headers, $link)
 __construct		0;"	f	S:resource function __construct($broker = ini_get("stomp.default_broker_uri"), $username, $password, $headers)	class:Stomp
+stomp_connect		0;"	f	S:resource function stomp_connect($broker = ini_get("stomp.default_broker_uri"), $username, $password, $headers)
 __destruct		0;"	f	S:bool function __destruct($link)	class:Stomp
+stomp_close		0;"	f	S:bool function stomp_close($link)
 error		0;"	f	S:string function error($link)	class:Stomp
+stomp_error		0;"	f	S:string function stomp_error($link)
 getReadTimeout		0;"	f	S:array function getReadTimeout($link)	class:Stomp
+stomp_get_read_timeout		0;"	f	S:array function stomp_get_read_timeout($link)
 getSessionId		0;"	f	S:string function getSessionId($link)	class:Stomp
+stomp_get_session_id		0;"	f	S:string function stomp_get_session_id($link)
 hasFrame		0;"	f	S:bool function hasFrame($link)	class:Stomp
+stomp_has_frame		0;"	f	S:bool function stomp_has_frame($link)
 readFrame		0;"	f	S:array function readFrame($class_name = "stompFrame", $link)	class:Stomp
+stomp_read_frame		0;"	f	S:array function stomp_read_frame($class_name = "stompFrame", $link)
 send		0;"	f	S:bool function send($destination, $msg, $headers, $link)	class:Stomp
+stomp_send		0;"	f	S:bool function stomp_send($destination, $msg, $headers, $link)
 setReadTimeout		0;"	f	S:void function setReadTimeout($seconds, $microseconds, $link)	class:Stomp
+stomp_set_read_timeout		0;"	f	S:void function stomp_set_read_timeout($seconds, $microseconds, $link)
 subscribe		0;"	f	S:bool function subscribe($destination, $headers, $link)	class:Stomp
+stomp_subscribe		0;"	f	S:bool function stomp_subscribe($destination, $headers, $link)
 unsubscribe		0;"	f	S:bool function unsubscribe($destination, $headers, $link)	class:Stomp
+stomp_unsubscribe		0;"	f	S:bool function stomp_unsubscribe($destination, $headers, $link)
 StompFrame		0;"	c
 command		0;"	p	class:StompFrame	S: StompFrame::command
 headers		0;"	p	class:StompFrame	S: StompFrame::headers
@@ -15216,47 +15727,89 @@ setRelaxNGSchemaSource		0;"	f	S:bool function setRelaxNGSchemaSource($source)	cl
 setSchema		0;"	f	S:bool function setSchema($filename)	class:XMLReader
 XML		0;"	f	S:bool function XML($source, $encoding, $options)	class:XMLReader
 endAttribute		0;"	f	S:bool function endAttribute($xmlwriter)	class:XMLWriter
+xmlwriter_end_attribute		0;"	f	S:bool function xmlwriter_end_attribute($xmlwriter)
 endCData		0;"	f	S:bool function endCData($xmlwriter)	class:XMLWriter
+xmlwriter_end_cdata		0;"	f	S:bool function xmlwriter_end_cdata($xmlwriter)
 endComment		0;"	f	S:bool function endComment($xmlwriter)	class:XMLWriter
+xmlwriter_end_comment		0;"	f	S:bool function xmlwriter_end_comment($xmlwriter)
 endDocument		0;"	f	S:bool function endDocument($xmlwriter)	class:XMLWriter
+xmlwriter_end_document		0;"	f	S:bool function xmlwriter_end_document($xmlwriter)
 endDTDAttlist		0;"	f	S:bool function endDTDAttlist($xmlwriter)	class:XMLWriter
+xmlwriter_end_dtd_attlist		0;"	f	S:bool function xmlwriter_end_dtd_attlist($xmlwriter)
 endDTDElement		0;"	f	S:bool function endDTDElement($xmlwriter)	class:XMLWriter
+xmlwriter_end_dtd_element		0;"	f	S:bool function xmlwriter_end_dtd_element($xmlwriter)
 endDTDEntity		0;"	f	S:bool function endDTDEntity($xmlwriter)	class:XMLWriter
+xmlwriter_end_dtd_entity		0;"	f	S:bool function xmlwriter_end_dtd_entity($xmlwriter)
 endDTD		0;"	f	S:bool function endDTD($xmlwriter)	class:XMLWriter
+xmlwriter_end_dtd		0;"	f	S:bool function xmlwriter_end_dtd($xmlwriter)
 endElement		0;"	f	S:bool function endElement($xmlwriter)	class:XMLWriter
+xmlwriter_end_element		0;"	f	S:bool function xmlwriter_end_element($xmlwriter)
 endPI		0;"	f	S:bool function endPI($xmlwriter)	class:XMLWriter
+xmlwriter_end_pi		0;"	f	S:bool function xmlwriter_end_pi($xmlwriter)
 flush		0;"	f	S:mixed function flush($empty = true, $xmlwriter)	class:XMLWriter
+xmlwriter_flush		0;"	f	S:mixed function xmlwriter_flush($empty = true, $xmlwriter)
 fullEndElement		0;"	f	S:bool function fullEndElement($xmlwriter)	class:XMLWriter
+xmlwriter_full_end_element		0;"	f	S:bool function xmlwriter_full_end_element($xmlwriter)
 openMemory		0;"	f	S:resource function openMemory()	class:XMLWriter
+xmlwriter_open_memory		0;"	f	S:resource function xmlwriter_open_memory()
 openURI		0;"	f	S:resource function openURI($uri)	class:XMLWriter
+xmlwriter_open_uri		0;"	f	S:resource function xmlwriter_open_uri($uri)
 outputMemory		0;"	f	S:string function outputMemory($flush = true, $xmlwriter)	class:XMLWriter
+xmlwriter_output_memory		0;"	f	S:string function xmlwriter_output_memory($flush = true, $xmlwriter)
 setIndentString		0;"	f	S:bool function setIndentString($indentString, $xmlwriter)	class:XMLWriter
+xmlwriter_set_indent_string		0;"	f	S:bool function xmlwriter_set_indent_string($indentString, $xmlwriter)
 setIndent		0;"	f	S:bool function setIndent($indent, $xmlwriter)	class:XMLWriter
+xmlwriter_set_indent		0;"	f	S:bool function xmlwriter_set_indent($indent, $xmlwriter)
 startAttributeNS		0;"	f	S:bool function startAttributeNS($prefix, $name, $uri, $xmlwriter)	class:XMLWriter
+xmlwriter_start_attribute_ns		0;"	f	S:bool function xmlwriter_start_attribute_ns($prefix, $name, $uri, $xmlwriter)
 startAttribute		0;"	f	S:bool function startAttribute($name, $xmlwriter)	class:XMLWriter
+xmlwriter_start_attribute		0;"	f	S:bool function xmlwriter_start_attribute($name, $xmlwriter)
 startCData		0;"	f	S:bool function startCData($xmlwriter)	class:XMLWriter
+xmlwriter_start_cdata		0;"	f	S:bool function xmlwriter_start_cdata($xmlwriter)
 startComment		0;"	f	S:bool function startComment($xmlwriter)	class:XMLWriter
+xmlwriter_start_comment		0;"	f	S:bool function xmlwriter_start_comment($xmlwriter)
 startDocument		0;"	f	S:bool function startDocument($version = 1.0, $encoding, $standalone, $xmlwriter)	class:XMLWriter
+xmlwriter_start_document		0;"	f	S:bool function xmlwriter_start_document($version = 1.0, $encoding, $standalone, $xmlwriter)
 startDTDAttlist		0;"	f	S:bool function startDTDAttlist($name, $xmlwriter)	class:XMLWriter
+xmlwriter_start_dtd_attlist		0;"	f	S:bool function xmlwriter_start_dtd_attlist($name, $xmlwriter)
 startDTDElement		0;"	f	S:bool function startDTDElement($qualifiedName, $xmlwriter)	class:XMLWriter
+xmlwriter_start_dtd_element		0;"	f	S:bool function xmlwriter_start_dtd_element($qualifiedName, $xmlwriter)
 startDTDEntity		0;"	f	S:bool function startDTDEntity($name, $isparam, $xmlwriter)	class:XMLWriter
+xmlwriter_start_dtd_entity		0;"	f	S:bool function xmlwriter_start_dtd_entity($name, $isparam, $xmlwriter)
 startDTD		0;"	f	S:bool function startDTD($qualifiedName, $publicId, $systemId, $xmlwriter)	class:XMLWriter
+xmlwriter_start_dtd		0;"	f	S:bool function xmlwriter_start_dtd($qualifiedName, $publicId, $systemId, $xmlwriter)
 startElementNS		0;"	f	S:bool function startElementNS($prefix, $name, $uri, $xmlwriter)	class:XMLWriter
+xmlwriter_start_element_ns		0;"	f	S:bool function xmlwriter_start_element_ns($prefix, $name, $uri, $xmlwriter)
 startElement		0;"	f	S:bool function startElement($name, $xmlwriter)	class:XMLWriter
+xmlwriter_start_element		0;"	f	S:bool function xmlwriter_start_element($name, $xmlwriter)
 startPI		0;"	f	S:bool function startPI($target, $xmlwriter)	class:XMLWriter
+xmlwriter_start_pi		0;"	f	S:bool function xmlwriter_start_pi($target, $xmlwriter)
 text		0;"	f	S:bool function text($content, $xmlwriter)	class:XMLWriter
+xmlwriter_text		0;"	f	S:bool function xmlwriter_text($content, $xmlwriter)
 writeAttributeNS		0;"	f	S:bool function writeAttributeNS($prefix, $name, $uri, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_attribute_ns		0;"	f	S:bool function xmlwriter_write_attribute_ns($prefix, $name, $uri, $content, $xmlwriter)
 writeAttribute		0;"	f	S:bool function writeAttribute($name, $value, $xmlwriter)	class:XMLWriter
+xmlwriter_write_attribute		0;"	f	S:bool function xmlwriter_write_attribute($name, $value, $xmlwriter)
 writeCData		0;"	f	S:bool function writeCData($content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_cdata		0;"	f	S:bool function xmlwriter_write_cdata($content, $xmlwriter)
 writeComment		0;"	f	S:bool function writeComment($content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_comment		0;"	f	S:bool function xmlwriter_write_comment($content, $xmlwriter)
 writeDTDAttlist		0;"	f	S:bool function writeDTDAttlist($name, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_dtd_attlist		0;"	f	S:bool function xmlwriter_write_dtd_attlist($name, $content, $xmlwriter)
 writeDTDElement		0;"	f	S:bool function writeDTDElement($name, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_dtd_element		0;"	f	S:bool function xmlwriter_write_dtd_element($name, $content, $xmlwriter)
 writeDTDEntity		0;"	f	S:bool function writeDTDEntity($name, $content, $pe, $pubid, $sysid, $ndataid, $xmlwriter)	class:XMLWriter
+xmlwriter_write_dtd_entity		0;"	f	S:bool function xmlwriter_write_dtd_entity($name, $content, $pe, $pubid, $sysid, $ndataid, $xmlwriter)
 writeDTD		0;"	f	S:bool function writeDTD($name, $publicId, $systemId, $subset, $xmlwriter)	class:XMLWriter
+xmlwriter_write_dtd		0;"	f	S:bool function xmlwriter_write_dtd($name, $publicId, $systemId, $subset, $xmlwriter)
 writeElementNS		0;"	f	S:bool function writeElementNS($prefix, $name, $uri, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_element_ns		0;"	f	S:bool function xmlwriter_write_element_ns($prefix, $name, $uri, $content, $xmlwriter)
 writeElement		0;"	f	S:bool function writeElement($name, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_element		0;"	f	S:bool function xmlwriter_write_element($name, $content, $xmlwriter)
 writePI		0;"	f	S:bool function writePI($target, $content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_pi		0;"	f	S:bool function xmlwriter_write_pi($target, $content, $xmlwriter)
 writeRaw		0;"	f	S:bool function writeRaw($content, $xmlwriter)	class:XMLWriter
+xmlwriter_write_raw		0;"	f	S:bool function xmlwriter_write_raw($content, $xmlwriter)
 XSL_CLONE_AUTO		0;"	d
 XSL_CLONE_NEVER		0;"	d
 XSL_CLONE_ALWAYS		0;"	d

@@ -257,6 +257,17 @@ private:
 	 * as uninitialized after a call to include
 	 */
 	bool HasIncludeCall;
+	
+	/**
+	 * flag that will be set when the destination in a variable assignment
+	 * is an indirect or variable variable like so 
+	 * 
+	 * $$name = '123';
+	 * 
+	 * In this case, we want to turn off uninitialized varaible checks
+	 * because we dont want to label false positives.
+	 */
+	bool HasIndirectVariable;
 
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods

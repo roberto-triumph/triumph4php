@@ -678,4 +678,23 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 	CHECK_EQUAL(2, Results[0].LineNumber);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
+	
+	// when we see a variable variable ie. '$$clazz' in the assignment
+	// we should turn off uninitialized variable checks, since the
+	// code is making variables assignments that we cannot know 
+	
+		UnicodeString code = t4p::CharToIcu(
+		"  function work() {\n"
+		"    $name = 'hello';\n"
+		"    $$name = 'bye';\n"
+		"    $msg = $hello . ' world';\n"
+		"    echo $msg;\n"
+		"  }\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
+
 }
