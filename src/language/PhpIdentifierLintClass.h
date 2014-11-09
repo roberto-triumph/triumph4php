@@ -239,6 +239,19 @@ private:
 		NotFoundFunctions,
 		NotFoundStaticMethods,
 		NotFoundStaticProperties;
+	
+	/**
+	 * keep track of calls to method_exists() function; if a call
+	 * is being made then disable method name checks as the code
+	 * may never produce an actual error when ran. Example:
+	 *
+	 *  if (method_exists($route, 'getHost')) {
+     *        $this->host = $route->getHost() ? : null;
+     *   } else {
+     *       $this->host = null;
+     *   }
+	 */
+	bool HasMethodExistsCalled;
 
 	/**
 	 * @param var the expression to check. A Check  will be

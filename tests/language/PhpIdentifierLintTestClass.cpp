@@ -542,4 +542,32 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY, Results[0].Type);
 }
 
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
+	
+	// if a piece of code calls method_exists, it means that the code
+	// accounts for methods not being available, therefore we should
+	// stop checking methods as when the code runs it will never generate
+	// an 'unknown method' error.
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"class Route { \n"
+		"  var $name; \n"
+		"} \n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+	   "$route = new Route();\n"
+	   "if (method_exists($route, 'getHost')) {\n"
+       "     $host = $route->getHost() ? : null;\n"
+       "} else {\n"
+       "    $host = null;\n"
+       "}\n"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache(true);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
+
 }

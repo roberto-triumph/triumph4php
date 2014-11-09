@@ -105,7 +105,8 @@ t4p::PhpIdentifierLintClass::PhpIdentifierLintClass()
 , NotFoundProperties()
 , NotFoundFunctions()
 , NotFoundStaticMethods()
-, NotFoundStaticProperties() {
+, NotFoundStaticProperties()
+, HasMethodExistsCalled(false) {
 	Parser.SetClassMemberObserver(this);
 	Parser.SetClassObserver(this);
 	Parser.SetExpressionObserver(this);
@@ -121,6 +122,7 @@ void t4p::PhpIdentifierLintClass::Init(t4p::TagCacheClass& tagCache) {
 	tagCache.NativePrepare(NativeMethodLookup, true);
 	tagCache.NativePrepare(NativePropertyLookup, true);
 	tagCache.NativePrepare(NativeFunctionLookup, true);
+	HasMethodExistsCalled = false;
 }
 
 void t4p::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
@@ -142,6 +144,7 @@ bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 	NotFoundFunctions.clear();
 	NotFoundStaticMethods.clear();
 	NotFoundStaticProperties.clear();
+	HasMethodExistsCalled = false;
 
 	AddMagicMethods(FoundMethods);
 	AddMagicMethods(FoundStaticMethods);
@@ -198,12 +201,13 @@ void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
 										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
-	
+	HasMethodExistsCalled = false;
 }
 
 void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
 											const UnicodeString& comment, const int lineNumber) {
+	HasMethodExistsCalled = false;
 }
 
 void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
@@ -472,6 +476,10 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	// but the parser always returns a fully qualified name because
 	// it does not know what functions are native and which aren't
 	UnicodeString functionName = functionProp.Name;
+	if (functionName == UNICODE_STRING_SIMPLE("\\method_exists") || functionName == UNICODE_STRING_SIMPLE("method_exists")) {
+		HasMethodExistsCalled = true;
+	}
+	
 	UnicodeString unqualifiedName;
 	int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 	bool isUnknown = false;
@@ -553,8 +561,11 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 
 	// skip empty methods or "variable methods names
 	// it $this->$methodName()
+	// also skip if we have seen a call to method_exists just exit; as the code
+	// may not ever produce an error
 	if (methodProp.Name.isEmpty() ||
-		methodProp.Name[0] == '$') {
+		methodProp.Name[0] == '$' ||
+		HasMethodExistsCalled) {
 		return;
 	}
 	
