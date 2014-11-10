@@ -109,6 +109,7 @@ SUITE(PhpVariableLintTestClass) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc() {\n"
 		"  $a = new MyClass();\n"
 		"  $a->work();\n"
@@ -120,6 +121,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithVariable) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($b) {\n"
 		"  $a = $b;\n"
 		"  $a->work();\n"
@@ -131,6 +133,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithVariable) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithArray) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($b) {\n"
 		"  $a = array(1, 2, 3);\n"
 		"  var_dump($a);\n"
@@ -142,6 +145,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithArray) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithStatic) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($b) {\n"
 		"  static $a = 1;\n"
 		"  var_dump($a);\n"
@@ -153,6 +157,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithStatic) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithGlobal) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($b) {\n"
 		"  global $a;\n"
 		"  var_dump($a);\n"
@@ -164,6 +169,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithGlobal) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithList) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($b) {\n"
 		"  list($k) = $b;\n"
 		"  var_dump($k);\n"
@@ -175,6 +181,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithList) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, PredefinedVariables) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc() {\n"
 		"  $a = $_GET['help'];\n"
 		"  $a->work();\n"
@@ -188,6 +195,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 
 	// function parameters should be automatically declared
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a, &$b) {\n"
 		"  $a->work();\n"
 		"  if (!$b) {\n"
@@ -204,6 +212,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
 	// no errors on exception blocks as exceptions
 	// caught are already initialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a, $b) {\n"
 		"  try {\n"
 		"    $a = $a + 99;\n"
@@ -225,6 +234,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
 	// don't check global variables
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"  $a->work();\n"
 	);
 	Parse(code);
@@ -236,6 +246,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
 	// $this variable is always defined in methods
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"class MyClass {\n"
 		"  function work() {\n"
 		"    $this->work();\n"
@@ -249,6 +260,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"class MyClass {\n"
 		"  function work() {\n"
 		"    if (self::workOnce()) {\n"
@@ -270,6 +282,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 	// the scope
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    extract($arrVars);\n"
@@ -295,6 +308,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
 	// the namespace
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"namespace Models;\n"
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
@@ -317,6 +331,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
 	// the scope
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    eval('$arr3 = 4;');\n"
@@ -337,6 +352,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
 	// the scope
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"class MyClass {\n"
 		"  function work($arrVars) {\n"
 		"    include('config.php');\n"
@@ -352,6 +368,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 
 	// arrays can be initialized and assigned at the same time
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a) {\n"
 		"  $data['name'] = 'John';\n"
 		"  var_dump($data);\n"
@@ -365,6 +382,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 
 	// assignment in conditional still counts as initialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a) {\n"
 		"  $fp = fopen('data.txt');\n"
 		"  while (!feof($fp) && ($line = fgets($fp))) {\n"
@@ -381,6 +399,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInSwitch) {
 	
 	// assignment in switch still counts as initialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function getCommandId(CommandInterface $command)\n"
 		"{\n"
 		"  switch (($commandId = $command->getId())) {\n"
@@ -400,6 +419,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 	// a variable being checked with the isset keyword
 	// should not be labeled as unitialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrPairs)) {\n"
 		"    return $arrNames[0];\n"
@@ -416,6 +436,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIssetArrayKeys) {
 	// a variable that is used as a key inside an isset statement
 	// should in fact be labeled as uninitialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrPairs[$name])) {\n"
 		"    return $arrNames;\n"
@@ -427,14 +448,14 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIssetArrayKeys) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$name", Results[0].VariableName);
-	CHECK_EQUAL(2, Results[0].LineNumber);
+	CHECK_EQUAL(3, Results[0].LineNumber);
 }
-
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
 
 	// assignment in conditional still count as initialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc(ReflectionClass $class, $arrNames, $arrValues) {\n"
 		"   if (isset($arrNames[$name = $class->getName()])) {\n"
 		"    return $arrValues[$name];\n"
@@ -448,6 +469,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc() {\n"
 		"  $a = $x + $y;\n"
 		"  $b->work();\n"
@@ -457,11 +479,11 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(3, Results);
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
-	CHECK_EQUAL(2, Results[0].LineNumber);
+	CHECK_EQUAL(3, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$y", Results[1].VariableName);
-	CHECK_EQUAL(2, Results[1].LineNumber);
+	CHECK_EQUAL(3, Results[1].LineNumber);
 	CHECK_UNISTR_EQUALS("$b", Results[2].VariableName);
-	CHECK_EQUAL(3, Results[2].LineNumber);
+	CHECK_EQUAL(4, Results[2].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
@@ -470,6 +492,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 	// that the same named-variable in different functions
 	// must be initialized in bothe functions
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc() {\n"
 		"  $x = myBFunc();\n"
 		"  $a = $x + 99;\n"
@@ -486,17 +509,18 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(3, Results);
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
-	CHECK_EQUAL(9, Results[0].LineNumber);
+	CHECK_EQUAL(10, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$y", Results[1].VariableName);
-	CHECK_EQUAL(9, Results[1].LineNumber);
+	CHECK_EQUAL(10, Results[1].LineNumber);
 	CHECK_UNISTR_EQUALS("$b", Results[2].VariableName);
-	CHECK_EQUAL(10, Results[2].LineNumber);
+	CHECK_EQUAL(11, Results[2].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n" 
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -510,7 +534,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
-	CHECK_EQUAL(7, Results[0].LineNumber);
+	CHECK_EQUAL(8, Results[0].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
@@ -565,10 +589,13 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 	// must recurse down function calls in case an argument
 	// is the result of another function call
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
 		"}\n"
+		"function myFunc2($a) {}\n"
+		"function myFunc3($a) {}\n"
 		"\n"
 		"function myBFunc($a) {\n"
 		"  myFunc(myFunc($a), myFunc2(myFunc3($x)));\n"
@@ -579,7 +606,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$x", Results[0].VariableName);
-	CHECK_EQUAL(7, Results[0].LineNumber);
+	CHECK_EQUAL(10, Results[0].LineNumber);
 }
 
 
@@ -591,6 +618,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 	// is the result of another function call
 	Options.Version = pelet::PHP_54;
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -605,12 +633,13 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 	CHECK_VECTOR_SIZE(2, Results);
 	CHECK_UNISTR_EQUALS("$c", Results[0].VariableName);
 	CHECK_UNISTR_EQUALS("$r", Results[1].VariableName);
-	CHECK_EQUAL(7, Results[0].LineNumber);
-	CHECK_EQUAL(7, Results[1].LineNumber);
+	CHECK_EQUAL(8, Results[0].LineNumber);
+	CHECK_EQUAL(8, Results[1].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedArrayKeys) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$key];\n"
 		"  $c[$k] = array($f => $g); \n"
@@ -620,17 +649,18 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedArrayKeys) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(4, Results);
 	CHECK_UNISTR_EQUALS("$key", Results[0].VariableName);
-	CHECK_EQUAL(2, Results[0].LineNumber);
+	CHECK_EQUAL(3, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
-	CHECK_EQUAL(3, Results[1].LineNumber);
+	CHECK_EQUAL(4, Results[1].LineNumber);
 	CHECK_UNISTR_EQUALS("$f", Results[2].VariableName);
-	CHECK_EQUAL(3, Results[2].LineNumber);
+	CHECK_EQUAL(4, Results[2].LineNumber);
 	CHECK_UNISTR_EQUALS("$g", Results[3].VariableName);
-	CHECK_EQUAL(3, Results[3].LineNumber);
+	CHECK_EQUAL(4, Results[3].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"$file2  = include __DIR__ . $file;\n"
 		"include_once __DIR__ . $file;\n"
 		"require __DIR__ . $file;\n"
@@ -646,12 +676,13 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	// into the current scope.
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$file", Results[0].VariableName);
-	CHECK_EQUAL(1, Results[0].LineNumber);
+	CHECK_EQUAL(2, Results[0].LineNumber);
 	
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$d];\n"
 		"  $zz = function($i, $j) use ($d) {\n"
@@ -663,9 +694,9 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(2, Results);
 	CHECK_UNISTR_EQUALS("$c", Results[0].VariableName);
-	CHECK_EQUAL(4, Results[0].LineNumber);
+	CHECK_EQUAL(5, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("$k", Results[1].VariableName);
-	CHECK_EQUAL(4, Results[1].LineNumber);
+	CHECK_EQUAL(5, Results[1].LineNumber);
 }
 
 
@@ -674,6 +705,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
 	// test that when a closure uses variables that are passed by 
 	// reference, the linter does NOT label them as un-initialized
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"function myFunc($c, $d) {\n"
 		"  $a = $c[$d];\n"
 		"  $zz = function($i, $j) use ($c, $d, &$f) {\n"
@@ -692,6 +724,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 
 	// $this variable is never defined in a function
 	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"  function work() {\n"
 		"    $this->work();\n"
 		"  }\n"
@@ -699,7 +732,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_UNISTR_EQUALS("$this", Results[0].VariableName);
-	CHECK_EQUAL(2, Results[0].LineNumber);
+	CHECK_EQUAL(3, Results[0].LineNumber);
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
@@ -709,6 +742,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
 	// code is making variables assignments that we cannot know 
 	
 		UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
 		"  function work() {\n"
 		"    $name = 'hello';\n"
 		"    $$name = 'bye';\n"

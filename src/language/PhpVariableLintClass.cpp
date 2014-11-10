@@ -524,23 +524,34 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 	// calling IsOk() on the lookup classes to account for the possibility of
 	// them not being initialized; only really occurs during unit tests
 	// since some unit tests dont create sqlite dbs
+	// note that we only return TRUE if there is one match only; multiple
+	// matches mean that there are many functions/methods named the same, 
+	// and we don't know which to use
 	wxString error;
 	if (!isMethod) {		
 		FunctionSignatureLookup.Set(functionName);
 		FunctionSignatureLookup.ReExec(error);
 		if (FunctionSignatureLookup.IsOk() && FunctionSignatureLookup.Found()) {
+			
+			// we only return true if there is 1 and only 1 match
 			FunctionSignatureLookup.Next();
-			signature =  FunctionSignatureLookup.Signature;
-			found = true;
+			if (!FunctionSignatureLookup.More()) {
+				signature =  FunctionSignatureLookup.Signature;
+				found = true;
+			}
 		}
 	}
 	else if (MethodSignatureLookup.IsOk()) {
 		MethodSignatureLookup.Set(functionName, isStatic);
 		MethodSignatureLookup.ReExec(error);
 		if (MethodSignatureLookup.Found()) {
+			
+			// we only return true if there is 1 and only 1 match
 			MethodSignatureLookup.Next();
-			signature =  MethodSignatureLookup.Signature;
-			found = true;
+			if (!MethodSignatureLookup.More()) {
+				signature =  MethodSignatureLookup.Signature;
+				found = true;
+			}
 		}
 	}
 	if (!found && NativeFunctionSignatureLookup.IsOk()) {
@@ -564,8 +575,12 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 			NativeFunctionSignatureLookup.ReExec(error);
 			if (NativeFunctionSignatureLookup.Found()) {
 				NativeFunctionSignatureLookup.Next();
-				signature = NativeFunctionSignatureLookup.Signature;
-				found = true;
+				
+				// we only return true if there is 1 and only 1 match
+				if (!NativeFunctionSignatureLookup.More()) {
+					signature = NativeFunctionSignatureLookup.Signature;
+					found = true;
+				}
 			}
 		}
 	}
@@ -717,7 +732,8 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 						// we know for sure its the right now.  if we find many matches, 
 						// then a method can be in any number of classes; it
 						// becomes really hard to know which method to pick.
-						if (foundFunctionTag && IsFunctionArgumentByReference(functionSignature, argIndex)) {
+						// in the case of multiple functions/methods, we "skip" the reference checks
+						if (!foundFunctionTag || IsFunctionArgumentByReference(functionSignature, argIndex)) {
 							ScopeVariables[argVar->ChainList[0].Name] = 1;
 						}
 					}
