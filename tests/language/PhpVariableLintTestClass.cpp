@@ -699,6 +699,25 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 	CHECK_EQUAL(5, Results[1].LineNumber);
 }
 
+TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionDefinedInClosure) {
+	
+	// define a function inside of a closure, make sure
+	// that the function arguments are correctly captured
+	// as being initialized
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"call_user_func(function() {\n"
+		"    function work($host) {\n"
+		"      echo 'running ' . $host . PHP_EOL;\n"
+		"    }\n"
+		"    \n"
+		"    work('localhost');\n"
+		"  });\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+	CHECK_VECTOR_SIZE(0, Results);
+}
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
 	
