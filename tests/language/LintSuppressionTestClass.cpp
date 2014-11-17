@@ -85,7 +85,7 @@ public:
 		wxString contents = wxString::FromAscii(
 			"# this is a comment, one, two, it should be skipped\n"
 			"skip_unknown_class, Couchbase, %locationFile%\n"
-			"skip_all, Couchbase, %locationDir%\n"
+			"skip_all, , %locationDir%\n"
 			"skip_unknown_method, serializeToCouchbase, %locationFile%\n"
 			"skip_unknown_function, couchbase_init, %locationFile%\n"
 			"skip_uninitialized_var, $connection, %locationFile%\n"
