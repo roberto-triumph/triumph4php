@@ -3002,7 +3002,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">This is the list of projects that Triumph looks at.&#x0A;&#x0A;A project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.&#x0A;&#x0A;A project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its tag cache.</property>
+                                <property name="label">This is the list of projects that Triumph looks at.&#x0A;&#x0A;A project is merely a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.&#x0A;&#x0A;A project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its tag cache.</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>

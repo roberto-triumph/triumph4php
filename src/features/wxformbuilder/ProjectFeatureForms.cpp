@@ -315,7 +315,7 @@ ProjectListDialogGeneratedClass::ProjectListDialogGeneratedClass( wxWindow* pare
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that Triumph looks at.\n\nA project is merely a list of directories where source code is located together with a human-firendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its tag cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("This is the list of projects that Triumph looks at.\n\nA project is merely a list of directories where source code is located together with a human-friendly label. A project can contain multiple directories from different locations. Additionally, Triumph can be told to exclude certain files from the project.\n\nA project can be enabled or disabled.  This is represented by the checkbox to the left of each. When a project is disabled, Triumph will not look at its tag cache."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
 	HelpLabel->Wrap( 400 );
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
 	
