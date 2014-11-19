@@ -52,6 +52,176 @@ LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 	
 }
 
+LintSuppressionsGeneratedPanelClass::LintSuppressionsGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* BoxSizer;
+	BoxSizer = new wxBoxSizer( wxVERTICAL );
+	
+	wxFlexGridSizer* FlexSizer;
+	FlexSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexSizer->AddGrowableCol( 0 );
+	FlexSizer->AddGrowableRow( 1 );
+	FlexSizer->SetFlexibleDirection( wxBOTH );
+	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( HelpButton, 0, wxALL, 5 );
+	
+	AddButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( AddButton, 0, wxALL, 5 );
+	
+	EditButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( EditButton, 0, wxALL, 5 );
+	
+	DeleteButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( DeleteButton, 0, wxALL, 5 );
+	
+	DeleteAllButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	TopSizer->Add( DeleteAllButton, 0, wxALL, 5 );
+	
+	Label = new wxStaticText( this, wxID_ANY, wxT("PHP Lint Suppressions"), wxDefaultPosition, wxDefaultSize, 0 );
+	Label->Wrap( -1 );
+	TopSizer->Add( Label, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	FlexSizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	SuppressionsList = new wxDataViewListCtrl(this, ID_SUPPRESSIONS_LIST);
+	FlexSizer->Add( SuppressionsList, 1, wxALL|wxEXPAND, 5 );
+	
+	BoxSizer->Add( FlexSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BoxSizer );
+	this->Layout();
+	
+	// Connect Events
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnHelpButton ), NULL, this );
+	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnAddButton ), NULL, this );
+	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnEditButton ), NULL, this );
+	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteButton ), NULL, this );
+	DeleteAllButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteAllButton ), NULL, this );
+}
+
+LintSuppressionsGeneratedPanelClass::~LintSuppressionsGeneratedPanelClass()
+{
+	// Disconnect Events
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnHelpButton ), NULL, this );
+	AddButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnAddButton ), NULL, this );
+	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnEditButton ), NULL, this );
+	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteButton ), NULL, this );
+	DeleteAllButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteAllButton ), NULL, this );
+	
+}
+
+LintSuppressionRuleGeneratedDialogClass::LintSuppressionRuleGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* BodySizer;
+	BodySizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	BodySizer->AddGrowableCol( 0 );
+	BodySizer->AddGrowableRow( 0 );
+	BodySizer->AddGrowableRow( 1 );
+	BodySizer->AddGrowableRow( 2 );
+	BodySizer->SetFlexibleDirection( wxBOTH );
+	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxBoxSizer* TopSizer;
+	TopSizer = new wxBoxSizer( wxVERTICAL );
+	
+	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("A lint suppression rule describes an item that the lint check will disregard (ignore).  You may want to ignore certain checks for various reasons:\n\n- Ignore code from the vendor directory, you don't care if there is a lint error in one of the composer packages because you won't fix it.\n- Ignore a function that you use that is defined in a PHP extension that is not documented in PHP.net; Triumph will not know that it exists.\n- Ignore a class is created at run time via a mocking mechanism (eval); Triumph will not know that it exists."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel->Wrap( 400 );
+	TopSizer->Add( HelpLabel, 1, wxALL|wxEXPAND, 5 );
+	
+	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* MidSizer;
+	MidSizer = new wxFlexGridSizer( 5, 2, 0, 0 );
+	MidSizer->AddGrowableCol( 1 );
+	MidSizer->SetFlexibleDirection( wxBOTH );
+	MidSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	TypeLabel = new wxStaticText( this, wxID_ANY, wxT("Rule Type"), wxDefaultPosition, wxDefaultSize, 0 );
+	TypeLabel->Wrap( -1 );
+	MidSizer->Add( TypeLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxString TypesChoices[] = { wxT("Skip Unknown Class"), wxT("Skip Unknown Method"), wxT("Skip Unknown Function"), wxT("Skip Uninitalized Variable"), wxT("Skip All") };
+	int TypesNChoices = sizeof( TypesChoices ) / sizeof( wxString );
+	Types = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, TypesNChoices, TypesChoices, 0 );
+	Types->SetSelection( 0 );
+	MidSizer->Add( Types, 1, wxALL|wxEXPAND, 5 );
+	
+	TargetLabel = new wxStaticText( this, wxID_ANY, wxT("Suppressed Item"), wxDefaultPosition, wxDefaultSize, 0 );
+	TargetLabel->Wrap( -1 );
+	MidSizer->Add( TargetLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	Target = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	MidSizer->Add( Target, 0, wxALL|wxEXPAND, 5 );
+	
+	LocationTypeLabel = new wxStaticText( this, wxID_ANY, wxT("Location Type"), wxDefaultPosition, wxDefaultSize, 0 );
+	LocationTypeLabel->Wrap( -1 );
+	MidSizer->Add( LocationTypeLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* RadioSizer;
+	RadioSizer = new wxBoxSizer( wxHORIZONTAL );
+	
+	DirectoryRadio = new wxRadioButton( this, wxID_ANY, wxT("Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	RadioSizer->Add( DirectoryRadio, 0, wxALL, 5 );
+	
+	FileRadio = new wxRadioButton( this, wxID_ANY, wxT("Single File"), wxDefaultPosition, wxDefaultSize, 0 );
+	RadioSizer->Add( FileRadio, 0, wxALL, 5 );
+	
+	MidSizer->Add( RadioSizer, 1, wxEXPAND, 5 );
+	
+	DirectoryLabel = new wxStaticText( this, wxID_ANY, wxT("Directory"), wxDefaultPosition, wxDefaultSize, 0 );
+	DirectoryLabel->Wrap( -1 );
+	MidSizer->Add( DirectoryLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	Directory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE );
+	MidSizer->Add( Directory, 0, wxALL|wxEXPAND, 5 );
+	
+	FileLabel = new wxStaticText( this, wxID_ANY, wxT("File"), wxDefaultPosition, wxDefaultSize, 0 );
+	FileLabel->Wrap( -1 );
+	MidSizer->Add( FileLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	File = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE );
+	MidSizer->Add( File, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	BodySizer->Add( MidSizer, 1, wxEXPAND, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	BodySizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	BodySizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	Types->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnTypeChoice ), NULL, this );
+	DirectoryRadio->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnDirectoryRadio ), NULL, this );
+	FileRadio->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnFileRadio ), NULL, this );
+	ButtonsSizerOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnOkButton ), NULL, this );
+}
+
+LintSuppressionRuleGeneratedDialogClass::~LintSuppressionRuleGeneratedDialogClass()
+{
+	// Disconnect Events
+	Types->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnTypeChoice ), NULL, this );
+	DirectoryRadio->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnDirectoryRadio ), NULL, this );
+	FileRadio->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnFileRadio ), NULL, this );
+	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionRuleGeneratedDialogClass::OnOkButton ), NULL, this );
+	
+}
+
 LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
 {
 	wxStaticBoxSizer* sbSizer2;
@@ -183,5 +353,40 @@ LintHelpDialogGeneratedDialogClass::LintHelpDialogGeneratedDialogClass( wxWindow
 }
 
 LintHelpDialogGeneratedDialogClass::~LintHelpDialogGeneratedDialogClass()
+{
+}
+
+LintSuppressionsHelpGeneratedDialogClass::LintSuppressionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* GridSizer;
+	GridSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
+	GridSizer->SetFlexibleDirection( wxBOTH );
+	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	HelpLabel = new wxStaticText( this, wxID_ANY, wxT("Lint Suppressions\n\n The lint suppression class describes items that a lint check\n should disregard (ignore).  The user may want to ignore certain\n checks for various reasons:\n \n - some files are never modified by the user; the user\n   uses them as libraries which means that the user doesn't\n   care if the lint fails\n - some classes are defined in a PHP extension that is not\n   documented in PHP.net (for example, a PHP extension\n   for couchbase). The user wants to supress these classes\n   because they are defined, but not in the code so Triumph\n   will tag them as unknown classes.\n- clases may be dynamically created via a mocking mechanism\n   (eval), Triumph does not find these classes and\n   will tag them as unknown classes."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel->Wrap( -1 );
+	GridSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, wxT("More about lint suppressions in Triumph 4 PHP"), wxT("http://docs.triumph4php.com/php-linter/#suppressions"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	GridSizer->Add( HelpLink, 0, wxALL, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerOK = new wxButton( this, wxID_OK );
+	ButtonsSizer->AddButton( ButtonsSizerOK );
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	GridSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( GridSizer );
+	this->Layout();
+	GridSizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+LintSuppressionsHelpGeneratedDialogClass::~LintSuppressionsHelpGeneratedDialogClass()
 {
 }

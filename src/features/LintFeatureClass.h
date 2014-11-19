@@ -35,6 +35,7 @@
 #include <features/wxformbuilder/LintFeatureForms.h>
 #include <language/PhpVariableLintClass.h>
 #include <language/PhpIdentifierLintClass.h>
+#include <language/LintSuppressionClass.h>
 
 namespace t4p {
 
@@ -489,6 +490,8 @@ private:
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnLintMenu(wxCommandEvent& event);
+	
+	void OnLintSuppressionsMenu(wxCommandEvent& event);
 
 	void OnNextLintError(wxCommandEvent& event);
 
@@ -518,13 +521,100 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+/**
+ * Shows the user lint settings, things that affect
+ * what checks to perform
+ */
 class LintPreferencesPanelClass : public LintPreferencesGeneratedPanelClass {
 
 public:
 
-	LintFeatureClass& Feature;
+	t4p::LintFeatureClass& Feature;
 
-	LintPreferencesPanelClass(wxWindow* parent, LintFeatureClass& feature);
+	LintPreferencesPanelClass(wxWindow* parent, t4p::LintFeatureClass& feature);
+	
+
+};
+
+/**
+ * Shows the user the list of suppression rules
+ */
+class LintSuppressionsPanelClass : public LintSuppressionsGeneratedPanelClass {
+
+public:
+
+	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile);
+	
+private:
+
+	// event handlers
+	void OnAddButton(wxCommandEvent& event);
+	void OnEditButton(wxCommandEvent& event);
+	void OnDeleteButton(wxCommandEvent& event);
+	void OnDeleteAllButton(wxCommandEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
+	void OnRowActivated(wxDataViewEvent& event);
+	
+	/**
+	 * refresh viewable list from the suppressions file
+	 */
+	void PopulateList();
+	
+	/**
+	 * adds the given rule to the list control
+	 */
+	void AppendRuleToList(const t4p::SuppressionRuleClass& rule);
+	
+	/**
+	 * saves the suppression rules to the suppressions
+	 * file
+	 */
+	void SaveList();
+	
+	/**
+	 * the location of the suppressions file
+	 */
+	wxFileName SuppressionFile;
+	
+	/**
+	 * the list of rules
+	 */
+	t4p::LintSuppressionClass Suppressions;
+	
+	/**
+	 * errors when loading suppressions
+	 */
+	std::vector<UnicodeString> Errors;
+	
+	DECLARE_EVENT_TABLE()
+};
+
+/**
+ * Shows the user a form to add or edit a suppression rule
+ */
+class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialogClass {
+	
+public:
+
+	LintSuppressionRuleDialogClass(wxWindow* parent, int id, t4p::SuppressionRuleClass& rule);
+	
+private:
+
+	// events to prevent invalid inputs
+	void OnTypeChoice(wxCommandEvent& event);
+	void OnDirectoryRadio(wxCommandEvent& event);
+	void OnFileRadio(wxCommandEvent& event);
+	void OnOkButton(wxCommandEvent& event);
+	
+	/**
+	 * the rule that will get modified once the user clicks OK
+	 */
+	t4p::SuppressionRuleClass& Rule;
+	
+	/**
+	 * the rule being edited
+	 */
+	t4p::SuppressionRuleClass EditRule;
 };
 
 }

@@ -42,7 +42,7 @@ static wxString RuleTypeString(t4p::SuppressionRuleClass::Types type)  {
 		case t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR:
 			return wxT("SKIP_UNINITIALIZED_VAR");
 		case t4p::SuppressionRuleClass::SKIP_ALL:
-			return wxT("all");
+			return wxT("SKIP_ALL");
 	}
 	return wxT("");
 }
@@ -217,16 +217,20 @@ bool t4p::LintSuppressionClass::Save(const wxFileName& suppressionFile) {
 	}
 	wxTextOutputStream txt(fstream);
 	
-	// each supression is in its own line, in comma-separated form
-	// 
-	// type,target, location
-	//
-	// examples:
-	// 
-	// SKIP_UNKNOWN_CLASS,Couchbase,/home/user/www/project
-	// SKIP_ALL,,/home/user/www/project/vendor
-	//
-	//
+	txt.WriteString("# each supression is in its own line, in comma-separated form\n");
+	txt.WriteString("# \n");
+	txt.WriteString("# type, target, location\n");
+	txt.WriteString("# \n");
+	txt.WriteString("# examples:\n");
+	txt.WriteString("# \n");
+	txt.WriteString("# SKIP_UNKNOWN_CLASS,Couchbase,/home/user/www/project\n");
+	txt.WriteString("# SKIP_ALL,,/home/user/www/project/vendor\n");
+	txt.WriteString("# \n");
+	txt.WriteString("# \n");
+	txt.WriteString("# Possible types:\n");
+	txt.WriteString("# SKIP_UNKNOWN_CLASS, SKIP_UNKNOWN_METHOD, SKIP_UNKNOWN_FUNCTION, \n");
+	txt.WriteString("# SKIP_UNINITIALIZED_VAR, SKIP_ALL\n");
+	txt.WriteString("# \n");
 	std::vector<t4p::SuppressionRuleClass>::const_iterator rule;
 	for (rule = Rules.begin(); rule != Rules.end(); ++rule) {
 		wxString typeStr = RuleTypeString(rule->Type);

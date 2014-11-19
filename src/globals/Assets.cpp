@@ -368,3 +368,9 @@ wxFileName t4p::ChangeLogFileAsset() {
 	wxFileName changeLogFile(asset.GetPath(), wxT("ChangeLog.md"));
 	return changeLogFile;
 }
+
+wxFileName t4p::LintSuppressionsFileAsset() {
+	wxFileName configDir = t4p::ConfigDirAsset();
+	wxFileName suppressionsFile(configDir.GetPath(), wxT("lint_suppressions.csv"));
+	return suppressionsFile;
+}

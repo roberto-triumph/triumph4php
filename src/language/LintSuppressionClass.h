@@ -145,6 +145,11 @@ class LintSuppressionClass {
 
 public:
 
+	/**
+	 * the items to supress
+	 */
+	std::vector<t4p::SuppressionRuleClass> Rules;
+
 	LintSuppressionClass();
 	
 	/**
@@ -187,13 +192,7 @@ public:
 	bool ShouldIgnore(const wxFileName& file, const UnicodeString& target, 
 		t4p::SuppressionRuleClass::Types type) const;
 	
-	
-private:
-	
-	/**
-	 * the items to supress
-	 */
-	std::vector<t4p::SuppressionRuleClass> Rules;
+
 };
 
 }
