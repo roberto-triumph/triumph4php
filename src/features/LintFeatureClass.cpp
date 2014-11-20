@@ -73,7 +73,8 @@ wxEvent* t4p::LintResultsSummaryEventClass::Clone() const {
 }
 
 
-t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options) 
+t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options,
+		const wxFileName& suppressionFile) 
 : WithErrors(0)
 , WithNoErrors(0) 
 , Options(options)
@@ -81,6 +82,9 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatu
 , VariableLinterOptions()
 , VariableLinter()
 , IdentifierLinter()
+, SuppressionFile(suppressionFile)
+, Suppressions()
+, HasLoadedSuppressions(false)
 , LastResults()
 , VariableResults()
 , IdentifierResults()
@@ -112,13 +116,28 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	LastResults.CharacterPosition = 0;
 	VariableResults.clear();
 	IdentifierResults.clear();
+	
+	// load suppressions if we have not done so
+	// doing it here to prevent file reads in the foreground thread
+	if (!HasLoadedSuppressions) {
+		std::vector<UnicodeString> loadErrors; // not sure how to propagate these errors
+		Suppressions.Init(SuppressionFile, loadErrors);
+	}
+	
+	// check to see if the all suppressions for a file are 
+	// suppressed. if so, then no need to parse the file
+	wxFileName wxf(fileName);
+	UnicodeString target; // for the "all" suppression, target is not needed
+	if (Suppressions.ShouldIgnore(wxf, target, t4p::SuppressionRuleClass::SKIP_ALL)) {
+		return ret;
+	}
 
+	// file is not in suppressions, the user wants to see errors
 	wxFFile file(fileName, wxT("rb"));
 	bool hasErrors = false;
 	if (!Parser.LintFile(file.fp(), t4p::WxToIcu(fileName), LastResults)) {
 		hasErrors = true;
 	}
-	wxFileName wxf(fileName);
 	if (Options.CheckUninitializedVariables) {
 		if (VariableLinter.ParseFile(wxf, VariableResults)) {
 			hasErrors = true;
@@ -141,50 +160,80 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 }
 
 std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErrors() {
+	
+	// did the file have syntax errors? these are not
+	// suppressable
 	std::vector<pelet::LintResultsClass> allResults;
 	if (!LastResults.Error.isEmpty()) {
 		allResults.push_back(LastResults);
 	}
+	
 	for (size_t i = 0; i < VariableResults.size(); ++i) {
-		pelet::LintResultsClass lintResult;
 		t4p::PhpVariableLintResultClass variableResult = VariableResults[i];
-		lintResult.Error = UNICODE_STRING_SIMPLE("Uninitialized variable ") + variableResult.VariableName;
-		lintResult.File = t4p::IcuToChar(variableResult.File);
-		lintResult.UnicodeFilename = variableResult.File;
-		lintResult.LineNumber = variableResult.LineNumber;
-		lintResult.CharacterPosition = variableResult.Pos;
-		allResults.push_back(lintResult);
+		
+		// did the user supress uninitialized variable results?
+		wxFileName wxf(t4p::IcuToWx(variableResult.File));
+		if (!Suppressions.ShouldIgnore(wxf, variableResult.VariableName, 
+			t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR)) {
+				
+			pelet::LintResultsClass lintResult;
+			lintResult.Error = UNICODE_STRING_SIMPLE("Uninitialized variable ") + variableResult.VariableName;
+			lintResult.File = t4p::IcuToChar(variableResult.File);
+			lintResult.UnicodeFilename = variableResult.File;
+			lintResult.LineNumber = variableResult.LineNumber;
+			lintResult.CharacterPosition = variableResult.Pos;
+			allResults.push_back(lintResult);
+		}
 	}
 	for (size_t i = 0; i < IdentifierResults.size(); ++i) {
-		pelet::LintResultsClass lintResult;
+		
 		t4p::PhpIdentifierLintResultClass identifierResult = IdentifierResults[i];
+		
+		// did the user supress unkown class/method/function results?
+		wxFileName wxf(t4p::IcuToWx(identifierResult.File));
+		bool suppressedClass = Suppressions.ShouldIgnore(
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS
+		);
+		bool suppressedMethod = Suppressions.ShouldIgnore(
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD
+		);
+		bool suppressedFunction = Suppressions.ShouldIgnore(
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION
+		);
+		
+		bool isSuppressed = false;
+		pelet::LintResultsClass lintResult;
 		if (t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown class ") + identifierResult.Identifier;
+			isSuppressed = suppressedClass;
 		}
 		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_METHOD == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown method ") + identifierResult.Identifier;
-		}
-		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
-			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown property ") + identifierResult.Identifier;
+			isSuppressed = suppressedMethod;
 		}
 		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown function ") + identifierResult.Identifier;
+			isSuppressed = suppressedFunction;
 		}
-		lintResult.File = t4p::IcuToChar(identifierResult.File);
-		lintResult.UnicodeFilename = identifierResult.File;
-		lintResult.LineNumber = identifierResult.LineNumber;
-		lintResult.CharacterPosition = identifierResult.Pos;
-		allResults.push_back(lintResult);
+		
+		if (!isSuppressed) {
+			lintResult.File = t4p::IcuToChar(identifierResult.File);
+			lintResult.UnicodeFilename = identifierResult.File;
+			lintResult.LineNumber = identifierResult.LineNumber;
+			lintResult.CharacterPosition = identifierResult.Pos;
+			allResults.push_back(lintResult);
+		}
 	}
 	return allResults;
 }
 
 t4p::LintActionClass::LintActionClass(t4p::RunningThreadsClass& runningThreads, 
 																		int eventId,
-																		const t4p::LintFeatureOptionsClass& options)
+																		const t4p::LintFeatureOptionsClass& options,
+																		const wxFileName& suppressionFile)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
-	, ParserDirectoryWalker(options)
+	, ParserDirectoryWalker(options, suppressionFile)
 	, Sources()
 	, Search()
 	, FilesCompleted(0) 
@@ -263,11 +312,12 @@ wxString t4p::LintActionClass::GetLabel() const {
 
 t4p::LintBackgroundSingleFileClass::LintBackgroundSingleFileClass(t4p::RunningThreadsClass& runningThreads, 
 																		int eventId,
-																		const t4p::LintFeatureOptionsClass& options)
+																		const t4p::LintFeatureOptionsClass& options,
+																		const wxFileName& suppressionFile)
 	: ActionClass(runningThreads, eventId)
 	, FileName()
 	, TagCache()
-	, ParserDirectoryWalker(options) {
+	, ParserDirectoryWalker(options, suppressionFile) {
 		
 }
 
@@ -301,10 +351,12 @@ wxString t4p::LintBackgroundSingleFileClass::GetLabel() const {
 }
 
 t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p::NotebookClass* notebook,
-														t4p::LintFeatureClass& feature)
+														t4p::LintFeatureClass& feature,
+														wxWindow* topWindow)
 	: LintResultsGeneratedPanelClass(parent, id) 
 	, Notebook(notebook) 
 	, Feature(feature)
+	, TopWindow(topWindow)
 	, TotalFiles(0)
 	, ErrorFiles(0) {
 	HelpButton->SetBitmap(
@@ -459,7 +511,7 @@ void t4p::LintResultsPanelClass::IncrementErrorFileCount() {
 }
 
 void t4p::LintResultsPanelClass::OnHelpButton(wxCommandEvent& event) {
-	LintHelpDialogGeneratedDialogClass dialog(this);
+	LintHelpDialogGeneratedDialogClass dialog(TopWindow);
 	dialog.ShowModal();
 }
 
@@ -519,7 +571,9 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 		return;
 	}
 	if (App.Globals.HasSources()) {
-		t4p::LintActionClass* reader = new t4p::LintActionClass(App.RunningThreads, ID_LINT_READER, Options);
+		t4p::LintActionClass* reader = new t4p::LintActionClass(
+			App.RunningThreads, ID_LINT_READER, Options, t4p::LintSuppressionsFileAsset()
+		);
 		std::vector<t4p::SourceClass> phpSources = App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
@@ -545,7 +599,7 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			}
 			else {
 				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
-						GetNotebook(), *this);
+						GetNotebook(), *this, GetMainWindow());
 				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);
@@ -567,7 +621,8 @@ void t4p::LintFeatureClass::OnLintSuppressionsMenu(wxCommandEvent& event) {
 	}
 	else {
 		t4p::LintSuppressionsPanelClass* panel = new t4p::LintSuppressionsPanelClass(
-			GetToolsNotebook(), ID_LINT_SUPPRESSIONS_PANEL, t4p::LintSuppressionsFileAsset()
+			GetToolsNotebook(), ID_LINT_SUPPRESSIONS_PANEL, t4p::LintSuppressionsFileAsset(),
+			GetMainWindow()
 		);
 		wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 		AddToolsWindow(panel, _("Lint Suppressions"), wxEmptyString, lintBitmap);
@@ -705,7 +760,9 @@ void t4p::LintFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	// errors (after they manually lint checked the project) then re-check
 	if (hasErrors || Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
-		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(App.RunningThreads, ID_LINT_READER_SAVE, Options);
+		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(
+			App.RunningThreads, ID_LINT_READER_SAVE, Options, t4p::LintSuppressionsFileAsset()
+		);
 		bool good = thread->Init(fileName, App.Globals);
 	
 		// handle the case where user has saved a file but has not clicked
@@ -824,11 +881,13 @@ void t4p::LintFeatureOptionsClass::Copy(const t4p::LintFeatureOptionsClass& src)
 	CheckGlobalScopeVariables = src.CheckGlobalScopeVariables;
 }
 
-t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile)
+t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
+	wxWindow* topWindow)
 : LintSuppressionsGeneratedPanelClass(parent, id)
 , SuppressionFile(suppressionFile)
 , Suppressions()
 , Errors()
+, TopWindow(topWindow)
 {
 	AddButton->SetBitmap(t4p::BitmapImageAsset(wxT("filter-add")));
 	EditButton->SetBitmap(t4p::BitmapImageAsset(wxT("filter-edit")));
@@ -860,7 +919,7 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 void t4p::LintSuppressionsPanelClass::OnAddButton(wxCommandEvent& event) {
 	
 	t4p::SuppressionRuleClass newRule;
-	t4p::LintSuppressionRuleDialogClass dialog(this, wxID_ANY, newRule);
+	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, newRule);
 	if (wxOK == dialog.ShowModal()) {
 		
 		// update file and list control
@@ -902,7 +961,7 @@ void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 		return;
 	}
 	t4p::SuppressionRuleClass editRule = Suppressions.Rules[row];
-	t4p::LintSuppressionRuleDialogClass dialog(this, wxID_ANY, editRule);
+	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, editRule);
 	if (wxOK == dialog.ShowModal()) {
 		
 		// update file and list control
@@ -941,7 +1000,7 @@ void t4p::LintSuppressionsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 }
 
 void t4p::LintSuppressionsPanelClass::OnHelpButton(wxCommandEvent& event) {
-	LintSuppressionsHelpGeneratedDialogClass dialog(this);
+	LintSuppressionsHelpGeneratedDialogClass dialog(TopWindow);
 	dialog.ShowModal();
 }
 

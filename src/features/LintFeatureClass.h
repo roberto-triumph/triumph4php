@@ -147,7 +147,8 @@ public:
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options);
+	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options, 
+		const wxFileName& suppressionFile);
 	
 	/**
 	 * initializes the linters  with the tag cache.  The linters use the
@@ -180,7 +181,8 @@ public:
 	void SetVersion(pelet::Versions version);
 	
 	/**
-	 * The last parsing results.
+	 * The last parsing results; minus any errors that were suppressed due
+	 * to the suppression rules.
 	 */
 	std::vector<pelet::LintResultsClass> GetLastErrors();
 
@@ -204,6 +206,11 @@ private:
 	t4p::PhpVariableLintOptionsClass VariableLinterOptions;
 	t4p::PhpVariableLintClass VariableLinter;
 	t4p::PhpIdentifierLintClass IdentifierLinter;
+	
+	// to ignore files/classes/methods
+	wxFileName SuppressionFile;
+	t4p::LintSuppressionClass Suppressions;
+	bool HasLoadedSuppressions;
 
 	// the results for each linter
 	pelet::LintResultsClass LastResults;
@@ -225,10 +232,12 @@ public:
 	 * 	      as well as WORK_* events
 	 * @param eventId the ID of the generated events
 	 * @param options flags to control how strict linter will be
+	 * @param suppressionFile the full path to the lint suppressions csv file.
+	 *        used to get the files/classes/methods to ignore
 	 * @see t4p::ActionClass class
 	 */
 	LintActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
-		const t4p::LintFeatureOptionsClass& options);
+		const t4p::LintFeatureOptionsClass& options, const wxFileName& suppressionFile);
 	
 	/**
 	 * prepare to lint a list of directories
@@ -297,10 +306,12 @@ public:
 	 * 	      as well as WORK_* events
 	 * @param eventId the ID of the generated events
 	 * @param options flags to control how strict linter will be
+	 * @param suppressionFile the full path to the lint suppressions file
+	 *        the file contains list of files/classes/methods/functions to ignore
 	 * @see t4p::ActionClass class
 	 */
 	LintBackgroundSingleFileClass(t4p::RunningThreadsClass& runningThreads, int eventId,
-		const t4p::LintFeatureOptionsClass& options);
+		const t4p::LintFeatureOptionsClass& options, const wxFileName& suppressionFile);
 	
 	/**
 	 * prepare to lint a list a single file
@@ -341,7 +352,8 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, t4p::LintFeatureClass& feature);
+	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, t4p::LintFeatureClass& feature,
+		wxWindow* topWindow);
 	
 	/**
 	 * adds to the list box widget AND the global list
@@ -415,6 +427,12 @@ private:
 	NotebookClass* Notebook;
 
 	t4p::LintFeatureClass& Feature;
+	
+	/**
+	 * to display the help dialog centered on the screen
+	 * and not just centered on the lint results panel
+	 */
+	wxWindow* TopWindow;
 
 	int TotalFiles;
 
@@ -543,7 +561,8 @@ class LintSuppressionsPanelClass : public LintSuppressionsGeneratedPanelClass {
 
 public:
 
-	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile);
+	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
+		wxWindow* topWindow);
 	
 private:
 
@@ -585,6 +604,12 @@ private:
 	 * errors when loading suppressions
 	 */
 	std::vector<UnicodeString> Errors;
+	
+	/**
+	 * to display the help dialog centered on the screen
+	 * and not just centered on the lint results panel
+	 */
+	wxWindow* TopWindow;
 	
 	DECLARE_EVENT_TABLE()
 };
