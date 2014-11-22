@@ -19,15 +19,18 @@ Features
 --------
   - Easy project management that is extremely quick to setup.
   - Modern IDE features: PHP autocompletion, call tips, and source code navigation.
-  - A comprehensive lint checker that warns you about uninitialized variables, unknown function
-    and methods.
+  - A comprehensive lint checker that warns you about uninitialized variables, unknown functions,
+    classes or methods.
   - Full CodeIgniter support: Triumph4PHP understands CodeIgniter routes, controllers, templates,
     and database config files.
   - Full Laravel support: Triumph4PHP understands Laravel routes, controllers, templates,
     and database config files.
   - Integrated SQL Browser: Write and run SQL queries from within the IDE, editor supports autocompletion
     when editing SQL queries.
-  
+  - Cross-platform: Triumph4PHP is a native Windows / linux application. 
+  - Performance: Bucking the recent trend of browser-based editors, Triumph4PHP is a C++ application; 
+    this makes it easier for Triumph4PHP to be optimized where needed.
+
 Installation
 ------------
 The latest version of Triumph4PHP is available in binary from triumph4php [main site](http://triumph4php.com).
@@ -37,7 +40,7 @@ Help
  - The [online manual](http://docs.triumph4php.com) explains all non-trivial features of triumph4php.
  - Support forums are located in the [support site](http://support.triumph4php.com/forums)
  - Bugs / Enhancements: Users can submit new bugs or feature requests at any time at the project's
-   [issue tracker](http://code.google.com/p/triumph4php/issues/list). Please do not use the issue
+   [issue tracker](https://github.com/robertop/triumph4php/issues). Please do not use the issue
    tracker for discussion, use it for requests only.  The forums are better suited for discussions.
  - Triumph4PHP roadmap: A look at the upcoming features that are being actively developed:
    http://code.google.com/p/triumph4php/w/list
