@@ -302,3 +302,51 @@ bool t4p::LintSuppressionClass::ShouldIgnore(const wxFileName& file, const Unico
 	}
 	return ignore;
 }
+
+bool t4p::LintSuppressionClass::AddSkipAllRuleForDirectory(const wxFileName& dir) {
+	bool isFound = false;
+	wxString dirStr = dir.GetPathWithSep();
+	std::vector<t4p::SuppressionRuleClass>::const_iterator rule = Rules.begin();
+	while (rule != Rules.end() && !isFound) {
+		if (rule->Location.IsDir()) {
+			wxString location = rule->Location.GetPathWithSep();
+			if (location == dirStr) {
+				isFound = true;
+			}
+		}		
+		++rule;
+	}
+	
+	if (!isFound) {
+		t4p::SuppressionRuleClass newRule;
+		newRule.SkipAllRule(dir);
+		Add(newRule);
+	}
+	return !isFound;
+}
+
+bool t4p::LintSuppressionClass::RemoveRulesForDirectory(const wxFileName& dir) {
+	std::vector<t4p::SuppressionRuleClass>::iterator rule = Rules.begin();
+	wxString dirStr = dir.GetPathWithSep();
+	int removeCount = 0;
+	while (rule != Rules.end()) {
+		bool isRemoved = false;
+		if (rule->Location.IsDir()) {
+			
+			// what should happen to rules that the user manually created
+			// that are in sub-drectories of the given dir? should we
+			// remove those too? for now, we are not
+			wxString location = rule->Location.GetPathWithSep();
+			if (location == dirStr) {
+				isRemoved = true;
+				rule = Rules.erase(rule);
+				removeCount++;
+			}
+		}
+		
+		if (!isRemoved) {
+			++rule;
+		}
+	}
+	return removeCount  > 0;
+}

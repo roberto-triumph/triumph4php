@@ -25,6 +25,7 @@
 #ifndef __T4P_EVENTS_H__
 #define __T4P_EVENTS_H__
 
+#include <globals/ProjectClass.h>
 #include <wx/event.h>
 #include <wx/filename.h>
 #include <vector>
@@ -510,6 +511,56 @@ extern const wxEventType EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED;
  */
 extern const wxEventType EVENT_APP_PROJECT_CREATED;
 
+/**
+ * Notification that a one or more projects were removed via the "Defined Projects"
+ * menu. The generated event will be a ProjectEventClass, it 
+ * will contain the projects that were removed.
+ */
+extern const wxEventType EVENT_APP_PROJECTS_REMOVED;
+
+/**
+ * Notification that a one or more projects were updated via the "Defined Projects"
+ * menu. The generated event will be a ProjectEventClass, it 
+ * will contain ONLY the projects that were actually updated.
+ * Note that a project update could just have a label change and not
+ * have any new source directories.
+ */
+extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
+
+/**
+ * Project event gets generated when one or more projects are
+ * added, removed, or updated
+ */
+class ProjectEventClass : public wxEvent {
+	
+public: 
+	
+	/**
+	 * the projects that were removed or updated. If this is a
+	 * remove event, the these are the projects that were removed
+	 * if this is a update event, then these projects were
+	 * actually updated. Note that a project update could just 
+	 * have a label change and not have any new source directories.
+	 */
+	const std::vector<t4p::ProjectClass>& Projects;
+	
+	ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects);
+	
+	wxEvent* Clone() const;
+
+};
+
+typedef void (wxEvtHandler::*ProjectEventClassFunction)(ProjectEventClass&);
+
+#define EVT_APP_PROJECTS_REMOVED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_REMOVED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ProjectEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_APP_PROJECTS_UPDATED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_UPDATED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( ProjectEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
  * Tell the app to open a new file.

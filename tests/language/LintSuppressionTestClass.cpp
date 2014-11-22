@@ -275,4 +275,50 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeUninitializedVariable) {
 	CHECK_EQUAL(false, ignore);
 }
 
+TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRule) {
+	
+	// make sure that adding a directory rule will add a rule
+	t4p::SuppressionRuleClass rule;
+	rule.SkipAllRule(CodeDir);
+	Suppressions.Add(rule);
+	
+	// now call the method being tested
+	wxFileName skipDir;
+	skipDir.AssignDir(CodeDir.GetPath());
+	skipDir.AppendDir(wxT("vendor"));
+	CHECK(Suppressions.AddSkipAllRuleForDirectory(skipDir));
+	CHECK_VECTOR_SIZE(2, Suppressions.Rules);
+}
+
+TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRuleWithDuplicates) {
+	
+	// make sure that adding a directory rule
+	// will not add a rule if another rule for the dir
+	// already exists
+	t4p::SuppressionRuleClass rule;
+	rule.SkipAllRule(CodeDir);
+	Suppressions.Add(rule);
+	
+	// now call the method being tested
+	CHECK_EQUAL(false, Suppressions.AddSkipAllRuleForDirectory(CodeDir));
+	CHECK_VECTOR_SIZE(1, Suppressions.Rules);
+}
+
+TEST_FIXTURE(LintSuppressionFixtureClass, RemoveDirectoryRuleWithExistingRules) {
+	
+	// add 2 rules, then attempt to remove 1
+	t4p::SuppressionRuleClass ruleDir;
+	ruleDir.SkipAllRule(CodeDir);
+	Suppressions.Add(ruleDir);
+	
+	t4p::SuppressionRuleClass ruleFile;
+	ruleFile.SkipAllRule(CodeFile);
+	Suppressions.Add(ruleFile);
+	
+	// now call the method being tested
+	CHECK_EQUAL(true, Suppressions.RemoveRulesForDirectory(CodeDir));
+	CHECK_VECTOR_SIZE(1, Suppressions.Rules);
+	
+}
+
 }

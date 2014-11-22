@@ -221,6 +221,22 @@ void t4p::ProjectFeatureClass::OnProjectDefine(wxCommandEvent& event) {
 		App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
+		
+		// order here is important for
+		// suppression to work properly .. not the best 
+		// but it'll do for now
+		// what happens when the user removes a project and 
+		// adds the same project back at the same time?
+		if (!removedProjects.empty()) {
+			t4p::ProjectEventClass removedEvt(t4p::EVENT_APP_PROJECTS_REMOVED, removedProjects);
+			App.EventSink.Publish(removedEvt);
+		}
+		
+		if (!touchedProjects.empty()) {
+			t4p::ProjectEventClass updateEvt(t4p::EVENT_APP_PROJECTS_UPDATED, touchedProjects);
+			App.EventSink.Publish(updateEvt);
+		}
+		
 
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config

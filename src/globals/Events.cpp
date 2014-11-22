@@ -153,6 +153,18 @@ wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
 	return evt;
 }
 
+t4p::ProjectEventClass::ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects)
+: wxEvent(wxID_ANY, type)
+, Projects(projects) {
+	
+}
+
+wxEvent* t4p::ProjectEventClass::Clone() const {
+	t4p::ProjectEventClass* evt = new t4p::ProjectEventClass(GetEventType(), Projects);
+	return evt;
+}
+
+
 
 const wxEventType t4p::EVENT_APP_READY = wxNewEventType();
 const wxEventType t4p::EVENT_APP_ACTIVATED = wxNewEventType();
@@ -173,6 +185,8 @@ const wxEventType t4p::EVENT_APP_DIR_RENAMED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_PREFERENCES_SAVED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_PROJECT_CREATED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_PROJECTS_REMOVED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_PROJECTS_UPDATED = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_FILE_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DIR_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
@@ -187,3 +201,4 @@ const long t4p::ID_OUTLINE_NOTEBOOK = 1002;
  * within the MainFrameForms (created by wxFormBuilder)
  */
 const long t4p::ID_CODE_NOTEBOOK = 1001;
+

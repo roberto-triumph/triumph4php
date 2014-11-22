@@ -530,6 +530,12 @@ private:
 	void OnFileSaved(t4p::CodeControlEventClass& event);
 	
 	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
+	
+	void OnProjectsUpdated(t4p::ProjectEventClass& event);
+
+	void OnProjectsRemoved(t4p::ProjectEventClass& event);
+	
+	void OnProjectCreated(wxCommandEvent& event);
 
 	/**
 	 * to stop the lint action if the user closes the tab

@@ -192,7 +192,24 @@ public:
 	bool ShouldIgnore(const wxFileName& file, const UnicodeString& target, 
 		t4p::SuppressionRuleClass::Types type) const;
 	
-
+	/**
+	 * loops through all of the rules and removes the rules whose location
+	 * is EQUAL TO the given directory
+	 * 
+	 * @param dir the location to check
+	 * @return bool TRUE if a rule was removed
+	 */
+	bool RemoveRulesForDirectory(const wxFileName& dir);
+	
+	/**
+	 * Adds a SKIP_ALL rule for the given directory, but only
+	 * if another SKIP_ALL rule for the directory does not yet
+	 * exist
+	 *
+	 * @param dir the directory to check and add
+	 * @return bool TRUE if a new rule was actually added
+	 */
+	bool AddSkipAllRuleForDirectory(const wxFileName& dir);
 };
 
 }

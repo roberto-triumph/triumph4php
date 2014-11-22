@@ -51,6 +51,24 @@ const int ID_LINT_ERROR_PANEL = wxNewId();
  */
 const int MAX_LINT_ERROR_FILES = 100;
 
+
+/**
+ * puts all of the given projects' source directories into the given map.
+ * 
+ * @param projects the projects to grab the sources from
+ * @param map the destination of the source directories
+ */
+static void SourcesToMap(const std::vector<t4p::ProjectClass>& projects, std::map<wxString, int>& map) {
+	std::vector<t4p::ProjectClass>::const_iterator project;
+	std::vector<t4p::SourceClass>::const_iterator source;
+	
+	for (project = projects.begin(); project != projects.end(); ++project) {
+		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
+			map[source->RootDirectory.GetPathWithSep()] = 1;
+		}
+	}
+}
+
 t4p::LintResultsEventClass::LintResultsEventClass(int eventId, const std::vector<pelet::LintResultsClass>& lintResults)
 	: wxEvent(eventId, t4p::EVENT_LINT_ERROR) 
 	, LintResults(lintResults) {
@@ -804,6 +822,124 @@ void t4p::LintFeatureClass::OnLintSummary(t4p::LintResultsSummaryEventClass& eve
 	}
 }
 
+void t4p::LintFeatureClass::OnProjectsRemoved(t4p::ProjectEventClass& event) {
+	
+	// when a project is removed then remove any suppression rules
+	// that mention the projects' sources
+	// question: what do we do when two different projects have the same
+	// source; but only one of the projects is removed? do we remove the
+	// suppression rule ? we only want to remove the rule if the
+	// rule directory is mentioned in the removed projects AND it is 
+	// not mentioned in any of the existing projects
+	std::map<wxString, int> removedSources;
+	SourcesToMap(event.Projects, removedSources);
+	
+	std::map<wxString, int> existingSources;
+	SourcesToMap(App.Globals.Projects, existingSources);
+	
+	// see which removed soures are not in the projects that have remained
+	std::map<wxString, int>::iterator oldSource;
+	std::map<wxString, int> toRemove;
+	for (oldSource = removedSources.begin(); oldSource != removedSources.end(); ++oldSource) {
+		if (existingSources.find(oldSource->first) == existingSources.end()) {
+			toRemove[oldSource->first] = 1;
+		}
+	}
+	
+	// finally, open the suppression rules and remove the old sources
+	// don't care about rule loading errors
+	t4p::LintSuppressionClass suppressions;
+	std::vector<UnicodeString> errors;
+	wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
+	suppressions.Init(suppressionFile, errors);
+	
+	std::map<wxString, int>::const_iterator remove;
+	for (remove = toRemove.begin(); remove != toRemove.end(); ++remove) {
+		
+		// remove the skip-all rules for the vendor dir (they were added
+		// when the project was created)
+		wxFileName fn;
+		fn.AssignDir(remove->first);
+		fn.AppendDir(wxT("vendor"));
+		suppressions.RemoveRulesForDirectory(fn);
+	}
+	
+	if (!suppressions.Save(suppressionFile)) {
+		t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
+	}
+	
+}
+
+void t4p::LintFeatureClass::OnProjectsUpdated(t4p::ProjectEventClass& event) {
+	
+	// when a project is added/updated then add any suppression rules
+	// that mention the projects' vendor directories.
+	// we add automatic suppression to the vendor directories because
+	// that's where composer puts the library code; and users 
+	// will most likely not want to run lint checks on libs.
+	//
+	// question: what do we do when two different projects have the same
+	// source? we only want to make at most 1 rule for a directory
+	std::map<wxString, int> updatedSources;
+	SourcesToMap(event.Projects, updatedSources);
+	
+	std::map<wxString, int> existingSources;
+	SourcesToMap(App.Globals.Projects, existingSources);
+	
+	// see which updated sources have a composer  dir(vendor)
+	std::map<wxString, int> vendorDirs;
+	std::map<wxString, int>::iterator updatedSource;
+	for (updatedSource = updatedSources.begin(); updatedSource != updatedSources.end(); ++updatedSource) {
+		if (wxFileName::IsDirReadable(updatedSource->first + wxT("vendor"))) {
+			vendorDirs[updatedSource->first + wxT("vendor")] = 1;
+		}
+	}
+	
+	// now add a suppression rule ONLY if the vendor dir is not already
+	// in a rule
+	// don't care about rule loading errors
+	t4p::LintSuppressionClass suppressions;
+	std::vector<UnicodeString> errors;
+	wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
+	suppressions.Init(suppressionFile, errors);
+	
+	std::map<wxString, int>::iterator vendorDir;
+	bool addedRule = false;
+	for (vendorDir = vendorDirs.begin(); vendorDir != vendorDirs.end(); ++vendorDir) {
+		wxFileName fn;
+		fn.AssignDir(vendorDir->first);
+		if (suppressions.AddSkipAllRuleForDirectory(fn)) {
+			addedRule = true;
+		}
+	}	
+	
+	if (addedRule && !suppressions.Save(suppressionFile)) {
+		t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
+	}
+}
+
+void t4p::LintFeatureClass::OnProjectCreated(wxCommandEvent& event) {
+	
+	// same as when projects are updated; add the vendor dir
+	// to the suppression list
+	wxFileName fn;
+	fn.AssignDir(event.GetString());
+	fn.AppendDir(wxT("vendor"));
+	if (fn.DirExists()) {
+		
+		// don't care about rule loading errors
+		t4p::LintSuppressionClass suppressions;
+		std::vector<UnicodeString> errors;
+		wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
+		suppressions.Init(suppressionFile, errors);
+		bool addedRule = suppressions.AddSkipAllRuleForDirectory(fn);
+		if (addedRule && !suppressions.Save(suppressionFile)) {
+			t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
+		}
+	}
+}
+
+
 t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 																t4p::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
@@ -1177,6 +1313,9 @@ BEGIN_EVENT_TABLE(t4p::LintFeatureClass, wxEvtHandler)
 	EVT_LINT_ERROR(ID_LINT_READER, t4p::LintFeatureClass::OnLintError)
 	EVT_LINT_ERROR(ID_LINT_READER_SAVE, t4p::LintFeatureClass::OnLintErrorAfterSave)
 	EVT_LINT_SUMMARY(ID_LINT_READER, t4p::LintFeatureClass::OnLintSummary)
+	EVT_APP_PROJECTS_UPDATED(t4p::LintFeatureClass::OnProjectsUpdated)
+	EVT_APP_PROJECTS_REMOVED(t4p::LintFeatureClass::OnProjectsRemoved)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PROJECT_CREATED, t4p::LintFeatureClass::OnProjectCreated)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::LintResultsPanelClass, LintResultsGeneratedPanelClass)
