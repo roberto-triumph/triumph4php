@@ -30,11 +30,13 @@
 
 #include <Triumph.h>
 #include <globals/Events.h>
+#include <globals/Number.h>
 #include <unicode/unistr.h>
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
 #include <wx/ffile.h>
+#include <wx/clipbrd.h>
 
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_SUPPRESSIONS_PANEL = wxNewId();
@@ -42,6 +44,9 @@ const int ID_LINT_RESULTS_GAUGE = wxNewId();
 const int ID_LINT_READER = wxNewId();
 const int ID_LINT_READER_SAVE = wxNewId();
 const int ID_LINT_ERROR_PANEL = wxNewId();
+const int ID_MENU_COPY_FILE = wxNewId();
+const int ID_MENU_COPY_ERROR = wxNewId();
+const int ID_MENU_ADD_SUPRESSION = wxNewId();
 
 /**
  * the maximum amount of errored files to tolerate.
@@ -472,6 +477,96 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 void t4p::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 	int index = ErrorsList->GetSelectedRow();
 	GoToAndDisplayLintError(index);
+}
+
+void t4p::LintResultsPanelClass::OnErrorContextMenu(wxDataViewEvent& event) {
+	wxMenu menu;
+	menu.Append(ID_MENU_COPY_FILE, _("Copy File"));
+	menu.Append(ID_MENU_COPY_ERROR, _("Copy Error"));
+	menu.Append(ID_MENU_ADD_SUPRESSION, _("Add Suppression"));
+	
+	PopupMenu(&menu);
+}
+
+void t4p::LintResultsPanelClass::OnCopyFile(wxCommandEvent& event) {
+	int index = ErrorsList->GetSelectedRow();
+	if (!t4p::NumberLessThan(index, Feature.LintErrors.size())) {
+		return;
+	}
+	pelet::LintResultsClass results = Feature.LintErrors[index];
+	wxString file = t4p::IcuToWx(results.UnicodeFilename);
+	
+	if (wxTheClipboard->Open()) {
+		wxTheClipboard->AddData(new wxTextDataObject(file));
+		wxTheClipboard->Close();
+	}
+}
+
+void t4p::LintResultsPanelClass::OnCopyError(wxCommandEvent& event) {
+	int index = ErrorsList->GetSelectedRow();
+	if (!t4p::NumberLessThan(index, Feature.LintErrors.size())) {
+		return;
+	}
+	pelet::LintResultsClass results = Feature.LintErrors[index];
+	wxString error = t4p::IcuToWx(results.Error);
+	if (wxTheClipboard->Open()) {
+		wxTheClipboard->AddData(new wxTextDataObject(error));
+		wxTheClipboard->Close();
+	}
+}
+
+void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
+	int row = ErrorsList->GetSelectedRow();
+	if (!t4p::NumberLessThan(row, Feature.LintErrors.size())) {
+		return;
+	}
+	
+	// the linters provide the error info directly, but we don't
+	// get the specific lint errors at this point.
+	t4p::SuppressionRuleClass rule;
+	pelet::LintResultsClass results = Feature.LintErrors[row];
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown class "))  >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
+		
+		// 14 == length of  'unknown class '
+		results.Error.extract(14, results.Error.length() - 14 + 1, rule.Target);
+	}
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown method ")) >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
+		
+		// 15 == length of  'unknown method '
+		results.Error.extract(15, results.Error.length() - 15 + 1, rule.Target);
+	}
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown function ")) >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
+		
+		// 17 = length of "unknown function "
+		results.Error.extract(17, results.Error.length() - 17 + 1, rule.Target);
+	}
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Uninitialized variable ")) >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
+		
+		// 23 = length of "uninitialized variable "
+		results.Error.extract(23, results.Error.length() - 23 + 1, rule.Target);
+	}
+	
+	if (!rule.Target.isEmpty()) {
+		rule.Location.Assign(results.File);
+		t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, rule);
+		if (dialog.ShowModal() == wxOK) {
+		
+			// now save the newly created
+			t4p::LintSuppressionClass suppressions;
+			std::vector<UnicodeString> errors;
+			
+			wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
+			suppressions.Init(suppressionFile, errors);
+			suppressions.Add(rule);
+			if (!suppressions.Save(suppressionFile)) {
+				t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
+			}		
+		}
+	}
 }
 
 void t4p::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
@@ -1223,11 +1318,13 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 	if (EditRule.Location.IsDir()) {
 		Directory->Enable(true);
 		File->Enable(false);
+		DirectoryRadio->SetValue(true);
 		Directory->SetPath(EditRule.Location.GetPath());
 	}
 	else {
 		Directory->Enable(false);
 		File->Enable(true);
+		FileRadio->SetValue(true);
 		File->SetPath(EditRule.Location.GetFullPath());
 	}
 	
@@ -1319,7 +1416,13 @@ BEGIN_EVENT_TABLE(t4p::LintFeatureClass, wxEvtHandler)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::LintResultsPanelClass, LintResultsGeneratedPanelClass)
-	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, t4p::LintResultsPanelClass::OnRowActivated)
+	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, 
+		t4p::LintResultsPanelClass::OnRowActivated)
+	EVT_DATAVIEW_ITEM_CONTEXT_MENU(LintResultsGeneratedPanelClass::ID_ERRORS_LIST,
+		t4p::LintResultsPanelClass::OnErrorContextMenu)
+	EVT_MENU(ID_MENU_COPY_FILE, t4p::LintResultsPanelClass::OnCopyFile)
+	EVT_MENU(ID_MENU_COPY_ERROR, t4p::LintResultsPanelClass::OnCopyError)
+	EVT_MENU(ID_MENU_ADD_SUPRESSION, t4p::LintResultsPanelClass::OnAddSuppression)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::LintSuppressionsPanelClass, LintSuppressionsGeneratedPanelClass)

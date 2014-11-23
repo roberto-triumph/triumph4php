@@ -421,6 +421,14 @@ public:
 	void OnRowActivated(wxDataViewEvent& event);
 	
 	void OnHelpButton(wxCommandEvent& event);
+	
+	void OnErrorContextMenu(wxDataViewEvent& event);
+	
+	void OnCopyFile(wxCommandEvent& event);
+	
+	void OnCopyError(wxCommandEvent& event);
+	
+	void OnAddSuppression(wxCommandEvent& event);
 
 private:
 
