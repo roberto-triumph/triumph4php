@@ -28,6 +28,7 @@
 #include <search/FindInFilesClass.h>
 #include <Triumph.h>
 #include <globals/Errors.h>
+#include <globals/Number.h>
 #include <widgets/FileTypeImageList.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
@@ -633,7 +634,7 @@ void t4p::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
 
 	// get the tab that was right clicked; the tab right menu event holds
 	// the index of the tab we want to close
-	if (TabIndexRightClickEvent >= 0 && TabIndexRightClickEvent < (int)GetPageCount()) {
+	if (t4p::NumberLessThan(TabIndexRightClickEvent, GetPageCount())) {
 		ClosePage(TabIndexRightClickEvent);
 		TabIndexRightClickEvent  = -1;
 	}

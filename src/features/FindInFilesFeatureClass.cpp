@@ -25,6 +25,7 @@
 #include <features/FindInFilesFeatureClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <globals/Errors.h>
@@ -427,7 +428,7 @@ void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 void t4p::FindInFilesResultsPanelClass::ShowNextMatch() {
 	int selected = ResultsList->GetSelectedRow();
 	int next = 0;
-	if (selected >= 0 && selected < ((int)ResultsList->GetItemCount() - 1)) {
+	if (selected >= 0 && t4p::NumberLessThan(selected, ResultsList->GetItemCount() - 1)) {
 		next = selected + 1;
 	}
 	else {
@@ -648,7 +649,7 @@ void t4p::FindInFilesResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 }
 
 void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
-	if (i < 0 || i >= (int)AllHits.size()) {
+	if (!t4p::NumberLessThan(i, AllHits.size())) {
 		return;
 	}
 	wxString fileName = AllHits[i].FileName;

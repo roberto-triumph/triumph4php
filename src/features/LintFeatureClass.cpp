@@ -602,7 +602,7 @@ void t4p::LintResultsPanelClass::SelectPreviousError() {
 }
 
 void t4p::LintResultsPanelClass::ShowLintError(int index) {
-	if (index < 0 || (size_t)index >= Feature.LintErrors.size()) {
+	if (!t4p::NumberLessThan(index, Feature.LintErrors.size())) {
 		return;
 	}
 	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
@@ -1170,10 +1170,7 @@ void t4p::LintSuppressionsPanelClass::OnDeleteAllButton(wxCommandEvent& event) {
 
 void t4p::LintSuppressionsPanelClass::OnDeleteButton(wxCommandEvent& event) {
 	int row = SuppressionsList->GetSelectedRow();
-	if (row == wxNOT_FOUND) {
-		return;
-	}
-	if ((size_t)row >= Suppressions.Rules.size()) {
+	if (!t4p::NumberLessThan(row, Suppressions.Rules.size())) {
 		return;
 	}
 	
@@ -1185,10 +1182,7 @@ void t4p::LintSuppressionsPanelClass::OnDeleteButton(wxCommandEvent& event) {
 
 void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 	int row = SuppressionsList->GetSelectedRow();
-	if (row == wxNOT_FOUND) {
-		return;
-	}
-	if ((size_t)row >= Suppressions.Rules.size()) {
+	if (!t4p::NumberLessThan(row, Suppressions.Rules.size())) {
 		return;
 	}
 	t4p::SuppressionRuleClass editRule = Suppressions.Rules[row];

@@ -33,6 +33,7 @@
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
+#include <globals/Number.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/file.h>
@@ -481,7 +482,7 @@ void t4p::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 	// create the command to test the selected detector on the selected
 	// project
 	int projectChoiceIndex = ProjectChoice->GetSelection();
-	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+	if (ProjectChoice->IsEmpty() || !t4p::NumberLessThan(projectChoiceIndex, Globals.Projects.size())) {
 		wxMessageBox(_("Please choose a project to test the detector on."));
 		return;
 	}
@@ -753,7 +754,7 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnTestButton(wxCommandEvent& event
 	// create the command to test the selected detector on the selected
 	// project
 	int projectChoiceIndex = ProjectChoice->GetSelection();
-	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+	if (ProjectChoice->IsEmpty() || !t4p::NumberLessThan(projectChoiceIndex, Globals.Projects.size())) {
 		wxMessageBox(_("Please choose a project to test the detector on."));
 		return;
 	}
@@ -797,7 +798,7 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnCallStackComplete(wxCommandEvent
 		return;
 	}
 	int projectChoiceIndex = ProjectChoice->GetSelection();
-	if (ProjectChoice->IsEmpty() || projectChoiceIndex >= (int)Globals.Projects.size()) {
+	if (ProjectChoice->IsEmpty() || !t4p::NumberLessThan(projectChoiceIndex, Globals.Projects.size())) {
 		return;
 	}
 	t4p::ProjectClass project = Globals.AllEnabledProjects()[projectChoiceIndex];

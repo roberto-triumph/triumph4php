@@ -26,6 +26,7 @@
 #include <features/SqlBrowserFeatureClass.h>
 #include <code_control/CodeControlClass.h>
 #include <globals/String.h>
+#include <globals/Number.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/FilePickerValidatorClass.h>
 #include <globals/Errors.h>
@@ -368,8 +369,8 @@ void t4p::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& event) {
 }
 
 void t4p::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
-	size_t sel = (size_t)event.GetSelection();
-	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
+	int sel = event.GetSelection();
+	if (t4p::NumberLessThan(sel, EditedDatabaseTags.size())) {
 		t4p::DatabaseTagClass editTag = EditedDatabaseTags[sel];
 		int res = 0;
 		if (t4p::DatabaseTagClass::MYSQL == editTag.Driver) {
@@ -430,8 +431,8 @@ void t4p::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEvent& eve
 	if (toTestIndexes.IsEmpty()) {
 		return;
 	}
-	size_t index = (size_t)toTestIndexes[0];
-	if (index < EditedDatabaseTags.size()) {
+	int index = toTestIndexes[0];
+	if (t4p::NumberLessThan(index, EditedDatabaseTags.size())) {
 		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
 		wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
 	
@@ -613,9 +614,9 @@ bool t4p::SqlBrowserPanelClass::Check() {
 	if (ret) {
 		
 		// make sure a connection has been chosen
-		size_t sel = (size_t)Connections->GetSelection();
+		size_t sel = Connections->GetSelection();
 		std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
-		if (sel >= 0 && sel < dbTags.size()) {
+		if (t4p::NumberLessThan(sel, dbTags.size())) {
 			Query.DatabaseTag.Copy(dbTags[sel]);
 		}
 		else {
@@ -838,9 +839,9 @@ void t4p::SqlBrowserPanelClass::LinkToCodeControl(t4p::CodeControlClass* codeCon
 	CodeControl = codeControl;
 	
 	// set the current selected db tag, so that code completion works
-	size_t sel = (size_t)Connections->GetSelection();
+	int sel = Connections->GetSelection();
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
-	if (sel >= 0 && sel < dbTags.size()) {
+	if (t4p::NumberLessThan(sel, dbTags.size())) {
 		Feature->SetCurrentInfo(dbTags[sel]);
 	}
 }
@@ -872,9 +873,9 @@ void t4p::SqlBrowserPanelClass::FillConnectionList() {
 }
 
 void t4p::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
-	size_t sel = (size_t)event.GetSelection();
+	int sel = event.GetSelection();
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature->App.Globals.AllEnabledDatabaseTags();
-	if (sel >= 0 && sel < dbTags.size()) {
+	if (t4p::NumberLessThan(sel, dbTags.size())) {
 		Feature->SetCurrentInfo(dbTags[sel]);
 	}
 }
@@ -1200,7 +1201,7 @@ void t4p::SqlBrowserFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEven
 					
 					int sel = panel->SelectedConnectionIndex();
 					std::vector<t4p::DatabaseTagClass> allDbTags = App.Globals.AllEnabledDatabaseTags();
-					if (sel >= 0 && sel < (int)allDbTags.size()) {
+					if (t4p::NumberLessThan(sel, allDbTags.size())) {
 						SqlCodeCompletionProvider.SetDbTag(allDbTags[sel]);
 					}
 					break;

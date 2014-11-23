@@ -25,6 +25,7 @@
 #include <UnitTest++.h>
 #include <globals/ApacheClass.h>
 #include <FileTestFixtureClass.h>
+#include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <wx/platinfo.h>
 #include <wx/utils.h>
@@ -261,7 +262,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
@@ -278,7 +279,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenListeningOnANonStandardPortAnd
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir, 8080, 8080);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
@@ -295,7 +296,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsOnDifferentPort) 
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir, 8000, 9000);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
@@ -323,7 +324,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostHasAWindowsPath) {
 		CreateHttpdFileWithVirtualHost(ConfigSubDirectory, documentRoot);
 		Walk();
 		
-		CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+		CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 		wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 		CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 		CHECK(Apache.SetHttpdPath(actualHttpdPath));
@@ -341,7 +342,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedFile) {
 	CreateVirtualHostFileInSubDirectory(ConfigSubDirectory);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
@@ -355,7 +356,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsDefinedInDifferen
 	CreateHttpdFileWithIncludeFile(hostsFilePath, ConfigSubDirectory);
 	CreateVirtualHostDifferentOrder(ConfigSubDirectory);
 	Walk();
-	CHECK_EQUAL((size_t)1, Apache.GetVirtualHostMappings().size());
+	CHECK_VECTOR_SIZE(1, Apache.GetVirtualHostMappings());
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
 	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
 	CHECK_EQUAL(expectedUrl, url);	
@@ -371,7 +372,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedDirecto
 	CreateVirtualHostFileInSubDirectory(hostsSubDirectory);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
@@ -391,7 +392,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedRelativ
 	CreateVirtualHostFileInSubDirectory(hostsSubDirectory);
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
@@ -415,7 +416,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedWildcar
 	CreateVirtualHostFileInSubDirectory(hostsSubDirectory);
 	Walk();
 
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
@@ -451,7 +452,7 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissi
 	));
 	Walk();
 	
-	CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
@@ -480,7 +481,7 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		));
 		Walk();
 		
-		CHECK_EQUAL((size_t)1, Search.GetMatchedFiles().size());
+		CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 		wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 		wxString expectedPath = TestProjectDir;
 		expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);

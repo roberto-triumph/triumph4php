@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/ChooseUrlDialogClass.h>
+#include <globals/Number.h>
 
 t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, 
 													  t4p::UrlTagFinderClass& urls,
@@ -97,7 +98,7 @@ void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
-	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
+	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
 		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
 	}
@@ -117,14 +118,14 @@ void t4p::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
 void t4p::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_DOWN && event.GetModifiers() == wxMOD_NONE) {
 		int selection = UrlList->GetSelection();
-		if (selection >= 0 && selection < (int)(UrlList->GetCount() - 1)) {
+		if (selection >= 0 && t4p::NumberLessThan(selection, UrlList->GetCount() - 1)) {
 			UrlList->SetSelection(selection  + 1);
 		}
 		Filter->SetFocus();
 	}
 	else if (event.GetKeyCode() == WXK_UP && event.GetModifiers() == wxMOD_NONE) {
 		int selection = UrlList->GetSelection();
-		if (selection > 0 && selection < (int)UrlList->GetCount()) {
+		if (selection > 0 && t4p::NumberLessThan(selection, UrlList->GetCount())) {
 			UrlList->SetSelection(selection  - 1);
 		}
 		Filter->SetFocus();
@@ -153,7 +154,7 @@ void t4p::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	std::vector<t4p::UrlTagClass> filteredUrls;
 
 	// project 0 is the "all enabled projects"
-	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
+	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
 		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
 	}
@@ -218,7 +219,7 @@ std::vector<wxFileName> t4p::ChooseUrlDialogClass::ActiveSourceDirectories() {
 	
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
-	if (sel >= 1 && sel < (int)ProjectChoice->GetCount()) {
+	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
 		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
 			dirs.push_back(src->RootDirectory);

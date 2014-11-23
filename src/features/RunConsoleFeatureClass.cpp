@@ -26,6 +26,7 @@
 #include <globals/String.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
@@ -130,8 +131,8 @@ void t4p::CliCommandListDialogClass::FillList() {
 }
 
 void t4p::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
-	size_t selection = (size_t) CommandsList->GetSelection();
-	if (selection > 0 && selection < EditedCommands.size()) {
+	int selection = CommandsList->GetSelection();
+	if (selection > 0 && t4p::NumberLessThan(selection, EditedCommands.size())) {
 		t4p::CliCommandClass tmp = EditedCommands[selection];
 		EditedCommands[selection] = EditedCommands[selection - 1];
 		EditedCommands[selection - 1] = tmp;
@@ -143,8 +144,8 @@ void t4p::CliCommandListDialogClass::OnUpButton(wxCommandEvent& event) {
 }
 
 void t4p::CliCommandListDialogClass::OnDownButton(wxCommandEvent& event) {
-	size_t selection = (size_t) CommandsList->GetSelection();
-	if (selection >= 0 && selection < (EditedCommands.size() - 1)) {
+	int selection = CommandsList->GetSelection();
+	if (t4p::NumberLessThan(selection, EditedCommands.size() - 1)) {
 		t4p::CliCommandClass tmp = EditedCommands[selection];
 		EditedCommands[selection] = EditedCommands[selection + 1];
 		EditedCommands[selection + 1] = tmp;
@@ -166,12 +167,12 @@ void t4p::CliCommandListDialogClass::OnAddButton(wxCommandEvent& event) {
 }
 
 void t4p::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
-	size_t selection = (size_t) CommandsList->GetSelection();
-	if (selection >= 0 && selection < EditedCommands.size()) {
+	int selection = CommandsList->GetSelection();
+	if (t4p::NumberLessThan(selection, EditedCommands.size())) {
 		CommandsList->Delete(selection);
 		EditedCommands.erase(EditedCommands.begin() + selection);
 		
-		if (selection >= EditedCommands.size() && !EditedCommands.empty()) {
+		if (!t4p::NumberLessThan(selection, EditedCommands.size()) && !EditedCommands.empty()) {
 			CommandsList->SetSelection(EditedCommands.size() - 1);
 		}
 		else if (selection >= 0 && !EditedCommands.empty()) {
@@ -181,8 +182,8 @@ void t4p::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
 }
 
 void t4p::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
-	size_t selection = (size_t) event.GetSelection();
-	if (selection >= 0 && selection < EditedCommands.size()) {
+	int selection = event.GetSelection();
+	if (t4p::NumberLessThan(selection, EditedCommands.size())) {
 		t4p::CliCommandClass cliCommand = EditedCommands[selection];
 		t4p::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
 		if (dialog.ShowModal() == wxID_OK) {
@@ -193,8 +194,8 @@ void t4p::CliCommandListDialogClass::OnListDoubleClick(wxCommandEvent& event) {
 }
 
 void t4p::CliCommandListDialogClass::OnEditButton(wxCommandEvent& event) {
-	size_t selection = (size_t) CommandsList->GetSelection();
-	if (selection >= 0 && selection < EditedCommands.size()) {
+	int selection = CommandsList->GetSelection();
+	if (t4p::NumberLessThan(selection, EditedCommands.size())) {
 		t4p::CliCommandClass cliCommand = EditedCommands[selection];
 		t4p::CliCommandEditDialogClass dialog(this, wxID_ANY, cliCommand);
 		if (dialog.ShowModal() == wxID_OK) {
@@ -806,9 +807,9 @@ void t4p::RunConsoleFeatureClass::FillCommandPanel() {
 }
 
 void t4p::RunConsoleFeatureClass::OnCommandButtonClick(wxCommandEvent& event) {
-	size_t index = (size_t)event.GetId();
+	int index = event.GetId();
 	index = index - (t4p::MENU_RUN_PHP + 5);
-	if (index >= 0 && index < CliCommands.size()) {
+	if (t4p::NumberLessThan(index, CliCommands.size())) {
 		t4p::CliCommandClass cmd = CliCommands[index];
 		RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
 	}

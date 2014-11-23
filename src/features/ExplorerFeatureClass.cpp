@@ -27,6 +27,7 @@
 #include <globals/Assets.h>
 #include <globals/Events.h>
 #include <globals/FileName.h>
+#include <globals/Number.h>
 #include <search/Directory.h>
 #include <widgets/FilePickerValidatorClass.h>
 #include <Triumph.h>
@@ -938,7 +939,7 @@ void t4p::ModalExplorerPanelClass::ShowDir() {
 	int totalFiles = FileListing->TotalFiles;
 	
 	wxString label;
-	if (files.size() == (size_t)totalFiles) {
+	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
 	}
 	else {
@@ -1346,7 +1347,7 @@ void t4p::ExplorerOutlinePanelClass::ShowDir() {
 	int totalFiles = FileListing->TotalFiles;
 	
 	wxString label;
-	if (files.size() == (size_t)totalFiles) {
+	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
 	}
 	else {

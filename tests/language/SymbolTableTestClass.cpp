@@ -950,13 +950,11 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)2, tags.size());
-	if ((size_t)2 == tags.size()) {
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), tags[0].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[0].ClassName);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), tags[1].Identifier);
-		CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[1].ClassName);
-	}
+	CHECK_VECTOR_SIZE(2, tags);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workA"), tags[0].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[0].ClassName);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"), tags[1].Identifier);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("MyClass"), tags[1].ClassName);
 }
 
 
@@ -973,7 +971,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, true, false, Error);
-	CHECK_EQUAL((size_t)0, tags.size());
+	CHECK_VECTOR_SIZE(0, tags);
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndNoDuckTyping) {
@@ -992,7 +990,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, false, false, Error);
-	CHECK_EQUAL((size_t)0, tags.size());
+	CHECK_VECTOR_SIZE(0, tags);
 }
 
 
@@ -1065,7 +1063,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, tags.size());
+	CHECK_VECTOR_SIZE(0, tags);
 	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\MyClass"),  Error.ErrorClass);
 }
@@ -1085,7 +1083,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, tags.size());
+	CHECK_VECTOR_SIZE(0, tags);
 	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("workB"),  Error.ErrorLexeme);
 }
@@ -1104,7 +1102,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 	std::vector<t4p::TagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
-	CHECK_EQUAL((size_t)0, tags.size());
+	CHECK_VECTOR_SIZE(0, tags);
 	CHECK_EQUAL(t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR, Error.Type);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$my"),  Error.ErrorLexeme);
 }

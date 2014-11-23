@@ -26,6 +26,7 @@
 #include <actions/UrlTagDetectorActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <widgets/ChooseUrlDialogClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
@@ -117,7 +118,7 @@ static int BrowserIconsIndex(std::vector<wxBitmap>&  browserIcons, const wxStrin
  */
 static void BrowserIconsMenuSet(std::vector<wxBitmap>&  browserIcons, wxMenuItem* menuItem) {
 	int index = BrowserIconsIndex(browserIcons, menuItem->GetItemLabelText());
-	if (index >= 0 && index < (int)browserIcons.size()) {
+	if (t4p::NumberLessThan(index, browserIcons.size())) {
 		menuItem->SetBitmap(browserIcons[index]);
 	}
 }
@@ -186,7 +187,7 @@ void t4p::RunBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
 		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
-		if (index >= 0 && index < (int)browserIcons.size()) {		
+		if (t4p::NumberLessThan(index, browserIcons.size())) {		
 			BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
 		BrowserToolbar->Realize();
@@ -207,7 +208,7 @@ void t4p::RunBrowserFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, App.Globals.ChosenBrowser);
 		std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 		int index = BrowserIconsIndex(browserIcons, App.Globals.ChosenBrowser);
-		if (index >= 0 && index < (int)browserIcons.size()) {		
+		if (t4p::NumberLessThan(index, browserIcons.size())) {
 			BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[index]);
 		}
 		BrowserToolbar->Realize();
@@ -369,7 +370,7 @@ void t4p::RunBrowserFeatureClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
 			std::vector<wxBitmap> browserIcons = BrowserIconsLoad();
 			int browserIndex = BrowserIconsIndex(browserIcons, name);
 			BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, name);
-			if (browserIndex >= 0 && browserIndex < (int)browserIcons.size()) {
+			if (t4p::NumberLessThan(browserIndex, browserIcons.size())) {
 				BrowserToolbar->SetToolBitmap(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 2, browserIcons[browserIndex]);
 			}
 			BrowserToolbar->Realize();

@@ -26,6 +26,7 @@
 #include <actions/DebuggerServerActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <widgets/DirPickerValidatorClass.h>
 #include <widgets/ListWidget.h>
 #include <wx/valgen.h>
@@ -1777,7 +1778,7 @@ void t4p::DebuggerBreakpointPanelClass::RefreshList() {
 
 void t4p::DebuggerBreakpointPanelClass::OnDeleteBreakpoint(wxCommandEvent& event) {
 	int index = BreakpointsList->GetSelectedRow();
-	if (wxNOT_FOUND == index || index >= (int)Feature.Breakpoints.size()) {
+	if (!t4p::NumberLessThan(index, Feature.Breakpoints.size())) {
 		return;
 	}
 	t4p::BreakpointWithHandleClass toRemove = Feature.Breakpoints[index];
@@ -1813,10 +1814,7 @@ void t4p::DebuggerBreakpointPanelClass::OnToggleAllBreakpoints(wxCommandEvent& e
 
 void t4p::DebuggerBreakpointPanelClass::OnItemActivated(wxDataViewEvent& event) {
 	int row = BreakpointsList->ItemToRow(event.GetItem());
-	if (wxNOT_FOUND == row) {
-		return;
-	}
-	if (row >= (int)Feature.Breakpoints.size()) {
+	if (!t4p::NumberLessThan(row, Feature.Breakpoints.size())) {
 		return;
 	}
 	Feature.BreakpointGoToSource(Feature.Breakpoints[row]);
@@ -1830,10 +1828,7 @@ void t4p::DebuggerBreakpointPanelClass::OnItemValueChanged(wxDataViewEvent& even
 		return;
 	}
 	int row = BreakpointsList->ItemToRow(event.GetItem());
-	if (wxNOT_FOUND == row) {
-		return;
-	}
-	if (row >= (int)Feature.Breakpoints.size()) {
+	if (!t4p::NumberLessThan(row, Feature.Breakpoints.size())) {
 		return;
 	}
 	bool isEnabled = BreakpointsList->GetToggleValue(row, 0);
