@@ -337,7 +337,7 @@ void ProfileTagSearch() {
 	delete result;
 	found = matches.size();
 	time = wxGetLocalTimeMillis() - time;
-	printf("time for tagFinder on entire project after caching:%ld ms found:%d\n", time.ToLong(), (int)found);
+	printf("time for tagFinder on entire project after caching:%ld ms found:%ld\n", time.ToLong(), found);
 }
 
 ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 

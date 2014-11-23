@@ -122,7 +122,7 @@ MyFrame::MyFrame() :
 		int lastHit = 0;
 		while (regEx.Matches(text, 0)) {
 			if (regEx.GetMatch(&matchStart, &matchLength, 0)) {
-				printf("hit at %d (length: %d)\n", (int)(lastHit + matchStart), (int)matchLength);
+				printf("hit at %ld (length: %ld)\n", (lastHit + matchStart), matchLength);
 				
 				
 				TextCtrl->StartStyling(lastHit + matchStart, STYLE_FIND);

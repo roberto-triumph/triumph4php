@@ -621,8 +621,8 @@ void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, c
 	if (!MatchesList->IsEmpty()) {
 		MatchesList->Select(0);
 	}
-	MatchesLabel->SetLabel(wxString::Format("Found %d files for %s. Please choose file(s) to open.", 
-		(int)allMatches.size(), finderQuery));
+	MatchesLabel->SetLabel(wxString::Format("Found %ld files for %s. Please choose file(s) to open.", 
+		allMatches.size(), finderQuery));
 }
 
 void t4p::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {

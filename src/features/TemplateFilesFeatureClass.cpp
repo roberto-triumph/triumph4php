@@ -162,7 +162,7 @@ void t4p::TemplateFilesPanelClass::UpdateControllers() {
 
 void t4p::TemplateFilesPanelClass::UpdateResults() {		
 	std::vector<t4p::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
-	StatusLabel->SetLabel(wxString::Format(_("Found %d view files"), (int)currentTemplates.size()));
+	StatusLabel->SetLabel(wxString::Format(_("Found %ld view files"), currentTemplates.size()));
 	FileTree->DeleteAllItems();
 
 	wxTreeItemId parent = FileTree->AddRoot(_("Templates"), IMAGE_TEMPLATE_FOLDER);

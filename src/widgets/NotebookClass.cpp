@@ -275,7 +275,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			// focus goes to the notebook. Meaning that if LoadPage gets
 			// called on a file that is already at the forefront the 
 			// code control will lose focus.
-			if (GetSelection() != (int)j) {
+			if (!t4p::NumberEqualTo(GetSelection(), j)) {
 				SetSelection(j);
 			}
 			found = true;

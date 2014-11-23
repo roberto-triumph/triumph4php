@@ -321,7 +321,8 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 	}
 	
 	// truncate to desired length
-	bool isTruncated = ((int)preview.length()) > maxPreviewLength;
+	bool isTruncated = !t4p::NumberLessThan(maxPreviewLength, preview.length()) 
+		&& !t4p::NumberEqualTo(maxPreviewLength, preview.length());
 	preview = preview.Mid(0, maxPreviewLength);
 	if (isTruncated) {
 		preview += wxT(" ...");

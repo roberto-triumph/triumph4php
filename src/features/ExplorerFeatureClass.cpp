@@ -1183,10 +1183,10 @@ void t4p::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName>
 		SourcesList->InsertItem(column1);
 	}
 	if (sourceDirs.size() == 1) {
-		SourcesLabel->SetLabel(wxString::Format(wxT("%d Source Directory"), (int)sourceDirs.size()));
+		SourcesLabel->SetLabel(wxString::Format(wxT("%ld Source Directory"), sourceDirs.size()));
 	}
 	else {
-		SourcesLabel->SetLabel(wxString::Format(wxT("%d Source Directories"), (int)sourceDirs.size()));
+		SourcesLabel->SetLabel(wxString::Format(wxT("%ld Source Directories"), sourceDirs.size()));
 	}
 }
 

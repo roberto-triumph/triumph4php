@@ -117,7 +117,7 @@ int main() {
 			callStack.MatchError.ErrorClass.getTerminatedBuffer());
 	}
 	u_fclose(ufout);
-	printf("The call stack is %d items long\n", (int)callStack.Variables.size());
+	printf("The call stack is %ld items long\n", callStack.Variables.size());
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(DetectorDbFullPath));
 	callStack.Persist(session);
 	printf("Call stack written to:%s\n", (const char*)DetectorDbFullPath.ToAscii());
