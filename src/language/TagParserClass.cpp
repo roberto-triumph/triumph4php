@@ -438,7 +438,10 @@ void t4p::TagParserClass::BuildResourceCache(const wxString& fullPath, bool pars
 	}
 }
 
-void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
+void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+		const UnicodeString& signature, 
+		const UnicodeString& baseClassName,
+		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber) {
 	TagClass classItem;
 	classItem.Identifier = className;

@@ -201,6 +201,35 @@ void t4p::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& na
 
 }
 
+void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+		const UnicodeString& signature, 
+		const UnicodeString& baseClassName,
+		const UnicodeString& implementsList,
+		const UnicodeString& comment, const int lineNumber) {
+	CheckClassName(baseClassName, lineNumber, 0);
+	
+	if (implementsList.isEmpty()) {
+		return;
+	}
+	
+	UChar* state = NULL;
+	UChar* buf = new UChar[implementsList.length() + 1];
+	u_memmove(buf, implementsList.getBuffer(), implementsList.length());
+	buf[implementsList.length()] = '\0';
+	
+	UChar delims[3] = { ',', ' ', '\0' };
+	UChar* next = u_strtok_r(buf, delims, &state);
+	while (next) {
+		UnicodeString nextInterface(next);
+		CheckClassName(nextInterface, lineNumber, 0);
+		
+		next = u_strtok_r(NULL, delims, &state);
+	}
+	
+	delete[] buf;
+}
+
+
 void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
@@ -259,7 +288,7 @@ void t4p::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::Ternary
 
 void t4p::PhpIdentifierLintClass::ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression) {
 	CheckExpression(expression->Expression1);
-	CheckClassName(expression->ClassName, expression);	
+	CheckClassName(expression->ClassName, expression->LineNumber, expression->Pos);	
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
@@ -272,7 +301,7 @@ void t4p::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceE
 	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
 		CheckExpression(*constructorArg);
 	}
-	CheckClassName(expression->ClassName, expression);
+	CheckClassName(expression->ClassName, expression->LineNumber, expression->Pos);
 
 	// check any function args to any chained method calls.
 	std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression->ChainList.begin();
@@ -414,11 +443,9 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 
 	// TODO:
 	// checks to implement
-	// 1. attempt to inherit from undefined base classes
-	// 2. attempt to implement undefined interfaces
-	// 3. type hints with classes that are not defined
-	// 4. namespace declarations with namespaces that are not defined
-	// 5. unused namespace imports
+	// 1. type hints with classes that are not defined
+	// 2. namespace declarations with namespaces that are not defined
+	// 3. unused namespace imports
 	if (var->ChainList[0].IsFunction) {
 		CheckFunctionName(var->ChainList[0], var);
 		
@@ -431,7 +458,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 	else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
 
 		// a classname in a static method call, ie User::DEFAULT_NAME
-		CheckClassName(var->ChainList[0].Name, var);
+		CheckClassName(var->ChainList[0].Name, var->LineNumber, var->Pos);
 	}
 
 	// check the rest of the variable property/method accesses
@@ -718,7 +745,7 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 }
 
 
-void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression) {
+void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, int lineNumber, int pos) {
 	
 	// some class names are never unknown
 	if (className.isEmpty() ||
@@ -760,8 +787,8 @@ void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className,
 	if (isUnknown) {
 		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
-		lintResult.LineNumber = expression->LineNumber;
-		lintResult.Pos = expression->Pos;
+		lintResult.LineNumber = lineNumber;
+		lintResult.Pos = pos;
 		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
 		lintResult.Identifier = className;
 		Errors.push_back(lintResult);	

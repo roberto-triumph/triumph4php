@@ -145,7 +145,10 @@ public:
 	/**
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& signature, 
+	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+		const UnicodeString& signature, 
+		const UnicodeString& baseClassName,
+		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber);
 
 	/**

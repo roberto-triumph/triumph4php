@@ -379,7 +379,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 
-	// callint a static method on an unknown class should generate
+	// calling a static method on an unknown class should generate
 	// an error
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"  
@@ -397,6 +397,53 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("NyClass", Results[0].Identifier);
+	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownBaseClass) {
+
+	// make sure that the class being extended from actually
+	// exists
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"class MyClass {\n"
+		"  function work() {} \n"
+		"} \n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"class MyInheritedClass extends UnknownClass {}"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_UNISTR_EQUALS("UnknownClass", Results[0].Identifier);
+	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
+
+	// make sure that the class being extended from actually
+	// exists
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"class MyClass {\n"
+		"  function work() {} \n"
+		"} \n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"class MyInheritedClass extends MyClass implements BadClass, UnknownClass {}"
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(2, Results);
+	CHECK_UNISTR_EQUALS("BadClass", Results[0].Identifier);
+	CHECK_UNISTR_EQUALS("UnknownClass", Results[1].Identifier);
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
 }
 

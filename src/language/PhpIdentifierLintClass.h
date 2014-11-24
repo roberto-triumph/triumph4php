@@ -140,6 +140,12 @@ public:
 	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
 			const UnicodeString& comment, const int lineNumber);
 
+	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
+		const UnicodeString& signature, 
+		const UnicodeString& baseClassName,
+		const UnicodeString& implementsList,
+		const UnicodeString& comment, const int lineNumber);
+		
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
@@ -293,10 +299,12 @@ private:
 	 * lookup the class name in the tag cache; if it is not found
 	 * then add an error
 	 * @param className the name of the class to look up,
-	 * @param expression the parent expression, used to get line number to populate the
-	 *        error string
+	 * @param lineNumber line where the class name is in the file,
+	 *        to populate the error string
+	 * @param pos position where the class name is in the file; used to 
+	 *        populate the error string
 	 */
-	void CheckClassName(const UnicodeString& className, pelet::ExpressionClass* expression);
+	void CheckClassName(const UnicodeString& className, int lineNumber, int pos);
 	
 	/**
 	 * lookup the method in the tag cache; if it is not found
