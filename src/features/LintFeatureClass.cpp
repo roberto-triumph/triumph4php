@@ -1238,6 +1238,19 @@ void t4p::LintSuppressionsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 	OnEditButton(evt);
 }
 
+void t4p::LintSuppressionsPanelClass::OnKeyDown(wxKeyEvent& event) {
+	if (event.GetKeyCode() != WXK_DELETE) {
+		event.Skip();
+		return;
+	}
+	if (event.HasAnyModifiers()) {
+		event.Skip();
+		return;
+	}
+	wxCommandEvent cmdEvt;
+	OnDeleteButton(cmdEvt);
+}
+
 void t4p::LintSuppressionsPanelClass::OnHelpButton(wxCommandEvent& event) {
 	LintSuppressionsHelpGeneratedDialogClass dialog(TopWindow);
 	dialog.ShowModal();

@@ -88,6 +88,7 @@ class LintSuppressionsGeneratedPanelClass : public wxPanel
 		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAllButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		
 	
 	public:

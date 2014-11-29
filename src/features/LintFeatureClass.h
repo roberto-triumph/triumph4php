@@ -587,6 +587,7 @@ private:
 	void OnDeleteAllButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnRowActivated(wxDataViewEvent& event);
+	void OnKeyDown(wxKeyEvent& event);
 	
 	/**
 	 * refresh viewable list from the suppressions file

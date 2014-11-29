@@ -102,6 +102,7 @@ LintSuppressionsGeneratedPanelClass::LintSuppressionsGeneratedPanelClass( wxWind
 	EditButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnEditButton ), NULL, this );
 	DeleteButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteButton ), NULL, this );
 	DeleteAllButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteAllButton ), NULL, this );
+	SuppressionsList->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintSuppressionsGeneratedPanelClass::OnKeyDown ), NULL, this );
 }
 
 LintSuppressionsGeneratedPanelClass::~LintSuppressionsGeneratedPanelClass()
@@ -112,6 +113,7 @@ LintSuppressionsGeneratedPanelClass::~LintSuppressionsGeneratedPanelClass()
 	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnEditButton ), NULL, this );
 	DeleteButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteButton ), NULL, this );
 	DeleteAllButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintSuppressionsGeneratedPanelClass::OnDeleteAllButton ), NULL, this );
+	SuppressionsList->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( LintSuppressionsGeneratedPanelClass::OnKeyDown ), NULL, this );
 	
 }
 
