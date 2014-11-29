@@ -389,6 +389,7 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 	, TopWindow(topWindow)
 	, TotalFiles(0)
 	, ErrorFiles(0) {
+	RunButton->SetBitmap(t4p::BitmapImageAsset(wxT("lint-check")));
 	HelpButton->SetBitmap(
 		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
 	);
@@ -399,6 +400,10 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 	ErrorsList->AppendTextColumn(_("Error"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
+}
+
+void t4p::LintResultsPanelClass::EnableRunButton(bool doEnable) {
+	RunButton->Enable(doEnable);
 }
 
 void t4p::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
@@ -484,6 +489,10 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 void t4p::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 	int index = ErrorsList->GetSelectedRow();
 	GoToAndDisplayLintError(index);
+}
+
+void t4p::LintResultsPanelClass::OnRunButton(wxCommandEvent& event) {
+	Feature.StartLint();
 }
 
 void t4p::LintResultsPanelClass::OnErrorContextMenu(wxDataViewEvent& event) {
@@ -686,6 +695,10 @@ void t4p::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
+	StartLint();
+}
+
+void t4p::LintFeatureClass::StartLint() {
 	if (RunningActionId > 0) {
 		wxMessageBox(_("There is already another lint check that is active. Please wait for it to finish."), _("Lint Check"));
 		return;
@@ -710,11 +723,12 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 			t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 			
-			// create / open the outline window
+			// create / open the results window
 			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 			if (window) {
 				t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 				resultsPanel->ClearErrors();
+				resultsPanel->EnableRunButton(false);
 				SetFocusToToolsWindow(resultsPanel);
 			}
 			else {
@@ -723,6 +737,7 @@ void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
 				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);
+				resultsPanel->EnableRunButton(false);
 			}
 		}
 		else {
@@ -921,6 +936,7 @@ void t4p::LintFeatureClass::OnLintSummary(t4p::LintResultsSummaryEventClass& eve
 	if (window) {
 		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
 		resultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
+		resultsPanel->EnableRunButton(true);
 	}
 }
 

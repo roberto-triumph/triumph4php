@@ -356,6 +356,11 @@ public:
 		wxWindow* topWindow);
 	
 	/**
+	 * @param doEnable TRUE if the button should be enabled
+	 */
+	void EnableRunButton(bool doEnable);
+	
+	/**
 	 * adds to the list box widget AND the global list
 	 */
 	void AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors);
@@ -419,6 +424,8 @@ public:
 	void IncrementErrorFileCount();
 	
 	void OnRowActivated(wxDataViewEvent& event);
+	
+	void OnRunButton(wxCommandEvent& event);
 	
 	void OnHelpButton(wxCommandEvent& event);
 	
@@ -504,6 +511,12 @@ public:
 	void LoadPreferences(wxConfigBase* config);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+	
+	/**
+	 * start a lint projects action. only 1 action at a time can be started.
+	 * (doesn't make sense to run multiple lints simulatenously)
+	 */
+	void StartLint();
 
 protected: 
 

@@ -46,11 +46,13 @@ class LintResultsGeneratedPanelClass : public wxPanel
 			ID_ERRORS_LIST = 1000,
 		};
 		
+		wxBitmapButton* RunButton;
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxDataViewListCtrl* ErrorsList;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	

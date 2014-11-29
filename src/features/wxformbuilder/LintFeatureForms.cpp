@@ -24,6 +24,13 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	wxBoxSizer* TopSizer;
 	TopSizer = new wxBoxSizer( wxHORIZONTAL );
 	
+	RunButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	RunButton->SetToolTip( wxT("Run Lint Check Against Projects") );
+	
+	RunButton->SetToolTip( wxT("Run Lint Check Against Projects") );
+	
+	TopSizer->Add( RunButton, 0, wxALL, 5 );
+	
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	TopSizer->Add( HelpButton, 0, wxALL, 5 );
 	
@@ -42,12 +49,14 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	this->Layout();
 	
 	// Connect Events
+	RunButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnRunButton ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
 }
 
 LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 {
 	// Disconnect Events
+	RunButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnRunButton ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
 	
 }
