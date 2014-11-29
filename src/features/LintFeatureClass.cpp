@@ -1168,11 +1168,15 @@ void t4p::LintSuppressionsPanelClass::OnAddButton(wxCommandEvent& event) {
 }
 
 void t4p::LintSuppressionsPanelClass::OnDeleteAllButton(wxCommandEvent& event) {
-	
-	// update file and list control
-	Suppressions.Rules.clear();
-	SaveList();
-	SuppressionsList->DeleteAllItems();
+	int confirm = wxMessageBox(_("Are you sure you want to delete all suppressions?"), 
+		_("Lint Suppressions"), wxYES | wxNO | wxCENTER);
+	if (confirm == wxYES) {
+		
+		// update file and list control
+		Suppressions.Rules.clear();
+		SaveList();
+		SuppressionsList->DeleteAllItems();
+	}
 }
 
 void t4p::LintSuppressionsPanelClass::OnDeleteButton(wxCommandEvent& event) {
