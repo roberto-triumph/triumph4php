@@ -147,7 +147,7 @@ LintSuppressionRuleGeneratedDialogClass::LintSuppressionRuleGeneratedDialogClass
 	TypeLabel->Wrap( -1 );
 	MidSizer->Add( TypeLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	wxString TypesChoices[] = { wxT("Skip Unknown Class"), wxT("Skip Unknown Method"), wxT("Skip Unknown Function"), wxT("Skip Uninitalized Variable"), wxT("Skip All") };
+	wxString TypesChoices[] = { wxT("Skip Unknown Class"), wxT("Skip Unknown Method"), wxT("Skip Unknown Property"), wxT("Skip Unknown Function"), wxT("Skip Uninitalized Variable"), wxT("Skip All") };
 	int TypesNChoices = sizeof( TypesChoices ) / sizeof( wxString );
 	Types = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, TypesNChoices, TypesChoices, 0 );
 	Types->SetSelection( 0 );

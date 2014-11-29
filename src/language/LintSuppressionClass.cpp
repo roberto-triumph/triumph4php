@@ -37,6 +37,8 @@ static wxString RuleTypeString(t4p::SuppressionRuleClass::Types type)  {
 			return wxT("SKIP_UNKNOWN_CLASS");
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD:
 			return wxT("SKIP_UNKNOWN_METHOD");
+		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY:
+			return wxT("SKIP_UNKNOWN_PROPERTY");
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION:
 			return wxT("SKIP_UNKNOWN_FUNCTION");
 		case t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR:
@@ -59,6 +61,10 @@ static t4p::SuppressionRuleClass::Types RuleTypeFromName(const wxString& name, b
 	 if (name.CmpNoCase(wxT("SKIP_UNKNOWN_METHOD")) == 0) {
 		 good = true;
 		 return t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
+	 }
+	 if (name.CmpNoCase(wxT("SKIP_UNKNOWN_PROPERTY")) == 0) {
+		 good = true;
+		 return t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY;
 	 }
 	 if (name.CmpNoCase(wxT("SKIP_UNKNOWN_FUNCTION")) == 0) {
 		 good = true;
@@ -228,7 +234,7 @@ bool t4p::LintSuppressionClass::Save(const wxFileName& suppressionFile) {
 	txt.WriteString("# \n");
 	txt.WriteString("# \n");
 	txt.WriteString("# Possible types:\n");
-	txt.WriteString("# SKIP_UNKNOWN_CLASS, SKIP_UNKNOWN_METHOD, SKIP_UNKNOWN_FUNCTION, \n");
+	txt.WriteString("# SKIP_UNKNOWN_CLASS, SKIP_UNKNOWN_METHOD, SKIP_UNKNOWN_PROPERTY, SKIP_UNKNOWN_FUNCTION, \n");
 	txt.WriteString("# SKIP_UNINITIALIZED_VAR, SKIP_ALL\n");
 	txt.WriteString("# \n");
 	std::vector<t4p::SuppressionRuleClass>::const_iterator rule;

@@ -223,6 +223,9 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		bool suppressedFunction = Suppressions.ShouldIgnore(
 			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION
 		);
+		bool suppressedProperty = Suppressions.ShouldIgnore(
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY
+		);	
 		
 		bool isSuppressed = false;
 		pelet::LintResultsClass lintResult;
@@ -237,6 +240,10 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown function ") + identifierResult.Identifier;
 			isSuppressed = suppressedFunction;
+		}
+		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
+			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown property ") + identifierResult.Identifier;
+			isSuppressed = suppressedProperty;
 		}
 		
 		if (!isSuppressed) {
@@ -1203,6 +1210,9 @@ void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD:
 			wxType = _("Skip Unknown Method");
 			break;
+		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY:
+			wxType = _("Skip Unknown Property");
+			break;
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION:
 			wxType = _("Skip Unknown Function");
 			break;
@@ -1250,6 +1260,9 @@ void t4p::LintSuppressionsPanelClass::AppendRuleToList(const t4p::SuppressionRul
 	case t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD:
 		wxType = _("Skip Unknown Method");
 		break;
+	case t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY:
+		wxType = _("Skip Unknown Property");
+		break;
 	case t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION:
 		wxType = _("Skip Unknown Function");
 		break;
@@ -1293,6 +1306,9 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 			break;
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD);
+			break;
+		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY:
+			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY);
 			break;
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION);

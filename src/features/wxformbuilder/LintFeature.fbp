@@ -1004,7 +1004,7 @@
                             <property name="proportion">1</property>
                             <object class="wxChoice" expanded="0">
                                 <property name="bg"></property>
-                                <property name="choices">&quot;Skip Unknown Class&quot; &quot;Skip Unknown Method&quot; &quot;Skip Unknown Function&quot; &quot;Skip Uninitalized Variable&quot; &quot;Skip All&quot;</property>
+                                <property name="choices">&quot;Skip Unknown Class&quot; &quot;Skip Unknown Method&quot; &quot;Skip Unknown Property&quot; &quot;Skip Unknown Function&quot; &quot;Skip Uninitalized Variable&quot; &quot;Skip All&quot;</property>
                                 <property name="context_help"></property>
                                 <property name="context_menu">1</property>
                                 <property name="enabled">1</property>
