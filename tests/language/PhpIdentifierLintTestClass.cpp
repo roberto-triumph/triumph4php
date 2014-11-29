@@ -316,7 +316,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 
 	// test that we don't flag native functions (strlen, strcmp, etc....)
-	// as unkown, we should always look them up in the global
+	// as unknown, we should always look them up in the global
 	// namespace even when the code is inside a namespace
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"  
@@ -327,6 +327,27 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 	UnicodeString code = t4p::CharToIcu(
 		"namespace Util; \n"
 		"$a = strlen('a long string');\n"
+	);
+
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache(true);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
+
+	// test that we don't flag global functions defined by user code
+	// as unknown, we should always look them up in the global
+	// namespace even when the code is inside a namespace
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"function doPrint($a) {} \n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"namespace Util; \n"
+		"$a = doPrint('a long string');\n"
 	);
 
 	SetupFile(wxT("MyClass.php"), cacheCode);

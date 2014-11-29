@@ -535,6 +535,8 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	if (pos >= 0) {
 		functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
 	}
+	
+	// first see if we have looked up this function before
 	if (!unqualifiedName.isEmpty() && FoundFunctions.find(unqualifiedName) != FoundFunctions.end()) {
 		isUnknown = false;
 		foundInMap = true;
@@ -543,54 +545,76 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		isUnknown = true;
 		foundInMap = true;
 	}
-	else if (!unqualifiedName.isEmpty() && NativeFunctionLookup.IsOk()) {
+	else if (FoundFunctions.find(functionName) != FoundFunctions.end()) {
+		isUnknown = false;
+		foundInMap = true;
+	}
+	else if (NotFoundFunctions.find(functionName) != NotFoundFunctions.end()) {
+		isUnknown = true;
+		foundInMap = true;
+	}
 	
-		// not found in our little cache. lookup in the big cache
+	// if we have not found the answer in the maps, then perform 
+	// a tag cache lookup, lookup the unqualified name in the native
+	// function tag cache
+	bool foundInTagCache = false;
+	if (!foundInMap && !unqualifiedName.isEmpty() && NativeFunctionLookup.IsOk()) {
 		NativeFunctionLookup.Set(unqualifiedName);
 		NativeFunctionLookup.ReExec(error);
 		if (NativeFunctionLookup.Found()) {
 			FoundFunctions[unqualifiedName] = 1;
 			isUnknown = false;
-			foundInMap = true;
+			foundInTagCache = true;
 		}
 		else {
 			NotFoundFunctions[unqualifiedName] = 1;
 			isUnknown = true;
 		}
 	}
-	if (!foundInMap && !isUnknown) {
-
-		// check the fully qualified function name
-		// dont check the native tags, as native PHP functions are never namespaced
-		if (FoundFunctions.find(functionName) != FoundFunctions.end()) {
+	
+	// lookup the qualified name in the global tag cache
+	if (!foundInMap && !foundInTagCache && NativeFunctionLookup.IsOk()) {
+		NativeFunctionLookup.Set(functionName);
+		NativeFunctionLookup.ReExec(error);
+		if (NativeFunctionLookup.Found()) {
+			FoundFunctions[functionName] = 1;
 			isUnknown = false;
-		}
-		else if (NotFoundFunctions.find(functionName) != NotFoundFunctions.end()) {
-			isUnknown = true;
+			foundInTagCache = true;
 		}
 		else {
-			// not found in our little cache. lookup in the big cache
-			FunctionLookup.Set(functionName);
-			NativeFunctionLookup.Set(functionName);
-			FunctionLookup.ReExec(error);
-			wxASSERT_MSG(error.empty(), error);
-			
-			bool isFound = FunctionLookup.Found();
-			if (!isFound) {
-				wxString error;
-				NativeFunctionLookup.ReExec(error);
-				wxASSERT_MSG(error.empty(), error);
-				isFound = NativeFunctionLookup.Found();
-			}
-			
-			if (isFound) {
-				FoundFunctions[functionName] = 1;
-				isUnknown = false;
-			}
-			else {
-				NotFoundFunctions[functionName] = 1;
-				isUnknown = true;
-			}
+			NotFoundFunctions[functionName] = 1;
+			isUnknown = true;
+		}
+	}
+	
+	// lookup the unqualified name in the global tag cache
+	if (!foundInMap && !foundInTagCache && FunctionLookup.IsOk()) {
+		FunctionLookup.Set(unqualifiedName);
+		FunctionLookup.ReExec(error);
+		if (FunctionLookup.Found()) {
+			FoundFunctions[unqualifiedName] = 1;
+			isUnknown = false;
+			foundInTagCache = true;
+		}
+		else {
+			NotFoundFunctions[unqualifiedName] = 1;
+			isUnknown = true;
+		}
+	}
+	
+	// lookup the qualified name in the global tag cache
+	if (!foundInMap && !foundInTagCache && FunctionLookup.IsOk()) {
+		FunctionLookup.Set(functionName);
+		FunctionLookup.ReExec(error);
+		wxASSERT_MSG(error.empty(), error);
+		bool isFound = FunctionLookup.Found();		
+		if (isFound) {
+			FoundFunctions[functionName] = 1;
+			isUnknown = false;
+		}
+		else {
+			NotFoundFunctions[functionName] = 1;
+			isUnknown = true;
 		}
 	}
 	if (isUnknown) {
