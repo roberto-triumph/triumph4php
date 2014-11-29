@@ -90,6 +90,7 @@ t4p::PhpIdentifierLintClass::PhpIdentifierLintClass()
 , MethodLookup()
 , PropertyLookup()
 , FunctionLookup()
+, NamespaceLookup()
 , NativeClassLookup()
 , NativeMethodLookup()
 , NativePropertyLookup()
@@ -119,6 +120,7 @@ void t4p::PhpIdentifierLintClass::Init(t4p::TagCacheClass& tagCache) {
 	tagCache.GlobalPrepare(MethodLookup, true);
 	tagCache.GlobalPrepare(PropertyLookup, true);
 	tagCache.GlobalPrepare(FunctionLookup, true);
+	tagCache.GlobalPrepare(NamespaceLookup, true);
 	tagCache.NativePrepare(NativeClassLookup, true);
 	tagCache.NativePrepare(NativeMethodLookup, true);
 	tagCache.NativePrepare(NativePropertyLookup, true);
@@ -206,7 +208,7 @@ void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName,
 		const UnicodeString& baseClassName,
 		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber) {
-	CheckClassName(baseClassName, lineNumber, 0);
+	CheckClassNameAndLog(baseClassName, lineNumber, 0);
 	
 	if (implementsList.isEmpty()) {
 		return;
@@ -221,7 +223,7 @@ void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName,
 	UChar* next = u_strtok_r(buf, delims, &state);
 	while (next) {
 		UnicodeString nextInterface(next);
-		CheckClassName(nextInterface, lineNumber, 0);
+		CheckClassNameAndLog(nextInterface, lineNumber, 0);
 		
 		next = u_strtok_r(NULL, delims, &state);
 	}
@@ -246,6 +248,19 @@ void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceNa
 }
 
 void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+	bool isKnown = CheckClassName(namespaceName);
+	if (!isKnown) {
+		isKnown = CheckNamespace(namespaceName);
+	}
+	if (!isKnown) {
+		t4p::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = 0;
+		lintResult.Pos = startingPos;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
+		lintResult.Identifier = namespaceName;
+		Errors.push_back(lintResult);	
+	}
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
@@ -288,7 +303,7 @@ void t4p::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::Ternary
 
 void t4p::PhpIdentifierLintClass::ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression) {
 	CheckExpression(expression->Expression1);
-	CheckClassName(expression->ClassName, expression->LineNumber, expression->Pos);	
+	CheckClassNameAndLog(expression->ClassName, expression->LineNumber, expression->Pos);	
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
@@ -301,7 +316,7 @@ void t4p::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceE
 	for (; constructorArg != expression->CallArguments.end(); ++constructorArg) {
 		CheckExpression(*constructorArg);
 	}
-	CheckClassName(expression->ClassName, expression->LineNumber, expression->Pos);
+	CheckClassNameAndLog(expression->ClassName, expression->LineNumber, expression->Pos);
 
 	// check any function args to any chained method calls.
 	std::vector<pelet::VariablePropertyClass>::const_iterator prop = expression->ChainList.begin();
@@ -458,7 +473,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 	else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
 
 		// a classname in a static method call, ie User::DEFAULT_NAME
-		CheckClassName(var->ChainList[0].Name, var->LineNumber, var->Pos);
+		CheckClassNameAndLog(var->ChainList[0].Name, var->LineNumber, var->Pos);
 	}
 
 	// check the rest of the variable property/method accesses
@@ -745,7 +760,20 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 }
 
 
-void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className, int lineNumber, int pos) {
+void t4p::PhpIdentifierLintClass::CheckClassNameAndLog(const UnicodeString& className, int lineNumber, int pos) {
+	bool isKnown = CheckClassName(className);
+	if (!isKnown) {
+		t4p::PhpIdentifierLintResultClass lintResult;
+		lintResult.File = File;
+		lintResult.LineNumber = lineNumber;
+		lintResult.Pos = pos;
+		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
+		lintResult.Identifier = className;
+		Errors.push_back(lintResult);
+	}
+}
+
+bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className) {
 	
 	// some class names are never unknown
 	if (className.isEmpty() ||
@@ -754,10 +782,10 @@ void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className,
 		className.compare(UNICODE_STRING_SIMPLE("static")) == 0 ||
 		className.caseCompare(UNICODE_STRING_SIMPLE("stdClass"), 0) == 0 ||
 		className.caseCompare(UNICODE_STRING_SIMPLE("\\stdClass"), 0) == 0) {
-		return;
+		return true;
 	}
 	if (FoundClasses.find(className) != FoundClasses.end()) {
-		return;
+		return true;
 	}
 	bool isUnknown = false;
 	wxString error;
@@ -784,13 +812,16 @@ void t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className,
 			FoundClasses[className] = 1;
 		}
 	}
-	if (isUnknown) {
-		t4p::PhpIdentifierLintResultClass lintResult;
-		lintResult.File = File;
-		lintResult.LineNumber = lineNumber;
-		lintResult.Pos = pos;
-		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
-		lintResult.Identifier = className;
-		Errors.push_back(lintResult);	
+	return !isUnknown;
+}
+
+bool t4p::PhpIdentifierLintClass::CheckNamespace(const UnicodeString& namespaceName) {
+	bool found = false;
+	if (NamespaceLookup.IsOk()) {
+		NamespaceLookup.Set(namespaceName);
+		wxString error;
+		NamespaceLookup.ReExec(error);
+		found = NamespaceLookup.Found();
 	}
+	return found;
 }

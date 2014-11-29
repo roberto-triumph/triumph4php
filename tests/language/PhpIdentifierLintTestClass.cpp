@@ -667,4 +667,34 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
 	CHECK_VECTOR_SIZE(0, Results);
 }
 
+TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
+
+	// test that when a unknown namespace is "used" with a use statement
+	// that we generate an error
+	wxString cacheCode = t4p::CharToWx(
+		"<?php \n"  
+		"namespace util {\n "
+		"\n"
+		"class MyClass {} \n"
+		"class AnotherClass {} \n"
+		"\n"
+		"}\n"
+	);
+
+	UnicodeString code = t4p::CharToIcu(
+		"use Util\\MyClass;\n"
+		"use UtilUnknown\\AnotherClass;\n"
+		"use UtilUnknown as U;\n"         // an aliased namespace
+	);
+	SetupFile(wxT("MyClass.php"), cacheCode);
+	BuildCache();
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(2, Results);
+	CHECK_UNISTR_EQUALS("\\UtilUnknown\\AnotherClass", Results[0].Identifier);
+	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+	CHECK_UNISTR_EQUALS("\\UtilUnknown", Results[1].Identifier);
+	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[1].Type);
+}
+
 }

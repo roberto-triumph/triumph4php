@@ -675,6 +675,68 @@ private:
 
 /**
  * A class that we use to query the tag cache 
+ * to see if a namespace exists. This is to be used when
+ * needing to do many namespace name lookups; as you can just
+ * prepare the query once and execute it over and over again.
+ * Note that this lookup class does not fetch any strings
+ * from the db, thereby preventing memory allocations.
+ */
+class NamespaceLookupClass : public t4p::SqliteResultClass {
+	
+public:
+	
+	NamespaceLookupClass();
+	
+	/**
+	 * Set the namespace to lookup. 
+	 * 
+	 * @param namespaceName the namespace name to lookup. 
+	 */
+	void Set(const UnicodeString& className);
+	
+	/**
+	 * @return boolean if TRUE it means that the class was found by the last call
+	 * to Exec() or ReExec()
+	 */
+	bool Found();
+	
+	/**
+	 * advance to the next row. after a call to this method, we will know if
+	 * the class was found in the cache
+	 */
+	void Next();
+
+protected:
+
+	/**
+	 * in this method subclasses will build the SQL and bind the input parameters.
+	 *
+	 * @param sttmt the soci statement
+	 * @param doLimit boolean if TRUE there should be a limit on the query
+	 */
+	bool DoPrepare(soci::statement& stmt, bool doLimit);
+	
+	/**
+	 *  bind the result columns to the instance variables
+	 */
+	void DoBind(soci::statement& stmt);
+	
+private:
+
+	/**
+	 *  bound to the prepared statement as an input 
+	 */
+	std::string NamespaceName;
+	int TagType;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int Id;
+};
+
+/**
+ * A class that we use to query the tag cache 
  * to see if a method exists. This is to be used when
  * needing to do many method lookups; as you can just
  * prepare the query once and execute it over and over again.

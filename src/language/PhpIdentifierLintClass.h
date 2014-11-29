@@ -223,6 +223,7 @@ private:
 	t4p::MethodLookupClass MethodLookup;
 	t4p::PropertyLookupClass PropertyLookup;
 	t4p::FunctionLookupClass FunctionLookup;
+	t4p::NamespaceLookupClass NamespaceLookup;
 	t4p::ClassLookupClass NativeClassLookup;
 	t4p::MethodLookupClass NativeMethodLookup;
 	t4p::PropertyLookupClass NativePropertyLookup;
@@ -304,7 +305,25 @@ private:
 	 * @param pos position where the class name is in the file; used to 
 	 *        populate the error string
 	 */
-	void CheckClassName(const UnicodeString& className, int lineNumber, int pos);
+	void CheckClassNameAndLog(const UnicodeString& className, int lineNumber, int pos);
+	
+	/**
+	 * lookup the class name in the tag cache; if it is not found
+	 * then returns false (no error is logged)
+	 * 
+	 * @param className the name of the class to look up
+	 * @return bool TRUE if class name exists in the tag cache
+	 */
+	bool CheckClassName(const UnicodeString& className);
+	
+	/**
+	 * lookup the namespace name in the tag cache; if it is not found
+	 * then returns false (no error is logged)
+	 * 
+	 * @param namespaceName the name of the namespace to look up
+	 * @return bool TRUE if class name exists in the tag cache
+	 */
+	bool CheckNamespace(const UnicodeString& namespaceName);
 	
 	/**
 	 * lookup the method in the tag cache; if it is not found

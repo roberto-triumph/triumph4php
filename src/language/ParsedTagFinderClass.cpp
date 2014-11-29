@@ -1141,6 +1141,50 @@ bool t4p::ClassLookupClass::Found() {
 	return !Empty() && Id > 0;
 }
 
+
+t4p::NamespaceLookupClass::NamespaceLookupClass()
+: t4p::SqliteResultClass() 
+, NamespaceName()
+, TagType(0)
+, Id(0) {
+	TagType = t4p::TagClass::NAMESPACE;
+}
+
+void t4p::NamespaceLookupClass::Set(const UnicodeString& namespaceName) {
+	NamespaceName = t4p::IcuToChar(namespaceName);
+}
+	
+bool t4p::NamespaceLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
+	std::string sql = "SELECT id FROM resources WHERE key = ? AND type = ?";
+	bool good = false;
+	wxString error;
+	try {	
+		stmt.prepare(sql);
+		stmt.exchange(soci::use(NamespaceName));
+		stmt.exchange(soci::use(TagType));
+
+	} catch (std::exception& e) {
+		error = t4p::CharToWx(e.what());
+		wxASSERT_MSG(false, error);
+	}
+	return good;
+}
+
+void t4p::NamespaceLookupClass::DoBind(soci::statement& stmt) {
+	stmt.exchange(soci::into(Id));
+}
+
+void t4p::NamespaceLookupClass::Next() {
+	
+	// nothing else as variable is already bound
+	// fetch gets the next row
+	Fetch();
+}
+
+bool t4p::NamespaceLookupClass::Found() {
+	return !Empty() && Id > 0;
+}
+
 t4p::MethodLookupClass::MethodLookupClass()
 : t4p::SqliteResultClass() 
 , MethodName()
