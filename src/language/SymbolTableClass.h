@@ -531,7 +531,7 @@ public:
 		
 	void NamespaceDeclarationFound(const UnicodeString& namespaceName, int startingPos);
 
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos);
+	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, int startingPos);
 		
 	void MethodScope(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		int startingPos, int endingPos);

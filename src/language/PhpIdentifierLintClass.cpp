@@ -247,7 +247,8 @@ void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceNa
 	CurrentClassName = UNICODE_STRING_SIMPLE("");
 }
 
-void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, 
+		int startingPos) {
 	bool isKnown = CheckClassName(namespaceName);
 	if (!isKnown) {
 		isKnown = CheckNamespace(namespaceName);
@@ -255,7 +256,7 @@ void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespa
 	if (!isKnown) {
 		t4p::PhpIdentifierLintResultClass lintResult;
 		lintResult.File = File;
-		lintResult.LineNumber = 0;
+		lintResult.LineNumber = lineNumber;
 		lintResult.Pos = startingPos;
 		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
 		lintResult.Identifier = namespaceName;
@@ -459,8 +460,6 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 	// TODO:
 	// checks to implement
 	// 1. type hints with classes that are not defined
-	// 2. namespace declarations with namespaces that are not defined
-	// 3. unused namespace imports
 	if (var->ChainList[0].IsFunction) {
 		CheckFunctionName(var->ChainList[0], var);
 		

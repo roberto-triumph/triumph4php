@@ -693,8 +693,10 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
 	CHECK_VECTOR_SIZE(2, Results);
 	CHECK_UNISTR_EQUALS("\\UtilUnknown\\AnotherClass", Results[0].Identifier);
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[0].Type);
+	CHECK_EQUAL(2, Results[0].LineNumber);
 	CHECK_UNISTR_EQUALS("\\UtilUnknown", Results[1].Identifier);
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[1].Type);
+	CHECK_EQUAL(3, Results[1].LineNumber);
 }
 
 }

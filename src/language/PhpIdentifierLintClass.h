@@ -154,7 +154,7 @@ public:
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		const int lineNumber);
 
-	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos);
+	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, int startingPos);
 		
 	void ExpressionVariableFound(pelet::VariableClass* expression);
 

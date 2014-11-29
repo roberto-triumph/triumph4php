@@ -996,7 +996,7 @@ void t4p::ScopeFinderClass::NamespaceDeclarationFound(const UnicodeString& names
 	}
 }
 
-void t4p::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int startingPos) {
+void t4p::ScopeFinderClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, int startingPos) {
 	if (startingPos >= PosToCheck) {
 		return;
 	}
