@@ -804,7 +804,9 @@ bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className)
 		className.compare(UNICODE_STRING_SIMPLE("self")) == 0 ||
 		className.compare(UNICODE_STRING_SIMPLE("static")) == 0 ||
 		className.caseCompare(UNICODE_STRING_SIMPLE("stdClass"), 0) == 0 ||
-		className.caseCompare(UNICODE_STRING_SIMPLE("\\stdClass"), 0) == 0) {
+		className.caseCompare(UNICODE_STRING_SIMPLE("\\stdClass"), 0) == 0 ||
+		className.caseCompare(UNICODE_STRING_SIMPLE("\\__PHP_Incomplete_Class"), 0) == 0 ||
+		className.caseCompare(UNICODE_STRING_SIMPLE("__PHP_Incomplete_Class"), 0) == 0) {
 		return true;
 	}
 	if (FoundClasses.find(className) != FoundClasses.end()) {
