@@ -979,7 +979,14 @@ void t4p::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& 
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);
 		byteNumber = t4p::CharToUtf8Pos(buf, documentLength, charNumber);
+
+		// make sure that selection ends up in the middle of the screen, hence the new caret policy
+		SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
+	
 		GotoPos(byteNumber);
+		
+		EnsureCaretVisible();
+		SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 
 		delete[] buf;
 	}
