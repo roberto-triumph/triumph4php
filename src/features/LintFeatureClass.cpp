@@ -404,6 +404,11 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 
 void t4p::LintResultsPanelClass::EnableRunButton(bool doEnable) {
 	RunButton->Enable(doEnable);
+	if (!doEnable) {
+		this->Label->SetLabel(
+			_("Lint check in progress")
+		);
+	}
 }
 
 void t4p::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors) {
