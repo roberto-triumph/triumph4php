@@ -197,7 +197,7 @@ LintSuppressionRuleGeneratedDialogClass::LintSuppressionRuleGeneratedDialogClass
 	FileLabel->Wrap( -1 );
 	MidSizer->Add( FileLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	File = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE );
+	File = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
 	MidSizer->Add( File, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	BodySizer->Add( MidSizer, 1, wxEXPAND, 5 );

@@ -100,7 +100,12 @@ void t4p::SuppressionRuleClass::SkipAllRule(const wxFileName& location) {
 	Target = UNICODE_STRING_SIMPLE("");
 	
 	// make thread safe
-	Location.Assign(location.GetFullPath());
+	if (location.IsDir()) {
+		Location.AssignDir(location.GetPath());
+	}
+	else {
+		Location.Assign(location.GetFullPath());
+	}
 }
 
 void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location, 
@@ -109,7 +114,12 @@ void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location,
 	Target = className;
 	
 	// make thread safe
-	Location.Assign(location.GetFullPath());
+	if (location.IsDir()) {
+		Location.AssignDir(location.GetPath());
+	}
+	else {
+		Location.Assign(location.GetFullPath());
+	}
 }
 
 void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location, 
@@ -118,7 +128,12 @@ void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location
 	Target = methodName;
 	
 	// make thread safe
-	Location.Assign(location.GetFullPath());
+	if (location.IsDir()) {
+		Location.AssignDir(location.GetPath());
+	}
+	else {
+		Location.Assign(location.GetFullPath());
+	}
 }
 
 void t4p::SuppressionRuleClass::SkipUnknownFunctionRule(const wxFileName& location, 
@@ -127,7 +142,12 @@ void t4p::SuppressionRuleClass::SkipUnknownFunctionRule(const wxFileName& locati
 	Target = functionName;
 	
 	// make thread safe
-	Location.Assign(location.GetFullPath());
+	if (location.IsDir()) {
+		Location.AssignDir(location.GetPath());
+	}
+	else {
+		Location.Assign(location.GetFullPath());
+	}
 }
 
 t4p::SuppressionRuleClass& t4p::SuppressionRuleClass::operator=(const t4p::SuppressionRuleClass& src) {
@@ -140,7 +160,12 @@ void t4p::SuppressionRuleClass::Copy(const t4p::SuppressionRuleClass& src) {
 	Target = src.Target;
 	
 	// make thread safe
-	Location.Assign(src.Location.GetFullPath());
+	if (src.Location.IsDir()) {
+		Location.AssignDir(src.Location.GetPath());
+	}
+	else {
+		Location.Assign(src.Location.GetFullPath());
+	}
 }
 
 t4p::LintSuppressionClass::LintSuppressionClass()

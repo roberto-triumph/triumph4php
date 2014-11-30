@@ -584,7 +584,32 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 	}
 	
 	if (!rule.Target.isEmpty()) {
-		rule.Location.Assign(results.File);
+		
+		if (rule.Type != t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR) {
+			
+			// for unknown class/method/function, default the location to be the 
+			// source directory; if a class is not found in one file it will not
+			// be found in any files of the project
+			std::vector<t4p::ProjectClass>::const_iterator project;
+			std::vector<t4p::SourceClass>::const_iterator src;
+			bool isDirFromProject = false;
+			
+			for (project = Feature.App.Globals.Projects.begin(); !isDirFromProject && project != Feature.App.Globals.Projects.end(); ++project) {
+				if (project->IsEnabled) {
+					for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
+						if (src->IsInRootDirectory(results.File)) {
+							rule.Location.AssignDir(src->RootDirectory.GetPath());
+							isDirFromProject = true;							
+							break;
+						}
+					}
+				}
+			}
+		}
+		else {
+			rule.Location.Assign(results.File);
+		}
+		
 		t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, rule);
 		if (dialog.ShowModal() == wxOK) {
 		
