@@ -237,7 +237,17 @@ void t4p::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
 	if (NULL != code && !code->IsNew()) {
 		int res = wxMessageBox(_("Reload file and lose all changes?"), _("Triumph"), wxICON_QUESTION | wxYES_NO, this);
 		if (wxYES == res) {
+			int currentLine = code->GetCurrentLine();
+			code->Freeze();
 			code->Revert();
+			
+			if (currentLine <= code->GetLineCount()) {
+				
+				// stc uses zero-based line numbers, this method
+				// accepts 1-based line numbers
+				code->GotoLineAndEnsureVisible(currentLine + 1);
+			}
+			code->Thaw();
 
 			t4p::CodeControlEventClass revertEvt(t4p::EVENT_APP_FILE_REVERTED, code);
 			App.EventSink.Publish(revertEvt);
