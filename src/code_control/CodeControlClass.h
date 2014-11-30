@@ -372,6 +372,16 @@ public:
 	 * @param int character position of end of selection
 	 */
 	void SetSelectionAndEnsureVisible(int start, int end);
+	
+	/**
+	 * Puts the caret at the start of the given line number 
+	 * and expands the line if it is currently folded. Also, 
+	 * the caret policy is changed so that the caret always
+	 * ends up in the middle of the screen.
+	 *
+	 * @param int lineNumber 1-based line number
+	 */
+	void GotoLineAndEnsureVisible(int lineNumber);
 
 	/**
 	 * Selects the given position of text but does not expand the line if it is currently folded.

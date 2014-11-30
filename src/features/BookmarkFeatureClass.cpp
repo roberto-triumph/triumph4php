@@ -195,10 +195,7 @@ void t4p::BookmarkFeatureClass::ShowBookmark(const t4p::BookmarkClass& bookmark)
 		if (selectionIndex != notebook->GetSelection()) {
 			notebook->SetSelection(selectionIndex);
 		}
-		
-		// scintilla line numbers are 1 based, ours are 1 based coz we want
-		// to show them to the user
-		bookmarkCtrl->GotoLine(bookmark.LineNumber - 1);
+		bookmarkCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
 	}
 	else {
 		
@@ -208,10 +205,7 @@ void t4p::BookmarkFeatureClass::ShowBookmark(const t4p::BookmarkClass& bookmark)
 		
 		// now we add all bookmarks for the newly opened file
 		AddBookmarks(bookmark.FileName, newlyOpenedCtrl);
-		
-		// scintilla line numbers are 1 based, ours are 1 based coz we want
-		// to show them to the user
-		newlyOpenedCtrl->GotoLine(bookmark.LineNumber - 1);
+		newlyOpenedCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber );
 	}
 }
 

@@ -578,6 +578,17 @@ void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 }
 
+void t4p::CodeControlClass::GotoLineAndEnsureVisible(int lineNumber) {
+	
+	// make sure that selection ends up in the middle of the screen, hence the new caret policy
+	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
+	
+	// stc lines are zero-based
+	GotoLine(lineNumber - 1);
+	EnsureCaretVisible();
+	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
+}
+
 void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end, bool setPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];

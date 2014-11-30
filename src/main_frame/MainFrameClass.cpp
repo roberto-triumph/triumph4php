@@ -220,10 +220,7 @@ void t4p::MainFrameClass::FileOpenLine(const wxString& fullPath, int lineNumber)
 	Notebook->LoadPage(fullPath);
 	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
 	if (codeControl) {
-		
-		// scintilla line numbers are 1 based, ours are 1 based coz they come
-		// from the user
-		codeControl->GotoLine(lineNumber - 1);
+		codeControl->GotoLineAndEnsureVisible(lineNumber);
 	}
 }
 	

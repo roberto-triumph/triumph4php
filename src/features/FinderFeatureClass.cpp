@@ -725,11 +725,7 @@ void t4p::FinderFeatureClass::OnEditGoToLine(wxCommandEvent& event) {
 		int maxLines = codeControl->GetLineCount();
 		int goToLine = wxGetNumberFromUser(_("Enter A Line Number"), _(""), _("Go To Line Number"), 0, 1, maxLines, codeControl);
 		if (goToLine >= 1) {
-
-			// line is zero-based in scintilla
-			goToLine--;
-			codeControl->GotoLine(goToLine);
-			codeControl->EnsureVisible(goToLine);
+			codeControl->GotoLineAndEnsureVisible(goToLine);
 		}
 	}
 }

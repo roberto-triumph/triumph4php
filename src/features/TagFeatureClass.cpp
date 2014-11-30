@@ -198,7 +198,7 @@ void t4p::TagFeatureClass::LoadPageFromResource(const wxString& finderQuery, con
 			// center of the screen
 			int pos = codeControl->PositionFromLine(tagSearch.GetLineNumber() - 1);
 			codeControl->SetSelectionAndEnsureVisible(pos, pos);
-			codeControl->GotoLine(tagSearch.GetLineNumber() - 1);
+			codeControl->GotoLineAndEnsureVisible(tagSearch.GetLineNumber());
 		}
 		if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType()) {
 				
