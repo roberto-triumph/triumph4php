@@ -1,8 +1,11 @@
 
 #include <UnitTest++.h>
+#include <TriumphChecks.h>
 #include <SqliteTestFixtureClass.h>
 #include <globals/FileCabinetItemClass.h>
+#include <globals/String.h>
 #include <wx/platinfo.h>
+#include <iostream>
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 	
@@ -26,19 +29,34 @@ TEST_FIXTURE(FileCabinetFixtureClass, FindAll) {
 	
 	// verify that we can load files and directories
 	// from the file cabinet items table
+	// user wxFileName so that tests work on all OSes
+	wxFileName file;
+	file.AppendDir("home");
+	file.AppendDir("user");
+	file.AppendDir("www");
+	file.SetFullName("test.php");
+
+	wxFileName dir;
+	dir.AppendDir("home");
+	dir.AppendDir("user");
+	dir.AppendDir("www");
+	dir.AppendDir("config");
+
 	Exec("BEGIN;");
-	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'test.php', '/home/user/www/test.php');");
-	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'config', '/home/user/www/config/');");
+	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'test.php', '" + 
+		t4p::WxToChar(file.GetFullPath()) + "');");
+	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'config', '" + 
+		t4p::WxToChar(dir.GetPathWithSep()) + "');");
 	Exec("COMMIT;");
 	
 	bool hasRows = SqliteFinder.Exec(&AllResults);
 	CHECK(hasRows);
 	AllResults.Next();
-	CHECK_EQUAL(wxT("/home/user/www/test.php"), AllResults.Item.FileName.GetFullPath());
+	CHECK_EQUAL(file.GetFullPath(), AllResults.Item.FileName.GetFullPath());
 	
 	CHECK(AllResults.More());
 	AllResults.Next();
-	CHECK_EQUAL(wxT("/home/user/www/config"), AllResults.Item.FileName.GetPath());
+	CHECK_EQUAL(dir.GetPath(), AllResults.Item.FileName.GetPath());
 	
 	CHECK_EQUAL(false, AllResults.More());
 }

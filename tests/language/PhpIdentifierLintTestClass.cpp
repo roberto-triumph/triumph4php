@@ -489,7 +489,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCo
 	SetupFile(wxT("MyClass.php"), cacheCode);
 	BuildCache();
 	Parse(code);
-	CHECK_EQUAL(0, HasError);
+	CHECK_EQUAL(false, HasError);
 	CHECK_VECTOR_SIZE(0, Results);
 }
 

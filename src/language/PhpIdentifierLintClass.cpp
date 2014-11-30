@@ -27,6 +27,7 @@
 #include <globals/String.h>
 #include <language/ParsedTagFinderClass.h>
 #include <wx/ffile.h>
+#include <unicode/ustring.h>
 #include <algorithm>
 
 static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
