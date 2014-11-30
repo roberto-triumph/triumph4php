@@ -146,9 +146,16 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	
 	// load suppressions if we have not done so
 	// doing it here to prevent file reads in the foreground thread
-	if (!HasLoadedSuppressions) {
+	if (!HasLoadedSuppressions && SuppressionFile.FileExists()) {
 		std::vector<UnicodeString> loadErrors; // not sure how to propagate these errors
 		Suppressions.Init(SuppressionFile, loadErrors);
+		HasLoadedSuppressions = true;
+	}
+	else if (!HasLoadedSuppressions) {
+
+		// no file== don't bother trying to load the suppression file
+		// (so that we don't generate file not found errors)
+		HasLoadedSuppressions = true;
 	}
 	
 	// check to see if the all suppressions for a file are 
@@ -1092,6 +1099,7 @@ void t4p::LintFeatureClass::OnProjectCreated(wxCommandEvent& event) {
 		std::vector<UnicodeString> errors;
 		wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
 		suppressions.Init(suppressionFile, errors);
+
 		bool addedRule = suppressions.AddSkipAllRuleForDirectory(fn);
 		if (addedRule && !suppressions.Save(suppressionFile)) {
 			t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());

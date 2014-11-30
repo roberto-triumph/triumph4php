@@ -174,6 +174,10 @@ t4p::LintSuppressionClass::LintSuppressionClass()
 }
 
 bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vector<UnicodeString>& errors) {
+	if (!suppressionFile.FileExists()) {
+		errors.push_back(UNICODE_STRING_SIMPLE("suppressions file does not exist"));
+		return false;
+	}
 	wxFFileInputStream fstream(suppressionFile.GetFullPath(), wxT("rb"));
 	if (!fstream.Ok()) {
 		return false;
