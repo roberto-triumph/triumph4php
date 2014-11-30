@@ -157,6 +157,16 @@ public:
 	void Init(t4p::TagCacheClass& tagCache);
 	
 	/**
+	 * @param bool to set the 'CheckUnknownIdentifiers' flag on the lint options
+	 *        this method is useful to override the user's choice when we know
+	 *        that perforning identifiers would result in many false positives;
+	 *        for example when the user saves a file that exists outside of a 
+	 *        project. Such files use classes/methods/functions that are not in the 
+	 *        tag cache.
+	 */
+	void OverrideIdentifierCheck(bool doIdentifierCheck);
+	
+	/**
 	 * This is the method where the parsing will take place. Will return true
 	 * if and only if there is a parse error.  
 	 */

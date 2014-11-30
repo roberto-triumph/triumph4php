@@ -120,6 +120,10 @@ void t4p::ParserDirectoryWalkerClass::Init(t4p::TagCacheClass& tagCache) {
 	IdentifierLinter.Init(tagCache);
 }
 
+void t4p::ParserDirectoryWalkerClass::OverrideIdentifierCheck(bool doIdentifierCheck) {
+	Options.CheckUnknownIdentifiers = doIdentifierCheck;
+}
+
 void t4p::ParserDirectoryWalkerClass::ResetTotals() {
 	WithErrors = 0;
 	WithNoErrors = 0;
@@ -362,6 +366,14 @@ bool t4p::LintBackgroundSingleFileClass::Init(const wxFileName& fileName, t4p::G
 		ParserDirectoryWalker.SetVersion(globals.Environment.Php.Version);
 		ParserDirectoryWalker.ResetTotals();
 		ParserDirectoryWalker.Init(TagCache);
+		
+		if (!globals.IsAPhpSourceFile(fileName.GetFullPath())) {
+			
+			// when a file is not inside of a project, it will probably contain
+			// functions and classes that are not in the tag cache; in this case
+			// don't bother doing class/method/function identifier checks.
+			ParserDirectoryWalker.OverrideIdentifierCheck(false);
+		}
 		good = true;
 	}
 	return good;
@@ -901,7 +913,7 @@ void t4p::LintFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	if (hasErrors || Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
 		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(
-			App.RunningThreads, ID_LINT_READER_SAVE, Options, t4p::LintSuppressionsFileAsset()
+			App.RunningThreads, ID_LINT_READER_SAVE, Options, t4p::LintSuppressionsFileAsset()			
 		);
 		bool good = thread->Init(fileName, App.Globals);
 	
