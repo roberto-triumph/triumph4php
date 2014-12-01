@@ -201,6 +201,24 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 			openDirEvt.SetString(result.Item.FileName.GetPath());
 			Feature.App.EventSink.Publish(openDirEvt);
 		}
+		else {
+			wxString path;
+			if (result.Item.FileName.IsDir()) {
+				path = result.Item.FileName.GetPath();
+			}
+			else {
+				path = result.Item.FileName.GetFullPath();
+			}
+
+			int confirm = wxMessageBox(
+				wxString::Format(_("Item no longer exists. Remove the item from the file cabinet?\n\n%s"), path),
+				_("File Cabinet"),
+				wxYES | wxNO
+			);
+			if (wxYES == confirm) {
+				DeleteItemAt(index);
+			}
+		}
 	}
 }
 
