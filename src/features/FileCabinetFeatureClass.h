@@ -89,7 +89,7 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 	
 public:
 	
-	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature);
+	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, wxWindow* mainWindow);
 
 	/**
 	 * add a file to the file cabinet list
@@ -98,12 +98,30 @@ public:
 
 private:
 
-	// click handlers
+	// event handlers
 	void OnAddFileClick(wxCommandEvent& event);
 	void OnAddDirectoryClick(wxCommandEvent& event);
 	void OnListItemActivated(wxListEvent& event);
 	void OnListItemDelete(wxCommandEvent& event);
+	void OnListItemRightClick(wxListEvent& event);
+	void OnHelpButton(wxCommandEvent& event);
+	void OnListItemOpen(wxCommandEvent& event);
 	
+	/**
+	 * Deletes the item at index.  The item is deleted from
+	 * the list and the file cabinet table.
+	 * 
+	 * @param int index list item index
+	 */
+	void DeleteItemAt(int index);
+
+	/**
+	 * Opens the item at index.
+	 * 
+	 * @param int index list item index
+	 */
+	void OpenItemAt(int index);
+
 	/**
 	 * fill the list control with the items that are
 	 * already stored in the file cabinet
@@ -128,6 +146,11 @@ private:
 	 *  The list control will own this pointer
 	 */
 	wxImageList* ImageList;
+
+	/**
+	 * The parent window. Used to make sure dialogs are centered
+	 */
+	wxWindow* MainWindow;
 	
 	enum ListImages {
 		LIST_FOLDER = t4p::IMGLIST_NONE + 1

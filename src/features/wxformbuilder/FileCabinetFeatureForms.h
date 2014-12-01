@@ -21,6 +21,9 @@
 #include <wx/sizer.h>
 #include <wx/listctrl.h>
 #include <wx/panel.h>
+#include <wx/stattext.h>
+#include <wx/hyperlink.h>
+#include <wx/dialog.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -35,18 +38,41 @@ class FileCabinetPanelGeneratedClass : public wxPanel
 	protected:
 		wxBitmapButton* AddFileButton;
 		wxBitmapButton* AddDirectoryButton;
+		wxBitmapButton* HelpButton;
 		wxListCtrl* List;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnAddFileClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDirectoryClick( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnListItemActivated( wxListEvent& event ) { event.Skip(); }
+		virtual void OnListItemRightClick( wxListEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
 		FileCabinetPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~FileCabinetPanelGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class FileCabinetFeatureHelpDialogGeneratedClass
+///////////////////////////////////////////////////////////////////////////////
+class FileCabinetFeatureHelpDialogGeneratedClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Help;
+		wxHyperlinkCtrl* MoreLink;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerOK;
+	
+	public:
+		
+		FileCabinetFeatureHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("File Cabinet Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~FileCabinetFeatureHelpDialogGeneratedClass();
 	
 };
 
