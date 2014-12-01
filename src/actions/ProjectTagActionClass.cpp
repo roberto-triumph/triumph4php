@@ -245,7 +245,7 @@ bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	bool isFileFromProject = false;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && project->IsAPhpSourceFile(FileName.GetFullPath())) {
+		if (project->IsEnabled && project->IsASourceFile(FileName.GetFullPath())) {
 			isFileFromProject = true;
 			Project = *project;
 			break;
