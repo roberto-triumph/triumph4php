@@ -416,7 +416,7 @@ void t4p::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespac
 }
 
 void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
-		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
+		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	
 	// this call will automatically create the predefined variables
 	GetScope(UNICODE_STRING_SIMPLE(""), functionName);
@@ -424,7 +424,7 @@ void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, co
 
 void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 	const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
+	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments) {
 	
 	std::vector<t4p::SymbolClass>& methodScope = GetScope(className, methodName);
 

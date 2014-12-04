@@ -170,7 +170,7 @@ public:
 	 */
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments);
  
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
@@ -183,7 +183,8 @@ public:
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
 	 */
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber);
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, 
+		bool hasVariableArguments);
 
 	/**
 	 * Print the tag cache to stdout.  Useful for debugging only.

@@ -235,14 +235,15 @@ void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName,
 void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
-										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
+										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, 
+										  bool hasVariableArguments) {
 	HasMethodExistsCalled = false;
 	CurrentClassName = className;
 }
 
 void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
-											const UnicodeString& comment, const int lineNumber) {
+											const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	HasMethodExistsCalled = false;
 	CurrentClassName = UNICODE_STRING_SIMPLE("");
 }

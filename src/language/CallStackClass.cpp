@@ -732,7 +732,7 @@ UnicodeString t4p::CallStackClass::NewTempVariable() {
 
 void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
         const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility,
-        bool isStatic, const int lineNumber) {
+        bool isStatic, const int lineNumber, bool hasVariableArguments) {
 	CurrentClass = className;
 	CurrentMethod = methodName;
 	CurrentFunction.remove();
@@ -756,7 +756,7 @@ void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const 
 }
 
 void t4p::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
-        const UnicodeString& comment, const int lineNumber) {
+        const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction = functionName;

@@ -575,7 +575,7 @@ void t4p::TagParserClass::DefineDeclarationFound(const UnicodeString& namespaceN
 
 void t4p::TagParserClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments) {
 	TagClass item;
 	item.Identifier = methodName;
 	item.ClassName = className;
@@ -659,7 +659,7 @@ void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, cons
 }
 
 void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
-		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber) {
+		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	TagClass item;
 	item.Identifier = functionName;
 	item.NamespaceName = namespaceName;

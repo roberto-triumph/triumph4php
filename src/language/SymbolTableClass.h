@@ -412,11 +412,11 @@ public:
 
 	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber);
+		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments);
 	
 	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
-		const int lineNumber);
+		const int lineNumber, bool hasVariableArguments);
 		
 	void VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment);

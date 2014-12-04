@@ -229,7 +229,8 @@ void t4p::PhpVariableLintClass::DefineDeclarationFound(const UnicodeString& name
 void t4p::PhpVariableLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
 										  const UnicodeString& methodName, const UnicodeString& signature, 
 										  const UnicodeString& returnType, const UnicodeString& comment,
-										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber) {
+										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, 
+										  bool hasVariableArguments) {
 	ScopeVariables.clear();
 	ScopeVariables[UNICODE_STRING_SIMPLE("$this")] = 1;
 	HasExtractCall = false;
@@ -240,7 +241,7 @@ void t4p::PhpVariableLintClass::MethodFound(const UnicodeString& namespaceName, 
 
 void t4p::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
 											const UnicodeString& signature, const UnicodeString& returnType, 
-											const UnicodeString& comment, const int lineNumber) {
+											const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	ScopeVariables.clear();
 	HasExtractCall = false;
 	HasEvalCall = false;
