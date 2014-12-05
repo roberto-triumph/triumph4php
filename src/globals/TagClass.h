@@ -138,6 +138,13 @@ public:
 	 * that is documented in php.net.
 	 */
 	bool IsNative;
+	
+	/**
+	 * TRUE if this is a function / method that has variable arguments. variable argument
+	 * detection works based off whether the body of the function / method
+	 * has a call to func_get_arg or its friends
+	 */
+	 bool HasVariableArgs;
 
 	/**
 	 * This is the "key" that we will use for lookups. This is the string that will be used to index resources

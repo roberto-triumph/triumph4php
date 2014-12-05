@@ -178,8 +178,12 @@ CREATE TABLE IF NOT EXISTS resources (
 	
 	-- 1 if this resource is a "native" function; ie a resource that is in the standard 
 	-- PHP libraries
-	is_native INTEGER
-
+	is_native INTEGER,
+	
+	-- 1 if this is a function / method that has variable arguments. variable argument
+	-- detection works based off whether the body of the function / method
+	-- has a call to func_get_arg or its friends
+	has_variable_args INTEGER
 );
 
 -- This table stores all of the trait relationships that have been found by Triumph.
@@ -313,7 +317,7 @@ CREATE INDEX IF NOT EXISTS idxFileCabinetName ON file_cabinet_items(name);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(8);
+INSERT INTO schema_version (version_number) VALUES(9);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

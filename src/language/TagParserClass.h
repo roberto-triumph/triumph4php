@@ -304,6 +304,7 @@ private:
 	int IsStatic;
 	int IsDynamic;
 	int IsNative;
+	int HasVariableArgs;
 		
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.

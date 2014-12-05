@@ -40,6 +40,7 @@ t4p::TagClass::TagClass()
 	, IsStatic(false)
 	, IsDynamic(false)
 	, IsNative(false)
+	, HasVariableArgs(false)
 	, Key()
 	, FullPath()
 	, FileTagId(-1) 
@@ -62,6 +63,7 @@ t4p::TagClass::TagClass(const t4p::TagClass& src)
 	, IsStatic(false)
 	, IsDynamic(false)
 	, IsNative(false)
+	, HasVariableArgs(false)
 	, Key()
 	, FullPath()
 	, FileTagId(-1) 
@@ -93,6 +95,7 @@ void t4p::TagClass::Copy(const t4p::TagClass& src) {
 	IsStatic = src.IsStatic;
 	IsDynamic = src.IsDynamic;
 	IsNative = src.IsNative;
+	HasVariableArgs = src.HasVariableArgs;
 	FileIsNew = src.FileIsNew;
 }
 
@@ -126,6 +129,7 @@ void t4p::TagClass::Clear() {
 	IsStatic = false;
 	IsDynamic = false;
 	IsNative = false;
+	HasVariableArgs = false;
 	FileIsNew = false;
 }
 

@@ -361,6 +361,7 @@ protected:
 	int IsStatic;
 	int IsDynamic;
 	int IsNative;
+	int HasVariableArgs;
 	int FileIsNew;
 	soci::indicator FileTagIdIndicator,
 		FullPathIndicator,

@@ -31,7 +31,7 @@
  * This number must match the number on the schema_version table
  * of the tags db; if numbers do not match the db will be recreated.
  */
-static const int SCHEMA_VERSION_TAGS = 8;
+static const int SCHEMA_VERSION_TAGS = 9;
 
 /**
  * This number must match the number on the schema_version table of the

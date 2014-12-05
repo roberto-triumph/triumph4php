@@ -55,7 +55,7 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 std::vector<t4p::TagClass> AllResources(soci::session& session) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) ";
 	sql += " ORDER BY key";
 	
@@ -76,6 +76,7 @@ std::vector<t4p::TagClass> AllResources(soci::session& session) {
 	int isStatic;
 	int isDynamic;
 	int isNative;
+	int hasVariableArgs;
 	int fileIsNew;
 	soci::indicator fileTagIdIndicator,
 		fullPathIndicator,
@@ -85,7 +86,8 @@ std::vector<t4p::TagClass> AllResources(soci::session& session) {
 			soci::into(fileTagId, fileTagIdIndicator), soci::into(sourceId), soci::into(key), soci::into(identifier), soci::into(className), 
 			soci::into(type), soci::into(namespaceName), soci::into(signature), 
 			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate), 
-			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(fileIsNew, fileIsNewIndicator)
+			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(hasVariableArgs),
+			soci::into(fileIsNew, fileIsNewIndicator)
 		);
 		if (stmt.execute(true)) {
 			do {
@@ -109,6 +111,7 @@ std::vector<t4p::TagClass> AllResources(soci::session& session) {
 				tag.IsStatic = isStatic != 0;
 				tag.IsDynamic = isDynamic != 0;
 				tag.IsNative = isNative != 0;
+				tag.HasVariableArgs = hasVariableArgs != 0;
 				if (soci::i_ok == fileIsNewIndicator) {
 					tag.FileIsNew = fileIsNew != 0;
 				}
@@ -234,12 +237,12 @@ void t4p::TagParserClass::BeginTransaction() {
 		sql += "file_item_id, source_id, key, identifier, class_name, ";
 		sql += "type, namespace_name, signature, ";
 		sql += "return_type, comment, is_protected, is_private, ";
-		sql += "is_static, is_dynamic, is_native";
+		sql += "is_static, is_dynamic, is_native, has_variable_args";
 		sql += ") VALUES(";
 		sql += "?, ?, ?, ?, ?, ";
 		sql += "?, ?, ?, ";
 		sql += "?, ?, ?, ?, ";
-		sql += "?, ?, ?";
+		sql += "?, ?, ?, ?";
 		sql += ");";
 		
 		wxASSERT_MSG(!InsertStmt, wxT("statement should be cleaned up"));
@@ -248,7 +251,7 @@ void t4p::TagParserClass::BeginTransaction() {
 			soci::use(FileTagId), soci::use(CurrentSourceId), soci::use(Key), soci::use(Identifier), soci::use(ClassName), 
 			soci::use(Type), soci::use(NamespaceName), soci::use(Signature), 
 			soci::use(ReturnType), soci::use(Comment), soci::use(IsProtected), soci::use(IsPrivate), 
-			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative)
+			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative), soci::use(HasVariableArgs)
 		);
 	} catch (std::exception& e) {
 		
@@ -601,6 +604,7 @@ void t4p::TagParserClass::MethodFound(const UnicodeString& namespaceName, const 
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
+	item.HasVariableArgs = hasVariableArguments;
 	PersistResources(item, CurrentFileTagId);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
@@ -646,6 +650,7 @@ void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, cons
 	}
 	item.IsStatic = isStatic;
 	item.IsNative = false;
+	item.HasVariableArgs = false;
 	PersistResources(item, CurrentFileTagId);
 	
 	// insert a complete name so that we can quickly lookup all methods for a single class
@@ -669,6 +674,7 @@ void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, cons
 	item.ReturnType = returnType;
 	item.Comment = comment;
 	item.IsNative = false;
+	item.HasVariableArgs = hasVariableArguments;
 	PersistResources(item, CurrentFileTagId);
 		
 	if (IsNewNamespace(namespaceName)) {
@@ -998,6 +1004,7 @@ void t4p::TagParserClass::PersistResources(const t4p::TagClass& resource, int fi
 		IsStatic = resource.IsStatic;
 		IsDynamic = resource.IsDynamic;
 		IsNative = resource.IsNative;
+		HasVariableArgs = resource.HasVariableArgs;
 		InsertStmt->execute(true);
 
 	} catch (std::exception& e) {

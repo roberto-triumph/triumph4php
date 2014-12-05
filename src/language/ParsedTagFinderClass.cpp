@@ -241,7 +241,7 @@ bool t4p::ExactMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool doLi
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON (s.source_id = r.source_id) WHERE ";
 	
 	sql += "key IN (?";
@@ -304,7 +304,7 @@ bool t4p::AllMembersTagResultClass::DoPrepare(soci::statement& stmt,  bool doLim
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 
 	// not using LIKE operator here, there are way too many situations where it wont use the index
@@ -377,7 +377,7 @@ bool t4p::NearMatchMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s  ON(s.source_id = r.source_id) WHERE ";
 
 	// not using LIKE operator here, there are way too many situations where it wont use the index
@@ -456,7 +456,7 @@ bool t4p::ExactNonMemberTagResultClass::DoPrepare(soci::statement& stmt, bool do
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	sql += "key = ? AND type IN(?";
 	for (size_t i = 1; i < TagTypes.size(); i++) {
@@ -517,7 +517,7 @@ bool t4p::NearMatchNonMemberTagResultClass::DoPrepare(soci::statement& stmt, boo
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE";
 
 	// not using LIKE operator here, there are way too many situations where it wont use the index
@@ -595,7 +595,7 @@ bool t4p::ExactMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	
 	// make sure to use the key because it is indexed
@@ -653,7 +653,7 @@ bool t4p::NearMatchMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt, bo
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
 	
 	// not using LIKE operator here, there are way too many situations where it wont use the index
@@ -707,7 +707,7 @@ bool t4p::TopLevelTagInFileResultClass::DoPrepare(soci::statement& stmt, bool do
 	// tags that don't begin with backslash
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
 	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ORDER BY key ";
 	
@@ -727,7 +727,7 @@ t4p::AllTagsResultClass::AllTagsResultClass()
 bool t4p::AllTagsResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id)";
 	
 	stmt.prepare(sql);
@@ -747,7 +747,7 @@ void t4p::TagByIdResultClass::Set(int id) {
 bool t4p::TagByIdResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
-	sql += "is_protected, is_private, is_static, is_dynamic, is_native, is_new ";
+	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id) ";
 	sql += "WHERE r.id = ?";
 	
@@ -1768,6 +1768,7 @@ t4p::TagResultClass::TagResultClass()
 	, IsStatic(false)
 	, IsDynamic(false)
 	, IsNative(false)
+	, HasVariableArgs(false)
 	, FileIsNew(false)
 	, FileTagIdIndicator()
 	, FullPathIndicator()
@@ -1795,6 +1796,7 @@ void t4p::TagResultClass::DoBind(soci::statement& stmt) {
 		stmt.exchange(soci::into(IsStatic));
 		stmt.exchange(soci::into(IsDynamic));
 		stmt.exchange(soci::into(IsNative));
+		stmt.exchange(soci::into(HasVariableArgs));
 		stmt.exchange(soci::into(FileIsNew, FileIsNewIndicator));
 		
 	} catch (std::exception& e) {
@@ -1825,6 +1827,7 @@ void t4p::TagResultClass::Next() {
 	Tag.IsStatic = IsStatic != 0;
 	Tag.IsDynamic = IsDynamic != 0;
 	Tag.IsNative = IsNative != 0;
+	Tag.HasVariableArgs = HasVariableArgs != 0;
 	if (soci::i_ok == FileIsNewIndicator) {
 		Tag.FileIsNew = FileIsNew != 0;
 	}

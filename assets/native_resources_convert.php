@@ -111,10 +111,10 @@ $outputPdo->beginTransaction();
 $insertStmt = $outputPdo->prepare('INSERT INTO resources(' .
 	'file_item_id, source_id, key, identifier, class_name, type, namespace_name, ' .
 	'signature, comment, return_type, is_protected, is_private, is_static, ' .
-	'is_dynamic, is_native) VALUES(' .
+	'is_dynamic, is_native, has_variable_args) VALUES(' .
 	'?, 0, ?, ?, ?, ?, ?, ' .
 	'?, ?, ?, ?, ?, ?, ' .
-	'?, ?)'
+	'?, ?, ?)'
 );
 $commentStatements = prepStatements($phdPdo);
 $if = fopen($tagsFile, 'rb');
@@ -156,6 +156,7 @@ if ($if) {
 		$isStatic = 0; 
 		$isDynamic = 0;
 		$isNative = 1;
+		$hasVariableArgs = hasVariableArgs($phdPdo, $identifier, $extensions, $commentStatements);
 		
 		$kind = strtolower($extensions['kind']);
 		if ('c' == $kind) {
@@ -208,7 +209,7 @@ if ($if) {
 		$insertStmt->execute(array(
 			$fileItemId, $key, $identifier, $className, $type, $namespaceName,
 			$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
-			$isDynamic, $isNative
+			$isDynamic, $isNative, $hasVariableArgs
 		));
 		if (RESOURCE_METHOD == $type || RESOURCE_MEMBER == $type || RESOURCE_CLASS_CONSTANT == $type) {
 		
@@ -217,7 +218,7 @@ if ($if) {
 			$insertStmt->execute(array(
 				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
 				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
-				$isDynamic, $isNative
+				$isDynamic, $isNative, $hasVariableArgs
 			));
 			
 			// insert the 'fully qualified' + namespace form
@@ -225,7 +226,7 @@ if ($if) {
 			$insertStmt->execute(array(
 				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
 				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
-				$isDynamic, $isNative
+				$isDynamic, $isNative, $hasVariableArgs
 			));
 		}
 		if (RESOURCE_CLASS == $type || RESOURCE_FUNCTION == $type || RESOURCE_NAMESPACE == $type) {
@@ -236,7 +237,7 @@ if ($if) {
 			$insertStmt->execute(array(
 				$fileItemId, $key, $identifier, $className, $type, $namespaceName,
 				$signature, $comment, $returnType, $isProtected, $isPrivate, $isStatic, 
-				$isDynamic, $isNative
+				$isDynamic, $isNative, $hasVariableArgs
 			));
 		}
 	}
@@ -450,6 +451,34 @@ function findComment(PDO $phdPdo, $identifier, $extensions, $commentStatements) 
 		$comment = "/**\n" . $comment . "*/";
 	}
 	return $comment;
+}
+
+
+/**
+ * Check tp see if the given tag has variable arguments
+ *
+ * @param PDO $phdPdo the connection to the PhD database
+ * @param string $identifier the function name to look for
+ * @param array $extensions the tag extension; to get the class name if any
+ * @param array $commentStatements the prepared statements
+ * @return bool TRUE if the function has variable arguments
+ */
+function hasVariableArgs(PDO $phdPdo, $identifier, $extensions, $commentStatements) {
+	$name = $identifier;
+	if ($extensions['class']) {
+		$name = $extensions['class'] . '.' . $identifier;
+	}
+	$paramsStmt = $commentStatements['params'];
+	$hasVariableArgs = FALSE;
+	if ($paramsStmt->execute(array($name))) {
+		
+		while ($param = $paramsStmt->fetch()) {
+			if (strcasecmp('...', $param['name']) == 0) {
+				$hasVariableArgs = TRUE;
+			}
+		}
+	}
+	return $hasVariableArgs;
 }
 
 /**

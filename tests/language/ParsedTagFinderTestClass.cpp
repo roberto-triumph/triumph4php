@@ -558,6 +558,26 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhen
 	CHECK_EQUAL(t4p::TagClass::FUNCTION, tag.Type);
 }
 
+TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWithVariableArgs) {
+	Prep(t4p::CharToIcu(
+		"<?php\n"
+		"/** print a user @return void */\n"
+		"function printUser($user) {\n"
+		"\t  $args = func_get_args(); \n"
+		"}\n"
+		"?>\n"
+	));	
+	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
+	CHECK_VECTOR_SIZE(1, Matches);
+	t4p::TagClass tag = Matches[0];
+	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
+	CHECK_UNISTR_EQUALS("void", tag.ReturnType);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), tag.Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), tag.Comment);
+	CHECK_EQUAL(t4p::TagClass::FUNCTION, tag.Type);
+	CHECK(tag.HasVariableArgs);
+}
+
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForClassesAndFunctions) {
 	Prep(t4p::CharToIcu(
 		"<?php\n"
