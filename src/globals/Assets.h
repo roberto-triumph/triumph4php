@@ -260,7 +260,8 @@ wxFileName ChangeLogFileAsset();
 
 /**
  * @return wxFileName the full path to the file that stores the lint suppression
- *         rules (a CSV file)
+ *         rules (a CSV file). Note that file may not actually exist, since 
+ *         the lint suppressions feature was added after initial release.
  */
 wxFileName LintSuppressionsFileAsset();
 

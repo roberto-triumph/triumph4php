@@ -25,7 +25,10 @@
 
 #ifndef __T4P_CHECKS_H__
 #define __T4P_CHECKS_H__
- 
+
+#include <wx/string.h> // so that UnitTest++ can compare wxStrings by their content
+#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+
 /**
  * This is a "hard" check for vector size. Will check that the vetor is of the given
  * size, if false, then the macro will exit from the current function

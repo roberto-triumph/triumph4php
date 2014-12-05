@@ -305,6 +305,20 @@ void t4p::TagFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 			false);
 		App.SqliteRunningThreads.Queue(builder);
 	}
+	else if (App.Globals.IsASourceFile(codeControl->GetFileName())) {
+		
+		// for other project files, we still want to "tag" them so that 
+		// we record their name, that way total search filename lookups
+		// will include these files
+		t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(App.SqliteRunningThreads, wxID_ANY);
+		tagAction->SetFileToParse(codeControl->GetFileName());
+		if (tagAction->Init(App.Globals)) {
+			App.SqliteRunningThreads.Queue(tagAction);
+		}
+		else {
+			delete tagAction;
+		}
+	}
 	event.Skip();
 }
 

@@ -1,8 +1,34 @@
-
+/*
+ * This software is released under the terms of the MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2014 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
 #include <UnitTest++.h>
+#include <TriumphChecks.h>
 #include <SqliteTestFixtureClass.h>
 #include <globals/FileCabinetItemClass.h>
+#include <globals/String.h>
 #include <wx/platinfo.h>
+#include <iostream>
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 	
@@ -26,19 +52,34 @@ TEST_FIXTURE(FileCabinetFixtureClass, FindAll) {
 	
 	// verify that we can load files and directories
 	// from the file cabinet items table
+	// user wxFileName so that tests work on all OSes
+	wxFileName file;
+	file.AppendDir("home");
+	file.AppendDir("user");
+	file.AppendDir("www");
+	file.SetFullName("test.php");
+
+	wxFileName dir;
+	dir.AppendDir("home");
+	dir.AppendDir("user");
+	dir.AppendDir("www");
+	dir.AppendDir("config");
+
 	Exec("BEGIN;");
-	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'test.php', '/home/user/www/test.php');");
-	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'config', '/home/user/www/config/');");
+	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'test.php', '" + 
+		t4p::WxToChar(file.GetFullPath()) + "');");
+	Exec("INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, 'config', '" + 
+		t4p::WxToChar(dir.GetPathWithSep()) + "');");
 	Exec("COMMIT;");
 	
 	bool hasRows = SqliteFinder.Exec(&AllResults);
 	CHECK(hasRows);
 	AllResults.Next();
-	CHECK_EQUAL(wxT("/home/user/www/test.php"), AllResults.Item.FileName.GetFullPath());
+	CHECK_EQUAL(file.GetFullPath(), AllResults.Item.FileName.GetFullPath());
 	
 	CHECK(AllResults.More());
 	AllResults.Next();
-	CHECK_EQUAL(wxT("/home/user/www/config"), AllResults.Item.FileName.GetPath());
+	CHECK_EQUAL(dir.GetPath(), AllResults.Item.FileName.GetPath());
 	
 	CHECK_EQUAL(false, AllResults.More());
 }
