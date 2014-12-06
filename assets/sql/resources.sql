@@ -32,42 +32,42 @@
 -- directory that contains source code files
 -- each source corresponds to a source directory that the user has added to a project.
 CREATE TABLE IF NOT EXISTS sources (
-	source_id INTEGER PRIMARY KEY,
+	source_id INTEGER NOT NULL PRIMARY KEY,
 	
 	-- the full path has OS-dependant file separators
 	-- the full path is the entire path to a source directory
 	-- don't do it case-insensitive because different file systems handle case differently
-	directory TEXT
+	directory TEXT NOT NULL 
 );
 
 -- this table stores all of the files that have been seen by Triumph
 CREATE TABLE IF NOT EXISTS file_items (
-	file_item_id INTEGER PRIMARY KEY, 
+	file_item_id INTEGER NOT NULL PRIMARY KEY, 
 		
 	-- the foreign key to the source directory
-	source_id INTEGER,
+	source_id INTEGER NOT NULL,
 
 	-- the full path has OS-dependant file separators
 	-- the full path is the entire path to a file
 	-- don't do it case-insensitive because different file systems handle case differently
 	-- this may not be an actual file path when is_new = 1
-	full_path TEXT, 
+	full_path TEXT NOT NULL, 
 	
 	-- the name (and extension) of the file
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	name TEXT COLLCATE NOCASE,
+	name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- this is up to the second precision. this time is used to check to see if
 	-- the file needs to be parsed
-	last_modified DATETIME, 
+	last_modified DATETIME NOT NULL, 
 	
 	-- 1 when the file has been parsed for resources
-	is_parsed INTEGER, 
+	is_parsed INTEGER NOT NULL, 
 	
 	-- 1 if this is a 'new' file; a file that the user has created but has not yet
 	-- been saved.  We still store it here so that the editor is aware of the file,
 	-- the editor can then jump to the file or use it in auto completion.
-	is_new INTEGER
+	is_new INTEGER NOT NULL
 );
 
 -- this table stores all of the resources (tags) for all files that
@@ -79,13 +79,13 @@ CREATE TABLE IF NOT EXISTS file_items (
 -- column).
 CREATE TABLE IF NOT EXISTS resources (
 
-	id INTEGER PRIMARY KEY,
+	id INTEGER NOT NULL PRIMARY KEY,
 	
 	-- the file that the resource is located in
-	file_item_id INTEGER, 
+	file_item_id INTEGER NOT NULL, 
 	
 	-- the foreign key to the source directory
-	source_id INTEGER,
+	source_id INTEGER NOT NULL,
 	
 	-- the key is used to perform lookups into this table.  The key will have
 	-- multiple formats:
@@ -103,19 +103,19 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
 	-- Note that the key is not necessarily unique; 2 different files may declare the same
 	-- class / methods / functions.
-	key TEXT COLLATE NOCASE,
+	key TEXT NOT NULL COLLATE NOCASE,
 	
 	-- the identifier is the lexeme of the resource. 
 	-- For classes, defines, or functions, this is the class / define function name
 	-- For methods, members, class constants, this is the method / member / constant name only
 	-- For namespaces, the key will always be the fully qualified namespace
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	identifier TEXT COLLATE NOCASE,  
+	identifier TEXT NOT NULL COLLATE NOCASE,  
 	
 	-- this will only be set for methods, members, or class constants. This is the
 	-- name of the class that holds the method / member / constant
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	class_name TEXT COLLATE NOCASE,
+	class_name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- a number that signifies the type of resource
 	-- 0 = class
@@ -125,12 +125,12 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- 4 = define
 	-- 5 = class constant
 	-- 6 = namespace
-	type INTEGER, 
+	type INTEGER NOT NULL, 
 	
 	-- this is the namespace that holds the class or function.
 	-- In the case where no namespace was declared, this will be the root namespace "\"
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	namespace_name TEXT COLLATE NOCASE, 
+	namespace_name TEXT NOT NULL COLLATE NOCASE, 
 	
 	-- this is the function / method signature. for classes, this is the
 	-- class declaration 
@@ -146,44 +146,44 @@ CREATE TABLE IF NOT EXISTS resources (
 	-- contain newlines.
 	-- The signature *may* contain the return type, if Triumph is able to determine
 	-- it from the PHPDoc comment.
-	signature TEXT, 
+	signature TEXT NOT NULL, 
 	
 	-- This is the entire comment that preceded the resource. Only PHPDoc comments are 
 	-- captured. This is the comment
 	-- as was found in the sources, complete with the original newlines, spaces, and comment
 	-- delimiters ("/**" and "*/")
-	comment TEXT,
+	comment TEXT NOT NULL,
 	
 	-- if Triumph is able to determine it from the PHPDoc comment, then this column
 	-- contains the function / method return type. In the case of members, this is the
 	-- member class name.
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	return_type TEXT COLLATE NOCASE, 
+	return_type TEXT NOT NULL COLLATE NOCASE, 
 	
 	-- 1 if this is a method / member / class constant and it has been labeled as protected
 	-- if is_protected = 0 and is_private = 0, then this resource is a public resource
-	is_protected INTEGER, 
+	is_protected INTEGER NOT NULL, 
 	
 	-- 1 if this is a method / member / class constant and it has been labeled as private
 	-- if is_protected = 0 and is_private = 0, then this resource is a public resource
-	is_private INTEGER,
+	is_private INTEGER NOT NULL,
 	
 	-- 1 if this is a method / member / class constant and it has been labeled as static
 	-- this is important, as triumph is smart enough to show only static members / methods
 	-- when a static call is being made
-	is_static INTEGER, 
+	is_static INTEGER NOT NULL, 
 	
 	-- 1 if this resource is a 'magic' resource.
-	is_dynamic INTEGER, 
+	is_dynamic INTEGER NOT NULL, 
 	
 	-- 1 if this resource is a "native" function; ie a resource that is in the standard 
 	-- PHP libraries
-	is_native INTEGER,
+	is_native INTEGER NOT NULL,
 	
 	-- 1 if this is a function / method that has variable arguments. variable argument
 	-- detection works based off whether the body of the function / method
 	-- has a call to func_get_arg or its friends
-	has_variable_args INTEGER
+	has_variable_args INTEGER NOT NULL
 );
 
 -- This table stores all of the trait relationships that have been found by Triumph.
@@ -195,42 +195,42 @@ CREATE TABLE IF NOT EXISTS resources (
 CREATE TABLE IF NOT EXISTS trait_resources (
 
 	-- the file that class_name is located in (the class that uses the trait)
-	file_item_id INTEGER, 
+	file_item_id INTEGER NOT NULL, 
 	
 	-- the foreign key to the source directory
-	source_id INTEGER,
+	source_id INTEGER NOT NULL,
 
 	-- the key is used to perform lookups into this table. The key will be either
 	-- 1. The name of the class that uses a trait (same as class_name column)
 	-- 2. The fully qualified name of the class that uses the trait (concatenation of namespace_name and class_name)
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	key TEXT COLLATE NOCASE,
+	key TEXT NOT NULL COLLATE NOCASE,
 	
 	-- the name of the class that uses a trait. This is the name of the class only
 	-- (no namespace)
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	class_name TEXT COLLATE NOCASE,
+	class_name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- the namespace of the class that uses the trait. This will be "\" if the class is
 	-- in the root namespace
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	namespace_name TEXT COLLATE NOCASE,
+	namespace_name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- the name of the class of the trait that is being used. This is the name of the class only
 	-- (no namespace)
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	trait_name TEXT COLLCATE NOCASE,
+	trait_name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- the namespace of the trait being used. This will be "\" if the trait is
 	-- in the root namespace
 	-- storing it as case-insensitive because we always want to do case-insensitive lookups
-	trait_namespace_name TEXT COLLATE NOCASE,
+	trait_namespace_name TEXT NOT NULL COLLATE NOCASE,
 	
 	-- a comma-separated list of all of the aliased methods from the trait
-	aliases TEXT,
+	aliases TEXT NOT NULL,
 	
 	-- a comma-separated list of all of the "insteadof" traits
-	instead_ofs TEXT
+	instead_ofs TEXT NOT NULL
 );
 
 --
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS trait_resources (
 --
 CREATE TABLE IF NOT EXISTS db_tables (
 
-	table_id INTEGER PRIMARY KEY,
+	table_id INTEGER NOT NULL PRIMARY KEY,
 	
 	-- this is the name of the connection that was used to extract the
 	-- tables from
@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS db_tables (
 -- projects all together.
 CREATE TABLE IF NOT EXISTS file_cabinet_items (
 	
-	file_cabinet_item_id INTEGER PRIMARY KEY,
+	file_cabinet_item_id INTEGER NOT NULL PRIMARY KEY,
 	
 	-- the full name of the file (with the extesion) or if this is a directory
 	-- then name is the name of the last sub-directory
@@ -317,7 +317,7 @@ CREATE INDEX IF NOT EXISTS idxFileCabinetName ON file_cabinet_items(name);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(9);
+INSERT INTO schema_version (version_number) VALUES(10);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes

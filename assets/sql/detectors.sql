@@ -33,7 +33,7 @@
 -- this table store all "source" directories. a source directory is just a 
 -- directory that contains source code files
 CREATE TABLE IF NOT EXISTS sources (
-	source_id INTEGER PRIMARY KEY AUTOINCREMENT,
+	source_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	
 	-- the full path has OS-dependant file separators
 	-- the full path is the entire path to a source directory
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	-- contain newlines.
 	-- The signature *may* contain the return type, if Triumph is able to determine
 	-- it from the PHPDoc comment.
-	signature TEXT, 
+	signature TEXT NOT NULL, 
 	
 	--
 	-- Description text that is shown to the user
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS detected_tags (
 	-- 1 if this is a method / member / class constant and it has been labeled as static
 	-- this is important, as triumph is smart enough to show only static members / methods
 	-- when a static call is being made
-	is_static INTEGER
+	is_static INTEGER NOT NULL
 );
 
 
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS database_tags (
 	-- 
 	-- needed for Zend_Db_Table_Abstract 
 	--
-	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 	
 	-- the foreign key to the source directory
 	source_id INT INTEGER NOT NULL,
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS config_tags (
 	-- 
 	-- needed for Zend_Db_Table_Abstract 
 	--
-	id INTEGER PRIMARY KEY AUTOINCREMENT, 
+	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
 	
 	-- the foreign key to the source directory
 	source_id INT INTEGER NOT NULL,
@@ -340,7 +340,7 @@ CREATE INDEX IF NOT EXISTS idxUrlSource ON url_tags(source_id);
 --
 -- This number must match the version in CacheDbVersionActionClass.cpp
 --
-INSERT INTO schema_version (version_number) VALUES(8);
+INSERT INTO schema_version (version_number) VALUES(9);
 
 --
 -- Write ahead logging to allow for concurrent reads and writes
