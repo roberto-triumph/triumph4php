@@ -26,6 +26,7 @@
 #include <TriumphChecks.h>
 #include <language/DbgpEventClass.h>
 #include <wx/string.h>
+#include <wx/log.h>
 
 SUITE(DbgpEventClassTest) {
 
@@ -215,8 +216,14 @@ TEST(InvalidXml) {
 	t4p::DbgpErrorEventClass errorEvt;
 	t4p::DbgpXmlErrors error = t4p::DBGP_XML_ERROR_NONE;
 
+
+	// disable xml error; we know its invalid
+	bool oldValue = wxLog::EnableLogging(false);
+
 	bool success = errorEvt.FromXml(xml, error);
 
+	wxLog::EnableLogging(oldValue);
+	
 	CHECK_EQUAL(false, success);
 	CHECK_EQUAL(t4p::DBGP_XML_ERROR_PARSE, error);
 }
