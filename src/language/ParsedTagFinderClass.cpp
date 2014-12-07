@@ -1318,9 +1318,11 @@ bool t4p::PropertyLookupClass::Found() {
 t4p::FunctionSignatureLookupClass::FunctionSignatureLookupClass()
 : t4p::SqliteResultClass() 
 , Signature()
+, HasVariableArgs(false)
 , FunctionName()
 , TagType(0)
 , Id(0) 
+, RowHasVariableArgs(0)
 , StdSignature() {
 	TagType = t4p::TagClass::FUNCTION;
 }
@@ -1330,7 +1332,7 @@ void t4p::FunctionSignatureLookupClass::Set(const UnicodeString& functionName) {
 }
 	
 bool t4p::FunctionSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	std::string sql = "SELECT id, signature FROM resources WHERE key = ? AND type = ?";
+	std::string sql = "SELECT id, has_variable_args, signature FROM resources WHERE key = ? AND type = ?";
 	bool good = false;
 	wxString error;
 	try {	
@@ -1347,6 +1349,7 @@ bool t4p::FunctionSignatureLookupClass::DoPrepare(soci::statement& stmt, bool do
 
 void t4p::FunctionSignatureLookupClass::DoBind(soci::statement& stmt) {
 	stmt.exchange(soci::into(Id));
+	stmt.exchange(soci::into(RowHasVariableArgs));
 	stmt.exchange(soci::into(StdSignature));
 }
 
@@ -1355,7 +1358,7 @@ void t4p::FunctionSignatureLookupClass::Next() {
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
-	
+	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
 }
 
@@ -1366,6 +1369,7 @@ bool t4p::FunctionSignatureLookupClass::Found() {
 t4p::MethodSignatureLookupClass::MethodSignatureLookupClass()
 : t4p::SqliteResultClass() 
 , Signature()
+, HasVariableArgs(false)
 , MethodName()
 , IsStaticTrue(0)
 , IsStaticFalse(0)
@@ -1396,7 +1400,9 @@ bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLi
 	// don't want the query to change when the isStatic flag changes
 	// otherwise we would need to re-prepare the statement (and negate
 	// any performance improvement)
-	std::string sql = "SELECT id, signature FROM resources WHERE key = ? AND type = ? AND is_static IN(?, ?)";
+	std::string sql = "SELECT id, has_variable_args, signature ";
+	sql += "FROM resources ";
+	sql += "WHERE key = ? AND type = ? AND is_static IN(?, ?)";
 	bool good = false;
 	wxString error;
 	try {	
@@ -1415,6 +1421,7 @@ bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLi
 
 void t4p::MethodSignatureLookupClass::DoBind(soci::statement& stmt) {
 	stmt.exchange(soci::into(Id));
+	stmt.exchange(soci::into(RowHasVariableArgs));
 	stmt.exchange(soci::into(StdSignature));
 }
 
@@ -1424,6 +1431,7 @@ void t4p::MethodSignatureLookupClass::Next() {
 	// fetch gets the next row
 	Fetch();
 	
+	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
 }
 

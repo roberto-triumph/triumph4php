@@ -29,6 +29,7 @@
 #include <language/TagCacheClass.h>
 #include <language/PhpVariableLintClass.h>
 #include <language/PhpIdentifierLintClass.h>
+#include <language/PhpFunctionCallLintClass.h>
 #include <language/TagFinderList.h>
 #include <language/ParsedTagFinderClass.h>
 #include <search/DirectorySearchClass.h>
@@ -111,6 +112,7 @@ private:
 	t4p::PhpVariableLintOptionsClass Options;
 	t4p::PhpVariableLintClass Linter;
 	t4p::PhpIdentifierLintClass IdentifierLinter;
+	t4p::PhpFunctionCallLintClass CallLinter;
 };
 
 
@@ -395,7 +397,8 @@ VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCach
 	, WithNoErrors(0)
 	, Options()
 	, Linter() 
-	, IdentifierLinter() {
+	, IdentifierLinter()
+	, CallLinter() {
 	
 	Options.CheckGlobalScope = false;
 	Options.Version = pelet::PHP_54;
@@ -403,12 +406,15 @@ VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCach
 	IdentifierLinter.SetVersion(pelet::PHP_54);
 	Linter.Init(tagCache);
 	IdentifierLinter.Init(tagCache);
+	CallLinter.Init(tagCache);
+	CallLinter.SetVersion(pelet::PHP_54);
 }
 
 bool VariableLinterWalkerClass::Walk(const wxString& file) {
 	if (file.EndsWith(wxT(".php"))) {
 		std::vector<t4p::PhpVariableLintResultClass> results;
 		std::vector<t4p::PhpIdentifierLintResultClass> identifierResults;
+		std::vector<t4p::PhpFunctionCallLintResultClass> callResults;
 		std::string stdFile(file.ToAscii());
 		UFILE *out = u_finit(stdout, NULL, NULL);
 		if (Linter.ParseFile(wxFileName(file), results)) {			
@@ -429,10 +435,34 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 					identifierResults[i].LineNumber);
 			}
 		}
+		if (CallLinter.ParseFile(wxFileName(file), callResults)) {
+			for (size_t i = 0; i < callResults.size(); ++i) {
+				if (callResults[i].Type == t4p::PhpFunctionCallLintResultClass::TOO_FEW_ARGS) {
+					u_fprintf(out,
+						"missing arguments to function `%S`: expected %d but calling with %d arguments on file %S around line %d\n",
+						callResults[i].Identifier.getTerminatedBuffer(),
+						callResults[i].ExpectedCount,
+						callResults[i].ActualCount,
+						callResults[i].File.getTerminatedBuffer(),				
+						callResults[i].LineNumber
+					);
+				}
+				else if (callResults[i].Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
+					u_fprintf(out,
+						"too many arguments to function `%S`: expected %d but calling with %d arguments on file %S around line %d\n",
+						callResults[i].Identifier.getTerminatedBuffer(),
+						callResults[i].ExpectedCount,
+						callResults[i].ActualCount,
+						callResults[i].File.getTerminatedBuffer(),				
+						callResults[i].LineNumber
+					);
+				}
+			}
+		}
 		
 		u_fclose(out);
 		
-		if (results.empty() && identifierResults.empty()) {
+		if (results.empty() && identifierResults.empty() && callResults.empty()) {
 			WithNoErrors++;
 		}
 		else {

@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_PhpLintErrorClass__
-#define __T4P_PhpLintErrorClass__
+#ifndef __T4P_PHPLINTERRORCLASS__
+#define __T4P_PHPLINTERRORCLASS__
 
 namespace t4p {
 
@@ -33,15 +33,13 @@ namespace t4p {
 class PhpLintErrorClass {
 
 public:
-
 	PhpLintErrorClass();
 	
-
 private:
 
 };
 
 }
 
-#endif // __T4P_PhpLintErrorClass__
+#endif // __T4P_PHPLINTERRORCLASS__
 

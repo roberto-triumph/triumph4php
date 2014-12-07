@@ -264,7 +264,7 @@ private:
 	 * 
 	 * $$name = '123';
 	 * 
-	 * In this case, we want to turn off uninitialized varaible checks
+	 * In this case, we want to turn off uninitialized variable checks
 	 * because we dont want to label false positives.
 	 */
 	bool HasIndirectVariable;

@@ -269,5 +269,5 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 		delete Stmt;
 		Stmt = NULL;
 	}
-	return IsEmpty;
+	return Stmt;
 }

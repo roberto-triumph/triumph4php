@@ -158,7 +158,7 @@ LintSuppressionRuleGeneratedDialogClass::LintSuppressionRuleGeneratedDialogClass
 	TypeLabel->Wrap( -1 );
 	MidSizer->Add( TypeLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	wxString TypesChoices[] = { wxT("Skip Unknown Class"), wxT("Skip Unknown Method"), wxT("Skip Unknown Property"), wxT("Skip Unknown Function"), wxT("Skip Uninitalized Variable"), wxT("Skip All") };
+	wxString TypesChoices[] = { wxT("Skip Unknown Class"), wxT("Skip Unknown Method"), wxT("Skip Unknown Property"), wxT("Skip Unknown Function"), wxT("Skip Uninitalized Variable"), wxT("Skip Function Argument Count Mismatch"), wxT("Skip All") };
 	int TypesNChoices = sizeof( TypesChoices ) / sizeof( wxString );
 	Types = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, TypesNChoices, TypesChoices, 0 );
 	Types->SetSelection( 0 );
@@ -245,7 +245,7 @@ LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow
 	FlexGidSizer->SetFlexibleDirection( wxBOTH );
 	FlexGidSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	Help = new wxStaticText( this, wxID_ANY, wxT("The lint preferences control the types of PHP errors that Triumph can detect.\n\nPerform lint check on file save \nWhen enabled, a lint check will be performed when the user saves a PHP file.\n\nCheck Uninitialized variables \nChecks for PHP variables that are being read before they have been initialized. Note \nthat this check is only done on variables inside a function or method.\n\nCheck Uninitialized global variables \nLike above, but it checks global variables. The reason it is disabled by default is because \nglobal variables are usually assigned via a template mechanism; checking for initialization \non global variables would lead to many false positives.\n\nCheck for unknown classes, methods and functions \nEach referenced class name, method name or function. In order for this check to\nwork properly there must be at least one defined project, and it must have\nbeen indexed.\n"), wxDefaultPosition, wxDefaultSize, 0 );
+	Help = new wxStaticText( this, wxID_ANY, wxT("The lint preferences control the types of PHP errors that Triumph can detect.\n\nPerform lint check on file save \nWhen enabled, a lint check will be performed when the user saves a PHP file.\n\nCheck Uninitialized variables \nChecks for PHP variables that are being read before they have been initialized. Note \nthat this check is only done on variables inside a function or method.\n\nCheck Uninitialized global variables \nLike above, but it checks global variables. The reason it is disabled by default is because \nglobal variables are usually assigned via a template mechanism; checking for initialization \non global variables would lead to many false positives.\n\nCheck for unknown classes, methods and functions \nEach referenced class name, method name or function. In order for this check to\nwork properly there must be at least one defined project, and it must have\nbeen indexed.\n\nCheck function argument count mismatch\nWhen enabled, each function / method call will be checked to make sure\nthat the call has the correct number of required arguments. In order\nfor this check to work properly there must be at least one defined \nproject, and it must have been indexed."), wxDefaultPosition, wxDefaultSize, 0 );
 	Help->Wrap( -1 );
 	FlexGidSizer->Add( Help, 0, wxALL, 5 );
 	
@@ -263,6 +263,9 @@ LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow
 	
 	CheckUnknownIdentifiers = new wxCheckBox( this, wxID_ANY, wxT("Check unknown classes, methods, and functions"), wxDefaultPosition, wxDefaultSize, 0 );
 	ChecksSizer->Add( CheckUnknownIdentifiers, 0, wxALL, 5 );
+	
+	CheckFunctionArgumentCount = new wxCheckBox( this, wxID_ANY, wxT("Check function argument count mismatch"), wxDefaultPosition, wxDefaultSize, 0 );
+	ChecksSizer->Add( CheckFunctionArgumentCount, 0, wxALL, 5 );
 	
 	FlexGidSizer->Add( ChecksSizer, 1, wxEXPAND, 5 );
 	

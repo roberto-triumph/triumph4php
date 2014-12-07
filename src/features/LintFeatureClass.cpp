@@ -105,12 +105,14 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatu
 , VariableLinterOptions()
 , VariableLinter()
 , IdentifierLinter()
+, CallLinter()
 , SuppressionFile(suppressionFile)
 , Suppressions()
 , HasLoadedSuppressions(false)
 , LastResults()
 , VariableResults()
 , IdentifierResults()
+, CallResults()
 {
 	VariableLinterOptions.CheckGlobalScope = Options.CheckGlobalScopeVariables;
 }
@@ -118,6 +120,7 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatu
 void t4p::ParserDirectoryWalkerClass::Init(t4p::TagCacheClass& tagCache) {
 	VariableLinter.Init(tagCache);
 	IdentifierLinter.Init(tagCache);
+	CallLinter.Init(tagCache);
 }
 
 void t4p::ParserDirectoryWalkerClass::OverrideIdentifierCheck(bool doIdentifierCheck) {
@@ -134,6 +137,7 @@ void t4p::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
 	VariableLinterOptions.Version = version;
 	VariableLinter.SetOptions(VariableLinterOptions);
 	IdentifierLinter.SetVersion(version);
+	CallLinter.SetVersion(version);
 }
 
 bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
@@ -143,6 +147,7 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	LastResults.CharacterPosition = 0;
 	VariableResults.clear();
 	IdentifierResults.clear();
+	CallResults.clear();
 	
 	// load suppressions if we have not done so
 	// doing it here to prevent file reads in the foreground thread
@@ -179,6 +184,11 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	}
 	if (Options.CheckUnknownIdentifiers) {
 		if (IdentifierLinter.ParseFile(wxf, IdentifierResults)) {
+			hasErrors = true;
+		}
+	}
+	if (Options.CheckFunctionArgumentCount) {
+		if (CallLinter.ParseFile(wxf, CallResults)) {
 			hasErrors = true;
 		}
 	}
@@ -262,6 +272,45 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 			lintResult.UnicodeFilename = identifierResult.File;
 			lintResult.LineNumber = identifierResult.LineNumber;
 			lintResult.CharacterPosition = identifierResult.Pos;
+			allResults.push_back(lintResult);
+		}
+	}
+	
+	for (size_t i = 0; i < CallResults.size(); ++i) {
+		t4p::PhpFunctionCallLintResultClass callResult = CallResults[i];
+		
+		// did the user supress function argument count mismatch errors?
+		wxFileName wxf(t4p::IcuToWx(callResult.File));
+		if (!Suppressions.ShouldIgnore(wxf, callResult.Identifier, 
+			t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH)) {
+				
+			pelet::LintResultsClass lintResult;
+			lintResult.File = t4p::IcuToChar(callResult.File);
+			lintResult.UnicodeFilename = callResult.File;
+			lintResult.LineNumber = callResult.LineNumber;
+			lintResult.CharacterPosition = callResult.Pos;
+			
+			int minCapacity = 500;
+			int32_t written = 0;
+			UChar* buf = lintResult.Error.getBuffer(minCapacity);
+			if (callResult.Type == t4p::PhpFunctionCallLintResultClass::TOO_FEW_ARGS) {
+				written = u_sprintf(buf,
+					"Missing arguments to function `%S`: expected %d but calling with %d arguments",
+					callResult.Identifier.getTerminatedBuffer(),
+					callResult.ExpectedCount,
+					callResult.ActualCount
+				);
+			}
+			else if (callResult.Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
+				written = u_sprintf(buf,
+					"Too many arguments to function `%S`: expected %d but calling with %d arguments",
+					callResult.Identifier.getTerminatedBuffer(),
+					callResult.ExpectedCount,
+					callResult.ActualCount
+				);
+			}
+			lintResult.Error.releaseBuffer(written);
+			
 			allResults.push_back(lintResult);
 		}
 	}
@@ -569,25 +618,39 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
 		
 		// 14 == length of  'unknown class '
-		results.Error.extract(14, results.Error.length() - 14 + 1, rule.Target);
+		results.Error.extractBetween(14, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown method ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
 		
 		// 15 == length of  'unknown method '
-		results.Error.extract(15, results.Error.length() - 15 + 1, rule.Target);
+		results.Error.extractBetween(15, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown function ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
 		
 		// 17 = length of "unknown function "
-		results.Error.extract(17, results.Error.length() - 17 + 1, rule.Target);
+		results.Error.extractBetween(17, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Uninitialized variable ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
 		
 		// 23 = length of "uninitialized variable "
-		results.Error.extract(23, results.Error.length() - 23 + 1, rule.Target);
+		results.Error.extractBetween(23, results.Error.length(), rule.Target);
+	}
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Missing arguments to function `")) >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH;
+		
+		// 31 = length of "Missing arguments to function `"
+		int32_t endTickPos = results.Error.indexOf('`', 32);
+		results.Error.extractBetween(31, endTickPos, rule.Target);
+	}
+	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Too many arguments to function `")) >= 0) {
+		rule.Type = t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH;
+		
+		// 32 = length of "Too many arguments to function `"
+		int32_t endTickPos = results.Error.indexOf('`', 33);
+		results.Error.extractBetween(32, endTickPos, rule.Target);
 	}
 	
 	if (!rule.Target.isEmpty()) {
@@ -734,6 +797,7 @@ void t4p::LintFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/LintCheck/CheckUninitializedVariables"), &Options.CheckUninitializedVariables);
 	config->Read(wxT("/LintCheck/CheckUnknownIdentifiers"), &Options.CheckUnknownIdentifiers);
 	config->Read(wxT("/LintCheck/CheckGlobalScopeVariables"), &Options.CheckGlobalScopeVariables);
+	config->Read(wxT("/LintCheck/CheckFunctionArgumentCount"), &Options.CheckFunctionArgumentCount);
 }
 void t4p::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
@@ -741,6 +805,7 @@ void t4p::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	config->Write(wxT("/LintCheck/CheckUninitializedVariables"), Options.CheckUninitializedVariables);
 	config->Write(wxT("/LintCheck/CheckUnknownIdentifiers"), Options.CheckUnknownIdentifiers);
 	config->Write(wxT("/LintCheck/CheckGlobalScopeVariables"), Options.CheckGlobalScopeVariables);
+	config->Write(wxT("/LintCheck/CheckFunctionArgumentCount"), Options.CheckFunctionArgumentCount);
 }
 
 void t4p::LintFeatureClass::OnLintMenu(wxCommandEvent& event) {
@@ -850,7 +915,7 @@ void t4p::LintFeatureClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& eve
         // of the error
         int i = LintErrors.size(); 
         resultsPanel->AddErrors(results);
-       resultsPanel->IncrementErrorFileCount(); 
+		resultsPanel->IncrementErrorFileCount(); 
 		resultsPanel->ShowLintError(i);
 	}
 	else if (codeControl && results.empty()) {
@@ -1123,6 +1188,9 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 
 	wxGenericValidator checkIdentifiersValidator(&Feature.Options.CheckUnknownIdentifiers);
 	CheckUnknownIdentifiers->SetValidator(checkIdentifiersValidator);
+	
+	wxGenericValidator checkFunctionArgumentCountValidator(&Feature.Options.CheckFunctionArgumentCount);
+	CheckFunctionArgumentCount->SetValidator(checkFunctionArgumentCountValidator);
 }
 
 t4p::LintErrorPanelClass::LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
@@ -1183,6 +1251,7 @@ void t4p::LintFeatureOptionsClass::Copy(const t4p::LintFeatureOptionsClass& src)
 	CheckUninitializedVariables = src.CheckUninitializedVariables;
 	CheckUnknownIdentifiers = src.CheckUnknownIdentifiers;
 	CheckGlobalScopeVariables = src.CheckGlobalScopeVariables;
+	CheckFunctionArgumentCount = src.CheckFunctionArgumentCount;
 }
 
 t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
@@ -1289,6 +1358,9 @@ void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 		case t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR:
 			wxType = _("Skip Uninitialized Variable");
 			break;
+		case t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH:
+			wxType = _("Skip Function Argument Count Mismatch");
+			break;
 		case t4p::SuppressionRuleClass::SKIP_ALL:
 			wxType = _("Skip All");
 			break;
@@ -1352,6 +1424,9 @@ void t4p::LintSuppressionsPanelClass::AppendRuleToList(const t4p::SuppressionRul
 	case t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR:
 		wxType = _("Skip Uninitialized Variable");
 		break;
+	case t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH:
+		wxType = _("Skip Function Argument Count Mismatch");
+		break;
 	case t4p::SuppressionRuleClass::SKIP_ALL:
 		wxType = _("Skip All");
 		break;
@@ -1398,6 +1473,9 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 			break;
 		case t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR);
+			break;
+		case t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH:
+			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH);
 			break;
 		case t4p::SuppressionRuleClass::SKIP_ALL:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_ALL);
@@ -1458,12 +1536,18 @@ void t4p::LintSuppressionRuleDialogClass::OnOkButton(wxCommandEvent& event) {
 		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
 		break;
 	case 2:
-		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
+		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY;
 		break;
 	case 3:
-		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
+		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
 		break;
 	case 4:
+		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
+		break;
+	case 5:
+		EditRule.Type = t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH;
+		break;
+	case 6:
 		EditRule.Type = t4p::SuppressionRuleClass::SKIP_ALL;
 		break;
 	}

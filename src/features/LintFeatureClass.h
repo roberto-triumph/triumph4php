@@ -36,6 +36,7 @@
 #include <language/PhpVariableLintClass.h>
 #include <language/PhpIdentifierLintClass.h>
 #include <language/LintSuppressionClass.h>
+#include <language/PhpFunctionCallLintClass.h>
 
 namespace t4p {
 
@@ -121,9 +122,16 @@ public:
 	/**
 	 * if TRUE, then methods, classes will be checked for existence
 	 * when they are being called.  this requires that a project 
-	 * be indexes.
+	 * be indexed.
 	 */
 	bool CheckUnknownIdentifiers;
+	
+	/**
+	 * if TRUE, then a check is done to make sure that the arguments
+	 * in a function/method call match the number of arguments of the 
+	 * function/method declaration.  this requires that a project be indexed.
+	 */
+	bool CheckFunctionArgumentCount;
 
 	/**
 	 * if TRUE, then a check for uninitialized variables is done
@@ -216,6 +224,7 @@ private:
 	t4p::PhpVariableLintOptionsClass VariableLinterOptions;
 	t4p::PhpVariableLintClass VariableLinter;
 	t4p::PhpIdentifierLintClass IdentifierLinter;
+	t4p::PhpFunctionCallLintClass CallLinter;
 	
 	// to ignore files/classes/methods
 	wxFileName SuppressionFile;
@@ -226,6 +235,7 @@ private:
 	pelet::LintResultsClass LastResults;
 	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
 	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
+	std::vector<t4p::PhpFunctionCallLintResultClass> CallResults;
 	
 };
 
@@ -507,12 +517,13 @@ public:
 	t4p::LintFeatureOptionsClass Options;
 
 	/**
-	 * errors that have been encountered so far. there are 3 types
+	 * errors that have been encountered so far. there are 4 types
 	 * of errors because there are different type of linters.
 	 */
 	std::vector<pelet::LintResultsClass> LintErrors;
 	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
 	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
+	std::vector<t4p::PhpFunctionCallLintResultClass> CallResults;
 
 	LintFeatureClass(t4p::AppClass& app);
 

@@ -78,14 +78,14 @@ public:
 	}
 	
 	void SetupFile(const wxString& fileName, const wxString& contents) {
-
-		// make the cache consume the file; to prime it with the resources because the
-		// call stack wont work without the cache
 		CreateSubDirectory(wxT("src"));
 		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
+		
+		// make the cache consume the source code file; to prime it with the resources because the
+		// variable linter uses the tag cache
 		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*session, t4p::ResourceSqlSchemaAsset()); 
 

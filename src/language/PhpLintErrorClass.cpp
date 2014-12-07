@@ -1,5 +1,3 @@
-#include "PhpLintErrorClass.h"
-
 /**
  * This software is released under the terms of the MIT License
  * 
@@ -24,7 +22,7 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <>
+#include <language/PhpLintErrorClass.h>
 
 
 t4p::PhpLintErrorClass::PhpLintErrorClass ()

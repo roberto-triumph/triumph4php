@@ -151,10 +151,11 @@ class LintPreferencesGeneratedPanelClass : public wxPanel
 		wxCheckBox* CheckUnitializedVariables;
 		wxCheckBox* CheckUnitializedGlobalVariables;
 		wxCheckBox* CheckUnknownIdentifiers;
+		wxCheckBox* CheckFunctionArgumentCount;
 	
 	public:
 		
-		LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,408 ), long style = wxTAB_TRAVERSAL );
+		LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 560,560 ), long style = wxTAB_TRAVERSAL );
 		~LintPreferencesGeneratedPanelClass();
 	
 };

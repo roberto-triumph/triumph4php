@@ -885,9 +885,16 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 public:
 
 	/**
-	 * the function;s signature that was found in the db
+	 * the function's signature that was found in the db
 	 */
 	UnicodeString Signature;
+	
+	/**
+	 * TRUE if the function has variable arguments, as determined by
+	 * the parser (if the parser finds calls to func_get_args() and
+	 * friends)
+	 */
+	bool HasVariableArgs;
 	
 	FunctionSignatureLookupClass();
 	
@@ -937,9 +944,16 @@ private:
 	int Id;
 	
 	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int RowHasVariableArgs;
+	
+	/**
 	 * bound to the prepared statment as an output
 	 */
 	std::string StdSignature;
+	
+	
 };
 
 
@@ -958,6 +972,13 @@ public:
 	 * the method's signature that was found in the db
 	 */
 	UnicodeString Signature;
+	
+	/**
+	 * TRUE if the function has variable arguments, as determined by
+	 * the parser (if the parser finds calls to func_get_args() and
+	 * friends)
+	 */
+	bool HasVariableArgs;
 	
 	MethodSignatureLookupClass();
 	
@@ -1011,6 +1032,11 @@ private:
 	 *  bound to the prepared statement as an output 
 	 */
 	int Id;
+	
+	/**
+	 *  bound to the prepared statement as an output 
+	 */
+	int RowHasVariableArgs;
 	
 	/**
 	 * bound to the prepared statment as an output
