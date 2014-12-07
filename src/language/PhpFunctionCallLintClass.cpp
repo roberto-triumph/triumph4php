@@ -27,6 +27,13 @@
 #include <wx/ffile.h>
 
 /**
+ * we will stop tracking errors after we have reached this
+ * many.  The user cannot possibly go through all 
+ * of them
+ */
+const static size_t MAX_ERRORS = 100;
+
+/**
  * @param the function signature to parse
  * @param [out] the number of required arguments in the signature
  * @param [out] the number of total arguments (required + optional) in the signature
@@ -252,6 +259,9 @@ bool t4p::PhpFunctionCallLintClass::ParseString(const UnicodeString& code,
 
 void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr) {
 	if (expr->ExpressionType != pelet::ExpressionClass::VARIABLE) {
+		return;
+	}
+	if (Errors.size() > MAX_ERRORS) {
 		return;
 	}
 	

@@ -30,6 +30,13 @@
 #include <algorithm>
 
 /**
+ * we will stop tracking errors after we have reached this
+ * many.  The user cannot possibly go through all 
+ * of them
+ */
+const static size_t MAX_ERRORS = 100;
+
+/**
  * this function will check to see if an argument is passed by reference. The
  * function 
  * 
@@ -655,6 +662,10 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	if (var->ChainList.empty()) {
 		return;
 	}
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
+	
 	if (HasIndirectVariable) {
 		
 		// an indirect assignment was found, lets not check for uninitialized

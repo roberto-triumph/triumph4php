@@ -76,11 +76,17 @@ public:
 	int TotalFiles;
 
 	/**
-	 * the number of files with at lest one error
+	 * the number of files with at least one error
 	 */
 	int ErrorFiles;
+	
+	/**
+	 * the number of files that were skipped due to
+	 * being larger than normal
+	 */
+	int SkippedFiles;
 
-	LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles);
+	LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles, int skippedFiles);
 
 	wxEvent* Clone() const;
 
@@ -213,6 +219,12 @@ public:
 	 * Running count of files that had zero parse errors.
 	 */
 	int WithNoErrors;
+	
+	/**
+	 * Running count of files that were skipped because they
+	 * are too big.
+	 */
+	int WithSkip;
 	
 private:
 
@@ -428,7 +440,7 @@ public:
 	/**
 	 * Add the file counts to a label.
 	 */
-	void PrintSummary(int totalFiles, int errorFiles);
+	void PrintSummary(int totalFiles, int errorFiles, int skippedFiles);
 
 	/**
 	 * updates the file count label based on errors that have been fixed or new errors that 
@@ -448,6 +460,8 @@ public:
 	void OnRunButton(wxCommandEvent& event);
 	
 	void OnHelpButton(wxCommandEvent& event);
+	
+	void OnSuppressionButton(wxCommandEvent& event);
 	
 	void OnErrorContextMenu(wxDataViewEvent& event);
 	
@@ -472,6 +486,8 @@ private:
 	int TotalFiles;
 
 	int ErrorFiles;
+	
+	int SkippedFiles;
 	
 	DECLARE_EVENT_TABLE()
 };
@@ -538,6 +554,11 @@ public:
 	 * (doesn't make sense to run multiple lints simulatenously)
 	 */
 	void StartLint();
+	
+	/**
+	 * shows the lint suppression panel, or brings it to the forefront
+	 */
+	void ShowSuppressionPanel();
 
 protected: 
 

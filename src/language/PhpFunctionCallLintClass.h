@@ -129,7 +129,9 @@ public:
 	void SetVersion(pelet::Versions version);
 	
 	/**
-	 * Init() method should be called before a file is parsed
+	 * Init() method should be called before a file is parsed. Note that
+	 * if a file has many errors, this class will stop adding	
+	 * errors after a certain amount.
 	 * 
 	 * @param fileName the file to parse and report errors on.
 	 * @param errors any argument count mismatch errors will be 
@@ -139,7 +141,9 @@ public:
 	bool ParseFile(const wxFileName& fileName, std::vector<t4p::PhpFunctionCallLintResultClass>& errors);
 
 	/**
-	 * Init() method should be called before a string is parsed
+	 * Init() method should be called before a string is parsed. Note that
+	 * if a string has many errors, this class will stop adding	
+	 * errors after a certain amount.
 	 *  
 	 * @param code the string to parse and report errors on
 	 * @param errors any uninitialized variable errors will be 

@@ -49,6 +49,13 @@ const int ID_MENU_COPY_ERROR = wxNewId();
 const int ID_MENU_ADD_SUPRESSION = wxNewId();
 
 /**
+ * any files bigger than this size will NOT be
+ * linted.  This is because linters build ASTs
+ * and those can get really big for big files
+ */
+const static int MAX_PARSE_FILESIZE = 5 * 1024 * 1024; // 5 MB
+
+/**
  * the maximum amount of errored files to tolerate.
  * Any more files than this anf we risk having too
  * many error instances in memory. Also, there is 
@@ -84,15 +91,17 @@ wxEvent* t4p::LintResultsEventClass::Clone() const {
 	return cloned;
 }
 
-t4p::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles)
+t4p::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles, 
+		int skippedFiles)
 	: wxEvent(eventId, t4p::EVENT_LINT_SUMMARY)
 	, TotalFiles(totalFiles)
-	, ErrorFiles(errorFiles) {
+	, ErrorFiles(errorFiles)
+	, SkippedFiles(skippedFiles) {
 
 }
 
 wxEvent* t4p::LintResultsSummaryEventClass::Clone() const {
-	return new t4p::LintResultsSummaryEventClass(GetId(), TotalFiles, ErrorFiles);
+	return new t4p::LintResultsSummaryEventClass(GetId(), TotalFiles, ErrorFiles, SkippedFiles);
 }
 
 
@@ -100,6 +109,7 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatu
 		const wxFileName& suppressionFile) 
 : WithErrors(0)
 , WithNoErrors(0) 
+, WithSkip(0)
 , Options(options)
 , Parser() 	
 , VariableLinterOptions()
@@ -130,6 +140,7 @@ void t4p::ParserDirectoryWalkerClass::OverrideIdentifierCheck(bool doIdentifierC
 void t4p::ParserDirectoryWalkerClass::ResetTotals() {
 	WithErrors = 0;
 	WithNoErrors = 0;
+	WithSkip = 0;
 }
 
 void t4p::ParserDirectoryWalkerClass::SetVersion(pelet::Versions version) {
@@ -149,6 +160,16 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	IdentifierResults.clear();
 	CallResults.clear();
 	
+	wxFileName fileToCheck(fileName);
+	
+	// skip files that re really big
+	// we don't want to build a huge AST
+	if (fileToCheck.GetSize() > MAX_PARSE_FILESIZE) {
+		WithSkip++;
+		return ret;
+	}
+	
+	
 	// load suppressions if we have not done so
 	// doing it here to prevent file reads in the foreground thread
 	if (!HasLoadedSuppressions && SuppressionFile.FileExists()) {
@@ -165,9 +186,9 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	
 	// check to see if the all suppressions for a file are 
 	// suppressed. if so, then no need to parse the file
-	wxFileName wxf(fileName);
+	
 	UnicodeString target; // for the "all" suppression, target is not needed
-	if (Suppressions.ShouldIgnore(wxf, target, t4p::SuppressionRuleClass::SKIP_ALL)) {
+	if (Suppressions.ShouldIgnore(fileToCheck, target, t4p::SuppressionRuleClass::SKIP_ALL)) {
 		return ret;
 	}
 
@@ -178,17 +199,17 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 		hasErrors = true;
 	}
 	if (Options.CheckUninitializedVariables) {
-		if (VariableLinter.ParseFile(wxf, VariableResults)) {
+		if (VariableLinter.ParseFile(fileToCheck, VariableResults)) {
 			hasErrors = true;
 		}
 	}
 	if (Options.CheckUnknownIdentifiers) {
-		if (IdentifierLinter.ParseFile(wxf, IdentifierResults)) {
+		if (IdentifierLinter.ParseFile(fileToCheck, IdentifierResults)) {
 			hasErrors = true;
 		}
 	}
 	if (Options.CheckFunctionArgumentCount) {
-		if (CallLinter.ParseFile(wxf, CallResults)) {
+		if (CallLinter.ParseFile(fileToCheck, CallResults)) {
 			hasErrors = true;
 		}
 	}
@@ -360,7 +381,8 @@ void t4p::LintActionClass::BackgroundWork() {
 		// send an event with summary of errors totals
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
-		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles);
+		int skippedFiles = ParserDirectoryWalker.WithSkip;
+		t4p::LintResultsSummaryEventClass summaryEvent(GetEventId(), totalFiles, errorFiles, skippedFiles);
 		PostEvent(summaryEvent);
 	}
 }	
@@ -461,6 +483,7 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 	HelpButton->SetBitmap(
 		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
 	);
+	SuppressionButton->SetBitmap(t4p::BitmapImageAsset(wxT("lint-check-suppression")));
 	
 	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -535,9 +558,10 @@ void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
 	}
 }
 
-void t4p::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles) {
+void t4p::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles, int skippedFiles) {
 	TotalFiles = totalFiles;
 	ErrorFiles = errorFiles;
+	SkippedFiles = skippedFiles;
 	UpdateSummary();
 }
 
@@ -550,6 +574,12 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 	else if (ErrorFiles > MAX_LINT_ERROR_FILES) {
 		this->Label->SetLabel(
 			wxString::Format(_("Found more than %d files with errors; stopping lint check"), MAX_LINT_ERROR_FILES)
+		);
+	}
+	else if (SkippedFiles > 0) {
+		this->Label->SetLabel(
+			wxString::Format(_("Found %d files with errors; checked %d files; skipped %d files"), 
+			ErrorFiles, TotalFiles, SkippedFiles)
 		);
 	}
 	else {
@@ -566,6 +596,10 @@ void t4p::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
 
 void t4p::LintResultsPanelClass::OnRunButton(wxCommandEvent& event) {
 	Feature.StartLint();
+}
+
+void t4p::LintResultsPanelClass::OnSuppressionButton(wxCommandEvent& event) {
+	Feature.ShowSuppressionPanel();
 }
 
 void t4p::LintResultsPanelClass::OnErrorContextMenu(wxDataViewEvent& event) {
@@ -864,6 +898,10 @@ void t4p::LintFeatureClass::StartLint() {
 }
 
 void t4p::LintFeatureClass::OnLintSuppressionsMenu(wxCommandEvent& event) {
+	ShowSuppressionPanel();
+}
+
+void t4p::LintFeatureClass::ShowSuppressionPanel() {
 	wxWindow* window = FindToolsWindow(ID_LINT_SUPPRESSIONS_PANEL);
 	if (window) {
 		SetFocusToToolsWindow(window);
@@ -873,7 +911,7 @@ void t4p::LintFeatureClass::OnLintSuppressionsMenu(wxCommandEvent& event) {
 			GetToolsNotebook(), ID_LINT_SUPPRESSIONS_PANEL, t4p::LintSuppressionsFileAsset(),
 			GetMainWindow()
 		);
-		wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
+		wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check-suppression"));
 		AddToolsWindow(panel, _("Lint Suppressions"), wxEmptyString, lintBitmap);
 	}
 }
@@ -1049,7 +1087,7 @@ void t4p::LintFeatureClass::OnLintSummary(t4p::LintResultsSummaryEventClass& eve
 	wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 	if (window) {
 		t4p::LintResultsPanelClass* resultsPanel = (t4p::LintResultsPanelClass*) window;
-		resultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles);
+		resultsPanel->PrintSummary(event.TotalFiles, event.ErrorFiles, event.SkippedFiles);
 		resultsPanel->EnableRunButton(true);
 	}
 }

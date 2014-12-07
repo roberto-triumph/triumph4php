@@ -48,12 +48,14 @@ class LintResultsGeneratedPanelClass : public wxPanel
 		
 		wxBitmapButton* RunButton;
 		wxBitmapButton* HelpButton;
+		wxBitmapButton* SuppressionButton;
 		wxStaticText* Label;
 		wxDataViewListCtrl* ErrorsList;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSuppressionButton( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

@@ -30,6 +30,13 @@
 #include <unicode/ustring.h>
 #include <algorithm>
 
+/**
+ * we will stop tracking errors after we have reached this
+ * many.  The user cannot possibly go through all 
+ * of them
+ */
+const static size_t MAX_ERRORS = 100;
+
 static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
 
 	// magic methods, never unknown 
@@ -251,6 +258,9 @@ void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceNa
 
 void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, 
 		int startingPos) {
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
 	bool isKnown = CheckClassName(namespaceName);
 	if (!isKnown) {
 		isKnown = CheckNamespace(namespaceName);
@@ -519,7 +529,10 @@ void t4p::PhpIdentifierLintClass::CheckArrayDefinition(pelet::ArrayExpressionCla
 }
 
 void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var) {
-
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
+	
 	// we check to see if the function is a native function first
 	// native functions never have a namespace
 	// but the parser always returns a fully qualified name because
@@ -631,7 +644,10 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 }
 
 void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyClass& methodProp, pelet::VariableClass* var) {
-
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
+	
 	// skip empty methods or "variable methods names
 	// it $this->$methodName()
 	// also skip if we have seen a call to method_exists just exit; as the code
@@ -727,6 +743,9 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 }
 
 void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropertyClass& propertyProp, pelet::VariableClass* var) {
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
 	
 	// only check for static properties (and constants)
 	// for now
@@ -786,6 +805,9 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 
 
 void t4p::PhpIdentifierLintClass::CheckClassNameAndLog(const UnicodeString& className, int lineNumber, int pos) {
+	if (Errors.size() > MAX_ERRORS) {
+		return;
+	}
 	bool isKnown = CheckClassName(className);
 	if (!isKnown) {
 		t4p::PhpIdentifierLintResultClass lintResult;

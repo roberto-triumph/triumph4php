@@ -34,6 +34,13 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	TopSizer->Add( HelpButton, 0, wxALL, 5 );
 	
+	SuppressionButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	SuppressionButton->SetToolTip( wxT("Show Lint Suppressions") );
+	
+	SuppressionButton->SetToolTip( wxT("Show Lint Suppressions") );
+	
+	TopSizer->Add( SuppressionButton, 0, wxALL, 5 );
+	
 	Label = new wxStaticText( this, wxID_ANY, wxT("PHP Lint Results"), wxDefaultPosition, wxDefaultSize, 0 );
 	Label->Wrap( -1 );
 	TopSizer->Add( Label, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -51,6 +58,7 @@ LintResultsGeneratedPanelClass::LintResultsGeneratedPanelClass( wxWindow* parent
 	// Connect Events
 	RunButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnRunButton ), NULL, this );
 	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
+	SuppressionButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnSuppressionButton ), NULL, this );
 }
 
 LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
@@ -58,6 +66,7 @@ LintResultsGeneratedPanelClass::~LintResultsGeneratedPanelClass()
 	// Disconnect Events
 	RunButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnRunButton ), NULL, this );
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnHelpButton ), NULL, this );
+	SuppressionButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintResultsGeneratedPanelClass::OnSuppressionButton ), NULL, this );
 	
 }
 
