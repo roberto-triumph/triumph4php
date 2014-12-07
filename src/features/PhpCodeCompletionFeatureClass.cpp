@@ -59,7 +59,7 @@ static wxString PhpCallTipSignature(size_t index, const std::vector<t4p::TagClas
 		callTip = sig;
 	}
 	else {
-		callTip = wxString::Format(wxT("\001 %u of %u \002 "), index + 1, size) + sig;
+		callTip = wxString::Format(wxT("\001 %ld of %ld \002 "), index + 1, size) + sig;
 	}
 	return callTip;
 }
