@@ -190,6 +190,7 @@ private:
 	t4p::FunctionSignatureLookupClass FunctionSignatureLookup;
 	t4p::MethodSignatureLookupClass MethodSignatureLookup;
 	t4p::FunctionSignatureLookupClass NativeFunctionSignatureLookup;
+	t4p::MethodSignatureLookupClass NativeMethodSignatureLookup;
 };
 
 }

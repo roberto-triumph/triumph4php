@@ -137,35 +137,62 @@ static bool LookupFunction(const UnicodeString& name, int& signatureRequiredArgC
  *              will be set in this variable if the function is found.
  * @param [out] signatureTotalArgCount the total number of arguments (required + optional)
  *              will be set in this variable if the function is found.
- * @param methodLookup the prepared statement used to lookup the function
+ * @param methodLookup the prepared statement used to lookup the method
+ * @param nativeMethodLookup the prepared statement used to lookup the method in the
+ *        native tags
  * @return bool TRUE if all of the following are true:
  *         method exists only once
  *         method has known number of arguments (ie not variable arguments like sprintf)
  */
 static bool LookupMethod(const UnicodeString& name, bool isStatic, int& signatureRequiredArgCount, 
 		int& signatureTotalArgCount,
-		t4p::MethodSignatureLookupClass& methodLookup) {
+		t4p::MethodSignatureLookupClass& methodLookup,
+		t4p::MethodSignatureLookupClass& nativeMethodLookup) {
 	bool found = false;
 	wxString error;
 	UnicodeString signature;
 	bool hasVariableArgs = false;
+	int matchCount = 0;
 	
 	methodLookup.Set(name, isStatic);
+	nativeMethodLookup.Set(name, isStatic);
 	if (methodLookup.ReExec(error) && methodLookup.Found()) {
 		methodLookup.Next();
+		matchCount++;
 		
 		// we only return true if there is 1 and only 1 match
-		if (!methodLookup.More()) {		
+		if (!methodLookup.More()) {
 			signature = methodLookup.Signature;
 			hasVariableArgs = methodLookup.HasVariableArgs;
 		}
 	}
+	if (nativeMethodLookup.ReExec(error) && nativeMethodLookup.Found()) {
+		matchCount++;
+		
+		// we only return true if there is 1 and only 1 match
+		if (!nativeMethodLookup.More()) {
+			matchCount++;
+			signature = nativeMethodLookup.Signature;
+			hasVariableArgs = nativeMethodLookup.HasVariableArgs;
+		}
+	}
 	
 	if (!signature.isEmpty() && !hasVariableArgs) {
-		 CountArgs(signature, signatureRequiredArgCount, signatureTotalArgCount);
+		CountArgs(signature, signatureRequiredArgCount, signatureTotalArgCount);
 		found = true;
 	}
+	
+	if (matchCount > 1) {
+		
+		// we found the same method name in the global tag and the native
+		// tags.  we don't know which signature to choose, so lets ignore
+		// for now.
+		found = false;
+		signatureRequiredArgCount = 0;
+		signatureTotalArgCount = 0;
+	}
 	return found;
+	
 }
 
 t4p::PhpFunctionCallLintResultClass::PhpFunctionCallLintResultClass() 
@@ -211,7 +238,8 @@ t4p::PhpFunctionCallLintClass::PhpFunctionCallLintClass()
 , File()
 , FunctionSignatureLookup()
 , MethodSignatureLookup()
-, NativeFunctionSignatureLookup() {
+, NativeFunctionSignatureLookup() 
+, NativeMethodSignatureLookup() {
 	Parser.SetExpressionObserver(this);
 }
 
@@ -220,6 +248,7 @@ void t4p::PhpFunctionCallLintClass::Init(t4p::TagCacheClass& tagCache) {
 	tagCache.GlobalPrepare(FunctionSignatureLookup, true);
 	tagCache.GlobalPrepare(MethodSignatureLookup, true);
 	tagCache.GlobalPrepare(NativeFunctionSignatureLookup, true);
+	tagCache.NativePrepare(NativeMethodSignatureLookup, true);
 }
 
 void t4p::PhpFunctionCallLintClass::SetVersion(pelet::Versions version) {
@@ -294,7 +323,7 @@ void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr
 				// a long variable calls, ie $this->user->getName()
 				found = LookupMethod(functionName, isStatic, 
 					signatureRequiredArgCount, signatureTotalArgCount,
-					MethodSignatureLookup);
+					MethodSignatureLookup, NativeMethodSignatureLookup);
 			}
 			
 			if ((found && callArgCount < signatureRequiredArgCount) || 

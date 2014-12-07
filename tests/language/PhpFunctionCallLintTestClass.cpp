@@ -194,6 +194,22 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariable
 	CHECK_EQUAL(false, HasError);
 }
 
+/*
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMissing) {
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"stripos('123 today is');\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(true, HasError);
+	CHECK_VECTOR_SIZE(1, Results);
+	CHECK_EQUAL(t4p::PhpFunctionCallLintResultClass::TOO_FEW_ARGS, Results[0].Type);
+	CHECK_UNISTR_EQUALS("stripos", Results[0].Identifier);
+	CHECK_EQUAL(2, Results[0].ExpectedCount);
+	CHECK_EQUAL(1, Results[0].ActualCount);
+}
+*/
+
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodArgumentMatch) {
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -225,6 +241,32 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodArgumentMissing) {
 	CHECK_UNISTR_EQUALS("myFunc", Results[0].Identifier);
 	CHECK_EQUAL(3, Results[0].ExpectedCount);
 	CHECK_EQUAL(2, Results[0].ActualCount);
+}
+
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
+	
+	// test that when there is a method name clash
+	// between that we do not attempt to check the arguments
+	// here we will make a method with the same name as a
+	// method defined in native functions.
+	//
+	// FYI: when we look for method signature, we don't yet
+	// narrow down to methods from a class yet since its
+	// hard to know the type of a variable
+	//
+	// getElementsByTagName is a native method defined in DomElement
+	// and it has 1 argument.
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"class MyClass {\n"
+		"  function getElementsByTagName($a, $d) {\n"
+		"  }\n"
+		"}\n"
+		"$obj = new DOMElement();\n"
+		"$obj->getElementsByTagName('123');\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
 }
 
 }
