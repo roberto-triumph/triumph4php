@@ -139,7 +139,7 @@ public:
 	 * 
 	 * @param session the connection.  must be around for as long as this result is alive.
 	 * @param doLimit boolean if TRUE there should be a limit on the query
-	 * @return bool subclasses should return TRUE if there is at least one result
+	 * @return bool will return TRUE if there is at least one result row
 	 */
 	bool Exec(soci::session& session, bool doLimit);
 

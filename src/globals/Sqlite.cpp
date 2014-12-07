@@ -182,6 +182,7 @@ t4p::SqliteResultClass::~SqliteResultClass() {
 
 bool t4p::SqliteResultClass::Init(soci::session& session, bool doLimit) {
 	bool good = false;
+	wxASSERT_MSG(NULL == Stmt, "result can only be initialized once");
 	try {
 		soci::statement* stmt = new soci::statement(session);
 		Stmt = stmt;
@@ -269,5 +270,5 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 		delete Stmt;
 		Stmt = NULL;
 	}
-	return Stmt;
+	return !IsEmpty;
 }
