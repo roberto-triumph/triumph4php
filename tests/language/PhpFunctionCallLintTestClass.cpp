@@ -92,7 +92,6 @@ public:
 			tagFinderList->Walk(search);
 		}
 		TagCache.RegisterGlobal(tagFinderList);
-		Lint.Init(TagCache);
 	}
 };
 

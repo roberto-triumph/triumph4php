@@ -68,6 +68,8 @@ public:
 	void Parse(const UnicodeString& code) {
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 		BuildCache(true);
+		
+		Lint.Init(TagCache);
 		HasError = Lint.ParseString(code, Results);
 	}
 
@@ -93,7 +95,6 @@ public:
 			tagFinderList->Walk(search);
 		}
 		TagCache.RegisterGlobal(tagFinderList);
-		Lint.Init(TagCache);
 	}
 };
 
@@ -115,7 +116,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassAndFunction) {
 		"  doPrint($a);\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -136,7 +136,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
 		"  $a = new UtilClass();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -160,7 +159,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassSelfReference) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -184,7 +182,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassParentReference) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -209,7 +206,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -237,7 +233,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -262,7 +257,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, SameClassReference) {
 
 	UnicodeString code = t4p::WxToIcu(cacheCode);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -286,7 +280,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -310,7 +303,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
 		"}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -332,7 +324,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 	);
 
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -353,7 +344,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
 	);
 
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -374,7 +364,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeProperty) {
 	);
 
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
@@ -392,7 +381,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 		"  $a = new NoneClass();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -415,7 +403,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 		"  $a = NyClass::work();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -438,7 +425,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownBaseClass) {
 		"class MyInheritedClass extends UnknownClass {}"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -461,7 +447,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
 		"class MyInheritedClass extends MyClass implements BadClass, UnknownClass {}"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(2, Results);
@@ -489,7 +474,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCo
 		"  $a = new Util\\MyClass();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 	CHECK_VECTOR_SIZE(0, Results);
@@ -515,7 +499,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
 		"  $a = new \\MyClass();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -536,7 +519,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
 		"  myFirst();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -560,7 +542,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
 		"MyFirstFunction(MySecondFunction(), MyThirdFunction());\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -585,7 +566,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
 		"MyThirdFunction()->name = MySecondFunction();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -607,7 +587,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownMethod) {
 		"$myc->notFound();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -632,7 +611,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticMethod) {
 		"MyClass::work();\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -654,7 +632,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
 		"$myc->name;\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -684,7 +661,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
        "}\n"
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache(true);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 	CHECK_VECTOR_SIZE(0, Results);
@@ -710,7 +686,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
 		"use UtilUnknown as U;\n"         // an aliased namespace
 	);
 	SetupFile(wxT("MyClass.php"), cacheCode);
-	BuildCache();
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(2, Results);
