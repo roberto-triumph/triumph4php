@@ -1355,11 +1355,22 @@ void t4p::FunctionSignatureLookupClass::DoBind(soci::statement& stmt) {
 
 void t4p::FunctionSignatureLookupClass::Next() {
 	
-	// nothing else as variable is already bound
-	// fetch gets the next row
-	Fetch();
+	// very important to assign to instance variables
+	// AND THEN fetch the next row, what way
+	// we can do this when looping
+	//
+	//  if (lookup.Exec()) {
+	//    while (lookup.More()) {
+	//      lookup.Next();
+	//      // HasVariableArgs, Signature is the first row
+	//      // in the first loop iteration
+	//
+	//    }
+	// }
 	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
+	
+	Fetch();
 }
 
 bool t4p::FunctionSignatureLookupClass::Found() {
@@ -1427,12 +1438,22 @@ void t4p::MethodSignatureLookupClass::DoBind(soci::statement& stmt) {
 
 void t4p::MethodSignatureLookupClass::Next() {
 	
-	// nothing else as variable is already bound
-	// fetch gets the next row
-	Fetch();
-	
+	// very important to assign to instance variables
+	// AND THEN fetch the next row, what way
+	// we can do this when looping
+	//
+	//  if (lookup.Exec()) {
+	//    while (lookup.More()) {
+	//      lookup.Next();
+	//      // HasVariableArgs, Signature is the first row
+	//      // in the first loop iteration
+	//
+	//    }
+	// }
 	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
+	
+	Fetch();
 }
 
 bool t4p::MethodSignatureLookupClass::Found() {

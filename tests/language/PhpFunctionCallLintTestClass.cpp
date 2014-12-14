@@ -162,6 +162,18 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, FunctionArgumentMultipleDefaul
 	CHECK_EQUAL(false, HasError);
 }
 
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, FunctionWithNoArguments) {
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"function myFunc() {\n"
+		"}\n"
+		"myFunc();\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMatch) {
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -188,13 +200,25 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariable
 	// then the linter should recognize that
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
-		"printf('123 today is %s', date());\n"
+		"printf('123 today is %s', date('Y-m-d'));\n"
 	);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
 
-/*
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionOptionalArgumentsArgs) {
+	
+	// since gmdate has the timestamp arg is optional
+	// then the linter should recognize that
+	// and not label it as an error
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"echo 'today is ' . gmdate('Y-m-d', now());\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMissing) {
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -208,7 +232,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMissing)
 	CHECK_EQUAL(2, Results[0].ExpectedCount);
 	CHECK_EQUAL(1, Results[0].ActualCount);
 }
-*/
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodArgumentMatch) {
 	UnicodeString code = t4p::CharToIcu(
@@ -264,6 +287,44 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
 		"}\n"
 		"$obj = new DOMElement();\n"
 		"$obj->getElementsByTagName('123');\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionJoin) {
+	
+	// the join function is special as it can have
+	// either 1 or 2 args
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"echo join(',', array(1, 2));\n"
+		"echo implode(array(1, 2));\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionRand) {
+	
+	// the rand / mt_rand functions are special as they can have
+	// either 0 or 2 args
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"echo rand();\n"
+		"echo mt_rand(1, 100);\n"
+	);
+	Parse(code);
+	CHECK_EQUAL(false, HasError);
+}
+
+TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionStripos) {
+	
+	// the stripos functions is special as the last 
+	// argument is optional
+	UnicodeString code = t4p::CharToIcu(
+		"<?php\n"
+		"echo stripos('haystack', 'needle', 5);\n"
 	);
 	Parse(code);
 	CHECK_EQUAL(false, HasError);

@@ -1170,7 +1170,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
 	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	
+	// 4 == there are 4 different signature for PDO query
+	// see http://php.net/manual/en/pdo.query.php
+	CHECK_VECTOR_SIZE(4, ResourceMatches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("query"), ResourceMatches[0].Identifier);
 }
 
@@ -1191,7 +1194,10 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 	ToProperty(UNICODE_STRING_SIMPLE("$pdo"), UNICODE_STRING_SIMPLE("que"), false, false);
 	CompletionSymbolTable.ExpressionCompletionMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		VariableMatches, ResourceMatches, DoDuckTyping, Error);
-	CHECK_VECTOR_SIZE(1, ResourceMatches);
+	
+	// 4 == there are 4 different signature for PDO query
+	// see http://php.net/manual/en/pdo.query.php
+	CHECK_VECTOR_SIZE(4, ResourceMatches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("query"), ResourceMatches[0].Identifier);
 }
 

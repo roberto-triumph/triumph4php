@@ -748,23 +748,25 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNa
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("bool function array_key_exists($key, $array)"), Matches[0].Signature);
 	CHECK_UNISTR_EQUALS("bool", Matches[0].ReturnType);
 	CHECK_UNISTR_EQUALS("array_keys", Matches[1].Identifier);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array function array_keys($array, $search_value, $strict = false)"), Matches[1].Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("array function array_keys($array, [ $search_value ], [ $strict = false ])"), Matches[1].Signature);
 	CHECK_UNISTR_EQUALS("array", Matches[1].ReturnType);
 	CHECK(Matches[0].IsNative);
 	CHECK(Matches[1].IsNative);
 
 	// test a built-in object
+	// 4 == there are 4 different signature for PDO query
+	// see http://php.net/manual/en/pdo.query.php
 	NearMatchTags(UNICODE_STRING_SIMPLE("pdo::que"));
-	CHECK_VECTOR_SIZE(1, Matches);
+	CHECK_VECTOR_SIZE(4, Matches);
 	CHECK_UNISTR_EQUALS("query", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("PDO", Matches[0].ClassName);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement, $PDO::FETCH_COLUMN, $colno, $PDO::FETCH_CLASS, $classname, $ctorargs, $PDO::FETCH_INTO, $object)"), Matches[0].Signature);
+	CHECK_EQUAL(UNICODE_STRING_SIMPLE("PDOStatement function query($statement)"), Matches[0].Signature);
 	CHECK_UNISTR_EQUALS("PDOStatement", Matches[0].ReturnType);
 	CHECK(Matches[0].IsNative);
 
 	// test a built-in object query for all methods
 	NearMatchTags(UNICODE_STRING_SIMPLE("PDO::"));
-	CHECK_VECTOR_SIZE(93, Matches);
+	CHECK_VECTOR_SIZE(100, Matches);
 	
 	// a fully qualified search
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\Exception"));

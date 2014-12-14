@@ -34,6 +34,73 @@
 const static size_t MAX_ERRORS = 100;
 
 /**
+ * @return int the index to the start of the next variable in the signature
+ *         if there are no more variables then the function returns -1
+ *         the function correctly handles the case where the signature
+ *         contains default values with '()' like for  example the 
+ *         date signature
+ *         
+ *         date($format, [ $timestamp = now() ])
+ *//*
+static int NextVariableStart(const UnicodeString& signature, int32_t start) {
+	int braceDepth = 0;
+	int32_t i = start;
+	for (; i < signature.length(); ++i) {
+		if (signature[i] == '(') {
+			braceDepth++;
+		}
+		if (signature[i] == ')') {
+			braceDepth--;
+		}
+		
+		if (braceDepth < 0) {
+			i++;
+			break;
+		}
+		if (signature[i] == ',') {
+			i++;
+			break;
+		}
+	}
+	return i == signature.length() ? -1 : i;
+}
+*/
+
+/**
+ * @return int the index to the end of the current variable in the signature
+ *         if there are no more variables then the function returns the index of
+ *         the ending close parenthesis
+ *         the function correctly handles the case where the signature
+ *         contains default values with '()' like for  example the 
+ *         date signature
+ *         
+ *         date($format, [ $timestamp = now() ])
+ */
+static int VariableEnd(const UnicodeString& signature, int32_t start) {
+	int braceDepth = 0;
+	int32_t i = start;
+	for (; i < signature.length(); ++i) {
+		if (signature[i] == '(') {
+			braceDepth++;
+		}
+		if (signature[i] == ')') {
+			braceDepth--;
+		}
+		
+		if (signature[i] == ',') {
+			i++;
+			break;
+		}
+		if (signature[i] == ')' && braceDepth < 0) {
+			
+			// the end of the signature
+			break;
+		}
+	}
+	return i;
+}
+
+/**
  * @param the function signature to parse
  * @param [out] the number of required arguments in the signature
  * @param [out] the number of total arguments (required + optional) in the signature
@@ -41,33 +108,30 @@ const static size_t MAX_ERRORS = 100;
 static void CountArgs(const UnicodeString& signature, int& required, int& total) {
 	required = 0;
 	total = 0;
-	int32_t start = signature.indexOf('(');
-	int32_t next = signature.indexOf(',', start);
-	if (next < 0) {
-			
-		// only 1 argument, look for the ending )
-		next = signature.indexOf(')', next + 1);
-	}
-	while (next > 0 && next > (start + 1)) {
-			
-		// this is the argument that we want to 
-		// check for default arguments (they will have an '='
-		// in the signature)
-		UnicodeString variable;
-		signature.extract(start, (next - start + 1), variable);
-		if (variable.indexOf('=') < 0) {
-			required++;
-		}
-		total++;
+	
+ 	int32_t start = signature.indexOf('(');
+	int32_t next = VariableEnd(signature, start + 1);
+	if (next > (start + 1)) {
 		
-		// find the end of the next variable
-		start = next;
-		next = signature.indexOf(',', start + 1);
-		if (next < 0) {
-			next = start;
+		// here means we have at least 1 argument watch out for "string function doIt()"
+		while (start >= 0 && start < signature.length()) {
+				
+			// this is the argument that we want to 
+			// check for default arguments (they will have an '='
+			// in the signature)
+			// also, native functions define optional arguments (ie
+			// not necessary but no default value) with square
+			// brackets "[]"
+			UnicodeString variable;
+			signature.extract(start, (next - start + 1), variable);
+			if (variable.indexOf('=') < 0 && variable.indexOf('[') < 0) {
+				required++;
+			}
+			total++;
 			
-			// last argument, look for the ending )
-			next = signature.indexOf(')', next + 1);
+			// find the end of the next variable
+			start = next + 1;
+			next = VariableEnd(signature, start);
 		}
 	}
 }
@@ -109,20 +173,40 @@ static bool LookupFunction(const UnicodeString& name, int& signatureRequiredArgC
 			signature = functionLookup.Signature;
 			hasVariableArgs = functionLookup.HasVariableArgs;
 		}
-	}
-	else if (nativeFunctionLookup.ReExec(error) && nativeFunctionLookup.Found()) {
-		nativeFunctionLookup.Next();
-		
-		// we only return true if there is 1 and only 1 match
-		if (!nativeFunctionLookup.More()) {		
-			signature = nativeFunctionLookup.Signature;
-			hasVariableArgs = nativeFunctionLookup.HasVariableArgs;
+		if (!signature.isEmpty() && !hasVariableArgs) {
+			CountArgs(signature, signatureRequiredArgCount, signatureTotalArgCount);
+			found = true;
 		}
 	}
-	
-	if (!signature.isEmpty() && !hasVariableArgs) {
-		CountArgs(signature, signatureRequiredArgCount, signatureTotalArgCount);
-		found = true;
+	else if (nativeFunctionLookup.ReExec(error) && nativeFunctionLookup.Found()) {
+				
+		// some native functions have more than 1 signature we look at
+		// all of the signatures.
+		// since we are looking ar multiple signature, the required 
+		// args is the least number of required args, the 
+		// total args is the most number of total args
+		//
+		signatureRequiredArgCount = -1;   // -1 so that zero can be set 
+		signatureTotalArgCount = 0;      // as a req/total var count
+		while (nativeFunctionLookup.More()) {
+			nativeFunctionLookup.Next();
+			
+			signature = nativeFunctionLookup.Signature;
+			hasVariableArgs = nativeFunctionLookup.HasVariableArgs;
+			if (!hasVariableArgs && !signature.isEmpty()) {
+				found = true;
+				int required = 0;
+				int total = 0;
+				CountArgs(signature, required, total);
+				if (signatureRequiredArgCount == -1 || required < signatureRequiredArgCount) {
+					signatureRequiredArgCount = required;
+				}
+				if (signatureTotalArgCount < total) { 
+					signatureTotalArgCount = total;
+				}
+			}
+		}
+		
 	}
 	return found;
 }
@@ -247,7 +331,7 @@ t4p::PhpFunctionCallLintClass::PhpFunctionCallLintClass()
 void t4p::PhpFunctionCallLintClass::Init(t4p::TagCacheClass& tagCache) {
 	tagCache.GlobalPrepare(FunctionSignatureLookup, true);
 	tagCache.GlobalPrepare(MethodSignatureLookup, true);
-	tagCache.GlobalPrepare(NativeFunctionSignatureLookup, true);
+	tagCache.NativePrepare(NativeFunctionSignatureLookup, true);
 	tagCache.NativePrepare(NativeMethodSignatureLookup, true);
 }
 
@@ -321,6 +405,12 @@ void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr
 			else {
 				
 				// a long variable calls, ie $this->user->getName()
+				// note that calls like parent::method() and self::method()
+				// are not static method calls
+				isStatic = isStatic 
+						&& var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) != 0
+						&& var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) != 0;
+				
 				found = LookupMethod(functionName, isStatic, 
 					signatureRequiredArgCount, signatureTotalArgCount,
 					MethodSignatureLookup, NativeMethodSignatureLookup);
