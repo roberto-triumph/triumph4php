@@ -68,10 +68,23 @@ void t4p::FileModifiedCheckFeatureClass::FilesModifiedPrompt(std::map<wxString, 
 
 		// find the control for the file and revert the contents
 		if (filesToPrompt.find(fileName) != filesToPrompt.end()) {
-			filesToPrompt[fileName]->Revert();
+			
+			t4p::CodeControlClass* code = filesToPrompt[fileName];
+			
+			int currentLine = code->GetCurrentLine();
+			code->Freeze();
+			code->Revert();
+			
+			if (currentLine <= code->GetLineCount()) {
+				
+				// stc uses zero-based line numbers, this method
+				// accepts 1-based line numbers
+				code->GotoLineAndEnsureVisible(currentLine + 1);
+			}
+			code->Thaw();
 
 			// need to notify the app that the file was reloaded
-			t4p::CodeControlEventClass revertEvt(t4p::EVENT_APP_FILE_REVERTED, filesToPrompt[fileName]);
+			t4p::CodeControlEventClass revertEvt(t4p::EVENT_APP_FILE_REVERTED, code);
 			App.EventSink.Publish(revertEvt);
 			revertedFiles.push_back(fileName);
 		}
