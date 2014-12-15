@@ -449,8 +449,8 @@ void t4p::DirectorySearchClass::EnumerateAllFiles(const wxString& path) {
 		while (next) {
 			if (!filename.IsEmpty()) {
 				wxString fullPath = path + filename;
-				TotalFileCount++;
 				if (MatchesWildcards(fullPath)) {
+					TotalFileCount++;
 					CurrentFiles.push(fullPath);
 				}
 			}
