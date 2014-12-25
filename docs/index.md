@@ -47,6 +47,7 @@ please ask a question in the [support forums](http://support.triumph4php.com/for
   * [Find](/find/)
   * [Find In Files](/find-in-files/)
   * [Explorer](/explorer/)
+  * [File Cabinet](/file-cabinet/)
   * [Framework Detection](/framework-detection/)
   * [Config Detectors](/config-detectors/)
   * [Database Detectors](/database-detectors/)

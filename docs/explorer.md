@@ -1,9 +1,10 @@
-[Table Of Contents](/#toc) | [Next - Framework Detection](/framework-detection/)
+[Table Of Contents](/#toc) | [Next - File Cabinet](/file-cabinet/)
 
 #Explorer#
 
 triumph4php has a pretty handy explorer panel. The explorer panel shows
-you the files and sub-directories of any directory you choose.
+you the files and sub-directories of *any* directory you choose. It will
+default to show you the source directories for all enabled projects.
 
 Clicking on the "Explore Projects" button of the toolbar will open
 the explorer panel.  If there is already an explorer panel open, it 
@@ -50,4 +51,4 @@ by using the View -> Explorer In Outline then the explorer panel is placed
 at the left-hand side of the screen (the "Outline" notebook). 
 
 
-[Table Of Contents](/#toc) | [Next - Framework Detection](/framework-detection/)
+[Table Of Contents](/#toc) | [Next - File cabinet](/file-cabinet/)
