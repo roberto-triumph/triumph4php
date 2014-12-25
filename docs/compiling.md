@@ -53,7 +53,7 @@ install them.  One nice way to install them is by using Chocolatey for windows
 
 ##Step 3: Download the triumph4php repo##
 
-    git clone https://code.google.com/p/triumph4php triumph4php
+    git clone https://github.com/robertop/triumph4php triumph4php
 	cd triumph4php
 	
 ##Step 4: Run the build script that sets up the dependent libraries##
@@ -91,7 +91,7 @@ to an hour, depending on your machine's processing power.
 
 ##Step 3: Download the triumph4php repo##
 
-    git clone https://code.google.com/p/triumph4php triumph4php
+    git clone https://github.com/robertop/triumph4php triumph4php
 	cd triumph4php
 	
 ##Step 4: Run the build script that sets up the dependent libraries##
@@ -134,7 +134,7 @@ and [wxFormBuilder](http://wxformbuilder.org)
 
 ##Step 3: Download the triumph4php repo##
 
-    git clone https://code.google.com/p/triumph4php triumph4php
+    git clone https://github.com/robertop/triumph4php triumph4php
 	cd triumph4php
 	
 ##Step 4: Run the build script that sets up the dependent libraries##

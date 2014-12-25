@@ -5,7 +5,7 @@
 One of the most useful features on an IDE is the ability to jump around the
 source code without needing to manually opening files.  Once you
 have added your projects, you will be able to jump to any class, method, function
-or file in your class.
+or file in your projects.
 
 Go to Search .. Total Search.  A dialog shows up prompting you the item to
 look for.  As soon as you start typing, the results list will update 

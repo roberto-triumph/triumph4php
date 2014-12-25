@@ -13,10 +13,14 @@ Interesting facts about the file cabinet:
 
 #Why would I use this? I have already created a project#
 The file cabinet is most useful to access files or directories that are not in
-a project, like apache config files, php.ini files, or log directories. The main
+a project, like apache config files or php.ini files. The main
 motivation was that you can add the php.ini in the file cabinet, then easily 
 open it when you need to edit it. Another motivation was to save the apache
 config directory to the file cabinet, so that virtual host entries can be
 edited with ease.
+
+*__TIP__: triumph4php can open and save files that are writable by an 
+administrator / root user !*
+
 
 [Table Of Contents](/#toc) | [Next - Framework Detection](/framework-detection/)

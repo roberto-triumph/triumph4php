@@ -15,7 +15,7 @@ following:
 
 	The location where triumph4php can be store its settings is configurable.
 	By default, triumph will store its configuration in the user data directory
-	(/home/user/.triumph4php on Linux, C:\Users\user\AppData\Roaming\.triumph4php
+	(/home/user/.triumph4php on Linux, C:\Users\user\AppData\Roaming\\.triumph4php
 	on windows). You can choose to store the configuration in another directory,
 	or in the same directory as the executable.  Storing the configuration
 	in the same directory as the executable is known as "portable" executable; you

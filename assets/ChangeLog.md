@@ -1,6 +1,25 @@
 Triumph 4 PHP ChangeLog
 =======================
 
+#Version 0.5.3#
+* PHP lint check greatly improved. Lint check now warns about uninitialized 
+  variables used in function calls.  (Linux, MSW)
+* PHP lint check contains a suppressions list that defines rules to ignore lint
+  errors from files / directories. This is done so that lint check shows only 
+  real problems. (Linux, MSW) 
+* Code completion is more robust by being able to complete on local variables
+* even when a file contains syntax errors. (Linux, MSW)
+* Call tips did not work correctly inside nested function calls. (Linux, MSW)
+* Non-PHP files were not automatically added to the tag cache, therefore
+  the total search dialog would not list them. (Linux, MSW)
+* New File cabinet feature to store frequently accessed files or directories 
+  to be accessed at a later time (Linux, MSW)
+* Files that can only be modified by an administrator / root user can now
+  be saved without Triumph needing to be run as an administrator / root user. 
+  (Linux, MSW)
+* The current line being debugged is now easier to spot because it is focused
+  to the middle of the screen when possible. (Linux, MSW)	
+
 #Version 0.5.2#
 * Triumph is now a full Xdebug client (Linux, MSW)
 * Triumph can be used for remote Xdebug debugging (Linux, MSW)

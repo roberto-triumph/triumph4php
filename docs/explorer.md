@@ -4,7 +4,7 @@
 
 triumph4php has a pretty handy explorer panel. The explorer panel shows
 you the files and sub-directories of *any* directory you choose. It will
-default to show you the source directories for all enabled projects.
+default to show you the source directories for all enabled projects.
 
 Clicking on the "Explore Projects" button of the toolbar will open
 the explorer panel.  If there is already an explorer panel open, it 
