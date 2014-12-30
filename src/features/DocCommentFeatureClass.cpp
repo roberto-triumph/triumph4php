@@ -181,7 +181,7 @@ void t4p::DocCommentFeatureClass::ShowDocComment(t4p::CodeControlClass* ctrl, in
 	std::vector<t4p::TagClass> matches = App.Globals.TagCache.GetTagsAtPosition(
 		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
 		App.Globals.AllEnabledSourceDirectories(),
-		App.Globals,
+		App.Globals.Environment.Php.Version,
 		matchError
 	);
 	wxString msg;

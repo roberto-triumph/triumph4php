@@ -625,7 +625,7 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 			std::vector<t4p::TagClass> matches = Globals.TagCache.GetTagsAtPosition(
 				ctrl->GetIdString(), ctrl->GetSafeText(), currentPos, 
 				Globals.AllEnabledSourceDirectories(),
-				Globals,
+				Globals.Environment.Php.Version,
 				status
 			);
 			

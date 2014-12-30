@@ -25,9 +25,7 @@
 #include <language/TagCacheClass.h>
 #include <language/TagFinderList.h>
 #include <language/DetectedTagFinderResultClass.h>
-#include <globals/Assets.h>
 #include <globals/Sqlite.h>
-#include <globals/GlobalsClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
@@ -239,15 +237,6 @@ t4p::WorkingCacheClass* t4p::TagCacheClass::GetWorking(const wxString& fileName)
 
 void t4p::TagCacheClass::RegisterGlobal(t4p::TagFinderListClass* cache) {
 	TagFinderList = cache;
-}
-
-void t4p::TagCacheClass::RegisterDefault(t4p::GlobalsClass& globals) {
-	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
-		globals.Environment.Php.Version);
-	cache->InitNativeTag(t4p::NativeFunctionsAsset());
-	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	RegisterGlobal(cache);
 }
 
 t4p::TagResultClass* t4p::TagCacheClass::ExactTags(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
@@ -662,7 +651,8 @@ bool t4p::TagCacheClass::HasDir(const wxString& dir) {
 std::vector<t4p::TagClass> t4p::TagCacheClass::GetTagsAtPosition(
 		const wxString& fileName, 
 		const UnicodeString& code, int posToCheck, 
-		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
+		const std::vector<wxFileName>& sourceDirs, 
+		pelet::Versions phpVersion,
 		wxString& status) {
 	std::vector<t4p::TagClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
@@ -671,9 +661,9 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::GetTagsAtPosition(
 	pelet::ScopeClass variableScope;
 	pelet::VariableClass parsedVariable(variableScope);
 
-	lexer.SetVersion(globals.Environment.Php.Version);
-	parser.SetVersion(globals.Environment.Php.Version);
-	scopeFinder.SetVersion(globals.Environment.Php.Version);
+	lexer.SetVersion(phpVersion);
+	parser.SetVersion(phpVersion);
+	scopeFinder.SetVersion(phpVersion);
 	
 	UnicodeString codeUntilPos(code, 0, posToCheck);
 	

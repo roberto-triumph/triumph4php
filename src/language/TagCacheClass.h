@@ -44,7 +44,6 @@ class TagFinderClass;
 class TagResultClass;
 class FileTagResultClass;
 class ParsedTagFinderClass;
-class GlobalsClass;
 
 /**
  * The working cache is an in-memory cache of source code that is being edited
@@ -198,16 +197,6 @@ public:
 	 * @param tagFinderList this class will own the pointer
 	 */
 	void RegisterGlobal(t4p::TagFinderListClass* tagFinderList);
-
-	/**
-	 * Set the global cache using the default settings (from Asset). After a call
-	 * to this method, the cache is available for use by 
-	 * the ExpressionCompletionMatches and ResourceMatches methods
-	 * This method clones data structures where necessary, so that this
-	 * TagCache can be used from a separate thread than where globals
-	 * resides
-	 */
-	void RegisterDefault(t4p::GlobalsClass& globals);
 	
 	/**
 	 * Searches the parsed tag finder
@@ -445,7 +434,7 @@ public:
 	 * @param code the code of the document being checked
 	 * @param int the character position in the document to check
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
-	 * @param globals to get the PHP version (to parse the code)
+	 * @param phpVersion the PHP version (to parse the code)
 	 * @param [out] status if there is an error querying for tags, error will be set. this is a human-friendly
 	 *        error message
 	 * @return tag matches
@@ -453,7 +442,7 @@ public:
 	std::vector<TagClass> GetTagsAtPosition(
 		const wxString& fileName, 
 		const UnicodeString& code, int posToCheck,
-		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
+		const std::vector<wxFileName>& sourceDirs, pelet::Versions phpVersion,
 		wxString& status);
 		
 	/**
