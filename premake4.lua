@@ -276,7 +276,9 @@ function pickywarnings(action)
 		-- since Visual Studio is not C99 compliant
 		buildoptions { "-Wall", "-Werror", "-Wvla" }
 	end
-end-- solution directory structure
+end
+
+-- solution directory structure
 -- the toolset files will be deposited in the build/ directory
 -- each toolset will have its own directory
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
