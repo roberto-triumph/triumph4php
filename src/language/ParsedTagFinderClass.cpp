@@ -349,7 +349,7 @@ t4p::NearMatchMemberTagResultClass::NearMatchMemberTagResultClass()
 	, FileItemId(0) {
 }
 
-void t4p::NearMatchMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+void t4p::NearMatchMemberTagResultClass::SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 												int fileItemId,
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
@@ -1677,7 +1677,7 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
 		}
 		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 
-		nearMatchMembersResult->Set(classHierarchy, GetMethodName(), GetFileItemId(), GetSourceDirs());
+		nearMatchMembersResult->SetNearMatchArgs(classHierarchy, GetMethodName(), GetFileItemId(), GetSourceDirs());
 		results = nearMatchMembersResult;
 	}
 	else if ((t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
@@ -2046,7 +2046,7 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p
 		// to make all of the keys we need to look for. remember that a tag class key is of the form
 		// ClassName::MethodName
 		t4p::NearMatchMemberTagResultClass nearMatchMemberResult;
-		nearMatchMemberResult.Set(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetFileItemId(), tagSearch.GetSourceDirs());
+		nearMatchMemberResult.SetNearMatchArgs(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetFileItemId(), tagSearch.GetSourceDirs());
 		nearMatchMemberResult.Exec(*Session, true);
 		matches = nearMatchMemberResult.Matches();			
 	}
