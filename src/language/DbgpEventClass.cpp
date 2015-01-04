@@ -1530,16 +1530,18 @@ std::string t4p::DbgpCommandClass::StackDepth() {
 }
 
 std::string t4p::DbgpCommandClass::StackGet(int stackDepth) {
+	wxString args = wxString::Format("-d %d", stackDepth);
 	return Build(
 		"stack_get",
-		"-d " + stackDepth
+		args
 	);
 }
 
 std::string t4p::DbgpCommandClass::ContextNames(int stackDepth) {
+	wxString args = wxString::Format("-d %d", stackDepth);
 	return Build(
 		"context_names",
-		"-d " + stackDepth
+		args
 	);
 }
 

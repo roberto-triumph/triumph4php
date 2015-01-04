@@ -540,7 +540,7 @@ public:
 
 	NearMatchMemberTagResultClass();
 
-	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
+	void SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
 protected:
 
