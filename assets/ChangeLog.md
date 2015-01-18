@@ -1,7 +1,7 @@
 Triumph 4 PHP ChangeLog
 =======================
 
-#Version 0.5.3#
+#Version 0.5.4#
 * PHP lint check greatly improved. Lint check now warns about uninitialized 
   variables used in function calls.  (Linux, MSW)
 * PHP lint check contains a suppressions list that defines rules to ignore lint
@@ -19,6 +19,9 @@ Triumph 4 PHP ChangeLog
   (Linux, MSW)
 * The current line being debugged is now easier to spot because it is focused
   to the middle of the screen when possible. (Linux, MSW)	
+
+#Version 0.5.3#
+* final build failed some checks; will be released as 0.5.4
 
 #Version 0.5.2#
 * Triumph is now a full Xdebug client (Linux, MSW)
