@@ -265,6 +265,14 @@ function initOutputPdo(PDO $outputPdo) {
 	$outputPdo->query(
 		'DELETE FROM resources'
 	);
+
+	// remove WAL journal mode for the native functions sqlite database
+	// since the db is going to be placed in a write-protected place 
+	// on linux systems (/usr/share/triumph4php) and WAL attempts to create
+	// files in the same directory
+	$outputPdo->query(
+		'PRAGMA journal_mode=DELETE'
+	);
 	
 }
 
