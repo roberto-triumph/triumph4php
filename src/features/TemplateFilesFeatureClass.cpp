@@ -274,7 +274,7 @@ void t4p::TemplateFilesPanelClass::OnCurrentButton(wxCommandEvent &event) {
 void t4p::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId item = event.GetItem();
 	wxString file = FileTree->GetItemText(item);
-	if (!file.IsEmpty() && !file.Find(wxT("[X]")) == 0 && item != FileTree->GetRootItem()) {
+	if (!file.IsEmpty() && file.Find(wxT("[X]")) != 0 && item != FileTree->GetRootItem()) {
 		t4p::TreeItemDataStringClass* data = (t4p::TreeItemDataStringClass*)FileTree->GetItemData(item);
 		if (data) {
 			file =  data->Str;

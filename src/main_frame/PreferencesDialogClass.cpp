@@ -116,8 +116,8 @@ void t4p::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<t4p::Dyn
 		wxString cmdIdentifier = cmds[i].GetIdentifier();
 		wxString key;
 		wxString item;
-		size_t index = cmdIdentifier.Find(wxT('-'));
-		if (index >= 0) {
+		int index = cmdIdentifier.Find(wxT('-'));
+		if (index != wxNOT_FOUND) {
 			key = cmdIdentifier.Mid(0, index);
 			item = cmdIdentifier.Mid(index + 1);
 		}

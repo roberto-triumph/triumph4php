@@ -138,7 +138,7 @@ bool t4p::FeatureClass::IsToolsWindowSelectedByName(const wxString& name) const 
 		return false;
 	}
 	size_t selection = ToolsNotebook->GetSelection();
-	if (selection >= 0 && selection < ToolsNotebook->GetPageCount()) {
+	if (selection < ToolsNotebook->GetPageCount()) {
 		return ToolsNotebook->GetPage(selection)->GetName() == name;
 	}
 	return false;

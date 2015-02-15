@@ -52,7 +52,7 @@ function prepIcu()
 			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*42.dll") .. " \"Release\\\"",
 			"xcopy /S /Y " .. normalizepath(ICU_LIB_DIR .. "../bin/*41d.dll") .. " \"Release\\\""
 		});
-	else  
+	elseif os.is "linux" then  
 	
 		-- on linux, we check that the icu config binary exists, as we use that
 		-- binary to get the location of the shared libraries
@@ -64,6 +64,20 @@ function prepIcu()
 				"You can install ICU via your package manager; ie. sudo apt-get install libicu-dev\n"
 			)
 		end
+	elseif os.is "macosx" then 
+	
+		-- on mac, we check that the icu config binary exists, as we use that
+		-- binary to get the location of the shared libraries
+		print(ICU_CONFIG .. " --exists")
+		if 0 ~= os.execute(ICU_CONFIG .. " --exists") then
+			error ("Could not execute icu-config. \n" ..
+				"Please install the ICU library, or change the location of \n" ..
+				"ICU_CONFIG in premake_opts_macosx.lua.\n" ..
+				"You can install ICU via home brew; ie. sudo brew install icu4c\n"
+			)
+		end
+	else 
+		print "Triumph does not support building ICU on this operating system.\n"
 	end
 end
 

@@ -49,19 +49,34 @@ function prepBoost()
 			"xcopy /S /Y " .. boostDebugBinPath .. " \"Debug\\\"",
 			"xcopy /S /Y " .. boostReleaseBinPath .. " \"Release\\\""
 		})
-	else  
+	elseif os.is "linux" then  
 	
-		-- BOOST_LIB_DIR is already the result of a os.searchpath
+		-- BOOST_RELEASE_LIB_DIR is already the result of a os.searchpath
 		-- which searched the default locations for the boost library
-		boostLib = BOOST_LIB_DIR
+		boostLib = BOOST_RELEASE_LIB_DIR
 		if boostLib == nil then
 			error (
 				"Boost libraries not found.  " .. 
 				"Please install the boost libraries, or change the location of \n" ..
-				"BOOST_LIB_DIR in premake_opts_linux.lua.\n" ..
+				"BOOST_RELEASE_LIB_DIR in premake_opts_linux.lua.\n" ..
 				"You can install the boost libraries via your package manager; ie. sudo apt-get install libboost-dev libboost-system-dev libasio-dev\n"
 			)
 		end
+	elseif os.is "macosx" then  
+	
+		-- BOOST_RELEASE_LIB_DIR is already the result of a os.searchpath
+		-- which searched the default locations for the boost library
+		boostLib = BOOST_RELEASE_LIB_DIR
+		if boostLib == nil then
+			error (
+				"Boost libraries not found.  " .. 
+				"Please install the boost libraries, or change the location of \n" ..
+				"BOOST_RELEASE_LIB_DIR in premake_opts_macosx.lua.\n" ..
+				"You can install the boost libraries via home brew; ie. sudo brew install boost\n"
+			)
+		end
+	else 
+		print "Triumph does not support building boost on this operating system.\n"
 	end
 end
 

@@ -25,6 +25,7 @@
 #include <features/TotalSearchFeatureClass.h>
 #include <search/FindInFilesClass.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <Triumph.h>
 #include <wx/imaglist.h>
 #include <wx/wupdlock.h>
@@ -148,7 +149,7 @@ void t4p::TotalSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 }
 
 void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
-	unsigned int nextIndex = MatchesList->GetSelection();
+	int nextIndex = MatchesList->GetSelection();
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_RETURN) {
 		skip = false;
@@ -159,7 +160,7 @@ void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	else if (event.GetKeyCode() == WXK_DOWN) {
 		skip = true;
 	}
-	if (!skip && nextIndex >= 0 && nextIndex < MatchesList->GetCount()) {
+	if (!skip && t4p::NumberLessThan(nextIndex, MatchesList->GetCount())) {
 		ChooseSelectedAndEnd(nextIndex);
 	}
 	if (skip) {
@@ -168,7 +169,7 @@ void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 }
 
 void t4p::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
-	unsigned int selected = event.GetSelection();
+	int selected = event.GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
@@ -189,15 +190,15 @@ void t4p::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void t4p::TotalSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
-	unsigned int selected = MatchesList->GetSelection();
+	int selected = MatchesList->GetSelection();
 	if (selected >= 0) {
 		ChooseSelectedAndEnd(selected);
 	}
 }
 
 void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
-	unsigned int currentIndex = MatchesList->GetSelection();
-	unsigned int nextIndex = currentIndex;
+	int currentIndex = MatchesList->GetSelection();
+	int nextIndex = currentIndex;
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_DOWN) {
 		nextIndex++;
@@ -310,7 +311,7 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 }
 
 void t4p::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
-	if (selected < 0 || selected >= Results.size()) {
+	if (selected >= Results.size()) {
 		return;
 	}
 	t4p::TotalTagResultClass tag = Results[selected];

@@ -457,11 +457,14 @@ void t4p::PreferencesClass::Init() {
 	ApplicationFont.SetFamily(wxFONTFAMILY_DEFAULT);
 	
 	// ATTN: on linux, default fonts are too big
-	if (info.GetOperatingSystemId() != wxOS_WINDOWS_NT) {
+	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
 		ApplicationFont.SetPointSize(8);
 	}
-	else {
+	else if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 		ApplicationFont.SetPointSize(8);
+	}
+	else if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+		ApplicationFont.SetPointSize(14);
 	}
 	t4p::CodeControlStylesInit(CodeControlOptions);
 }

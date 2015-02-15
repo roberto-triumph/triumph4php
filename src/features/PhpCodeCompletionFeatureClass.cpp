@@ -733,13 +733,13 @@ void t4p::PhpCallTipProviderClass::OnCallTipClick(wxStyledTextEvent& evt) {
 		// looping around looks better than hiding arrows; because hiding arrows changes the 
 		// rendering position and make the call tip jump around when clicking up/down
 		if (1 == position) {
-			CurrentCallTipIndex = ((CurrentCallTipIndex - 1) >= 0 && (CurrentCallTipIndex - 1) < resourcesSize) ? CurrentCallTipIndex - 1 : resourcesSize - 1;				
+			CurrentCallTipIndex = ((CurrentCallTipIndex >= 1) && (CurrentCallTipIndex - 1) < resourcesSize) ? CurrentCallTipIndex - 1 : resourcesSize - 1;				
 			callTip =  PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
 		}
 		else if (2 == position) {
 
 			// down arrow
-			CurrentCallTipIndex = ((CurrentCallTipIndex + 1) >= 0 && (CurrentCallTipIndex + 1) < resourcesSize) ? CurrentCallTipIndex + 1 : 0;
+			CurrentCallTipIndex = ((CurrentCallTipIndex + 1) < resourcesSize) ? CurrentCallTipIndex + 1 : 0;
 			callTip = PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
 		}
 		if (!callTip.IsEmpty()) {
@@ -761,12 +761,8 @@ bool t4p::PhpBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
 
 void t4p::PhpBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
 	if (!InCommentOrStringStyle(ctrl, posToCheck)) {
-		wxChar c1 = ctrl->GetCharAt(posToCheck),
-		            c2 = ctrl->GetCharAt(posToCheck - 1);
-		if (wxT('{') == c1 || wxT('}') == c1 || wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1) {
-			posToCheck = posToCheck;
-		}
-		else if (wxT('{') == c2 || wxT('}') == c2 || wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2) {
+		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('{') == c2 || wxT('}') == c2 || wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2) {
 			posToCheck = posToCheck - 1;
 		}
 		else  {

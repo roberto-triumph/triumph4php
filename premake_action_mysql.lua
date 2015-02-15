@@ -36,10 +36,10 @@ function prepMysql()
 			"xcopy /S /Y " .. mysqlLibPath  .. " \"Debug\\\"",
 			"xcopy /S /Y " .. mysqlLibPath  .. " \"Release\\\""
 		})
-	else  
+	elseif os.is "linux" then  
 	
 		-- MYSQL_LIB_DIR is already the result of a os.searchpath
-		-- which searched the default locations for the curl library
+		-- which searched the default locations for the mysql library
 		mysqlLi = MYSQL_LIB_DIR
 		if mysqlLi == nil then
 			error (
@@ -49,6 +49,21 @@ function prepMysql()
 				"You can install mysql client via your package manager; ie. sudo apt-get install libmysqlclient-dev\n"
 			)
 		end
+	elseif os.is "macosx" then  
+	
+		-- MYSQL_LIB_DIR is already the result of a os.searchpath
+		-- which searched the default locations for the mysql library
+		mysqlLi = MYSQL_LIB_DIR
+		if mysqlLi == nil then
+			error (
+				"MySQL client libraries not found.  " .. 
+				"Please install the MySQL client library, or change the location of \n" ..
+				"MYSQL_LIB_DIR in premake_opts_linux.lua.\n" ..
+				"You can install mysql client via a package manager; ie. sudo brew install mysql-connector-c\n"
+			)
+		end
+	else 
+		print "Triumph does not support building MySQL on this operating system.\n"
 	end
 end
 

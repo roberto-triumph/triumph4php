@@ -62,7 +62,7 @@ function prepSoci()
 			"xcopy /S /Y " .. normalizepath('lib/soci/src/bin/Release/*.dll') .. " \"Release\\\"",
 			
 		})
-	else 
+	elseif os.is "linux" then 
 		sociInstallDebugDir = normalizepath("lib/soci/triumph/Debug")
 		sociInstallReleaseDir = normalizepath("lib/soci/triumph/Release")
 
@@ -140,6 +140,75 @@ function prepSoci()
 				foundCount = foundCount + 1;
 			end
 		end
+	elseif os.is "macosx" then 
+		sociInstallDebugDir = normalizepath("lib/soci/triumph/Debug")
+		sociInstallReleaseDir = normalizepath("lib/soci/triumph/Release")
+
+		batchexecute(normalizepath(""), {
+			"mkdir -p " .. sociInstallDebugDir,
+			"mkdir -p " .. sociInstallReleaseDir
+		})
+		
+		-- now build SOCI
+		-- exclude SOCI from linking against Boost. we don't use it
+		batchexecute(sociInstallDebugDir, {
+			CMAKE ..
+				" -G \"Unix Makefiles\"" ..
+				" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+				" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
+				" -DCMAKE_INSTALL_PREFIX=" .. sociInstallDebugDir ..
+				" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+				" -DSQLITE3_LIBRARY=" .. normalizepath(SQLITE_LIB_DIR) .. '/'  .. SQLITE_LIB_NAME ..
+				" -DWITH_MYSQL=YES " ..
+				" -DWITH_MYSQL=ODBC " ..
+				" -DWITH_ORACLE=NO " ..
+				" -DWITH_POSTGRESQL=NO " ..
+				" -DWITH_SQLITE3=YES " ..
+				" -DWITH_BOOST=NO" ..
+				" -DSOCI_TESTS=YES " ..
+				" -DCMAKE_BUILD_TYPE=Debug " ..
+				" " .. SOCI_SRC,
+			"make",
+			"make install"
+		})
+		
+		
+		-- build release mode
+		batchexecute(sociInstallReleaseDir, {
+			CMAKE ..
+				" -G \"Unix Makefiles\"" ..
+				" -DMYSQL_INCLUDE_DIR=" .. MYSQL_INCLUDE_DIR ..
+				" -DMYSQL_LIBRARY=" .. MYSQL_LIB_DIR .. "/" .. MYSQL_LIB_NAME ..
+				" -DCMAKE_INSTALL_PREFIX=" .. sociInstallReleaseDir ..
+				" -DSQLITE3_INCLUDE_DIR=" .. SQLITE_INCLUDE_DIR ..
+				" -DSQLITE3_LIBRARY=" .. normalizepath(SQLITE_LIB_DIR) .. '/'  .. SQLITE_LIB_NAME ..
+				" -DWITH_MYSQL=YES " ..
+				" -DWITH_MYSQL=ODBC " ..
+				" -DWITH_ORACLE=NO " ..
+				" -DWITH_POSTGRESQL=NO " ..
+				" -DWITH_SQLITE3=YES " ..
+				" -DWITH_BOOST=NO" ..
+				" -DSOCI_TESTS=YES " ..
+				" -DCMAKE_BUILD_TYPE=Release " ..
+				" " .. SOCI_SRC,
+			"make",
+			"make install"
+		});
+
+		-- copy dynamic libs to appropriate output dir
+		foundCount = 0;
+		libs = os.matchfiles("lib/soci/triumph/Debug/lib/*.dylib");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib/*.dylib Debug/");
+			foundCount = foundCount + 1;
+		end
+		libs = os.matchfiles("lib/soci/triumph/Release/lib/*.dylib");
+		if #libs > 0 then
+			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib/*.dylib Release/");
+			foundCount = foundCount + 1;
+		end
+	else 
+		print "Triumph does not support building SOCI on this operating system.\n"
 	end
 end
 

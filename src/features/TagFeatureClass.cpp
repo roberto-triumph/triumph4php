@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Events.h>
+#include <globals/Number.h>
 #include <actions/TagWipeActionClass.h>
 #include <globals/TagList.h>
 #include <Triumph.h>
@@ -571,8 +572,8 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	
 		// open the checked items
 		for (size_t i = 0; i < checks.Count(); ++i) {
-			size_t matchIndex = checks.Item(i);
-			if (matchIndex >= 0 && matchIndex < MatchedResources.size()) {
+			int matchIndex = checks.Item(i);
+			if (t4p::NumberLessThan(matchIndex, MatchedResources.size())) {
 				ChosenResources.push_back(MatchedResources[matchIndex]);
 			}
 		}
@@ -582,8 +583,8 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 
 	// no checked items, take the user to the
 	// selected item
-	size_t selection = MatchesList->GetSelection();
-	if (selection >= 0 && selection < MatchedResources.size()) {
+	int selection = MatchesList->GetSelection();
+	if (t4p::NumberLessThan(selection, MatchedResources.size())) {
 		ChosenResources.push_back(MatchedResources[selection]);
 	}
 	EndModal(wxOK);
@@ -704,10 +705,10 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
-		if (!MatchesList->IsEmpty() && selection >= 0 && selection < (MatchesList->GetCount() - 1)) {
+		if (!MatchesList->IsEmpty() && selection < (MatchesList->GetCount() - 1)) {
 			MatchesList->SetSelection(selection + 1);
 		}
-		else if (!MatchesList->IsEmpty() && selection >= 0) {
+		else if (!MatchesList->IsEmpty()) {
 
 			// cycle back to the beginning
 			MatchesList->SetSelection(0);
@@ -731,7 +732,7 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 }
 
 void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
-	size_t selection = event.GetSelection();
+	int selection = event.GetSelection();
 	if (selection >= MatchesList->GetCount()) {
 		
 		// no item chosen
@@ -743,7 +744,7 @@ void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) 
 	TransferDataFromWindow();
 	ChosenResources.clear();
 	
-	if (selection >= 0 && selection < MatchesList->GetCount()) {
+	if (t4p::NumberLessThan(selection, MatchesList->GetCount())) {
 		ChosenResources.push_back(MatchedResources[selection]);
 	}
 	EndModal(wxOK);

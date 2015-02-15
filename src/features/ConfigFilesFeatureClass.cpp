@@ -24,6 +24,7 @@
  */
 #include <features/ConfigFilesFeatureClass.h>
 #include <actions/ConfigTagDetectorActionClass.h>
+#include <globals/Number.h>
 #include <Triumph.h>
 
 // max amount of menu items to show
@@ -119,7 +120,7 @@ void t4p::ConfigFilesFeatureClass::OnConfigFilesDetected(t4p::ActionEventClass& 
 
 void t4p::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
 	size_t index = event.GetId() - t4p::CONFIG_DETECTORS;
-	if (index >= 0 && index < MAX_CONFIG_MENU_ITEMS && index < ConfigTags.size()) {
+	if (t4p::NumberLessThan(index, MAX_CONFIG_MENU_ITEMS) && index <ConfigTags.size()) {
 		wxFileName fileName = ConfigTags[index].ConfigFileName;
 		t4p::OpenFileCommandEventClass cmd(fileName.GetFullPath());
 		App.EventSink.Publish(cmd);

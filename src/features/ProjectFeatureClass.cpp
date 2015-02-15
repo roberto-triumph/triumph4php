@@ -26,6 +26,7 @@
 #include <widgets/NonEmptyTextValidatorClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
@@ -433,7 +434,7 @@ void t4p::ProjectDefinitionDialogClass::OnAddSource(wxCommandEvent& event) {
 
 void t4p::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event) {
 	size_t selected = SourcesList->GetSelection();
-	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+	if (selected < EditedProject.Sources.size()) {
 		t4p::SourceClass src = EditedProject.Sources[selected];
 		t4p::ProjectSourceDialogClass dialog(this, src);
 		if (wxOK == dialog.ShowModal()) {
@@ -444,8 +445,8 @@ void t4p::ProjectDefinitionDialogClass::OnEditSource(wxCommandEvent& event) {
 }
 
 void t4p::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& event) {
-	size_t selected = SourcesList->GetSelection();
-	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+	int selected = SourcesList->GetSelection();
+	if (t4p::NumberLessThan(selected, EditedProject.Sources.size())) {
 		t4p::SourceClass src = EditedProject.Sources[selected];
 		wxString msg = _("Are you sure you wish to remove the source? ");
 		msg += src.RootDirectory.GetFullPath();
@@ -477,7 +478,7 @@ void t4p::ProjectDefinitionDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 void t4p::ProjectDefinitionDialogClass::OnSourcesListDoubleClick(wxCommandEvent& event) {
 	size_t selected = event.GetSelection();
-	if (selected >= 0 && selected < EditedProject.Sources.size()) {
+	if (selected < EditedProject.Sources.size()) {
 		t4p::SourceClass src = EditedProject.Sources[selected];
 		t4p::ProjectSourceDialogClass dialog(this, src);
 		if (wxOK == dialog.ShowModal()) {
@@ -561,7 +562,7 @@ void t4p::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
 
 void t4p::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
-	if (selection >= 0 && selection < EditedProjects.size()) {
+	if (selection < EditedProjects.size()) {
 		t4p::ProjectClass project = EditedProjects[selection];
 		t4p::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {
@@ -587,7 +588,7 @@ void t4p::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& even
 
 void t4p::ProjectListDialogClass::OnProjectsListCheckbox(wxCommandEvent& event) {
 	size_t selection = event.GetSelection();
-	if (selection >= 0 && selection < EditedProjects.size()) {
+	if (selection < EditedProjects.size()) {
 		t4p::ProjectClass project = EditedProjects[selection];
 		project.IsEnabled = ProjectsList->IsChecked(selection);
 		EditedProjects[selection] = project;
@@ -624,7 +625,7 @@ void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		wxString projectLabels;
 		for (size_t i = 0 ; i <  selections.GetCount(); ++i) {
 			size_t selection = selections[i];
-			if (selection >= 0  && selection < EditedProjects.size()) {
+			if (selection < EditedProjects.size()) {
 				t4p::ProjectClass project = EditedProjects[selection];
 				projectLabels += project.Label;
 				projectLabels += wxT("\n");
@@ -671,8 +672,8 @@ void t4p::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 		wxMessageBox(_("Please select a single project to edit."));
 		return;
 	}
-	size_t selection = selections[0];
-	if (selection >= 0 && selection < EditedProjects.size()) {
+	int selection = selections[0];
+	if (t4p::NumberLessThan(selection, EditedProjects.size())) {
 		t4p::ProjectClass project = EditedProjects[selection];
 		t4p::ProjectDefinitionDialogClass dialog(this, project);
 		if (wxOK == dialog.ShowModal()) {

@@ -3,3 +3,4 @@ Release
 dist
 build
 lib/**
+.DS_Store

@@ -58,12 +58,8 @@ bool t4p::CssBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
 
 void t4p::CssBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
 	if (!InCssCommentOrStringStyle(ctrl, posToCheck)) {
-		wxChar c1 = ctrl->GetCharAt(posToCheck),
-		            c2 = ctrl->GetCharAt(posToCheck - 1);
-		if (wxT('(') == c1 || wxT(')') == c1 || wxT('[') == c1 || wxT(']') == c1 || wxT('{') == c1 || wxT('}') == c1) {
-			posToCheck = posToCheck;
-		}
-		else if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
+		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
 			posToCheck = posToCheck - 1;
 		}
 		else  {

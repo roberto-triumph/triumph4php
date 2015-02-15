@@ -676,9 +676,6 @@ public:
 
 	ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);	
 
-private:
-
-	t4p::ExplorerFeatureClass& Feature;
 };
 
 /**

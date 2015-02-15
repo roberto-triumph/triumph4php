@@ -60,10 +60,10 @@ function prepSqlite()
 			"xcopy /S /Y " .. sqliteLibPath .. " \"Release\\\""
 		});
 	
-	else  
+	elseif os.is "linux" then  
 	
 		-- SQLITE_LIB_DIR is already the result of a os.searchpath
-		-- which searched the default locations for the curl library
+		-- which searched the default locations for the sqlite library
 		sqliteLib = SQLITE_LIB_DIR
 		if sqliteLib == nil then
 			error (
@@ -73,6 +73,23 @@ function prepSqlite()
 				"You can install SQLite client via your package manager; ie. sudo apt-get install libsqlite3-dev\n"
 			)
 		end
+	elseif os.is "macosx" then  
+	
+		-- SQLITE_LIB_DIR is already the result of a os.searchpath
+		-- which searched the default locations for the sqlite library
+		sqliteLib = SQLITE_LIB_DIR
+		if sqliteLib == nil then
+			error (
+				"SQLite client libraries not found.  " .. 
+				"Please install the SQLite client library, or change the location of \n" ..
+				"SQLITE_LIB_DIR in premake_opts_macosx.lua.\n" ..
+				"You can install SQLite client via a package manager; ie. sudo brew install sqlite\n" ..
+				"Note that we use a homebrewed' version, since the system version sqlite was not \n" ..
+				"compiled with SQLITE_ENABLE_COLUMN_METADATA and Triumph makes use of this function\n"
+			)
+		end
+	else 
+		print "Triumph does not support building SQLite3 on this operating system.\n"
 	end
 end
 

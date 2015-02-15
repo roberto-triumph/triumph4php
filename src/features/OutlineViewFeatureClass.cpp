@@ -926,10 +926,10 @@ void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
-		if (!MatchesList->IsEmpty() && selection >= 0 && selection < (MatchesList->GetCount() - 1)) {
+		if (!MatchesList->IsEmpty() && selection < (MatchesList->GetCount() - 1)) {
 			MatchesList->SetSelection(selection + 1);
 		}
-		else if (!MatchesList->IsEmpty() && selection >= 0) {
+		else if (!MatchesList->IsEmpty()) {
 
 			// cycle back to the beginning
 			MatchesList->SetSelection(0);
@@ -956,7 +956,7 @@ void t4p::FileSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event)
 	TransferDataFromWindow();
 	ChosenTags.clear();
 	size_t selection = event.GetSelection();
-	if (selection >= 0 && selection < MatchesList->GetCount()) {
+	if (selection < MatchesList->GetCount()) {
 		ChosenTags.push_back(MatchingTags[selection]);
 	}
 	if (ChosenTags.empty()) {
@@ -1083,7 +1083,7 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 			// open the checked items
 			for (size_t i = 0; i < checks.Count(); ++i) {
 				size_t matchIndex = checks.Item(i);
-				if (matchIndex >= 0 && matchIndex < MatchingTags.size()) {
+				if (matchIndex < MatchingTags.size()) {
 					ChosenTags.push_back(MatchingTags[matchIndex]);
 				}
 			}
@@ -1093,7 +1093,7 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 			// no checked items, take the user to the
 			// selected item
 			size_t selection = MatchesList->GetSelection();
-			if (selection >= 0 && selection < MatchingTags.size()) {
+			if (selection < MatchingTags.size()) {
 				ChosenTags.push_back(MatchingTags[selection]);
 				EndModal(wxOK);
 			}

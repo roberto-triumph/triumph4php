@@ -120,7 +120,6 @@ t4p::NewUserSettingsPanelClass::NewUserSettingsPanelClass(wxWindow *parent,
 														  t4p::PreferencesClass& preferences,
 														  wxFileName& configFileDir)
 : NewUserSettingsPanelGeneratedClass(parent, ID_NEW_USER_DIALOG)
-, Globals(globals)
 , Preferences(preferences)
 , ConfigFileDir(configFileDir) {
 	

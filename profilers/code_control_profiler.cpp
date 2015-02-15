@@ -160,9 +160,6 @@ private:
 	};
 	
 	t4p::CodeControlClass* Ctrl;
-	
-	CodeControlProfilerAppClass& App;
-	
 
 	DECLARE_EVENT_TABLE()
 };
@@ -210,8 +207,7 @@ int CodeControlProfilerAppClass::OnExit() {
 
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
 	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
-			wxSize(1024, 768)) 
-	, App(app) {
+			wxSize(1024, 768)) {
 	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
 	Ctrl->SetFileType(t4p::FILE_TYPE_PHP);

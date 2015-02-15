@@ -426,22 +426,33 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
+
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -902,16 +913,24 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -1372,16 +1391,24 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -1842,16 +1869,24 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -2312,16 +2347,24 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -2782,16 +2825,24 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -3252,16 +3303,24 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -3722,16 +3781,24 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -4192,16 +4259,24 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -4662,16 +4737,24 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -5132,16 +5215,24 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -5602,16 +5693,24 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -6072,16 +6171,24 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -6542,16 +6649,24 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -7012,16 +7127,24 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -7482,16 +7605,24 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -7952,16 +8083,24 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -8422,16 +8561,24 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -8892,16 +9039,24 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -9362,16 +9517,24 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -9832,16 +9995,24 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -10302,16 +10473,24 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -10772,16 +10951,24 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -11242,16 +11429,24 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -11712,16 +11907,24 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -12182,16 +12385,24 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
@@ -12652,16 +12863,24 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {

@@ -70,6 +70,8 @@ bool t4p::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 		// get the 'raw' connection because it can handle multiple statements at once
 		char *errorMessage = NULL;
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
+		
+		wxASSERT_MSG(backend->conn_, "session is not connected, cannot execute sql script file");
 		sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
 		if (errorMessage) {
 			error = t4p::CharToWx(errorMessage);

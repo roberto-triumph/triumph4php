@@ -289,7 +289,7 @@ void t4p::ExplorerFeatureClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	
 	// show the selected project
 	size_t index = event.GetId() - t4p::MENU_EXPLORER - 3;
-	if (index >= 0 && index < SourceDirs.size()) {
+	if (index < SourceDirs.size()) {
 		panel->RefreshDir(SourceDirs[index].RootDirectory);
 	}
 	else if (!SourceDirs.empty()) {
@@ -1882,8 +1882,7 @@ wxEvent* t4p::ExplorerModifyEventClass::Clone() const {
 }
 
 t4p::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature)
-	: ExplorerOptionsGeneratedPanelClass(parent, id)
-	, Feature(feature) {
+	: ExplorerOptionsGeneratedPanelClass(parent, id) {
 	t4p::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
 	FileManager->SetValidator(fileManagerValidator);
 	t4p::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);

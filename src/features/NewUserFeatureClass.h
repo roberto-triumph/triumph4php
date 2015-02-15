@@ -73,8 +73,6 @@ private:
 
 	void OnUpdateUi(wxUpdateUIEvent& event);
 
-	t4p::GlobalsClass& Globals;
-
 	t4p::PreferencesClass& Preferences;
 
 	wxFileName& ConfigFileDir;

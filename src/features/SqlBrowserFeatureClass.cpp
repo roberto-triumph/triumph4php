@@ -361,9 +361,9 @@ void t4p::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event)
 }
 
 void t4p::SqlConnectionListDialogClass::OnCheckToggled(wxCommandEvent& event) {
-	size_t sel = event.GetInt();
+	int sel = event.GetInt();
 	bool b = List->IsChecked(sel);
-	if (sel >= 0 && sel < EditedDatabaseTags.size()) {
+	if (t4p::NumberLessThan(sel, EditedDatabaseTags.size())) {
 		EditedDatabaseTags[sel].IsEnabled = b;
 	}
 }
@@ -1527,8 +1527,8 @@ void t4p::TableDefinitionPanelClass::OnTableNameEnter(wxCommandEvent& event) {
 	
 	// select the connection to the one to show
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
-	size_t selectedIndex = Connections->GetSelection();
-	if (selectedIndex >= 0 && selectedIndex < dbTags.size()) {
+	int selectedIndex = Connections->GetSelection();
+	if (t4p::NumberLessThan(selectedIndex, dbTags.size())) {
 		t4p::DatabaseTagClass selectedTag = dbTags[selectedIndex];
 		ShowTable(selectedTag, TableName->GetValue());
 	}
@@ -1678,7 +1678,7 @@ void t4p::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutput
 		}
 		stream.WriteString(ColumnEnclosure);
 		
-		if (i >= 0 && i < (size - 1)) {
+		if (i < (size - 1)) {
 			stream.WriteString(trueColumnDelim);
 		}
 	}
@@ -1770,7 +1770,7 @@ void t4p::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 	for (size_t i = 0; i < Columns->GetCount(); ++i) {
 		if (Columns->IsChecked(i)) {
 			EditedRowToSql.CheckedColumns.push_back(EditedRowToSql.Columns[i]);
-			if (i >= 0 && i < EditedRowToSql.Values.size()) {
+			if (i < EditedRowToSql.Values.size()) {
 				EditedRowToSql.CheckedValues.push_back(EditedRowToSql.Values[i]);
 			}
 		}
@@ -2102,12 +2102,8 @@ bool t4p::SqlBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
 
 void t4p::SqlBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
 	if (!InCommentOrStringStyle(ctrl, posToCheck)) {
-		wxChar c1 = ctrl->GetCharAt(posToCheck),
-		            c2 = ctrl->GetCharAt(posToCheck - 1);
-		if (wxT('(') == c1 || wxT(')') == c1) {
-			posToCheck = posToCheck;
-		}
-		else if (wxT('(') == c2 || wxT(')') == c2) {
+		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
+		if (wxT('(') == c2 || wxT(')') == c2) {
 			posToCheck = posToCheck - 1;
 		}
 		else  {

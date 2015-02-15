@@ -145,16 +145,24 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
 	int os = platform.GetOperatingSystemId();
+	int fontSize = 10;
+
 	//ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
+		fontSize = 10;
 	}
-	else {
+	else if (os == wxOS_UNIX_LINUX) {
 		
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
+		fontSize = 10;
 	}
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
+	else if (os == wxOS_MAC_OSX_DARWIN) {
+		fontName = wxT("Monaco");
+		fontSize = 14;
+	}
+	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
 				
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {

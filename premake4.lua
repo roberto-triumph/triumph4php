@@ -23,6 +23,7 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+
 dofile "premake_functions.lua"
 
 -- load opts after functions, opts need the trim function
@@ -30,6 +31,8 @@ if os.is("windows") then
 	dofile "premake_opts_windows.lua"
 elseif os.is("linux") then
 	dofile "premake_opts_linux.lua"
+elseif os.is("macosx") then
+	dofile "premake_opts_macosx.lua"
 else
 	error "You are running on a non-supported operating system. triumph4php cannot be built.\n"
 end
@@ -188,10 +191,18 @@ function sociconfiguration(config)
 			"soci_mysql", 
 			"soci_sqlite3" 
 		}
-		links { 
-			string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
-			string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.so$") 
-		}
+
+		if os.is "linux" then
+			links { 
+				string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
+				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.so$") 
+			}
+		elseif os.is "macosx" then
+			links { 
+				string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.dylib$"),
+				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.dylib$") 
+			}
+		end
 	end
 end
 
@@ -282,6 +293,7 @@ end-- solution directory structure
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
 -- compile flags will be set to be stricter than normal
 solution "triumph4php"
+
 	location (BUILD_SCRIPTS_DIR)
 	
 	configurations { "Release", "Debug"}
@@ -294,6 +306,21 @@ solution "triumph4php"
 	defines {
 		string.format("T4P_ASSET_DIR=%s", string.gsub(T4P_ASSET_DIR, '\\', '/'))
 	}
+	
+	if os.is "linux" then
+		configuration "gmake or codelite" 
+
+			-- link against our own version of wxWidgets / SOCI instead of any installed in the system
+			linkoptions { string.format("-Wl,-rpath=%s", T4P_LIB_DIR)  }
+	elseif os.is "macosx" then
+		
+		-- this is a workaround for a premake issue where it will use 
+		-- bad compiler flags "-Wl,x" for a workaround that is longer
+		-- needed in GCC, but it just prevents clang from compiling
+		-- see http://industriousone.com/topic/how-remove-flags-ldflags
+		flags { "Symbols" } 
+	end
+
 	configuration "Debug"
 		objdir "Debug"
 		targetdir "Debug"
@@ -301,11 +328,6 @@ solution "triumph4php"
 	configuration "Release"
 		objdir "Release"
 		targetdir "Release"
-	configuration "gmake or codelite"
-
-		-- link against our own version of wxWidgets / SOCI instead of any installed in the system
-		linkoptions { string.format("-Wl,-rpath=%s", T4P_LIB_DIR)  }
-
 
 	project "triumph4php"
 		language "C++"
@@ -581,6 +603,41 @@ solution "triumph4php"
 		-- this is needed so that symbols are exported
 		defines { "DLL_EXPORTS", "WXMAKINGDLL_KEYBINDER" }
 		includedirs { "lib/keybinder/include" }
+		
+		-- for mac osx, change the shared library ID so that
+		-- it can be located inside the same directory
+		if os.is "macosx" then
+			configuration { "Debug" }
+				postbuildcommands {
+					string.format("install_name_tool -id %s %s", 
+						"@executable_path/../MacOS/libkeybinder.dylib", 
+						normalizepath("Debug/libkeybinder.dylib")
+					),
+					string.format("mkdir -p %s", 
+						normalizepath("Debug/triumph4php.app/Contents/MacOS")
+					),
+					string.format("cp %s %s",
+						normalizepath("Debug/libkeybinder.dylib"),
+						normalizepath("Debug/triumph4php.app/Contents/MacOS")	
+					)
+				}
+
+			configuration { "Release" }
+				postbuildcommands {
+					string.format("install_name_tool -id %s %s", 
+						"@executable_path/../MacOS/libkeybinder.dylib", 
+						normalizepath("Release/libkeybinder.dylib")
+					), 
+					string.format("mkdir -p %s", 
+						normalizepath("Release/triumph4php.app/Contents/MacOS")
+					),
+					string.format("cp %s %s",
+						normalizepath("Release/libkeybinder.dylib"),
+						normalizepath("Release/triumph4php.app/Contents/MacOS")	
+					)
+				}
+		end
+
 		configuration { "Debug" }
 			wxconfiguration("Debug", _ACTION)
 		configuration { "Release" }
@@ -591,6 +648,7 @@ solution "triumph4php"
 		configuration { "gmake or codelite" }
 			-- prevent warning: deprecated stuff from wxWidgets 2.8 -> 2.9
 			buildoptions { "-Wno-deprecated" }
+
 
 	project "keybinder_test"
 		language "C++"
@@ -622,10 +680,45 @@ solution "triumph4php"
 		includedirs { "lib/pelet/include" }
 		defines { "PELET_MAKING_DLL" }
 		pickywarnings(_ACTION)
+		
+		-- for mac osx, change the shared library ID so that
+		-- it can be located inside the same directory
+		if os.is "macosx" then
+			configuration { "Debug" }
+				postbuildcommands {
+					string.format("install_name_tool -id %s %s", 
+						"@executable_path/../MacOS/libpelet.dylib", 
+						normalizepath("Debug/libpelet.dylib")
+					),
+					string.format("mkdir -p %s", 
+						normalizepath("Debug/triumph4php.app/Contents/MacOS")
+					),
+					string.format("cp %s %s",
+						normalizepath("Debug/libpelet.dylib"),
+						normalizepath("Debug/triumph4php.app/Contents/MacOS")	
+					)
+				}
+			configuration { "Release" }
+				postbuildcommands {
+					string.format("install_name_tool -id %s %s", 
+						"@executable_path/../MacOS/libpelet.dylib", 
+						normalizepath("Release/libpelet.dylib")
+					),
+					string.format("mkdir -p %s", 
+						normalizepath("Release/triumph4php.app/Contents/MacOS")
+					),
+					string.format("cp %s %s",
+						normalizepath("Release/libpelet.dylib"),
+						normalizepath("Release/triumph4php.app/Contents/MacOS")	
+					)
+				}
+		end
+
 		configuration "Release"
 			icuconfiguration("Release", _ACTION)
 		configuration { "Debug" }
 			icuconfiguration("Debug", _ACTION)
+
 
 	project "pelet_tests"
 		language "C++"

@@ -44,7 +44,7 @@ function prepCurl()
 			"xcopy /S /Y " .. curlDebugBinPath .. " \"Debug\\\"",
 			"xcopy /S /Y " .. curlReleaseBinPath .. " \"Release\\\""
 		});		
-	else  
+	elseif os.is "linux" then
 	
 		-- CURL_LIB_DIR is already the result of a os.searchpath
 		-- which searched the default locations for the curl library
@@ -57,9 +57,23 @@ function prepCurl()
 				"You can install curl via your package manager; ie. sudo apt-get install libcurl-dev\n"
 			)
 		end
+	elseif os.is "macosx" then
+	
+		-- CURL_LIB_DIR is already the result of a os.searchpath
+		-- which searched the default locations for the curl library
+		curlLib = CURL_LIB_DIR
+		if curlLib == nil then
+			error (
+				"CURL libraries not found.  " .. 
+				"Please install the CURL client library, or change the location of \n" ..
+				"CURL_LIB_DIR in premake_opts_macosx.lua.\n" ..
+				"Curl is usually installed in macosx by default. \n"
+			)
+		end
+	else 
+		print "Triumph does not support building wxwidgets on this operating system.\n"
 	end
 end
-
 
 newaction {
 	trigger = "curl",

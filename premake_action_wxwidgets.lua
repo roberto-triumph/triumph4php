@@ -53,7 +53,7 @@ function prepWxWidgets()
 			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxbase*u_*.dll") .. " \"Release\\\"",
 			"xcopy /S /Y " .. normalizepath(WX_LIB_DIR .. "wxmsw*u_*.dll") .. " \"Release\\\""
 		});
-	else 
+	elseif os.is "linux" then
 
 		-- build wxWidgets using make
         -- remove libs that we don't use
@@ -98,11 +98,63 @@ function prepWxWidgets()
 			"cp -r " .. debugLibDir .. "/*.so* Debug/",
 			"cp -r " .. releaseLibDir .. "/*.so* Release/"
 		});
-		end
+	elseif  os.is "macosx" then
+
+		-- we won't "make install" in mac osx as its not
+		-- recommended due to the way mac handles shared libraries
+		-- see https://wiki.wxwidgets.org/Compiling_wxWidgets_using_the_command-line_%28Terminal%29
+		-- also, be sure to link to the newer C++ runtime (libc++)
+		-- we need it so that all our deps can use the newer runtime
+		-- in particular I could not get ICU to link using the old
+		-- c++ runtime libstdc++
+		wxInstallDebug = normalizepath("lib/wxWidgets/triumph_debug/")
+        wxInstallRelease = normalizepath("lib/wxWidgets/triumph/")
+		
+		batchexecute('lib/wxWidgets', {
+			"mkdir -p " .. wxInstallDebug,
+			"mkdir -p " .. wxInstallRelease,
+			"cd " .. wxInstallDebug,
+			"../configure " ..
+				"--disable-webkit --disable-webviewwebkit --disable-webview " ..
+				"--with-expat=builtin --enable-debug  " ..
+				"--without-libjpeg --without-libtiff  " ..
+				"CC=clang CXX=clang++ CXXFLAGS='-stdlib=libc++ -std=c++11' " ..
+				"OBJCXXFLAGS='-stdlib=libc++ -std=c++11' " ..
+				"LDFLAGS=-stdlib=libc++ " ..
+				"--with-osx_cocoa " ..
+				"--with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/ " ..
+				"--with-macosx-version-min=10.7 " .. 
+				"--prefix=" .. wxInstallDebug,
+				"make -j 6",
+
+			-- now build the release version
+			"cd " .. wxInstallRelease,
+			"../configure " .. 
+				"--disable-webkit --disable-webviewwebkit --disable-webview " ..
+				"--with-expat=builtin --disable-debug  " ..
+				"--without-libjpeg --without-libtiff  " ..
+				"CC=clang CXX=clang++ CXXFLAGS='-stdlib=libc++ -std=c++11' " ..
+				"OBJCXXFLAGS='-stdlib=libc++ -std=c++11' " ..
+				"LDFLAGS=-stdlib=libc++ " ..
+				"--with-osx_cocoa " ..
+				"--with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/ " ..
+				"--with-macosx-version-min=10.7 " .. 
+				"--prefix=" .. wxInstallRelease,
+				"make -j 6",
+		})
+
+	else
+		print "Triumph does not support building wxwidgets on this operating system.\n"
+	end
 end
 
 newaction {
 	trigger = "wxwidgets",
 	description = "Build the wxWidgets library",
 	execute = prepWxWidgets
+}
+
+newoption {
+	trigger = "force",
+	description = "before building, delete the build directories"
 }
