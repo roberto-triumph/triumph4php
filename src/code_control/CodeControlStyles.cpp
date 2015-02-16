@@ -429,6 +429,7 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
@@ -450,7 +451,7 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -928,7 +929,7 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -1406,7 +1407,7 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -1884,7 +1885,7 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -2362,7 +2363,7 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -2840,7 +2841,7 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -3318,7 +3319,7 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -3796,7 +3797,7 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -4274,7 +4275,7 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -4752,7 +4753,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -5230,7 +5231,7 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -5708,7 +5709,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -6186,7 +6187,7 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -6664,7 +6665,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -7142,7 +7143,7 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -7620,7 +7621,7 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -8098,7 +8099,7 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -8576,7 +8577,7 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -9054,7 +9055,7 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -9532,7 +9533,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -10010,7 +10011,7 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -10488,7 +10489,7 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -10966,7 +10967,7 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -11444,7 +11445,7 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -11922,7 +11923,7 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -12400,7 +12401,7 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);
@@ -12878,7 +12879,7 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);

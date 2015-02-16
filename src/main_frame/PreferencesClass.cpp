@@ -464,7 +464,7 @@ void t4p::PreferencesClass::Init() {
 		ApplicationFont.SetPointSize(8);
 	}
 	else if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
-		ApplicationFont.SetPointSize(14);
+		ApplicationFont.SetPointSize(12);
 	}
 	t4p::CodeControlStylesInit(CodeControlOptions);
 }

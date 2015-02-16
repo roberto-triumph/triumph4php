@@ -448,7 +448,7 @@ void t4p::MainFrameClass::SetApplicationFont() {
 	// ATTN: on linux, default fonts are too big
 	//       this code makes them smaller
 	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() != wxOS_WINDOWS_NT) {
+	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
 		SetFont(Preferences.ApplicationFont);
 		
 		// so that the tabs use the same font

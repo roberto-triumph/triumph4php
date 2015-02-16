@@ -160,7 +160,7 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	}
 	else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
-		fontSize = 14;
+		fontSize = 12;
 	}
 	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
 				fontName);

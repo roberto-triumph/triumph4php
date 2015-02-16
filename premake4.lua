@@ -345,6 +345,23 @@ solution "triumph4php"
 		}
 		links { "keybinder", "pelet" }
 
+		if os.is "macosx" then
+			configuration { "Debug" }
+				postbuildcommands {
+					string.format("cp %s %s",
+						normalizepath("package/Info.plist"),
+						normalizepath("Debug/triumph4php.app/Contents/")
+					)
+				}
+			configuration { "Release" }
+				postbuildcommands {
+					string.format("cp %s %s",
+						normalizepath("package/Info.plist"),
+						normalizepath("Release/triumph4php.app/Contents/")
+					)
+				}
+		end
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
