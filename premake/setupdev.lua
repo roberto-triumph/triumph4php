@@ -23,6 +23,17 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- this function will setup the dev environment by running all actions
+-- for the dependencies ie. boost, curl, icu, mysql ... wxWidgets.  After
+-- this function runs, Triumph will be able to be compiled successfully.
+-- 
+-- This function will make sure that necessary programs (git, wget, zip)
+-- are present.
+--
+-- This function only needs to be run once; when a dev wants to
+-- compile Triumph for the first time on a machine.
+--
 function setupDev()
     if (os.is "windows") then
     	failMsg = "This program is required to setup the development environment.\n" ..

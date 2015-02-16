@@ -23,6 +23,20 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the SQLite shared library.
+-- Triumph uses SQLite in order to store source code meta-data (classes, methods, files)
+-- so that they can be looked up easily and quickly. SQLite is a fundamental part
+-- of Triumph's total search and code completion functionality.
+--
+-- SQLite is prepped in different ways.  In Linux or Mac OS X, we tell the developer
+-- to get it from the package manager apt or homebrew. In MSW, we fetch a binary version
+-- that is hosted in Triumph's servers; this was done so that we use the same version
+-- of SQLite in all platforms; as the SQLite site does not seem to have an archive of
+-- previous versions.
+--
+-- See http://sqlite.org/
+--
 function prepSqlite()
 	
 	if os.is "windows" then

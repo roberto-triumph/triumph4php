@@ -23,6 +23,20 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the SOCI library
+-- SOCI is a database access library. Triumph uses SOCI to be able to query
+-- MySQL and SQLite databases using a single API. 
+--
+-- The SOCI code is included as a git submodule. On all platforms the 
+-- SOCI code is fetched and compiled.  We do this because some linux 
+-- distributions might have a really old version of SOCI.
+--
+-- The building instructions are in the code, in lib/soci/doc.
+-- SOCI requires cmake, so the system needs to have cmake installed.
+--
+-- See http://soci.sourceforge.net/
+--
 function prepSoci() 
 	SOCI_BUILD_DIR =  normalizepath("lib/soci/triumph");
 	SOCI_ROOT = normalizepath("lib/soci")

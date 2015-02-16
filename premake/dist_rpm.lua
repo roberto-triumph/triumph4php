@@ -22,6 +22,32 @@
 -- @copyright  2014 Roberto Perpuly
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
+
+-- 
+-- The distdeb action creates a RPM package of Triumph so that it can
+-- be distributed and downloaded easily.  This action can only be run
+-- on RedHat-based linux distributions as it requires that RPM packaging
+-- tools be present. The RPM package will contain our executable plus
+-- the wxWidgets libraries, as we use a fork of wxWidgets, and the version
+-- of wxWidgets in the stable repos can be pretty old. Most other shared
+-- libraries, like mysql, sqlite, curl will need to be in the system; the 
+-- user will need to install them via yum.
+--
+-- The process to build a deb pretty complicated, below is a brief summary:
+-- 1. create a new directory to start fresh in ~/rpmbuild/sources. This directory
+--    is NOT configurable
+-- 2. clone triumph into the new directory
+-- 3. Copy the wxWigets and SOCI libraries from the dev directory into the
+--    package directory, as we don't want to compile them on every release
+--    since it would take tens of minutes to compile them.
+-- 4. Create the version file  
+-- 5. create the desktop and menu files, so that there are menu items
+--    created for triumph. Copy the spec file as well. 
+-- 6. create makefiles for triumph. This is different for releasing, as 
+--    we need to point to the assets directory to the directory
+--    where it will be located in the user's sytem (/usr/share)
+-- 7. Run rpmbuild, it will build the final executable using our Makefile
+--    and will package it.
 newaction {
 	trigger = "distrpm",
 	description = "Build the Triumph distributable RPM package.",

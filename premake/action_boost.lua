@@ -23,10 +23,28 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the boost C++ libraries.
+-- Triumph uses the boost libraries for its cross-platform sockets which
+-- are used by the debugger. There are different ways of building boost
+-- depending on the running OS; on Mac OS X or linux we tell the developer
+-- to get the binary version from a package manager (homebrew or apt). In 
+-- MSW, we get a binary version that has been previously built by Triumph;
+-- we avoid unzipping and compiling boost since it is pretty time consuming (especially
+-- the unzipping; it takes ages!)
+-- 
+-- Boost prep instructions
+-- http://www.boost.org/doc/libs/1_57_0/more/getting_started/windows.html#prepare-to-use-a-boost-library-binary
+--
 function prepBoost()
 	
 	if os.is "windows" then
 	
+	
+		-- on windows, we download a version that's been previously compiled
+		-- we download it from our own servers, in binary form
+		-- extracting and compiling boost takes a while, we want to avoid it 
+		-- on MSW
 		boostZip = "lib/boost_1_46_0.7z";
 		boostDownload = "http://triumph4php.com/boost_1_46_0.7z"
 		extractedDir = 'lib/boost_1_46_0'
@@ -51,6 +69,9 @@ function prepBoost()
 		})
 	elseif os.is "linux" then  
 	
+		-- on linux, we don't install boost, we just look for it 
+		-- and if we don't find it tell the user to get it
+		--
 		-- BOOST_RELEASE_LIB_DIR is already the result of a os.searchpath
 		-- which searched the default locations for the boost library
 		boostLib = BOOST_RELEASE_LIB_DIR
@@ -64,6 +85,9 @@ function prepBoost()
 		end
 	elseif os.is "macosx" then  
 	
+		-- on mac , we don't install boost, we just look for it 
+		-- and if we don't find it tell the user to get it
+		--
 		-- BOOST_RELEASE_LIB_DIR is already the result of a os.searchpath
 		-- which searched the default locations for the boost library
 		boostLib = BOOST_RELEASE_LIB_DIR
@@ -72,7 +96,7 @@ function prepBoost()
 				"Boost libraries not found.  " .. 
 				"Please install the boost libraries, or change the location of \n" ..
 				"BOOST_RELEASE_LIB_DIR in premake_opts_macosx.lua.\n" ..
-				"You can install the boost libraries via home brew; ie. sudo brew install boost\n"
+				"You can install the boost libraries via homebrew; ie. brew install boost\n"
 			)
 		end
 	else 

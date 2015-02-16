@@ -22,6 +22,39 @@
 -- @copyright  2009-2011 Roberto Perpuly
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
+
+-- 
+-- The distdeb action creates a DEBian package of Triumph so that it can
+-- be distributed and downloaded easily.  This action can only be run
+-- on Debian-based linux distributions as it requires that debian packaging
+-- tools be present. The DEB package will contain our executable plus
+-- the wxWidgets libraries, as we use a fork of wxWidgets, and the version
+-- of wxWidgets in the stable repos can be pretty old. Most other shared
+-- libraries, like mysql, sqlite, curl will need to be in the system; the 
+-- user will need to install them via apt-get.
+--
+-- The process to build a deb pretty complicated, below is a brief summary:
+-- 1. create a new directory to start fresh
+-- 2. clone triumph into the new directory
+-- 3. create makefiles for triumph. This is different for releasing, as 
+--    we need to point to the assets directory to the directory
+--    where it will be located in the user's sytem (/usr/share)
+-- 4. Copy the wxWigets and SOCI libraries from the dev directory into the
+--    package directory, as we don't want to compile them on every release
+--    since it would take tens of minutes to compile them.
+-- 5. run dh_make
+-- 6. create the desktop and menu files, so that there are menu items
+--    created for triumph 
+-- 7. create the install file; this is the file that lists all files
+--    that need to be in the DEB archive.  It must list all files individually,
+--    including shared libraries and assets. The files are laid out
+--    in the proper manner; assets are put in usr/share, libs are placed
+--    in usr/libs/triumph4php
+-- 8. copy other files needed for the DEB archive, like the version file and
+--    the LICENSE files, remove other boilerplate files created by dh_make
+-- 9. Run dpkg-buildpackage it will build the final executable using our Makefile
+--    and will package it.
+--
 newaction {
 	trigger = "distdeb",
 	description = "Build the Triumph distributable DEB package",
@@ -177,7 +210,7 @@ newaction {
 			
 			-- finally, create the .deb this command will basically run our makefile
 			-- gather all of the 3rd party libs and assets and package them
-			-- we need to set the LD_LIBRAR_PATH so that dpkg finds our dependencies
+			-- we need to set the LD_LIBRARY_PATH so that dpkg finds our dependencies
 			-- -b means we create the binary only package, also -us -uc
 			-- creates an unsigned version
 			"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:Release/libs:Release dpkg-buildpackage -b -us -uc"

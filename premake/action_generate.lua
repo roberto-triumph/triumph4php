@@ -23,6 +23,12 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Create the PHP parser and lexer C++ code
+-- from the grammar files (bison, re2c). This only needs to be
+-- done when the grammar files change, as the resulting C++ code
+-- is checked into source control.
+--
 newaction {
 	trigger = "generate",
 	description = "Regenerate the source code for the PHP parser and PHP lexer.",

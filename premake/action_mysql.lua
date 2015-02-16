@@ -23,6 +23,16 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the MySQL connection (client) library
+-- Triumph uses the MySQL client library so that the user can explore database tables
+-- and write ad-hoc queries against MySQL databases.
+-- 
+-- On MSW, MySQL C connector binary is fetched from the MySQL dev site. On linux 
+-- or Mac OS X, the developer is told to install it via a package manager.
+--
+-- See http://dev.mysql.com/downloads/connector/c/
+--
 function prepMysql()
 	
 	if os.is "windows" then

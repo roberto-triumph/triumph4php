@@ -22,6 +22,29 @@
 -- @copyright  2009-2011 Roberto Perpuly
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
+
+--
+-- Builds a package for MS Windows; just a plain a 7-zip archive with the
+-- following structure;
+--
+-- ROOT
+--  |
+--	--> bin (holds triumph and all shared libraries)
+--  |
+--  --> assets (holds all images, php native functions db)
+--
+-- The package is a 7-zip archive because ZIP files with executables are labelled as
+-- "potentially dangerous" by web browsers (Chrome), and Chrome won't download them.
+-- The process of making the final archive is as follows:
+--
+-- 1. create a new directory to hold the final relase
+-- 2. clone triumph into the new directory
+-- 3. compile triumph
+-- 4. copy the shared libraries into the final destination
+-- 5. copy the assets into their final destination
+-- 6. create the version file
+-- 7. create the archive
+--
 newaction {
 	trigger = "distmsw",
 	description = "Build the Triumph distributable for MS Windows.",

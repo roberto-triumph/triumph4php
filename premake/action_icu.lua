@@ -23,6 +23,15 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the ICU libraries
+-- Triumph uses ICU to handle unicode text correctly.
+-- 
+-- On MSW, the ICU code is fetched, unzipped, and compiled as a shared library. On linux 
+-- or Mac OS X, the developer is told to install it via a package manager.
+--
+-- See http://site.icu-project.org/download
+--
 function prepIcu()
 	if os.is "windows" then
 		

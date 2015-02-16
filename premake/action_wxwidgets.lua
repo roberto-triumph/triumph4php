@@ -23,6 +23,19 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- This function preps the wxWidgets library. Triumph uses wxWidgets as a 
+-- GUI framework; it was chosen in order to make Triumph work in multiple
+-- platforms.
+--
+-- The wxWidgets source code is included as a git submodule; note that the
+-- submodule is to a triumph fork of wxWidgets because there are some bug fixes
+-- that were done to it. 
+--
+-- wxWidgets is fetched and compiled on all platforms.  
+--
+-- See http://wxwidgets.org/
+--
 function prepWxWidgets()
 	if os.is "windows" then
 		print "Compiling wxWidgets; this will take a several minutes..."

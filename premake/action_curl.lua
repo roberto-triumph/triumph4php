@@ -23,6 +23,17 @@
 -- @license    http://www.opensource.org/licenses/mit-license.php The MIT License
 -------------------------------------------------------------------
 
+--
+-- Prepare the cURL libraries
+-- Triumph uses cURL for making HTTP requests to the
+-- Triumph update server in order to check for new versions of itself
+-- 
+-- The cURL code is included as a git submodule, this function will compile
+-- it as a shared library on MSW. On linux or Mac OS X, the developer is 
+--  told to install it via a package manager.
+--
+-- See http://curl.haxx.se/libcurl/
+--
 function prepCurl()
 	curlDir =  normalizepath("lib/curl");
 	if os.is "windows" then
@@ -67,7 +78,7 @@ function prepCurl()
 				"CURL libraries not found.  " .. 
 				"Please install the CURL client library, or change the location of \n" ..
 				"CURL_LIB_DIR in premake_opts_macosx.lua.\n" ..
-				"Curl is usually installed in macosx by default. \n"
+				"You can install curl via your package manager ie. homebrew install curl. \n"
 			)
 		end
 	else 

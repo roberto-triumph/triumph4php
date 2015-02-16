@@ -24,9 +24,12 @@
 -------------------------------------------------------------------
 
 
-dofile "premake_functions.lua"
+includes = os.matchfiles("premake/*.lua")
+for key, scriptFile in ipairs(includes) do
+	dofile(scriptFile)
+end 
 
--- load opts after functions, opts need the trim function
+-- load opts after functions, premake_opts_* files make use of the trim function
 if os.is("windows") then
 	dofile "premake_opts_windows.lua"
 elseif os.is("linux") then
@@ -36,20 +39,6 @@ elseif os.is("macosx") then
 else
 	error "You are running on a non-supported operating system. triumph4php cannot be built.\n"
 end
-
-dofile "premake_action_dist_msw.lua"
-dofile "premake_action_dist_deb.lua"
-dofile "premake_action_dist_rpm.lua"
-dofile "premake_action_generate.lua"
-dofile "premake_action_soci.lua"
-dofile "premake_action_wxwidgets.lua"
-dofile "premake_action_curl.lua"
-dofile "premake_action_icu.lua"
-dofile "premake_action_mysql.lua"
-dofile "premake_action_sqlite.lua"
-dofile "premake_action_boost.lua"
-dofile "premake_action_setupdev.lua"
-
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations
 -- this is usually the case on linux
@@ -287,7 +276,9 @@ function pickywarnings(action)
 		-- since Visual Studio is not C99 compliant
 		buildoptions { "-Wall", "-Werror", "-Wvla" }
 	end
-end-- solution directory structure
+end
+
+-- solution directory structure
 -- the toolset files will be deposited in the build/ directory
 -- each toolset will have its own directory
 -- the executable files will be placed in the configuration directory (Debug/ or Release/)
