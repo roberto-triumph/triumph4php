@@ -29,14 +29,18 @@ managers; meaning we must do a lot of the work ourselves.
 
 ##Linux##
 1. The build system will require the developer to install the 
-   required dev packages
+   required dev packages, however setting up a dev environment
+   should not be more than 1 line of "sudo apt-get install ..."
+   or "sudo yum install ..."
 2. Triumph will be easy to build on linux using make and GCC.
 3. The final distribution will be in DEB or RPM form to make it
    easy on the end user to install.
 
 ##Mac OS X##
 1. The build system will require the developer to install the 
-   required dev packages
+   required dev packages however setting up a dev environment
+   should not be more than 1 line of "sudo port install ..."
+   or "brew install ..."
 2. Triumph will be easy to build on Mac OS X using make and
    CLANG.
 3. The final distribution will be in DMG form to make it
