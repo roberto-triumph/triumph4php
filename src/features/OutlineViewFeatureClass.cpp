@@ -30,6 +30,7 @@
 #include <globals/TagList.h>
 #include <language/TagParserClass.h>
 #include <globals/Sqlite.h>
+#include <globals/Number.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <Triumph.h>
 #include <soci/soci.h>
@@ -924,9 +925,9 @@ void t4p::FileSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 
 void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
-	size_t selection = MatchesList->GetSelection();
+	int selection = MatchesList->GetSelection();
 	if (keyCode == WXK_DOWN) {		
-		if (!MatchesList->IsEmpty() && selection < (MatchesList->GetCount() - 1)) {
+		if (!MatchesList->IsEmpty() && t4p::NumberLessThan(selection, (MatchesList->GetCount() - 1))) {
 			MatchesList->SetSelection(selection + 1);
 		}
 		else if (!MatchesList->IsEmpty()) {
@@ -955,8 +956,8 @@ void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 void t4p::FileSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	ChosenTags.clear();
-	size_t selection = event.GetSelection();
-	if (selection < MatchesList->GetCount()) {
+	int selection = event.GetSelection();
+	if (t4p::NumberLessThan(selection, MatchesList->GetCount())) {
 		ChosenTags.push_back(MatchingTags[selection]);
 	}
 	if (ChosenTags.empty()) {
@@ -1092,8 +1093,8 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 		else {
 			// no checked items, take the user to the
 			// selected item
-			size_t selection = MatchesList->GetSelection();
-			if (selection < MatchingTags.size()) {
+			int selection = MatchesList->GetSelection();
+			if (t4p::NumberLessThan(selection, MatchingTags.size())) {
 				ChosenTags.push_back(MatchingTags[selection]);
 				EndModal(wxOK);
 			}
