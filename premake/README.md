@@ -2,7 +2,7 @@
 
 Triumph's build system prepares the dev environment, manages dependencies,
 and builds the final distributable pacakges. Triumph is a cross-platform 
-application; the build process takes into account this. Further complicating 
+application; the build process takes this into account. Further complicating 
 things is the fact that there are no cross-platform C++ module / dependency 
 managers; meaning we must do a lot of the work ourselves.
 
@@ -45,3 +45,10 @@ managers; meaning we must do a lot of the work ourselves.
    CLANG.
 3. The final distribution will be in DMG form to make it
    easy on the end user to install.
+
+##FAQ##
+1. Why do the premake scripts read options from environment variables?
+The reason for this is that when we make final distributable
+packages, the location of assets and shared libraries on the machines
+where triumph will be installed on are different than the location
+of the libs / assets of the dev machines. 

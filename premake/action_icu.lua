@@ -82,7 +82,7 @@ function prepIcu()
 			error ("Could not execute icu-config. \n" ..
 				"Please install the ICU library, or change the location of \n" ..
 				"ICU_CONFIG in premake_opts_macosx.lua.\n" ..
-				"You can install ICU via home brew; ie. sudo brew install icu4c\n"
+				"You can install ICU via home brew; ie. brew install icu4c\n"
 			)
 		end
 	else 
