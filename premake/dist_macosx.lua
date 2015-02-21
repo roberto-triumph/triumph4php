@@ -46,7 +46,7 @@ newaction {
 		rootDir = normalizepath("./")
 		workDir = path.getabsolute("../triumph4php-" .. tag)
 		binDir = workDir .. "/Release/triumph4php.app/Contents/MacOS"
-		
+
 		-- the asset dir will be inside the app bundle, need to make it in a 
 		-- directory adjacent to the "Contents/MacOS" directory
 		assetDir = "../Resources"
@@ -77,9 +77,7 @@ newaction {
 			-- copy assets to the app bundle dir
 			string.format('mkdir -p %s', assetDestFullPath),
 			string.format('cp -r %s/* %s', assetSrcFullPath, assetDestFullPath),
-			
-			-- copy the app icons
-			string.format('cp %s/icons/triumph4php.png %s/triumph4php.png', assetSrcFullPath, assetDestFullPath)
+			string.format('cp -r %s/icons/triumph4php.icns %s/triumph4php.icns', assetDestFullPath, assetDestFullPath)
 		})
 		
 		cmdOutput = execoutput(ICU_CONFIG .. ' --prefix')
@@ -87,27 +85,28 @@ newaction {
 		
 		cmdOutput = execoutput(WX_CONFIG .. ' --prefix')
 		wxWidgetsLibDir = trim(cmdOutput) .. "/triumph/lib" -- because we do not "install" wx widgets; see action_wxwidgets
-		
-		deps = {
-			["boost"] = normalizepath(BOOST_RELEASE_LIB_DIR .. '/libboost_system-mt.dylib'), -- we only need this one for now asio is header only
-			["curl"] = normalizepath(CURL_LIB_DIR .. '/' .. CURL_LIB_NAME),
-			["icu"] = normalizepath(icuLibDir .. '/libicu*.dylib'),
-			["mysql"] = normalizepath(MYSQL_LIB_DIR .. '/' .. MYSQL_LIB_NAME),
-			["soci"] = normalizepath(SOCI_RELEASE_LIB_DIR .. '/libsoci*.dylib'),
-			["sqlite"] = normalizepath(SQLITE_LIB_DIR .. '/' .. SQLITE_LIB_NAME),
-			["wx"] = normalizepath(wxWidgetsLibDir .. '/libwx*.dylib'),
-			["keybinder"] = normalizepath(workDir .. '/Release/libkeybinder.dylib'),
-			["pelet"] = normalizepath(workDir .. '/Release/libpelet.dylib'),
-		}
 			
 		-- move the dependant libraries to the "Contents/MacOS" directory right
 		-- next to the triumph binary
 		os.execute("mkdir -p " .. workDir .. "/Release/triumph4php.app/Contents/MacOS")
-		for lib, libDir in pairs(deps) do
-			batchexecute(rootDir, {
-				string.format("cp %s %s", libDir, binDir)	
-			})
-		end
+		batchexecute(rootDir, {
+
+			-- -P and -R so that symlinks are copied as links, and files 
+			-- are not duplicated
+			string.format("cp -P -R %s %s", normalizepath(wxWidgetsLibDir .. '/libwx*.dylib'), binDir),
+			string.format("cp -P -R %s %s", normalizepath(SOCI_RELEASE_LIB_DIR .. '/libsoci*.dylib'), binDir),
+			string.format("cp -P -R %s %s", normalizepath(icuLibDir .. '/libicu*.dylib'), binDir),
+			
+			-- here since were are copying single lines, we want symlinks to be followed
+			string.format("cp %s %s", normalizepath(CURL_LIB_DIR .. '/' .. CURL_LIB_NAME), binDir),
+			string.format("cp %s %s", normalizepath(workDir .. '/Release/libpelet.dylib'), binDir),
+			string.format("cp %s %s", normalizepath(workDir .. '/Release/libkeybinder.dylib'), binDir),
+			string.format("cp %s %s", normalizepath(SQLITE_LIB_DIR .. '/' .. SQLITE_LIB_NAME), binDir),
+			string.format("cp %s %s", normalizepath(MYSQL_LIB_DIR .. '/' .. MYSQL_LIB_NAME), binDir),
+
+			-- we only need this one for now asio is header only
+			string.format("cp %s %s", normalizepath(BOOST_RELEASE_LIB_DIR .. '/libboost_system-mt.dylib'), binDir)
+		})
 		
 		-- go through each shared library and change it so that the ID of
 		-- the library is relative to the root of the app bundle
@@ -150,5 +149,30 @@ newaction {
 				lineNumber = lineNumber + 1
 			end
 		end
+
+		-- now create a DMG file
+		-- i followed instructions from 
+		-- https://wiki.wxwidgets.org/Distributing_WxWidgets_Applications-Distributing_WxMac_Programs
+
+		-- we need to get the directory size of the volume to create
+		cmdOutput = execoutput("du -hs " .. workDir .. "/Release/triumph4php.app")
+		sizeMb = trim(cmdOutput)
+		size = string.match(sizeMb, "(%d+)")
+		size = size + 4  -- add some padding, round up
+		batchexecute(workDir, {
+			string.format("hdiutil create -megabytes %d -layout NONE triumph4php.dmg", size),
+		})
+
+		-- need to read the disk that was created
+		cmdOutput = execoutput(string.format("hdid -nomount %s/triumph4php.dmg", workDir))
+		disk = trim(cmdOutput)
+		print("disk=" .. disk)
+
+		batchexecute(workDir, {
+			string.format("newfs_hfs -v triumph4php %s", disk),
+			string.format("hdiutil eject %s", disk),
+			"hdid triumph4php.dmg",
+			"cp -P -R Release/triumph4php.app /Volumes/triumph4php"
+		})
 	end
 }

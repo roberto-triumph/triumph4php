@@ -158,6 +158,9 @@ end
 
 -- executes the given command and returns the output 
 -- of the command.  Only returns stdout
+-- this will return the entire ouput; it will most
+-- likely need to be trimmed to remove unexpected
+-- new lines
 function execoutput(cmd)
 	cmdStream = io.popen(cmd)
 	cmdOutput = cmdStream:read("*a")

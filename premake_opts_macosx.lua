@@ -119,6 +119,7 @@ MYSQL_INCLUDE_DIR = '/usr/local/include/mysql/'
 MYSQL_LIB_NAME = 'libmysqlclient.dylib'
 
 MYSQL_LIB_DIR = os.pathsearch('libmysqlclient.dylib', 
+	"/usr/local/opt/mysql-connector-c/lib",
 	"/usr/local/lib", 
 	"/usr/local/lib/mysql",
 	"/usr/lib/",
@@ -177,6 +178,7 @@ end
 -- assume release libs are installed
 BOOST_DEBUG_INCLUDE_DIR = '/usr/local/include'
 BOOST_DEBUG_LIB_DIR = os.pathsearch('libboost_system-mt.dylib', 
+	"/usr/loca/opt/boost/lib",
 	"/usr/local/lib",
 	"/usr/lib"
 );

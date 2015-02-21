@@ -10,7 +10,7 @@
     <key>CFBundleName</key>
     <string>Triumph4PHP</string>
     <key>CFBundleIconFile</key>
-    <string></string>
+    <string>triumph4php.icns</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleVersion</key>
