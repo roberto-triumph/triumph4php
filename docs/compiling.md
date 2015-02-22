@@ -121,11 +121,14 @@ to an hour, depending on your machine's processing power.
 
 ##Step 1: Download dependent packages##
 
-    sudo yum install libicu libicu-devel community-mysql-common \
+    sudo yum install gcc-c++ libicu libicu-devel community-mysql-common \
 	community-mysql-devel re2c bison cmake git php-cli php-pdo \
     glibc.i686 sqlite sqlite-devel libcurl libcurl-devel \
     gtk2-devel boost-system asio-devel \
 	libpng-devel libnotify-devel expat-devel
+
+
+Note: you may also see the MySQL packages as "mariadb"
 
 ##Step 2: Download the development tools##
 Use your favorite IDE / editor, or get [Codelite](http://codelite.org)
