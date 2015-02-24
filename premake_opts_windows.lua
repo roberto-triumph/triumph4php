@@ -107,7 +107,11 @@ WX_LIB_STC_RELEASE = "wxmsw29u_stc"
 
 -- location of the Git executable. this is used by the
 -- setupdev action to get all submodule
-GIT = 'C:\\Program Files (x86)\\Git\\bin\\git.exe';
+GIT = os.getenv("T4P_GIT")
+if (not GIT) then
+	GIT = 'C:\\Program Files (x86)\\Git\\bin\\git.exe';
+	print "Using default location of 'C:\\Program Files (x86)\\Git\\bin\\git.exe' for git"
+end
 
 -- location of the cmake executable. cmake is used to build the SOCI
 -- library (Database Access wrapper)
@@ -115,8 +119,11 @@ CMAKE = 'cmake';
 
 -- location of 7-zip, used to unzip downloaded binaries of Triumph
 -- dependencies from the Internet
-SEVENZIP = 'C:\\Chocolatey\\bin\\7za';
-
+SEVENZIP = os.getenv('T4P_SEVENZIP')
+if (not SEVENZIP) then
+	SEVENZIP = 'C:\\Chocolatey\\bin\\7za';
+	print "Using default location of 'C:\\Chocolatey\\bin\\7za' for 7-zip executable"
+end
 -- location of wget, used to retrieve some of Triumph
 -- dependencies from the Internet
 WGET = 'wget';
