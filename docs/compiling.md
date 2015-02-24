@@ -79,9 +79,9 @@ to an hour, depending on your machine's processing power.
 
 ##Step 1: Download dependent packages##
 
-    sudo apt-get install libicu48 libicu-dev libicu48-dbg libmysqlclient-dev \
+    sudo apt-get install build-essential libicu48 libicu-dev libicu48-dbg libmysqlclient-dev \
 	                     re2c bison CMake git libtool php5-cli \
-						ia32-libs sqlite3 libsqlite3-dev libsqlite3-0-dbg \
+						libc6:i386 sqlite3 libsqlite3-dev libsqlite3-0-dbg \
 						libcurl3-dev libgtk2.0-dev libasio-dev libboost-system-dev \
 						libpng-dev libnotify-dev libexpat1-dev
 						
