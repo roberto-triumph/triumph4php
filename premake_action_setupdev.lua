@@ -87,6 +87,7 @@ function setupDev()
 	prepMysql();
 	prepSqlite();
 	prepSoci();
+	prepBoost();
 	prepWxWidgets();
 	
 	print "SUCCESS! All dependencies are met. Next step is to build triumph4php in your environment.";
