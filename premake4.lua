@@ -46,6 +46,7 @@ dofile "premake_action_mysql.lua"
 dofile "premake_action_sqlite.lua"
 dofile "premake_action_boost.lua"
 dofile "premake_action_setupdev.lua"
+dofile "premake_action_compile_msw.lua"
 
 
 -- this configuration uses the icu-config binary to get the ICU header & library locations
