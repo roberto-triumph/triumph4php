@@ -38,8 +38,8 @@ function compileMsw()
 		
 		-- wrap around quotes in case path has spaces
 		"\"" .. VSVARS .. "\"",
-		"vcbuild triumph4php.sln \"Debug|Win32\"",
-		"vcbuild triumph4php.sln \"Release|Win32\""		
+		"vcbuild /rebuild triumph4php.sln \"Debug|Win32\"",
+		"vcbuild /rebuild triumph4php.sln \"Release|Win32\""
 	})
 end
 
