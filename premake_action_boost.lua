@@ -51,14 +51,14 @@ function prepBoost()
 		})
 	else  
 	
-		-- BOOST_LIB_DIR is already the result of a os.searchpath
+		-- BOOST_RELASE_LIB_DIR is already the result of a os.searchpath
 		-- which searched the default locations for the boost library
-		boostLib = BOOST_LIB_DIR
+		boostLib = BOOST_RELEASE_LIB_DIR
 		if boostLib == nil then
 			error (
 				"Boost libraries not found.  " .. 
 				"Please install the boost libraries, or change the location of \n" ..
-				"BOOST_LIB_DIR in premake_opts_linux.lua.\n" ..
+				"BOOST__RELEASE_LIB_DIR in premake_opts_linux.lua.\n" ..
 				"You can install the boost libraries via your package manager; ie. sudo apt-get install libboost-dev libboost-system-dev libasio-dev\n"
 			)
 		end
