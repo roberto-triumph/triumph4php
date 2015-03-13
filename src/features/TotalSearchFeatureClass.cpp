@@ -198,7 +198,13 @@ void t4p::TotalSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 
 void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int currentIndex = MatchesList->GetSelection();
-	int nextIndex = currentIndex;
+	if (currentIndex == wxNOT_FOUND) {
+		event.Skip();
+		return;
+	}
+
+	// at this point currentIndex is guaranteed to be >= 0
+	unsigned int nextIndex = currentIndex;
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_DOWN) {
 		nextIndex++;
@@ -208,13 +214,15 @@ void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 		skip = false;
 	}
 	else if (event.GetKeyCode() == WXK_UP) {
-		nextIndex--;
-		if (nextIndex < 0) {
+		if (nextIndex == 0) {
 			nextIndex = MatchesList->GetCount() - 1;
+		}
+		else {
+			nextIndex--;
 		}
 		skip = false;
 	}
-	if (nextIndex >= 0 && nextIndex < MatchesList->GetCount()) {
+	if (nextIndex < MatchesList->GetCount()) {
 		MatchesList->SetSelection(nextIndex);
 	}
 	if (skip) {
