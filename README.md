@@ -43,4 +43,4 @@ Help
    [issue tracker](https://github.com/robertop/triumph4php/issues). Please do not use the issue
    tracker for discussion, use it for requests only.  The forums are better suited for discussions.
  - Triumph4PHP roadmap: A look at the upcoming features that are being actively developed:
-   http://code.google.com/p/triumph4php/w/list
+   https://github.com/robertop/triumph4php/issues
