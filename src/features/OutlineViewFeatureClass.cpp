@@ -938,7 +938,7 @@ void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 		SearchText->SetFocus();
 	}
 	else if (keyCode == WXK_UP) {
-		if (!MatchesList->IsEmpty() && selection > 0 && selection < MatchesList->GetCount()) {
+		if (!MatchesList->IsEmpty() && selection > 0 && t4p::NumberLessThan(selection, MatchesList->GetCount())) {
 			MatchesList->SetSelection(selection - 1);
 		}
 		else if (!MatchesList->IsEmpty() && selection == 0) {

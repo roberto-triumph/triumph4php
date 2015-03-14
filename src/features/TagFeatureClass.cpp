@@ -733,7 +733,7 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 
 void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	int selection = event.GetSelection();
-	if (selection >= MatchesList->GetCount()) {
+	if (selection == wxNOT_FOUND) {
 		
 		// no item chosen
 		return;
