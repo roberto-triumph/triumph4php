@@ -325,9 +325,9 @@ solution "triumph4php"
 		kind "WindowedApp"
 		
 		if os.is "windows" then
-			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "README.md", "src/Triumph.rc" }
+			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "premake/*.lua", "README.md", "src/Triumph.rc" }
 		else 
-			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "README.md" }
+			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "premake/*.lua", "README.md" }
 		end
 		includedirs { 
 			"src/", 
