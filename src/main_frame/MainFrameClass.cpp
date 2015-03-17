@@ -662,7 +662,7 @@ void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
 	
 	
 	// move preferences menu to the end, similar to most other programs
-	wxMenuItem* preferencesMenu = EditMenu->Remove(ID_EDIT_PREFERENCES);
+	wxMenuItem* preferencesMenu = EditMenu->Remove(wxID_PREFERENCES);
 	EditMenu->Append(preferencesMenu);
 
 	// move exit menu to the end, similar to most other programs
@@ -829,7 +829,7 @@ void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[wxID_SELECTALL] = wxT("Edit-Select All");
 	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
 	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
-	defaultMenus[ID_EDIT_PREFERENCES] = wxT("Edit-Preferences");
+	defaultMenus[wxID_PREFERENCES] = wxT("Edit-Preferences");
 	defaultMenus[ID_VIEW_TOGGLE_TOOLS] = wxT("View-Tools");
 	defaultMenus[ID_VIEW_TOGGLE_OUTLINE] = wxT("View-Outline");
 

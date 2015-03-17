@@ -372,7 +372,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Edit</property>
                     <property name="name">EditMenu</property>
                     <property name="permission">protected</property>
@@ -475,7 +475,7 @@
                         <property name="checked">0</property>
                         <property name="enabled">1</property>
                         <property name="help"></property>
-                        <property name="id">ID_EDIT_PREFERENCES</property>
+                        <property name="id">wxID_PREFERENCES</property>
                         <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">Preferences</property>
                         <property name="name">MenuItemEditPreferences</property>
