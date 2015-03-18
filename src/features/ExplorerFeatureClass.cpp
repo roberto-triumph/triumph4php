@@ -208,6 +208,10 @@ t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app)
 			FileManagerExecutable = wxT("/usr/bin/nautilus");
 			ShellExecutable = wxT("/bin/sh");
 			break;
+		case wxOS_MAC_OSX_DARWIN:
+			FileManagerExecutable = wxT("/usr/bin/open");
+			ShellExecutable = wxT("/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal");
+			break;
 		default:
 			FileManagerExecutable = wxT("C:\\windows\\system32\\explorer.exe");
 			ShellExecutable = wxT("C:\\windows\\system32\\cmd.exe");
@@ -797,15 +801,15 @@ void t4p::FileListingWidgetClass::OnListMenuShell(wxCommandEvent& event) {
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		cmd += wxT(" /k cd \"") + FileListing->WorkingDir.GetPath() + wxT("\"");
 	}
+	else {
+		cmd += wxT(" \"") + FileListing->WorkingDir.GetPath() + wxT("\"");
+	}
 	wxExecute(cmd, wxEXEC_ASYNC);
 }
 
 void t4p::FileListingWidgetClass::OnListMenuFileManager(wxCommandEvent& event) {
 	wxString cmd = Feature->FileManagerExecutable.GetFullPath();
-	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
-		cmd += wxT(" ") + FileListing->WorkingDir.GetPath();
-	}
+	cmd += wxT(" \"") + FileListing->WorkingDir.GetPath() + wxT("\"");
 	wxExecute(cmd, wxEXEC_ASYNC);
 }
 
