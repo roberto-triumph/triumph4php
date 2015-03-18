@@ -110,6 +110,13 @@ void wxMenuCmd::Update()
 	// on GTK, the SetAccel() function doesn't have any effect...	   
 	m_pItem->SetItemLabel(newtext);
 
+#elif defined( __WXMAC__ )
+	
+	// this line was patched by triumph
+	// it is needed so that menu items are properly updated
+	// in Mac OS X
+	m_pItem->SetItemLabel(newtext);
+
 #ifdef __WXGTK20__
 
 	//   gtk_menu_item_set_accel_path(GTK_MENU_ITEM(m_pItem), wxGTK_CONV(newtext));
