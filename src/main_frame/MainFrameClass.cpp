@@ -586,7 +586,7 @@ void t4p::MainFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	menuItem->Enable(hasEditors && Notebook->IsPageModified(currentPage));
 	menuItem = MenuBar->FindItem(wxID_SAVEAS);
 	menuItem->Enable(hasEditors && NULL != code);
-	menuItem = MenuBar->FindItem(ID_FILE_CLOSE);
+	menuItem = MenuBar->FindItem(wxID_CLOSE);
 	menuItem->Enable(hasEditors);
 	menuItem = MenuBar->FindItem(ID_FILE_REVERT);
 	menuItem->Enable(hasEditors && Notebook->IsPageModified(currentPage) && NULL != code && !code->IsNew());
@@ -821,7 +821,7 @@ void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[wxID_SAVEAS] = wxT("File-Save As");
 	defaultMenus[ID_FILE_SAVE_ALL] = wxT("File-Save All");
 	defaultMenus[ID_FILE_REVERT] = wxT("File-Revert");
-	defaultMenus[ID_FILE_CLOSE] = wxT("File-Close");
+	defaultMenus[wxID_CLOSE] = wxT("File-Close");
 	defaultMenus[wxID_EXIT] = wxT("File-Exit");
 	defaultMenus[wxID_CUT] = wxT("Edit-Cut");
 	defaultMenus[wxID_COPY] = wxT("Edit-Copy");
@@ -833,12 +833,23 @@ void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 	defaultMenus[ID_VIEW_TOGGLE_TOOLS] = wxT("View-Tools");
 	defaultMenus[ID_VIEW_TOGGLE_OUTLINE] = wxT("View-Outline");
 
-	defaultMenus[ID_ABOUT] = wxT("Help-About");
+	defaultMenus[wxID_ABOUT] = wxT("Help-About");
 	wxMenuBar* menuBar = GetMenuBar();
+	wxPlatformInfo info;
 	for (std::map<int, wxString>::iterator it = defaultMenus.begin(); it != defaultMenus.end(); ++it) {
 		wxMenuItem* item = menuBar->FindItem(it->first);
 		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
 		t4p::DynamicCmdClass cmd(item, it->second);
+		
+		// ATTN: do this here, since we want the close file shortcut to
+		// be different per OS
+		// so that in Mac, we use the same close shortcut as other Editors
+		if (it->first == wxID_CLOSE && info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
+			cmd.AddShortcut(wxT("CTRL+F4"));
+		}
+		else if (it->first == wxID_CLOSE) {
+			cmd.AddShortcut(wxT("CTRL+W"));
+		}
 		Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
 	}
 }
