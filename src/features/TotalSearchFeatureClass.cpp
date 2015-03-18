@@ -224,6 +224,14 @@ void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 	if (nextIndex < MatchesList->GetCount()) {
 		MatchesList->SetSelection(nextIndex);
+		
+		// in Mac os x the item is not scrolled to the
+		// viewable port when it is selected, we must do
+		// it ourselves
+		wxPlatformInfo info;
+		if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+			MatchesList->EnsureVisible(nextIndex);
+		}
 	}
 	if (skip) {
 		event.Skip();
