@@ -88,6 +88,9 @@ void t4p::PhpEnvironmentClass::Init() {
 		case wxOS_WINDOWS_NT:
 			PhpExecutablePath = wxT("php-win.exe");
 			break;
+		case wxOS_MAC_OSX_DARWIN:
+			PhpExecutablePath = wxT("php");
+			break;
 		default:
 			break;
 	}
@@ -200,6 +203,12 @@ void t4p::EnvironmentClass::AddDefaults() {
 			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Internet Explorer"), wxFileName(wxT("C:\\Program Files (x86)\\Internet Explorer\\iexplore.exe"))));
 			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Opera"), wxFileName(wxT("C:\\Program Files (x86)\\Opera\\opera.exe"))));
 			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Safari"), wxFileName(wxT("C:\\Program Files (x86)\\Safari\\Safari.exe"))));
+			break;
+		case wxOS_MAC_OSX_DARWIN:
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Safari"), wxFileName(wxT("/Applications/Safari.app/Contents/MacOS/Safari"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Mozilla Firefox"), wxFileName(wxT("/Applications/Firefox.app/Contents/MacOS/firefox"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Google Chrome"), wxFileName(wxT("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"))));
+			WebBrowsers.push_back(t4p::WebBrowserClass(wxT("Opera"), wxFileName(wxT("/Applications/Opera.app/Contents/MacOS/Opera"))));
 			break;
 		default:
 			break;
