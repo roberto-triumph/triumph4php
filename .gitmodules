@@ -9,3 +9,7 @@
 	path = lib/curl
 	url = https://github.com/bagder/curl.git
 	ignore = dirty
+[submodule "lib/wxWidgets"]
+	path = lib/wxWidgets
+	url = git@github.com:robertop/wxWidgets.git
+	ignore = dirty
