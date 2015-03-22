@@ -430,6 +430,7 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
@@ -453,9 +454,8 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#D8D8D8"));
@@ -931,9 +931,8 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#F8E1AA"));
@@ -1409,9 +1408,8 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#657A81"));
@@ -1887,9 +1885,8 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#839496"));
@@ -2365,9 +2362,8 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#d3d7cf"));
@@ -2843,9 +2839,8 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#f6f3e8"));
@@ -3321,9 +3316,8 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#C0C0C0"));
@@ -3799,9 +3793,8 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#FFFFFF"));
@@ -4277,9 +4270,8 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#E0E2E4"));
@@ -4755,9 +4747,8 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#000000"));
@@ -5233,9 +5224,8 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#C0B6A8"));
@@ -5711,9 +5701,8 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#000000"));
@@ -6189,9 +6178,8 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#430400"));
@@ -6667,9 +6655,8 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#000000"));
@@ -7145,9 +7132,8 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#FFFFFF"));
@@ -7623,9 +7609,8 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#D0D0D0"));
@@ -8101,9 +8086,8 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#333333"));
@@ -8579,9 +8563,8 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#F9F9F9"));
@@ -9057,9 +9040,8 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#CFBFAD"));
@@ -9535,9 +9517,8 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#000000"));
@@ -10013,9 +9994,8 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#E2E2E2"));
@@ -10491,9 +10471,8 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#F8F8F2"));
@@ -10969,9 +10948,8 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#CFBFAD"));
@@ -11447,9 +11425,8 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#E0E2E4"));
@@ -11925,9 +11902,8 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#DCDCCC"));
@@ -12403,9 +12379,8 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#FFFFFF"));
@@ -12881,9 +12856,8 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("#585858"));

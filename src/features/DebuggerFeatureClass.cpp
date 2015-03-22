@@ -1380,7 +1380,7 @@ void t4p::DebuggerFeatureClass::OnViewDebuggerEval(wxCommandEvent& event) {
 
 t4p::DebuggerLogPanelClass::DebuggerLogPanelClass(wxWindow* parent)
 : DebuggerLogPanelGeneratedClass(parent, wxID_ANY) {
-	ClearButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("eraser")));
+	ClearButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("eraser")));
 }
 
 void t4p::DebuggerLogPanelClass::Append(const wxString& text) {
@@ -1742,8 +1742,8 @@ t4p::DebuggerBreakpointPanelClass::DebuggerBreakpointPanelClass(wxWindow* parent
 , Feature(feature) 
 , AreAllEnabled(false) {
 
-	DeleteBreakpointButton->SetBitmap(t4p::BitmapImageAsset(wxT("breakpoint-delete")));
-	ToggleAllBreakpointsButton->SetBitmap(t4p::BitmapImageAsset(wxT("breakpoint-toggle")));
+	DeleteBreakpointButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("breakpoint-delete")));
+	ToggleAllBreakpointsButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("breakpoint-toggle")));
 
 	BreakpointsList->AppendToggleColumn("Enabled");
 	BreakpointsList->AppendTextColumn("File");
@@ -2025,8 +2025,8 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 	CodeCtrl->SetFileType(t4p::FILE_TYPE_PHP);
 	ExprSizer->Add(CodeCtrl, 1, wxALL | wxEXPAND, 5);
 	
-	EvalButton->SetBitmap(t4p::BitmapImageAsset(wxT("debugger-eval")));
-	ClearButton->SetBitmap(t4p::BitmapImageAsset(wxT("eraser")));
+	EvalButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("debugger-eval")));
+	ClearButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("eraser")));
 	Splitter->SetSashPosition(0);
 	ResetStatus(false);
 	
@@ -2071,8 +2071,7 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
 	ExprResult->SetFont(font);
 }
 

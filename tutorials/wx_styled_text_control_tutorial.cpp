@@ -63,8 +63,7 @@ MyFrame::MyFrame() :
 	// set all of the used styles to the same font
 	// each token type has its own 'style' that can be changed
 	// independently.
-	wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-	            wxT("Courier New"));
+	wxFont font(wxFontInfo(10).AntiAliased(true).FaceName(wxT("Courier New")));
 	for (int i = wxSTC_H_DEFAULT; i <= wxSTC_H_QUESTION; i++) {
 		TextCtrl->StyleSetFont(i, font);
 	}

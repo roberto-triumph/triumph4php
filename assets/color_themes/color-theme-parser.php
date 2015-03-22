@@ -162,9 +162,8 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
-	wxFont font(fontSize, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL | wxFONTFLAG_ANTIALIASED, wxFONTWEIGHT_NORMAL, false,
-				fontName);
-				
+	wxFont font(wxFontInfo(fontSize).AntiAliased(true).FaceName(fontName));
+	
 	for (size_t i = 0; i < options.PhpStyles.size(); ++i) {
 		options.PhpStyles[i].Font = font;
 		options.PhpStyles[i].Color = wxColour(wxT("{$defaultForeground}"));
