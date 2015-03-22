@@ -873,13 +873,10 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	SourcesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	SourcesList->AssignImageList(SourcesImageList, wxIMAGE_LIST_SMALL);
 
-	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
-	ParentButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("arrow-up")));
-	RefreshButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
-
+	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
+	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
+	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
+	
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();	
 	FillSourcesList(sourceDirs);
 
@@ -1264,12 +1261,9 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
 	List->AssignImageList(FilesImageList, wxIMAGE_LIST_SMALL);
 
-	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
-	ParentButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("arrow-up")));
-	RefreshButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
+	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
+	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
+	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
 	
 	List->DeleteAllColumns();
 	List->InsertColumn(0, _(""));

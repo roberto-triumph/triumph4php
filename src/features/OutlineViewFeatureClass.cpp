@@ -358,12 +358,10 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	, ShowFunctionArgs(false)
 	, SortByName(true)
 	, SortByType(false) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-	SyncButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-refresh")));
-	AddButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("outline-add")));
-	FilterButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("filter")));
-	SortButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("sort")));
+	SyncButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
+	AddButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-add")));
+	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
+	SortButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("sort")));
 
 	SetStatus(_(""));
 	

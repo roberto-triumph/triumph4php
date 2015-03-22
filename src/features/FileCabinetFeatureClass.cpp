@@ -106,11 +106,8 @@ t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p:
 , FileCabinet()
 , Feature(feature) 
 , MainWindow(mainWindow) {
-	AddFileButton->SetBitmap(t4p::BitmapImageAsset(wxT("document-plus")));
-	AddDirectoryButton->SetBitmap(t4p::BitmapImageAsset(wxT("directory-plus")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))	
-	);
+	AddFileButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("document-plus")));
+	AddDirectoryButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("directory-plus")));
 	ImageList = new wxImageList(16, 16);
 	
 	t4p::FileTypeImageList(*ImageList);

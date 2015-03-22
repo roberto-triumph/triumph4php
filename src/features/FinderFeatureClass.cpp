@@ -26,6 +26,7 @@
 #include <globals/String.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
+#include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/numdlg.h>
 #include <wx/valgen.h>
@@ -58,14 +59,9 @@ t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId,
 	wxGenericValidator wrapValidator(&Finder.Wrap);
 	Wrap->SetValidator(wrapValidator);
 	RESULT_MESSAGE = _("Status: Found text at line %d");
-	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN, wxART_TOOLBAR,
-		wxSize(16, 16)));
-	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP, wxART_TOOLBAR,
-		wxSize(16, 16)));
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
-		wxART_FRAME_ICON, wxSize(16, 16))));
+	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN));
+	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP));
+	CloseButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_ERROR));
 	TransferDataToWindow();
 }
 
@@ -247,22 +243,14 @@ t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::F
 	wxGenericValidator wrapValidator(&Finder.Wrap);
 	Wrap->SetValidator(wrapValidator);
 	RESULT_MESSAGE = _("Status: Found text at line %d");
-	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN, wxART_TOOLBAR,
-		wxSize(16, 16)));
-	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP, wxART_TOOLBAR,
-		wxSize(16, 16)));
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-	CloseButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_ERROR, 
-		wxART_FRAME_ICON, wxSize(16, 16))));
+	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN));
+	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP));
+	CloseButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_ERROR));
 	UnicodeStringValidatorClass replaceValidator(&Finder.ReplaceExpression, true);
 	ReplaceWithText->SetValidator(replaceValidator);
-	ReplaceButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-	ReplaceAllButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-	UndoButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_UNDO, 
-		wxART_TOOLBAR, wxSize(16, 16))));
+	ReplaceButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE));
+	ReplaceAllButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE));
+	UndoButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_UNDO));
 	ReplaceWithText->MoveAfterInTabOrder(FindText);
 	RegExReplaceHelpButton->MoveAfterInTabOrder(ReplaceWithText);
 	TransferDataToWindow();

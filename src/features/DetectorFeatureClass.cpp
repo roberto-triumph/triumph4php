@@ -645,8 +645,6 @@ t4p::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id
 	: UrlDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("url-detectors"))) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
 
 	// propagate the menu events to the handler since the handler is not connected to the 
 	// GUI it will not get them by default
@@ -686,9 +684,7 @@ t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWi
 	, Globals(globals) 
 	, RunningThreads(runningThreads) 
 	, EventSink(eventSink) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-
+	
 	// propagate the menu events to the handler since the handler is not connected to the 
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
@@ -819,9 +815,7 @@ t4p::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, t4p:
 	: TagDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("tag-detectors"))) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-
+	
 	// propagate the menu events to the handler since the handler is not connected to the 
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
@@ -854,9 +848,7 @@ t4p::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* pare
 	: DatabaseDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("database-detectors"))) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
-
+	
 	// propagate the menu events to the handler since the handler is not connected to the 
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED, 
@@ -889,8 +881,6 @@ t4p::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, 
 	: ConfigDetectorPanelGeneratedClass(parent, id) 
 	, Detector() 
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("config-detectors"))) {
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
 
 	// propagate the menu events to the handler since the handler is not connected to the 
 	// GUI it will not get them by default

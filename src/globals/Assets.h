@@ -57,6 +57,21 @@ wxBitmap AutoCompleteImageAsset(wxString imageName);
 wxBitmap BitmapImageAsset(wxString imageName);
 
 /**
+ * Load one of the png images in the asset dir into a bitmap
+ * prepping the image to go inside a button. we do a bit
+ * of prep work for images that go inside buttons, because
+ * in Mac OS X the images that we have are too small
+ * and they make the buttons look bad. Ideally we would have
+ * "retina ready" pngs but I am not an artist and have 
+ * zero clue as to how to do that.
+ * 
+ * @param the name of an image, minus the .png extension
+ * @return the loaded bitmap of the given icon image.  The image name must exist; if it
+ * does not an assertion is triggered.
+ */
+wxBitmap BitmapImageButtonPrepAsset(wxString imageName);
+
+/**
  * @param the name of an image, minus the .ico extension
  * @return the loaded bitmap of the given icon image.  The image name must exist; if it
  * does not an assertion is triggered.

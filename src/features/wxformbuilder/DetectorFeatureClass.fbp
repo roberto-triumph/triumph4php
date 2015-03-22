@@ -343,14 +343,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -535,7 +535,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -583,16 +583,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
                 <property name="name">BoxSizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxFlexGridSizer" expanded="1">
+                    <object class="wxFlexGridSizer" expanded="0">
                         <property name="cols">1</property>
                         <property name="flexible_direction">wxBOTH</property>
                         <property name="growablecols">0</property>
@@ -857,14 +857,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -903,11 +903,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">UrlSizer</property>
                                 <property name="orient">wxHORIZONTAL</property>
@@ -968,11 +968,11 @@
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxALL|wxEXPAND</property>
                                     <property name="proportion">1</property>
-                                    <object class="wxTextCtrl" expanded="1">
+                                    <object class="wxTextCtrl" expanded="0">
                                         <property name="bg"></property>
                                         <property name="context_help"></property>
                                         <property name="context_menu">1</property>
@@ -1028,11 +1028,11 @@
                                         <event name="OnUpdateUI"></event>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxALL</property>
                                     <property name="proportion">0</property>
-                                    <object class="wxButton" expanded="1">
+                                    <object class="wxButton" expanded="0">
                                         <property name="bg"></property>
                                         <property name="context_help"></property>
                                         <property name="context_menu">1</property>
@@ -1555,14 +1555,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
-                                        <property name="pos"></property>
+                                        <property name="pos">-1,-1</property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -2069,14 +2069,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -2261,7 +2261,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -2309,16 +2309,16 @@
             <event name="OnSetFocus"></event>
             <event name="OnSize"></event>
             <event name="OnUpdateUI"></event>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
                 <property name="name">BoxSizer</property>
                 <property name="orient">wxVERTICAL</property>
                 <property name="permission">none</property>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxFlexGridSizer" expanded="1">
+                    <object class="wxFlexGridSizer" expanded="0">
                         <property name="cols">1</property>
                         <property name="flexible_direction">wxBOTH</property>
                         <property name="growablecols">0</property>
@@ -2330,11 +2330,11 @@
                         <property name="permission">none</property>
                         <property name="rows">3</property>
                         <property name="vgap">0</property>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">TopSizer</property>
                                 <property name="orient">wxHORIZONTAL</property>
@@ -2583,14 +2583,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>

@@ -136,8 +136,6 @@ t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, 
 	, Feature(feature) 
 	, ImageList(16, 16) {
 	StatusLabel->SetLabel(_(""));
-	HelpButton->SetBitmapLabel((wxArtProvider::GetBitmap(wxART_HELP, 
-		wxART_TOOLBAR, wxSize(16, 16))));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal-open")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("template-files")));

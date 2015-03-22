@@ -479,11 +479,8 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 	, TopWindow(topWindow)
 	, TotalFiles(0)
 	, ErrorFiles(0) {
-	RunButton->SetBitmap(t4p::BitmapImageAsset(wxT("lint-check")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
-	SuppressionButton->SetBitmap(t4p::BitmapImageAsset(wxT("lint-check-suppression")));
+	RunButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check")));
+	SuppressionButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check-suppression")));
 	
 	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -1300,13 +1297,10 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 , Errors()
 , TopWindow(topWindow)
 {
-	AddButton->SetBitmap(t4p::BitmapImageAsset(wxT("filter-add")));
-	EditButton->SetBitmap(t4p::BitmapImageAsset(wxT("filter-edit")));
-	DeleteButton->SetBitmap(t4p::BitmapImageAsset(wxT("filter-delete")));
-	DeleteAllButton->SetBitmap(t4p::BitmapImageAsset(wxT("stop")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
+	AddButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-add")));
+	EditButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-edit")));
+	DeleteButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-delete")));
+	DeleteAllButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("stop")));
 	
 	SuppressionsList->AppendTextColumn(_("Rule Type"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);

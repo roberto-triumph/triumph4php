@@ -317,14 +317,14 @@ t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
 
-	ReplaceButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace")));
-	ReplaceAllInFileButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace-file")));
-	ReplaceInAllFilesButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("replace-all")));
-	PreviousHitButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("previous")));
-	NextHitButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("next")));
-	StopButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("stop")));
-	CopySelectedButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("copy")));
-	CopyAllButton->SetBitmapLabel(t4p::BitmapImageAsset(wxT("copy-all")));
+	ReplaceButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("replace")));
+	ReplaceAllInFileButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("replace-file")));
+	ReplaceInAllFilesButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("replace-all")));
+	PreviousHitButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("previous")));
+	NextHitButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("next")));
+	StopButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("stop")));
+	CopySelectedButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("copy")));
+	CopyAllButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("copy-all")));
 	
 	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT, 
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);

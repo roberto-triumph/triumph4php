@@ -110,6 +110,30 @@ wxBitmap t4p::BitmapImageAsset(wxString imageName) {
 	return bitmap;
 }
 
+wxBitmap t4p::BitmapImageButtonPrepAsset(wxString imageName) {
+	if (!wxImage::FindHandler(wxBITMAP_TYPE_PNG)) {
+		wxImage::AddHandler(new wxPNGHandler());
+	}
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("icons"));
+    wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
+    
+	wxASSERT(iconFile.IsOk());
+	wxBitmap bitmap;
+	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
+	wxUnusedVar(loaded);
+	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
+	
+#ifdef __WXMAC__
+
+	// make images bigger, that way buttons have extra padding
+	// on retina screens, the buttons look ugly
+	bitmap.SetWidth(24);
+	bitmap.SetHeight(24);
+#endif
+	return bitmap;
+}
+
 wxIcon t4p::IconImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_ICO)) {
 		wxImage::AddHandler(new wxICOHandler());

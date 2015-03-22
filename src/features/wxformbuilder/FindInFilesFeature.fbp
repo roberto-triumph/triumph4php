@@ -37,7 +37,7 @@
             <property name="minimum_size"></property>
             <property name="name">FindInFilesDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">500,430</property>
+            <property name="size">500,-1</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Find In Files</property>
@@ -104,16 +104,16 @@
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">TopSizer</property>
                                 <property name="orient">wxVERTICAL</property>
                                 <property name="permission">none</property>
-                                <object class="sizeritem" expanded="1">
+                                <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND</property>
                                     <property name="proportion">1</property>
-                                    <object class="wxFlexGridSizer" expanded="1">
+                                    <object class="wxFlexGridSizer" expanded="0">
                                         <property name="cols">1</property>
                                         <property name="flexible_direction">wxVERTICAL</property>
                                         <property name="growablecols">0</property>
@@ -181,20 +181,20 @@
                                                 <event name="OnUpdateUI"></event>
                                             </object>
                                         </object>
-                                        <object class="sizeritem" expanded="1">
+                                        <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
                                             <property name="flag">wxEXPAND</property>
                                             <property name="proportion">1</property>
-                                            <object class="wxBoxSizer" expanded="1">
+                                            <object class="wxBoxSizer" expanded="0">
                                                 <property name="minimum_size"></property>
                                                 <property name="name">FindWithButtonSizer</property>
                                                 <property name="orient">wxHORIZONTAL</property>
                                                 <property name="permission">none</property>
-                                                <object class="sizeritem" expanded="1">
+                                                <object class="sizeritem" expanded="0">
                                                     <property name="border">5</property>
                                                     <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL</property>
                                                     <property name="proportion">0</property>
-                                                    <object class="wxButton" expanded="1">
+                                                    <object class="wxButton" expanded="0">
                                                         <property name="bg"></property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>
@@ -364,20 +364,20 @@
                                                 <event name="OnUpdateUI"></event>
                                             </object>
                                         </object>
-                                        <object class="sizeritem" expanded="1">
+                                        <object class="sizeritem" expanded="0">
                                             <property name="border">5</property>
                                             <property name="flag">wxEXPAND</property>
                                             <property name="proportion">1</property>
-                                            <object class="wxBoxSizer" expanded="1">
+                                            <object class="wxBoxSizer" expanded="0">
                                                 <property name="minimum_size"></property>
                                                 <property name="name">ReplaceWithButtonSizer</property>
                                                 <property name="orient">wxHORIZONTAL</property>
                                                 <property name="permission">none</property>
-                                                <object class="sizeritem" expanded="1">
+                                                <object class="sizeritem" expanded="0">
                                                     <property name="border">5</property>
                                                     <property name="flag">wxALL|wxALIGN_CENTER_VERTICAL</property>
                                                     <property name="proportion">0</property>
-                                                    <object class="wxButton" expanded="1">
+                                                    <object class="wxButton" expanded="0">
                                                         <property name="bg"></property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>
@@ -495,11 +495,11 @@
                                 </object>
                             </object>
                         </object>
-                        <object class="sizeritem" expanded="1">
+                        <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxBoxSizer" expanded="1">
+                            <object class="wxBoxSizer" expanded="0">
                                 <property name="minimum_size"></property>
                                 <property name="name">MidSizer</property>
                                 <property name="orient">wxVERTICAL</property>
@@ -880,7 +880,7 @@
                                 <property name="Apply">0</property>
                                 <property name="Cancel">1</property>
                                 <property name="ContextHelp">0</property>
-                                <property name="Help">1</property>
+                                <property name="Help">0</property>
                                 <property name="No">0</property>
                                 <property name="OK">1</property>
                                 <property name="Save">0</property>
@@ -891,7 +891,7 @@
                                 <event name="OnApplyButtonClick"></event>
                                 <event name="OnCancelButtonClick">OnCancelButton</event>
                                 <event name="OnContextHelpButtonClick"></event>
-                                <event name="OnHelpButtonClick">OnHelpButton</event>
+                                <event name="OnHelpButtonClick"></event>
                                 <event name="OnNoButtonClick"></event>
                                 <event name="OnOKButtonClick">OnOkButton</event>
                                 <event name="OnSaveButtonClick"></event>
@@ -1189,7 +1189,7 @@
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">1</property>
-                            <object class="wxFlexGridSizer" expanded="0">
+                            <object class="wxFlexGridSizer" expanded="1">
                                 <property name="cols">3</property>
                                 <property name="flexible_direction">wxBOTH</property>
                                 <property name="growablecols">1</property>
@@ -1201,11 +1201,11 @@
                                 <property name="permission">none</property>
                                 <property name="rows">1</property>
                                 <property name="vgap">0</property>
-                                <object class="sizeritem" expanded="0">
+                                <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxALIGN_CENTER_VERTICAL</property>
                                     <property name="proportion">1</property>
-                                    <object class="wxBoxSizer" expanded="0">
+                                    <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
                                         <property name="name">ButtonSizer</property>
                                         <property name="orient">wxHORIZONTAL</property>
@@ -1708,11 +1708,11 @@
                                         </object>
                                     </object>
                                 </object>
-                                <object class="sizeritem" expanded="0">
+                                <object class="sizeritem" expanded="1">
                                     <property name="border">5</property>
                                     <property name="flag">wxEXPAND</property>
                                     <property name="proportion">1</property>
-                                    <object class="wxBoxSizer" expanded="0">
+                                    <object class="wxBoxSizer" expanded="1">
                                         <property name="minimum_size"></property>
                                         <property name="name">ReplaceSizer</property>
                                         <property name="orient">wxHORIZONTAL</property>

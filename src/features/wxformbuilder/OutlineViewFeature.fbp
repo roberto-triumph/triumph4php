@@ -412,7 +412,7 @@
                                 </object>
                                 <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
-                                    <property name="flag">wxALL|wxEXPAND</property>
+                                    <property name="flag">wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL</property>
                                     <property name="proportion">1</property>
                                     <object class="wxBitmapButton" expanded="0">
                                         <property name="bg"></property>
@@ -428,14 +428,14 @@
                                         <property name="hidden">0</property>
                                         <property name="hover"></property>
                                         <property name="id">wxID_HELP</property>
-                                        <property name="label">MyButton</property>
+                                        <property name="label"></property>
                                         <property name="maximum_size"></property>
                                         <property name="minimum_size"></property>
                                         <property name="name">HelpButton</property>
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size"></property>
+                                        <property name="size">24,24</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip">Help</property>
