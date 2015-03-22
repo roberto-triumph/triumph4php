@@ -87,11 +87,11 @@ void t4p::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* m
 	wxDateTime dateTime(timestamp);
 	dateString = dateTime.FormatISOTime();
 	if (Grid->AppendRows(1)) {
-		Grid->SetCellOverflow(Grid->GetRows() - 1, 0, false);
-		Grid->SetCellValue(Grid->GetRows() - 1, 0, error);
-		Grid->SetCellValue(Grid->GetRows() - 1, 1, fix);
-		Grid->SetCellValue(Grid->GetRows() - 1, 2, levelString);
-		Grid->SetCellValue(Grid->GetRows() - 1, 3, dateString);
+		Grid->SetCellOverflow(Grid->GetNumberRows() - 1, 0, false);
+		Grid->SetCellValue(Grid->GetNumberRows() - 1, 0, error);
+		Grid->SetCellValue(Grid->GetNumberRows() - 1, 1, fix);
+		Grid->SetCellValue(Grid->GetNumberRows() - 1, 2, levelString);
+		Grid->SetCellValue(Grid->GetNumberRows() - 1, 3, dateString);
 
 		// ATTN: make the grid expand to the entire panel
 		// not sure if this will render nicely when many messages are shown

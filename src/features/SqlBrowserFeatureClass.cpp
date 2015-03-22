@@ -104,7 +104,7 @@ static void FillGridWithResults(wxGrid* grid, t4p::SqlResultClass* results) {
 	for (size_t i = 0; i < autoSizeColumns.size(); i++) {
 		if (autoSizeColumns[i]) {
 			grid->AutoSizeColumn(i);
-			grid->SetColMinimalWidth(i, grid->GetColumnWidth(i));
+			grid->SetColMinimalWidth(i, grid->GetColSize(i));
 		}
 		else {
 			grid->SetColSize(i, 50);
@@ -593,10 +593,7 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	ResultsGrid->ClearGrid();
 	UpdateLabels(wxT(""));
 
-	RefreshButton->SetBitmap(t4p::BitmapImageAsset(wxT("outline-refresh")));
-	HelpButton->SetBitmap(
-		wxArtProvider::GetBitmap(wxART_HELP, wxART_BUTTON, wxSize(16, 16))
-	);
+	RefreshButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }
@@ -902,7 +899,7 @@ void t4p::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
 	if (SelectedCol < 0 || SelectedRow < 0) {
 		return;
 	}
-	if (ResultsGrid->GetRows() > 2000) {
+	if (ResultsGrid->GetNumberRows() > 2000) {
 		wxMessageBox(wxT("There are too many rows to copy to the clipboard"), wxT("Copy All Rows"));
 		return;
 	}
@@ -911,8 +908,8 @@ void t4p::SqlBrowserPanelClass::OnCopyAllRows(wxCommandEvent& event) {
 		std::vector<wxString> values;
 		wxStringOutputStream ostream;
 		wxTextOutputStream tstream(ostream, wxEOL_UNIX);
-		int cols = ResultsGrid->GetCols();
-		int rows = ResultsGrid->GetRows();
+		int cols = ResultsGrid->GetNumberCols();
+		int rows = ResultsGrid->GetNumberRows();
 		for (int r = 0; r < rows; ++r) {
 			for (int c = 0; c < cols; ++c) {
 				wxString val = ResultsGrid->GetCellValue(r, c);
@@ -941,7 +938,7 @@ void t4p::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
 		std::vector<wxString> values;
 		wxStringOutputStream ostream;
 		wxTextOutputStream tstream(ostream, wxEOL_UNIX);
-		for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+		for (int i = 0; i < ResultsGrid->GetNumberCols(); ++i) {
 			wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
 			values.push_back(val);
 		}
@@ -966,7 +963,7 @@ void t4p::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 	}
 	RowToSqlInsert.Values.clear();
 	RowToSqlInsert.CheckedValues.clear();
-	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+	for (int i = 0; i < ResultsGrid->GetNumberCols(); ++i) {
 		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
 		RowToSqlInsert.Values.push_back(t4p::WxToIcu(val));
 	}
@@ -991,7 +988,7 @@ void t4p::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 	}
 	RowToPhp.Values.clear();
 	RowToPhp.CheckedValues.clear();
-	for (int i = 0; i < ResultsGrid->GetCols(); ++i) {
+	for (int i = 0; i < ResultsGrid->GetNumberCols(); ++i) {
 		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
 		RowToPhp.Values.push_back(t4p::WxToIcu(val));
 	}
@@ -1434,7 +1431,7 @@ t4p::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int 
 	Connections->Clear();
 	FillConnectionList();
 	RunningThreads.AddEventHandler(this);
-	RefreshButton->SetBitmap(t4p::BitmapImageAsset("outline-refresh"));
+	RefreshButton->SetBitmap(t4p::BitmapImageButtonPrepAsset("outline-refresh"));
 
 	DefinitionIndicesPanel = new t4p::DefinitionIndicesPanelClass(Notebook);
 	DefinitionColumnsPanel = new t4p::DefinitionColumnsPanelClass(Notebook);
