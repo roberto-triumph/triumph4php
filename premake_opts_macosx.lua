@@ -213,13 +213,13 @@ end
 -- location of the final lib directory
 -- all of the dependant shared libraries (*.so) will be placed here
 -- by default this will be the same directory as the directory where
--- the executable is located. in linux, we want our version patched
--- version of wxWidgets and SOCI to be used, so we compile them,  place 
--- them in a directory, and we add a compile flag to look for
--- so files in a specific location (-rpath) so that we don't 
--- use the system version of the libraries. Furthermore, when we
--- make distribution packages (DEB files), we place them in a separate
--- location as well.
+-- the executable is located. in mac os x, the shared library "id" 
+-- dictates where shared files will be looked for (the locations
+-- are baked into the executable). In triumph dev mode, the lib
+-- ids are full paths; when we make the final app package the
+
+-- The install_name_tool and otool programs are helpful in finding
+-- where the binary looks for its dependencies
 -- lib dir can be relative, it is relative it is assumed to be
 -- relative to the executable location
 T4P_LIB_DIR = os.getenv("T4P_LIB_DIR");
