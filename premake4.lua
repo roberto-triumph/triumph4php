@@ -342,14 +342,30 @@ solution "triumph4php"
 					string.format("cp %s %s",
 						normalizepath("package/Info.plist"),
 						normalizepath("Debug/triumph4php.app/Contents/")
+					),
+					
+					-- so that "run" works correctly in codelite
+					-- due to the CWD that codelite uses buy default
+					string.format("cp %s %s",
+						normalizepath("Debug/libsoci*.dylib"),
+						normalizepath("Debug/triumph4php.app/Contents/MacOS/")
 					)
+					
 				}
 			configuration { "Release" }
 				postbuildcommands {
 					string.format("cp %s %s",
 						normalizepath("package/Info.plist"),
 						normalizepath("Release/triumph4php.app/Contents/")
+					),
+					
+					-- so that "run" works correctly in codelite
+					-- due to the CWD that codelite uses buy default
+					string.format("cp %s %s",
+						normalizepath("Release/libsoci*.dylib"),
+						normalizepath("Release/triumph4php.app/Contents/MacOS/")
 					)
+					
 				}
 		end
 
