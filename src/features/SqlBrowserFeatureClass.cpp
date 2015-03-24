@@ -29,6 +29,7 @@
 #include <globals/Number.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/FilePickerValidatorClass.h>
+#include <widgets/Buttons.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <language/Keywords.h>
@@ -594,6 +595,7 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	UpdateLabels(wxT(""));
 
 	RefreshButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
+	HelpButtonIcon(HelpButton);
 	Feature->App.RunningThreads.AddEventHandler(this);
 	FillConnectionList();
 }

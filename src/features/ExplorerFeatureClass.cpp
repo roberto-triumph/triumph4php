@@ -30,6 +30,7 @@
 #include <globals/Number.h>
 #include <search/Directory.h>
 #include <widgets/FilePickerValidatorClass.h>
+#include <widgets/Buttons.h>
 #include <Triumph.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
@@ -876,6 +877,7 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
 	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
+	t4p::HelpButtonIcon(HelpButton);
 	
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();	
 	FillSourcesList(sourceDirs);
@@ -1264,6 +1266,7 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
 	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
 	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
+	t4p::HelpButtonIcon(HelpButton);
 	
 	List->DeleteAllColumns();
 	List->InsertColumn(0, _(""));

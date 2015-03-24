@@ -31,6 +31,7 @@
 #include <actions/ConfigTagDetectorActionClass.h>
 #include <widgets/TreeItemDataStringClass.h>
 #include <widgets/ChooseUrlDialogClass.h>
+#include <widgets/Buttons.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <globals/Number.h>
@@ -301,7 +302,7 @@ void t4p::ConfigTagDetectorClass::HelpMessage() {
 t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree,
 															  wxButton* testButton,
 															  wxButton* addButton,
-															  wxButton* helpButton,
+															  wxBitmapButton* helpButton,
 															  wxChoice* projectChoice,
 															  t4p::DetectorClass* detector,
 															  t4p::GlobalsClass& globals, 
@@ -319,6 +320,7 @@ t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree
 	, EventSink(eventSink) {
 
 	// Connect Events
+	t4p::HelpButtonIcon(HelpButton);
 	if (TestButton) {
 		TestButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(DetectorTreeHandlerClass::OnTestButton), NULL, this);
 	}
