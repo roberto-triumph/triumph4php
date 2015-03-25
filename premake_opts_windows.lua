@@ -71,25 +71,25 @@ ICU_INCLUDE_DIR = ICU_DIR .. "\\include\\"
 -- these are the core wxWidgets debug libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_DEBUG = {
 	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
-	"wxmsw29ud_core", "wxbase29ud_net", "wxbase29ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud",
-	"wxtiffd", "wxzlibd", "wxbase29ud_xml"
+	"wxmsw31ud_core", "wxbase31ud_net", "wxbase31ud", "wxexpatd", "wxjpegd", "wxpngd", "wxregexud",
+	"wxtiffd", "wxzlibd", "wxbase31ud_xml"
 }
 
 -- these are the core wxWidgets Release libraries and their Win32 dependencies (win dependencies listed first)
 WX_LIBS_RELEASE = {
 	"winmm", "comctl32", "rpcrt4", "wsock32", "wininet",
-	"wxmsw29u_core", "wxbase29u_net", "wxbase29u", "wxexpat", "wxjpeg", "wxpng", "wxregexu",
-	"wxtiff", "wxzlib", "wxbase29u_xml"
+	"wxmsw31u_core", "wxbase31u_net", "wxbase31u", "wxexpat", "wxjpeg", "wxpng", "wxregexu",
+	"wxtiff", "wxzlib", "wxbase31u_xml"
 }
 
 -- the wxWidgets GUI debug libraries
-WX_LIBS_WINDOW_DEBUG = { "wxmsw29ud_adv", "wxmsw29ud_aui", "wxmsw29ud_html", "wxmsw29ud_richtext" }
+WX_LIBS_WINDOW_DEBUG = { "wxmsw31ud_adv", "wxmsw31ud_aui", "wxmsw31ud_html", "wxmsw31ud_richtext" }
 
 -- the wxWidgets GUI release libraries
-WX_LIBS_WINDOW_RELEASE = { "wxmsw29u_adv", "wxmsw29u_aui", "wxmsw29u_html", "wxmsw29u_richtext" }
+WX_LIBS_WINDOW_RELEASE = { "wxmsw31u_adv", "wxmsw31u_aui", "wxmsw31u_html", "wxmsw31u_richtext" }
 
 -- the styled text control library
-WX_LIB_STC_DEBUG = "wxmsw29ud_stc"
+WX_LIB_STC_DEBUG = "wxmsw31ud_stc"
 
 WXWIDGETS_DIR = os.getenv("T4P_WXWIDGETS_DIR")
 if (not WXWIDGETS_DIR) then
@@ -103,7 +103,7 @@ WX_INCLUDE_DIRS_DEBUG = { WXWIDGETS_DIR .. "\\include\\", WXWIDGETS_DIR .. "\\li
 WX_INCLUDE_DIRS_RELEASE =  { WXWIDGETS_DIR .. "\\include\\", WXWIDGETS_DIR .. "\\lib\\vc_dll\\mswu\\" }
 
 -- the styled text control library
-WX_LIB_STC_RELEASE = "wxmsw29u_stc"
+WX_LIB_STC_RELEASE = "wxmsw31u_stc"
 
 -- location of the Git executable. this is used by the
 -- setupdev action to get all submodule
