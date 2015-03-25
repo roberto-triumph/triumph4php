@@ -32,6 +32,7 @@ void t4p::HelpButtonIcon(wxBitmapButton* button) {
 		
 		// the mac toolkit will put icons on the help
 		// buttons (when the button's ID is wxID_HELP)
+		button->SetMinSize(wxSize(32, 32));
 		return;
 	}
 	
