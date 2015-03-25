@@ -94,7 +94,7 @@ void wxMenuCmd::Update()
 #if defined( __WXMSW__ )
 
 	// change the accelerator...
-	m_pItem->SetText(newtext);
+	m_pItem->SetItemLabel(newtext);
 	m_pItem->GetMenu()->UpdateAccel(m_pItem);
 
 	// we could also do that in this way:
