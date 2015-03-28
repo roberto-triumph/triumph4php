@@ -16,6 +16,7 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
+	BoxSizer->SetMinSize( wxSize( 500,-1 ) ); 
 	wxFlexGridSizer* FlexGridSizer;
 	FlexGridSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
@@ -130,6 +131,7 @@ FindInFilesDialogGeneratedClass::FindInFilesDialogGeneratedClass( wxWindow* pare
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	BoxSizer->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
