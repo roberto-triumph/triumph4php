@@ -407,7 +407,8 @@ solution "triumph4php"
 			"src/actions/*.cpp",
 			"src/language/*.cpp",
 			"src/search/*.cpp",
-			"src/widgets/ProcessWithHeartbeatClass.cpp"
+			"src/widgets/ProcessWithHeartbeatClass.cpp",
+			"lib/pelet/src/*.cpp"
 		}
 
 		-- these will be used by the SqlResourceFinder tests
@@ -433,8 +434,7 @@ solution "triumph4php"
 			"tests/", 
 		}
 		links { 
-			"unit_test++", 
-			"pelet"
+			"unit_test++"
 		}
 
 		configuration "Debug"
@@ -457,10 +457,10 @@ solution "triumph4php"
 			"profilers/tag_finder_profiler.cpp",
 			"src/globals/*.cpp",
 			"src/language/*.cpp",
-			"src/search/*.cpp"
+			"src/search/*.cpp",
+			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
-		links { "pelet" }
 
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -486,11 +486,11 @@ solution "triumph4php"
 			"src/actions/TagDetectorActionClass.cpp",
 			"src/actions/ActionClass.cpp",
 			"src/actions/GlobalActionClass.cpp",
-			"src/widgets/ProcessWithHeartbeatClass.cpp"
+			"src/widgets/ProcessWithHeartbeatClass.cpp",
+			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
-		links { "pelet" }
-
+		
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
@@ -511,10 +511,10 @@ solution "triumph4php"
 			"src/language/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
-			"profilers/action_profiler.cpp"
+			"profilers/action_profiler.cpp",
+			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
-		links { "pelet" }
 		
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -563,10 +563,10 @@ solution "triumph4php"
 			"src/globals/*.cpp",
 			"src/language/*.cpp",
 			"src/search/*.cpp",
-			"src/actions/ActionClass.cpp"
+			"src/actions/ActionClass.cpp",
+			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
-		links { "pelet" }
 		
 		configuration "Debug"
 			pickywarnings(_ACTION)
@@ -749,10 +749,11 @@ solution "triumph4php"
 		kind "ConsoleApp"
 		files {
 			"lib/pelet/tests/**.cpp",
-			"lib/pelet/tests/**.h"
+			"lib/pelet/tests/**.h",
+			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "lib/pelet/include/", "lib/UnitTest++/src/", "lib/pelet/tests/" }
-		links { "pelet", "unit_test++" }
+		links { "unit_test++" }
 
 		configuration "vs2008"
 			-- dont bother with warnings  with using 'unsafe' fopen

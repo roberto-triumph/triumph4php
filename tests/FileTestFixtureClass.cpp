@@ -101,7 +101,7 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 
 wxString FileTestFixtureClass::HideFile(const wxString& fileName) {	
 
-	// since tests are not wxApps we cannot use wxPlatformInfo or wxExecute
+	// since tests are not wxApps we cannot use wxExecute
 	// must do it the hard way
 	
 	// start with the windows way
@@ -115,9 +115,9 @@ wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 		const char *cmd = buf.data();
 		system(cmd);
 	}
-	else if(info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
+	else if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX || info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
 		
-		//hide the file when running tests on a linux box by renaming to a dot file
+		//hide the file when running tests on a linux / unix box by renaming to a dot file
 		wxString hiddenName;
 		wxFileName wxf(fileName);
 		hiddenName = wxf.GetPath(true) + wxT(".") + wxf.GetFullName();
