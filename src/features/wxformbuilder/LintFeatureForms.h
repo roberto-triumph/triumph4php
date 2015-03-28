@@ -148,12 +148,17 @@ class LintPreferencesGeneratedPanelClass : public wxPanel
 	private:
 	
 	protected:
-		wxStaticText* Help;
+		wxStaticText* HelpText;
+		wxBitmapButton* HelpButton;
 		wxCheckBox* CheckOnSave;
 		wxCheckBox* CheckUnitializedVariables;
 		wxCheckBox* CheckUnitializedGlobalVariables;
 		wxCheckBox* CheckUnknownIdentifiers;
 		wxCheckBox* CheckFunctionArgumentCount;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnHelpClick( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
@@ -226,6 +231,25 @@ class LintSuppressionsHelpGeneratedDialogClass : public wxDialog
 		
 		LintSuppressionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("PHP Lint Suppressions Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~LintSuppressionsHelpGeneratedDialogClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class LintOptionsHelpGeneratedDialogClass
+///////////////////////////////////////////////////////////////////////////////
+class LintOptionsHelpGeneratedDialogClass : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* Help;
+		wxStdDialogButtonSizer* ButtonsSizer;
+		wxButton* ButtonsSizerCancel;
+	
+	public:
+		
+		LintOptionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Lint Preferences Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~LintOptionsHelpGeneratedDialogClass();
 	
 };
 

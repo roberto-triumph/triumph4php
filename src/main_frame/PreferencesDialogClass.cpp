@@ -38,14 +38,16 @@ t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 														  t4p::PreferencesClass& preferences,
 														  wxFileName& settingsDir,
 														  bool& changedSettingsDir, bool& needsRetag)
-		: wxPropertySheetDialog(parent, wxID_ANY, _("Preferences"))
-		, Preferences(preferences) 
+		: Preferences(preferences) 
 		, Globals(globals)
 		, OldSettingsDir(settingsDir)
 		, SettingsDir(settingsDir)
 		, ChangedSettingsDir(changedSettingsDir)
 		, NeedsRetag(needsRetag) {
+	SetSheetStyle(wxPROPSHEET_TREEBOOK);
+	Create(parent, wxID_ANY, _("Preferences"));
 	CreateButtons(wxOK | wxCANCEL);
+	
 	wxBookCtrlBase* notebook = GetBookCtrl();
 	
 	// make it so that no other preference dialogs have to explictly call Transfer methods

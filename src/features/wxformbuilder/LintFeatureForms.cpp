@@ -248,15 +248,18 @@ LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Lint Preferences") ), wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGidSizer;
-	FlexGidSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
+	FlexGidSizer = new wxFlexGridSizer( 3, 1, 0, 0 );
 	FlexGidSizer->AddGrowableCol( 0 );
-	FlexGidSizer->AddGrowableRow( 1 );
+	FlexGidSizer->AddGrowableRow( 2 );
 	FlexGidSizer->SetFlexibleDirection( wxBOTH );
 	FlexGidSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	Help = new wxStaticText( this, wxID_ANY, wxT("The lint preferences control the types of PHP errors that Triumph can detect.\n\nPerform lint check on file save \nWhen enabled, a lint check will be performed when the user saves a PHP file.\n\nCheck Uninitialized variables \nChecks for PHP variables that are being read before they have been initialized. Note \nthat this check is only done on variables inside a function or method.\n\nCheck Uninitialized global variables \nLike above, but it checks global variables. The reason it is disabled by default is because \nglobal variables are usually assigned via a template mechanism; checking for initialization \non global variables would lead to many false positives.\n\nCheck for unknown classes, methods and functions \nEach referenced class name, method name or function. In order for this check to\nwork properly there must be at least one defined project, and it must have\nbeen indexed.\n\nCheck function argument count mismatch\nWhen enabled, each function / method call will be checked to make sure\nthat the call has the correct number of required arguments. In order\nfor this check to work properly there must be at least one defined \nproject, and it must have been indexed."), wxDefaultPosition, wxDefaultSize, 0 );
-	Help->Wrap( -1 );
-	FlexGidSizer->Add( Help, 0, wxALL, 5 );
+	HelpText = new wxStaticText( this, wxID_ANY, wxT("These options control how the Triumph linter works."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpText->Wrap( -1 );
+	FlexGidSizer->Add( HelpText, 0, wxALL, 5 );
+	
+	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	FlexGidSizer->Add( HelpButton, 0, wxALL, 5 );
 	
 	wxBoxSizer* ChecksSizer;
 	ChecksSizer = new wxBoxSizer( wxVERTICAL );
@@ -282,10 +285,16 @@ LintPreferencesGeneratedPanelClass::LintPreferencesGeneratedPanelClass( wxWindow
 	
 	this->SetSizer( sbSizer2 );
 	this->Layout();
+	
+	// Connect Events
+	HelpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintPreferencesGeneratedPanelClass::OnHelpClick ), NULL, this );
 }
 
 LintPreferencesGeneratedPanelClass::~LintPreferencesGeneratedPanelClass()
 {
+	// Disconnect Events
+	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LintPreferencesGeneratedPanelClass::OnHelpClick ), NULL, this );
+	
 }
 
 LintErrorGeneratedPanelClass::LintErrorGeneratedPanelClass( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -411,5 +420,33 @@ LintSuppressionsHelpGeneratedDialogClass::LintSuppressionsHelpGeneratedDialogCla
 }
 
 LintSuppressionsHelpGeneratedDialogClass::~LintSuppressionsHelpGeneratedDialogClass()
+{
+}
+
+LintOptionsHelpGeneratedDialogClass::LintOptionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* BodySizer;
+	BodySizer = new wxBoxSizer( wxVERTICAL );
+	
+	Help = new wxStaticText( this, wxID_ANY, wxT("The lint preferences control the types of PHP errors that Triumph can detect.\n\nPerform lint check on file save \nWhen enabled, a lint check will be performed when the user saves a PHP file.\n\nCheck Uninitialized variables \nChecks for PHP variables that are being read before they have been initialized. Note \nthat this check is only done on variables inside a function or method.\n\nCheck Uninitialized global variables \nLike above, but it checks global variables. The reason it is disabled by default is because \nglobal variables are usually assigned via a template mechanism; checking for initialization \non global variables would lead to many false positives.\n\nCheck for unknown classes, methods and functions \nEach referenced class name, method name or function. In order for this check to\nwork properly there must be at least one defined project, and it must have\nbeen indexed.\n\nCheck function argument count mismatch\nWhen enabled, each function / method call will be checked to make sure\nthat the call has the correct number of required arguments. In order\nfor this check to work properly there must be at least one defined \nproject, and it must have been indexed."), wxDefaultPosition, wxDefaultSize, 0 );
+	Help->Wrap( -1 );
+	BodySizer->Add( Help, 0, wxALL, 5 );
+	
+	ButtonsSizer = new wxStdDialogButtonSizer();
+	ButtonsSizerCancel = new wxButton( this, wxID_CANCEL );
+	ButtonsSizer->AddButton( ButtonsSizerCancel );
+	ButtonsSizer->Realize();
+	BodySizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
+	
+	this->SetSizer( BodySizer );
+	this->Layout();
+	BodySizer->Fit( this );
+	
+	this->Centre( wxBOTH );
+}
+
+LintOptionsHelpGeneratedDialogClass::~LintOptionsHelpGeneratedDialogClass()
 {
 }

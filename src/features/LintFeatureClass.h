@@ -619,8 +619,8 @@ public:
 	t4p::LintFeatureClass& Feature;
 
 	LintPreferencesPanelClass(wxWindow* parent, t4p::LintFeatureClass& feature);
-	
 
+	void OnHelpClick(wxCommandEvent& event);
 };
 
 /**

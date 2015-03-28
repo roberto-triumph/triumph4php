@@ -1214,6 +1214,9 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 																t4p::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
+		
+	t4p::HelpButtonIcon(HelpButton);
+	
 	wxGenericValidator checkValidator(&Feature.Options.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);
 
@@ -1228,6 +1231,11 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 	
 	wxGenericValidator checkFunctionArgumentCountValidator(&Feature.Options.CheckFunctionArgumentCount);
 	CheckFunctionArgumentCount->SetValidator(checkFunctionArgumentCountValidator);
+}
+
+void t4p::LintPreferencesPanelClass::OnHelpClick(wxCommandEvent& event) {
+	LintOptionsHelpGeneratedDialogClass dialog(this);
+	dialog.ShowModal();
 }
 
 t4p::LintErrorPanelClass::LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
