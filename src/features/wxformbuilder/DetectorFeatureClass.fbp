@@ -350,7 +350,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -864,7 +864,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -1562,7 +1562,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos">-1,-1</property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -1747,7 +1747,7 @@
                 </object>
             </object>
         </object>
-        <object class="Panel" expanded="1">
+        <object class="Panel" expanded="0">
             <property name="bg"></property>
             <property name="context_help"></property>
             <property name="context_menu">1</property>
@@ -2076,7 +2076,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>
@@ -2590,7 +2590,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>

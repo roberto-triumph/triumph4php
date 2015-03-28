@@ -179,7 +179,7 @@ public:
 	 * @param rootImage the bitmap to be shown in the root of the tree
 	 */
 	DetectorTreeHandlerClass(wxTreeCtrl* detectorTree, wxButton* testButton, wxButton* addButton,
-		wxButton* helpButton, wxChoice* projectChoice,
+		wxBitmapButton* helpButton, wxChoice* projectChoice,
 		t4p::DetectorClass* detector,
 		t4p::GlobalsClass& globals, t4p::EventSinkClass& eventSink,
 		const wxBitmap& rootImage);
@@ -226,7 +226,7 @@ private:
 	wxTreeCtrl* DetectorTree;
 	wxButton* TestButton;
 	wxButton* AddButton;
-	wxButton* HelpButton;
+	wxBitmapButton* HelpButton;
 	wxChoice* ProjectChoice;
 
 	t4p::DetectorClass* Detector;

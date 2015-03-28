@@ -26,6 +26,7 @@
 #include <globals/String.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
+#include <widgets/Buttons.h>
 #include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/numdlg.h>
@@ -62,6 +63,7 @@ t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId,
 	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN));
 	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP));
 	CloseButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_ERROR));
+	HelpButtonIcon(HelpButton);
 	TransferDataToWindow();
 }
 
@@ -246,6 +248,8 @@ t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::F
 	NextButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_DOWN));
 	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP));
 	CloseButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_ERROR));
+	HelpButtonIcon(HelpButton);
+	
 	UnicodeStringValidatorClass replaceValidator(&Finder.ReplaceExpression, true);
 	ReplaceWithText->SetValidator(replaceValidator);
 	ReplaceButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE));

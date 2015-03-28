@@ -186,7 +186,7 @@
                                         <property name="permission">protected</property>
                                         <property name="pos"></property>
                                         <property name="selected"></property>
-                                        <property name="size">24,24</property>
+                                        <property name="size">-1,-1</property>
                                         <property name="style">wxBU_AUTODRAW</property>
                                         <property name="subclass"></property>
                                         <property name="tooltip"></property>

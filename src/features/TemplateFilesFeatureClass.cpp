@@ -24,6 +24,7 @@
  */
 #include <features/TemplateFilesFeatureClass.h>
 #include <widgets/TreeItemDataStringClass.h>
+#include <widgets/Buttons.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/TemplateFileTagClass.h>
@@ -136,6 +137,7 @@ t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, 
 	, Feature(feature) 
 	, ImageList(16, 16) {
 	StatusLabel->SetLabel(_(""));
+	HelpButtonIcon(HelpButton);
 	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal-open")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("template-files")));

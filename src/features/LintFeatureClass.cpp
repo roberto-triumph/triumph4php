@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <widgets/UnicodeStringValidatorClass.h>
+#include <widgets/Buttons.h>
 
 #include <Triumph.h>
 #include <globals/Events.h>
@@ -481,6 +482,7 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p:
 	, ErrorFiles(0) {
 	RunButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check")));
 	SuppressionButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check-suppression")));
+	HelpButtonIcon(HelpButton);
 	
 	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -1301,6 +1303,7 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 	EditButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-edit")));
 	DeleteButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-delete")));
 	DeleteAllButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("stop")));
+	HelpButtonIcon(HelpButton);
 	
 	SuppressionsList->AppendTextColumn(_("Rule Type"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);

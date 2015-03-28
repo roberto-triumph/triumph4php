@@ -1,6 +1,11 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
+*.cpp text
+*.h text
+*.lua text
+*.php text
+
 # do not attempt to normalize line ending  on these files
 lib/keybinder/build/GNUmakefile                 -text
 lib/keybinder/build/keybinder.sln               -text

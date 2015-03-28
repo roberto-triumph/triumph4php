@@ -32,6 +32,7 @@
 #include <globals/Sqlite.h>
 #include <globals/Number.h>
 #include <widgets/TreeItemDataStringClass.h>
+#include <widgets/Buttons.h>
 #include <Triumph.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
@@ -362,6 +363,7 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	AddButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-add")));
 	FilterButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("filter")));
 	SortButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("sort")));
+	HelpButtonIcon(HelpButton);
 
 	SetStatus(_(""));
 	

@@ -25,6 +25,7 @@
 #include <features/FileCabinetFeatureClass.h>
 #include <Triumph.h>
 #include <globals/Assets.h>
+#include <widgets/Buttons.h>
 #include <wx/artprov.h>
 
 static int ID_FILE_CABINET_PANEL = wxNewId();
@@ -108,6 +109,7 @@ t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p:
 , MainWindow(mainWindow) {
 	AddFileButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("document-plus")));
 	AddDirectoryButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("directory-plus")));
+	HelpButtonIcon(HelpButton);
 	ImageList = new wxImageList(16, 16);
 	
 	t4p::FileTypeImageList(*ImageList);
