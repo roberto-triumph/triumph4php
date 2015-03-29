@@ -243,7 +243,7 @@ end
 -- relative to the executable location
 T4P_ASSET_DIR = os.getenv("T4P_ASSET_DIR")
 if (not T4P_ASSET_DIR) then
-    T4P_ASSET_DIR = '../assets/'
+    T4P_ASSET_DIR = normalizepath('assets/')
     print("Using default location of " .. T4P_ASSET_DIR .. " for assets location")
 end
 
