@@ -287,6 +287,42 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 #endif
 }
 
+static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxString& contents, 
+	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
+	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
+	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
+	bool ret = savedTemp;
+	
+	// now copy the contents the temp file to the desired location
+	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
+	// and we want the original file's attributes to not be changed.
+	// ie. if a file owned by root is being saved, it should stay
+	// as owned by root and not the current user (that is saving the file).
+	// 
+	// note that the filenames given to CAT are enclosed in quotes but the
+	// resulting scriupt needs to escape them
+	wxString scriptContents = wxString::Format(
+		"do shell script \" cat \\\"%s\\\" > \\\"%s\\\"\" with administrator privileges",
+		tempFile, fullPath
+	);
+	wxString scriptTempFile = wxFileName::CreateTempFileName("triumph_script");
+	SaveFileWithCharset(scriptTempFile, scriptContents, "", false);
+	wxString cmd = wxString::Format(
+		"osascript '%s' ",
+		scriptTempFile
+	);
+	
+	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
+	eventSink.Publish(codeControlEvent);
+	
+	t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
+	proc->TempFile = tempFile;
+	proc->ScriptTempFile = scriptTempFile;
+	int pid = wxExecute(cmd, wxEXEC_ASYNC, proc);
+	ret = pid > 0;
+	return ret;
+}
+
 /**
  * saves the given contents into the given file path; 
  * taking into account UTF-8 BOM signature if desired. This 
@@ -330,6 +366,10 @@ static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxStri
 	}
 	else if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
 		return SavePrivilegedFileWithCharsetWindows(fullPath, contents, 
+			charset, hasSignature, codeCtrl, eventSink);
+	}
+	else if (wxOS_MAC_OSX_DARWIN == platform.GetOperatingSystemId()) {
+		return SavePrivilegedFileWithCharsetMac(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
 	}
 	return false;
