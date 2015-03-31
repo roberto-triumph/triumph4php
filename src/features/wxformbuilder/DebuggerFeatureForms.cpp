@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Sep 12 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -291,7 +291,7 @@ DebuggerEvalPanelGeneratedClass::DebuggerEvalPanelGeneratedClass( wxWindow* pare
 	
 	BodySizer->Add( TopSizer, 1, wxEXPAND, 5 );
 	
-	Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
+	Splitter = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3DSASH|wxSP_NOBORDER );
 	Splitter->Connect( wxEVT_IDLE, wxIdleEventHandler( DebuggerEvalPanelGeneratedClass::SplitterOnIdle ), NULL, this );
 	
 	ExprCodePanel = new wxPanel( Splitter, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
