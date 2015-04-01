@@ -43,6 +43,15 @@ static void ExternalBrowser(const wxString& browserName, const wxURI& url, t4p::
 		return;
 	}
 	wxString cmd = wxT("\"") + webBrowserPath.GetFullPath() + wxT("\""); 
+	
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN && browserName.CmpNoCase(wxT("Safari")) == 0) {
+		
+		// safari on Mac does not handle command line URL arguments
+		// need to use the "open" program
+		// see http://superuser.com/questions/459268/run-safari-from-command-line-with-url-parameter
+		cmd = wxT("open -a safari ");
+	}
 	cmd += wxT(" \"");
 	cmd += url.BuildURI();
 	cmd += wxT("\"");
