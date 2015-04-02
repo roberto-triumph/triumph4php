@@ -75,5 +75,44 @@ Enabling or disabling projects affects the tags that the PHP code completion and
 total search features use.  You might want to disable / enable projects when you
 are switching and working on separate projects.
 
+<a id="wildcards"></a>
+#Source File Wildcards#
+Sources have a set of include wildcards and a set of exclude wildcards. Any file
+that does NOT match the exclude wildcards and DOES match the include wildcard
+will be added to the project. Exclude wildcards take precedence over include 
+wildcards. Exclude wildcards are useful to ignore cache files, or for example 
+Symfony skeleton files.
+
+A wildcard can have either a '*' or a '?'.
+
+"*" = any number of characters
+"?" = 0 or 1 character
+
+Multiple wildcards are separated by the semicolon (';')
+
+A wildcard can have directory separators; but they must match the operation 
+system's path separator.
+
+##Examples##
+
+Root Directory: /Users/me/src
+Include Files: *.php
+Exclude Files: */tmp/*;*.cache.php;*/config/prod/*
+
+The following files will be _included_ in the source:
+
+* /Users/me/src/hello.php
+* /Users/me/src/config/dev.php
+
+The following files will be _excluded_ from the source (
+triumph will not parse them for classes, will not check
+them for syntax errors, and will not show them in total 
+search):
+
+* /Users/me/hello.php
+* /Users/me/src/tmp/hello.php
+* /Users/me/src/hello.cache.php
+* /Users/me/src/config/prod/hello.php
+
 
 [Table Of Contents](/#toc) | [Next - total search](/total-search/)

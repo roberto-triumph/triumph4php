@@ -2416,7 +2416,7 @@
             <property name="minimum_size"></property>
             <property name="name">ProjectSourceDialogGeneratedClass</property>
             <property name="pos"></property>
-            <property name="size">536,541</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Project Source</property>
@@ -2477,7 +2477,7 @@
                         <property name="name">FlexGridSizer</property>
                         <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
                         <property name="permission">none</property>
-                        <property name="rows">8</property>
+                        <property name="rows">9</property>
                         <property name="vgap">0</property>
                         <object class="sizeritem" expanded="0">
                             <property name="border">5</property>
@@ -2492,7 +2492,7 @@
                                 <property name="font"></property>
                                 <property name="hidden">0</property>
                                 <property name="id">wxID_ANY</property>
-                                <property name="label">Enter a list of files that you want Triumph to track and ignore. &#x0A;&#x0A;Include and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.&#x0A;&#x0A;Exlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.&#x0A;&#x0A;A wildcard can have either a &apos;*&apos; or a &apos;?&apos;.&#x0A;&#x0A;* = any number of characters&#x0A;? = 0 or 1 character&#x0A;&#x0A;Multiple wildcards are separated by the semicolon (&apos;;&apos;)&#x0A;&#x0A;A wildcard can have directory separators; but they must match the operation system&apos;s path separator.</property>
+                                <property name="label">Enter a list of files that you want Triumph to track and ignore. &#x0A;&#x0A;Exlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.&#x0A;&#x0A;A wildcard can have either a &apos;*&apos; or a &apos;?&apos;.&#x0A;&#x0A;* = any number of characters&#x0A;? = 0 or 1 character&#x0A;; = separator of multiple wildcards</property>
                                 <property name="maximum_size"></property>
                                 <property name="minimum_size"></property>
                                 <property name="name">HelpLabel</property>
@@ -2513,6 +2513,66 @@
                                 <event name="OnChar"></event>
                                 <event name="OnEnterWindow"></event>
                                 <event name="OnEraseBackground"></event>
+                                <event name="OnKeyDown"></event>
+                                <event name="OnKeyUp"></event>
+                                <event name="OnKillFocus"></event>
+                                <event name="OnLeaveWindow"></event>
+                                <event name="OnLeftDClick"></event>
+                                <event name="OnLeftDown"></event>
+                                <event name="OnLeftUp"></event>
+                                <event name="OnMiddleDClick"></event>
+                                <event name="OnMiddleDown"></event>
+                                <event name="OnMiddleUp"></event>
+                                <event name="OnMotion"></event>
+                                <event name="OnMouseEvents"></event>
+                                <event name="OnMouseWheel"></event>
+                                <event name="OnPaint"></event>
+                                <event name="OnRightDClick"></event>
+                                <event name="OnRightDown"></event>
+                                <event name="OnRightUp"></event>
+                                <event name="OnSetFocus"></event>
+                                <event name="OnSize"></event>
+                                <event name="OnUpdateUI"></event>
+                            </object>
+                        </object>
+                        <object class="sizeritem" expanded="1">
+                            <property name="border">5</property>
+                            <property name="flag">wxALL</property>
+                            <property name="proportion">0</property>
+                            <object class="wxHyperlinkCtrl" expanded="1">
+                                <property name="bg"></property>
+                                <property name="context_help"></property>
+                                <property name="context_menu">1</property>
+                                <property name="enabled">1</property>
+                                <property name="fg"></property>
+                                <property name="font"></property>
+                                <property name="hidden">0</property>
+                                <property name="hover_color"></property>
+                                <property name="id">wxID_ANY</property>
+                                <property name="label">More about Source Directories in Triumph4PHP</property>
+                                <property name="maximum_size"></property>
+                                <property name="minimum_size"></property>
+                                <property name="name">HelpLink</property>
+                                <property name="normal_color"></property>
+                                <property name="permission">protected</property>
+                                <property name="pos"></property>
+                                <property name="size"></property>
+                                <property name="style">wxHL_DEFAULT_STYLE</property>
+                                <property name="subclass"></property>
+                                <property name="tooltip"></property>
+                                <property name="url">http://docs.triumph4php.com/projects/#wildcards</property>
+                                <property name="validator_data_type"></property>
+                                <property name="validator_style">wxFILTER_NONE</property>
+                                <property name="validator_type">wxDefaultValidator</property>
+                                <property name="validator_variable"></property>
+                                <property name="visited_color"></property>
+                                <property name="window_extra_style"></property>
+                                <property name="window_name"></property>
+                                <property name="window_style"></property>
+                                <event name="OnChar"></event>
+                                <event name="OnEnterWindow"></event>
+                                <event name="OnEraseBackground"></event>
+                                <event name="OnHyperlink"></event>
                                 <event name="OnKeyDown"></event>
                                 <event name="OnKeyUp"></event>
                                 <event name="OnKillFocus"></event>

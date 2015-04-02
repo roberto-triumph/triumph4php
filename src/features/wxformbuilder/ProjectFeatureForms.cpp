@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Sep 12 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -244,15 +244,18 @@ ProjectSourceDialogGeneratedClass::ProjectSourceDialogGeneratedClass( wxWindow* 
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxFlexGridSizer* FlexGridSizer;
-	FlexGridSizer = new wxFlexGridSizer( 8, 1, 0, 0 );
+	FlexGridSizer = new wxFlexGridSizer( 9, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 0 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	HelpLabel = new wxStaticText( this, wxID_ANY, _("Enter a list of files that you want Triumph to track and ignore. \n\nInclude and exclude wildcards can contain one or more wildcards;  any files that match do NOT match the exclude wildcards and DO match the include wildcards will be added to the project. Exclude wildcards take precedence over include wildcards.\n\nExlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.\n\nA wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n\nMultiple wildcards are separated by the semicolon (';')\n\nA wildcard can have directory separators; but they must match the operation system's path separator."), wxDefaultPosition, wxDefaultSize, 0 );
+	HelpLabel = new wxStaticText( this, wxID_ANY, _("Enter a list of files that you want Triumph to track and ignore. \n\nExlcude wildcards are useful to ignore cache files, or for example Symfony skeleton files.\n\nA wildcard can have either a '*' or a '?'.\n\n* = any number of characters\n? = 0 or 1 character\n; = separator of multiple wildcards"), wxDefaultPosition, wxDefaultSize, 0 );
 	HelpLabel->Wrap( 500 );
 	FlexGridSizer->Add( HelpLabel, 0, wxALL, 5 );
+	
+	HelpLink = new wxHyperlinkCtrl( this, wxID_ANY, _("More about Source Directories in Triumph4PHP"), wxT("http://docs.triumph4php.com/projects/#wildcards"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	FlexGridSizer->Add( HelpLink, 0, wxALL, 5 );
 	
 	RootDirectoryLabel = new wxStaticText( this, wxID_ANY, _("Root Directory"), wxDefaultPosition, wxDefaultSize, 0 );
 	RootDirectoryLabel->Wrap( -1 );
@@ -287,6 +290,7 @@ ProjectSourceDialogGeneratedClass::ProjectSourceDialogGeneratedClass( wxWindow* 
 	
 	this->SetSizer( BoxSizer );
 	this->Layout();
+	BoxSizer->Fit( this );
 	
 	this->Centre( wxBOTH );
 	

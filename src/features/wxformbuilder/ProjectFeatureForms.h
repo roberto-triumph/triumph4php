@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Sep 12 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -23,8 +23,8 @@
 #include <wx/listbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
-#include <wx/filepicker.h>
 #include <wx/hyperlink.h>
+#include <wx/filepicker.h>
 #include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -119,6 +119,7 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 	
 	protected:
 		wxStaticText* HelpLabel;
+		wxHyperlinkCtrl* HelpLink;
 		wxStaticText* RootDirectoryLabel;
 		wxDirPickerCtrl* RootDirectory;
 		wxStaticText* IncludeWildcardsLabel;
@@ -135,7 +136,7 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,541 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectSourceDialogGeneratedClass();
 	
 };
