@@ -29,6 +29,7 @@
 #include <globals/Number.h>
 #include <widgets/DirPickerValidatorClass.h>
 #include <widgets/ListWidget.h>
+#include <widgets/TreeList.h>
 #include <wx/valgen.h>
 #include <Triumph.h>
 #include <istream>
@@ -1603,7 +1604,10 @@ void t4p::DebuggerVariablePanelClass::SetLocalVariables(const std::vector<t4p::D
 	for (it = variables.begin(); it != variables.end(); ++it) {
 		AppendTreeListItem(VariablesList, LocalVariablesRoot, *it);
 	}
-	VariablesList->Expand(LocalVariablesRoot);;
+	VariablesList->Expand(LocalVariablesRoot);
+	
+	// auto size all columns, so that the user can see the variables clearly
+	t4p::TreeListAutoSizeAllColumns(VariablesList);
 }
 
 void t4p::DebuggerVariablePanelClass::UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
@@ -1618,6 +1622,9 @@ void t4p::DebuggerVariablePanelClass::UpdateLocalVariables(const std::vector<t4p
 			AppendTreeListItem(VariablesList, LocalVariablesRoot, *it);
 		}
 	}
+	
+	// auto size all columns, so that the user can see the variables clearly
+	t4p::TreeListAutoSizeAllColumns(VariablesList);
 }
 
 void t4p::DebuggerVariablePanelClass::ClearLocalVariables() {
@@ -1633,9 +1640,8 @@ void t4p::DebuggerVariablePanelClass::SetGlobalVariables(const std::vector<t4p::
 	
 	ResetStatus(true);
 	
-	VariablesList->SetColumnWidth(0, wxCOL_WIDTH_DEFAULT);
-	VariablesList->SetColumnWidth(1, wxCOL_WIDTH_DEFAULT);
-	VariablesList->SetColumnWidth(2, wxCOL_WIDTH_AUTOSIZE);
+	// auto size all columns, so that the user can see the variables clearly
+	t4p::TreeListAutoSizeAllColumns(VariablesList);
 }
 
 void t4p::DebuggerVariablePanelClass::UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables) {
@@ -1650,6 +1656,9 @@ void t4p::DebuggerVariablePanelClass::UpdateGlobalVariables(const std::vector<t4
 			AppendTreeListItem(VariablesList, GlobalVariablesRoot, *it);
 		}
 	}
+	
+	// auto size all columns, so that the user can see the variables clearly
+	t4p::TreeListAutoSizeAllColumns(VariablesList);
 }
 
 void t4p::DebuggerVariablePanelClass::ClearGlobalVariables() {

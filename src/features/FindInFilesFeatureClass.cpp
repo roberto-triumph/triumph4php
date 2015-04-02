@@ -28,6 +28,7 @@
 #include <globals/Number.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
+#include <widgets/DataViewGrid.h>
 #include <globals/Errors.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
@@ -566,6 +567,9 @@ void t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& ev
 		else {
 			SetStatus(_("Did not Find any Matches"));
 		}
+		
+		// now resize the columns so that the hits can be seen
+		t4p::DataViewGridAutoSizeAllColumns(ResultsList);
 	}
 	else if (event.GetInt() == BackgroundFileReaderClass::MATCHED) {
 		if (matchedFilesSize > 0) {

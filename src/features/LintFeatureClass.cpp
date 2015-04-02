@@ -33,6 +33,7 @@
 #include <globals/Events.h>
 #include <globals/Number.h>
 #include <unicode/unistr.h>
+#include <widgets/DataViewGrid.h>
 #include <wx/artprov.h>
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
@@ -586,6 +587,9 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles)
 		);
 	}
+	
+	// now resize the columns so that the errors can be seen
+	t4p::DataViewGridAutoSizeAllColumns(ErrorsList);
 }
 
 void t4p::LintResultsPanelClass::OnRowActivated(wxDataViewEvent& event) {
@@ -1445,6 +1449,13 @@ void t4p::LintSuppressionsPanelClass::PopulateList() {
 	if (!Suppressions.Rules.empty()) {
 		SuppressionsList->SelectRow(0);
 	}
+	
+	// now resize the columns so that the suppressions can be seen
+	t4p::DataViewGridAutoSizeAllColumns(SuppressionsList);
+	
+	// don't know why the first column is not auto-sized all the way
+	// I have seen that on Mac OS X the first column is still truncated
+	SuppressionsList->GetColumn(0)->SetWidth(200);
 }
 
 void t4p::LintSuppressionsPanelClass::AppendRuleToList(const t4p::SuppressionRuleClass& rule) {
@@ -1489,8 +1500,6 @@ void t4p::LintSuppressionsPanelClass::SaveList() {
 		wxMessageBox(_("Could not saved suppressions file at ") + SuppressionFile.GetFullPath(), _("File Error"));
 	}
 }
-
-
 
 t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* parent, int id, 
 	t4p::SuppressionRuleClass& rule)
