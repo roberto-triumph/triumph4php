@@ -11,5 +11,5 @@
 	ignore = dirty
 [submodule "lib/wxWidgets"]
 	path = lib/wxWidgets
-	url = git@github.com:robertop/wxWidgets.git
+	url = https://github.com/robertop/wxWidgets.git
 	ignore = dirty
