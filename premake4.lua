@@ -335,7 +335,8 @@ solution "triumph4php"
 			"lib/pelet/include"
 		}
 		links { "keybinder", "pelet" }
-
+		defines { "PELET_USE_DLL"}
+		
 		if os.is "macosx" then
 			configuration { "Debug" }
 				postbuildcommands {
