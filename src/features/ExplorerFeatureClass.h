@@ -213,15 +213,7 @@ class FileListingWidgetClass : public wxEvtHandler {
 	
 	void ShowDir();
 	
-private:
-
-	// events handlers for the files list
-	void OnListItemRightClick(wxListEvent& event);
-	void OnListEndLabelEdit(wxListEvent& event);
-	void OnListRightDown(wxMouseEvent& event);
-
 	// event handlers for the context menu on the files list
-	void OnListMenuOpenParent(wxCommandEvent& event);
 	void OnListMenuRename(wxCommandEvent& event);
 	void OnListMenuDelete(wxCommandEvent& event);
 	void OnListMenuCreateNew(wxCommandEvent& event);
@@ -229,6 +221,13 @@ private:
 	void OnListMenuShell(wxCommandEvent& event);
 	void OnListMenuFileManager(wxCommandEvent& event);
 	
+private:
+
+	// events handlers for the files list
+	void OnListItemRightClick(wxListEvent& event);
+	void OnListEndLabelEdit(wxListEvent& event);
+	void OnListRightDown(wxMouseEvent& event);
+
 	// adds files or directories to the list control
 	void ListFiles(const std::vector<wxFileName>& files);
 	void ListDirectories(const std::vector<wxFileName>& dirs);
@@ -338,6 +337,7 @@ private:
 
 	void OnListItemActivated(wxListEvent& event);
 	void OnListMenuOpen(wxCommandEvent& event);
+	void OnListKeyDown(wxKeyEvent& event);
 	
 	// handlers for the buttons
 	void OnParentButtonClick(wxCommandEvent& event);
@@ -413,6 +413,7 @@ private:
 
 	void OnListItemActivated(wxListEvent& event);
 	void OnListMenuOpen(wxCommandEvent& event);
+	void OnListKeyDown(wxKeyEvent& event);
 	
 	// handlers for the buttons
 	void OnParentButtonClick(wxCommandEvent& event);

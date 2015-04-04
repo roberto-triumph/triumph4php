@@ -442,17 +442,6 @@ void t4p::ExplorerFeatureClass::OnCmdDirOpen(wxCommandEvent& event) {
 	OnAppProjectCreated(event);
 }
 
-static void SetExplorerAccelerators(wxListCtrl* ctrl) {
-	wxAcceleratorEntry entries[5];
-    entries[0].Set(wxACCEL_NORMAL, WXK_F2, ID_EXPLORER_LIST_RENAME);
-    entries[1].Set(wxACCEL_NORMAL, WXK_BACK, ID_EXPLORER_LIST_OPEN_PARENT);
-	entries[2].Set(wxACCEL_ALT, WXK_LEFT, ID_EXPLORER_LIST_OPEN_PARENT);
-	entries[3].Set(wxACCEL_NORMAL, WXK_RETURN, ID_EXPLORER_LIST_OPEN);
-	entries[4].Set(wxACCEL_NORMAL, WXK_DELETE, ID_EXPLORER_LIST_DELETE);
-	wxAcceleratorTable table(5, entries);
-    ctrl->SetAcceleratorTable(table);
-}
-
 t4p::FileListingWidgetClass::FileListingWidgetClass(wxListCtrl* list, wxImageList* imageList, t4p::FileListingClass* fileListing,
 	wxWindow* parentPanel, t4p::ExplorerFeatureClass* feature)
 : wxEvtHandler()
@@ -561,7 +550,7 @@ void t4p::FileListingWidgetClass::ShowDir() {
 		List->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	}
 	List->SetFocus();
-}
+ }
 
 void t4p::FileListingWidgetClass::OnListItemRightClick(wxListEvent& event) {
 	long index = event.GetIndex();
@@ -614,11 +603,6 @@ void t4p::FileListingWidgetClass::OnListMenuRename(wxCommandEvent& event) {
 
 	// dont allow the parent dir to be renamed
 	if (index > 0) {
-		
-		// set the null accelerator table, so that the backspace is captured
-		// by the text control
-		List->SetAcceleratorTable(wxNullAcceleratorTable);
-
 		wxTextCtrl* ctrl = List->EditLabel(index);
 		
 		// change the selection. select only the file name not the
@@ -837,14 +821,8 @@ void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
 		wxFileName destFile(FileListing->WorkingDir.GetPath(), newName);
 		
 		FileListing->StartRename(sourceFile, newName);
-
-		// put back the accelerators for rename / parent
-		SetExplorerAccelerators(List);
 	}
 	else {
-
-		// put back the accelerators for rename / parent
-		SetExplorerAccelerators(List);
 		event.Veto();
 	}
 }
@@ -881,8 +859,6 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();	
 	FillSourcesList(sourceDirs);
-
-	SetExplorerAccelerators(List);
 }
 
 t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
@@ -997,6 +973,39 @@ void t4p::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
 		nextDir.AppendDir(text);
 		RefreshDir(nextDir);
+	}
+}
+
+void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
+	int keyCode = event.GetKeyCode();
+	wxCommandEvent cmdEvt;
+	switch (keyCode) {
+		
+		// note that F2 does not really work; since it is the 
+		// default shortcut for 'go to next bookmark'
+		// It could be overwritten by using a wxAcceleratorTable
+		// but that would mean that the 'go to bookmark' shortcut
+		// would never work when the explorer panel is shown.
+		// maybe there is a way around this, not quite sure
+		case WXK_F2:
+			FileListingWidget->OnListMenuRename(cmdEvt);
+			break;
+		case WXK_DELETE:
+			FileListingWidget->OnListMenuDelete(cmdEvt);
+			break;
+		case WXK_BACK:
+			OnParentButtonClick(cmdEvt);
+			break;
+		case WXK_LEFT:
+			if (event.GetModifiers() & WXK_ALT) {
+				OnParentButtonClick(cmdEvt);
+			}
+			else {
+				event.Skip();
+			}
+			break;
+		default:
+			event.Skip();
 	}
 }
 
@@ -1270,9 +1279,6 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	
 	List->DeleteAllColumns();
 	List->InsertColumn(0, _(""));
-	
-
-	SetExplorerAccelerators(List);
 }
 
 t4p::ExplorerOutlinePanelClass::~ExplorerOutlinePanelClass() {
@@ -1335,6 +1341,39 @@ void t4p::ExplorerOutlinePanelClass::OnParentButtonClick(wxCommandEvent& event) 
 		if (curDir.IsOk()) {	
 			RefreshDir(curDir);
 		}
+	}
+}
+
+void t4p::ExplorerOutlinePanelClass::OnListKeyDown(wxKeyEvent& event) {
+	int keyCode = event.GetKeyCode();
+	wxCommandEvent cmdEvt;
+	switch (keyCode) {
+		
+		// note that F2 does not really work; since it is the 
+		// default shortcut for 'go to next bookmark'
+		// It could be overwritten by using a wxAcceleratorTable
+		// but that would mean that the 'go to bookmark' shortcut
+		// would never work when the explorer panel is shown.
+		// maybe there is a way around this, not quite sure
+		case WXK_F2:
+			FileListingWidget->OnListMenuRename(cmdEvt);
+			break;
+		case WXK_DELETE:
+			FileListingWidget->OnListMenuDelete(cmdEvt);
+			break;
+		case WXK_BACK:
+			OnParentButtonClick(cmdEvt);
+			break;
+		case WXK_LEFT:
+			if (event.GetModifiers() & WXK_ALT) {
+				OnParentButtonClick(cmdEvt);
+			}
+			else {
+				event.Skip();
+			}
+			break;
+		default:
+			event.Skip();
 	}
 }
 
