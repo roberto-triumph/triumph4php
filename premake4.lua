@@ -344,14 +344,11 @@ solution "triumph4php"
 						normalizepath("package/Info.plist"),
 						normalizepath("Debug/triumph4php.app/Contents/")
 					),
-					
-					-- so that "run" works correctly in codelite
-					-- due to the CWD that codelite uses buy default
+					string.format("mkdir -p %s", normalizepath("Debug/triumph4php.app/Contents/Resources/")),
 					string.format("cp %s %s",
-						normalizepath("Debug/libsoci*.dylib"),
-						normalizepath("Debug/triumph4php.app/Contents/MacOS/")
+						normalizepath("assets/icons/triumph4php.icns"),
+						normalizepath("Debug/triumph4php.app/Contents/Resources/")
 					)
-					
 				}
 			configuration { "Release" }
 				postbuildcommands {
@@ -359,14 +356,11 @@ solution "triumph4php"
 						normalizepath("package/Info.plist"),
 						normalizepath("Release/triumph4php.app/Contents/")
 					),
-					
-					-- so that "run" works correctly in codelite
-					-- due to the CWD that codelite uses buy default
+					string.format("mkdir -p %s", normalizepath("Release/triumph4php.app/Contents/Resources/")),
 					string.format("cp %s %s",
-						normalizepath("Release/libsoci*.dylib"),
-						normalizepath("Release/triumph4php.app/Contents/MacOS/")
+						normalizepath("assets/icons/triumph4php.icns"),
+						normalizepath("Release/triumph4php.app/Contents/Resources/")
 					)
-					
 				}
 		end
 
@@ -630,37 +624,19 @@ solution "triumph4php"
 		includedirs { "lib/keybinder/include" }
 		
 		-- for mac osx, change the shared library ID so that
-		-- it can be located inside the same directory
+		-- it is the full path, that way we can run the executable
+		-- from any location and the lib will always be found
+		-- it becomes painful when running from the command line
+		-- vs. finder vs. the debugger vs. the codelite terminal,
+		-- they all have different working directories and this
+		-- makes relative install names not easy to work with
+		-- when passing arguments to the linker, must replace
+		-- spaces with commas
 		if os.is "macosx" then
 			configuration { "Debug" }
-				postbuildcommands {
-					string.format("install_name_tool -id %s %s", 
-						"@executable_path/../MacOS/libkeybinder.dylib", 
-						normalizepath("Debug/libkeybinder.dylib")
-					),
-					string.format("mkdir -p %s", 
-						normalizepath("Debug/triumph4php.app/Contents/MacOS")
-					),
-					string.format("cp %s %s",
-						normalizepath("Debug/libkeybinder.dylib"),
-						normalizepath("Debug/triumph4php.app/Contents/MacOS")	
-					)
-				}
-
+				linkoptions { "-Wl,-install_name," .. normalizepath("Debug/libkeybinder.dylib")  }
 			configuration { "Release" }
-				postbuildcommands {
-					string.format("install_name_tool -id %s %s", 
-						"@executable_path/../MacOS/libkeybinder.dylib", 
-						normalizepath("Release/libkeybinder.dylib")
-					), 
-					string.format("mkdir -p %s", 
-						normalizepath("Release/triumph4php.app/Contents/MacOS")
-					),
-					string.format("cp %s %s",
-						normalizepath("Release/libkeybinder.dylib"),
-						normalizepath("Release/triumph4php.app/Contents/MacOS")	
-					)
-				}
+				linkoptions { "-Wl,-install_name," .. normalizepath("Release/libkeybinder.dylib")  }
 		end
 
 		configuration { "Debug" }
@@ -707,36 +683,19 @@ solution "triumph4php"
 		pickywarnings(_ACTION)
 		
 		-- for mac osx, change the shared library ID so that
-		-- it can be located inside the same directory
+		-- it is the full path, that way we can run the executable
+		-- from any location and the lib will always be found
+		-- it becomes painful when running from the command line
+		-- vs. finder vs. the debugger vs. the codelite terminal,
+		-- they all have different working directories and this
+		-- makes relative install names not easy to work with
+		-- when passing arguments to the linker, must replace
+		-- spaces with commas
 		if os.is "macosx" then
 			configuration { "Debug" }
-				postbuildcommands {
-					string.format("install_name_tool -id %s %s", 
-						"@executable_path/../MacOS/libpelet.dylib", 
-						normalizepath("Debug/libpelet.dylib")
-					),
-					string.format("mkdir -p %s", 
-						normalizepath("Debug/triumph4php.app/Contents/MacOS")
-					),
-					string.format("cp %s %s",
-						normalizepath("Debug/libpelet.dylib"),
-						normalizepath("Debug/triumph4php.app/Contents/MacOS")	
-					)
-				}
+				linkoptions { "-Wl,-install_name," .. normalizepath("Debug/libpelet.dylib")  }
 			configuration { "Release" }
-				postbuildcommands {
-					string.format("install_name_tool -id %s %s", 
-						"@executable_path/../MacOS/libpelet.dylib", 
-						normalizepath("Release/libpelet.dylib")
-					),
-					string.format("mkdir -p %s", 
-						normalizepath("Release/triumph4php.app/Contents/MacOS")
-					),
-					string.format("cp %s %s",
-						normalizepath("Release/libpelet.dylib"),
-						normalizepath("Release/triumph4php.app/Contents/MacOS")	
-					)
-				}
+				linkoptions { "-Wl,-install_name," .. normalizepath("Release/libpelet.dylib")  }
 		end
 
 		configuration "Release"

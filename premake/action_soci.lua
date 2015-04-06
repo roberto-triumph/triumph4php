@@ -102,7 +102,7 @@ function prepSoci()
 				" -DWITH_SQLITE3=YES " ..
 				" -DWITH_BOOST=NO" ..
 				" -DSOCI_TESTS=YES " ..
-				" -DCMAKE_BUILD_TYPE=Debug " .. 
+				" -DCMAKE_BUILD_TYPE=Debug " ..
 				" " .. SOCI_SRC,
 			"make",
 			"make install"
@@ -124,7 +124,7 @@ function prepSoci()
 				" -DWITH_SQLITE3=YES " ..
 				" -DWITH_BOOST=NO" ..
 				" -DSOCI_TESTS=YES " ..
-				" -DCMAKE_BUILD_TYPE=Debug " .. 
+				" -DCMAKE_BUILD_TYPE=Release " ..
 				" " .. SOCI_SRC,
 			"make",
 			"make install"
@@ -156,7 +156,9 @@ function prepSoci()
 		end
 	elseif os.is "macosx" then 
 		sociInstallDebugDir = normalizepath("lib/soci/triumph/Debug")
+		sociInstallDebugLibDir = normalizepath("lib/soci/triumph/Debug/lib")
 		sociInstallReleaseDir = normalizepath("lib/soci/triumph/Release")
+		sociInstallReleaseLibDir = normalizepath("lib/soci/triumph/Release/lib")
 
 		batchexecute(normalizepath(""), {
 			"mkdir -p " .. sociInstallDebugDir,
@@ -181,6 +183,11 @@ function prepSoci()
 				" -DWITH_BOOST=NO" ..
 				" -DSOCI_TESTS=YES " ..
 				" -DCMAKE_BUILD_TYPE=Debug " ..
+				
+				-- tell the linker to use the full path as the install name for
+				-- soci libs; that way the executables can find them no matter 
+				-- what directory we are running the executable from
+				" -DCMAKE_INSTALL_NAME_DIR=" .. sociInstallDebugLibDir ..
 				" " .. SOCI_SRC,
 			"make",
 			"make install"
@@ -204,23 +211,15 @@ function prepSoci()
 				" -DWITH_BOOST=NO" ..
 				" -DSOCI_TESTS=YES " ..
 				" -DCMAKE_BUILD_TYPE=Release " ..
+				
+				-- tell the linker to use the full path as the install name for
+				-- soci libs; that way the executables can find them no matter 
+				-- what directory we are running the executable from
+				" -DCMAKE_INSTALL_NAME_DIR=" .. sociInstallReleaseLibDir ..
 				" " .. SOCI_SRC,
 			"make",
 			"make install"
 		});
-
-		-- copy dynamic libs to appropriate output dir
-		foundCount = 0;
-		libs = os.matchfiles("lib/soci/triumph/Debug/lib/*.dylib");
-		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Debug/lib/*.dylib Debug/");
-			foundCount = foundCount + 1;
-		end
-		libs = os.matchfiles("lib/soci/triumph/Release/lib/*.dylib");
-		if #libs > 0 then
-			os.execute("cp -r " .. os.getcwd() .. "/lib/soci/triumph/Release/lib/*.dylib Release/");
-			foundCount = foundCount + 1;
-		end
 	else 
 		print "Triumph does not support building SOCI on this operating system.\n"
 	end
