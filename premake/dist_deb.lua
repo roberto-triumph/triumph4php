@@ -75,6 +75,10 @@ newaction {
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
 		debianControl = path.getabsolute("./package/debian.control");
+		debVersion = tag
+		if tag == master then
+			debVersion = '99.99.99'
+		end
 		
 		if (not os.isdir(workDir)) then
 			batchexecute(rootDir, {
@@ -85,7 +89,7 @@ newaction {
 				"git submodule init",
 				"git submodule update lib/pelet",
 				
-					
+				
 				-- create the makefiles, which will be used to build
 				-- the release version of the project
 				-- basically, this command makes the work directory use
@@ -107,7 +111,7 @@ newaction {
 				"./premake4 gmake",
 				
 				-- this will prep the dir to be a debian work dir
-				"dh_make -s --email roberto@triumph4php.com  --native",
+				"dh_make -s -y --email roberto@triumph4php.com  --native -p triumph4php_" .. debVersion,
 				
 				-- remove any example files put there by dh_make
 				 "rm -rf debian/*.ex",
