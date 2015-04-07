@@ -179,7 +179,7 @@ newaction {
 			"T4P_BUILD_SCRIPTS_DIR=. " .. 
 			"T4P_LIB_DIR=" .. finalLibDir .. " " ..
 			"T4P_ASSET_DIR=" .. assetDir .. " " ..
-			"rpmbuild -bb " .. specFile
+			"rpmbuild -bb " .. specLinkFile
 		});
 	end
 }
