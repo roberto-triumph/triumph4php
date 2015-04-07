@@ -78,9 +78,11 @@ newaction {
 		specLinkFile = userRoot .. "/rpmbuild/SPECS/triumph4php.spec";
 		
 		os.execute(
-			string.format("rm -rf \"%s\" && " ..
+			string.format(
+				"mkdir -p \"%s\""
+				"rm -rf \"%s\" && " ..
 				"ln -s \"%s\" \"%s\"",
-				specLinkFile, specFile, specLinkFile)
+				userRoot .."/rpmbuild/SPECS", specLinkFile, specFile, specLinkFile)
 		);
 		
 		if (not os.isdir(workDir)) then
