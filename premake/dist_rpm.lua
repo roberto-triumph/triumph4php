@@ -79,7 +79,7 @@ newaction {
 		
 		os.execute(
 			string.format(
-				"mkdir -p \"%s\""
+				"mkdir -p \"%s\"",
 				"rm -rf \"%s\" && " ..
 				"ln -s \"%s\" \"%s\"",
 				userRoot .."/rpmbuild/SPECS", specLinkFile, specFile, specLinkFile)
