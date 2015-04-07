@@ -72,7 +72,7 @@ newaction {
 		cmdStream:close()
 		
 		userRoot = cmdOutput
-		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..tag
+		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..versionNumber
 		desktopFile = userRoot .. "/rpmbuild/SPECS/triumph4php.desktop"
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
