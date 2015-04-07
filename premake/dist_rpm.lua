@@ -84,7 +84,7 @@ newaction {
 		batchexecute(rootDir, {
 			string.format("mkdir -p \"%s\"", userRoot .. "/rpmbuild/SPECS"),
 			string.format("rm -rf \"%s\"",  specLinkFile),
-			string.format("ln -s \"%s\" \"%s\"", specFile, specLinkFile),
+			string.format("cp \"%s\" \"%s\"", specFile, specLinkFile),
 			string.format("sed -i 's/0.0.0/%s/g' %s", versionNumber, specLinkFile)
 		});
 		
