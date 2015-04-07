@@ -58,6 +58,10 @@ newaction {
 			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
 			os.exit(-1)
 		end
+		versionNumber = tag;
+		if tag == 'master' then
+			versionNumber = '9.9.9'
+		end
 		
 		--
 		-- linux distribution: we package a .RPM file
@@ -80,7 +84,8 @@ newaction {
 		batchexecute(rootDir, {
 			string.format("mkdir -p \"%s\"", userRoot .. "/rpmbuild/SPECS"),
 			string.format("rm -rf \"%s\"",  specLinkFile),
-			string.format("ln -s \"%s\" \"%s\"", specFile, specLinkFile)
+			string.format("ln -s \"%s\" \"%s\"", specFile, specLinkFile),
+			string.format("sed -i 's/0.0.0/%s/g' %s", versionNumber, specLinkFile)
 		});
 		
 		if (not os.isdir(workDir)) then

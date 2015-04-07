@@ -1,10 +1,10 @@
 Name:           triumph4php
-Version:        0.5.3
+Version:        0.0.0
 Release:        1%{?dist}
 Summary:        Open source, cross-platform editor and IDE dedicated exclusively for PHP 
 License:        MIT
 URL:            http://triumph4php.com
-Source0:        triumph4php-0.5.3
+Source0:        triumph4php-0.0.0
 
 #BuildRequires: glibc.i686 
 BuildRequires: community-mysql-devel
