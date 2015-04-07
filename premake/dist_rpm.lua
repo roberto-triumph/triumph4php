@@ -77,13 +77,11 @@ newaction {
 		specFile = path.getabsolute("package/triumph4php.spec");
 		specLinkFile = userRoot .. "/rpmbuild/SPECS/triumph4php.spec";
 		
-		os.execute(
-			string.format(
-				"mkdir -p \"%s\"",
-				"rm -rf \"%s\" && " ..
-				"ln -s \"%s\" \"%s\"",
-				userRoot .."/rpmbuild/SPECS", specLinkFile, specFile, specLinkFile)
-		);
+		batchexecute(rootDir, {
+			string.format("mkdir -p \"%s\"", userRoot .. "/rpmbuild/SPECS"),
+			string.format("rm -rf \"%s\"",  specLinkFile),
+			string.format("ln -s \"%s\" \"%s\"", specFile, specLinkFile)
+		});
 		
 		if (not os.isdir(workDir)) then
 			batchexecute(rootDir, {
