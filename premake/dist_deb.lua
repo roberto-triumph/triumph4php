@@ -111,7 +111,7 @@ newaction {
 				"./premake4 gmake",
 				
 				-- this will prep the dir to be a debian work dir
-				"dh_make -s -y --email roberto@triumph4php.com  --native -p triumph4php_" .. debVersion,
+				"yes | dh_make --single --email roberto@triumph4php.com  --native --packagename triumph4php_" .. debVersion,
 				
 				-- remove any example files put there by dh_make
 				 "rm -rf debian/*.ex",
