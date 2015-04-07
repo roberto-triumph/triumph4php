@@ -52,16 +52,17 @@ newaction {
 	trigger = "distrpm",
 	description = "Build the Triumph distributable RPM package.",
 	execute = function()
+		tag = disttag()
+		version = distversion()
 		
-		tag = os.getenv('T4P_TAG');
-		if (not tag) then
-			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
+		if (not tag or not version) then
+			print("Cannot determine what branch or version to build. Please set them manually using the " ..
+				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
-		versionNumber = tag;
-		if tag == 'master' then
-			versionNumber = '9.9.9'
-		end
+		printf("creating RPM package for branch %s using version number %s\n", tag, version)
+		
+		
 		
 		--
 		-- linux distribution: we package a .RPM file
@@ -72,7 +73,7 @@ newaction {
 		cmdStream:close()
 		
 		userRoot = cmdOutput
-		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..versionNumber
+		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..version
 		desktopFile = userRoot .. "/rpmbuild/SPECS/triumph4php.desktop"
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
@@ -85,7 +86,7 @@ newaction {
 			string.format("mkdir -p \"%s\"", userRoot .. "/rpmbuild/SPECS"),
 			string.format("rm -rf \"%s\"",  specLinkFile),
 			string.format("cp \"%s\" \"%s\"", specFile, specLinkFile),
-			string.format("sed -i 's/0.0.0/%s/g' %s", versionNumber, specLinkFile)
+			string.format("sed -i 's/0.0.0/%s/g' %s", version, specLinkFile)
 		});
 		
 		if (not os.isdir(workDir)) then

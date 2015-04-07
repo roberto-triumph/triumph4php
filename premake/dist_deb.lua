@@ -59,12 +59,16 @@ newaction {
 	trigger = "distdeb",
 	description = "Build the Triumph distributable DEB package",
 	execute = function()
-		tag = os.getenv('T4P_TAG');
-		if (not tag) then
-			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
+		tag = disttag()
+		version = distversion()
+		
+		if (not tag or not version) then
+			print("Cannot determine what branch or version to build. Please set them manually using the " ..
+				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
-		
+		printf("creating DEBIAN package for branch %s using version number %s\n", tag, version)
+
 		--
 		-- linux distribution: we package a .DEB file
 		--
@@ -75,10 +79,6 @@ newaction {
 		libWildcards =  normalizepath("./Release/*.so*")
 		assetDir = "/usr/share/triumph4php"
 		debianControl = path.getabsolute("./package/debian.control");
-		debVersion = tag
-		if tag == master then
-			debVersion = '99.99.99'
-		end
 		
 		if (not os.isdir(workDir)) then
 			batchexecute(rootDir, {
@@ -111,7 +111,7 @@ newaction {
 				"./premake4 gmake",
 				
 				-- this will prep the dir to be a debian work dir
-				"yes | dh_make --single --email roberto@triumph4php.com  --native --packagename triumph4php_" .. debVersion,
+				"yes | dh_make --single --email roberto@triumph4php.com  --native --packagename triumph4php_" .. version,
 				
 				-- remove any example files put there by dh_make
 				 "rm -rf debian/*.ex",

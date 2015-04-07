@@ -49,11 +49,16 @@ newaction {
 	trigger = "distmsw",
 	description = "Build the Triumph distributable for MS Windows.",
 	execute = function()
-		tag = os.getenv('T4P_TAG');
-		if (not tag) then
-			print "Need to set the T4P_TAG environment variable to know which tag to package.\n";
+		tag = disttag()
+		version = distversion()
+		
+		if (not tag or not version) then
+			print("Cannot determine what branch or version to build. Please set them manually using the " ..
+				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
+		printf("creating MSW 7-zip archive for branch %s using version number %s\n", tag, version)
+
 		destDir = normalizepath("..\\triumph4php-" .. tag)
 		
 		-- MSW version, we just zip up the compiled executable

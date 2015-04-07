@@ -167,3 +167,41 @@ function execoutput(cmd)
 	cmdStream:close()
 	return cmdOutput
 end
+
+-- returns the tag that we need to build a distributable
+-- for.  The tag is either
+-- 1. fetched from T4P_TAG environment variable
+-- 2. fetched using 'git describe --all' 
+function disttag()
+	tag = os.getenv('T4P_TAG');
+	if (not tag) then
+		tag = execoutput(string.format('%s describe --all', GIT))
+		tag = trim(tag)
+		
+		-- remove the 'heads/' in case of RC branches
+		tag = string.gsub(tag, '^heads/', '')
+	end
+	return tag
+end
+
+-- returns the version number that we will assign the distributable
+-- The version number must follow certain guidelines depending
+-- on which platform we are using, so we want the flexibility to
+-- name it differently than the tag/branch we are using. For example,
+-- debian versions must be 'N.N.N' where N is a number [0-9], but we
+-- may want to build a 'nightly' using the master branch.
+-- The version number is either
+-- 1. The environment variable T4P_TAG_VERSION
+-- 2. The name of the tag being built (0.5.2)
+-- 3. The name of the branch being built (0.6.2-RC branch ==> version 0.6.2)
+function distversion()
+	version = os.getenv('T4P_TAG_VERSION');
+	if (not version) then
+		tag = disttag();
+	
+		-- remove the 'RC' label, as most packagers require N.N.N
+		-- version
+		version = string.gsub(tag, '%-RC', '');
+	end
+	return version
+end
