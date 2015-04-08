@@ -77,7 +77,7 @@ newaction {
 		-- single action)
 		onlyFilename = os.getenv('T4P_PKG_FILENAME_ONLY');
 		if (onlyFilename == '1') then
-			print(path.getabsolute("../triumph4php_" .. version .. ".deb"))
+			print(path.getabsolute("triumph4php_" .. version .. ".deb"))
 			os.exit(0)
 		end
 		
