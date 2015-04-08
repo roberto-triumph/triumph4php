@@ -45,6 +45,21 @@ newaction {
 				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
+		
+		-- if we only want to print out the name of the dmg file
+		-- this may be used by buildbot (when/if we have it for mac)
+		-- so that it knows the name of
+		-- the package file to copy it out of the slave and to the
+		-- master (because slaves are in EC2 and they are terminated)
+		-- this is not a command line option because I don't like how
+		-- premake deals with options (options cannot be tied to a 
+		-- single action)
+		onlyFilename = os.getenv('T4P_PKG_FILENAME_ONLY');
+		if (onlyFilename == '1') then
+			print(path.getabsolute("../triumph4php-" .. tag .."/triumph4php-" .. version .. ".dmg"))
+			os.exit(0)
+		end
+		
 		printf("creating Mac OS X app bundle for branch %s using version number %s\n", tag, version)
 		
 		rootDir = normalizepath("./")
@@ -164,18 +179,18 @@ newaction {
 		size = string.match(sizeMb, "(%d+)")
 		size = size + 4  -- add some padding, round up
 		batchexecute(workDir, {
-			string.format("hdiutil create -megabytes %d -layout NONE triumph4php.dmg", size),
+			string.format("hdiutil create -megabytes %d -layout NONE triumph4php-%s.dmg", size, version),
 		})
 
 		-- need to read the disk that was created
-		cmdOutput = execoutput(string.format("hdid -nomount %s/triumph4php.dmg", workDir))
+		cmdOutput = execoutput(string.format("hdid -nomount %s/triumph4php-%s.dmg", workDir, version))
 		disk = trim(cmdOutput)
 		print("disk=" .. disk)
 
 		batchexecute(workDir, {
 			string.format("newfs_hfs -v triumph4php %s", disk),
 			string.format("hdiutil eject %s", disk),
-			"hdid triumph4php.dmg",
+			string.format("hdid triumph4php-%s.dmg", version),
 			"cp -P -R Release/triumph4php.app /Volumes/triumph4php"
 		})
 	end

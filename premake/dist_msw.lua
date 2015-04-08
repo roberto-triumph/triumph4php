@@ -57,9 +57,23 @@ newaction {
 				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
+		
+		-- if we only want to print out the name of the 7zip file
+		-- this is used by buildbot so that it knows the name of
+		-- the package file to copy it out of the slave and to the
+		-- master (because slaves are in EC2 and they are terminated)
+		-- this is not a command line option because I don't like how
+		-- premake deals with options (options cannot be tied to a 
+		-- single action)
+		onlyFilename = os.getenv('T4P_PKG_FILENAME_ONLY');
+		if (onlyFilename == '1') then
+			print(path.getabsolute("..\\triumph4php-" .. version .. "\\triumph4php-" .. version .. ".7z"))
+			os.exit(0)
+		end
+		
 		printf("creating MSW 7-zip archive for branch %s using version number %s\n", tag, version)
 
-		destDir = normalizepath("..\\triumph4php-" .. tag)
+		destDir = normalizepath("..\\triumph4php-" .. version)
 		
 		-- MSW version, we just zip up the compiled executable
 		-- the shared libs and assets
@@ -100,8 +114,8 @@ newaction {
 			"vcbuild triumph4php.vcproj \"Release|Win32\"",
 		});
 		
-		if (os.isdir("..\\triumph4php-" .. tag .. "\\dist")) then
-			os.execute("rmdir /s /q " .. "..\\triumph4php-" .. tag .. "\\dist")
+		if (os.isdir("..\\triumph4php-" .. version .. "\\dist")) then
+			os.execute("rmdir /s /q " .. "..\\triumph4php-" .. version .. "\\dist")
 		end
 		batchexecute(destDir, {
 			"mkdir dist\\triumph4php\\bin",

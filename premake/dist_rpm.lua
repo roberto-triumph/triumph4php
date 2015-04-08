@@ -60,20 +60,29 @@ newaction {
 				"T4P_TAG and T4P_TAG_VERSION environment variables\n");
 			os.exit(-1)
 		end
+		
+		cmdOutput = trim(execoutput("echo ~"))
+		userRoot = cmdOutput
+		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..version
+		
+		-- if we only want to print out the name of the rpm file
+		-- this is used by buildbot so that it knows the name of
+		-- the package file to copy it out of the slave and to the
+		-- master (because slaves are in EC2 and they are terminated)
+		-- this is not a command line option because I don't like how
+		-- premake deals with options (options cannot be tied to a 
+		-- single action)
+		onlyFilename = os.getenv('T4P_PKG_FILENAME_ONLY');
+		if (onlyFilename == '1') then
+			print(userRoot .. "/rpmbuild/RPMS/x86_64/triumph4php-" .. version .. "-1.fc21.x86_64.rpm")
+			os.exit(0)
+		end
+		
 		printf("creating RPM package for branch %s using version number %s\n", tag, version)
-		
-		
 		
 		--
 		-- linux distribution: we package a .RPM file
 		--
-		cmd = "echo ~"
-		cmdStream = io.popen(cmd)
-		cmdOutput = cmdStream:read("*l")
-		cmdStream:close()
-		
-		userRoot = cmdOutput
-		workDir = userRoot .. "/rpmbuild/SOURCES/triumph4php-" ..version
 		desktopFile = userRoot .. "/rpmbuild/SPECS/triumph4php.desktop"
 		finalLibDir = "/usr/lib64/triumph4php"
 		rootDir = normalizepath("./")
