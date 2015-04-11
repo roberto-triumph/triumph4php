@@ -26,6 +26,7 @@
 #define __T4P_FILEWATCHERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <features/wxformbuilder/FileWatcherFeatureForms.h>
 #include <actions/ActionClass.h>
 #include <wx/fswatcher.h>
 
@@ -51,7 +52,7 @@ class VolumeListEventClass;
  * we tell MSW to watch for directory changes recursively. 
  *
  * Note that we do not directly propagate wxFileSystemWatcher events
- * to the rest of the app as they come in. This feture will buffer
+ * to the rest of the app as they come in. This feature will buffer
  * FS events a bit, wait until events stop coming in, and then notify
  * the rest of the app. This is because a file save may generate
  * more than 1 FS event depending on how it is saved by an application,
@@ -63,7 +64,17 @@ class FileWatcherFeatureClass : public t4p::FeatureClass {
 
 public:
 
+	/**
+	 * Flag to turn this feature on or off, we want this so that in case
+	 * there are bugs with this feature users can turn this feature off.
+	 */
+	bool Enabled;
+
 	FileWatcherFeatureClass(t4p::AppClass& app);
+	
+	void LoadPreferences(wxConfigBase* config);
+	
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 private:
 
@@ -236,6 +247,17 @@ public:
 
 
 	wxEvent* Clone() const;
+};
+
+class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
+	
+public:
+	
+	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
+
+private:
+
+	t4p::FileWatcherFeatureClass& Feature;
 };
 
 }

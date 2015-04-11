@@ -27,6 +27,8 @@
 #include <globals/Errors.h>
 #include <globals/Events.h>
 #include <wx/volume.h>
+#include <wx/platinfo.h>
+#include <wx/valgen.h>
 #include <algorithm>
 #include <map>
 
@@ -133,6 +135,7 @@ static std::map<wxString, t4p::CodeControlClass*> OpenedFiles(t4p::NotebookClass
 
 t4p::FileWatcherFeatureClass::FileWatcherFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
+, Enabled(true)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , FilesExternallyCreated()
 , FilesExternallyModified()
@@ -148,6 +151,18 @@ t4p::FileWatcherFeatureClass::FileWatcherFeatureClass(t4p::AppClass& app)
 , IsWatchError(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
+	
+	// by default, disable on mac os x because wxFileSystemWatcher
+	// users kqueue for fs notifications, and this requires an open
+	// file handle for each patch being watched.
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+		Enabled = false;
+	}
+}
+
+void t4p::FileWatcherFeatureClass::LoadPreferences(wxConfigBase* config) {
+	config->Read(wxT("FileWatcher/Enabled"), &Enabled, Enabled);
 }
 
 void t4p::FileWatcherFeatureClass::OnAppReady(wxCommandEvent& event) {
@@ -176,6 +191,8 @@ void t4p::FileWatcherFeatureClass::OnAppExit(wxCommandEvent& event) {
 }
 
 void t4p::FileWatcherFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
+	wxConfigBase* config = wxConfig::Get();
+	config->Write(wxT("FileWatcher/Enabled"), Enabled);
 	
 	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
 	// watches.
@@ -190,8 +207,16 @@ void t4p::FileWatcherFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	StartWatch();
 }
 
+void t4p::FileWatcherFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+	t4p::FileWatcherPreferencesPanelClass* prefs = new t4p::FileWatcherPreferencesPanelClass(parent, *this);
+	parent->AddPage(prefs, _("File Watcher"));
+}
+
 void t4p::FileWatcherFeatureClass::StartWatch() {
 	IsWatchError = false;
+	if (!Enabled) {
+		return;
+	}
 	FsWatcher = new wxFileSystemWatcher();
 	FsWatcher->SetOwner(this);
 
@@ -484,6 +509,13 @@ t4p::VolumeListEventClass::VolumeListEventClass(int id,
 
 wxEvent* t4p::VolumeListEventClass::Clone() const {
 	return new t4p::VolumeListEventClass(GetId(), LocalVolumes);
+}
+
+t4p::FileWatcherPreferencesPanelClass::FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature)
+: FileWatcherPreferencesPanelGeneratedClass(parent, wxID_ANY)
+, Feature(feature) {
+	wxGenericValidator validator(&Feature.Enabled);
+	Enabled->SetValidator(validator);
 }
 
 const wxEventType t4p::EVENT_ACTION_VOLUME_LIST = wxNewEventType();
