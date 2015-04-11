@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <widgets/ProcessWithHeartbeatClass.h>
+#include <wx/txtstrm.h>
 
 extern const wxEventType t4p::EVENT_PROCESS_COMPLETE = wxNewEventType();
 
@@ -139,21 +140,20 @@ wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const {
 }
 
 wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const {
-	wxInputStream* stream = proc->GetInputStream();
-	wxString allOutput;
+	wxString allOutput;		
 	while (proc->IsInputAvailable()) {
-		char ch = stream->GetC();
-		if (isprint(ch) || isspace(ch)) {
-			allOutput.Append(ch);
-		}
+		wxInputStream* stream = proc->GetInputStream();
+		wxTextInputStream tis(*stream);
+		allOutput << tis.ReadLine();
+		allOutput << wxT("\n");
 	}
-	stream = proc->GetErrorStream();
 	while (proc->IsErrorAvailable()) {
-		char ch = stream->GetC();
-		if (isprint(ch) || isspace(ch)) {
-			allOutput.Append(ch);
-		}
+		wxInputStream* stream = proc->GetErrorStream();
+		wxTextInputStream tis(*stream);
+		allOutput << tis.ReadLine();
+		allOutput << wxT("\n");
 	}
+	
 	return allOutput;
 }
 
