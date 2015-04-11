@@ -1,6 +1,12 @@
 Triumph 4 PHP ChangeLog
 =======================
 
+#Version 0.6.0#
+* Mac OS X app bundle. Triumph can now run on Mac OS X.
+* Styling updates to the preferences panel.  Now, the panels are rendered
+  in a tree notebook so that the user can see the page titles without needing
+  to scroll through the tabs. (Linux, MSW, Mac)
+
 #Version 0.5.4#
 * PHP lint check greatly improved. Lint check now warns about uninitialized 
   variables used in function calls.  (Linux, MSW)

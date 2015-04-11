@@ -3,10 +3,10 @@
   * [MS Windows Instructions](/compiling/#msw)
   * [Ubuntu Instructions](/compiling/#ubuntu)
   * [Fedora Code Instructions](/compiling/#fedora) 
-
+  * [Mac OS X Instructions](/compiling/#mac)
 
 triumph4php uses premake for build/configuration.  Premake makes it easier to perform cross-platform 
-development between Linux and Windows by generating Codelite / Makefile / Visual Studio Solution Files. 
+development between Linux, Windows and Mac by generating Codelite / Makefile / Visual Studio Solution Files. 
 
 #Project Dependencies#
  * [wxWidgets](http://www.wxwidgets.org) - This is the GUI toolkit used. Currently using version 2.9.5.
@@ -156,6 +156,46 @@ and machine processor power.
 OR, if you want to use Makefiles
 
     ./premake4 gmake
+	
+Now go into the build/ directory, you should see a either a Codelite directory or a
+gmake directory. Open the Codelite workspace and compile, or use Make
+to compile triumph4php. This will also take a good 30 minutes
+to an hour, depending on your machine's processing power.
+
+<a id="mac"></a>
+#Mac OS X#
+
+##Step 1: Download dependent packages##
+A nice, easy way is to get the dependencies via homebrew.
+
+    brew install icu4c boost mysql sqlite cmake 
+						
+##Step 2: Download the development tools##
+Codelite or another IDE / editor can be downloaded separately. You will
+also need to download the "Command Line Developer Tools" that contains
+the Apple SDKs needed to compile wxWidgets.
+
+##Step 3: Download the triumph4php repo##
+
+    git clone https://github.com/robertop/triumph4php triumph4php
+	cd triumph4php
+	
+##Step 4: Run the build script that sets up the dependent libraries##
+
+    ./premake4-macosx setupdev
+	
+The setupdev script will download the git submodules and compile 
+them.  Note: The setupdev command will take a long time; it may take a 
+good 30 min to an hour depending on your internet connection speed 
+and machine processor power.
+
+## Step 5: Build triumph4php##
+
+    ./premake4-macosx codelite
+	
+OR, if you want to use Makefiles
+
+    ./premake4-macosx gmake
 	
 Now go into the build/ directory, you should see a either a Codelite directory or a
 gmake directory. Open the Codelite workspace and compile, or use Make

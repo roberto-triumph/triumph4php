@@ -42,23 +42,8 @@ ICU_CONFIG = '/usr/local/opt/icu4c/bin/icu-config'
 -- location to the wx-config executable. In macosx systems we use this 
 -- binary to get the various compiler linker flags to use the wxWidgets library. 
 -- Note that if you change this then it's because you installed wxWidgets in a 
--- non-standard location; this means you will also need to add the wxWidgets 
--- lib directory to your LD_LIBRARY_PATH, otherwise the wxWidgets library 
--- will not be found at runtime (ie. when you try to execute triumph).
--- Also, if you build wxWidgets yourself, you will need to build the Unicode
--- version
--- Your command line to build wxWidgets should look like this (for Release mode):
---
---    ./configure --prefix="/path/to/wx/dest" --disable-debug --disable-debug_gdb \
---                --with-osx_cocoa --enable-unicode --enable-optimize
---    make
---
--- For debug mode:
---
---    ./configure --prefix="/path/to/wx/dest" --with-osx_cocoa --enable-unicode --enable-debug
---    make
---
--- Consult the wxWidgets for more info if necessary
+-- non-standard location, that's fine, just make sure that it is the unicode version
+-- and that both the release and debug version are built. 
 --
 WX_CONFIG = os.getenv("T4P_WXCONFIG")
 if (not WX_CONFIG) then
