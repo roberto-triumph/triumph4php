@@ -141,6 +141,20 @@ foreach (glob("{$themesDir}/*.xml") as $file ) {
 	
 	$strFunc = themeFuncName($name);
 	$strCode .= <<<CODE
+	
+static void SetTo{$strFunc}ThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetTo{$strFunc}ThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -259,7 +273,23 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetTo{$strFunc}ThemePhp(options);
+	SetTo{$strFunc}ThemeSql(options);
+	SetTo{$strFunc}ThemeCss(options);
+	SetTo{$strFunc}ThemeJs(options);
+	SetTo{$strFunc}ThemeConfig(options);
+	SetTo{$strFunc}ThemeCrontab(options);
+	SetTo{$strFunc}ThemeYaml(options);
+	SetTo{$strFunc}ThemeRuby(options);
+	SetTo{$strFunc}ThemeLua(options);
+	SetTo{$strFunc}ThemeMarkdown(options);
+	SetTo{$strFunc}ThemeBash(options);
+	SetTo{$strFunc}ThemeDiff(options);
+}
 
+static void SetTo{$strFunc}ThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("{$keyword}"));
@@ -324,7 +354,10 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("{$defaultForeground}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -352,7 +385,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-	
+}
+
+static void SetTo{$strFunc}ThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("{$commentSingle}"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -372,7 +407,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-	
+}
+
+static void SetTo{$strFunc}ThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("{$keyword}"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -400,7 +437,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-	
+}
+
+static void SetTo{$strFunc}ThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("{$string}"));
@@ -421,7 +460,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("{$operator}"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -443,7 +484,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("{$string}"));
@@ -464,7 +507,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("{$string}"));
@@ -509,7 +554,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("{$commentMultiLine}"));
@@ -541,7 +588,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("{$string}"));
@@ -574,7 +623,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("{$string}"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("{$string}"));
@@ -598,7 +649,9 @@ static void SetTo{$strFunc}Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("{$caretLine}"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("{$selectionBackground}"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("{$matchHighlight}"));
-		
+}
+
+static void SetTo{$strFunc}ThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("{$defaultForeground}"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));

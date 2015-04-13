@@ -431,7 +431,23 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
+
+	
+static void SetToOblivionThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToOblivionThemeDiff(t4p::CodeControlOptionsClass& options);
 
 static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
@@ -551,7 +567,23 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToOblivionThemePhp(options);
+	SetToOblivionThemeSql(options);
+	SetToOblivionThemeCss(options);
+	SetToOblivionThemeJs(options);
+	SetToOblivionThemeConfig(options);
+	SetToOblivionThemeCrontab(options);
+	SetToOblivionThemeYaml(options);
+	SetToOblivionThemeRuby(options);
+	SetToOblivionThemeLua(options);
+	SetToOblivionThemeMarkdown(options);
+	SetToOblivionThemeBash(options);
+	SetToOblivionThemeDiff(options);
+}
 
+static void SetToOblivionThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FFFFFF"));
@@ -616,7 +648,10 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#D8D8D8"));
-		
+}
+
+static void SetToOblivionThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -644,7 +679,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToOblivionThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#C7DD0C"));
@@ -664,7 +701,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToOblivionThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -692,7 +731,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToOblivionThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#FFC600"));
@@ -713,7 +754,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -735,7 +778,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#C7DD0C"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#FFC600"));
@@ -756,7 +801,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#FFC600"));
@@ -801,7 +848,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -833,7 +882,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#FFC600"));
@@ -866,7 +917,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#FFC600"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#FFC600"));
@@ -890,7 +943,9 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToOblivionThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -910,6 +965,20 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToRettaThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToRettaThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -1028,7 +1097,23 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToRettaThemePhp(options);
+	SetToRettaThemeSql(options);
+	SetToRettaThemeCss(options);
+	SetToRettaThemeJs(options);
+	SetToRettaThemeConfig(options);
+	SetToRettaThemeCrontab(options);
+	SetToRettaThemeYaml(options);
+	SetToRettaThemeRuby(options);
+	SetToRettaThemeLua(options);
+	SetToRettaThemeMarkdown(options);
+	SetToRettaThemeBash(options);
+	SetToRettaThemeDiff(options);
+}
 
+static void SetToRettaThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#E79E3C"));
@@ -1093,7 +1178,10 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#F8E1AA"));
-		
+}
+
+static void SetToRettaThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1121,7 +1209,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRettaThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#83786E"));
@@ -1141,7 +1231,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRettaThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#E79E3C"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1169,7 +1261,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRettaThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#D6C248"));
@@ -1190,7 +1284,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1212,7 +1308,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#83786E"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#D6C248"));
@@ -1233,7 +1331,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#D6C248"));
@@ -1278,7 +1378,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1310,7 +1412,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#D6C248"));
@@ -1343,7 +1447,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#D6C248"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#D6C248"));
@@ -1367,7 +1473,9 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2A2A2A"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRettaThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -1387,6 +1495,20 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#527D5D"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToSolarized_lightThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_lightThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -1505,7 +1627,23 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToSolarized_lightThemePhp(options);
+	SetToSolarized_lightThemeSql(options);
+	SetToSolarized_lightThemeCss(options);
+	SetToSolarized_lightThemeJs(options);
+	SetToSolarized_lightThemeConfig(options);
+	SetToSolarized_lightThemeCrontab(options);
+	SetToSolarized_lightThemeYaml(options);
+	SetToSolarized_lightThemeRuby(options);
+	SetToSolarized_lightThemeLua(options);
+	SetToSolarized_lightThemeMarkdown(options);
+	SetToSolarized_lightThemeBash(options);
+	SetToSolarized_lightThemeDiff(options);
+}
 
+static void SetToSolarized_lightThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#B58900"));
@@ -1570,7 +1708,10 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#657A81"));
-		
+}
+
+static void SetToSolarized_lightThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1598,7 +1739,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_lightThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#93A1A1"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#586E75"));
@@ -1618,7 +1761,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_lightThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#B58900"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1646,7 +1791,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_lightThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#2AA198"));
@@ -1667,7 +1814,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1689,7 +1838,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#2AA198"));
@@ -1710,7 +1861,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -1755,7 +1908,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -1787,7 +1942,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#2AA198"));
@@ -1820,7 +1977,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -1844,7 +2003,9 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#FDF6E3"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_lightThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -1864,6 +2025,20 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#ECE7D5"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToSolarized_darkThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToSolarized_darkThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -1982,7 +2157,23 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToSolarized_darkThemePhp(options);
+	SetToSolarized_darkThemeSql(options);
+	SetToSolarized_darkThemeCss(options);
+	SetToSolarized_darkThemeJs(options);
+	SetToSolarized_darkThemeConfig(options);
+	SetToSolarized_darkThemeCrontab(options);
+	SetToSolarized_darkThemeYaml(options);
+	SetToSolarized_darkThemeRuby(options);
+	SetToSolarized_darkThemeLua(options);
+	SetToSolarized_darkThemeMarkdown(options);
+	SetToSolarized_darkThemeBash(options);
+	SetToSolarized_darkThemeDiff(options);
+}
 
+static void SetToSolarized_darkThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#B58900"));
@@ -2047,7 +2238,10 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#839496"));
-		
+}
+
+static void SetToSolarized_darkThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2075,7 +2269,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_darkThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#586E75"));
@@ -2095,7 +2291,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_darkThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#B58900"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2123,7 +2321,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSolarized_darkThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#2AA198"));
@@ -2144,7 +2344,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#B58900"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2166,7 +2368,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#586E75"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#2AA198"));
@@ -2187,7 +2391,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -2232,7 +2438,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2264,7 +2472,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#2AA198"));
@@ -2297,7 +2507,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#2AA198"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#2AA198"));
@@ -2321,7 +2533,9 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#002B36"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSolarized_darkThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -2341,6 +2555,20 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#073642"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToGedit_original_oblivionThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToGedit_original_oblivionThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -2459,7 +2687,23 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToGedit_original_oblivionThemePhp(options);
+	SetToGedit_original_oblivionThemeSql(options);
+	SetToGedit_original_oblivionThemeCss(options);
+	SetToGedit_original_oblivionThemeJs(options);
+	SetToGedit_original_oblivionThemeConfig(options);
+	SetToGedit_original_oblivionThemeCrontab(options);
+	SetToGedit_original_oblivionThemeYaml(options);
+	SetToGedit_original_oblivionThemeRuby(options);
+	SetToGedit_original_oblivionThemeLua(options);
+	SetToGedit_original_oblivionThemeMarkdown(options);
+	SetToGedit_original_oblivionThemeBash(options);
+	SetToGedit_original_oblivionThemeDiff(options);
+}
 
+static void SetToGedit_original_oblivionThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FFFFFF"));
@@ -2524,7 +2768,10 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#d3d7cf"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2552,7 +2799,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToGedit_original_oblivionThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#888a85"));
@@ -2572,7 +2821,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToGedit_original_oblivionThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2600,7 +2851,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToGedit_original_oblivionThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#edd400"));
@@ -2621,7 +2874,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2643,7 +2898,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#edd400"));
@@ -2664,7 +2921,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#edd400"));
@@ -2709,7 +2968,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -2741,7 +3002,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#edd400"));
@@ -2774,7 +3037,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#edd400"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#edd400"));
@@ -2798,7 +3063,9 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#555753"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToGedit_original_oblivionThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -2818,6 +3085,20 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#888a85"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToWombatThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToWombatThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -2936,7 +3217,23 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToWombatThemePhp(options);
+	SetToWombatThemeSql(options);
+	SetToWombatThemeCss(options);
+	SetToWombatThemeJs(options);
+	SetToWombatThemeConfig(options);
+	SetToWombatThemeCrontab(options);
+	SetToWombatThemeYaml(options);
+	SetToWombatThemeRuby(options);
+	SetToWombatThemeLua(options);
+	SetToWombatThemeMarkdown(options);
+	SetToWombatThemeBash(options);
+	SetToWombatThemeDiff(options);
+}
 
+static void SetToWombatThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#8ac6f2"));
@@ -3001,7 +3298,10 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#f6f3e8"));
-		
+}
+
+static void SetToWombatThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3029,7 +3329,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToWombatThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#99968b"));
@@ -3049,7 +3351,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToWombatThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#8ac6f2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3077,7 +3381,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToWombatThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#95e454"));
@@ -3098,7 +3404,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#f3f6ee"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3120,7 +3428,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#99968b"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#95e454"));
@@ -3141,7 +3451,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#95e454"));
@@ -3186,7 +3498,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3218,7 +3532,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#95e454"));
@@ -3251,7 +3567,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#95e454"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#95e454"));
@@ -3275,7 +3593,9 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#656565"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToWombatThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -3295,6 +3615,20 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#898941"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToBlack_pastelThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToBlack_pastelThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -3413,7 +3747,23 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToBlack_pastelThemePhp(options);
+	SetToBlack_pastelThemeSql(options);
+	SetToBlack_pastelThemeCss(options);
+	SetToBlack_pastelThemeJs(options);
+	SetToBlack_pastelThemeConfig(options);
+	SetToBlack_pastelThemeCrontab(options);
+	SetToBlack_pastelThemeYaml(options);
+	SetToBlack_pastelThemeRuby(options);
+	SetToBlack_pastelThemeLua(options);
+	SetToBlack_pastelThemeMarkdown(options);
+	SetToBlack_pastelThemeBash(options);
+	SetToBlack_pastelThemeDiff(options);
+}
 
+static void SetToBlack_pastelThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#82677E"));
@@ -3478,7 +3828,10 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#C0C0C0"));
-		
+}
+
+static void SetToBlack_pastelThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3506,7 +3859,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToBlack_pastelThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -3526,7 +3881,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToBlack_pastelThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#82677E"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3554,7 +3911,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToBlack_pastelThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#c78d9b"));
@@ -3575,7 +3934,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3597,7 +3958,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#c78d9b"));
@@ -3618,7 +3981,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -3663,7 +4028,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -3695,7 +4062,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#c78d9b"));
@@ -3728,7 +4097,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -3752,7 +4123,9 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToBlack_pastelThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -3772,6 +4145,20 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToVisual_studioThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToVisual_studioThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -3890,7 +4277,23 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToVisual_studioThemePhp(options);
+	SetToVisual_studioThemeSql(options);
+	SetToVisual_studioThemeCss(options);
+	SetToVisual_studioThemeJs(options);
+	SetToVisual_studioThemeConfig(options);
+	SetToVisual_studioThemeCrontab(options);
+	SetToVisual_studioThemeYaml(options);
+	SetToVisual_studioThemeRuby(options);
+	SetToVisual_studioThemeLua(options);
+	SetToVisual_studioThemeMarkdown(options);
+	SetToVisual_studioThemeBash(options);
+	SetToVisual_studioThemeDiff(options);
+}
 
+static void SetToVisual_studioThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#3333ff"));
@@ -3955,7 +4358,10 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#FFFFFF"));
-		
+}
+
+static void SetToVisual_studioThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -3983,7 +4389,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVisual_studioThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#00cc00"));
@@ -4003,7 +4411,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVisual_studioThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#3333ff"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -4031,7 +4441,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVisual_studioThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#990000"));
@@ -4052,7 +4464,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -4074,7 +4488,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#00cc00"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#990000"));
@@ -4095,7 +4511,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#990000"));
@@ -4140,7 +4558,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -4172,7 +4592,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#990000"));
@@ -4205,7 +4627,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#990000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#990000"));
@@ -4229,7 +4653,9 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#807575"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVisual_studioThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -4249,6 +4675,20 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToObsidianThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToObsidianThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -4367,7 +4807,23 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToObsidianThemePhp(options);
+	SetToObsidianThemeSql(options);
+	SetToObsidianThemeCss(options);
+	SetToObsidianThemeJs(options);
+	SetToObsidianThemeConfig(options);
+	SetToObsidianThemeCrontab(options);
+	SetToObsidianThemeYaml(options);
+	SetToObsidianThemeRuby(options);
+	SetToObsidianThemeLua(options);
+	SetToObsidianThemeMarkdown(options);
+	SetToObsidianThemeBash(options);
+	SetToObsidianThemeDiff(options);
+}
 
+static void SetToObsidianThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#93C763"));
@@ -4432,7 +4888,10 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#E0E2E4"));
-		
+}
+
+static void SetToObsidianThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4460,7 +4919,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToObsidianThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -4480,7 +4941,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToObsidianThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#93C763"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4508,7 +4971,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToObsidianThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#EC7600"));
@@ -4529,7 +4994,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4551,7 +5018,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#EC7600"));
@@ -4572,7 +5041,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#EC7600"));
@@ -4617,7 +5088,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4649,7 +5122,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#EC7600"));
@@ -4682,7 +5157,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#EC7600"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#EC7600"));
@@ -4706,7 +5183,9 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToObsidianThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -4726,6 +5205,20 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#804000"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToAs_visual_studio_2010ThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToAs_visual_studio_2010ThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -4844,7 +5337,23 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToAs_visual_studio_2010ThemePhp(options);
+	SetToAs_visual_studio_2010ThemeSql(options);
+	SetToAs_visual_studio_2010ThemeCss(options);
+	SetToAs_visual_studio_2010ThemeJs(options);
+	SetToAs_visual_studio_2010ThemeConfig(options);
+	SetToAs_visual_studio_2010ThemeCrontab(options);
+	SetToAs_visual_studio_2010ThemeYaml(options);
+	SetToAs_visual_studio_2010ThemeRuby(options);
+	SetToAs_visual_studio_2010ThemeLua(options);
+	SetToAs_visual_studio_2010ThemeMarkdown(options);
+	SetToAs_visual_studio_2010ThemeBash(options);
+	SetToAs_visual_studio_2010ThemeDiff(options);
+}
 
+static void SetToAs_visual_studio_2010ThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -4909,7 +5418,10 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#000000"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
@@ -4937,7 +5449,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToAs_visual_studio_2010ThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#008000"));
@@ -4957,7 +5471,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToAs_visual_studio_2010ThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#008000"));
@@ -4985,7 +5501,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToAs_visual_studio_2010ThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#A31515"));
@@ -5006,7 +5524,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#008000"));
@@ -5028,7 +5548,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#A31515"));
@@ -5049,7 +5571,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#A31515"));
@@ -5094,7 +5618,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#008000"));
@@ -5126,7 +5652,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#A31515"));
@@ -5159,7 +5687,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#A31515"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#A31515"));
@@ -5183,7 +5713,9 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToAs_visual_studio_2010ThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -5203,6 +5735,20 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#3399FF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToHavenjarkThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToHavenjarkThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -5321,7 +5867,23 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToHavenjarkThemePhp(options);
+	SetToHavenjarkThemeSql(options);
+	SetToHavenjarkThemeCss(options);
+	SetToHavenjarkThemeJs(options);
+	SetToHavenjarkThemeConfig(options);
+	SetToHavenjarkThemeCrontab(options);
+	SetToHavenjarkThemeYaml(options);
+	SetToHavenjarkThemeRuby(options);
+	SetToHavenjarkThemeLua(options);
+	SetToHavenjarkThemeMarkdown(options);
+	SetToHavenjarkThemeBash(options);
+	SetToHavenjarkThemeDiff(options);
+}
 
+static void SetToHavenjarkThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#A38474"));
@@ -5386,7 +5948,10 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#C0B6A8"));
-		
+}
+
+static void SetToHavenjarkThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5414,7 +5979,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToHavenjarkThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#AEAEAE"));
@@ -5434,7 +6001,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToHavenjarkThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#A38474"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5462,7 +6031,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToHavenjarkThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#CC9393"));
@@ -5483,7 +6054,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5505,7 +6078,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#AEAEAE"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#CC9393"));
@@ -5526,7 +6101,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -5571,7 +6148,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -5603,7 +6182,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#CC9393"));
@@ -5636,7 +6217,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -5660,7 +6243,9 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#00001F"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToHavenjarkThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -5680,6 +6265,20 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#2A4750"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToTangoThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToTangoThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -5798,7 +6397,23 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToTangoThemePhp(options);
+	SetToTangoThemeSql(options);
+	SetToTangoThemeCss(options);
+	SetToTangoThemeJs(options);
+	SetToTangoThemeConfig(options);
+	SetToTangoThemeCrontab(options);
+	SetToTangoThemeYaml(options);
+	SetToTangoThemeRuby(options);
+	SetToTangoThemeLua(options);
+	SetToTangoThemeMarkdown(options);
+	SetToTangoThemeBash(options);
+	SetToTangoThemeDiff(options);
+}
 
+static void SetToTangoThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#688046"));
@@ -5863,7 +6478,10 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#000000"));
-		
+}
+
+static void SetToTangoThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5891,7 +6509,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToTangoThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#17608f"));
@@ -5911,7 +6531,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToTangoThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#688046"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5939,7 +6561,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToTangoThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#92679a"));
@@ -5960,7 +6584,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -5982,7 +6608,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#17608f"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#92679a"));
@@ -6003,7 +6631,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#92679a"));
@@ -6048,7 +6678,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -6080,7 +6712,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#92679a"));
@@ -6113,7 +6747,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#92679a"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#92679a"));
@@ -6137,7 +6773,9 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToTangoThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -6157,6 +6795,20 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToSchussThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToSchussThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -6275,7 +6927,23 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToSchussThemePhp(options);
+	SetToSchussThemeSql(options);
+	SetToSchussThemeCss(options);
+	SetToSchussThemeJs(options);
+	SetToSchussThemeConfig(options);
+	SetToSchussThemeCrontab(options);
+	SetToSchussThemeYaml(options);
+	SetToSchussThemeRuby(options);
+	SetToSchussThemeLua(options);
+	SetToSchussThemeMarkdown(options);
+	SetToSchussThemeBash(options);
+	SetToSchussThemeDiff(options);
+}
 
+static void SetToSchussThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#606060"));
@@ -6340,7 +7008,10 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#430400"));
-		
+}
+
+static void SetToSchussThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6368,7 +7039,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSchussThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#d7d3cc"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#d5d9e5"));
@@ -6388,7 +7061,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSchussThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#606060"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6416,7 +7091,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSchussThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#585545"));
@@ -6437,7 +7114,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#5f97a9"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6459,7 +7138,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#d5d9e5"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#585545"));
@@ -6480,7 +7161,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#585545"));
@@ -6525,7 +7208,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -6557,7 +7242,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#585545"));
@@ -6590,7 +7277,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#585545"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#585545"));
@@ -6614,7 +7303,9 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#fff7cd"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSchussThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -6634,6 +7325,20 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#f4fdff"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToNotepad_defaultThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToNotepad_defaultThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -6752,7 +7457,23 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToNotepad_defaultThemePhp(options);
+	SetToNotepad_defaultThemeSql(options);
+	SetToNotepad_defaultThemeCss(options);
+	SetToNotepad_defaultThemeJs(options);
+	SetToNotepad_defaultThemeConfig(options);
+	SetToNotepad_defaultThemeCrontab(options);
+	SetToNotepad_defaultThemeYaml(options);
+	SetToNotepad_defaultThemeRuby(options);
+	SetToNotepad_defaultThemeLua(options);
+	SetToNotepad_defaultThemeMarkdown(options);
+	SetToNotepad_defaultThemeBash(options);
+	SetToNotepad_defaultThemeDiff(options);
+}
 
+static void SetToNotepad_defaultThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -6817,7 +7538,10 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#000000"));
-		
+}
+
+static void SetToNotepad_defaultThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6845,7 +7569,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNotepad_defaultThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#008000"));
@@ -6865,7 +7591,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNotepad_defaultThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6893,7 +7621,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNotepad_defaultThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#808080"));
@@ -6914,7 +7644,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#8000FF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#008000"));
@@ -6936,7 +7668,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#008000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#808080"));
@@ -6957,7 +7691,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#808080"));
@@ -7002,7 +7738,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#008000"));
@@ -7034,7 +7772,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#808080"));
@@ -7067,7 +7807,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#808080"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#808080"));
@@ -7091,7 +7833,9 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#EEEEEE"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNotepad_defaultThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -7111,6 +7855,20 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToVibrant_inkThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToVibrant_inkThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -7229,7 +7987,23 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToVibrant_inkThemePhp(options);
+	SetToVibrant_inkThemeSql(options);
+	SetToVibrant_inkThemeCss(options);
+	SetToVibrant_inkThemeJs(options);
+	SetToVibrant_inkThemeConfig(options);
+	SetToVibrant_inkThemeCrontab(options);
+	SetToVibrant_inkThemeYaml(options);
+	SetToVibrant_inkThemeRuby(options);
+	SetToVibrant_inkThemeLua(options);
+	SetToVibrant_inkThemeMarkdown(options);
+	SetToVibrant_inkThemeBash(options);
+	SetToVibrant_inkThemeDiff(options);
+}
 
+static void SetToVibrant_inkThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#EC691E"));
@@ -7294,7 +8068,10 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#FFFFFF"));
-		
+}
+
+static void SetToVibrant_inkThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7322,7 +8099,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVibrant_inkThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#8146A2"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#8C3FC8"));
@@ -7342,7 +8121,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVibrant_inkThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#EC691E"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7370,7 +8151,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToVibrant_inkThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#477488"));
@@ -7391,7 +8174,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7413,7 +8198,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#8C3FC8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#477488"));
@@ -7434,7 +8221,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#477488"));
@@ -7479,7 +8268,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -7511,7 +8302,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#477488"));
@@ -7544,7 +8337,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#477488"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#477488"));
@@ -7568,7 +8363,9 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToVibrant_inkThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -7588,6 +8385,20 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#414C3B"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToRecogneyesThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToRecogneyesThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -7706,7 +8517,23 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToRecogneyesThemePhp(options);
+	SetToRecogneyesThemeSql(options);
+	SetToRecogneyesThemeCss(options);
+	SetToRecogneyesThemeJs(options);
+	SetToRecogneyesThemeConfig(options);
+	SetToRecogneyesThemeCrontab(options);
+	SetToRecogneyesThemeYaml(options);
+	SetToRecogneyesThemeRuby(options);
+	SetToRecogneyesThemeLua(options);
+	SetToRecogneyesThemeMarkdown(options);
+	SetToRecogneyesThemeBash(options);
+	SetToRecogneyesThemeDiff(options);
+}
 
+static void SetToRecogneyesThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#00D0D0"));
@@ -7771,7 +8598,10 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#D0D0D0"));
-		
+}
+
+static void SetToRecogneyesThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7799,7 +8629,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRecogneyesThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#00E000"));
@@ -7819,7 +8651,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRecogneyesThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#00D0D0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7847,7 +8681,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRecogneyesThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#DC78DC"));
@@ -7868,7 +8704,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7890,7 +8728,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#00E000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#DC78DC"));
@@ -7911,7 +8751,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#DC78DC"));
@@ -7956,7 +8798,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -7988,7 +8832,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#DC78DC"));
@@ -8021,7 +8867,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#DC78DC"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#DC78DC"));
@@ -8045,7 +8893,9 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#202030"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRecogneyesThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -8065,6 +8915,20 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToMrThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToMrThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -8183,7 +9047,23 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToMrThemePhp(options);
+	SetToMrThemeSql(options);
+	SetToMrThemeCss(options);
+	SetToMrThemeJs(options);
+	SetToMrThemeConfig(options);
+	SetToMrThemeCrontab(options);
+	SetToMrThemeYaml(options);
+	SetToMrThemeRuby(options);
+	SetToMrThemeLua(options);
+	SetToMrThemeMarkdown(options);
+	SetToMrThemeBash(options);
+	SetToMrThemeDiff(options);
+}
 
+static void SetToMrThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#0000FF"));
@@ -8248,7 +9128,10 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#333333"));
-		
+}
+
+static void SetToMrThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8276,7 +9159,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMrThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#FF9900"));
@@ -8296,7 +9181,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMrThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8324,7 +9211,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMrThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#CC0000"));
@@ -8345,7 +9234,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8367,7 +9258,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#FF9900"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#CC0000"));
@@ -8388,7 +9281,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#CC0000"));
@@ -8433,7 +9328,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -8465,7 +9362,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#CC0000"));
@@ -8498,7 +9397,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC0000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#CC0000"));
@@ -8522,7 +9423,9 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMrThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -8542,6 +9445,20 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToSunburstThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToSunburstThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -8660,7 +9577,23 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToSunburstThemePhp(options);
+	SetToSunburstThemeSql(options);
+	SetToSunburstThemeCss(options);
+	SetToSunburstThemeJs(options);
+	SetToSunburstThemeConfig(options);
+	SetToSunburstThemeCrontab(options);
+	SetToSunburstThemeYaml(options);
+	SetToSunburstThemeRuby(options);
+	SetToSunburstThemeLua(options);
+	SetToSunburstThemeMarkdown(options);
+	SetToSunburstThemeBash(options);
+	SetToSunburstThemeDiff(options);
+}
 
+static void SetToSunburstThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#EA9C77"));
@@ -8725,7 +9658,10 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#F9F9F9"));
-		
+}
+
+static void SetToSunburstThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8753,7 +9689,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSunburstThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#A8A8A8"));
@@ -8773,7 +9711,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSunburstThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#EA9C77"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8801,7 +9741,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSunburstThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#76BA53"));
@@ -8822,7 +9764,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8844,7 +9788,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#A8A8A8"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#76BA53"));
@@ -8865,7 +9811,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#76BA53"));
@@ -8910,7 +9858,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -8942,7 +9892,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#76BA53"));
@@ -8975,7 +9927,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#76BA53"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#76BA53"));
@@ -8999,7 +9953,9 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F2F2F"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSunburstThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -9019,6 +9975,20 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#DDF0FF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToInkpotThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToInkpotThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -9137,7 +10107,23 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToInkpotThemePhp(options);
+	SetToInkpotThemeSql(options);
+	SetToInkpotThemeCss(options);
+	SetToInkpotThemeJs(options);
+	SetToInkpotThemeConfig(options);
+	SetToInkpotThemeCrontab(options);
+	SetToInkpotThemeYaml(options);
+	SetToInkpotThemeRuby(options);
+	SetToInkpotThemeLua(options);
+	SetToInkpotThemeMarkdown(options);
+	SetToInkpotThemeBash(options);
+	SetToInkpotThemeDiff(options);
+}
 
+static void SetToInkpotThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#808BED"));
@@ -9202,7 +10188,10 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#CFBFAD"));
-		
+}
+
+static void SetToInkpotThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9230,7 +10219,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToInkpotThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#CD8B00"));
@@ -9250,7 +10241,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToInkpotThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#808BED"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9278,7 +10271,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToInkpotThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#FFCD8B"));
@@ -9299,7 +10294,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9321,7 +10318,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#CD8B00"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#FFCD8B"));
@@ -9342,7 +10341,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#FFCD8B"));
@@ -9387,7 +10388,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -9419,7 +10422,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#FFCD8B"));
@@ -9452,7 +10457,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#FFCD8B"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#FFCD8B"));
@@ -9476,7 +10483,9 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2D2D44"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToInkpotThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -9496,6 +10505,20 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#8B8BFF"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToMinimalThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToMinimalThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -9614,7 +10637,23 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToMinimalThemePhp(options);
+	SetToMinimalThemeSql(options);
+	SetToMinimalThemeCss(options);
+	SetToMinimalThemeJs(options);
+	SetToMinimalThemeConfig(options);
+	SetToMinimalThemeCrontab(options);
+	SetToMinimalThemeYaml(options);
+	SetToMinimalThemeRuby(options);
+	SetToMinimalThemeLua(options);
+	SetToMinimalThemeMarkdown(options);
+	SetToMinimalThemeBash(options);
+	SetToMinimalThemeDiff(options);
+}
 
+static void SetToMinimalThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#5c8198"));
@@ -9679,7 +10718,10 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#000000"));
-		
+}
+
+static void SetToMinimalThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9707,7 +10749,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMinimalThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#334466"));
@@ -9727,7 +10771,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMinimalThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#5c8198"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9755,7 +10801,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMinimalThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#333333"));
@@ -9776,7 +10824,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9798,7 +10848,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#334466"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#333333"));
@@ -9819,7 +10871,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#333333"));
@@ -9864,7 +10918,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#334466"));
@@ -9896,7 +10952,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#333333"));
@@ -9929,7 +10987,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#333333"));
@@ -9953,7 +11013,9 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#aaccff"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMinimalThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -9973,6 +11035,20 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToNightlion_aptana_themeThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToNightlion_aptana_themeThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -10091,7 +11167,23 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToNightlion_aptana_themeThemePhp(options);
+	SetToNightlion_aptana_themeThemeSql(options);
+	SetToNightlion_aptana_themeThemeCss(options);
+	SetToNightlion_aptana_themeThemeJs(options);
+	SetToNightlion_aptana_themeThemeConfig(options);
+	SetToNightlion_aptana_themeThemeCrontab(options);
+	SetToNightlion_aptana_themeThemeYaml(options);
+	SetToNightlion_aptana_themeThemeRuby(options);
+	SetToNightlion_aptana_themeThemeLua(options);
+	SetToNightlion_aptana_themeThemeMarkdown(options);
+	SetToNightlion_aptana_themeThemeBash(options);
+	SetToNightlion_aptana_themeThemeDiff(options);
+}
 
+static void SetToNightlion_aptana_themeThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#8DCBE2"));
@@ -10156,7 +11248,10 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#E2E2E2"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10184,7 +11279,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNightlion_aptana_themeThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#73879B"));
@@ -10204,7 +11301,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNightlion_aptana_themeThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#8DCBE2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10232,7 +11331,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToNightlion_aptana_themeThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#CC9393"));
@@ -10253,7 +11354,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10275,7 +11378,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#73879B"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#CC9393"));
@@ -10296,7 +11401,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -10341,7 +11448,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -10373,7 +11482,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#CC9393"));
@@ -10406,7 +11517,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -10430,7 +11543,9 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToNightlion_aptana_themeThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -10450,6 +11565,20 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#364656"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToMonokaiThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToMonokaiThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -10568,7 +11697,23 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToMonokaiThemePhp(options);
+	SetToMonokaiThemeSql(options);
+	SetToMonokaiThemeCss(options);
+	SetToMonokaiThemeJs(options);
+	SetToMonokaiThemeConfig(options);
+	SetToMonokaiThemeCrontab(options);
+	SetToMonokaiThemeYaml(options);
+	SetToMonokaiThemeRuby(options);
+	SetToMonokaiThemeLua(options);
+	SetToMonokaiThemeMarkdown(options);
+	SetToMonokaiThemeBash(options);
+	SetToMonokaiThemeDiff(options);
+}
 
+static void SetToMonokaiThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#66CCB3"));
@@ -10633,7 +11778,10 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#F8F8F2"));
-		
+}
+
+static void SetToMonokaiThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10661,7 +11809,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMonokaiThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#75715E"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#75715e"));
@@ -10681,7 +11831,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMonokaiThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#66CCB3"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10709,7 +11861,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToMonokaiThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#E6DB74"));
@@ -10730,7 +11884,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10752,7 +11908,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#75715e"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#E6DB74"));
@@ -10773,7 +11931,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#E6DB74"));
@@ -10818,7 +11978,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -10850,7 +12012,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#E6DB74"));
@@ -10883,7 +12047,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#E6DB74"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#E6DB74"));
@@ -10907,7 +12073,9 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#3E3D32"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToMonokaiThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -10927,6 +12095,20 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#757575"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToSublime_text_2ThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToSublime_text_2ThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -11045,7 +12227,23 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToSublime_text_2ThemePhp(options);
+	SetToSublime_text_2ThemeSql(options);
+	SetToSublime_text_2ThemeCss(options);
+	SetToSublime_text_2ThemeJs(options);
+	SetToSublime_text_2ThemeConfig(options);
+	SetToSublime_text_2ThemeCrontab(options);
+	SetToSublime_text_2ThemeYaml(options);
+	SetToSublime_text_2ThemeRuby(options);
+	SetToSublime_text_2ThemeLua(options);
+	SetToSublime_text_2ThemeMarkdown(options);
+	SetToSublime_text_2ThemeBash(options);
+	SetToSublime_text_2ThemeDiff(options);
+}
 
+static void SetToSublime_text_2ThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#FF007F"));
@@ -11110,7 +12308,10 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#CFBFAD"));
-		
+}
+
+static void SetToSublime_text_2ThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11138,7 +12339,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSublime_text_2ThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#FFFFFF"));
@@ -11158,7 +12361,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSublime_text_2ThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#FF007F"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11186,7 +12391,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToSublime_text_2ThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#ECE47E"));
@@ -11207,7 +12414,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FF007F"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11229,7 +12438,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#ECE47E"));
@@ -11250,7 +12461,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#ECE47E"));
@@ -11295,7 +12508,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -11327,7 +12542,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#ECE47E"));
@@ -11360,7 +12577,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#ECE47E"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#ECE47E"));
@@ -11384,7 +12603,9 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#5B5A4E"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToSublime_text_2ThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -11404,6 +12625,20 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#CC9900"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToPastelThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToPastelThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -11522,7 +12757,23 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToPastelThemePhp(options);
+	SetToPastelThemeSql(options);
+	SetToPastelThemeCss(options);
+	SetToPastelThemeJs(options);
+	SetToPastelThemeConfig(options);
+	SetToPastelThemeCrontab(options);
+	SetToPastelThemeYaml(options);
+	SetToPastelThemeRuby(options);
+	SetToPastelThemeLua(options);
+	SetToPastelThemeMarkdown(options);
+	SetToPastelThemeBash(options);
+	SetToPastelThemeDiff(options);
+}
 
+static void SetToPastelThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#a57b61"));
@@ -11587,7 +12838,10 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#E0E2E4"));
-		
+}
+
+static void SetToPastelThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11615,7 +12869,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToPastelThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7D8C93"));
@@ -11635,7 +12891,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToPastelThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#a57b61"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11663,7 +12921,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToPastelThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#c78d9b"));
@@ -11684,7 +12944,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#E8E2B7"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11706,7 +12968,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7D8C93"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#c78d9b"));
@@ -11727,7 +12991,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -11772,7 +13038,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -11804,7 +13072,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#c78d9b"));
@@ -11837,7 +13107,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#c78d9b"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#c78d9b"));
@@ -11861,7 +13133,9 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#2F393C"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToPastelThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -11881,6 +13155,20 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#95bed8"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToZenburn_highcontrastThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToZenburn_highcontrastThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -11999,7 +13287,23 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToZenburn_highcontrastThemePhp(options);
+	SetToZenburn_highcontrastThemeSql(options);
+	SetToZenburn_highcontrastThemeCss(options);
+	SetToZenburn_highcontrastThemeJs(options);
+	SetToZenburn_highcontrastThemeConfig(options);
+	SetToZenburn_highcontrastThemeCrontab(options);
+	SetToZenburn_highcontrastThemeYaml(options);
+	SetToZenburn_highcontrastThemeRuby(options);
+	SetToZenburn_highcontrastThemeLua(options);
+	SetToZenburn_highcontrastThemeMarkdown(options);
+	SetToZenburn_highcontrastThemeBash(options);
+	SetToZenburn_highcontrastThemeDiff(options);
+}
 
+static void SetToZenburn_highcontrastThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#F0DFAF"));
@@ -12064,7 +13368,10 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#DCDCCC"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -12092,7 +13399,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToZenburn_highcontrastThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#7F9F7F"));
@@ -12112,7 +13421,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToZenburn_highcontrastThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#F0DFAF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -12140,7 +13451,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToZenburn_highcontrastThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#CC9393"));
@@ -12161,7 +13474,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#F0EFD0"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -12183,7 +13498,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#7F9F7F"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#CC9393"));
@@ -12204,7 +13521,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -12249,7 +13568,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -12281,7 +13602,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#CC9393"));
@@ -12314,7 +13637,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#CC9393"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#CC9393"));
@@ -12338,7 +13663,9 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#505050"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToZenburn_highcontrastThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -12358,6 +13685,20 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#71D3B4"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToFrontenddevThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToFrontenddevThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -12476,7 +13817,23 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToFrontenddevThemePhp(options);
+	SetToFrontenddevThemeSql(options);
+	SetToFrontenddevThemeCss(options);
+	SetToFrontenddevThemeJs(options);
+	SetToFrontenddevThemeConfig(options);
+	SetToFrontenddevThemeCrontab(options);
+	SetToFrontenddevThemeYaml(options);
+	SetToFrontenddevThemeRuby(options);
+	SetToFrontenddevThemeLua(options);
+	SetToFrontenddevThemeMarkdown(options);
+	SetToFrontenddevThemeBash(options);
+	SetToFrontenddevThemeDiff(options);
+}
 
+static void SetToFrontenddevThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#999999"));
@@ -12541,7 +13898,10 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#FFFFFF"));
-		
+}
+
+static void SetToFrontenddevThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12569,7 +13929,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToFrontenddevThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#666666"));
@@ -12589,7 +13951,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToFrontenddevThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#999999"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12617,7 +13981,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToFrontenddevThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#00a40f"));
@@ -12638,7 +14004,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12660,7 +14028,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#666666"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#00a40f"));
@@ -12681,7 +14051,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#00a40f"));
@@ -12726,7 +14098,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#666666"));
@@ -12758,7 +14132,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#00a40f"));
@@ -12791,7 +14167,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#00a40f"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#00a40f"));
@@ -12815,7 +14193,9 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#222220"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToFrontenddevThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
@@ -12835,6 +14215,20 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.DiffStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));	
 }
+	
+static void SetToRoboticketThemePhp(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeSql(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeCss(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeJs(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeConfig(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeCrontab(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeYaml(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeRuby(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeLua(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeMarkdown(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeBash(t4p::CodeControlOptionsClass& options);
+static void SetToRoboticketThemeDiff(t4p::CodeControlOptionsClass& options);
+
 static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	wxPlatformInfo platform;
 	wxString fontName;
@@ -12953,7 +14347,23 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 		options.DiffStyles[i].IsBold = false;
 		options.DiffStyles[i].IsItalic = false;
 	}
+	
+	
+	SetToRoboticketThemePhp(options);
+	SetToRoboticketThemeSql(options);
+	SetToRoboticketThemeCss(options);
+	SetToRoboticketThemeJs(options);
+	SetToRoboticketThemeConfig(options);
+	SetToRoboticketThemeCrontab(options);
+	SetToRoboticketThemeYaml(options);
+	SetToRoboticketThemeRuby(options);
+	SetToRoboticketThemeLua(options);
+	SetToRoboticketThemeMarkdown(options);
+	SetToRoboticketThemeBash(options);
+	SetToRoboticketThemeDiff(options);
+}
 
+static void SetToRoboticketThemePhp(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_HSTRING).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_SIMPLESTRING).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_HPHP_WORD).Color = wxColour(wxT("#295F94"));
@@ -13018,7 +14428,10 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XCCOMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLEND).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.PhpStyles, wxSTC_H_XMLSTART).Color = wxColour(wxT("#585858"));
-		
+}
+
+static void SetToRoboticketThemeJs(t4p::CodeControlOptionsClass& options) {
+	
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -13046,7 +14459,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.JsStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRoboticketThemeSql(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC).Color = wxColour(wxT("#AD95AF"));
@@ -13066,7 +14481,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.SqlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRoboticketThemeCss(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_ATTRIBUTE).Color = wxColour(wxT("#295F94"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_CLASS).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.CssStyles, wxSTC_CSS_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -13094,7 +14511,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.CssStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-	
+}
+
+static void SetToRoboticketThemeConfig(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.ConfigStyles, wxSTC_CONF_DIRECTIVE).Color = wxColour(wxT("#317ECC"));
@@ -13115,7 +14534,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.ConfigStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeCrontab(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_ASTERISK).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.CrontabStyles, wxSTC_NNCRONTAB_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -13137,7 +14558,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.CrontabStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeYaml(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_COMMENT).Color = wxColour(wxT("#AD95AF"));
 	options.FindByStcStyle(options.YamlStyles, wxSTC_YAML_DOCUMENT).Color = wxColour(wxT("#317ECC"));
@@ -13158,7 +14581,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.YamlStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeRuby(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_BACKTICKS).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.RubyStyles, wxSTC_RB_CHARACTER).Color = wxColour(wxT("#317ECC"));
@@ -13203,7 +14628,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.RubyStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeLua(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_CHARACTER).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.LuaStyles, wxSTC_LUA_COMMENT).Color = wxColour(wxT("#AD95AF"));
@@ -13235,7 +14662,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.LuaStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeMarkdown(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_BLOCKQUOTE).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.MarkdownStyles, wxSTC_MARKDOWN_CODE).Color = wxColour(wxT("#317ECC"));
@@ -13268,7 +14697,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.MarkdownStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeBash(t4p::CodeControlOptionsClass& options) {		
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_BACKTICKS).Color = wxColour(wxT("#317ECC"));
 	options.FindByStcStyle(options.BashStyles, wxSTC_SH_CHARACTER).Color = wxColour(wxT("#317ECC"));
@@ -13292,7 +14723,9 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_CARET_LINE).BackgroundColor = wxColour(wxT("#E0E0FF"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_SELECTION).BackgroundColor = wxColour(wxT("#BDD8F2"));
 	options.FindByStcStyle(options.BashStyles, t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT).Color = wxColour(wxT("#FFFF00"));
-		
+}
+
+static void SetToRoboticketThemeDiff(t4p::CodeControlOptionsClass& options) {	
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_ADDED).Color = wxColour(wxT("#0000FF"));
 	options.FindByStcStyle(options.DiffStyles, wxSTC_DIFF_CHANGED).Color = wxColour(wxT("#00FF00"));
