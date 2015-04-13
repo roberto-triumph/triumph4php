@@ -231,7 +231,13 @@ newaction {
 			-- we need to set the LD_LIBRARY_PATH so that dpkg finds our dependencies
 			-- -b means we create the binary only package, also -us -uc
 			-- creates an unsigned version
-			"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:Release/libs:Release dpkg-buildpackage -b -us -uc"
+			-- The custom build options are there so that the build slaves can successfully
+			-- create the DEB packages. It seems that the hardening and optimization features are 
+			-- pretty memory intensive, and the buildslaves only have 1 GB RAM, so building 
+			-- the packages fails with the machine running out of memory. Of course, we'd rather 
+			-- not have to do this, but we really want the DEB file generation to be an
+			-- automatic process.
+			"LD_LIBRARY_PATH=$LD_LIBRARY_PATH:Release/libs:Release DEB_CXXFLAGS_STRIP='-O2 -g' DEB_CFLAGS_STRIP='-O2 -g' DEB_BUILD_MAINT_OPTIONS=hardening=-fortify,-stackprotector dpkg-buildpackage -b -us -uc"
 		});
 	end
 }
