@@ -67,7 +67,7 @@ newaction {
 		-- single action)
 		onlyFilename = os.getenv('T4P_PKG_FILENAME_ONLY');
 		if (onlyFilename == '1') then
-			print(path.getabsolute("..\\triumph4php-" .. version .. "\\triumph4php-" .. version .. ".7z"))
+			print(path.getabsolute("..\\triumph4php-" .. version .. "\\dist\\triumph4php-" .. version .. ".7z"))
 			os.exit(0)
 		end
 		
