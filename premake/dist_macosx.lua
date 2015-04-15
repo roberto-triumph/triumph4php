@@ -96,7 +96,11 @@ newaction {
 			-- copy assets to the app bundle dir
 			string.format('mkdir -p %s', assetDestFullPath),
 			string.format('cp -r %s/* %s', assetSrcFullPath, assetDestFullPath),
-			string.format('cp -r %s/icons/triumph4php.icns %s/triumph4php.icns', assetDestFullPath, assetDestFullPath)
+			string.format('cp -r %s/icons/triumph4php.icns %s/triumph4php.icns', assetDestFullPath, assetDestFullPath),
+			
+			-- get the version info from git and populate the version file
+			-- if we have no tags yet, use the -all flag
+			string.format('git describe --long > %s/version.txt', assetDestFullPath)
 		})
 		
 		cmdOutput = execoutput(ICU_CONFIG .. ' --prefix')
