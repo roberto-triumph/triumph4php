@@ -35,6 +35,14 @@ Installation
 ------------
 The latest version of Triumph4PHP is available in binary from triumph4php [main site](http://triumph4php.com).
 
+Status
+------
+While it does not have every feature imaginable (and may not even have your favorite feature), Triumph is ready for every day use. Every release goes through sanity checks to make sure that it runs on Mac OS X, Ubuntu Linux, and MS Windows.
+
+Development Status
+------------------
+Triumph exercises continuous integration; a buildbot instance runs Triumph's code on MS Windows and Ubuntu Linux to make sure that it compiles.  The buildbot instance can be seen at [http://ci.triumph4php.com:8020/](http://ci.triumph4php.com:8020/).
+
 Help
 ------------
  - The [online manual](http://docs.triumph4php.com) explains all non-trivial features of triumph4php.
