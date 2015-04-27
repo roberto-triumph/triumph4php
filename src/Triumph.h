@@ -25,6 +25,7 @@
 #include <globals/GlobalsClass.h>
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
@@ -185,9 +186,25 @@ private:
 	void OnActivateApp(wxActivateEvent& event);
 
 	/**
-	 * Additional functionality
+	 * Almost all functionality is encapsulated in features; the 
+	 * app just creates them and hangs on to them until the end. 
+	 * Each feature is created only once at app start and is
+	 * deleted at app end.
+	 * pointers are owned by this class.
 	 */
 	std::vector<FeatureClass*> Features;
+	
+	/**
+	 * Feature views are view specific functionality; a view
+	 * is the class that makes updates to the GUI of the editor
+	 * (adds menu items, buttons, panels, etc).
+	 * Each feature view is created once at app start, and will
+	 * be deleted when the app main frame is deleted. Note that
+	 * on Mac OS X, an application may run without a main frame,
+	 * so during a run feature views may be created more than once
+	 * (but there will be at most 1 instance to each view).
+	 */
+	std::vector<FeatureViewClass*> FeatureViews;
 
 	/**
 	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the

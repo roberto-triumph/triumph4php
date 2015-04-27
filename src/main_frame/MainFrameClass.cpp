@@ -24,6 +24,7 @@
  */
 #include <main_frame/MainFrameClass.h>
 #include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
 #include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
@@ -612,54 +613,54 @@ void t4p::MainFrameClass::AuiManagerUpdate() {
 	AuiManager.Update();
 }
 
-void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
+void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass& feature) {
 	
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus
-	feature->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, &AuiManager, GetMenuBar());
+	feature.InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, 
+		&AuiManager, GetMenuBar());
 	
 	//  when adding the separators, we dont want a separator at the very end
 	// we dont need separators if the feature did not add any menu items
 	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
-	feature->AddFileMenuItems(FileMenu);
+	feature.AddFileMenuItems(FileMenu);
 	if (oldFileMenuCount != FileMenu->GetMenuItemCount() && oldFileMenuCount > 0) {
 		FileMenu->InsertSeparator(oldFileMenuCount);
 	}
 
 	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
-	feature->AddEditMenuItems(EditMenu);
+	feature.AddEditMenuItems(EditMenu);
 	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
 		EditMenu->InsertSeparator(oldEditMenuCount);
 	}
 
 	size_t oldViewMenuCount = ViewMenu->GetMenuItemCount();
-	feature->AddViewMenuItems(ViewMenu);
+	feature.AddViewMenuItems(ViewMenu);
 	if (oldViewMenuCount != ViewMenu->GetMenuItemCount() && oldViewMenuCount > 0) {
 		ViewMenu->InsertSeparator(oldViewMenuCount);
 	}
 
 	size_t oldSearchMenuCount = SearchMenu->GetMenuItemCount();
-	feature->AddSearchMenuItems(SearchMenu);
+	feature.AddSearchMenuItems(SearchMenu);
 	if (oldSearchMenuCount != SearchMenu->GetMenuItemCount() && oldSearchMenuCount > 0) {
 		SearchMenu->InsertSeparator(oldSearchMenuCount);
 	}
 
 	size_t oldHelpMenuCount = HelpMenu->GetMenuItemCount();
-	feature->AddHelpMenuItems(HelpMenu);
+	feature.AddHelpMenuItems(HelpMenu);
 	if (oldHelpMenuCount != HelpMenu->GetMenuItemCount() && oldHelpMenuCount > 0) {
 		HelpMenu->InsertSeparator(oldHelpMenuCount);
 	}
 
 	wxMenuBar* menuBar = GetMenuBar();
-	feature->AddNewMenu(menuBar);
-
+	feature.AddNewMenu(menuBar);
+	
 	// new menus may have been added; push the Help menu all the way to the end
 	int helpIndex = menuBar->FindMenu(_("&Help"));
 	if (helpIndex != wxNOT_FOUND) {
 		menuBar->Remove(helpIndex);
 		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
 	}
-	
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(wxID_PREFERENCES);
@@ -669,8 +670,69 @@ void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
 	wxMenuItem* exitMenu = FileMenu->Remove(wxID_EXIT);
 	FileMenu->Append(exitMenu);
 
-	feature->AddToolBarItems(ToolBar);
-	feature->AddWindows();
+	feature.AddToolBarItems(ToolBar);
+	feature.AddWindows();
+}
+
+void t4p::MainFrameClass::LoadFeatureView(t4p::FeatureViewClass& view) {
+	
+	// propagate GUI events to features, so that they can handle menu events themselves
+	// feature menus
+	view.InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, 
+		&AuiManager, GetMenuBar());
+	
+	//  when adding the separators, we dont want a separator at the very end
+	// we dont need separators if the feature did not add any menu items
+	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
+	view.AddFileMenuItems(FileMenu);
+	if (oldFileMenuCount != FileMenu->GetMenuItemCount() && oldFileMenuCount > 0) {
+		FileMenu->InsertSeparator(oldFileMenuCount);
+	}
+
+	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
+	view.AddEditMenuItems(EditMenu);
+	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
+		EditMenu->InsertSeparator(oldEditMenuCount);
+	}
+
+	size_t oldViewMenuCount = ViewMenu->GetMenuItemCount();
+	view.AddViewMenuItems(ViewMenu);
+	if (oldViewMenuCount != ViewMenu->GetMenuItemCount() && oldViewMenuCount > 0) {
+		ViewMenu->InsertSeparator(oldViewMenuCount);
+	}
+
+	size_t oldSearchMenuCount = SearchMenu->GetMenuItemCount();
+	view.AddSearchMenuItems(SearchMenu);
+	if (oldSearchMenuCount != SearchMenu->GetMenuItemCount() && oldSearchMenuCount > 0) {
+		SearchMenu->InsertSeparator(oldSearchMenuCount);
+	}
+
+	size_t oldHelpMenuCount = HelpMenu->GetMenuItemCount();
+	view.AddHelpMenuItems(HelpMenu);
+	if (oldHelpMenuCount != HelpMenu->GetMenuItemCount() && oldHelpMenuCount > 0) {
+		HelpMenu->InsertSeparator(oldHelpMenuCount);
+	}
+
+	wxMenuBar* menuBar = GetMenuBar();
+	view.AddNewMenu(menuBar);
+
+	// new menus may have been added; push the Help menu all the way to the end
+	int helpIndex = menuBar->FindMenu(_("&Help"));
+	if (helpIndex != wxNOT_FOUND) {
+		menuBar->Remove(helpIndex);
+		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
+	}
+	
+	// move preferences menu to the end, similar to most other programs
+	wxMenuItem* preferencesMenu = EditMenu->Remove(wxID_PREFERENCES);
+	EditMenu->Append(preferencesMenu);
+
+	// move exit menu to the end, similar to most other programs
+	wxMenuItem* exitMenu = FileMenu->Remove(wxID_EXIT);
+	FileMenu->Append(exitMenu);
+
+	view.AddToolBarItems(ToolBar);
+	view.AddWindows();
 }
 
 void t4p::MainFrameClass::RealizeToolbar() {

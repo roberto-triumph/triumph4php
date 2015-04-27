@@ -27,15 +27,9 @@
 #include <Triumph.h>
 #include <wx/ffile.h>
 
-
 t4p::ChangelogFeatureClass::ChangelogFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , LastVersion() {
-}
-
-void t4p::ChangelogFeatureClass::AddHelpMenuItems(wxMenu* helpMenu) {
-	helpMenu->Append(t4p::MENU_CHANGELOG + 0, _("See ChangeLog"),
-		_("Open the triumph4php ChangeLog file"), wxITEM_NORMAL);
 }
 
 void t4p::ChangelogFeatureClass::LoadPreferences(wxConfigBase* config) {

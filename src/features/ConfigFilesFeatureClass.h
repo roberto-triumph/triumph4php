@@ -40,13 +40,7 @@ namespace t4p {
  */
 class ConfigFilesFeatureClass : public t4p::FeatureClass {
 
-public:
-
-	ConfigFilesFeatureClass(t4p::AppClass& app);
-
-	void AddNewMenu(wxMenuBar* menuBar);
-
-private:
+	public:
 
 	/**
 	 * pair together a project name and the config files for that
@@ -56,8 +50,16 @@ private:
 		wxString ProjectLabel;
 		std::vector<t4p::ConfigTagClass> ConfigTags;
 	};
+	
+	/**
+	 * organizes all of the detected config files by grouping
+	 * them into separate vectors, one vector per project.
+	 */
+	 std::vector<ConfigPair> BuildConfigPairs();
 
-	std::vector<ConfigPair> ConfigPairs;
+	ConfigFilesFeatureClass(t4p::AppClass& app);
+
+private:
 
 	/**
 	 * Read all of the detected config tags into memory; that way we can
@@ -65,17 +67,6 @@ private:
 	 * as the menu ID).
 	 */
 	std::vector<t4p::ConfigTagClass> ConfigTags;
-
-	/**
-	 * we will attach this to the menu bar; it will be
-	 * owned up by wxMenuBar
-	 */
-	wxMenu* ConfigMenu;
-
-	/**
-	 * recreate the menu based from the loaded ConfigTags.
-	 */
-	void RebuildMenu();
 
 	/**
 	 * when the config detectors have finished running, load all of the

@@ -422,76 +422,15 @@ void t4p::DebuggerOptionsClass::Copy(const t4p::DebuggerOptionsClass& src) {
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , Breakpoints() 
+, Options()
 , RunningThreads() 
 , EventSinkLocker() 
 , Cmd()
-, Options()
 , CurrentStackFunction()
 , LastStackFunction()
 , IsDebuggerSessionActive(false)
-, IsDebuggerServerActive(false) 
-, WasDebuggerPortChanged(false) 
-, WasDebuggerPort(0) {
+, IsDebuggerServerActive(false) {
 }
-
-void t4p::DebuggerFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	wxMenu* menu = new wxMenu();
-	menu->Append(t4p::MENU_DEBUGGER + 0, _("Start Listening for Debugger"), 
-			_("Opens a server socket to listen for incoming xdebug connections"));
-	menu->Append(t4p::MENU_DEBUGGER + 8, _("Stop Listening for Debugger"), 
-		_("Closes the server socket that listens for incoming xdebug connections"));
-	menu->AppendSeparator();
-	
-	menu->Append(t4p::MENU_DEBUGGER + 2, _("Step Into\tF11"), 
-		_("Run the next command, recursing inside function calls"));
-	menu->Append(t4p::MENU_DEBUGGER + 3, _("Step Over\tF10"),
-		_("Run the next command, without recursing inside function calls"));
-	menu->Append(t4p::MENU_DEBUGGER + 4, _("Step Out\tCTRL+F11"),
-		_("Run until the end of the current function"));
-	menu->Append(t4p::MENU_DEBUGGER + 5, _("Continue\tF5"),
-		_("Run until the next breakpoint"));
-	menu->Append(t4p::MENU_DEBUGGER + 6, _("Continue To Cursor"),
-		_("Run until the code reaches the cursor"));
-	menu->Append(t4p::MENU_DEBUGGER + 9, _("Finish Session"),
-		_("Run until the end of the session, ignoring any breakpoints"));
-	menu->Append(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"),
-		_("Places the cursor in the line where the debugger has stopped at."));
-	menu->AppendSeparator();
-	menu->Append(t4p::MENU_DEBUGGER + 7, _("Toggle Breakpoint\tCTRL+K"), 
-		_("Turn on or off a breakpoint at the current line of source code."));
-
-	menuBar->Append(menu, _("Debug"));
-}
-
-void t4p::DebuggerFeatureClass::AddViewMenuItems(wxMenu* menu) {
-	wxMenu* subMenu = new wxMenu();
-	
-	subMenu->Append(t4p::MENU_DEBUGGER + 11, _("Variables"));
-	subMenu->Append(t4p::MENU_DEBUGGER + 12, _("Breakpoints"));
-	subMenu->Append(t4p::MENU_DEBUGGER + 13, _("Eval"));
-	subMenu->Append(t4p::MENU_DEBUGGER + 14, _("Log"));
-	
-	menu->AppendSubMenu(subMenu, _("Debugger"));
-}
-
-void t4p::DebuggerFeatureClass::AddToolBarItems(wxAuiToolBar* bar) {
-	bar->AddSeparator();
-	
-	bar->AddTool(t4p::MENU_DEBUGGER + 0, _("Start Debugger"), t4p::BitmapImageAsset(wxT("debugger-start")), 
-		_("Opens a server socket to listen for incoming xdebug connections"), wxITEM_NORMAL);
-	bar->AddTool(t4p::MENU_DEBUGGER + 9, _("Finish Session"), t4p::BitmapImageAsset(wxT("debugger-finish")),
-		_("Run until the end of the session, ignoring any breakpoints"), wxITEM_NORMAL);
-		
-	bar->AddTool(t4p::MENU_DEBUGGER + 2, _("Step Into"), t4p::BitmapImageAsset(wxT("arrow-step-in")), 
-		_("Run the next command, recursing inside function calls"), wxITEM_NORMAL);
-	bar->AddTool(t4p::MENU_DEBUGGER + 3, _("Step Over"), t4p::BitmapImageAsset(wxT("arrow-step-over")), 
-		_("Run the next command, without recursing inside function calls"), wxITEM_NORMAL);
-	bar->AddTool(t4p::MENU_DEBUGGER + 4, _("Step Out"), t4p::BitmapImageAsset(wxT("arrow-step-out")), 
-		_("Run until the end of the current function"), wxITEM_NORMAL);
-	bar->AddTool(t4p::MENU_DEBUGGER + 10, _("Go To Current Line"), t4p::BitmapImageAsset(wxT("arrow-right")), 
-		_("Places the cursor in the line where the debugger has stopped at."));
-	}
-
 
 void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
 	RunningThreads.SetMaxThreads(1);
@@ -557,17 +496,15 @@ void t4p::DebuggerFeatureClass::LoadPreferences(wxConfigBase* base) {
 void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* base = wxConfig::Get();
 	ConfigStore(base, Options, Breakpoints);
-	
-	if (WasDebuggerPortChanged) {
+}
+
+void t4p::DebuggerFeatureClass::RestartDebugger(int oldPort) {
 		
-		// need to shutdown the server and listen on the new port
-		StopDebugger(WasDebuggerPort);
-		if (Options.DoListenOnAppReady) {
-			StartDebugger(false);
-		}
+	// need to shutdown the server and listen on the new port
+	StopDebugger(oldPort);
+	if (Options.DoListenOnAppReady) {
+		StartDebugger(false);
 	}
-	WasDebuggerPortChanged = false;
-	WasDebuggerPort = Options.Port;
 }
 
 void t4p::DebuggerFeatureClass::OnStyledTextModified(wxStyledTextEvent& event) {
@@ -590,15 +527,6 @@ void t4p::DebuggerFeatureClass::OnStyledTextModified(wxStyledTextEvent& event) {
 			}
 		}
 	}
-}
-
-
-void t4p::DebuggerFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	WasDebuggerPortChanged = false;
-	WasDebuggerPort = Options.Port;
-	t4p::DebuggerOptionsPanelClass* panel =  new t4p::DebuggerOptionsPanelClass(parent, Options, WasDebuggerPortChanged);
-	
-	parent->AddPage(panel, _("Debugger"));
 }
 
 void t4p::DebuggerFeatureClass::OnStopDebugger(wxCommandEvent& event) {
@@ -2187,7 +2115,6 @@ const wxEventType t4p::EVENT_DEBUGGER_SHOW_FULL = wxNewEventType();
 BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::DebuggerFeatureClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::DebuggerFeatureClass::OnPreferencesSaved)
 	EVT_APP_FILE_OPEN(t4p::DebuggerFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::DebuggerFeatureClass::OnAppFileClosed)
 	EVT_STC_MODIFIED(wxID_ANY, t4p::DebuggerFeatureClass::OnStyledTextModified)

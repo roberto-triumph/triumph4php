@@ -63,7 +63,9 @@
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
 #include <features/ChangelogFeatureClass.h>
+#include <features/views/ChangelogViewClass.h>
 #include <features/BookmarkFeatureClass.h>
+#include <features/views/BookmarkViewClass.h>
 #include <features/DebuggerFeatureClass.h>
 #include <features/FileCabinetFeatureClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
@@ -246,6 +248,7 @@ bool t4p::AppClass::CommandLine() {
 
 void t4p::AppClass::CreateFeatures() {
 	FeatureClass* feature;
+	
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FinderFeatureClass(*this);
@@ -294,10 +297,17 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new EditorBehaviorFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new ChangelogFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new BookmarkFeatureClass(*this);
-	Features.push_back(feature);
+	
+	t4p::ChangelogFeatureClass* changelog = new ChangelogFeatureClass(*this);
+	t4p::ChangelogViewClass* changelogView = new ChangelogViewClass();
+	Features.push_back(changelog);
+	FeatureViews.push_back(changelogView);
+	
+	t4p::BookmarkFeatureClass* bookmark = new BookmarkFeatureClass(*this);
+	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass();
+	Features.push_back(bookmark);
+	FeatureViews.push_back(bookmarkView);
+	
 	feature = new DebuggerFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FileCabinetFeatureClass(*this);
@@ -320,11 +330,18 @@ void t4p::AppClass::CreateFeatures() {
 		RunningThreads.AddEventHandler(Features[i]);
 		SqliteRunningThreads.AddEventHandler(Features[i]);
 	}
+	
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		EventSink.PushHandler(FeatureViews[i]);
+	}
 }
 
 void t4p::AppClass::FeatureWindows() {
 	for (size_t i = 0; i < Features.size(); ++i) {
-		MainFrame->LoadFeature(Features[i]);
+		MainFrame->LoadFeature(*Features[i]);
+	}
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		MainFrame->LoadFeatureView(*FeatureViews[i]);
 	}
 	MainFrame->RealizeToolbar();
 }
@@ -345,6 +362,11 @@ void t4p::AppClass::DeleteFeatures() {
 	}
 	Features.clear();
 	EditorMessagesFeature = NULL;
+	
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		delete FeatureViews[i];
+	}
+	FeatureViews.clear();
 }
 
 void t4p::AppClass::LoadPreferences() {

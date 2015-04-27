@@ -40,15 +40,6 @@ t4p::ConfigFilesFeatureClass::ConfigFilesFeatureClass(t4p::AppClass& app)
 
 }
 
-void t4p::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	ConfigMenu = new wxMenu();
-	menuBar->Append(ConfigMenu, _("Project Configs"));
-
-	// at this point the projects are not loaded yet must wait
-	// until projects are loaded so that we can load 
-	// the detected config files
-}
-
 void t4p::ConfigFilesFeatureClass::RebuildMenu() {
 	ConfigPairs.clear();
 	ConfigTags.clear();
@@ -110,13 +101,6 @@ void t4p::ConfigFilesFeatureClass::RebuildMenu() {
 	}
 }
 
-void t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete(t4p::ActionEventClass& event) {
-	RebuildMenu();
-}
-
-void t4p::ConfigFilesFeatureClass::OnConfigFilesDetected(t4p::ActionEventClass& event) {
-	RebuildMenu();
-}
 
 void t4p::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
 	size_t index = event.GetId() - t4p::CONFIG_DETECTORS;
@@ -144,8 +128,6 @@ void t4p::ConfigFilesFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event
 
 
 BEGIN_EVENT_TABLE(t4p::ConfigFilesFeatureClass, t4p::FeatureClass) 
-	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT,  t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete)
-	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, t4p::ConfigFilesFeatureClass::OnConfigFilesDetected)
 	EVT_MENU_RANGE(t4p::CONFIG_DETECTORS, t4p::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, t4p::ConfigFilesFeatureClass::OnConfigMenuItem)
 	EVT_APP_FILE_SAVED(t4p::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

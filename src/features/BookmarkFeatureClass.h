@@ -90,18 +90,8 @@ class BookmarkFeatureClass : public t4p::FeatureClass {
 
 public:
 	BookmarkFeatureClass(t4p::AppClass& app);
-	
-	/**
-	 * the user can toggle bookmarks via the edit menu
-	 */
-	void AddEditMenuItems(wxMenu* editMenu);
-
-	/**
-	 * adds keyboard shortcuts for the bookmark functionality
-	 */
-	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts);
-	
-	private:
+		
+private:
 
 	/**
 	 * this menu handler will toggle the bookmark in the current

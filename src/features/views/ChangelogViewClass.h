@@ -19,51 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CHANGELOGFEATURECLASS_H__
-#define __T4P_CHANGELOGFEATURECLASS_H__
+#ifndef T4P_CHANGELOGVIEWCLASS_H__
+#define T4P_CHANGELOGVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
 
 namespace t4p {
 
+// forward declaration, defined in another file
+class ChangelogFeatureClass;
+
 /**
- * This is a small feature that shows the user the
- * change log file; the file that describes the various
- * updates that triump4hp has released
+ * Adds a menu item that enables the user to see
+ * triumph's release change log
  */
-class ChangelogFeatureClass : public t4p::FeatureClass {
+class ChangelogViewClass : public t4p::FeatureViewClass {
 
 public:
-
-	ChangelogFeatureClass(t4p::AppClass& app);
-
-	void LoadPreferences(wxConfigBase* config);
 	
-private:
-		
-	void OnHelpChangelog(wxCommandEvent& event);
+	ChangelogViewClass();
 	
-	void OnAppReady(wxCommandEvent& event);
-	
-	void OnSavePreferences(wxCommandEvent& event);
-	
-	void ShowChangeLog();
-	
-	/**
-	 * the last version of the app that was opened.
-	 * This is value is stored in the config. When we read
-	 * it in and it is different than the running version,
-	 * it means that the user upgraded (or downgraded)
-	 * versions.
-	 */
-	wxString LastVersion;
-	
-	DECLARE_EVENT_TABLE()
+	void AddHelpMenuItems(wxMenu* helpMenu);
 };
 
 }
 
-#endif // __T4P_CHANGELOGFEATURECLASS_H__
+#endif

@@ -28,7 +28,7 @@
 #include <globals/ProjectClass.h>
 #include <main_frame/wxformbuilder/MainFrameForms.h>
 #include <widgets/NotebookClass.h>
-#include <features/FeatureClass.h>
+#include <widgets/StatusBarWithGaugeClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/ActionClass.h>
@@ -43,6 +43,10 @@ class AppClass;
 
 // defined at the bottom of this file
 class MainFrameClass;
+
+// forward declarations, defined in other files
+class FeatureClass;
+class FeatureViewClass;
 
 /**
  * This class is used to listen for app events.  It is a separate class
@@ -120,9 +124,14 @@ public:
 
 	/**
 	 * get all of the feature's extra windows and menus and attach them to the main frame.
-	 * This class will not own this pointer
+	 * TODO this should be removed
 	 */
-	void LoadFeature(FeatureClass* feature);
+	void LoadFeature(FeatureClass& feature);
+	
+	/**
+	 * get all of the feature view's extra windows and menus and attach them to the main frame.
+	 */
+	void LoadFeatureView(FeatureViewClass& view);
 
 	/**
 	 * this should be called whenever a new window is added.
@@ -210,7 +219,7 @@ private:
 	 * 
 	 * @return StatusBarWithGaugeClass do NOT delete the pointer.  This class will take care of memory management.
 	 */
-	StatusBarWithGaugeClass* GetStatusBarWithGauge();
+	t4p::StatusBarWithGaugeClass* GetStatusBarWithGauge();
 	
 	/**
 	 * When a page is modified, enable the save button

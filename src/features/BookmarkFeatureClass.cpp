@@ -68,38 +68,6 @@ t4p::BookmarkFeatureClass::BookmarkFeatureClass(t4p::AppClass& app)
 {
 }
 
-void t4p::BookmarkFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(t4p::MENU_BOOKMARK + 0,
-		_("Toggle Bookmark\tCTRL+B"), 
-		_("Toggle Bookmark on or off in the current cursor location"), 
-		wxITEM_NORMAL
-	);
-	editMenu->Append(t4p::MENU_BOOKMARK + 1,
-		_("Go to next Bookmark\tF2"), 
-		_("Navigate the cursor to the next bookmark"), 
-		wxITEM_NORMAL
-	);
-	editMenu->Append(t4p::MENU_BOOKMARK + 2,
-		_("Go to previous Bookmark\tSHIFT+F2"), 
-		_("Navigate the cursor to the previous bookmark"), 
-		wxITEM_NORMAL
-	);
-	editMenu->Append(t4p::MENU_BOOKMARK + 3,
-		_("Clear all Bookmarks"), 
-		_("Clears all of the bookmarks for all files"), 
-		wxITEM_NORMAL
-	);
-}
-
-void t4p::BookmarkFeatureClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {
-	std::map<int, wxString> menuItemIds;
-	menuItemIds[t4p::MENU_BOOKMARK + 0] = wxT("Edit-Toggle Bookmark");
-	menuItemIds[t4p::MENU_BOOKMARK + 1] = wxT("Edit-Go to next Bookmark");
-	menuItemIds[t4p::MENU_BOOKMARK + 2] = wxT("Edit-Go to previous Bookmark");
-	AddDynamicCmd(menuItemIds, shortcuts);
-}
-
-
 void t4p::BookmarkFeatureClass::OnEditToggleBookmark(wxCommandEvent& event) {
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	

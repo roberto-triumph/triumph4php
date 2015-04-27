@@ -162,16 +162,13 @@ public:
 	 * the breakpoints that the user has set.
 	 */
 	std::vector<t4p::BreakpointWithHandleClass> Breakpoints;
+	
+	/**
+	 * configuration options for xdebug
+	 */
+	t4p::DebuggerOptionsClass Options;
 
 	DebuggerFeatureClass(t4p::AppClass& app);
-
-	void AddNewMenu(wxMenuBar* menuBar);
-	
-	void AddViewMenuItems(wxMenu* menu);
-	
-	void AddToolBarItems(wxAuiToolBar* bar);
-	
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
 	void LoadPreferences(wxConfigBase* base);
 	
@@ -316,6 +313,17 @@ private:
 	void StopDebugger(int port);
 	
 	/**
+	 * Stops and restart the debugger server.  Note that this method
+	 * handles port changes (stopping the server at port X and starting
+	 * the debugger server at port Y). This is done to handle the case
+	 * where the user changes the server port number in the preferences
+	 * dialog.
+	 * 
+	 * @param oldPort
+	 */
+	void RestartDebugger(int oldPort);
+	
+	/**
 	 * handler for saving preferences to disk
 	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
@@ -409,11 +417,6 @@ private:
 	t4p::DbgpCommandClass Cmd;
 	
 	/**
-	 * configuration options for xdebug
-	 */
-	t4p::DebuggerOptionsClass Options;
-	
-	/**
 	 * the name of the last stack that we displayed to
 	 * the user.  We use this so that we can know
 	 * when we are changing scope and need to re-draw
@@ -434,20 +437,6 @@ private:
 	 * connections
 	 */
 	bool IsDebuggerServerActive;
-	
-	/**
-	 * TRUE if the user modified the port number in the preferences
-	 * window. We need to know this so that we can restart the
-	 * debugger server on the new port.
-	 */
-	bool WasDebuggerPortChanged;
-	
-	/**
-	 * The value of the debugger port before it was modified. Used in
-	 * conjunction with WasDebuggerPortChanged to stop the debugger
-	 * server socket when the user changes ports.
-	 */
-	int WasDebuggerPort;
 	
 	DECLARE_EVENT_TABLE()
 };
