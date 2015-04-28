@@ -33,6 +33,7 @@
 #include <wx/string.h>
 #include <wx/timer.h>
 #include <vector>
+#include <wx/bookctrl.h>
 
 namespace t4p {
 
@@ -162,6 +163,13 @@ public:
 	 * delete features from memory in a safe way
 	 */
 	void DeleteFeatures();
+	
+	/**
+	 * Adds all features' preferences panels into the given parent.
+	 * 
+	 * @param parent the parent book control
+	 */
+	void AddPreferencesWindows(wxBookCtrlBase* parent);
 
 private:
 

@@ -458,6 +458,15 @@ void t4p::AppClass::OnActivateApp(wxActivateEvent& event) {
 	}
 }
 
+void t4p::AppClass::AddPreferencesWindows(wxBookCtrlBase* parent) {
+	for (size_t i = 0; i < Features.size(); ++i) {
+		Features[i]->AddPreferenceWindow(parent);
+	}
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		FeatureViews[i]->AddPreferenceWindow(parent);
+	}
+}
+
 t4p::AppTimerClass::AppTimerClass(t4p::AppClass& app)
 	: wxTimer()
 	, App(app) {

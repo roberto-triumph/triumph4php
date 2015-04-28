@@ -387,10 +387,7 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	bool changedSettingsDir = false;
 	bool needsRetag = false;
 	PreferencesDialogClass prefDialog(this, App.Globals, Preferences, settingsDir, changedSettingsDir, needsRetag);
-	
-	for (size_t i = 0; i < Features.size(); ++i) {
-		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
-	}
+	App.AddPreferencesWindows(prefDialog.GetBookCtrl());
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
