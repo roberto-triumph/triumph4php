@@ -371,6 +371,10 @@ void t4p::AppClass::DeleteFeatures() {
 		RunningThreads.RemoveEventHandler(Features[i]);
 		SqliteRunningThreads.RemoveEventHandler(Features[i]);
 	}
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		RunningThreads.RemoveEventHandler(FeatureViews[i]);
+		SqliteRunningThreads.RemoveEventHandler(FeatureViews[i]);
+	}
 
 	// disconnect from events so that events dont get sent after
 	// features are destroyed
