@@ -151,53 +151,6 @@ static int SciModifiersToWxModifiers(int sciModifiers) {
 	return wxMods;
 }
 
-static  int SciCommandToMenuId(int cmdId) {
-	for (int i = 0; SciCommands[i][0] > 0; ++i) {
-		if (SciCommands[i][1] == cmdId) {
-			return SciCommands[i][0];
-		}
-	}
-	return 0;
-}
-
-static int MenuIdToSciCommand(int menuId) {
-	for (int i = 0; SciCommands[i][0] > 0; ++i) {
-		if (SciCommands[i][0] == menuId) {
-			return SciCommands[i][1];
-		}
-	}
-	return 0;
-}
-
-static void KeyboardCommandFromString(t4p::EditorKeyboardCommandClass& cmd, const wxString& shortcut) {
-	int wxKeyCode = 0;
-	int wxModifiers = 0;
-	if (!shortcut.empty()) {
-		t4p::ShortcutStringToKeyCode(shortcut, wxModifiers, wxKeyCode);
-	
-		// turn wx keys, modifiers into stc counterparts
-		cmd.KeyCode = WxKeyCodeToSciKeyCode(wxKeyCode);
-		cmd.Modifiers = WxModifiersToSciModifiers(wxModifiers);
-	}
-	else {
-		// empty string == no shortcut
-		cmd.KeyCode = 0;
-		cmd.Modifiers = 0;
-	}
-}
-
-static wxString KeyboardCommandToString(t4p::EditorKeyboardCommandClass& cmd) {
-
-	// turn stc keys, modifiers into wx counterparts
-	// to feed into the keybinder function
-	int wxKeyCode = SciKeyCodeToWxKeyCode(cmd.KeyCode);
-	int wxModifiers = SciModifiersToWxModifiers(cmd.Modifiers);
-	if (wxKeyCode > 0 && wxModifiers > 0) {
-		return t4p::KeyCodeToShortcutString(wxModifiers, wxKeyCode);
-	}
-	return wxT("");
-}
-
 static void PC(std::vector<t4p::EditorKeyboardCommandClass>& commands, const wxString& name, int cmdId, int modifiers, int keyCode) {
 	commands.push_back(t4p::EditorKeyboardCommandClass(name, cmdId, modifiers, keyCode));
 }
@@ -273,111 +226,33 @@ bool t4p::EditorKeyboardCommandClass::IsOk() const {
 	return Modifiers > 0 && KeyCode > 0;
 }
 
-/**
- * adds menu items for each of the scintilla keyboard commands
- * to the given menu
- * @param menu the menu to add the items to
- * @param bool if TRUE menu items that require that text be selected
- *        will be disabled
- */
-static void AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
+void t4p::EditorKeyboardCommandClass::InitFromString(const wxString& shortcut) {
+	int wxKeyCode = 0;
+	int wxModifiers = 0;
+	if (!shortcut.empty()) {
+		t4p::ShortcutStringToKeyCode(shortcut, wxModifiers, wxKeyCode);
 	
-	/*
-	 the transform menu exposes the following scintilla commands
-	 
-	SCI_LINECUT
-	SCI_LINEDUPLICATE
-	SCI_LINEDELETE
-	SCI_LINETRANSPOSE
-	SCI_LINECOPY 
-	SCI_LOWERCASE 
-	SCI_UPPERCASE
-	SCI_DELWORDLEFT
-	SCI_DELWORDRIGHT
-	SCI_DELLINELEFT
-	SCI_DELLINERIGHT 
-	SCI_SELECTIONDUPLICATE 
-	SCI_MOVESELECTEDLINESUP
-	SCI_MOVESELECTEDLINESDOWN
-	*/
-	// not sure what these message do
-	// SCI_DELETEBACKNOTLINE
-	// SCI_DELWORDRIGHTEND
-	// 2469 == there is no wxSTC_CMD_SELECTIONDUPLICATE
-	wxMenu* transformMenu = new wxMenu();
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINECUT), _("Cut Line"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINEDUPLICATE), _("Duplicate Line"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINEDELETE), _("Delete Line"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINETRANSPOSE), _("Transpose Line"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LINECOPY), _("Copy Line"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_LOWERCASE), _("Convert To Lower Case"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_UPPERCASE), _("Convert To Upper Case"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELWORDLEFT), _("Delete to start of Word"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELWORDRIGHT), _("Delete to end of Word"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELLINELEFT), _("Delete Line up to cursor"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_DELLINERIGHT), _("Delete Line after cursor"));
-	transformMenu->Append(SciCommandToMenuId(2469), _("Duplicate selection"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_MOVESELECTEDLINESUP), _("Move selected lines up"));
-	transformMenu->Append(SciCommandToMenuId(wxSTC_CMD_MOVESELECTEDLINESDOWN), _("Move selected lines down"));
-
-	/*
-	the selection menu exposes the following scintilla commands
-	SCI_PARADOWNEXTEND
-	SCI_PARAUPEXTEND
-	SCI_WORDLEFTEXTEND
-	SCI_WORDRIGHTEXTEND
-	SCI_WORDLEFTENDEXTEND
-	SCI_WORDRIGHTENDEXTEND
-	SCI_WORDPARTLEFTEXTEND
-	SCI_WORDPARTRIGHTEXTEND
-	*/
-	wxMenu* selectionMenu = new wxMenu();
-	
-	
-	/*
-	the caret menu exposes the following scintilla commands
-	SCI_PARADOWN
-	SCI_PARAUP
-	SCI_WORDLEFT
-	SCI_WORDRIGHT
-	SCI_WORDPARTLEFT
-	SCI_WORDPARTRIGHT 
-	*/
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARADOWNEXTEND), _("Expand selection to the end of paragraph")); //\tCTRL+SHIFT+]
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARAUPEXTEND), _("Expand selection to the beginning of paragraph")); // \tCTRL+SHIFT+[
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFTEXTEND), _("Expand selection to the beginning of previous word\tCTRL+SHIFT+LEFT"));
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHTEXTEND), _("Expand selection to the beginning of next word\tCTRL+SHIFT+RIGHT"));
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFTENDEXTEND), _("Expand selection to the end of previous word"));
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHTENDEXTEND), _("Expand selection to the end of next word"));
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment")); // \tCTRL+SHIFT+/
-	selectionMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment")); // \tCTRL+SHIFT+backslash
-	
-	//?? not sure what these do
-	//SCI_WORDLEFTEND
-	//SCI_WORDRIGHTEND
-	wxMenu* caretMenu = new wxMenu();
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARADOWN), _("Move to next paragraph")); // \tCTRL+]
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_PARAUP), _("Move to previous paragraph")); // \tCTRL+[
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDLEFT), _("Move to previous word\tCTRL+LEFT"));
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDRIGHT), _("Move to next word\tCTRL+RIGHT"));
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFT), _("Move to previous word segment")); // \tCTRL+/
-	caretMenu->Append(SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHT), _("Move to next word segment")); // \tCTRL+backslash
-	
-	menu->Append(ID_SUBMENU_TRANSFORM, _("Transform text"), transformMenu);
-	menu->Append(ID_SUBMENU_SELECTION, _("Selection"), selectionMenu);
-	menu->Append(ID_SUBMENU_CARET, _("Move caret"), caretMenu);
-	
-	transformMenu->Enable(SciCommandToMenuId(wxSTC_CMD_LOWERCASE), isTextSelected);
-	transformMenu->Enable(SciCommandToMenuId(wxSTC_CMD_UPPERCASE), isTextSelected);
+		// turn wx keys, modifiers into stc counterparts
+		KeyCode = WxKeyCodeToSciKeyCode(wxKeyCode);
+		Modifiers = WxModifiersToSciModifiers(wxModifiers);
+	}
+	else {
+		// empty string == no shortcut
+		KeyCode = 0;
+		Modifiers = 0;
+	}
 }
 
-static void AssignKeyCommands(wxStyledTextCtrl* ctrl, const std::vector<t4p::EditorKeyboardCommandClass>& keyboardCommands) {
-	for (size_t i = 0; i < keyboardCommands.size(); ++i) {
-		t4p::EditorKeyboardCommandClass cmd = keyboardCommands[i];
-		if (cmd.CmdId > 0 && cmd.IsOk()) {
-			ctrl->CmdKeyAssign(cmd.KeyCode, cmd.Modifiers, cmd.CmdId);
-		}
+wxString t4p::EditorKeyboardCommandClass::ToString() const {
+
+	// turn stc keys, modifiers into wx counterparts
+	// to feed into the keybinder function
+	int wxKeyCode = SciKeyCodeToWxKeyCode(KeyCode);
+	int wxModifiers = SciModifiersToWxModifiers(Modifiers);
+	if (wxKeyCode > 0 && wxModifiers > 0) {
+		return t4p::KeyCodeToShortcutString(wxModifiers, wxKeyCode);
 	}
+	return wxT("");
 }
 
 t4p::EditorBehaviorFeatureClass::EditorBehaviorFeatureClass(t4p::AppClass& app)
@@ -394,96 +269,36 @@ void t4p::EditorBehaviorFeatureClass::LoadPreferences(wxConfigBase* config) {
 		wxString key = wxString::Format(wxT("KeyboardCommands/Cmd-%d"), KeyboardCommands[i].CmdId);
 		wxString storedShortcut;
 		if (config->Read(key, &storedShortcut) && !storedShortcut.empty()) {
-			KeyboardCommandFromString(KeyboardCommands[i], storedShortcut);
+			KeyboardCommands[i].InitFromString(storedShortcut);
 		}
 	}
 }
 
-void t4p::EditorBehaviorFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddSeparator();
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 1, _("Word Wrap"), 
-		t4p::BitmapImageAsset(wxT("wrap")), _("Enable / disable word wrap"), wxITEM_NORMAL
-	);
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 2, _("Indentation"), 
-		t4p::BitmapImageAsset(wxT("indentation")), _("Enable / disable identation guides"), wxITEM_NORMAL
-	);
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 3, _("Whitespace"), 
-		t4p::BitmapImageAsset(wxT("whitespace")), _("Enable / disable showing whitespace"), wxITEM_NORMAL
-	);
-}
-
-void t4p::EditorBehaviorFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
-	wxMenu* subMenu = new wxMenu();
-	subMenu->Append(t4p::MENU_BEHAVIOR + 7, _("Unix (LF)"), _("Convert Line ending to UNIX"));
-	subMenu->Append(t4p::MENU_BEHAVIOR + 8, _("Windows (CRLF)"), _("Convert Line ending to Windows"));
-	subMenu->Append(t4p::MENU_BEHAVIOR + 9, _("Max (CR)"), _("Convert Line ending to MAC"));
-	
-	editMenu->Append(wxID_ANY, _("Convert Line Endings To"), subMenu);
-}
-
-void t4p::EditorBehaviorFeatureClass::AddViewMenuItems(wxMenu* menu) {
-	menu->Append(t4p::MENU_BEHAVIOR + 4, _("Zoom In"), _("Zoom In"));
-	menu->Append(t4p::MENU_BEHAVIOR + 5, _("Zoom Out"), _("Zoom Out"));
-	menu->Append(t4p::MENU_BEHAVIOR + 6, _("Reset Zoom\tCTRL+0"), _("Reset Zoom"));
-}
-
-void t4p::EditorBehaviorFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	
-	// no need to delete moreMenu pointer, the contextMenu will delete it for us
-	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
-	bool isTextSelected = false;
-	if (codeCtrl) {
-		isTextSelected = !codeCtrl->GetSelectedText().IsEmpty();
-	}
-	AddKeyboardCommands(menu, isTextSelected);
-	
-	// update the menu accelerators to be the ones configured by the
-	// user
-	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {
-		int cmdId = KeyboardCommands[i].CmdId;
-		int menuId = SciCommandToMenuId(cmdId);
-		wxMenuItem* menuItem = menu->FindItem(menuId);
-		if (menuItem) {
-			wxString label = 
-				menuItem->GetItemLabelText()
-				+ wxT("\t") 
-				+ KeyboardCommandToString(KeyboardCommands[i]);
-			menuItem->SetItemLabel(label);
-		}
-	}
-}
-
-void t4p::EditorBehaviorFeatureClass::OnToggleWordWrap(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ToggleWordWrap() {
 	App.Preferences.CodeControlOptions.EnableWordWrap = !App.Preferences.CodeControlOptions.EnableWordWrap;
 	
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
-void t4p::EditorBehaviorFeatureClass::OnToggleIndentationGuides(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ToggleIndentationGuides() {
 	App.Preferences.CodeControlOptions.EnableIndentationGuides = !App.Preferences.CodeControlOptions.EnableIndentationGuides;
 	
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
-void t4p::EditorBehaviorFeatureClass::OnToggleWhitespace(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ToggleWhitespace() {
 	App.Preferences.CodeControlOptions.ShowWhitespace = !App.Preferences.CodeControlOptions.ShowWhitespace;
 	
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
-void t4p::EditorBehaviorFeatureClass::OnZoomIn(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ZoomIn() {
 	App.Preferences.CodeControlOptions.Zoom++;
 	if (App.Preferences.CodeControlOptions.Zoom > 50) {
 		App.Preferences.CodeControlOptions.Zoom = 50;
@@ -492,11 +307,9 @@ void t4p::EditorBehaviorFeatureClass::OnZoomIn(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
-void t4p::EditorBehaviorFeatureClass::OnZoomOut(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ZoomOut() {
 	App.Preferences.CodeControlOptions.Zoom--;
 	if (App.Preferences.CodeControlOptions.Zoom < -35) {
 		App.Preferences.CodeControlOptions.Zoom = -35;
@@ -505,392 +318,48 @@ void t4p::EditorBehaviorFeatureClass::OnZoomOut(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
 }
 
-void t4p::EditorBehaviorFeatureClass::OnZoomReset(wxCommandEvent& event) {
+void t4p::EditorBehaviorFeatureClass::ZoomReset() {
 	App.Preferences.CodeControlOptions.Zoom = 0;
 	
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
-	
-	SetFeaturesOnNotebook();
-}
-
-void t4p::EditorBehaviorFeatureClass::OnEditConvertEols(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
-	if (!codeCtrl) {
-		return;
-	}
-	if (event.GetId() == (t4p::MENU_BEHAVIOR + 7)) {
-		codeCtrl->ConvertEOLs(wxSTC_EOL_LF);
-	}
-	else if (event.GetId() == (t4p::MENU_BEHAVIOR + 8)) {
-		codeCtrl->ConvertEOLs(wxSTC_EOL_CRLF);
-	}
-	else if (event.GetId() == (t4p::MENU_BEHAVIOR + 9)) {
-		codeCtrl->ConvertEOLs(wxSTC_EOL_CR);
-	}
 }
 
 void t4p::EditorBehaviorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
-	SetFeaturesOnNotebook();
 
 	// write the shortcuts to the config
 	wxConfigBase* config = wxConfig::Get();
 	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {
 		wxString key = wxString::Format(wxT("KeyboardCommands/Cmd-%d"), KeyboardCommands[i].CmdId);
-		wxString storedShortcut = KeyboardCommandToString(KeyboardCommands[i]);
+		wxString storedShortcut = KeyboardCommands[i].ToString();
 		config->Write(key, storedShortcut);
 	}
 }
 
-void t4p::EditorBehaviorFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	wxKeyBinder* keyBinder = App.Preferences.KeyProfiles.GetSelProfile();
-
-	t4p::EditorBehaviorPanelClass* panel = new t4p::EditorBehaviorPanelClass(parent, 
-		App.Preferences.CodeControlOptions);
-	t4p::EditorCommandPanelClass* cmdPanel = new t4p::EditorCommandPanelClass(parent,
-		wxID_ANY, KeyboardCommands, keyBinder);
-	parent->AddPage(panel, _("Editor Behavior"));
-	parent->AddPage(cmdPanel, _("Editor Shortcuts"));
-}
-
-void t4p::EditorBehaviorFeatureClass::SetFeaturesOnNotebook() {
-	t4p::NotebookClass* notebook = GetNotebook();
-	t4p::CodeControlOptionsClass options = App.Preferences.CodeControlOptions;
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		SetFeatures(options, notebook->GetCodeControl(i));
-	}
-}
-
-void t4p::EditorBehaviorFeatureClass::SetFeatures(const t4p::CodeControlOptionsClass& options, wxStyledTextCtrl* codeCtrl) {
-	if (options.IndentUsingTabs) {
-		codeCtrl->SetUseTabs(true);
-		codeCtrl->SetTabWidth(options.TabWidth);
-		codeCtrl->SetIndent(0);
-		codeCtrl->SetTabIndents(true);
-		codeCtrl->SetBackSpaceUnIndents(true);
-	}
-	else {
-		codeCtrl->SetUseTabs(false);
-		codeCtrl->SetTabWidth(options.SpacesPerIndent);
-		codeCtrl->SetIndent(options.SpacesPerIndent);
-		codeCtrl->SetTabIndents(false);
-		codeCtrl->SetBackSpaceUnIndents(false);
-	}
-	if (options.RightMargin > 0) {
-		codeCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
-		codeCtrl->SetEdgeColumn(options.RightMargin);
-	}
-	else {
-		codeCtrl->SetEdgeMode(wxSTC_EDGE_NONE);
-	}
-	codeCtrl->SetIndentationGuides(options.EnableIndentationGuides);
-	codeCtrl->SetEOLMode(options.LineEndingMode);
-	codeCtrl->SetViewEOL(options.EnableLineEndings);
-	
-	if (options.EnableWordWrap) {
-		codeCtrl->SetWrapMode(wxSTC_WRAP_WORD);
-		codeCtrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
-	}
-	else {
-		codeCtrl->SetWrapMode(wxSTC_WRAP_NONE);
-	}
-	
-	codeCtrl->SetMultipleSelection(options.EnableMultipleSelection);
-	codeCtrl->SetAdditionalSelectionTyping(options.EnableMultipleSelection);
-	if (options.EnableMultipleSelection) {
-		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_EACH);
-		
-	}
-	else {
-		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_ONCE);
-	}
-	
-	int virtualSpaceOpts = wxSTC_SCVS_NONE;
-	if (options.EnableVirtualSpace) {
-		virtualSpaceOpts |= wxSTC_SCVS_USERACCESSIBLE;
-	}
-	if (options.EnableRectangularSelection) {
-		virtualSpaceOpts |= wxSTC_SCVS_RECTANGULARSELECTION;
-	}
-	codeCtrl->SetVirtualSpaceOptions(virtualSpaceOpts);
-	
-	int selectionMode = wxSTC_SEL_STREAM;
-	if (options.EnableRectangularSelection) {
-		selectionMode = wxSTC_SEL_RECTANGLE;
-	}
-	codeCtrl->SetSelectionMode(selectionMode);
-	int whitespaceMode = wxSTC_WS_INVISIBLE;
-	if (options.ShowWhitespace) {
-		whitespaceMode = wxSTC_WS_VISIBLEALWAYS;
-	}
-	codeCtrl->SetViewWhiteSpace(whitespaceMode);
-	codeCtrl->SetZoom(options.Zoom);
-	
-	AssignKeyCommands(codeCtrl, KeyboardCommands);
-}
-
-void t4p::EditorBehaviorFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-	SetFeatures(App.Preferences.CodeControlOptions, event.GetCodeControl());
-}
-
-void t4p::EditorBehaviorFeatureClass::OnAppFileNew(t4p::CodeControlEventClass& event) {
-	SetFeatures(App.Preferences.CodeControlOptions, event.GetCodeControl());
-}
-
-void t4p::EditorBehaviorFeatureClass::OnEditorCommand(wxCommandEvent& event) {
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
-	if (!ctrl) {
-		return;
-	}
-
-	// this method handles all scintilla commands
-	// use the menu item ID is scintilla command to execute
-	int menuId = event.GetId();
-	int cmdId = MenuIdToSciCommand(menuId);
-	ctrl->CmdKeyExecute(cmdId);
-}
-
-t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
-	: EditorBehaviorPanelGeneratedClass(parent) {
-	wxGenericValidator enableCodeFoldingValidator(&options.EnableCodeFolding);
-	EnableCodeFolding->SetValidator(enableCodeFoldingValidator);
-	wxGenericValidator enableAutomaticIndentationValidator(&options.EnableAutomaticLineIndentation);
-	EnableAutomaticLineIndentation->SetValidator(enableAutomaticIndentationValidator);
-	wxGenericValidator enableLineNumbersValidator(&options.EnableLineNumbers);
-	EnableLineNumbers->SetValidator(enableLineNumbersValidator);
-	wxGenericValidator indentUsingTabsValidator(&options.IndentUsingTabs);
-	IndentUsingTabs->SetValidator(indentUsingTabsValidator);
-	wxGenericValidator tabWidthValidator(&options.TabWidth);
-	TabWidth->SetValidator(tabWidthValidator);
-	wxGenericValidator spacesPerIndentValidator(&options.SpacesPerIndent);
-	SpacesPerIndent->SetValidator(spacesPerIndentValidator);
-	TabWidth->Enable(options.IndentUsingTabs);
-	SpacesPerIndent->Enable(!options.IndentUsingTabs);
-	wxGenericValidator enableIndentationGuidesValidator(&options.EnableIndentationGuides);
-	EnableIndentationGuides->SetValidator(enableIndentationGuidesValidator);
-	wxGenericValidator rightMarginValidator(&options.RightMargin);
-	RightMargin->SetValidator(rightMarginValidator);
-	wxGenericValidator enableLineEndingsValidator(&options.EnableLineEndings);	
-	EnableLineEndings->SetValidator(enableLineEndingsValidator);
-	wxGenericValidator lineEndingModeValidator(&options.LineEndingMode);
-	LineEndingMode->SetValidator(lineEndingModeValidator);
-	wxGenericValidator autoCompletionValidator(&options.EnableAutoCompletion);
-	EnableAutoCompletion->SetValidator(autoCompletionValidator);
-	wxGenericValidator dynamicAutoCompletionValidator(&options.EnableDynamicAutoCompletion);
-	EnableDynamicAutoCompletion->SetValidator(dynamicAutoCompletionValidator);
-	wxGenericValidator wordWrapValidator(&options.EnableWordWrap);
-	EnableWordWrap->SetValidator(wordWrapValidator);
-	wxGenericValidator trimTrailingSpaceValidator(&options.TrimTrailingSpaceBeforeSave);
-	TrimTrailingSpaceBeforeSave->SetValidator(trimTrailingSpaceValidator);
-	wxGenericValidator removeTrailingBlankLinesValidator(&options.RemoveTrailingBlankLinesBeforeSave);
-	RemoveTrailingBlankLines->SetValidator(removeTrailingBlankLinesValidator);
-	wxGenericValidator callTipOnMouseHoverValidator(&options.EnableCallTipsOnMouseHover);
-	EnableCallTipOnMouseHover->SetValidator(callTipOnMouseHoverValidator);
-	wxGenericValidator multipleSelectionValidator(&options.EnableMultipleSelection);
-	EnableMultipleSelection->SetValidator(multipleSelectionValidator);
-	wxGenericValidator virtualSpaceValidator(&options.EnableVirtualSpace);
-	EnableVirtualSpace->SetValidator(virtualSpaceValidator);
-	wxGenericValidator rectangularSelectionValidator(&options.EnableRectangularSelection);
-	EnableRectangularSelection->SetValidator(rectangularSelectionValidator);
-	wxGenericValidator whitespaceValidator(&options.ShowWhitespace);
-	ShowWhitespace->SetValidator(whitespaceValidator);
-	wxGenericValidator zoomValidator(&options.Zoom);
-	Zoom->SetValidator(zoomValidator);
-}
-
-void t4p::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {
-	TabWidth->Enable(event.IsChecked());
-	SpacesPerIndent->Enable(!event.IsChecked());
-}
-
-bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
-	if (wxWindow::TransferDataToWindow()) {
-		
-		// CodeControlOptionsClass disables right margin when RightMargin = 0
-		EnableRightMargin->SetValue(RightMargin->GetValue() > 0);
-		RightMargin->Enable(RightMargin->GetValue() > 0);
-		return true;
-	}
-	return false;
-}
-
-bool t4p::EditorBehaviorPanelClass::TransferDataFromWindow() {
-	
-	// CodeControlOptionsClass disables right margin when RightMargin = 0
-	if (!EnableRightMargin->IsChecked()) {
-		RightMargin->SetValue(0);
-	}	
-	return wxWindow::TransferDataFromWindow();
-}
-
-void t4p::EditorBehaviorPanelClass::OnCheckRightMargin(wxCommandEvent& event) {
-	RightMargin->Enable(event.IsChecked());
-}
-
-t4p::EditorCommandPanelClass::EditorCommandPanelClass(wxWindow* parent, int id,
-													  std::vector<t4p::EditorKeyboardCommandClass>& commands,
-													  wxKeyBinder* keyBinder)
-: EditorCommandPanelGeneratedClass(parent, id)
-, Commands(commands)
-, EditedCommands(commands) 
-, KeyBinder(keyBinder) {
-	List->ClearAll();
-	List->InsertColumn(0, _("Command"));
-	List->InsertColumn(1, _("Shortcut"));
-	List->SetColumnWidth(0, 250);
-	List->SetColumnWidth(1, 250);
-	FillCommands();
-}
-
-bool t4p::EditorCommandPanelClass::TransferDataFromWindow() {
-	Commands = EditedCommands;
-	return true;
-}
-
-void t4p::EditorCommandPanelClass::FillCommands() {
-	for (size_t i = 0; i < EditedCommands.size(); ++i) {
-		wxListItem itemName;
-		itemName.SetColumn(0);
-		itemName.SetId(i);
-		itemName.SetText(EditedCommands[i].Name);
-		List->InsertItem(itemName);
-
-		wxListItem itemShortcut;
-		itemShortcut.SetId(i);
-		itemShortcut.SetColumn(1);
-		itemShortcut.SetText(KeyboardCommandToString(EditedCommands[i]));
-		List->SetItem(itemShortcut);
-	}
-	List->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
-	List->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	List->SetColumnWidth(1, wxLIST_AUTOSIZE);
-}
-
-void t4p::EditorCommandPanelClass::OnItemActivated(wxListEvent& event) {
-	int row = event.GetIndex();
-	
-	wxString name = List->GetItemText(row, 0);
-	wxString shortcut = List->GetItemText(row, 1);
-
-	t4p::KeyboardCommandEditDialogClass dialog(this, name, shortcut, EditedCommands, KeyBinder);
-	if (dialog.ShowModal() == wxOK) {
-		KeyboardCommandFromString(EditedCommands[row], shortcut);
-		List->SetItem(row, 1, shortcut);
-	}
-}
-
-t4p::KeyboardCommandEditDialogClass::KeyboardCommandEditDialogClass(wxWindow* parent, const wxString& commandName,
-																	wxString& shortcut,
-																	std::vector<t4p::EditorKeyboardCommandClass>& commands,
-																	wxKeyBinder* keyBinder)
-: KeyboardCommandEditDialogGeneratedClass(parent, wxID_ANY) 
-, Commands(commands) 
-, KeyBinder(keyBinder) 
-, OriginalShortcut(shortcut) {
-	Help->SetLabel(Help->GetLabel() + wxT(" ") + commandName);
-
-	wxTextValidator val(wxFILTER_NONE, &shortcut);
-	Edit->SetValidator(val);
-	TransferDataToWindow();
-}
-
-void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
-	wxString newShortcut = Edit->GetValue();
-	if (newShortcut == OriginalShortcut || newShortcut.empty()) {
-
-		// allow the user to "save" the same shortcut
-		// also, allow the user to remove shortcuts (empty 
-		// string == no shortcut)
-		TransferDataFromWindow();
-		EndModal(wxOK);
-		return;
-	}
-	wxString existingCmd;
-
-	// for a shortcut to be valid, it must not already be assigned to
-	// either the scintilla commands NOR the menu shortcuts
-	bool alreadyExists = false;
-	for (size_t i = 0; i < Commands.size(); ++i) {
-		if (KeyboardCommandToString(Commands[i]) == newShortcut) {
-			alreadyExists = true;
-			existingCmd = Commands[i].Name;
-			break;
+int t4p::EditorBehaviorFeatureClass::SciCommandToMenuId(int cmdId) {
+	for (int i = 0; SciCommands[i][0] > 0; ++i) {
+		if (SciCommands[i][1] == cmdId) {
+			return SciCommands[i][0];
 		}
 	}
-	if (!alreadyExists && !newShortcut.empty()) {
-		wxCmd* cmd = KeyBinder->GetCmdBindTo(newShortcut);
-		if (cmd) {
-			alreadyExists = true;
-			existingCmd = cmd->GetName();
+	return 0;
+}
+
+int t4p::EditorBehaviorFeatureClass::MenuIdToSciCommand(int menuId) {
+	for (int i = 0; SciCommands[i][0] > 0; ++i) {
+		if (SciCommands[i][0] == menuId) {
+			return SciCommands[i][1];
 		}
 	}
-	if (alreadyExists) {
-		wxMessageBox(
-			wxString::Format(_("shortcut %s is already defined to %s"), newShortcut.c_str(), existingCmd), 
-			_("Edit Keyboard Command"), 
-			wxCENTRE, this
-		);
-		return;
-	}
-	TransferDataFromWindow();
-	EndModal(wxOK);
-}
-
-void t4p::KeyboardCommandEditDialogClass::OnEnter(wxCommandEvent& event) {
-	OnOkButton(event);
-}
-
-void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
-	int keyCode = event.GetKeyCode();
-	bool hasModifiers = event.HasAnyModifiers();
-	if (hasModifiers && keyCode > 0) {	
-		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
-		Edit->SetInsertionPointEnd();
-	}
-	else if (keyCode > WXK_START && keyCode <=  WXK_SPECIAL20) {
-		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
-		Edit->SetInsertionPointEnd();
-	}
-	else if (hasModifiers && (
-		WXK_BACK == keyCode ||
-		WXK_TAB == keyCode ||	
-		WXK_RETURN == keyCode ||
-		WXK_ESCAPE == keyCode || 	
-		WXK_SPACE == keyCode ||	
-		WXK_DELETE  == keyCode)) {
-		
-		// shortcuts with special chars ie CTRL+TAB
-		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
-		Edit->SetInsertionPointEnd();
-	}
-	else {
-		Edit->Clear();
-		event.Skip();
-	}
+	return 0;
 }
 
 BEGIN_EVENT_TABLE(t4p::EditorBehaviorFeatureClass, t4p::FeatureClass)
-	EVT_APP_FILE_OPEN(t4p::EditorBehaviorFeatureClass::OnAppFileOpened)
-	EVT_APP_FILE_NEW(t4p::EditorBehaviorFeatureClass::OnAppFileNew)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EditorBehaviorFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::EditorBehaviorFeatureClass::OnPreferencesSaved)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 1, t4p::EditorBehaviorFeatureClass::OnToggleWordWrap)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 2, t4p::EditorBehaviorFeatureClass::OnToggleIndentationGuides)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 3, t4p::EditorBehaviorFeatureClass::OnToggleWhitespace)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 4, t4p::EditorBehaviorFeatureClass::OnZoomIn)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 5, t4p::EditorBehaviorFeatureClass::OnZoomOut)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 6, t4p::EditorBehaviorFeatureClass::OnZoomReset)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 7, t4p::EditorBehaviorFeatureClass::OnEditConvertEols)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 8, t4p::EditorBehaviorFeatureClass::OnEditConvertEols)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 9, t4p::EditorBehaviorFeatureClass::OnEditConvertEols)
-	
-	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 10, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorFeatureClass::OnEditorCommand)
-
 END_EVENT_TABLE()
 
 

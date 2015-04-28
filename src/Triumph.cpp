@@ -64,6 +64,7 @@
 #include <features/views/DocCommentViewClass.h>
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
+#include <features/views/EditorBehaviorViewClass.h>
 #include <features/ChangelogFeatureClass.h>
 #include <features/views/ChangelogViewClass.h>
 #include <features/BookmarkFeatureClass.h>
@@ -275,6 +276,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(docComment);
 	FeatureViews.push_back(docCommentView);
 	
+	t4p::EditorBehaviorFeatureClass* editorBehavior = new EditorBehaviorFeatureClass(*this);
+	t4p::EditorBehaviorViewClass* editorBehaviorView = new EditorBehaviorViewClass(*editorBehavior);
+	Features.push_back(editorBehavior);
+	FeatureViews.push_back(editorBehaviorView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -317,8 +323,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new SyntaxHighlightFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new EditorBehaviorFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FileCabinetFeatureClass(*this);
 	Features.push_back(feature);
