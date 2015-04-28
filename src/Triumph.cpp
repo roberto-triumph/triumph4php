@@ -61,6 +61,7 @@
 #include <features/VersionUpdateFeatureClass.h>
 #include <features/TotalSearchFeatureClass.h>
 #include <features/DocCommentFeatureClass.h>
+#include <features/views/DocCommentViewClass.h>
 #include <features/SyntaxHighlightFeatureClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
 #include <features/ChangelogFeatureClass.h>
@@ -249,8 +250,32 @@ bool t4p::AppClass::CommandLine() {
 }
 
 void t4p::AppClass::CreateFeatures() {
-	FeatureClass* feature;
+	t4p::ChangelogFeatureClass* changelog = new ChangelogFeatureClass(*this);
+	t4p::ChangelogViewClass* changelogView = new ChangelogViewClass();
+	Features.push_back(changelog);
+	FeatureViews.push_back(changelogView);
 	
+	t4p::BookmarkFeatureClass* bookmark = new BookmarkFeatureClass(*this);
+	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass();
+	Features.push_back(bookmark);
+	FeatureViews.push_back(bookmarkView);
+	
+	t4p::DebuggerFeatureClass* debugger = new DebuggerFeatureClass(*this);
+	t4p::DebuggerViewClass* debuggerView = new DebuggerViewClass(*debugger);
+	Features.push_back(debugger);
+	FeatureViews.push_back(debuggerView);
+	
+	t4p::DetectorFeatureClass* detector = new DetectorFeatureClass(*this);
+	t4p::DetectorViewClass* detectorView = new DetectorViewClass(*detector);
+	Features.push_back(detector);
+	FeatureViews.push_back(detectorView);
+	
+	t4p::DocCommentFeatureClass* docComment = new DocCommentFeatureClass(*this);
+	t4p::DocCommentViewClass* docCommentView = new DocCommentViewClass(*docComment);
+	Features.push_back(docComment);
+	FeatureViews.push_back(docCommentView);
+	
+	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FinderFeatureClass(*this);
@@ -275,12 +300,6 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);
 	Features.push_back(feature);
-	
-	t4p::DetectorFeatureClass* detector = new DetectorFeatureClass(*this);
-	t4p::DetectorViewClass* detectorView = new DetectorViewClass(*detector);
-	Features.push_back(detector);
-	FeatureViews.push_back(detectorView);
-	
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new ConfigFilesFeatureClass(*this);
@@ -297,28 +316,10 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new DocCommentFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new SyntaxHighlightFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new EditorBehaviorFeatureClass(*this);
 	Features.push_back(feature);
-	
-	t4p::ChangelogFeatureClass* changelog = new ChangelogFeatureClass(*this);
-	t4p::ChangelogViewClass* changelogView = new ChangelogViewClass();
-	Features.push_back(changelog);
-	FeatureViews.push_back(changelogView);
-	
-	t4p::BookmarkFeatureClass* bookmark = new BookmarkFeatureClass(*this);
-	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass();
-	Features.push_back(bookmark);
-	FeatureViews.push_back(bookmarkView);
-	
-	t4p::DebuggerFeatureClass* debugger = new DebuggerFeatureClass(*this);
-	t4p::DebuggerViewClass* debuggerView = new DebuggerViewClass(*debugger);
-	Features.push_back(debugger);
-	FeatureViews.push_back(debuggerView);
-	
 	feature = new FileCabinetFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new PhpCodeCompletionFeatureClass(*this);

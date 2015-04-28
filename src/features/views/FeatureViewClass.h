@@ -25,12 +25,18 @@
 #ifndef T4P_FEATUREVIEWCLASS_H__
 #define T4P_FEATUREVIEWCLASS_H__
 
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <widgets/NotebookClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <wx/event.h>
+#include <wx/aui/aui.h>
+#include <map>
+#include <vector>
 
 namespace t4p {
+
+// forward declaration, defined in another file
+class StatusBarWithGaugeClass;
+class NotebookClass;
+class CodeControlClass;
 
 /**
  * A feature view encapsulates the GUI of the application; it 
@@ -300,6 +306,13 @@ protected:
 	 * @return CodeControlClass* the code control that has focus; can be NULL
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	 * The status bar that the feature can use to display a gauge to the user. Do NOT delete the pointer.
+	 * 
+	 * @return StatusBarWithGaugeClass*
+	 */	
+	StatusBarWithGaugeClass* GetStatusBarWithGauge() const;
 	
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI

@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/views/FeatureViewClass.h>
+#include <widgets/NotebookClass.h>
 
 t4p::FeatureViewClass::FeatureViewClass() 
 : wxEvtHandler() {}void t4p::FeatureViewClass::InitWindow(		StatusBarWithGaugeClass* statusBarWithGauge, 		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 		wxMenuBar* menuBar) {	AuiManager = auiManager;	StatusBarWithGauge = statusBarWithGauge;	Notebook = notebook;	ToolsNotebook = toolsNotebook;	OutlineNotebook = outlineNotebook;	MenuBar = menuBar;
@@ -145,4 +146,9 @@ t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
 wxWindow* t4p::FeatureViewClass::GetMainWindow() const {
 	return ToolsNotebook->GetParent();
 }
+
+t4p::StatusBarWithGaugeClass* t4p::FeatureViewClass::GetStatusBarWithGauge() const {
+	return StatusBarWithGauge;
+}
+
 

@@ -24,8 +24,6 @@
  */
 #include <globals/GlobalsClass.h>
 #include <features/EditorMessagesFeatureClass.h>
-#include <features/FeatureClass.h>
-#include <features/views/FeatureViewClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
@@ -41,6 +39,8 @@ namespace t4p {
 
 // forward declaration
 class MainFrameClass;
+class FeatureClass;
+class FeatureViewClass;
 
 // defined below
 class AppClass;
