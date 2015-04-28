@@ -49,6 +49,7 @@
 #include <features/LintFeatureClass.h>
 #include <features/SqlBrowserFeatureClass.h>
 #include <features/EditorMessagesFeatureClass.h>
+#include <features/views/EditorMessagesViewClass.h>
 #include <features/RecentFilesFeatureClass.h>
 #include <features/DetectorFeatureClass.h>
 #include <features/views/DetectorViewClass.h>
@@ -281,6 +282,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(editorBehavior);
 	FeatureViews.push_back(editorBehaviorView);
 	
+	EditorMessagesFeature = new t4p::EditorMessagesFeatureClass(*this);
+	t4p::EditorMessagesViewClass* editorMessagesView = new t4p::EditorMessagesViewClass();
+	Features.push_back(EditorMessagesFeature);
+	FeatureViews.push_back(editorMessagesView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -300,8 +306,6 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
-	EditorMessagesFeature = new t4p::EditorMessagesFeatureClass(*this);
-	Features.push_back(EditorMessagesFeature);
 	feature = new RunBrowserFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);

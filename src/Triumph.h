@@ -23,7 +23,6 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/GlobalsClass.h>
-#include <features/EditorMessagesFeatureClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
@@ -41,6 +40,7 @@ namespace t4p {
 class MainFrameClass;
 class FeatureClass;
 class FeatureViewClass;
+class EditorMessagesFeatureClass;
 
 // defined below
 class AppClass;
