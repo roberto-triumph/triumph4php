@@ -39,6 +39,7 @@
 
 #include <main_frame/MainFrameClass.h>
 #include <features/EnvironmentFeatureClass.h>
+#include <features/views/EnvironmentViewClass.h>
 #include <features/FindInFilesFeatureClass.h>
 #include <features/FinderFeatureClass.h>
 #include <features/ProjectFeatureClass.h>
@@ -286,6 +287,11 @@ void t4p::AppClass::CreateFeatures() {
 	t4p::EditorMessagesViewClass* editorMessagesView = new t4p::EditorMessagesViewClass();
 	Features.push_back(EditorMessagesFeature);
 	FeatureViews.push_back(editorMessagesView);
+	
+	EnvironmentFeatureClass* environmentFeature = new t4p::EnvironmentFeatureClass(*this);
+	EnvironmentViewClass* environmentView = new t4p::EnvironmentViewClass(*environmentFeature);
+	Features.push_back(environmentFeature);
+	FeatureViews.push_back(environmentView);
 	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
