@@ -51,6 +51,7 @@
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/RecentFilesFeatureClass.h>
 #include <features/DetectorFeatureClass.h>
+#include <features/views/DetectorViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
@@ -274,8 +275,12 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new RecentFilesFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new DetectorFeatureClass(*this);
-	Features.push_back(feature);
+	
+	t4p::DetectorFeatureClass* detector = new DetectorFeatureClass(*this);
+	t4p::DetectorViewClass* detectorView = new DetectorViewClass(*detector);
+	Features.push_back(detector);
+	FeatureViews.push_back(detectorView);
+	
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new ConfigFilesFeatureClass(*this);
