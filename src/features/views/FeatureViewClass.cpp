@@ -27,3 +27,122 @@
 t4p::FeatureViewClass::FeatureViewClass() 
 : wxEvtHandler() {}void t4p::FeatureViewClass::InitWindow(		StatusBarWithGaugeClass* statusBarWithGauge, 		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 		wxMenuBar* menuBar) {	AuiManager = auiManager;	StatusBarWithGauge = statusBarWithGauge;	Notebook = notebook;	ToolsNotebook = toolsNotebook;	OutlineNotebook = outlineNotebook;	MenuBar = menuBar;
 }void t4p::FeatureViewClass::AddViewMenuItems(wxMenu* viewMenu) {}void t4p::FeatureViewClass::AddSearchMenuItems(wxMenu* searchMenu) {}void t4p::FeatureViewClass::AddFileMenuItems(wxMenu* fileMenu) {}void t4p::FeatureViewClass::AddEditMenuItems(wxMenu* editMenu) {}void t4p::FeatureViewClass::AddHelpMenuItems(wxMenu* editMenu) {}void t4p::FeatureViewClass::AddNewMenu(wxMenuBar* menuBar) {}void t4p::FeatureViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {}void t4p::FeatureViewClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {}void t4p::FeatureViewClass::AddWindows() {}void t4p::FeatureViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {}void t4p::FeatureViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {}void t4p::FeatureViewClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<t4p::DynamicCmdClass>& shortcuts) {	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {		wxMenuItem* item = MenuBar->FindItem(it->first);		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);		t4p::DynamicCmdClass cmd(item, it->second);		shortcuts.push_back(cmd);	}}
+
+wxWindow* t4p::FeatureViewClass::FindToolsWindow(int windowId) const {
+	return wxWindow::FindWindowById(windowId, GetToolsNotebook());
+}
+
+wxWindow* t4p::FeatureViewClass::FindOutlineWindow(int windowId) const {
+	return wxWindow::FindWindowById(windowId, GetOutlineNotebook());
+}
+
+bool t4p::FeatureViewClass::IsToolsWindowSelected(int windowId) const {
+	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
+	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the window
+		// is hidden because its parent is hidden
+		return false;
+	}
+	int windowIndex = ToolsNotebook->GetPageIndex(window); 
+	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
+}
+
+bool t4p::FeatureViewClass::IsToolsWindowSelectedByName(const wxString& name) const {
+	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the outline window
+		// is hidden because its parent is hidden
+		return false;
+	}
+	size_t selection = ToolsNotebook->GetSelection();
+	if (selection < ToolsNotebook->GetPageCount()) {
+		return ToolsNotebook->GetPage(selection)->GetName() == name;
+	}
+	return false;
+}
+
+bool t4p::FeatureViewClass::IsOutlineWindowSelected(int windowId) const {
+	
+	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
+	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
+	if (!info.IsShown()) {
+		
+		// if the notebook itself is not shown, it means that the window
+		// is hidden because its parent is hidden
+		return false;
+	}
+	int windowIndex = OutlineNotebook->GetPageIndex(window); 
+	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
+}
+
+t4p::NotebookClass* t4p::FeatureViewClass::GetNotebook() const {
+	return Notebook;
+}
+
+wxAuiNotebook* t4p::FeatureViewClass::GetToolsNotebook() const {
+	return ToolsNotebook;
+}
+
+wxAuiNotebook* t4p::FeatureViewClass::GetOutlineNotebook() const {
+	return OutlineNotebook;
+}
+
+void t4p::FeatureViewClass::SetFocusToToolsWindow(wxWindow* window) {
+	int index = ToolsNotebook->GetPageIndex(window);
+	if (index != wxNOT_FOUND) {
+		ToolsNotebook->SetSelection(index);
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(ToolsNotebook).Show();
+			AuiManager->Update();
+		}
+	}
+}
+
+void t4p::FeatureViewClass::SetFocusToOutlineWindow(wxWindow* window) {
+	int index = OutlineNotebook->GetPageIndex(window);
+	if (index != wxNOT_FOUND) {
+		OutlineNotebook->SetSelection(index);
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(OutlineNotebook).Show();
+			AuiManager->Update();
+		}
+	}
+}
+
+bool t4p::FeatureViewClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName, const wxBitmap& bitmap) {
+	if (!windowName.IsEmpty()) {
+		window->SetName(windowName);
+	}
+	if (ToolsNotebook->AddPage(window, tabName, true, bitmap)) {
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(ToolsNotebook).Show();
+			AuiManager->Update();
+		}
+		return true;
+	}
+	return false;
+}
+
+bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap) {
+	if (OutlineNotebook->AddPage(window, name, true, bitmap)) {
+		if (NULL != AuiManager) {
+			AuiManager->GetPane(OutlineNotebook).Show();
+			AuiManager->Update();
+		}
+		return true;
+	}
+	wxASSERT_MSG(false, wxT("could not add window to outline notebook"));
+	return false;
+}
+
+t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
+	return Notebook->GetCurrentCodeControl();
+}
+
+wxWindow* t4p::FeatureViewClass::GetMainWindow() const {
+	return ToolsNotebook->GetParent();
+}
+

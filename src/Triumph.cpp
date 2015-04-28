@@ -67,6 +67,7 @@
 #include <features/BookmarkFeatureClass.h>
 #include <features/views/BookmarkViewClass.h>
 #include <features/DebuggerFeatureClass.h>
+#include <features/views/DebuggerViewClass.h>
 #include <features/FileCabinetFeatureClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
 #include <features/HtmlFeatureClass.h>
@@ -308,8 +309,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(bookmark);
 	FeatureViews.push_back(bookmarkView);
 	
-	feature = new DebuggerFeatureClass(*this);
-	Features.push_back(feature);
+	t4p::DebuggerFeatureClass* debugger = new DebuggerFeatureClass(*this);
+	t4p::DebuggerViewClass* debuggerView = new DebuggerViewClass(*debugger);
+	Features.push_back(debugger);
+	FeatureViews.push_back(debuggerView);
+	
 	feature = new FileCabinetFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new PhpCodeCompletionFeatureClass(*this);
@@ -333,6 +337,8 @@ void t4p::AppClass::CreateFeatures() {
 	
 	for (size_t i = 0; i < FeatureViews.size(); ++i) {
 		EventSink.PushHandler(FeatureViews[i]);
+		RunningThreads.AddEventHandler(FeatureViews[i]);
+		SqliteRunningThreads.AddEventHandler(FeatureViews[i]);
 	}
 }
 

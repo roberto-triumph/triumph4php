@@ -195,6 +195,111 @@ protected:
 	 */
 	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
 	
+	/**
+	 * Finds the tools window with the given window ID and returns it.
+	 * 
+	 * @param int windowId the window ID to look for
+	 * @return wxWindow* the window, could be NULL if window was not found
+	 */
+	wxWindow* FindToolsWindow(int windowId) const;
+	
+		/**
+	 * Finds the outline window with the given window ID and returns it.
+	 * 
+	 * @param int windowId the window ID to look for
+	 * @return wxWindow* the window, could be NULL if window was not found
+	 */
+	wxWindow* FindOutlineWindow(int windowId) const;
+	
+	/**
+	 * Check to see if the given window is the tools window that's currently active
+	 * @param int windowId
+	 * @return bool true if the window with the given windowId is the selected (active) tools window.
+	 */
+	bool IsToolsWindowSelected(int windowId) const;
+
+	/**
+	 * Check to see if the given window is the tools window that's currently active
+	 * This method is useful when a feature creates multiple tools windows
+	 *
+	 * @param wxString name the window name to check (wxWindow::GetName())
+	 * @return bool true if the selected (active) tools window's name is equal to the given name.
+	 */
+	bool IsToolsWindowSelectedByName(const wxString& name) const;
+
+	/**
+	 * Check to see if the given window is the outline window that's currently active
+	 * @param int windowId
+	 * @return bool true if the window with the given windowId is the selected (active) outline window.
+	 */
+	bool IsOutlineWindowSelected(int windowId) const;
+	
+	/**
+	 * Returns the top-level window.
+	 * 
+	 * @return wxWindow* the main window
+	 */
+	wxWindow* GetMainWindow() const;
+	
+		/**
+	 * Do NOT delete the pointer
+	 * @return wxAuiNotebook* the parent of all tool windows. guaranteed to be not null.
+	 */
+	wxAuiNotebook* GetToolsNotebook() const;
+	
+	/**
+	 * Do NOT delete the pointer
+	 * @return wxAuiNotebook* the parent of all outline windows. guaranteed to be not null.
+	 */
+	wxAuiNotebook* GetOutlineNotebook() const;
+
+	/**
+	 * The source code control notebook. Guaranteed to be not null.
+	 * 
+	 * @return NotebookClass*
+	 */
+	NotebookClass* GetNotebook() const;
+
+	/**
+	 * Set the given page to be the selected page for the tools notebook
+	 * @param wxWindow the window that the tools notebook will be visible
+	 */
+	void SetFocusToToolsWindow(wxWindow* window);
+
+	/**
+	 * Set the given page to be the selected page for the outline notebook
+	 * @param wxWindow the window that the tools notebook will be visible
+	 */
+	void SetFocusToOutlineWindow(wxWindow* window);
+	
+	/**
+	 * Add a window to the tool notebook. Once added, this class will take care of memory management for the window pointer.
+	 * 
+	 * @param wxWindow* window the window to add
+	 * @param wxString tabName the name that will show up in the window's tab
+	 * @param wxString windowName the name that will be given to the window (wxWindow::SetName)
+	 * @param bitmap the image that gets place in the notebook tab for this window
+	 * @return bool true if window was added.
+	 */
+	bool AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap);
+
+	/**
+	 * Add a window to the outline notebook. Once added, this class will take care of memory management for the window pointer.
+	 * 
+	 * @param wxWindow* window the window to add
+	 * @param wxString name the name that will show up in the window's tab
+	 * @param bitmap the image that gets place in the notebook tab for this window
+	 * @return bool true if window was added.
+	 */
+	bool AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap = wxNullBitmap);
+	
+	/**
+	 * Get the currently selected code control. This may be NULL if the editor's content pane is
+	 * focused on something other than a code control.
+	 * 
+	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 */
+	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
 	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI

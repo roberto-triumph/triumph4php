@@ -26,6 +26,7 @@
 #define T4P_ConfigFilesFeatureViewClass_H__
 
 #include <features/views/FeatureViewClass.h>
+#include <actions/ActionClass.h>
 
 namespace t4p {
 
@@ -33,7 +34,8 @@ namespace t4p {
 class ConfigFilesFeatureClass;
 
 /**
- *
+ * The ConfigFiles view will populate the menu of items
+ * based on the config files that were parsed.  
  */
 class ConfigFilesViewClass : public t4p::FeatureViewClass {
 
@@ -46,11 +48,34 @@ public:
 	private:
 	
 	/**
+	 * rebuilds the config files menu based on the current config
+	 * tags.
+	 */
+	void RebuildMenu();
+	
+	/**
 	 * when the detector cache has been loaded rebuild the menu
 	 */
 	void OnDetectorDbInitComplete(t4p::ActionEventClass& event);
 	
+	/**
+	 * when the config detectors have finished running, load all of the
+	 * projects' config files and build the menu.
+	 */
+	void OnConfigFilesDetected(t4p::ActionEventClass& event);
+	
+	/**
+	 * The feature gives this view the list of config tags
+	 * in all current projects.
+	 */
 	t4p::ConfigFilesFeatureClass& Feature;
+	
+	/**
+	 * Store the menu that we use to put the config file
+	 * menu items in. Since its a wxWindow pointer, it is 
+	 * owned by the menu bar.
+	 */
+	wxMenu* ConfigMenu;
 
 	DECLARE_EVENT_TABLE()
 };
