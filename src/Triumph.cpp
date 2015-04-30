@@ -57,7 +57,9 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
+#include <features/views/FileModifiedCheckViewClass.h>
 #include <features/FileWatcherFeatureClass.h>
+#include <features/views/FileWatcherViewClass.h>
 #include <features/ExplorerFeatureClass.h>
 #include <features/views/ExplorerViewClass.h>
 #include <features/NewUserFeatureClass.h>
@@ -299,6 +301,16 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(explorer);
 	FeatureViews.push_back(explorerView);
 	
+	FileModifiedCheckFeatureClass* modifiedCheck = new FileModifiedCheckFeatureClass(*this);
+	Features.push_back(modifiedCheck);
+	FileModifiedCheckViewClass* modifiedView = new FileModifiedCheckViewClass(*modifiedCheck);
+	FeatureViews.push_back(modifiedView);
+	
+	FileWatcherFeatureClass* fileWatcher = new FileWatcherFeatureClass(*this);
+	FileWatcherViewClass* fileWatcherView = new FileWatcherViewClass(*fileWatcher);
+	Features.push_back(fileWatcher);
+	FeatureViews.push_back(fileWatcherView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -325,10 +337,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new ConfigFilesFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new FileModifiedCheckFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new FileWatcherFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new NewUserFeatureClass(*this);
 	Features.push_back(feature);

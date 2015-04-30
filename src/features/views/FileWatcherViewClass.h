@@ -19,25 +19,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/FileModifiedCheckFeatureClass.h>
-#include <actions/FileModifiedCheckActionClass.h>
-#include <Triumph.h>
+#ifndef T4P_FILEWATCHERVIEWCLASS_H__
+#define T4P_FILEWATCHERVIEWCLASS_H__
 
-const int t4p::ID_FILE_MODIFIED_ACTION = wxNewId();
+#include <features/views/FeatureViewClass.h>
+#include <features/wxformbuilder/FileWatcherFeatureForms.h>
+#include <features/FileWatcherFeatureClass.h>
 
-t4p::FileModifiedCheckFeatureClass::FileModifiedCheckFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) {
+namespace t4p {
+
+class FileWatcherViewClass : public t4p::FeatureViewClass {
+
+public:
+
+	FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
+	
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
+	
+private:
+	
+	t4p::FileWatcherFeatureClass& Feature;
+	
+	// to track opened files, since the watcher needs to 
+	// see which files are currently opened
+	void OnFileClosed(t4p::CodeControlEventClass& event);
+	void OnFileOpened(t4p::CodeControlEventClass& event);
+	
+	DECLARE_EVENT_TABLE()
+};
+
+class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
+	
+public:
+	
+	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
+
+private:
+
+	t4p::FileWatcherFeatureClass& Feature;
+};
+
 }
 
-
-void t4p::FileModifiedCheckFeatureClass::StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll) {
-	if (!filesToPoll.empty()) {
-		t4p::FileModifiedCheckActionClass* action = new t4p::FileModifiedCheckActionClass(App.RunningThreads,
-			t4p::ID_FILE_MODIFIED_ACTION);
-		action->SetFiles(filesToPoll);
-		App.RunningThreads.Queue(action);
-	}
-}
+#endif
+
