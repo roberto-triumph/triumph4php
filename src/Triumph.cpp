@@ -59,6 +59,7 @@
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <features/FileWatcherFeatureClass.h>
 #include <features/ExplorerFeatureClass.h>
+#include <features/views/ExplorerViewClass.h>
 #include <features/NewUserFeatureClass.h>
 #include <features/VersionUpdateFeatureClass.h>
 #include <features/TotalSearchFeatureClass.h>
@@ -293,6 +294,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(environmentFeature);
 	FeatureViews.push_back(environmentView);
 	
+	ExplorerFeatureClass* explorer = new ExplorerFeatureClass(*this);
+	ExplorerViewClass* explorerView = new ExplorerViewClass(*explorer);
+	Features.push_back(explorer);
+	FeatureViews.push_back(explorerView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -323,8 +329,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new FileModifiedCheckFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new FileWatcherFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new ExplorerFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new NewUserFeatureClass(*this);
 	Features.push_back(feature);
