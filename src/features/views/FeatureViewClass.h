@@ -308,6 +308,14 @@ protected:
 	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
+	 * Returns the text that's currently selected in the currently active code control.
+	 * 
+	 * @retun wxString the selected text.  If no text is selected, or there is not opened code control, 
+	 *        an empty string is returned
+	 */
+	wxString GetSelectedText() const;
+	
+	/**
 	 * The status bar that the feature can use to display a gauge to the user. Do NOT delete the pointer.
 	 * 
 	 * @return StatusBarWithGaugeClass*

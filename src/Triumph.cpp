@@ -41,7 +41,9 @@
 #include <features/EnvironmentFeatureClass.h>
 #include <features/views/EnvironmentViewClass.h>
 #include <features/FindInFilesFeatureClass.h>
+#include <features/views/FindInFilesViewClass.h>
 #include <features/FinderFeatureClass.h>
+#include <features/views/FinderViewClass.h>
 #include <features/ProjectFeatureClass.h>
 #include <features/OutlineViewFeatureClass.h>
 #include <features/TagFeatureClass.h>
@@ -77,6 +79,7 @@
 #include <features/DebuggerFeatureClass.h>
 #include <features/views/DebuggerViewClass.h>
 #include <features/FileCabinetFeatureClass.h>
+#include <features/views/FileCabinetViewClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
 #include <features/HtmlFeatureClass.h>
 #include <features/JavascriptFeatureClass.h>
@@ -311,12 +314,23 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(fileWatcher);
 	FeatureViews.push_back(fileWatcherView);
 	
+	FinderFeatureClass* finder = new FinderFeatureClass(*this);
+	FinderViewClass* finderView = new FinderViewClass(*finder);
+	Features.push_back(finder);
+	FeatureViews.push_back(finderView);
+	
+	FindInFilesFeatureClass* findInFiles = new FindInFilesFeatureClass(*this);
+	Features.push_back(findInFiles);
+	FindInFilesViewClass* findInFilesView = new FindInFilesViewClass(*findInFiles);
+	FeatureViews.push_back(findInFilesView);
+	
+	FileCabinetFeatureClass* fileCabinet = new FileCabinetFeatureClass(*this);
+	Features.push_back(fileCabinet);
+	FileCabinetViewClass* fileCabinetView = new FileCabinetViewClass(*fileCabinet);
+	FeatureViews.push_back(fileCabinetView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new FinderFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new FindInFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);
@@ -345,8 +359,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new SyntaxHighlightFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new FileCabinetFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new PhpCodeCompletionFeatureClass(*this);
 	Features.push_back(feature);

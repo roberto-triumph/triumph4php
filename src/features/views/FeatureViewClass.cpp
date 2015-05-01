@@ -151,4 +151,11 @@ t4p::StatusBarWithGaugeClass* t4p::FeatureViewClass::GetStatusBarWithGauge() con
 	return StatusBarWithGauge;
 }
 
-
+wxString t4p::FeatureViewClass::GetSelectedText() const {
+	CodeControlClass* page = GetCurrentCodeControl();
+	wxString selectedText;
+	if (page) {
+		selectedText = page->GetSelectedText();
+	}
+	return selectedText;
+}

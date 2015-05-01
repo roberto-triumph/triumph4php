@@ -25,296 +25,11 @@
 #ifndef __T4P_FINDERFEATURECLASS_H_
 #define __T4P_FINDERFEATURECLASS_H_
 
-#include <features/wxformbuilder/FinderFeatureForms.h>
-#include <widgets/ComboBoxHistoryClass.h>
-#include <widgets/NotebookClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
 #include <search/FinderClass.h>
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
-/**
- * This dialog allows the user to input text and search a file
- * for desired text.
- */
-class FinderPanelClass : public FinderPanelGeneratedClass {
-	
-protected:
-	// Handlers for FindDialogGeneratedClass events.
-	void OnHelpButton(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
-	void OnPreviousButton(wxCommandEvent& event);
-	void OnNextButton(wxCommandEvent& event);
-	void OnCloseButton(wxCommandEvent& event);
-	void OnRegExFindHelpButton(wxCommandEvent& event);
-	void OnFindEnter(wxCommandEvent& event);
-	void OnFindKeyDown(wxKeyEvent& event);
-
-	/**
-	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
-	 * GetInsertionPoint() of combobox fails when it does not have focus.
-	 * The insertion is needed to have the cursor show up properly when
-	 * the user clicks on the regex help buttons
-	 */
-	void OnFindKillFocus(wxFocusEvent& event);
-		
-public:
-	
-	/**
-	 * Construct a new finder dialog
-	 * 
-	 * @param wxWindow* parent the parent window
-	 * @param int windowId the window ID
-	 * @param finder the finder instance to use for searching
-	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
-	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
-	 *        delete the pointer, it is up to the caller.
-	 
-	 */
-	FinderPanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
-
-	/**
-	 * The focus will  be set on the find text box.
-	 */
-	void SetFocusOnFindText();
-	
-	/**
-	 * Set the new expression.
-	 * 
-	 * @param const wxString& expression the expression to set
-	 */
-	void SetExpression(const wxString& expression);
-
-	/**
-	 * Searches for the next instance of this expression in the current active code control. Searching starts at the current
-	 * cursor position.
-	 */
-	void FindNext();
-	
-	/**
-	 * Searches for the previous instance of this expression in the current active code control. Searching starts at the current
-	 * cursor position.
-	 */
-	void FindPrevious();
-	
-private:
-
-	/**
-	 * Execute a find on the currently active notebook page
-	 */
-	void Find(bool findNext = true);
-	
-	/**
-	 * Place the given string in the results status label
-	 * 
-	 * @param wxString message to show to the user
-	 */
-	void SetStatus(const wxString& message);
-	
-	/**
-	 * When called show the user a picked a item in the menu of reg ex symbols
-	 * @param wxCommandEvent& event
-	 */
-	void InsertRegExSymbol(wxCommandEvent& event);
-
-	/**
-	 * When called show the user a picked a item in the menu of replace reg ex symbols
-	 * @param wxCommandEvent& event
-	 */
-	void InsertReplaceRegExSymbol(wxCommandEvent& event);
-	
-	/**
-	 * The Finder object to be displayed.
-	 * 
-	 * @var FinderClass
-	 */
-	FinderClass& Finder;
-	
-	/**
-	 * Holds previously entered searches
-	 */
-	ComboBoxHistoryClass ComboBoxHistory;
-	
-	/**
-	 * The source of text to search in
-	 * @var t4p::NotebookClass
-	 */
-	NotebookClass* Notebook;
-	
-	/**
-	 * The AUI Manager is needed in order to hide this panel based on keyboard shortcuts. This class will NOT
-	 * delete this pointer.
-	 * 
-	 * @var wxAuiManager* 
-	 */
-	wxAuiManager* AuiManager;
-	
-	/**
-	 * The message shown to the user (suitable to input into printf() function)
-	 * @var wxString
-	 */
-	wxString RESULT_MESSAGE;
-
-	int CurrentInsertionPointFind;
-	
-	DECLARE_EVENT_TABLE()
-
-};
-
-class ReplacePanelClass : public ReplacePanelGeneratedClass {
-	
-protected:
-	void OnHelpButton(wxCommandEvent& event);
-	void OnOkButton(wxCommandEvent& event);
-	void OnPreviousButton(wxCommandEvent& event);
-	void OnNextButton(wxCommandEvent& event);
-	void OnReplaceButton(wxCommandEvent& event);
-	void OnReplaceAllButton(wxCommandEvent& event);
-	void OnUndoButton(wxCommandEvent& event);
-	void OnCloseButton(wxCommandEvent& event);
-	void OnRegExFindHelpButton(wxCommandEvent& event);
-	void OnReplaceRegExFindHelpButton(wxCommandEvent& event);
-	void OnFindEnter(wxCommandEvent& event);
-	void OnReplaceEnter(wxCommandEvent& event);
-
-	/** 
-	 * since this panel handles EVT_TEXT_ENTER, we need to handle the
-	 * tab traversal ourselves otherwise tab travesal wont work
-	 */
-	void OnFindKeyDown(wxKeyEvent& event);
-	void OnReplaceKeyDown(wxKeyEvent& event);
-
-	/**
-	 * Need to save the insertion point of the Find and replace combo boxes; in Win32
-	 * GetInsertionPoint() of combobox fails when it does not have focus.
-	 * The insertion is needed to have the cursor show up properly when
-	 * the user clicks on the regex help buttons
-	 */
-	void OnFindKillFocus(wxFocusEvent& event);
-	void OnReplaceKillFocus(wxFocusEvent& event);
-	
-public:
-
-	/**
-	 * Construct a new finder dialog
-	 * 
-	 * @param wxWindow* parent the parent window
-	 * @param int windowId the window ID
-	 * @param finder the object that does the searching
-	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
-	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
-	 *        delete the pointer, it is up to the caller.
-	 */
-	ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
-
-	/**
-	 * Enables/disables replace buttons
-	 * @var bool enable if true, buttons will be enabled. else, buttons
-	 *     will be disabled.
-	 */
-	void EnableReplaceButtons(bool enable);
-
-	/**
-	 * The focus will  be set on the find text box.
-	 */
-	void SetFocusOnFindText();
-	
-	/**
-	 * Set the new expression.
-	 * 
-	 * @param const wxString& expression the expression to set
-	 */
-	void SetExpression(const wxString& expression);
-
-	/**
-	 * Searches for the next instance of this expression in the current active code control. Searching starts at the current
-	 * cursor position.
-	 */
-	void FindNext();
-	
-	/**
-	 * Searches for the previous instance of this expression in the current active code control. Searching starts at the current
-	 * cursor position.
-	 */
-	void FindPrevious();
-	
-private:
-
-	/**
-	 * Execute a find on the currently active notebook page
-	 */
-	void Find(bool findNext = true);
-	
-	/**
-	 * Place the given string in the results status label
-	 * 
-	 * @param wxString message to show to the user
-	 */
-	void SetStatus(const wxString& message);
-	
-	/**
-	 * Called whenever the user hits the ENTER key. Will perform a find when in Multiline mode.
-	 * @param wxCommandEvent& event
-	 */
-	void OnTextEnter(wxCommandEvent& event);
-	
-	/**
-	 * When called show the user a picked a item in the menu of reg ex symbols
-	 * @param wxCommandEvnt& event
-	 */
-	void InsertRegExSymbol(wxCommandEvent& event);
-	
-	/**
-	 * When called show the user a picked a item in the menu of replace reg ex symbols
-	 * @param wxCommandEvnt& event
-	 */
-	void InsertReplaceRegExSymbol(wxCommandEvent& event);
-
-	/**
-	 * The Finder object to be displayed.
-	 * 
-	 * @var FinderClass
-	 */
-	FinderClass &Finder;
-	
-	/**
-	 * Holds previously entered searches
-	 */
-	ComboBoxHistoryClass FindHistory;
-	
-	/**
-	 * Holds previously entered replacements
-	 */
-	ComboBoxHistoryClass ReplaceHistory;
-	
-	/**
-	 * The source of text to search in
-	 * @var t4p::NotebookClass
-	 */
-	NotebookClass* Notebook;
-	
-	/**
-	 * The AUI Manager is needed in order to hide this panel based on keyboard shortcuts. This class will NOT
-	 * delete this pointer.
-	 * 
-	 * @var wxAuiManager* 
-	 */
-	wxAuiManager* AuiManager;
-	
-	/**
-	 * The message shown to the user (suitable to input into printf() function)
-	 * @var wxString
-	 */
-	wxString RESULT_MESSAGE;
-
-	int CurrentInsertionPointFind;
-
-	int CurrentInsertionPointReplace;
-	
-	DECLARE_EVENT_TABLE()
-};
 
 /**
  * An action that will perform a find on an entire set of text
@@ -387,6 +102,7 @@ public:
 };
 
 extern const wxEventType EVENT_FINDER_ACTION;
+extern const int ID_FINDER_ACTION;
 
 typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventClass&);
 
@@ -401,76 +117,28 @@ class FinderFeatureClass : public FeatureClass {
 public:
 
 	/**
-	 * Constructor
- 	 */
-	FinderFeatureClass(t4p::AppClass& app);
-	
-	/**
-	 * Add menu items to the edit menu for this feature.
-	 * 
-	 * @param wxMenu* menu the tools menu to add items to.
-	 */
-	void AddEditMenuItems(wxMenu* editMenu);
-
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-	void LoadPreferences(wxConfigBase* config);
-
-private:
-
-	/**
 	 * will perform the searching
 	 */
 	t4p::FinderClass Finder;
 	t4p::FinderClass FinderReplace;
 
 	/**
-	 * show the find dialog 
-	 * 
-	 * @param wxCommandEvent& event the event
-	 */
-	void OnEditFind(wxCommandEvent& event);
+	 * Constructor
+ 	 */
+	FinderFeatureClass(t4p::AppClass& app);
+	
+	void LoadPreferences(wxConfigBase* config);
 	
 	/**
-	 * go to the next hit
+	 * start a search in the background thread to look for word
+	 * inside buf
 	 * 
-	 * @param wxCommandEvent& event
+	 * @param word
+	 * @param buf not owned by this class
+	 * @param documentLength length of buf
 	 */
-	void OnEditFindNext(wxCommandEvent& event);
-	
-	/**
-	 * go to the previous hit
-	 * 
-	 * @param wxCommandEvent& event
-	 */
-	void OnEditFindPrevious(wxCommandEvent& event);
+	void StartFinderAction(UnicodeString word, char* buf, int documentLength);
 
-	/**
-	 * show the replace dialog
-	 * 
-	 * @param wxCommandEvent& event
-	 */
-	void OnEditReplace(wxCommandEvent& event);
-
-	/**
-	 * show the Go To Line dialog
-	 * 
-	 * @param wxCommandEvent& event
-	 */
-	void OnEditGoToLine(wxCommandEvent& event);
-	
-	/**
-	 * when a background search finds a hit we will highlight it
-	 */
-	void OnFinderHit(t4p::FinderHitEventClass& event);
-	
-	/**
-	 *  when the user double clicks on a word we will start a search
-	 * for that word 
-	 */
-	void OnDoubleClick(wxStyledTextEvent& event);
-	
-	DECLARE_EVENT_TABLE()
 };
 
 }
