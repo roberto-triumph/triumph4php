@@ -57,6 +57,7 @@
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/views/EditorMessagesViewClass.h>
 #include <features/RecentFilesFeatureClass.h>
+#include <features/views/RecentFilesViewClass.h>
 #include <features/DetectorFeatureClass.h>
 #include <features/views/DetectorViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
@@ -370,6 +371,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(project);
 	ProjectViewClass* projectView = new ProjectViewClass(*project);
 	FeatureViews.push_back(projectView);
+	
+	RecentFilesFeatureClass* recentFiles = new RecentFilesFeatureClass(*this);
+	Features.push_back(recentFiles);
+	RecentFilesViewClass* recentFilesView = new RecentFilesViewClass(*recentFiles);
+	FeatureViews.push_back(recentFilesView);
 
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
@@ -379,8 +385,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new RunBrowserFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new RecentFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);

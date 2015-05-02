@@ -22,37 +22,55 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_RECENTFILESFEATURECLASS_H__
-#define __T4P_RECENTFILESFEATURECLASS_H__
+#ifndef __T4P_RECENTFILESVIEWCLASS_H__
+#define __T4P_RECENTFILESVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
+#include <features/RecentFilesFeatureClass.h>
 #include <wx/docview.h>
 
 namespace t4p {
 
-extern const int MAX_RECENT_FILES;
-
-/**
- * The recent files feature keeps track of the most
- * recent files that the user has opened in Triumph.
- */
-class RecentFilesFeatureClass : public FeatureClass {
+class RecentFilesViewClass : public FeatureViewClass {
 
 public:
 
-	/**
-	 * class that encapsulates the logic
-	 */	
-	wxFileHistory FileHistory;
+	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
 
-	RecentFilesFeatureClass(t4p::AppClass& app);
-	
-	void LoadPreferences(wxConfigBase* config);
-	
+	void AddFileMenuItems(wxMenu* fileMenu);
+
 	void SavePreferences();
 
 private:
 
+	/**
+	 * sub-menu to hold the recent files
+	 */
+	wxMenu* RecentFilesMenu;
+
+	/**
+	 * class that encapsulates the logic
+	 */
+	t4p::RecentFilesFeatureClass& Feature;
+
+	/**
+	 * handler for the file menu event
+	 */
+	void OnRecentFileMenu(wxCommandEvent& event);
+
+	/**
+	 * when a file has been opened, add it to the recent
+	 * list.
+	 */
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+
+	/**
+	 * when a file has been created, add it to the recent
+	 * list.
+	 */
+	void OnAppFileCreated(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 }
