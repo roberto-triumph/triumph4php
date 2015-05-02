@@ -50,6 +50,7 @@
 #include <features/views/OutlineViewClass.h>
 #include <features/TagFeatureClass.h>
 #include <features/RunConsoleFeatureClass.h>
+#include <features/views/RunConsoleViewClass.h>
 #include <features/RunBrowserFeatureClass.h>
 #include <features/views/RunBrowserViewClass.h>
 #include <features/LintFeatureClass.h>
@@ -383,10 +384,13 @@ void t4p::AppClass::CreateFeatures() {
 	RunBrowserViewClass* runBrowserView = new RunBrowserViewClass(*runBrowser);
 	FeatureViews.push_back(runBrowserView);
 
+	RunConsoleFeatureClass* runConsole = new RunConsoleFeatureClass(*this);
+	Features.push_back(runConsole);
+	RunConsoleViewClass* runConsoleView = new RunConsoleViewClass(*runConsole);
+	FeatureViews.push_back(runConsoleView);
+
 
 	FeatureClass* feature;
-	feature = new RunConsoleFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);	
 	feature = new SqlBrowserFeatureClass(*this);
