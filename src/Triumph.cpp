@@ -51,6 +51,7 @@
 #include <features/TagFeatureClass.h>
 #include <features/RunConsoleFeatureClass.h>
 #include <features/RunBrowserFeatureClass.h>
+#include <features/views/RunBrowserViewClass.h>
 #include <features/LintFeatureClass.h>
 #include <features/views/LintViewClass.h>
 #include <features/SqlBrowserFeatureClass.h>
@@ -376,6 +377,12 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(recentFiles);
 	RecentFilesViewClass* recentFilesView = new RecentFilesViewClass(*recentFiles);
 	FeatureViews.push_back(recentFilesView);
+	
+	RunBrowserFeatureClass* runBrowser = new RunBrowserFeatureClass(*this);
+	Features.push_back(runBrowser);
+	RunBrowserViewClass* runBrowserView = new RunBrowserViewClass(*runBrowser);
+	FeatureViews.push_back(runBrowserView);
+
 
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
@@ -383,8 +390,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);	
 	feature = new SqlBrowserFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new RunBrowserFeatureClass(*this);
 	Features.push_back(feature);
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
