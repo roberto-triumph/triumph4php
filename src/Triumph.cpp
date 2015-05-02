@@ -45,6 +45,7 @@
 #include <features/FinderFeatureClass.h>
 #include <features/views/FinderViewClass.h>
 #include <features/ProjectFeatureClass.h>
+#include <features/views/ProjectViewClass.h>
 #include <features/OutlineFeatureClass.h>
 #include <features/views/OutlineViewClass.h>
 #include <features/TagFeatureClass.h>
@@ -60,6 +61,7 @@
 #include <features/views/DetectorViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
 #include <features/ConfigFilesFeatureClass.h>
+#include <features/views/ConfigFilesViewClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <features/views/FileModifiedCheckViewClass.h>
 #include <features/FileWatcherFeatureClass.h>
@@ -84,6 +86,7 @@
 #include <features/FileCabinetFeatureClass.h>
 #include <features/views/FileCabinetViewClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
+#include <features/views/PhpCodeCompletionViewClass.h>
 #include <features/views/HtmlViewClass.h>
 #include <features/views/JavascriptViewClass.h>
 #include <globals/Errors.h>
@@ -272,6 +275,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(bookmark);
 	FeatureViews.push_back(bookmarkView);
 	
+	ConfigFilesFeatureClass* configFiles = new ConfigFilesFeatureClass(*this);
+	Features.push_back(configFiles);
+	ConfigFilesViewClass* configFilesView = new ConfigFilesViewClass(*configFiles);
+	FeatureViews.push_back(configFilesView);
+
 	t4p::DebuggerFeatureClass* debugger = new DebuggerFeatureClass(*this);
 	t4p::DebuggerViewClass* debuggerView = new DebuggerViewClass(*debugger);
 	Features.push_back(debugger);
@@ -353,16 +361,21 @@ void t4p::AppClass::CreateFeatures() {
 	OutlineViewClass* outlineView = new OutlineViewClass(*outline);
 	FeatureViews.push_back(outlineView);
 
+	PhpCodeCompletionFeatureClass* phpCodeCompletion = new PhpCodeCompletionFeatureClass(*this);
+	Features.push_back(phpCodeCompletion);
+	PhpCodeCompletionViewClass* phpCodeCompletionView = new PhpCodeCompletionViewClass(*phpCodeCompletion);
+	FeatureViews.push_back(phpCodeCompletionView);
+	
+	ProjectFeatureClass* project = new ProjectFeatureClass(*this);
+	Features.push_back(project);
+	ProjectViewClass* projectView = new ProjectViewClass(*project);
+	FeatureViews.push_back(projectView);
 
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new TagFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new EnvironmentFeatureClass(*this);
 	Features.push_back(feature);	
-	feature = new ProjectFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new RunBrowserFeatureClass(*this);
@@ -371,15 +384,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new ConfigFilesFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new VersionUpdateFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new SyntaxHighlightFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new PhpCodeCompletionFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
