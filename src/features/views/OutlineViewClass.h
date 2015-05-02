@@ -22,12 +22,10 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef OUTLINE_VIEW_FEATURECLASS_H__
-#define OUTLINE_VIEW_FEATURECLASS_H__
+#ifndef OUTLINE_VIEW_CLASS_H__
+#define OUTLINE_VIEW_CLASS_H__
 
-#include <features/FeatureClass.h>
-#include <pelet/TokenClass.h>
-#include <actions/ActionClass.h>
+#include <features/views/FeatureViewClass.h>
 #include <features/wxformbuilder/OutlineViewFeatureForms.h>
 #include <wx/imaglist.h>
 #include <vector>
@@ -35,102 +33,17 @@
 namespace t4p {
 
 /**
- * grouping of a tag and its member tags.
- */
-class OutlineSearchCompleteClass {
-
-public:
-
-	wxString Label;
-
-	std::map<wxString, std::vector<t4p::TagClass> > Tags;
-
-	OutlineSearchCompleteClass();
-
-	OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src);
-
-	void Copy(const t4p::OutlineSearchCompleteClass& src);
-
-	bool IsLabelFileName() const;
-};
-
-/**
- * event that is generated when a tag query is completed.  this event
- * contains the results of the search.
- */
-class OutlineSearchCompleteEventClass : public wxEvent {
-        
-        public:
-        
-        /**
-         * Will contain all of the resulting tags.
-         */
-        std::vector<t4p::OutlineSearchCompleteClass> Tags;
-        
-        OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
-        
-        wxEvent* Clone() const;
-        
-};
-
-extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
-
-typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSearchCompleteEventClass&);
-
-#define EVENT_OUTLINE_SEARCH_COMPLETE(id, fn) \
-        DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_OUTLINE_SEARCH_COMPLETE, id, -1, \
-    (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( OutlineSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
-
-/**
- * class that will execute a query against the tag cache in the background.
- * the results will be posted in an event.
- */
-class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
-	
-public:
-
-	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
-
-	/**
-	 * set the search parameters.  this should be called before the action is
-	 * added to the run queue
-	 *
-	 * @param searches the search strings, can be either file names, full paths, or class names
-	 * @param globals to get the locations of the tag dbs
-	 */
-	void SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals);
-
-	wxString GetLabel() const;
-
-protected:
-
-	void BackgroundWork();
-
-private:
-
-	t4p::TagCacheClass TagCache;
-
-	std::vector<UnicodeString> SearchStrings;
-	
-	/**
-	 * the directories to look in
-	 */
-	std::vector<wxFileName> EnabledSourceDirs;
-};
-
-/**
  * This is a feature that is designed to let the user see the classes / methods of 
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
  */
-class OutlineViewFeatureClass : public FeatureClass {
+class OutlineViewClass : public FeatureViewClass {
 public:
 	
 	/**
-	 * Creates a new OutlineViewFeature.
+	 * Creates a new OutlineView.
 	 */
-	OutlineViewFeatureClass(t4p::AppClass& app);
+	OutlineViewClass(t4p::OutlineFeatureClass& feature);
 
 	/**
 	 * This feature will have a view menu entry
@@ -184,6 +97,8 @@ private:
 	 */
 	void OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event);
 	
+	t4p::OutlineFeatureClass& Feature;
+	
 	DECLARE_EVENT_TABLE()
 };
 
@@ -196,12 +111,12 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * 
 	 * @param wxWindow* parent the parent window
 	 * @param int windowId the window ID
-	 * @param OutlineViewFeatureClass* feature the object that will execute the business logic. This panel will NOT
-	 *        own the pointer.  The caller must DELETE the feature when appropriate. This parameter MUST NOT BE NULL!
+	 * @param OutlineFeatureClass& feature the object that will execute the business logic. 
+	 * @param OutlineViewClass& view another object that will execute the business logic. 
 	 * @param NotebookClass* notebook we need to listen to the notebook page change events so that the outline is updated to show
 	 *        an outline of the newly opened page
 	 */
-	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, NotebookClass* notebook);
+	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, OutlineViewClass& view, NotebookClass* notebook);
 	
 	/**
 	 * update the status label
@@ -277,9 +192,15 @@ private:
 
 	/**
 	 * The feature class that will execute all logic. 
-	 * @var OutlineViewFeatureClass*
+	 * @var OutlineFeatureClass&
 	 */
-	OutlineViewFeatureClass* Feature;
+	OutlineFeatureClass& Feature;
+	
+	/**
+	 * The feature class that will execute all logic. 
+	 * @var OutlineViewClass&
+	 */
+	OutlineViewClass& View;
 	
 	/**
 	 * The notebook to listen (for page changing) events  to
@@ -441,7 +362,7 @@ public:
 	 * @param feature to get the project list and to search for files
 	 * @param chosenTags the tags that the user chose will be filled in here
 	 */
-	FileSearchDialogClass(wxWindow* parent, t4p::OutlineViewFeatureClass& feature, 
+	FileSearchDialogClass(wxWindow* parent, t4p::OutlineFeatureClass& feature, 
 		std::vector<t4p::TagClass>& chosenTags);
 
 protected:
@@ -476,7 +397,7 @@ private:
 	/**
 	 * to get the project list and perform tag search
 	 */
-	t4p::OutlineViewFeatureClass& Feature;
+	t4p::OutlineFeatureClass& Feature;
 
 	/**
 	 * the tags that the were the result of the preivous search

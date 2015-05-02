@@ -45,7 +45,8 @@
 #include <features/FinderFeatureClass.h>
 #include <features/views/FinderViewClass.h>
 #include <features/ProjectFeatureClass.h>
-#include <features/OutlineViewFeatureClass.h>
+#include <features/OutlineFeatureClass.h>
+#include <features/views/OutlineViewClass.h>
 #include <features/TagFeatureClass.h>
 #include <features/RunConsoleFeatureClass.h>
 #include <features/RunBrowserFeatureClass.h>
@@ -66,6 +67,7 @@
 #include <features/ExplorerFeatureClass.h>
 #include <features/views/ExplorerViewClass.h>
 #include <features/NewUserFeatureClass.h>
+#include <features/views/NewUserViewClass.h>
 #include <features/VersionUpdateFeatureClass.h>
 #include <features/TotalSearchFeatureClass.h>
 #include <features/DocCommentFeatureClass.h>
@@ -341,6 +343,17 @@ void t4p::AppClass::CreateFeatures() {
 	LintViewClass* lintView = new LintViewClass(*lint);
 	FeatureViews.push_back(lintView);
 	
+	NewUserFeatureClass* newUser = new NewUserFeatureClass(*this);
+	Features.push_back(newUser);
+	NewUserViewClass* newUserView = new NewUserViewClass(*newUser);
+	FeatureViews.push_back(newUserView);
+	
+	OutlineFeatureClass* outline = new OutlineFeatureClass(*this);
+	Features.push_back(outline);
+	OutlineViewClass* outlineView = new OutlineViewClass(*outline);
+	FeatureViews.push_back(outlineView);
+
+
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -349,8 +362,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new EnvironmentFeatureClass(*this);
 	Features.push_back(feature);	
 	feature = new ProjectFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new OutlineViewFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
@@ -361,8 +372,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new ConfigFilesFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new NewUserFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new VersionUpdateFeatureClass(*this);
 	Features.push_back(feature);
