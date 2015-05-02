@@ -50,6 +50,7 @@
 #include <features/RunConsoleFeatureClass.h>
 #include <features/RunBrowserFeatureClass.h>
 #include <features/LintFeatureClass.h>
+#include <features/views/LintViewClass.h>
 #include <features/SqlBrowserFeatureClass.h>
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/views/EditorMessagesViewClass.h>
@@ -81,8 +82,8 @@
 #include <features/FileCabinetFeatureClass.h>
 #include <features/views/FileCabinetViewClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
-#include <features/HtmlFeatureClass.h>
-#include <features/JavascriptFeatureClass.h>
+#include <features/views/HtmlViewClass.h>
+#include <features/views/JavascriptViewClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -329,6 +330,17 @@ void t4p::AppClass::CreateFeatures() {
 	FileCabinetViewClass* fileCabinetView = new FileCabinetViewClass(*fileCabinet);
 	FeatureViews.push_back(fileCabinetView);
 	
+	HtmlViewClass* html = new HtmlViewClass();
+	FeatureViews.push_back(html);
+	
+	JavascriptViewClass* javascript = new JavascriptViewClass();
+	FeatureViews.push_back(javascript);
+	
+	LintFeatureClass* lint = new LintFeatureClass(*this);
+	Features.push_back(lint);
+	LintViewClass* lintView = new LintViewClass(*lint);
+	FeatureViews.push_back(lintView);
+	
 	FeatureClass* feature;
 	feature = new RunConsoleFeatureClass(*this);
 	Features.push_back(feature);
@@ -339,8 +351,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new ProjectFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new OutlineViewFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new LintFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new SqlBrowserFeatureClass(*this);
 	Features.push_back(feature);
@@ -361,10 +371,6 @@ void t4p::AppClass::CreateFeatures() {
 	feature = new SyntaxHighlightFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new PhpCodeCompletionFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new HtmlFeatureClass(*this);
-	Features.push_back(feature);
-	feature = new JavascriptFeatureClass(*this);
 	Features.push_back(feature);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF

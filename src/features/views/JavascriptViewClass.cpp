@@ -22,7 +22,7 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/JavascriptFeatureClass.h>
+#include <features/views/JavascriptViewClass.h>
 
 static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);
@@ -83,19 +83,19 @@ void t4p::JavascriptBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, in
 	}
 }
 
-t4p::JavascriptFeatureClass::JavascriptFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
+t4p::JavascriptViewClass::JavascriptViewClass()
+: FeatureViewClass()
 , JavascriptCompletionProvider() 
 , BraceStyler() {
 	
 }
 
-void t4p::JavascriptFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+void t4p::JavascriptViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	event.GetCodeControl()->RegisterCompletionProvider(&JavascriptCompletionProvider);
 	event.GetCodeControl()->RegisterBraceMatchStyler(&BraceStyler);
 }
 
-BEGIN_EVENT_TABLE(t4p::JavascriptFeatureClass, t4p::FeatureClass)
-	EVT_APP_FILE_NEW(t4p::JavascriptFeatureClass::OnAppFileOpened)
-	EVT_APP_FILE_OPEN(t4p::JavascriptFeatureClass::OnAppFileOpened)
+BEGIN_EVENT_TABLE(t4p::JavascriptViewClass, t4p::FeatureViewClass)
+	EVT_APP_FILE_NEW(t4p::JavascriptViewClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(t4p::JavascriptViewClass::OnAppFileOpened)
 END_EVENT_TABLE()

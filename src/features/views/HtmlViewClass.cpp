@@ -19,10 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2014 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/HtmlFeatureClass.h>
+#include <features/views/HtmlViewClass.h>
+#include <code_control/CodeControlClass.h>
 
 static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);
@@ -83,19 +84,19 @@ void t4p::CssBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 	}
 }
 
-t4p::HtmlFeatureClass::HtmlFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
+t4p::HtmlViewClass::HtmlViewClass()
+: FeatureViewClass()
 , HtmlCompletionProvider() 
 , CssBraceStyler() {
 	
 }
 
-void t4p::HtmlFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+void t4p::HtmlViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	event.GetCodeControl()->RegisterCompletionProvider(&HtmlCompletionProvider);
 	event.GetCodeControl()->RegisterBraceMatchStyler(&CssBraceStyler);
 }
 
-BEGIN_EVENT_TABLE(t4p::HtmlFeatureClass, t4p::FeatureClass)
-	EVT_APP_FILE_NEW(t4p::HtmlFeatureClass::OnAppFileOpened)
-	EVT_APP_FILE_OPEN(t4p::HtmlFeatureClass::OnAppFileOpened)
+BEGIN_EVENT_TABLE(t4p::HtmlViewClass, t4p::FeatureViewClass)
+	EVT_APP_FILE_NEW(t4p::HtmlViewClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(t4p::HtmlViewClass::OnAppFileOpened)
 END_EVENT_TABLE()

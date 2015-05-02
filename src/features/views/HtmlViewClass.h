@@ -19,25 +19,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2014 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_JAVASCRIPTFEATURECLASS__
-#define __T4P_JAVASCRIPTFEATURECLASS__
+#ifndef __T4P_HTMLVIEWCLASS__
+#define __T4P_HTMLVIEWCLASS__
 
-#include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
+#include <code_control/CodeControlClass.h>
+#include <globals/Events.h>
 
 namespace t4p {
 
 /**
- * The Javascript code compeltion class implements the code that 
+ * The html code completion class implements the code that 
  * code completes HTML keywords
  */
-class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
+class HtmlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 	
 public:
 
-	JavascriptCodeCompletionProviderClass();
+	HtmlCodeCompletionProviderClass();
 	
 	bool DoesSupport(t4p::FileType type);
 	
@@ -48,27 +50,26 @@ public:
 /**
  * this class highlights matching braces {}, [], and ()
  */
-class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
+class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
 	
 public:
 
-	JavascriptBraceMatchStylerClass();
+	CssBraceMatchStylerClass();
 	
 	bool DoesSupport(t4p::FileType type);
 	
 	void Style(t4p::CodeControlClass* ctrl, int postToCheck);
 };
 
-
 /**
- * The Javascript feature implements features that are useful for
- * coding Javascript, code completion, keyword highlighting
+ * The Html feature implements features that are useful for
+ * coding HTML, code completion, keyword highlighting
  */
-class JavascriptFeatureClass : public t4p::FeatureClass {
+class HtmlViewClass : public t4p::FeatureViewClass {
 
 public:
 
-	JavascriptFeatureClass(t4p::AppClass& app);
+	HtmlViewClass();
 	
 private:
 
@@ -77,16 +78,16 @@ private:
 	/**
 	 * to implement code completion of html tags and attributes
 	 */
-	t4p::JavascriptCodeCompletionProviderClass JavascriptCompletionProvider;
+	t4p::HtmlCodeCompletionProviderClass HtmlCompletionProvider;
 	
 	/**
 	 * to implement brace matching
 	 */
-	t4p::JavascriptBraceMatchStylerClass BraceStyler;
+	t4p::CssBraceMatchStylerClass CssBraceStyler;
 	
 	DECLARE_EVENT_TABLE()
 };
 
 }
 
-#endif // __T4P_JAVASCRIPTFEATURECLASS__
+#endif // __T4P_HTMLVIEWCLASS__
