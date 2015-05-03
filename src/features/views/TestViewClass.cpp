@@ -22,30 +22,38 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef TEST_FEATURECLASS_H__
-#define TEST_FEATURECLASS_H__
+#include <features/views/TestViewClass.h>
+#include <search/FindInFilesClass.h>
+#include <globals/String.h>
+#include <wx/artprov.h>
 
-#include <features/FeatureClass.h>
+int ID_GO_BUTTON = wxNewId();
 
-namespace t4p {
-
-/**
- * This is a feature that is designed to test the feature mechanism. 
- * This is also useful for prototyping of a feature or debugging (instead of
- * repeating steps just put the code in the Go() method )
- */
-class TestFeatureClass : public FeatureClass {
-public:
-
-	TestFeatureClass(t4p::AppClass& app);
-			
-	/**
-	 * the actual code that will get executed when the "GO" button is clicked
-	 */
-	void Go();
-	
-};
-
+void t4p::TestViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 }
 
-#endif
+void t4p::TestViewClass::AddEditMenuItems(wxMenu* editMenu) {
+}
+
+void t4p::TestViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
+	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
+}
+
+void t4p::TestViewClass::AddWindows() {
+}
+
+void t4p::TestViewClass::Go(wxCommandEvent& event) {
+	wxMessageBox(wxT("Clicked the GO! button"));
+	Feature.Go();
+}
+
+t4p::TestViewClass::TestViewClass(t4p::TestFeatureClass& feature)
+	: FeatureViewClass() 
+	, Feature(feature) {
+		
+}
+
+BEGIN_EVENT_TABLE(t4p::TestViewClass, t4p::FeatureViewClass)
+	EVT_MENU(ID_GO_BUTTON, TestViewClass::Go)
+END_EVENT_TABLE()

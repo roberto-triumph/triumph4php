@@ -98,6 +98,8 @@
 #include <features/views/PhpCodeCompletionViewClass.h>
 #include <features/views/HtmlViewClass.h>
 #include <features/views/JavascriptViewClass.h>
+#include <features/TestFeatureClass.h>
+#include <features/views/TestViewClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -425,10 +427,13 @@ void t4p::AppClass::CreateFeatures() {
 	VersionUpdateViewClass* versionUpdateView = new VersionUpdateViewClass(*versionUpdate);
 	FeatureViews.push_back(versionUpdateView);
 
-	// TODO test feature need to find a quicker way to toggling it ON / OFF
-	//feature = new TestFeatureClass(*this);
-	//Features.push_back(feature);
-
+#if T4P_USE_TEST_FEATURE
+	TestFeatureClass* testFeature = new TestFeatureClass(*this);
+	Features.push_back(testFeature);
+	TestViewClass* testView = new TestViewClass(*testFeature);
+	FeatureViews.push_back(testView);
+#endif
+	
 	// connect the features to the event sink so that they can
 	// receive app events
 	for (size_t i = 0; i < Features.size(); ++i) {

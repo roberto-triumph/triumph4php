@@ -22,28 +22,56 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef TEST_FEATURECLASS_H__
-#define TEST_FEATURECLASS_H__
+#ifndef TEST_VIEWCLASS_H__
+#define TEST_VIEWCLASS_H__
 
-#include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
+#include <features/TestFeatureClass.h>
 
 namespace t4p {
 
 /**
  * This is a feature that is designed to test the feature mechanism. 
- * This is also useful for prototyping of a feature or debugging (instead of
- * repeating steps just put the code in the Go() method )
+ * This is also useful for prototyping of a feature or debugging.
  */
-class TestFeatureClass : public FeatureClass {
+class TestViewClass : public FeatureViewClass {
 public:
 
-	TestFeatureClass(t4p::AppClass& app);
-			
+	TestViewClass(t4p::TestFeatureClass& feature);
+		
+	/**
+	 * This feature will have no Edit menu items
+	 */
+	void AddEditMenuItems(wxMenu* editMenu);
+
+	/**
+	 * This feature will have one toolbar button, when clicked the Go() method will get called
+	 */
+	void AddToolBarItems(wxAuiToolBar* toolBar);
+	
+	/**
+	 * This feature will have no extra windows.
+	 */
+	void AddWindows();
+	
+	/**
+	 * This feature will have no context menu items
+	 */
+	void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	
+private:	
+
 	/**
 	 * the actual code that will get executed when the "GO" button is clicked
 	 */
-	void Go();
+	void Go(wxCommandEvent& event);
 	
+	/**
+	 * most logic should be contained in the feature
+	 */
+	t4p::TestFeatureClass& Feature;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }

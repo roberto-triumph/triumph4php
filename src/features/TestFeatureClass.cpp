@@ -23,50 +23,11 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/TestFeatureClass.h>
-#include <search/FindInFilesClass.h>
-#include <globals/String.h>
-#include <wx/artprov.h>
 
-int ID_GO_BUTTON = wxNewId();
-
-void t4p::TestFeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app) 
+: FeatureClass(app) {
 }
-
-void t4p::TestFeatureClass::AddEditMenuItems(wxMenu* editMenu) {
-}
-
-void t4p::TestFeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
-	toolBar->AddTool(ID_GO_BUTTON, wxT("GO"), wxArtProvider::GetBitmap(
-	                     wxART_EXECUTABLE_FILE, wxART_TOOLBAR, wxSize(16, 16)), wxT("GO"), wxITEM_NORMAL);
-}
-
-void t4p::TestFeatureClass::AddWindows() {
-}
-
-void t4p::TestFeatureClass::Go(wxCommandEvent& event) {
-	//wxMessageBox(wxT("Clicked the GO! button"));
-	wxString file = wxT("/home/roberto/workspace/sample_php_project/high_ascii.php");
 	
-	t4p::FindInFilesClass findInFiles;
+void t4p::TestFeatureClass::Go() {
 	
-	UnicodeString str;
-	UFILE* f = u_fopen(file.ToAscii(), "r", NULL, NULL);
-	if (f) {
-		int read = u_file_read(str.getBuffer(1024), 1024, f);
-		str.releaseBuffer(read);
-		u_fclose(f);
-	}
-	GetNotebook()->LoadPage(file);
-	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->SetText(t4p::IcuToWx(str));
-	}
 }
-
-t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) {
-}
-
-BEGIN_EVENT_TABLE(t4p::TestFeatureClass, wxEvtHandler)
-	EVT_MENU(ID_GO_BUTTON, TestFeatureClass::Go)
-END_EVENT_TABLE()
