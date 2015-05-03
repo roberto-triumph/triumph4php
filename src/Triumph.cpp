@@ -77,6 +77,7 @@
 #include <features/NewUserFeatureClass.h>
 #include <features/views/NewUserViewClass.h>
 #include <features/VersionUpdateFeatureClass.h>
+#include <features/views/VersionUpdateViewClass.h>
 #include <features/TotalSearchFeatureClass.h>
 #include <features/views/TotalSearchViewClass.h>
 #include <features/DocCommentFeatureClass.h>
@@ -418,14 +419,11 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(totalSearch);
 	TotalSearchViewClass* totalSearchView = new TotalSearchViewClass(*totalSearch);
 	FeatureViews.push_back(totalSearchView);
-
-
-
-	FeatureClass* feature;
-	feature = new VersionUpdateFeatureClass(*this);
-	Features.push_back(feature);
 	
-	
+	VersionUpdateFeatureClass* versionUpdate = new VersionUpdateFeatureClass(*this);
+	Features.push_back(versionUpdate);
+	VersionUpdateViewClass* versionUpdateView = new VersionUpdateViewClass(*versionUpdate);
+	FeatureViews.push_back(versionUpdateView);
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);

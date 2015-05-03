@@ -26,7 +26,6 @@
 #define __T4P_VERSIONUPDATEFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/VersionUpdateFeatureForms.h>
 #include <actions/ActionClass.h>
 
 namespace t4p {
@@ -42,101 +41,23 @@ public:
 
 	VersionUpdateFeatureClass(t4p::AppClass& app);
 
-	void AddHelpMenuItems(wxMenu* helpMenu);
-
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
-
 	void LoadPreferences(wxConfigBase* config);
 	
-private:
-
-	/**
-	 * when the app starts, start the update check timer
-	 */
-	void OnAppReady(wxCommandEvent& event);
-
-	/**
-	 * when preferences are saved, start or stop the
-	 * version check timer depending on user preferences
-	 */	 
-	void OnPreferencesSaved(wxCommandEvent& event);
-
-	/**
-	 * when preferences are updated, start or stop the
-	 * version check timer depending on user preferences
-	 */	 
-	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
-
-	/**
-	 * the actual code that will get executed when the "Check for updates" menu is selected
-	 */
-	void OnHelpCheckForUpdates(wxCommandEvent& event);
-
-	/**
-	 * when the timer is hit, we check to see if we need to do a version check
-	 */
-	void OnTimer(wxTimerEvent& event);
-
-	/**
-	 * read the response from the update server.  if there is a new version, 
-	 * tell the user.
-	 */
-	void OnUpdateCheckComplete(wxCommandEvent& event);
-
 	wxString GetCurrentVersion() const;
 
 	/**
-	 * the nexy time we are to check for a new version
+	 * the next time we are to check for a new version
 	 */
 	wxDateTime NextCheckTime;
 
-	/**
-	 * the timer is used to see if its time to do a version check
-	 */
-	wxTimer Timer;
+private:
+
+
+	void OnAppReady(wxCommandEvent& event);
 	
 	DECLARE_EVENT_TABLE()
 };
 
-class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
-
-public:
-
-	VersionUpdateDialogClass(wxWindow* parent, int id, 
-		t4p::RunningThreadsClass& runningThreads,
-		const wxString& currentVersion, 
-		bool showNewVersion,
-		wxString newVersion);
-
-protected:
-
-	void OnOkButton(wxCommandEvent& event);
-
-private:
-
-	void OnTimer(wxTimerEvent& event);
-
-	void OnUpdateCheckComplete(wxCommandEvent& event);
-
-	void ConnectToUpdateServer();
-
-	wxTimer Timer;
-
-	t4p::RunningThreadsClass& RunningThreads;
-
-	bool StartedCheck;
-
-	DECLARE_EVENT_TABLE()
-
-};
-
-class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGeneratedPanelClass {
-
-public:
-
-	VersionUpdatePreferencesPanelClass(wxWindow* parent, t4p::PreferencesClass& preferences);
-
-};
 
 /**
  * This is the action that checks for new versions of Triumph
@@ -163,6 +84,10 @@ protected:
 private:
 
 	wxString CurrentVersion;
+	
+	void OnAppReady(wxCommandEvent& event);
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }
