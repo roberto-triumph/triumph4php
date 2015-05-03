@@ -316,9 +316,9 @@ t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 , Breakpoints() 
 , Options()
 , IsDebuggerSessionActive(false)
+, Cmd()
 , RunningThreads() 
 , EventSinkLocker() 
-, Cmd()
 , CurrentStackFunction()
 , LastStackFunction()
 , IsDebuggerServerActive(false) {
@@ -335,6 +335,10 @@ void t4p::DebuggerFeatureClass::OnAppReady(wxCommandEvent& event) {
 void t4p::DebuggerFeatureClass::OnAppExit(wxCommandEvent& event) {
 	RunningThreads.RemoveEventHandler(this);
 	StopDebugger(Options.Port);
+}
+
+void t4p::DebuggerFeatureClass::SaveConfig() {
+	ConfigStore(wxConfigBase::Get(), Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::LoadPreferences(wxConfigBase* base) {
@@ -547,27 +551,6 @@ void t4p::DebuggerFeatureClass::OnContinue(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnContinueToCursor(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
-	if (!codeCtrl) {
-		return;
-	}
-	if (codeCtrl->IsNew()) {
-		return;
-	}
-	wxString filename = codeCtrl->GetFileName();
-
-	// scintilla lines are 0-based, xdebug lines are 1-based
-	int lineNumber = codeCtrl->LineFromPosition(codeCtrl->GetCurrentPos()) + 1;
-
-	PostCmd(
-		Cmd.BreakpointRunToCursor(filename, lineNumber)
-	);
-	PostCmd(
-		Cmd.Run()
-	);
-}
-
 void t4p::DebuggerFeatureClass::OnFinish(wxCommandEvent& event) {
 	
 	// finish is a special command
@@ -608,104 +591,6 @@ void t4p::DebuggerFeatureClass::CmdPropertyGetChildren(const t4p::DbgpPropertyCl
 	PostCmd(
 		Cmd.PropertyGet(0, contextId, prop.FullName, prop.Key)
 	);
-}
-
-void t4p::DebuggerFeatureClass::BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-	
-	// if the breakpoint is located in an opened file and has a marker
-	// lets remove the marker.  note that the file may not be open and that's
-	// not unexpected.
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
-	if (codeCtrl) {
-		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
-	}
-	
-	// remove the breakpoint from this list
-	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
-	while (it != Breakpoints.end()) {
-		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
-			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
-			it = Breakpoints.erase(it);
-			break;
-		}
-		else {
-			++it;
-		}
-	}
-
-	PostCmd(
-		Cmd.BreakpointRemove(breakpointWithHandle.Breakpoint.BreakpointId)
-	);
-	
-	// store the breakpoints to disk
-	wxConfigBase* base = wxConfig::Get();
-	ConfigStore(base, Options, Breakpoints);
-}
-
-void t4p::DebuggerFeatureClass::BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-	
-	// if the breakpoint is located in an opened file and has a marker
-	// lets remove the marker.  note that the file may not be open and that's
-	// not unexpected.
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
-	if (codeCtrl) {
-		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
-	}
-	
-	// set the breakpoint as disabled
-	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
-	while (it != Breakpoints.end()) {
-		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
-			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
-			it->Breakpoint.IsEnabled = false;
-			break;
-		}
-		else {
-			++it;
-		}
-	}
-
-	PostCmd(
-		Cmd.BreakpointDisable(breakpointWithHandle.Breakpoint.BreakpointId)
-	);
-	
-	// store the breakpoints to disk
-	wxConfigBase* base = wxConfig::Get();
-	ConfigStore(base, Options, Breakpoints);
-}
-
-void t4p::DebuggerFeatureClass::BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-	
-	// if the breakpoint is located in an opened file and does not have a marker
-	// lets add the marker.  note that the file may not be open and that's
-	// not unexpected.
-	int newHandle = -1;
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
-	if (codeCtrl) {
-		codeCtrl->BreakpointMarkAt(breakpointWithHandle.Breakpoint.LineNumber, newHandle);
-	}
-	
-	// set the breakpoint as enabled
-	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
-	while (it != Breakpoints.end()) {
-		if (it->Breakpoint.Filename == breakpointWithHandle.Breakpoint.Filename &&
-			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
-			it->Breakpoint.IsEnabled = true;
-			it->Handle = newHandle;
-			break;
-		}
-		else {
-			++it;
-		}
-	}
-
-	PostCmd(
-		Cmd.BreakpointEnable(breakpointWithHandle.Breakpoint.BreakpointId)
-	);
-	
-	// store the breakpoints to disk
-	wxConfigBase* base = wxConfig::Get();
-	ConfigStore(base, Options, Breakpoints);
 }
 
 void t4p::DebuggerFeatureClass::CmdEvaluate(const wxString& code) {
@@ -923,7 +808,6 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_MENU(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
 	EVT_MENU(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
 	EVT_MENU(t4p::MENU_DEBUGGER + 5, t4p::DebuggerFeatureClass::OnContinue)
-	EVT_MENU(t4p::MENU_DEBUGGER + 6, t4p::DebuggerFeatureClass::OnContinueToCursor)
 	EVT_MENU(t4p::MENU_DEBUGGER + 8, t4p::DebuggerFeatureClass::OnStopDebugger)
 	EVT_MENU(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
 	EVT_MENU(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)

@@ -94,10 +94,9 @@ t4p::EnvironmentFeatureClass::EnvironmentFeatureClass(t4p::AppClass& app)
 
 void t4p::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get();
-	t4p::EnvironmentClass* environment = GetEnvironment();
-	environment->SaveToConfig(config);
-	if (environment->Php.IsAuto && environment->Php.Installed) {
-		environment->Php.AutoDetermine();
+	App.Globals.Environment.SaveToConfig(config);
+	if (App.Globals.Environment.Php.IsAuto && App.Globals.Environment.Php.Installed) {
+		App.Globals.Environment.Php.AutoDetermine();
 	}
 
 	// signal that this app has modified the config file, that way the external

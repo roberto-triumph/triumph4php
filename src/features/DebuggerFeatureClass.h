@@ -173,6 +173,12 @@ public:
 	 * the debug engine when the user adds or removes a breakpoint.
 	 */
 	bool IsDebuggerSessionActive;
+	
+	/**
+	 * used to build the xdebug commands. using a class-wide instance
+	 * because xdebug commands require a unique "transactionId"
+	 */
+	t4p::DbgpCommandClass Cmd;
 
 	DebuggerFeatureClass(t4p::AppClass& app);
 	
@@ -187,52 +193,7 @@ public:
 	 * See section 7.13 of the xdbgp protocol docs.
 	 */
 	void CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop, int contextId);
-
-	/**
-	 * Performs all necessary actions to remove the breakpoint.
-	 * Removes it from the breakpoints list
-	 * Removes its marker (in the code control margin)
-	 * Sends the breakpoint_remove command to the debug engine
-	 *  
-	 * issues a debugger command to remove the given breakpoint. 
-	 * The command is asynchronous; this method exits 
-	 * immediately, and the command is queued to be sent to 
-	 * the debugger over a socket on a background thread.
-	 *
-	 * See section 7.6.4 of the xdbgp protocol docs.
-	 */
-	void BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
-
-	/**
-	 * Performs all necessary actions to disable the breakpoint.
-	 * disables it in the breakpoints list
-	 * Removes its marker (in the code control margin)
-	 * Sends the breakpoint_update command to the debug engine
-	 *
-	 * Issues a debugger command to disable the given breakpoint.
-	 * The command is asynchronous; this method exits
-	 * immediately, and the command is queued to be sent to 
-	 * the debugger over a socket on a background thread.
-	 *
-	 * See section 7.6.3 of the xdbgp protocol docs.
-	*/
-	void BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
-
-	/**
-	 * Performs all necessary actions to enable the breakpoint.
-	 * Enables it in the breakpoints list
-	 * Adds its marker (in the code control margin)
-	 * Sends the breakpoint_update command to the debug engine
-	 *
-	 * Issues a debugger command to enable the given breakpoint.
-	 * The command is asynchronous; this method exits
-	 * immediately, and the command is queued to be sent to 
-	 * the debugger over a socket on a background thread.
-	 *
-	 * See section 7.6.3 of the xdbgp protocol docs.
-	*/
-	void BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
-
+	
 	/**
 	 * Goes to the file and line number of the breakpoint. Opens the file
 	 * if the file is not opened.
@@ -323,7 +284,7 @@ public:
 	 */
 	bool RemoveBreakpointAtLine(const wxString& fileName, int lineNumber);
 
-/**
+	/**
 	 * enables a breakpoint at the given file / line. If 
 	 * a breakpoint does not exist at the given location, it is added (and this
 	 * method returns true). If a breakpoint already exists at the given
@@ -337,6 +298,21 @@ public:
 	 */
 	bool AddBreakpointAtLine(const wxString& fileName, int handle, int lineNumber);
 	
+	
+	/**
+	 * send a command to the debug engine.  This is an asynchronous
+	 * operation; we send the command over to the background thread,
+	 * and the background thread sends the command to the debug engine.
+	 *
+	 * @param cmd the command string to send, built by DbgpCommandClass
+	 */
+	void PostCmd(std::string cmd);
+	
+	/**
+	 * store breakpoints to disk.
+	 */
+	void SaveConfig();
+
 private:
 
 	// handlers for menu items
@@ -346,7 +322,7 @@ private:
 	void OnStepOver(wxCommandEvent& event);
 	void OnStepOut(wxCommandEvent& event);
 	void OnContinue(wxCommandEvent& event);
-	void OnContinueToCursor(wxCommandEvent& event);
+	
 	void OnFinish(wxCommandEvent& event);
 	void OnGoToExecutingLine(wxCommandEvent& event);
 	
@@ -394,15 +370,6 @@ private:
 	void OnDebuggerSocketError(wxThreadEvent& event);
 
 	/**
-	 * send a command to the debug engine.  This is an asynchronous
-	 * operation; we send the command over to the background thread,
-	 * and the background thread sends the command to the debug engine.
-	 *
-	 * @param cmd the command string to send, built by DbgpCommandClass
-	 */
-	void PostCmd(std::string cmd);
-
-	/**
 	 * event handler for the show full event, when
 	 * the user wants to see the full variable 
 	 * contents.
@@ -421,12 +388,6 @@ private:
 	 */
 	t4p::EventSinkLockerClass EventSinkLocker;
 
-	/**
-	 * used to build the xdebug commands. using a class-wide instance
-	 * because xdebug commands require a unique "transactionId"
-	 */
-	t4p::DbgpCommandClass Cmd;
-	
 	/**
 	 * the name of the last stack that we displayed to
 	 * the user.  We use this so that we can know

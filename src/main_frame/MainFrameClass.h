@@ -99,7 +99,7 @@ class MainFrameClass : public MainFrameGeneratedClass {
 
 public:
 	
-	MainFrameClass(const std::vector<FeatureClass*>& features, AppClass&  app,
+	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, AppClass&  app,
 		PreferencesClass& preferences);
 	
 	~MainFrameClass();
@@ -122,12 +122,6 @@ public:
 	 */
 	void FileOpenLine(const wxString& fullPath, int lineNumber);
 
-	/**
-	 * get all of the feature's extra windows and menus and attach them to the main frame.
-	 * TODO this should be removed
-	 */
-	void LoadFeature(FeatureClass& feature);
-	
 	/**
 	 * get all of the feature view's extra windows and menus and attach them to the main frame.
 	 */
@@ -367,7 +361,7 @@ private:
 	/**
 	 * Additional functionality
 	 */
-	const std::vector<FeatureClass*>& Features;
+	const std::vector<FeatureViewClass*>& FeatureViews;
 
 	/**
 	 * Used to listen for app events.

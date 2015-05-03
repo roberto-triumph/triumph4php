@@ -191,7 +191,7 @@ bool t4p::AppClass::OnInit() {
 	// frame and initialize the feature windows so that all menus are created
 	// and only then can we load the keyboard shortcuts from the INI file
 	// all menu items must be present in the menu bar for shortcuts to take effect
-	MainFrame = new t4p::MainFrameClass(Features, *this, Preferences);
+	MainFrame = new t4p::MainFrameClass(FeatureViews, *this, Preferences);
 	FeatureWindows();
 	LoadPreferences();
 	MainFrame->AuiManagerUpdate();
@@ -282,7 +282,7 @@ void t4p::AppClass::CreateFeatures() {
 	FeatureViews.push_back(changelogView);
 	
 	t4p::BookmarkFeatureClass* bookmark = new BookmarkFeatureClass(*this);
-	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass();
+	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass(*bookmark);
 	Features.push_back(bookmark);
 	FeatureViews.push_back(bookmarkView);
 	
@@ -450,9 +450,6 @@ void t4p::AppClass::CreateFeatures() {
 }
 
 void t4p::AppClass::FeatureWindows() {
-	for (size_t i = 0; i < Features.size(); ++i) {
-		MainFrame->LoadFeature(*Features[i]);
-	}
 	for (size_t i = 0; i < FeatureViews.size(); ++i) {
 		MainFrame->LoadFeatureView(*FeatureViews[i]);
 	}
@@ -500,7 +497,9 @@ void t4p::AppClass::LoadPreferences() {
 	// tell each feature to load their settings from the INI file
 	for (size_t i = 0; i < Features.size(); ++i) {
 		Features[i]->LoadPreferences(config);
-		Features[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
+	}
+	for (size_t i = 0; i < FeatureViews.size(); ++i) {
+		FeatureViews[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
 	Preferences.Load(config, MainFrame);
 }
@@ -556,9 +555,6 @@ void t4p::AppClass::OnActivateApp(wxActivateEvent& event) {
 }
 
 void t4p::AppClass::AddPreferencesWindows(wxBookCtrlBase* parent) {
-	for (size_t i = 0; i < Features.size(); ++i) {
-		Features[i]->AddPreferenceWindow(parent);
-	}
 	for (size_t i = 0; i < FeatureViews.size(); ++i) {
 		FeatureViews[i]->AddPreferenceWindow(parent);
 	}

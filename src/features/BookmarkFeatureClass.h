@@ -89,55 +89,6 @@ class BookmarkClass {
 class BookmarkFeatureClass : public t4p::FeatureClass {
 
 public:
-	BookmarkFeatureClass(t4p::AppClass& app);
-		
-private:
-
-	/**
-	 * this menu handler will toggle the bookmark in the current
-	 * file / line on or off.
-	 */
-	void OnEditToggleBookmark(wxCommandEvent& event);
-	
-	/**
-	 * this menu handler will clear all bookmarks
-	 */
-	void OnEditClearAllBookmarks(wxCommandEvent& event);
-	
-	/**
-	 * takes the user to the next bookmarked place
-	 */
-	void OnEditNextBookmark(wxCommandEvent& event);
-	
-	/**
-	 * takes the user to the previous bookmarked place
-	 */
-	void OnEditPreviousBookmark(wxCommandEvent& event);
-	
-	/**
-	 * takes the user to the given bookmakrk. if the file 
-	 * is not open, it will be opened.
-	 */
-	void ShowBookmark(const t4p::BookmarkClass& bookmark);
-	
-	/**
-	 * Adds all bookmarks for the file to the given code control
-	 * but it does not acutally move the cursor
-	 */
-	void AddBookmarks(const wxFileName& fileName, t4p::CodeControlClass* ctrl);
-	
-	/**
-	 * we capture event from the styled text control so that we know
-	 * when a bookmark has moved up/down a line.  If that's the case,
-	 * then we update our internal bookmarks list
-	 */
-	void OnStyledTextModified(wxStyledTextEvent& event);
-	
-	/**
-	 * when the user reverts a file, we must add in the bookmarks
-	 * again, since they get deleted on file reload
-	 */
-	void OnAppFileReverted(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * all bookmarks added by the user
@@ -149,7 +100,8 @@ private:
 	 */
 	int CurrentBookmarkIndex;
 	
-	DECLARE_EVENT_TABLE()
+	BookmarkFeatureClass(t4p::AppClass& app);
+	
 };
 
 }

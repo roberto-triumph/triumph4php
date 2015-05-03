@@ -432,7 +432,7 @@ void t4p::FileWatcherFeatureClass::HandleWatchError() {
 		);
 		msg += dirsDeleted;
 		msg = wxGetTranslation(msg);
-		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, GetMainWindow());
+		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, NULL);
 	}
 
 	StartWatch();

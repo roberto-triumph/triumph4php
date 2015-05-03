@@ -46,6 +46,51 @@ public:
 	
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 	
+	/**
+	 * Performs all necessary actions to disable the breakpoint.
+	 * disables it in the breakpoints list
+	 * Removes its marker (in the code control margin)
+	 * Sends the breakpoint_update command to the debug engine
+	 *
+	 * Issues a debugger command to disable the given breakpoint.
+	 * The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.3 of the xdbgp protocol docs.
+	*/
+	void BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+
+	/**
+	 * Performs all necessary actions to enable the breakpoint.
+	 * Enables it in the breakpoints list
+	 * Adds its marker (in the code control margin)
+	 * Sends the breakpoint_update command to the debug engine
+	 *
+	 * Issues a debugger command to enable the given breakpoint.
+	 * The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.3 of the xdbgp protocol docs.
+	*/
+	void BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+	
+	/**
+	 * Performs all necessary actions to remove the breakpoint.
+	 * Removes it from the breakpoints list
+	 * Removes its marker (in the code control margin)
+	 * Sends the breakpoint_remove command to the debug engine
+	 *  
+	 * issues a debugger command to remove the given breakpoint. 
+	 * The command is asynchronous; this method exits 
+	 * immediately, and the command is queued to be sent to 
+	 * the debugger over a socket on a background thread.
+	 *
+	 * See section 7.6.4 of the xdbgp protocol docs.
+	 */
+	void BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
+
 private:
 
 	t4p::DebuggerFeatureClass& Feature;
@@ -87,7 +132,7 @@ private:
 	void OnViewDebuggerBreakpoints(wxCommandEvent& event);
 	void OnViewDebuggerEval(wxCommandEvent& event);
 	void OnToggleBreakpoint(wxCommandEvent& event);
-
+	void OnContinueToCursor(wxCommandEvent& event);
 	
 	// debugger event handlers; update the debugger panels
 	void OnDbgpError(t4p::DbgpErrorEventClass& event);
@@ -223,7 +268,8 @@ class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClas
 
 public:
 
-	DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+	DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature,
+		t4p::DebuggerViewClass& view);
 
 	/**
 	 * should be called when the user adds a breakpoint. the breakpoint list is redrawn.
@@ -245,6 +291,7 @@ private:
 	 * to send the delete/disable breakpoint command to the debug engine
 	 */
 	t4p::DebuggerFeatureClass& Feature;
+	t4p::DebuggerViewClass& View;
 
 	/**
 	 * true if all breakpoints are currently enabled. when we toggle,
@@ -320,7 +367,8 @@ public:
 	t4p::DebuggerBreakpointPanelClass* BreakpointPanel;
 	t4p::DebuggerEvalPanelClass* EvalPanel;
 
-	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
+	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature,
+		t4p::DebuggerViewClass& view);
 	
 	// bring the various panels to the forefront
 	void SelectLoggerPanel();

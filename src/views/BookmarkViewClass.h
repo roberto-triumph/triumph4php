@@ -26,11 +26,9 @@
 #define __T4P__BOOKMARKFEATUREVIEWCLASS_H__
 
 #include <views/FeatureViewClass.h>
+#include <features/BookmarkFeatureClass.h>
 
 namespace t4p {
-
-// forward declaration, defined in another file
-class BookmarkFeatureClass;
 
 /**
  * The bookmark feature keeps track of bookmarks at the user's request.
@@ -53,7 +51,7 @@ class BookmarkFeatureClass;
 class BookmarkViewClass : public t4p::FeatureViewClass {
 
 public:
-	BookmarkViewClass();
+	BookmarkViewClass(t4p::BookmarkFeatureClass& feature);
 	
 	/**
 	 * the user can toggle bookmarks via the edit menu
@@ -65,8 +63,57 @@ public:
 	 */
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts);
 	
-	private:
+private:
+	
+	/**
+	 * this menu handler will toggle the bookmark in the current
+	 * file / line on or off.
+	 */
+	void OnEditToggleBookmark(wxCommandEvent& event);
+	
+	/**
+	 * this menu handler will clear all bookmarks
+	 */
+	void OnEditClearAllBookmarks(wxCommandEvent& event);
+	
+	/**
+	 * takes the user to the next bookmarked place
+	 */
+	void OnEditNextBookmark(wxCommandEvent& event);
+	
+	/**
+	 * takes the user to the previous bookmarked place
+	 */
+	void OnEditPreviousBookmark(wxCommandEvent& event);
+	
+	/**
+	 * takes the user to the given bookmakrk. if the file 
+	 * is not open, it will be opened.
+	 */
+	void ShowBookmark(const t4p::BookmarkClass& bookmark);
+	
+	/**
+	 * Adds all bookmarks for the file to the given code control
+	 * but it does not acutally move the cursor
+	 */
+	void AddBookmarks(const wxFileName& fileName, t4p::CodeControlClass* ctrl);
+	
+	/**
+	 * we capture event from the styled text control so that we know
+	 * when a bookmark has moved up/down a line.  If that's the case,
+	 * then we update our internal bookmarks list
+	 */
+	void OnStyledTextModified(wxStyledTextEvent& event);
+	
+	/**
+	 * when the user reverts a file, we must add in the bookmarks
+	 * again, since they get deleted on file reload
+	 */
+	void OnAppFileReverted(t4p::CodeControlEventClass& event);
 
+	t4p::BookmarkFeatureClass& Feature;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }
