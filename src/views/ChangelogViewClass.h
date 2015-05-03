@@ -19,39 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef T4P_CHANGELOGVIEWCLASS_H__
+#define T4P_CHANGELOGVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
 
 namespace t4p {
 
 // forward declaration, defined in another file
-class CodeControlClass;
+class ChangelogFeatureClass;
 
 /**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
+ * Adds a menu item that enables the user to see
+ * triumph's release change log
  */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class ChangelogViewClass : public t4p::FeatureViewClass {
 
 public:
-
-	DocCommentFeatureClass(t4p::AppClass& app);
 	
-	/**
-	 * @return TRUE if this feature is enabled
-	 */
-	bool IsEnabled() const;
-
+	ChangelogViewClass();
+	
+	void AddHelpMenuItems(wxMenu* helpMenu);
 };
 
 }
 
-#endif
+#endif

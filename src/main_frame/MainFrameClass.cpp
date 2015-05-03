@@ -24,7 +24,7 @@
  */
 #include <main_frame/MainFrameClass.h>
 #include <features/FeatureClass.h>
-#include <features/views/FeatureViewClass.h>
+#include <views/FeatureViewClass.h>
 #include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>

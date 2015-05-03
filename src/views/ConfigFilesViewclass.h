@@ -19,39 +19,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef T4P_ConfigFilesFeatureViewClass_H__
+#define T4P_ConfigFilesFeatureViewClass_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
+#include <actions/ActionClass.h>
 
 namespace t4p {
 
 // forward declaration, defined in another file
-class CodeControlClass;
+class ConfigFilesFeatureClass;
 
 /**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
+ * The ConfigFiles view will populate the menu of items
+ * based on the config files that were parsed.  
  */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class ConfigFilesViewClass : public t4p::FeatureViewClass {
 
 public:
+	
+	ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature);
+	
+	void AddNewMenu(wxMenuBar* menuBar);
 
-	DocCommentFeatureClass(t4p::AppClass& app);
+	private:
 	
 	/**
-	 * @return TRUE if this feature is enabled
+	 * rebuilds the config files menu based on the current config
+	 * tags.
 	 */
-	bool IsEnabled() const;
+	void RebuildMenu();
+	
+	/**
+	 * when the detector cache has been loaded rebuild the menu
+	 */
+	void OnDetectorDbInitComplete(t4p::ActionEventClass& event);
+	
+	/**
+	 * when the config detectors have finished running, load all of the
+	 * projects' config files and build the menu.
+	 */
+	void OnConfigFilesDetected(t4p::ActionEventClass& event);
+	
+	/**
+	 * The feature gives this view the list of config tags
+	 * in all current projects.
+	 */
+	t4p::ConfigFilesFeatureClass& Feature;
+	
+	/**
+	 * Store the menu that we use to put the config file
+	 * menu items in. Since its a wxWindow pointer, it is 
+	 * owned by the menu bar.
+	 */
+	wxMenu* ConfigMenu;
 
+	DECLARE_EVENT_TABLE()
 };
 
 }
 
-#endif
+#endif

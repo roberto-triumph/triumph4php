@@ -19,37 +19,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef __T4P_RECENTFILESVIEWCLASS_H__
+#define __T4P_RECENTFILESVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
+#include <features/RecentFilesFeatureClass.h>
+#include <wx/docview.h>
 
 namespace t4p {
 
-// forward declaration, defined in another file
-class CodeControlClass;
-
-/**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
- */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class RecentFilesViewClass : public FeatureViewClass {
 
 public:
 
-	DocCommentFeatureClass(t4p::AppClass& app);
-	
-	/**
-	 * @return TRUE if this feature is enabled
-	 */
-	bool IsEnabled() const;
+	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
 
+	void AddFileMenuItems(wxMenu* fileMenu);
+
+	void SavePreferences();
+
+private:
+
+	/**
+	 * sub-menu to hold the recent files
+	 */
+	wxMenu* RecentFilesMenu;
+
+	/**
+	 * class that encapsulates the logic
+	 */
+	t4p::RecentFilesFeatureClass& Feature;
+
+	/**
+	 * handler for the file menu event
+	 */
+	void OnRecentFileMenu(wxCommandEvent& event);
+
+	/**
+	 * when a file has been opened, add it to the recent
+	 * list.
+	 */
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+
+	/**
+	 * when a file has been created, add it to the recent
+	 * list.
+	 */
+	void OnAppFileCreated(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
 };
 
 }

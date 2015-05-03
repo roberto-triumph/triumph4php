@@ -19,39 +19,74 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef T4P_EDITORMESSAGESVIEWCLASS_H__
+#define T4P_EDITORMESSAGESVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
+#include <views/wxformbuilder/EditorMessagesFeatureForms.h>
 
 namespace t4p {
-
+	
 // forward declaration, defined in another file
-class CodeControlClass;
+class EditorLogEventClass;
 
-/**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
- */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class EditorMessagesViewClass : public t4p::FeatureViewClass {
 
 public:
 
-	DocCommentFeatureClass(t4p::AppClass& app);
+	EditorMessagesViewClass();
 	
+	void AddViewMenuItems(wxMenu* toolsMenu);
+
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+	
+private:
+
 	/**
-	 * @return TRUE if this feature is enabled
+	 * When the user clicks on the editor messages menu
+	 * show the editor messages window
 	 */
-	bool IsEnabled() const;
+	void OnMenu(wxCommandEvent& event);
+	
+	void OnAppLog(t4p::EditorLogEventClass& event);
+		
+	/**
+	 * create the messages panel (or use the existing one) and
+	 * add a message to it.
+	 */
+	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
+
+	DECLARE_EVENT_TABLE();
+};
+
+/**
+ * This class will display a grid containing all of the 
+ * messages.
+ */
+class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
+
+public:
+
+	EditorMessagesPanelClass(wxWindow* parent, int id);
+
+	/**
+	 * Add a message to the display grid.
+	 */
+	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
+
+protected:
+
+	/**
+	 * Removes all messages from the display grid.
+	 */
+	void OnClearButton(wxCommandEvent& event);
 
 };
 
 }
 
 #endif
+

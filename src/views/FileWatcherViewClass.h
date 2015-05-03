@@ -19,39 +19,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef T4P_FILEWATCHERVIEWCLASS_H__
+#define T4P_FILEWATCHERVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
+#include <views/wxformbuilder/FileWatcherFeatureForms.h>
+#include <features/FileWatcherFeatureClass.h>
 
 namespace t4p {
 
-// forward declaration, defined in another file
-class CodeControlClass;
-
-/**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
- */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class FileWatcherViewClass : public t4p::FeatureViewClass {
 
 public:
 
-	DocCommentFeatureClass(t4p::AppClass& app);
+	FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
 	
-	/**
-	 * @return TRUE if this feature is enabled
-	 */
-	bool IsEnabled() const;
+	void AddPreferenceWindow(wxBookCtrlBase* parent);
+	
+private:
+	
+	t4p::FileWatcherFeatureClass& Feature;
+	
+	// to track opened files, since the watcher needs to 
+	// see which files are currently opened
+	void OnFileClosed(t4p::CodeControlEventClass& event);
+	void OnFileOpened(t4p::CodeControlEventClass& event);
+	
+	DECLARE_EVENT_TABLE()
+};
 
+class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
+	
+public:
+	
+	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
+
+private:
+
+	t4p::FileWatcherFeatureClass& Feature;
 };
 
 }
 
 #endif
+

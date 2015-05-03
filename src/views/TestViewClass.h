@@ -19,37 +19,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef TEST_VIEWCLASS_H__
+#define TEST_VIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
+#include <features/TestFeatureClass.h>
 
 namespace t4p {
 
-// forward declaration, defined in another file
-class CodeControlClass;
-
 /**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
+ * This is a feature that is designed to test the feature mechanism. 
+ * This is also useful for prototyping of a feature or debugging.
  */
-class DocCommentFeatureClass : public t4p::FeatureClass {
-
+class TestViewClass : public FeatureViewClass {
 public:
 
-	DocCommentFeatureClass(t4p::AppClass& app);
+	TestViewClass(t4p::TestFeatureClass& feature);
+		
+	/**
+	 * This feature will have no Edit menu items
+	 */
+	void AddEditMenuItems(wxMenu* editMenu);
+
+	/**
+	 * This feature will have one toolbar button, when clicked the Go() method will get called
+	 */
+	void AddToolBarItems(wxAuiToolBar* toolBar);
 	
 	/**
-	 * @return TRUE if this feature is enabled
+	 * This feature will have no extra windows.
 	 */
-	bool IsEnabled() const;
+	void AddWindows();
+	
+	/**
+	 * This feature will have no context menu items
+	 */
+	void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	
+private:	
 
+	/**
+	 * the actual code that will get executed when the "GO" button is clicked
+	 */
+	void Go(wxCommandEvent& event);
+	
+	/**
+	 * most logic should be contained in the feature
+	 */
+	t4p::TestFeatureClass& Feature;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }

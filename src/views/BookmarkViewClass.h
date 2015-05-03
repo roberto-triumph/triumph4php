@@ -19,39 +19,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2013 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef __T4P__BOOKMARKFEATUREVIEWCLASS_H__
+#define __T4P__BOOKMARKFEATUREVIEWCLASS_H__
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
-#include <wx/hyperlink.h>
+#include <views/FeatureViewClass.h>
 
 namespace t4p {
 
 // forward declaration, defined in another file
-class CodeControlClass;
+class BookmarkFeatureClass;
 
 /**
- * this feature will show a small panel with the PHP Doc
- * comment of the item that is currently under the 
- * mouse pointer or at the current cursor position. 
+ * The bookmark feature keeps track of bookmarks at the user's request.
+ * The bookmark feature allows the user to cycle through their
+ * bookmarkes using keyboard shortcuts.  
+ * 
+ * While the user specifies a file/line number, in reality the
+ * true power of a bookmark lies in the ability to point to a
+ * section of code rather than a line number itself. For example, 
+ * the user bookmarks the start of a function. Even if the user
+ * adds a new function before the bookmarked function, the bookmark
+ * will still point to the bookmarked function.
+ * 
+ * Bookmarks can be created on any file, not just files inside
+ * of projects.
+ * 
+ * For now, bookmarks are not persisted across restarts.  This 
+ * is because bookmarks are often used for short periods of time.
  */
-class DocCommentFeatureClass : public t4p::FeatureClass {
+class BookmarkViewClass : public t4p::FeatureViewClass {
 
 public:
-
-	DocCommentFeatureClass(t4p::AppClass& app);
+	BookmarkViewClass();
 	
 	/**
-	 * @return TRUE if this feature is enabled
+	 * the user can toggle bookmarks via the edit menu
 	 */
-	bool IsEnabled() const;
+	void AddEditMenuItems(wxMenu* editMenu);
+
+	/**
+	 * adds keyboard shortcuts for the bookmark functionality
+	 */
+	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts);
+	
+	private:
 
 };
 
 }
 
-#endif
+#endif // __T4P__BOOKMARKFEATURECLASS_H__
