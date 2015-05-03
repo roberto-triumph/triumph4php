@@ -56,6 +56,7 @@
 #include <features/LintFeatureClass.h>
 #include <features/views/LintViewClass.h>
 #include <features/SqlBrowserFeatureClass.h>
+#include <features/views/SqlBrowserViewClass.h>
 #include <features/EditorMessagesFeatureClass.h>
 #include <features/views/EditorMessagesViewClass.h>
 #include <features/RecentFilesFeatureClass.h>
@@ -389,12 +390,15 @@ void t4p::AppClass::CreateFeatures() {
 	RunConsoleViewClass* runConsoleView = new RunConsoleViewClass(*runConsole);
 	FeatureViews.push_back(runConsoleView);
 
+	SqlBrowserFeatureClass* sqlBrowser = new SqlBrowserFeatureClass(*this);
+	Features.push_back(sqlBrowser);
+	SqlBrowserViewClass* sqlBrowserView = new SqlBrowserViewClass(*sqlBrowser);
+	FeatureViews.push_back(sqlBrowserView);
+
 
 	FeatureClass* feature;
 	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);	
-	feature = new SqlBrowserFeatureClass(*this);
-	Features.push_back(feature);
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new VersionUpdateFeatureClass(*this);
