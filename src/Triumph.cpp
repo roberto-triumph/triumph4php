@@ -79,6 +79,7 @@
 #include <features/DocCommentFeatureClass.h>
 #include <features/views/DocCommentViewClass.h>
 #include <features/SyntaxHighlightFeatureClass.h>
+#include <features/views/SyntaxHighlightViewClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
 #include <features/views/EditorBehaviorViewClass.h>
 #include <features/ChangelogFeatureClass.h>
@@ -395,7 +396,11 @@ void t4p::AppClass::CreateFeatures() {
 	SqlBrowserViewClass* sqlBrowserView = new SqlBrowserViewClass(*sqlBrowser);
 	FeatureViews.push_back(sqlBrowserView);
 
-
+	SyntaxHighlightFeatureClass* syntaxHighlight = new SyntaxHighlightFeatureClass(*this);
+	Features.push_back(syntaxHighlight);
+	SyntaxHighlightViewClass* syntaxHighlightView = new SyntaxHighlightViewClass(*syntaxHighlight);
+	FeatureViews.push_back(syntaxHighlightView);
+	
 	FeatureClass* feature;
 	feature = new TagFeatureClass(*this);
 	Features.push_back(feature);	
@@ -405,8 +410,7 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(feature);
 	feature = new TotalSearchFeatureClass(*this);
 	Features.push_back(feature);
-	feature = new SyntaxHighlightFeatureClass(*this);
-	Features.push_back(feature);
+	
 
 	// TODO test feature need to find a quicker way to toggling it ON / OFF
 	//feature = new TestFeatureClass(*this);
