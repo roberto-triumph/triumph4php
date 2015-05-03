@@ -49,6 +49,7 @@
 #include <features/OutlineFeatureClass.h>
 #include <features/views/OutlineViewClass.h>
 #include <features/TagFeatureClass.h>
+#include <features/views/TagViewClass.h>
 #include <features/RunConsoleFeatureClass.h>
 #include <features/views/RunConsoleViewClass.h>
 #include <features/RunBrowserFeatureClass.h>
@@ -401,9 +402,12 @@ void t4p::AppClass::CreateFeatures() {
 	SyntaxHighlightViewClass* syntaxHighlightView = new SyntaxHighlightViewClass(*syntaxHighlight);
 	FeatureViews.push_back(syntaxHighlightView);
 	
+	TagFeatureClass* tag = new TagFeatureClass(*this);
+	Features.push_back(tag);
+	TagViewClass* tagView = new TagViewClass(*tag);
+	FeatureViews.push_back(tagView);
+
 	FeatureClass* feature;
-	feature = new TagFeatureClass(*this);
-	Features.push_back(feature);	
 	feature =  new TemplateFilesFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new VersionUpdateFeatureClass(*this);
