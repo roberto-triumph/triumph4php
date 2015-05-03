@@ -22,12 +22,15 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __TEMPLATEFILES_FEATURECLASS_H__
-#define __TEMPLATEFILES_FEATURECLASS_H__
+#ifndef __TEMPLATEFILES_VIEWCLASS_H__
+#define __TEMPLATEFILES_VIEWCLASS_H__
 
-#include <features/FeatureClass.h>
+#include <features/views/FeatureViewClass.h>
+#include <features/TemplateFilesFeatureClass.h>
+#include <features/wxformbuilder/TemplateFilesFeatureForms.h>
 #include <globals/TemplateFileTagClass.h>
 #include <actions/ActionClass.h>
+#include <wx/imaglist.h>
 
 namespace t4p {
 
@@ -43,25 +46,87 @@ namespace t4p {
  * After all of this, it will populate a window with the template files
  * for the URL that the user has selected.
  */
-class TemplateFilesFeatureClass : public t4p::FeatureClass {
+class TemplateFilesViewClass : public t4p::FeatureViewClass {
 	
 public:
 	
-	TemplateFilesFeatureClass(t4p::AppClass& app);
+	TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature);
 
 	void SetCurrentUrl(t4p::UrlTagClass url);
+	
+	void AddViewMenuItems(wxMenu* viewMenu);
 
-	UrlTagFinderClass& Urls();
 
 	/**
-	 * starts the view file detection process. This is an asynchronous operation.
-	 * When view files are detected, the feature will update the
-	 * panel appropriately.
+	 * @return wxString the currently opened file. Note that this may not be
+	 *         a valid file (new, untitled files).
 	 */
-	void StartDetection();
+	wxString CurrentFile();
+
+	/**
+	 * Opens the given file. file must be a full path.
+	 */
+	void OpenFile(wxString file);
 	
 private:
 	
+	/**
+	 * show (or create) the view files window and start the calculations if needed
+	 */
+	void OnTemplateFilesMenu(wxCommandEvent& event);
+
+	/**
+	 * when the template file detection process completes update the variable tree
+	 */
+	void OnTemplateDetectionComplete(t4p::ActionEventClass& event);
+		
+	void ShowPanel();
+	
+	t4p::TemplateFilesFeatureClass& Feature;
+	
+	DECLARE_EVENT_TABLE()
+};
+
+class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
+	
+public:
+
+	TemplateFilesFeatureClass& Feature;
+	
+	TemplateFilesViewClass& View;
+	
+	TemplateFilesPanelClass(wxWindow* parent, int id, 
+		TemplateFilesFeatureClass& feature,
+		TemplateFilesViewClass& view);
+
+	void UpdateResults();
+
+	void ClearResults();
+
+	void UpdateControllers();
+	
+protected:
+
+	void OnHelpButton(wxCommandEvent& event);
+
+	void OnCurrentButton(wxCommandEvent& event);
+
+	void OnControllerChoice(wxCommandEvent& event);
+
+	void OnActionChoice(wxCommandEvent& event);
+
+	void OnTreeItemActivated(wxTreeEvent& event);
+
+private:
+
+	enum {
+		IMAGE_TEMPLATE_FOLDER = 0,
+		IMAGE_TEMPLATE_FOLDER_OPEN,
+		IMAGE_TEMPLATE_FILE,
+		IMAGE_TEMPLATE_VARIABLE
+	};
+
+	wxImageList ImageList;
 };
 
 }

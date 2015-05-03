@@ -65,6 +65,7 @@
 #include <features/DetectorFeatureClass.h>
 #include <features/views/DetectorViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
+#include <features/views/TemplateFilesViewClass.h>
 #include <features/ConfigFilesFeatureClass.h>
 #include <features/views/ConfigFilesViewClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
@@ -406,10 +407,14 @@ void t4p::AppClass::CreateFeatures() {
 	Features.push_back(tag);
 	TagViewClass* tagView = new TagViewClass(*tag);
 	FeatureViews.push_back(tagView);
+	
+	TemplateFilesFeatureClass* templateFiles = new TemplateFilesFeatureClass(*this);
+	Features.push_back(templateFiles);
+	TemplateFilesViewClass* templateFilesView = new TemplateFilesViewClass(*templateFiles);
+	FeatureViews.push_back(templateFilesView);
+
 
 	FeatureClass* feature;
-	feature =  new TemplateFilesFeatureClass(*this);
-	Features.push_back(feature);
 	feature = new VersionUpdateFeatureClass(*this);
 	Features.push_back(feature);
 	feature = new TotalSearchFeatureClass(*this);
