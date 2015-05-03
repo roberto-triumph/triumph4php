@@ -26,6 +26,7 @@
 #define T4P_FEATUREVIEWCLASS_H__
 
 #include <main_frame/PreferencesClass.h>
+#include <globals/FileTypeClass.h>
 #include <wx/event.h>
 #include <wx/aui/aui.h>
 #include <map>
@@ -306,6 +307,17 @@ protected:
 	 * @return CodeControlClass* the code control that has focus; can be NULL
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	  * Creates a new code control that is primed with the global editor
+	  * options. code control will be tied to the application code Notebook.
+	  * 
+	  * @param tabName the name that will go on the tab of the new page
+	  *        This can be empty; if empty then a default message is shown
+	  * @param mode the document mode that the control will be editing
+	  * @return CodeControlClass* this class will own the pointer, DONT delete it
+	  */
+	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.

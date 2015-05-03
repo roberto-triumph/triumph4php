@@ -159,3 +159,13 @@ wxString t4p::FeatureViewClass::GetSelectedText() const {
 	}
 	return selectedText;
 }
+
+t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& tabName, t4p::FileType type) const {
+	t4p::NotebookClass* notebook = GetNotebook();
+	notebook->AddTriumphPage(type);
+	if (!tabName.IsEmpty()) {
+		notebook->SetPageText(notebook->GetSelection(), tabName);
+	}
+	t4p::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
+	return ctrl;
+}
