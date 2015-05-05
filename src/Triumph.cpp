@@ -38,68 +38,9 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 #include <main_frame/MainFrameClass.h>
-#include <features/EnvironmentFeatureClass.h>
-#include <views/EnvironmentViewClass.h>
-#include <features/FindInFilesFeatureClass.h>
-#include <views/FindInFilesViewClass.h>
-#include <features/FinderFeatureClass.h>
-#include <views/FinderViewClass.h>
-#include <features/ProjectFeatureClass.h>
-#include <views/ProjectViewClass.h>
-#include <features/OutlineFeatureClass.h>
-#include <views/OutlineViewClass.h>
-#include <features/TagFeatureClass.h>
-#include <views/TagViewClass.h>
-#include <features/RunConsoleFeatureClass.h>
-#include <views/RunConsoleViewClass.h>
-#include <features/RunBrowserFeatureClass.h>
-#include <views/RunBrowserViewClass.h>
-#include <features/LintFeatureClass.h>
-#include <views/LintViewClass.h>
-#include <features/SqlBrowserFeatureClass.h>
-#include <views/SqlBrowserViewClass.h>
-#include <features/EditorMessagesFeatureClass.h>
-#include <views/EditorMessagesViewClass.h>
-#include <features/RecentFilesFeatureClass.h>
-#include <views/RecentFilesViewClass.h>
-#include <features/DetectorFeatureClass.h>
-#include <views/DetectorViewClass.h>
-#include <features/TemplateFilesFeatureClass.h>
-#include <views/TemplateFilesViewClass.h>
-#include <features/ConfigFilesFeatureClass.h>
-#include <views/ConfigFilesViewClass.h>
-#include <features/FileModifiedCheckFeatureClass.h>
-#include <views/FileModifiedCheckViewClass.h>
-#include <features/FileWatcherFeatureClass.h>
-#include <views/FileWatcherViewClass.h>
-#include <features/ExplorerFeatureClass.h>
-#include <views/ExplorerViewClass.h>
-#include <features/NewUserFeatureClass.h>
-#include <views/NewUserViewClass.h>
-#include <features/VersionUpdateFeatureClass.h>
-#include <views/VersionUpdateViewClass.h>
-#include <features/TotalSearchFeatureClass.h>
-#include <views/TotalSearchViewClass.h>
-#include <features/DocCommentFeatureClass.h>
-#include <views/DocCommentViewClass.h>
-#include <features/SyntaxHighlightFeatureClass.h>
-#include <views/SyntaxHighlightViewClass.h>
-#include <features/EditorBehaviorFeatureClass.h>
-#include <views/EditorBehaviorViewClass.h>
-#include <features/ChangelogFeatureClass.h>
-#include <views/ChangelogViewClass.h>
-#include <features/BookmarkFeatureClass.h>
-#include <views/BookmarkViewClass.h>
-#include <features/DebuggerFeatureClass.h>
-#include <views/DebuggerViewClass.h>
-#include <features/FileCabinetFeatureClass.h>
-#include <views/FileCabinetViewClass.h>
-#include <features/PhpCodeCompletionFeatureClass.h>
-#include <views/PhpCodeCompletionViewClass.h>
-#include <views/HtmlViewClass.h>
-#include <views/JavascriptViewClass.h>
-#include <features/TestFeatureClass.h>
-#include <views/TestViewClass.h>
+#include <main_frame/MacCommonMenuBarClass.h>
+#include <features/FeatureClass.h>
+#include <views/FeatureViewClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 
@@ -149,9 +90,9 @@ t4p::AppClass::AppClass()
 	, Sequences(Globals, SqliteRunningThreads)
 	, Preferences()
 	, ConfigLastModified()
-	, Features()
+	, FeatureFactory(*this)
 	, Timer(*this)
-	, EditorMessagesFeature(NULL) 
+	, MacCommonMenuBar(NULL)
 	, IsAppReady(false) {
 	MainFrame = NULL;
 }
@@ -163,7 +104,7 @@ bool t4p::AppClass::OnInit() {
 	
 	// 1 ==> to make sure any queued items are done one at a time
 	SqliteRunningThreads.SetMaxThreads(1);
-	
+	MacCommonMenuBar = new t4p::MacCommonMenuBarClass(*this);
 	RunningThreads.SetThreadCleanup(new t4p::MysqlThreadCleanupClass);
 	
 	// not really needed since we will use this running threads for sqlite actions only,
@@ -186,31 +127,12 @@ bool t4p::AppClass::OnInit() {
 	//    crashes.
 	mysql_library_init(0, NULL, NULL);
 	sqlite_api::sqlite3_initialize();
-
-	// due to the way keyboard shortcuts are serialized, we need to load the
-	// frame and initialize the feature windows so that all menus are created
-	// and only then can we load the keyboard shortcuts from the INI file
-	// all menu items must be present in the menu bar for shortcuts to take effect
-	MainFrame = new t4p::MainFrameClass(FeatureViews, *this, Preferences);
-	FeatureWindows();
-	LoadPreferences();
-	MainFrame->AuiManagerUpdate();
-	if (CommandLine()) {
-		MainFrame->SetIcon(t4p::IconImageAsset(wxT("triumph4php")));
-		SetTopWindow(MainFrame);
-		MainFrame->Show(true);
-
-		// maximize only after showing, that way the size event gets propagated and
-		// the main frame is drawn correctly at app start.
-		// if we don't do this, there is a nasty effect on windows OS that shows 
-		// the status bar in the middle of the page until the user re-maximizes the app
-		MainFrame->Maximize();
-
-		// this line is needed so that we get all the wxLogXXX messages
-		// pointer will be managed by wxWidgets
-		// need to put this here because the logger needs an initialized window state
-		if (EditorMessagesFeature) {
-			wxLog::SetActiveTarget(new t4p::EditorMessagesLoggerClass(*EditorMessagesFeature));
+	
+	std::vector<wxString> filenames;
+	if (CommandLine(filenames)) {
+		CreateFrame();
+		if (!filenames.empty()) {
+			MainFrame->FileOpen(filenames);
 		}
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;
@@ -218,11 +140,77 @@ bool t4p::AppClass::OnInit() {
 	return false;
 }
 
+void t4p::AppClass::CreateFrame() {
+	wxASSERT_MSG(MainFrame == NULL, "main frame must not have been created");
+	
+	// due to the way keyboard shortcuts are serialized, we need to load the
+	// frame and initialize the feature windows so that all menus are created
+	// and only then can we load the keyboard shortcuts from the INI file
+	// all menu items must be present in the menu bar for shortcuts to take effect
+	MainFrame = new t4p::MainFrameClass(FeatureFactory.FeatureViews, *this);
+	FeatureWindows();
+	LoadPreferences();
+	MainFrame->AuiManagerUpdate();
+	MainFrame->SetIcon(t4p::IconImageAsset(wxT("triumph4php")));
+	SetTopWindow(MainFrame);
+	MainFrame->Show(true);
+
+	// maximize only after showing, that way the size event gets propagated and
+	// the main frame is drawn correctly at app start.
+	// if we don't do this, there is a nasty effect on windows OS that shows 
+	// the status bar in the middle of the page until the user re-maximizes the app
+	MainFrame->Maximize();	
+}
+
+void t4p::AppClass::OnCommonMenuFileNew(wxCommandEvent& event)
+{
+	CreateFrame();
+	
+	wxCommandEvent appReady(t4p::EVENT_APP_READY);
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		FeatureFactory.FeatureViews[i]->ProcessEvent(appReady);
+	}
+	
+	CreateNewCodeCtrl();
+}
+
+void t4p::AppClass::OnCommonMenuFileOpen(wxCommandEvent& event) {
+	wxFileDialog dialog(
+		NULL, 
+		_("Select file to open"),
+		"", "", "", wxFD_OPEN | wxFD_FILE_MUST_EXIST
+	);
+	if (wxOK == dialog.ShowModal()) {
+		CreateFrame();
+		
+		wxCommandEvent appReady(t4p::EVENT_APP_READY);
+		for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+			FeatureFactory.FeatureViews[i]->ProcessEvent(appReady);
+		}
+
+		wxString name = dialog.GetPath();
+		wxCommandEvent evt(t4p::EVENT_CMD_FILE_OPEN);
+		evt.SetString(name);
+		EventSink.Publish(evt);
+	}
+}
+
+void t4p::AppClass::CreateNewCodeCtrl() {
+	MainFrame->CreateNewCodeCtrl();
+}
+
 t4p::AppClass::~AppClass() {
 	Timer.Stop();
 	RunningThreads.RemoveEventHandler(&GlobalsChangeHandler);
 	RunningThreads.RemoveEventHandler(&Timer);
+	
+	RunningThreads.Shutdown();
+	SqliteRunningThreads.Shutdown();
+		
 	DeleteFeatures();
+	DeleteFeatureViews();
+	
+	delete MacCommonMenuBar;
 
 	// must close all soci sessions before shutting down sqlite library
 	Globals.Close();
@@ -236,7 +224,7 @@ t4p::AppClass::~AppClass() {
 }
 
 
-bool t4p::AppClass::CommandLine() {
+bool t4p::AppClass::CommandLine(std::vector<wxString>& filenames) {
 	bool ret = true;
 	wxCmdLineEntryDesc description[3];
 	description[0].description = "File name to open on startup";
@@ -264,9 +252,7 @@ bool t4p::AppClass::CommandLine() {
 		wxString filename,
 			projectDirectory;
 		if (parser.Found(wxT("file"), &filename)) {
-			std::vector<wxString> filenames;
 			filenames.push_back(filename);
-			MainFrame->FileOpen(filenames);
 		}
 	}
 	else if (-1 == result) {
@@ -276,211 +262,51 @@ bool t4p::AppClass::CommandLine() {
 }
 
 void t4p::AppClass::CreateFeatures() {
-	t4p::ChangelogFeatureClass* changelog = new ChangelogFeatureClass(*this);
-	t4p::ChangelogViewClass* changelogView = new ChangelogViewClass();
-	Features.push_back(changelog);
-	FeatureViews.push_back(changelogView);
-	
-	t4p::BookmarkFeatureClass* bookmark = new BookmarkFeatureClass(*this);
-	t4p::BookmarkViewClass* bookmarkView = new BookmarkViewClass(*bookmark);
-	Features.push_back(bookmark);
-	FeatureViews.push_back(bookmarkView);
-	
-	ConfigFilesFeatureClass* configFiles = new ConfigFilesFeatureClass(*this);
-	Features.push_back(configFiles);
-	ConfigFilesViewClass* configFilesView = new ConfigFilesViewClass(*configFiles);
-	FeatureViews.push_back(configFilesView);
 
-	t4p::DebuggerFeatureClass* debugger = new DebuggerFeatureClass(*this);
-	t4p::DebuggerViewClass* debuggerView = new DebuggerViewClass(*debugger);
-	Features.push_back(debugger);
-	FeatureViews.push_back(debuggerView);
-	
-	t4p::DetectorFeatureClass* detector = new DetectorFeatureClass(*this);
-	t4p::DetectorViewClass* detectorView = new DetectorViewClass(*detector);
-	Features.push_back(detector);
-	FeatureViews.push_back(detectorView);
-	
-	t4p::DocCommentFeatureClass* docComment = new DocCommentFeatureClass(*this);
-	t4p::DocCommentViewClass* docCommentView = new DocCommentViewClass(*docComment);
-	Features.push_back(docComment);
-	FeatureViews.push_back(docCommentView);
-	
-	t4p::EditorBehaviorFeatureClass* editorBehavior = new EditorBehaviorFeatureClass(*this);
-	t4p::EditorBehaviorViewClass* editorBehaviorView = new EditorBehaviorViewClass(*editorBehavior);
-	Features.push_back(editorBehavior);
-	FeatureViews.push_back(editorBehaviorView);
-	
-	EditorMessagesFeature = new t4p::EditorMessagesFeatureClass(*this);
-	t4p::EditorMessagesViewClass* editorMessagesView = new t4p::EditorMessagesViewClass();
-	Features.push_back(EditorMessagesFeature);
-	FeatureViews.push_back(editorMessagesView);
-	
-	EnvironmentFeatureClass* environmentFeature = new t4p::EnvironmentFeatureClass(*this);
-	EnvironmentViewClass* environmentView = new t4p::EnvironmentViewClass(*environmentFeature);
-	Features.push_back(environmentFeature);
-	FeatureViews.push_back(environmentView);
-	
-	ExplorerFeatureClass* explorer = new ExplorerFeatureClass(*this);
-	ExplorerViewClass* explorerView = new ExplorerViewClass(*explorer);
-	Features.push_back(explorer);
-	FeatureViews.push_back(explorerView);
-	
-	FileModifiedCheckFeatureClass* modifiedCheck = new FileModifiedCheckFeatureClass(*this);
-	Features.push_back(modifiedCheck);
-	FileModifiedCheckViewClass* modifiedView = new FileModifiedCheckViewClass(*modifiedCheck);
-	FeatureViews.push_back(modifiedView);
-	
-	FileWatcherFeatureClass* fileWatcher = new FileWatcherFeatureClass(*this);
-	FileWatcherViewClass* fileWatcherView = new FileWatcherViewClass(*fileWatcher);
-	Features.push_back(fileWatcher);
-	FeatureViews.push_back(fileWatcherView);
-	
-	FinderFeatureClass* finder = new FinderFeatureClass(*this);
-	FinderViewClass* finderView = new FinderViewClass(*finder);
-	Features.push_back(finder);
-	FeatureViews.push_back(finderView);
-	
-	FindInFilesFeatureClass* findInFiles = new FindInFilesFeatureClass(*this);
-	Features.push_back(findInFiles);
-	FindInFilesViewClass* findInFilesView = new FindInFilesViewClass(*findInFiles);
-	FeatureViews.push_back(findInFilesView);
-	
-	FileCabinetFeatureClass* fileCabinet = new FileCabinetFeatureClass(*this);
-	Features.push_back(fileCabinet);
-	FileCabinetViewClass* fileCabinetView = new FileCabinetViewClass(*fileCabinet);
-	FeatureViews.push_back(fileCabinetView);
-	
-	HtmlViewClass* html = new HtmlViewClass();
-	FeatureViews.push_back(html);
-	
-	JavascriptViewClass* javascript = new JavascriptViewClass();
-	FeatureViews.push_back(javascript);
-	
-	LintFeatureClass* lint = new LintFeatureClass(*this);
-	Features.push_back(lint);
-	LintViewClass* lintView = new LintViewClass(*lint);
-	FeatureViews.push_back(lintView);
-	
-	NewUserFeatureClass* newUser = new NewUserFeatureClass(*this);
-	Features.push_back(newUser);
-	NewUserViewClass* newUserView = new NewUserViewClass(*newUser);
-	FeatureViews.push_back(newUserView);
-	
-	OutlineFeatureClass* outline = new OutlineFeatureClass(*this);
-	Features.push_back(outline);
-	OutlineViewClass* outlineView = new OutlineViewClass(*outline);
-	FeatureViews.push_back(outlineView);
-
-	PhpCodeCompletionFeatureClass* phpCodeCompletion = new PhpCodeCompletionFeatureClass(*this);
-	Features.push_back(phpCodeCompletion);
-	PhpCodeCompletionViewClass* phpCodeCompletionView = new PhpCodeCompletionViewClass(*phpCodeCompletion);
-	FeatureViews.push_back(phpCodeCompletionView);
-	
-	ProjectFeatureClass* project = new ProjectFeatureClass(*this);
-	Features.push_back(project);
-	ProjectViewClass* projectView = new ProjectViewClass(*project);
-	FeatureViews.push_back(projectView);
-	
-	RecentFilesFeatureClass* recentFiles = new RecentFilesFeatureClass(*this);
-	Features.push_back(recentFiles);
-	RecentFilesViewClass* recentFilesView = new RecentFilesViewClass(*recentFiles);
-	FeatureViews.push_back(recentFilesView);
-	
-	RunBrowserFeatureClass* runBrowser = new RunBrowserFeatureClass(*this);
-	Features.push_back(runBrowser);
-	RunBrowserViewClass* runBrowserView = new RunBrowserViewClass(*runBrowser);
-	FeatureViews.push_back(runBrowserView);
-
-	RunConsoleFeatureClass* runConsole = new RunConsoleFeatureClass(*this);
-	Features.push_back(runConsole);
-	RunConsoleViewClass* runConsoleView = new RunConsoleViewClass(*runConsole);
-	FeatureViews.push_back(runConsoleView);
-
-	SqlBrowserFeatureClass* sqlBrowser = new SqlBrowserFeatureClass(*this);
-	Features.push_back(sqlBrowser);
-	SqlBrowserViewClass* sqlBrowserView = new SqlBrowserViewClass(*sqlBrowser);
-	FeatureViews.push_back(sqlBrowserView);
-
-	SyntaxHighlightFeatureClass* syntaxHighlight = new SyntaxHighlightFeatureClass(*this);
-	Features.push_back(syntaxHighlight);
-	SyntaxHighlightViewClass* syntaxHighlightView = new SyntaxHighlightViewClass(*syntaxHighlight);
-	FeatureViews.push_back(syntaxHighlightView);
-	
-	TagFeatureClass* tag = new TagFeatureClass(*this);
-	Features.push_back(tag);
-	TagViewClass* tagView = new TagViewClass(*tag);
-	FeatureViews.push_back(tagView);
-	
-	TemplateFilesFeatureClass* templateFiles = new TemplateFilesFeatureClass(*this);
-	Features.push_back(templateFiles);
-	TemplateFilesViewClass* templateFilesView = new TemplateFilesViewClass(*templateFiles);
-	FeatureViews.push_back(templateFilesView);
-	
-	TotalSearchFeatureClass* totalSearch = new TotalSearchFeatureClass(*this);
-	Features.push_back(totalSearch);
-	TotalSearchViewClass* totalSearchView = new TotalSearchViewClass(*totalSearch);
-	FeatureViews.push_back(totalSearchView);
-	
-	VersionUpdateFeatureClass* versionUpdate = new VersionUpdateFeatureClass(*this);
-	Features.push_back(versionUpdate);
-	VersionUpdateViewClass* versionUpdateView = new VersionUpdateViewClass(*versionUpdate);
-	FeatureViews.push_back(versionUpdateView);
-
-#if T4P_USE_TEST_FEATURE
-	TestFeatureClass* testFeature = new TestFeatureClass(*this);
-	Features.push_back(testFeature);
-	TestViewClass* testView = new TestViewClass(*testFeature);
-	FeatureViews.push_back(testView);
-#endif
 	
 	// connect the features to the event sink so that they can
 	// receive app events
-	for (size_t i = 0; i < Features.size(); ++i) {
-		EventSink.PushHandler(Features[i]);
-		RunningThreads.AddEventHandler(Features[i]);
-		SqliteRunningThreads.AddEventHandler(Features[i]);
-	}
-	
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		EventSink.PushHandler(FeatureViews[i]);
-		RunningThreads.AddEventHandler(FeatureViews[i]);
-		SqliteRunningThreads.AddEventHandler(FeatureViews[i]);
+	FeatureFactory.CreateFeatures();
+	for (size_t i = 0; i < FeatureFactory.Features.size(); ++i) {
+		EventSink.PushHandler(FeatureFactory.Features[i]);
+		RunningThreads.AddEventHandler(FeatureFactory.Features[i]);
+		SqliteRunningThreads.AddEventHandler(FeatureFactory.Features[i]);
 	}
 }
 
 void t4p::AppClass::FeatureWindows() {
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		MainFrame->LoadFeatureView(*FeatureViews[i]);
+	FeatureFactory.CreateViews();
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		EventSink.PushHandler(FeatureFactory.FeatureViews[i]);
+		RunningThreads.AddEventHandler(FeatureFactory.FeatureViews[i]);
+		SqliteRunningThreads.AddEventHandler(FeatureFactory.FeatureViews[i]);
+	}
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		MainFrame->LoadFeatureView(*FeatureFactory.FeatureViews[i]);
 	}
 	MainFrame->RealizeToolbar();
 }
 
 void t4p::AppClass::DeleteFeatures() {
-	for (size_t i = 0; i < Features.size(); ++i) {
-		RunningThreads.RemoveEventHandler(Features[i]);
-		SqliteRunningThreads.RemoveEventHandler(Features[i]);
-	}
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		RunningThreads.RemoveEventHandler(FeatureViews[i]);
-		SqliteRunningThreads.RemoveEventHandler(FeatureViews[i]);
-	}
-
-	// disconnect from events so that events dont get sent after
-	// features are destroyed
-	EventSink.RemoveAllHandlers();
-
-	// now it should be safe to 
-	for (size_t i = 0; i < Features.size(); ++i) {
-		delete Features[i];
-	}
-	Features.clear();
-	EditorMessagesFeature = NULL;
+	for (size_t i = 0; i < FeatureFactory.Features.size(); ++i) {
+		RunningThreads.RemoveEventHandler(FeatureFactory.Features[i]);
+		SqliteRunningThreads.RemoveEventHandler(FeatureFactory.Features[i]);
 	
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		delete FeatureViews[i];
+		// disconnect from events so that events dont get sent after
+		// features are destroyed
+		EventSink.RemoveHandler(FeatureFactory.Features[i]);
 	}
-	FeatureViews.clear();
+	FeatureFactory.DeleteFeatures();
+}
+
+void t4p::AppClass::DeleteFeatureViews() {
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		RunningThreads.RemoveEventHandler(FeatureFactory.FeatureViews[i]);
+		SqliteRunningThreads.RemoveEventHandler(FeatureFactory.FeatureViews[i]);
+		EventSink.RemoveHandler(FeatureFactory.FeatureViews[i]);
+	}
+	FeatureFactory.DeleteViews();
+	MainFrame = NULL;
 }
 
 void t4p::AppClass::LoadPreferences() {
@@ -495,11 +321,11 @@ void t4p::AppClass::LoadPreferences() {
 	Globals.Environment.LoadFromConfig(config);
 
 	// tell each feature to load their settings from the INI file
-	for (size_t i = 0; i < Features.size(); ++i) {
-		Features[i]->LoadPreferences(config);
+	for (size_t i = 0; i < FeatureFactory.Features.size(); ++i) {
+		FeatureFactory.Features[i]->LoadPreferences(config);
 	}
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		FeatureViews[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		FeatureFactory.FeatureViews[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
 	}	
 	Preferences.Load(config, MainFrame);
 }
@@ -555,8 +381,8 @@ void t4p::AppClass::OnActivateApp(wxActivateEvent& event) {
 }
 
 void t4p::AppClass::AddPreferencesWindows(wxBookCtrlBase* parent) {
-	for (size_t i = 0; i < FeatureViews.size(); ++i) {
-		FeatureViews[i]->AddPreferenceWindow(parent);
+	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
+		FeatureFactory.FeatureViews[i]->AddPreferenceWindow(parent);
 	}
 }
 
@@ -642,4 +468,6 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::AppClass, wxApp)
 	EVT_ACTIVATE_APP(t4p::AppClass::OnActivateApp)
+	EVT_MENU(t4p::MacCommonMenuBarClass::ID_COMMON_MENU_NEW, t4p::AppClass::OnCommonMenuFileNew)
+	EVT_MENU(t4p::MacCommonMenuBarClass::ID_COMMON_MENU_OPEN, t4p::AppClass::OnCommonMenuFileOpen)
 END_EVENT_TABLE()

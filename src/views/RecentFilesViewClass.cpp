@@ -31,6 +31,10 @@ t4p::RecentFilesViewClass::RecentFilesViewClass(t4p::RecentFilesFeatureClass& fe
 	RecentFilesMenu = NULL;
 }
 
+t4p::RecentFilesViewClass::~RecentFilesViewClass() {
+	Feature.FileHistory.RemoveMenu(RecentFilesMenu);
+}
+
 void t4p::RecentFilesViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 
 	// ATTN: possible problem. according to wxWidgets docs

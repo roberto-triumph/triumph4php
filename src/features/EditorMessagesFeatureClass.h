@@ -69,7 +69,12 @@ class EditorMessagesFeatureClass : public FeatureClass {
 public:
 
 	EditorMessagesFeatureClass(t4p::AppClass& app);
+	
+private:
 
+	void OnAppReady(wxCommandEvent& event);
+	
+	DECLARE_EVENT_TABLE()
 };
 
 /**

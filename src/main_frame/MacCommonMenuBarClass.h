@@ -19,62 +19,65 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2009-2011 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_RECENTFILESVIEWCLASS_H__
-#define __T4P_RECENTFILESVIEWCLASS_H__
+#ifndef T4P_MACCOMMONMENUBARCLASS_H__
+#define T4P_MACCOMMONMENUBARCLASS_H__
 
-#include <views/FeatureViewClass.h>
-#include <features/RecentFilesFeatureClass.h>
-#include <wx/docview.h>
+#include <wx/event.h>
+#include <wx/menu.h>
 
 namespace t4p {
 
-class RecentFilesViewClass : public FeatureViewClass {
+// forward declaration, defined in another file
+class AppClass;
+
+/**
+ * The man common menu bar is the menu bar that is
+ * shown to the user has closed the main frame.  It
+ * contains very simple menu that creates a new main 
+ * frame. 
+ *
+ * This class allows the application to stay running 
+ * even after the main frame is closed; this behavior
+ * is common to Mac Apps.  This class will contain the
+ * menu handlers for the menu that is shown when 
+ * there is no main frame running.
+ * 
+ * This class should only be used on Mac OS X, where
+ * the main frame can be closed but the app is still
+ * running. 
+ * 
+ * DEV note: not handling menu handlers here since
+ * the menu events never reach this class, since 
+ * this class is not connected to the app's
+ * event handler system
+ */
+class MacCommonMenuBarClass {
 
 public:
 
-	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
-
-	~RecentFilesViewClass();
+	enum {
+		ID_COMMON_MENU_NEW = wxID_HIGHEST + 1,
+		ID_COMMON_MENU_OPEN
+	};
 	
-	void AddFileMenuItems(wxMenu* fileMenu);
-
-	void SavePreferences();
-
-private:
-
+	MacCommonMenuBarClass(t4p::AppClass& app);
+	
+	private:
+	
+	t4p::AppClass& App;
+	
 	/**
-	 * sub-menu to hold the recent files
+	 * menubar that is shown when the main frame is not around.
 	 */
-	wxMenu* RecentFilesMenu;
-
-	/**
-	 * class that encapsulates the logic
-	 */
-	t4p::RecentFilesFeatureClass& Feature;
-
-	/**
-	 * handler for the file menu event
-	 */
-	void OnRecentFileMenu(wxCommandEvent& event);
-
-	/**
-	 * when a file has been opened, add it to the recent
-	 * list.
-	 */
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-
-	/**
-	 * when a file has been created, add it to the recent
-	 * list.
-	 */
-	void OnAppFileCreated(wxCommandEvent& event);
-
+	std::auto_ptr<wxMenuBar> CommonMenuBar;
+	
 	DECLARE_EVENT_TABLE()
 };
 
 }
 
 #endif
+

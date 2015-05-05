@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <main_frame/MainFrameClass.h>
-#include <features/FeatureClass.h>
 #include <views/FeatureViewClass.h>
+#include <features/FeatureClass.h>
 #include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
@@ -42,15 +42,13 @@ static int ID_SEQUENCE_GAUGE = wxNewId();
 static int ID_STATUS_BAR_TIMER = wxNewId();
 
 t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& featureViews,
-										t4p::AppClass& app,
-										t4p::PreferencesClass& preferences)
+										t4p::AppClass& app)
 	: MainFrameGeneratedClass(NULL)
 	, AuiManager()
 	, StatusBarTimer(this, ID_STATUS_BAR_TIMER)
 	, FeatureViews(featureViews)
 	, Listener(this)
 	, App(app)
-	, Preferences(preferences)
 	, ToolBar(NULL)
 	, ToolsNotebook(NULL)
 	, OutlineNotebook(NULL) {
@@ -66,7 +64,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
-	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
+	Notebook->CodeControlOptions = &App.Preferences.CodeControlOptions;
 	Notebook->Globals = &App.Globals;
 	Notebook->EventSink = &App.EventSink;
 	
@@ -134,7 +132,9 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		App.EventSink.Publish(exitEvent);
 		
 		// need to detach the window from the keyboard BEFORE the window is invalidated
-		Preferences.KeyProfiles.GetSelProfile()->DetachAll();	
+		// clearing the menu shortcuts because the menu is about to be gone
+		App.Preferences.KeyProfiles.GetSelProfile()->DetachAll();
+		App.Preferences.ClearAllShortcuts();
 
 		// need to remove the logging to the messages tab. We need to do this
 		// so that because a log message will try to be written to the 
@@ -146,23 +146,15 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		wxLog::DontCreateOnDemand();
 		App.Sequences.Stop();
 
+		App.EventSink.RemoveHandler(&Listener);
 		App.RunningThreads.RemoveEventHandler(this);
 		App.SqliteRunningThreads.RemoveEventHandler(this);
-		App.RunningThreads.Shutdown();
-		App.SqliteRunningThreads.Shutdown();
+		App.DeleteFeatureViews();
 		
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
 		// threads that are running
 		Notebook->CloseAllPages();
-
-		// delete the features first so that we can destroy
-		// the windows without worrying if the features
-		// may access them.
-		// only delete features until after we close the notebook code pages,
-		// so that the features can get the file closed events and perform
-		// any cleanup
-		App.DeleteFeatures();
 
 		while (ToolsNotebook->GetPageCount() > 0) {
 			ToolsNotebook->DeletePage(0);
@@ -172,6 +164,10 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		}
 		event.Skip();
 	}
+}
+
+void t4p::MainFrameClass::CreateNewCodeCtrl() {
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 }
 
 void t4p::MainFrameClass::OnFileSave(wxCommandEvent& event) {
@@ -386,7 +382,7 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	wxFileName settingsDir = t4p::SettingsDirAsset();
 	bool changedSettingsDir = false;
 	bool needsRetag = false;
-	PreferencesDialogClass prefDialog(this, App.Globals, Preferences, settingsDir, changedSettingsDir, needsRetag);
+	PreferencesDialogClass prefDialog(this, App.Globals, App.Preferences, settingsDir, changedSettingsDir, needsRetag);
 	App.AddPreferencesWindows(prefDialog.GetBookCtrl());
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
@@ -431,7 +427,7 @@ void t4p::MainFrameClass::OnViewToggleTools(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::PreferencesSaved() {
-	Preferences.EnableSelectedProfile(this);
+	App.Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
 }
 
@@ -447,18 +443,18 @@ void t4p::MainFrameClass::SetApplicationFont() {
 	//       this code makes them smaller
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
-		SetFont(Preferences.ApplicationFont);
+		SetFont(App.Preferences.ApplicationFont);
 		
 		// so that the tabs use the same font
-		Notebook->SetFont(Preferences.ApplicationFont);
-		Notebook->SetNormalFont(Preferences.ApplicationFont);
-		ToolsNotebook->SetFont(Preferences.ApplicationFont);
-		ToolsNotebook->SetNormalFont(Preferences.ApplicationFont);
-		OutlineNotebook->SetFont(Preferences.ApplicationFont);
-		OutlineNotebook->SetNormalFont(Preferences.ApplicationFont);
+		Notebook->SetFont(App.Preferences.ApplicationFont);
+		Notebook->SetNormalFont(App.Preferences.ApplicationFont);
+		ToolsNotebook->SetFont(App.Preferences.ApplicationFont);
+		ToolsNotebook->SetNormalFont(App.Preferences.ApplicationFont);
+		OutlineNotebook->SetFont(App.Preferences.ApplicationFont);
+		OutlineNotebook->SetNormalFont(App.Preferences.ApplicationFont);
 		
 		// so that the toolbar buttons use the same font
-		ToolBar->SetFont(Preferences.ApplicationFont);
+		ToolBar->SetFont(App.Preferences.ApplicationFont);
 	}
 }
 
@@ -848,7 +844,7 @@ void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 		else if (it->first == wxID_CLOSE) {
 			cmd.AddShortcut(wxT("CTRL+W"));
 		}
-		Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
+		App.Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
 	}
 }
 

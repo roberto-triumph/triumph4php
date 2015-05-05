@@ -45,7 +45,6 @@ class AppClass;
 class MainFrameClass;
 
 // forward declarations, defined in other files
-class FeatureClass;
 class FeatureViewClass;
 
 /**
@@ -99,8 +98,15 @@ class MainFrameClass : public MainFrameGeneratedClass {
 
 public:
 	
-	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, AppClass&  app,
-		PreferencesClass& preferences);
+	/**
+	 * @brief 
+	 * @param featureViews the views (to get menu bars, toolbars). This class
+	 *        will not own the pointers, although the main fram will tell the
+	 *        app to delete them when the user closes the main frame
+	 * @param app the application, used to get the preferences
+	 * 
+	 */
+	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, AppClass&  app);
 	
 	~MainFrameClass();
 	
@@ -166,6 +172,12 @@ public:
 	 * and it makes the app feel sluggish.
 	 */
 	void StartStatusBarTimer();
+
+	/**
+	 * creates a new code control and attaches it to the
+	 * notebook 
+	 */
+	void CreateNewCodeCtrl();
 
 protected:
 
@@ -359,7 +371,7 @@ private:
 	wxTimer StatusBarTimer;
 
 	/**
-	 * Additional functionality
+	 * Additional functionality, this class will not own the pointers
 	 */
 	const std::vector<FeatureViewClass*>& FeatureViews;
 
@@ -372,13 +384,6 @@ private:
 	 * The application global
 	 */
 	AppClass& App;
-
-	/**
-	 * The user preferences
-	 * 
-	 * @var PreferencesClass;
-	 */
-	PreferencesClass& Preferences;
 
 	/**
 	 * The toolbar instance
