@@ -492,3 +492,5 @@ UnicodeString t4p::RowToPhpClass::CreatePhpArray() {
 	code += UNICODE_STRING_SIMPLE("\n");
 	return code;
 }
+
+const wxEventType t4p::QUERY_COMPLETE_EVENT = wxNewEventType();

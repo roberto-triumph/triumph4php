@@ -628,6 +628,10 @@ void t4p::LintFeatureOptionsClass::Copy(const t4p::LintFeatureOptionsClass& src)
 	CheckFunctionArgumentCount = src.CheckFunctionArgumentCount;
 }
 
+const wxEventType t4p::EVENT_LINT_ERROR = wxNewEventType();
+const wxEventType t4p::EVENT_LINT_SUMMARY = wxNewEventType();
+
+
 BEGIN_EVENT_TABLE(t4p::LintFeatureClass, wxEvtHandler) 
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::LintFeatureClass::OnPreferencesSaved)
 	EVT_APP_PROJECTS_UPDATED(t4p::LintFeatureClass::OnProjectsUpdated)

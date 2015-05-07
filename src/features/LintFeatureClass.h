@@ -42,8 +42,8 @@ namespace t4p {
 // forward declaration, defined below
 class LintFeatureClass;
 
-const wxEventType EVENT_LINT_ERROR = wxNewEventType();
-const wxEventType EVENT_LINT_SUMMARY = wxNewEventType();
+extern const wxEventType EVENT_LINT_ERROR;
+extern const wxEventType EVENT_LINT_SUMMARY;
 
 /**
  * One EVENT_LINT_ERROR event will be generated once a PHP lint error has been encountered.

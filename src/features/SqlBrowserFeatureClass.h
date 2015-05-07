@@ -46,7 +46,7 @@ namespace t4p {
  * are done reading the result. This pointer may be NULL when there are no results.
  * event.GetId() will contain the ID of query (as given to MultiplSqlExecuteClass::Init).
  */
-const wxEventType QUERY_COMPLETE_EVENT = wxNewEventType();
+extern const wxEventType QUERY_COMPLETE_EVENT;
 
 class QueryCompleteEventClass : public wxEvent {
 
