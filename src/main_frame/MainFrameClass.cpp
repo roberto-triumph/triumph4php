@@ -226,7 +226,13 @@ void t4p::MainFrameClass::OnFileClose(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
-	Close();
+	if (Close()) {
+		
+		// on mac, we don't close the app when the user closes the
+		// main frame. *But* this handler is for the exit menu item,
+		// this means that the user really wants to stop the app.
+		App.SetExitOnFrameDelete(true);
+	}
 }
 
 void t4p::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
