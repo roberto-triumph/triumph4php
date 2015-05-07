@@ -165,7 +165,7 @@ private:
 };
 
 
-const wxEventType EVENT_FIND_IN_FILES_FILE_HIT = wxNewEventType();
+extern const wxEventType EVENT_FIND_IN_FILES_FILE_HIT;
 
 typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEventClass&);
 

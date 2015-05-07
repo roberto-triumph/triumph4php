@@ -200,3 +200,5 @@ t4p::FindInFilesFeatureClass::FindInFilesFeatureClass(t4p::AppClass& app)
 	, PreviousFindInFiles()
 	, DoHiddenFiles(false) {
 }
+
+const wxEventType t4p::EVENT_FIND_IN_FILES_FILE_HIT = wxNewEventType();
