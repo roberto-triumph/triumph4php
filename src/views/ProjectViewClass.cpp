@@ -174,33 +174,7 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 	wxDirDialog dirDialog(GetMainWindow(), _("Choose Project Root Directory"));
 	if (dirDialog.ShowModal() == wxID_OK) {
 		wxString dir = dirDialog.GetPath();
-		wxFileName rootPath;
-		rootPath.AssignDir(dir);
-		wxString projectName = rootPath.GetDirs().Last();
-
-		t4p::ProjectClass newProject;
-		t4p::SourceClass newSource;
-		newSource.RootDirectory = rootPath;
-		newSource.SetIncludeWildcards(wxT("*.*"));
-		newProject.AddSource(newSource);
-		newProject.Label = projectName;
-		newProject.IsEnabled = true;
-
-		Feature.App.Globals.Projects.push_back(newProject);
-
-		// for new projects we need to fill in the file extensions
-		// the rest of the app assumes they are already filled in
-		Feature.App.Globals.AssignFileExtensions(newProject);
-
-		wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
-		Feature.App.EventSink.Publish(evt);
-		wxConfigBase* config = wxConfig::Get();
-		config->Flush();
-
-		// signal that this app has modified the config file, that way the external
-		// modification check fails and the user will not be prompted to reload the config
-		Feature.App.UpdateConfigModifiedTime();
-
+		
 		// start the sequence that will update all global data structures
 		// delete the cache files for the projects the user has removed
 		// remove tags from deleted projects
@@ -216,17 +190,8 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 		);
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
-		if (wxYES == ret) {
-
-			// user does not want to re-tag newly enabled projects
-			std::vector<t4p::ProjectClass> empty;
-			std::vector<t4p::ProjectClass> touchedProjects;
-			touchedProjects.push_back(newProject);
-			Feature.App.Sequences.ProjectDefinitionsUpdated(touchedProjects, empty);
-		}
-		wxCommandEvent newProjectEvt(t4p::EVENT_APP_PROJECT_CREATED);
-		newProjectEvt.SetString(dir);
-		Feature.App.EventSink.Publish(newProjectEvt);
+		bool doTag = wxYES == ret;
+		Feature.CreateProject(dir, doTag);
 	}
 }
 

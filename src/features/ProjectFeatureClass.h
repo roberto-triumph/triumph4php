@@ -51,6 +51,24 @@ public:
 	 * Load the preferences from persistent storage 
 	 */
 	void LoadPreferences(wxConfigBase* config);
+	
+	/**
+	 * Creates a project with only 1 source directory. The
+	 * source will include all of the Global file types
+	 * The new project will be stored in memory and the
+	 * config will be flushed so that it is persisted right away.
+	 * Also, the app will be notified that a new project has been
+	 * created. Project will be set as enabled; its label
+	 * will be the last directory's name.
+	 * 
+	 * @param dir the full path to the root of the project.The
+	 *        directory is assumed to exist.
+	 * @param doTag if TRUE, then the new project will be tagged (indexed)
+	 *        the indexing will be done in a background thread; after this
+	 *        method completes the indexing will be taking place and the
+	 *        indexing will complete at a later time.
+	 */
+	void CreateProject(const wxString& dir, bool doTag);
 
 private:
 

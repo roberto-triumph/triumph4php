@@ -170,6 +170,48 @@ void t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& ev
 	App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
 }
 
+void t4p::ProjectFeatureClass::CreateProject(const wxString& dir, bool doTag) {
+	wxFileName rootPath;
+	rootPath.AssignDir(dir);
+	wxString projectName = rootPath.GetDirs().Last();
+
+	t4p::ProjectClass newProject;
+	t4p::SourceClass newSource;
+	newSource.RootDirectory = rootPath;
+	newSource.SetIncludeWildcards(wxT("*.*"));
+	newProject.AddSource(newSource);
+	newProject.Label = projectName;
+	newProject.IsEnabled = true;
+
+	App.Globals.Projects.push_back(newProject);
+
+	// for new projects we need to fill in the file extensions
+	// the rest of the app assumes they are already filled in
+	App.Globals.AssignFileExtensions(newProject);
+
+	wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
+	App.EventSink.Publish(evt);
+	wxConfigBase* config = wxConfig::Get();
+	config->Flush();
+	
+	// signal that this app has modified the config file, that way the external
+	// modification check fails and the user will not be prompted to reload the config
+	App.UpdateConfigModifiedTime();
+	
+	if (doTag) {
+		// user wants to re-tag newly enabled projects
+		std::vector<t4p::ProjectClass> empty;
+		std::vector<t4p::ProjectClass> touchedProjects;
+		touchedProjects.push_back(newProject);
+		App.Sequences.ProjectDefinitionsUpdated(touchedProjects, empty);
+	}
+	
+	// notity the rest of the app that a project has been created.
+	wxCommandEvent newProjectEvt(t4p::EVENT_APP_PROJECT_CREATED);
+	newProjectEvt.SetString(dir);
+	App.EventSink.Publish(newProjectEvt);
+}
+
 BEGIN_EVENT_TABLE(t4p::ProjectFeatureClass, FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::ProjectFeatureClass::OnPreferencesSaved)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated)
