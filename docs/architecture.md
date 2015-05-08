@@ -187,47 +187,53 @@ events in the background, both the feature or the view may respond to them.
   the libraries and they also aid in debugging; you can quickly test things
   out to see if there is a bug in one of the libraries.
 
-* __actions__ contains classes that execute logic in background threads. Triumph utilizes
+* __src/actions__ contains classes that execute logic in background threads. Triumph utilizes
 threads in many places so that we keep the main thread from being too
 busy.
 
-* __code_control__ contains classes related to managing and configuring Scintilla. Scintilla handles 
+* __src/code_control__ contains classes related to managing and configuring Scintilla. Scintilla handles 
 a multitude of languages, but we must configure it to turn functionality on or
 off depending on what language the file contains.
 
-* __features__ Features are distinct, user-noticeable functionality. For example, there is a 
-finder feature which takes care of showing the finder panel, there is a project feature that
-takes of showing the projects dialogs. Each feature is pretty isolated from
-all others and does not interact directly with another feature.
+* __src/features__ Features are distinct, user-noticeable functionality. For example, there is a 
+finder feature which takes care of searching for a string in text, there is a project feature that
+takes of storing project source directories. Each feature is pretty isolated from
+all others and does not interact directly with another feature. A feature does NOT contain any UI
+related code.
 
-* __features/wxformbuilder__ contains files with extensions .fbp, .cpp, or .h.  The 
+* __src/views__ Views are the GUI for a single feature. Each feature has 1 and only 1 view. For 
+example, the finder feature has a a finder view, the project feature has a project view, and 
+so on. Views are where the GUI logic lives; views add menu items, buttons, panels, and
+keyboard shortcuts.  They also bring up dialogs.
+
+* __src/views/wxformbuilder__ contains files with extensions .fbp, .cpp, or .h.  The 
 .fbp files are wxformbuilder files; they contain the designs of the features. There is 1 
 .fbp file per feature; each feature may have multiple panels and dialogs in the same design 
 file.  The .cpp and .h files are generated from the design files.  The C++ files in this directory 
 are never manually edited; they are always generated when the design changes.
 
-* __globals__ holds classes that are shared between features; globals are the "domain
+* __src/globals__ holds classes that are shared between features; globals are the "domain
 models" of Triumph.  For example, there is a ProjectClass that contains project
 info (root directory), and there is a TagClass that holds the tag (parsed PHP
 class name / filename).
 
-* __language__ Anything that is PHP-specific is put in this directory. PHP linters, 
+* __src/language__ Anything that is PHP-specific is put in this directory. PHP linters, 
 PHP tag cache, and PHP debugger objects are all here.
 
-* __main_frame__ The main frame is the Triumph's top-level window; it will display all of the 
+* __src/main_frame__ The main frame is the Triumph's top-level window; it will display all of the 
 toolbars and menus. Also, the top-level preferences panel is stored in this directory.
 
-* __main_frame/wxformbuilder__ contains files with extension .fbp, .cpp, and .h.  The 
+* __src/main_frame/wxformbuilder__ contains files with extension .fbp, .cpp, and .h.  The 
 .fbp file is a wxformbuilder file; it contains the design of the main frame.  The .cpp 
 and .h files are generated from  the design file.  The C++ files in this directory are 
 never manually edited; they are always generated when the design changes.
 
-* __search__ contains search and IO-related classes; classes to search a string, recurse a directory.
+* __src/search__ contains search and IO-related classes; classes to search a string, recurse a directory.
 
-* __widgets__ contains UI-specific classes that are shared among many features; for example file picker
+* __src/widgets__ contains UI-specific classes that are shared among many features; for example file picker
 validators, string validators.
 
-* __widgets/wxformbuilder__ contains files with extension fb.p, .cpp, and .h.  The 
+* __src/widgets/wxformbuilder__ contains files with extension fb.p, .cpp, and .h.  The 
 .fbp file is a wxformbuilder file; it contains the design of widgets.  The .cpp and 
 .h files are generated from  the design files.  The C++ files in this directory are never 
 manually edited; they are always generated when the design changes.
