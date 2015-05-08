@@ -30,48 +30,29 @@
 
 namespace t4p {
 
+extern const int MAX_RECENT_FILES;
+
+/**
+ * The recent files feature keeps track of the most
+ * recent files that the user has opened in Triumph.
+ */
 class RecentFilesFeatureClass : public FeatureClass {
 
 public:
 
+	/**
+	 * class that encapsulates the logic
+	 */	
+	wxFileHistory FileHistory;
+
 	RecentFilesFeatureClass(t4p::AppClass& app);
-
-	void AddFileMenuItems(wxMenu* fileMenu);
-
+	
 	void LoadPreferences(wxConfigBase* config);
-
+	
 	void SavePreferences();
 
 private:
 
-	/**
-	 * sub-menu to hold the recent files
-	 */
-	wxMenu* RecentFilesMenu;
-
-	/**
-	 * class that encapsulates the logic
-	 */
-	wxFileHistory FileHistory;
-
-	/**
-	 * handler for the file menu event
-	 */
-	void OnRecentFileMenu(wxCommandEvent& event);
-
-	/**
-	 * when a file has been opened, add it to the recent
-	 * list.
-	 */
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-
-	/**
-	 * when a file has been created, add it to the recent
-	 * list.
-	 */
-	void OnAppFileCreated(wxCommandEvent& event);
-
-	DECLARE_EVENT_TABLE()
 };
 
 }

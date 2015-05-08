@@ -27,9 +27,10 @@
 
 #include <features/FeatureClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
-#include <wx/fswatcher.h>
 
 namespace t4p {
+	
+extern const int ID_FILE_MODIFIED_ACTION;
 
 /**
  * A feature that checks to see if any files that are currently
@@ -42,64 +43,24 @@ namespace t4p {
  * event loop immediately, which calls the reactivate event and
  * then we perform the file check before we get the EVENT_APP_FILE_RENAMED
  * event (because this event is buffered)
+ * 
+ * The file modification times are read in a background thread so
+ * that if the user has many files open the user does not
+ * feel lag.
  */
 class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
 
 public:
 
 	FileModifiedCheckFeatureClass(t4p::AppClass& app);
-
-private:
 	
 	/**
-	 * handle the files that are not part of the watched directories
-	 * ie we will check the file modified times
+	 * starts a background action that will check the file mod
+	 * timestamps of the files vs. the timestamps we last got
+	 * for those files. The results will be posted in events
+	 * by the FileModifiedCheckActionClass.
 	 */
-	void OpenedCodeControlCheck();
-
-	/**
-	 * special handling for files that are open. For open files that were externally modified
-	 * we will prompt the user to take action
-	 */
-	void HandleOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
-
-	/**
-	 * prompt the user to reload modified files
-	 */
-	void FilesModifiedPrompt(std::map<wxString, t4p::CodeControlClass*>& filesToPrompt);
-
-	/**
-	 * prompt the user to save the deleted files
-	 */
-	void FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, int>& deletedFiles);
-
-	/**
-	 * prompt the user to open or close the renamed files
-	 */
-	void FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
-
-	/**
-	 * when the user puts this app in the foreground, check for
-	 * file modifications.  maybe the user went to another editor
-	 * and modified one of the files that is opened in triumph. Note that we
-	 * will check the file modified times in a background thread
-	 */
-	void OnActivateApp(wxCommandEvent& event);
-
-	/**
-	 * After we check the file modified times in a background thread this
-	 * method gets called. here we will prompt the user to reload/close the
-	 * files that were modified outside of triumph
-	 */
-	void OnFileModifiedPollComplete(t4p::FilesModifiedEventClass& event);
-	
-	/**
-	 * flag to prevent multiple modified dialogs during activate app event.
-	 * needed for linux
-	 */
-	bool JustReactivated;
-	
-	DECLARE_EVENT_TABLE()
+	void StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll);
 
 };
 

@@ -26,7 +26,6 @@
 #define __T4P_FILEWATCHERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/FileWatcherFeatureForms.h>
 #include <actions/ActionClass.h>
 #include <wx/fswatcher.h>
 
@@ -74,8 +73,24 @@ public:
 	
 	void LoadPreferences(wxConfigBase* config);
 	
-	void AddPreferenceWindow(wxBookCtrlBase* parent);
-
+	/**
+	 * @param fullPath the full path to add to the list of string of full paths of
+	 *        files that are opened in this editor. This feature
+	 *        will send different events based on whether or 
+	 *        not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
+	 *        This method should be called every time the user opens a file
+	 */
+	void TrackOpenedFile(wxString fullPath);
+	
+	/**
+	 * @param fullPath the full path to remove from the list of string of full paths of
+	 *        files that are opened in this editor. This feature
+	 *        will send different events based on whether or 
+	 *        not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
+	 *        This method should be called every time the user closes a file.
+	 */
+	void UntrackOpenedFile(wxString fullPath);
+	
 private:
 
 	/**
@@ -97,7 +112,7 @@ private:
 	/**
 	 * special handling for files that are not open.
 	 */
-	void HandleNonOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
+	void HandleNonOpenedFiles(const std::vector<wxString>& openedFiles, std::map<wxString, wxString>& pathsRenamed);
 
 	/**
 	 * when a file has been externally modified / added / deleted we need to
@@ -186,6 +201,14 @@ private:
 	wxDateTime LastWatcherEventTime;
 	
 	/**
+	 *  list of string of full paths of
+	 *  files that are opened in this editor. This feature
+	 *  will send different events based on whether or 
+	 *  not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
+	 */
+	std::vector<wxString> OpenedFiles;
+	
+	/**
 	 * will be set to TRUE if the watcher saw an error event.  We may get 
 	 * error events when a project source dir has been deleted. In this case, 
 	 * we want to prompt the user on what action to take
@@ -247,17 +270,6 @@ public:
 
 
 	wxEvent* Clone() const;
-};
-
-class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
-	
-public:
-	
-	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
-
-private:
-
-	t4p::FileWatcherFeatureClass& Feature;
 };
 
 }

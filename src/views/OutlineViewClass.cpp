@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/OutlineViewFeatureClass.h>
-#include <language/SymbolTableClass.h>
+#include <features/OutlineFeatureClass.h>
+#include <views/OutlineViewClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
@@ -56,8 +56,6 @@ static int ID_OUTLINE_MENU_TOGGLE_FUNCTION_ARGS = wxNewId();
 static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_NAME = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_TYPE = wxNewId();
-
-const wxEventType t4p::EVENT_OUTLINE_SEARCH_COMPLETE = wxNewEventType();
 
 static bool SortTagsByName(const t4p::TagClass& a, const t4p::TagClass& b) {
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
@@ -93,152 +91,24 @@ public:
 };
 }
 
-t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass()
-	: Label()
-	, Tags() {
-
+t4p::OutlineViewClass::OutlineViewClass(t4p::OutlineFeatureClass& feature)
+	: FeatureViewClass() 
+	, Feature(feature) {
 }
 
-
-t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src)
-	: Label()
-	, Tags() {
-	Copy(src);
-}
-
-void t4p::OutlineSearchCompleteClass::Copy(const t4p::OutlineSearchCompleteClass& src) {
-	Label = src.Label;
-	Tags = src.Tags;
-}
-
-bool t4p::OutlineSearchCompleteClass::IsLabelFileName() const {
-	return Label.Find(wxT(".")) != wxNOT_FOUND;
-}
-
-t4p::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventId, 
-																	const std::vector<t4p::OutlineSearchCompleteClass>& tags)
-	: wxEvent(eventId, t4p::EVENT_OUTLINE_SEARCH_COMPLETE)
-	, Tags(tags) {
-
-}
-
-wxEvent* t4p::OutlineSearchCompleteEventClass::Clone() const {
-	return new t4p::OutlineSearchCompleteEventClass(GetId(), Tags);
-}
-
-t4p::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads,
-																int eventId)
-	: ActionClass(runningThreads, eventId)
-	, TagCache()
-	, SearchStrings() 
-	, EnabledSourceDirs() {
-
-}
-
-void t4p::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals) {
-	SearchStrings = searches;
-	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, 
-		globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
-		globals.Environment.Php.Version);
-	cache->InitNativeTag(t4p::NativeFunctionsAsset());
-	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
-	TagCache.RegisterGlobal(cache);
-	
-	EnabledSourceDirs.clear();
-	std::vector<t4p::ProjectClass>::const_iterator project;
-	std::vector<t4p::SourceClass>::const_iterator source;
-	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled) {
-			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
-				wxFileName rootDir(source->RootDirectory);
-				EnabledSourceDirs.push_back(rootDir);
-			}
-		}
-	}
-}
-
-void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
-	std::vector<t4p::OutlineSearchCompleteClass> topLevelTags;
-	if (!IsCancelled()) {
-		std::vector<UnicodeString>::const_iterator search;
-		for (search = SearchStrings.begin(); !IsCancelled() && search != SearchStrings.end(); ++search) {
-			std::vector<t4p::TagClass> tags;
-			std::vector<t4p::TagClass>::const_iterator tag;
-			OutlineSearchCompleteClass tagSearchComplete;
-			tagSearchComplete.Label = t4p::IcuToWx(*search);
-			if (search->indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
-				
-				// searching for all tags in the file
-				tags = TagCache.AllClassesFunctionsDefines(t4p::IcuToWx(*search));
-				
-				// now for each class, collect all methods/properties for any class.
-				for (tag = tags.begin(); tag != tags.end(); ++tag) {
-					if (tag->Type == t4p::TagClass::CLASS) {
-						wxString classLabel = t4p::IcuToWx(tag->Identifier);
-						if (!tag->NamespaceName.isEmpty()) {
-							classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);
-						}
-						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
-					}
-					else {
-						tagSearchComplete.Tags[wxT("")].push_back(*tag);
-					}
-				}
-			}
-			else {
-				
-				// searching for all members in a class name
-				t4p::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
-				if (results) {
-					tags = results->Matches();
-					delete results;
-				}
-
-				if (!tags.empty()) {
-					tag = tags.begin();
-				}
-				wxString classLabel = t4p::IcuToWx(tag->Identifier);
-				if (classLabel.Contains(wxT("\\"))) {
-					classLabel = classLabel.AfterLast(wxT('\\'));
-				}
-				if (!tag->NamespaceName.isEmpty()) {
-					classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);
-				}
-				tagSearchComplete.Label = classLabel;
-				tagSearchComplete.Tags[wxT("")] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
-			}
-			topLevelTags.push_back(tagSearchComplete);
-		}
-	}
-	if (!IsCancelled()) {
-
-		// PostEvent will set the correct event ID
-		t4p::OutlineSearchCompleteEventClass evt(wxID_ANY, topLevelTags);
-		PostEvent(evt);	
-	}
-}
-wxString t4p::OutlineTagCacheSearchActionClass::GetLabel() const {
-	return wxT("Tag Cache Search");
-}
-
-t4p::OutlineViewFeatureClass::OutlineViewFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) {
-}
-
-void t4p::OutlineViewFeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+void t4p::OutlineViewClass::AddViewMenuItems(wxMenu* viewMenu) {
 	viewMenu->Append(t4p::MENU_OUTLINE, _("Outline Current File\tCTRL+SHIFT+O"),  _("Opens an outline view of the currently viewed file"), wxITEM_NORMAL);
 }
 
-void t4p::OutlineViewFeatureClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+void t4p::OutlineViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
 	std::map<int, wxString> menuItemIds;
 	menuItemIds[t4p::MENU_OUTLINE + 0] = wxT("Outline-Outline Current File");
 	AddDynamicCmd(menuItemIds, shortcuts);
 }
 
-void t4p::OutlineViewFeatureClass::JumpToResource(int tagId) {
+void t4p::OutlineViewClass::JumpToResource(int tagId) {
 	t4p::TagClass tag;
-	bool found = App.Globals.TagCache.FindById(tagId, tag);
+	bool found = Feature.App.Globals.TagCache.FindById(tagId, tag);
 	if (found) {
 		GetNotebook()->LoadPage(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
@@ -254,13 +124,13 @@ void t4p::OutlineViewFeatureClass::JumpToResource(int tagId) {
 	}
 }
 
-void t4p::OutlineViewFeatureClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
-	t4p::OutlineTagCacheSearchActionClass* action = new t4p::OutlineTagCacheSearchActionClass(App.RunningThreads, wxID_ANY);
-	action->SetSearch(searchStrings, App.Globals);
-	App.RunningThreads.Queue(action);
+void t4p::OutlineViewClass::StartTagSearch(const std::vector<UnicodeString>& searchStrings) {
+	t4p::OutlineTagCacheSearchActionClass* action = new t4p::OutlineTagCacheSearchActionClass(Feature.App.RunningThreads, wxID_ANY);
+	action->SetSearch(searchStrings, Feature.App.Globals);
+	Feature.App.RunningThreads.Queue(action);
 }
 
-void t4p::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
+void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 	
 	// create / open the outline window
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
@@ -273,7 +143,7 @@ void t4p::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 	else {
 		t4p::NotebookClass* notebook = GetNotebook();
 		if (notebook != NULL) {
-			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, this, notebook);
+			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, Feature, *this, notebook);
 			wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
 			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
 		}
@@ -288,7 +158,7 @@ void t4p::OutlineViewFeatureClass::OnOutlineMenu(wxCommandEvent& event) {
 	}
 }
 
-void t4p::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
@@ -308,7 +178,7 @@ void t4p::OutlineViewFeatureClass::OnContentNotebookPageChanged(wxAuiNotebookEve
 	event.Skip();
 }
 
-void t4p::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
@@ -321,7 +191,7 @@ void t4p::OutlineViewFeatureClass::OnContentNotebookPageClosed(wxAuiNotebookEven
 	event.Skip();
 }
 
-void t4p::OutlineViewFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+void t4p::OutlineViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
@@ -333,7 +203,7 @@ void t4p::OutlineViewFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& e
 	}
 }
 
-void t4p::OutlineViewFeatureClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event) {
+void t4p::OutlineViewClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event) {
 
 	//if the outline window is open, update the tree
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
@@ -344,12 +214,13 @@ void t4p::OutlineViewFeatureClass::OnTagSearchComplete(t4p::OutlineSearchComplet
 	}
 }
 
-t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineViewFeatureClass* feature, 
-		NotebookClass* notebook)
+t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, 
+		OutlineViewClass& view, NotebookClass* notebook)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
 	, OutlinedTags()
 	, ImageList(NULL)
 	, Feature(feature)
+	, View(view)
 	, Notebook(notebook)
 	, ShowMethods(true)
 	, ShowProperties(true)
@@ -595,7 +466,7 @@ void t4p::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 
 void t4p::OutlineViewPanelClass::OnAddButton(wxCommandEvent& event) {
 	std::vector<t4p::TagClass> tags;
-	t4p::FileSearchDialogClass dialog(this->GetParent(), *Feature, tags);
+	t4p::FileSearchDialogClass dialog(this->GetParent(), Feature, tags);
 	if (dialog.ShowModal() == wxOK) {
 		SearchTagsToOutline(tags);
 	}
@@ -611,7 +482,7 @@ void t4p::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
 			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
 		}
 	}
-	Feature->StartTagSearch(searchStrings);
+	View.StartTagSearch(searchStrings);
 }
 
 void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
@@ -630,7 +501,7 @@ void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 		event.Skip();
 		return;
 	}
-	Feature->JumpToResource(idItemData->Id);
+	View.JumpToResource(idItemData->Id);
 }
 
 void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::TagClass>& tags) {
@@ -652,7 +523,7 @@ void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::TagC
 			searchStrings.push_back(chosenTag->FullyQualifiedClassName());
 		}
 	}
-	Feature->StartTagSearch(searchStrings);
+	View.StartTagSearch(searchStrings);
 }
 
 void t4p::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
@@ -863,7 +734,7 @@ void t4p::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) {
 	RedrawOutline();
 }
 
-t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::OutlineViewFeatureClass& feature, std::vector<t4p::TagClass>& chosenTags)
+t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::OutlineFeatureClass& feature, std::vector<t4p::TagClass>& chosenTags)
 	: FileSearchDialogGeneratedClass(parent)
 	, Feature(feature)
 	, MatchingTags()
@@ -1108,13 +979,13 @@ void t4p::FileSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 	OnSearchEnter(event);
 }
 
-BEGIN_EVENT_TABLE(t4p::OutlineViewFeatureClass, wxEvtHandler)
-	EVT_MENU(t4p::MENU_OUTLINE, t4p::OutlineViewFeatureClass::OnOutlineMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::OutlineViewFeatureClass::OnContentNotebookPageChanged)
+BEGIN_EVENT_TABLE(t4p::OutlineViewClass, FeatureViewClass)
+	EVT_MENU(t4p::MENU_OUTLINE, t4p::OutlineViewClass::OnOutlineMenu)
+	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::OutlineViewClass::OnContentNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, 
-		t4p::OutlineViewFeatureClass::OnContentNotebookPageClosed)
-	EVT_APP_FILE_OPEN(t4p::OutlineViewFeatureClass::OnAppFileOpened)
-	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, t4p::OutlineViewFeatureClass::OnTagSearchComplete)
+		t4p::OutlineViewClass::OnContentNotebookPageClosed)
+	EVT_APP_FILE_OPEN(t4p::OutlineViewClass::OnAppFileOpened)
+	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, t4p::OutlineViewClass::OnTagSearchComplete)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::OutlineViewPanelClass, OutlineViewGeneratedPanelClass)

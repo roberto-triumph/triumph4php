@@ -26,7 +26,6 @@
 #define __EDITORMESSAGESFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/EditorMessagesFeatureForms.h>
 #include <wx/log.h>
 
 namespace t4p {
@@ -60,29 +59,7 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( EditorLogEventClassFunction, & fn ), (wxObject *) NULL ),
 
-/**
- * This class will display a grid containing all of the 
- * messages.
- */
-class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
 
-public:
-
-	EditorMessagesPanelClass(wxWindow* parent, int id);
-
-	/**
-	 * Add a message to the display grid.
-	 */
-	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
-
-protected:
-
-	/**
-	 * Removes all messages from the display grid.
-	 */
-	void OnClearButton(wxCommandEvent& event);
-
-};
 
 /**
  * This class is the handler for the editor message menu items.  
@@ -92,28 +69,11 @@ class EditorMessagesFeatureClass : public FeatureClass {
 public:
 
 	EditorMessagesFeatureClass(t4p::AppClass& app);
-
-	void AddViewMenuItems(wxMenu* toolsMenu);
-
-	/**
-	 * create the messages panel (or use the existing one) and
-	 * add a message to it.
-	 */
-	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
-
-	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-
+	
 private:
 
-	/**
-	 * When the user clicks on the editor messages menu
-	 * show the editor messages window
-	 */
-	void OnMenu(wxCommandEvent& event);
+	void OnAppReady(wxCommandEvent& event);
 	
-	void OnAppLog(t4p::EditorLogEventClass& event);
-
 	DECLARE_EVENT_TABLE()
 };
 

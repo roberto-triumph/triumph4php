@@ -26,7 +26,7 @@
 #define __T4P_CALLTIPFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/DocCommentFeatureForms.h>
+#include <views/wxformbuilder/DocCommentFeatureForms.h>
 #include <wx/hyperlink.h>
 
 namespace t4p {
@@ -44,43 +44,12 @@ class DocCommentFeatureClass : public t4p::FeatureClass {
 public:
 
 	DocCommentFeatureClass(t4p::AppClass& app);
-
-	void AddEditMenuItems(wxMenu* editMenu);
-
-private:
-
-	void OnShowDocComment(wxCommandEvent& event);
-
-	void OnMotionAlt(wxCommandEvent& event);
-
-	void ShowDocComment(t4p::CodeControlClass* ctrl, int pos);
-
-	void OnPhpSiteLinkClick(wxHyperlinkEvent& event);
-
-	DECLARE_EVENT_TABLE()
-};
-
-/**
- * the panel that shows a PHP doc comment.
- */
-class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
-
-public:
-
-	DocCommentPanelClass(wxWindow* parent, t4p::DocCommentFeatureClass& feature);
-
-	void SetText(const wxString& text);
 	
-	void EnablePhpSiteLink(const wxString& functionName);
+	/**
+	 * @return TRUE if this feature is enabled
+	 */
+	bool IsEnabled() const;
 
-protected:
-
-	void OnClose(wxHyperlinkEvent& event);
-	void OnKeyDown(wxKeyEvent& event);
-	void OnPhpSiteDocs(wxHyperlinkEvent& event);
-	void DoDestroy();
-
-	t4p::DocCommentFeatureClass& Feature;
 };
 
 }

@@ -57,22 +57,10 @@ static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* str
 
 t4p::VersionUpdateFeatureClass::VersionUpdateFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
-, NextCheckTime()
-, Timer(this, ID_VERSION_FEATURE_TIMER) {
+, NextCheckTime() {
 
 }
 
-void t4p::VersionUpdateFeatureClass::AddHelpMenuItems(wxMenu* helpMenu) {
-	helpMenu->Append(t4p::MENU_VERSION_UPDATE, _("Check for updates"),
-		_("Check for new version of Triumph"), wxITEM_NORMAL);
-}
-
-void t4p::VersionUpdateFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-
-	VersionUpdatePreferencesPanelClass* panel = new t4p::VersionUpdatePreferencesPanelClass(
-		parent, App.Preferences);
-	parent->AddPage(panel, _("Check for updates"));
-}
 
 void t4p::VersionUpdateFeatureClass::LoadPreferences(wxConfigBase* config) {
 	wxString readTime;
@@ -83,95 +71,12 @@ void t4p::VersionUpdateFeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
 void t4p::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
-	if (App.Preferences.CheckForUpdates) {
-		Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
-	}
 	CURLcode code = curl_global_init(CURL_GLOBAL_DEFAULT);
 	bool good = 0 == code;
 	wxUnusedVar(good);
 	wxASSERT_MSG(good, _("curl did not initialize"));
 }
 
-void t4p::VersionUpdateFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
-	if (App.Preferences.CheckForUpdates) {
-		if (!Timer.IsRunning()) {
-			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
-		}
-	}
-	else {
-		Timer.Stop();
-	}
-}
-
-void t4p::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
-	if (App.Preferences.CheckForUpdates) {
-		if (!Timer.IsRunning()) {
-			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
-		}
-	}
-	else {
-		Timer.Stop();
-	}
-}
-
-void t4p::VersionUpdateFeatureClass::OnTimer(wxTimerEvent& event) {
-	
-	// is it time to check for a new version
-	wxDateTime now = wxDateTime::Now();
-	if (NextCheckTime.IsEarlierThan(now)) {
-		Timer.Stop();
-		wxString currentVersion = GetCurrentVersion();
-		t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
-			App.RunningThreads, ID_EVENT_VERSION_UPDATES, currentVersion
-		);
-		App.RunningThreads.Queue(action);
-	}
-}
-
-void t4p::VersionUpdateFeatureClass::OnUpdateCheckComplete(wxCommandEvent& event) {
-	wxString nextVersion = event.GetString();
-	
-	wxString currentVersion = GetCurrentVersion();
-	if (!nextVersion.empty()) {
-		VersionUpdateDialogClass dialog(GetMainWindow(), wxID_ANY,
-			App.RunningThreads, currentVersion,
-			true, nextVersion);
-		dialog.ShowModal();
-	}
-
-	// do another check a week from today
-	NextCheckTime = wxDateTime::Now();
-	wxDateSpan week(0, 0, 1, 0);
-	NextCheckTime.Add(week);
-
-	// write the check time to the config
-	// NOTE: we check if settings dir has been set, if it has not
-	// been set, then we cannot write the config to a file 
-	// because the user has not chosen a settings directory
-	// since the version check is triggered during the app ready
-	// event, during the very first run the user has not yet
-	// chosen a settings dir, and the config is not usable
-	// TODO: we should prevent config from being read
-	// before the user has chosen a settings dir, or
-	// provide a default settings dir
-	wxFileName settingsDir = t4p::SettingsDirAsset();
-	if (settingsDir.IsOk()) {
-		wxConfigBase* config = wxConfig::Get();
-	
-		config->Write(wxT("VersionUpdates/NextCheckTime"), NextCheckTime.FormatISOCombined(' '));
-		config->Flush();
-	}
-
-	Timer.Start(1000 * 20, wxTIMER_CONTINUOUS);
-}
-
-void t4p::VersionUpdateFeatureClass::OnHelpCheckForUpdates(wxCommandEvent& event) {
-	wxString currentVersion  = GetCurrentVersion();
-	t4p::VersionUpdateDialogClass dialog(GetMainWindow(), 
-			wxID_ANY, App.RunningThreads, currentVersion, false,
-			wxEmptyString);
-	dialog.ShowModal();
-}
 
 wxString t4p::VersionUpdateFeatureClass::GetCurrentVersion() const {
 
@@ -186,77 +91,6 @@ wxString t4p::VersionUpdateFeatureClass::GetCurrentVersion() const {
 	}
 	currentVersion.Trim(true);
 	return currentVersion;
-}
-
-t4p::VersionUpdatePreferencesPanelClass::VersionUpdatePreferencesPanelClass(wxWindow* parent,
-																				  t4p::PreferencesClass& preferences)
-: VersionUpdatePreferencesGeneratedPanelClass(parent, wxID_ANY) {
-	wxGenericValidator checkValidator(&preferences.CheckForUpdates);
-	CheckForUpdates->SetValidator(checkValidator);
-	TransferDataToWindow();
-}
-
-t4p::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id, 
-															  t4p::RunningThreadsClass& runningThreads,
-															  const wxString& currentVersion,
-															  bool showNewVersion,
-															  wxString newVersion) 
-: VersionUpdateGeneratedDialogClass(parent, id)
-, Timer(this, ID_VERSION_DIALOG_TIMER)
-, RunningThreads(runningThreads)
-, StartedCheck(false) {
-	RunningThreads.AddEventHandler(this);
-	CurrentVersion->SetLabel(currentVersion);
-	if (showNewVersion) {
-		Gauge->Show(false);
-		NewVersion->SetLabel(newVersion);
-		Result->SetLabel(wxT("New version available: ") + newVersion);
-	}
-	else {
-		Timer.Start(200, wxTIMER_CONTINUOUS);
-	}
-}
-
-void t4p::VersionUpdateDialogClass::OnTimer(wxTimerEvent& event) {
-	if (!StartedCheck) {
-		Result->SetLabel(wxT("Checking for new version"));
-		ConnectToUpdateServer();
-		StartedCheck = true;
-	}
-	else {
-		Gauge->Pulse();
-	}
-}
-
-void t4p::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& event) {
-	Gauge->Show(false);
-	wxString newVersion = event.GetString();
-	int statusCode = event.GetInt();
-
-	bool foundNew = 200 == statusCode && !newVersion.empty();
-	if (foundNew) {
-		Result->SetLabel(wxT("New version available: ") + newVersion);
-	}
-	else if (statusCode == 200) {
-		Result->SetLabel(wxT("Your version is up-to-date"));
-		NewVersion->SetLabel(CurrentVersion->GetLabel());
-	}
-	else {
-		Result->SetLabel(wxString::Format(wxT("Connection error: (%d) %s"), statusCode, newVersion));
-	}
-	Timer.Stop();
-}
-
-void t4p::VersionUpdateDialogClass::ConnectToUpdateServer() {	
-	t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
-		RunningThreads, ID_EVENT_VERSION_UPDATES_ON_DIALOG, CurrentVersion->GetLabel()
-	);
-	RunningThreads.Queue(action);
-}
-
-void t4p::VersionUpdateDialogClass::OnOkButton(wxCommandEvent& event) {
-	RunningThreads.RemoveEventHandler(this);
-	EndModal(wxOK);
 }
 
 t4p::VersionUpdateActionClass::VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, 
@@ -335,16 +169,5 @@ wxString t4p::VersionUpdateActionClass::GetLabel() const {
 }
 
 BEGIN_EVENT_TABLE(t4p::VersionUpdateFeatureClass, t4p::FeatureClass)
-	EVT_MENU(t4p::MENU_VERSION_UPDATE + 0, t4p::VersionUpdateFeatureClass::OnHelpCheckForUpdates)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::VersionUpdateFeatureClass::OnAppReady)
-	EVT_TIMER(ID_VERSION_FEATURE_TIMER, t4p::VersionUpdateFeatureClass::OnTimer)
-	EVT_COMMAND(ID_EVENT_VERSION_UPDATES, EVENT_VERSION_CHECK, t4p::VersionUpdateFeatureClass::OnUpdateCheckComplete)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::VersionUpdateFeatureClass::OnPreferencesSaved)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::VersionUpdateFeatureClass::OnPreferencesExternallyUpdated)
-END_EVENT_TABLE()
-
-
-BEGIN_EVENT_TABLE(t4p::VersionUpdateDialogClass, wxDialog)
-	EVT_TIMER(ID_VERSION_DIALOG_TIMER, t4p::VersionUpdateDialogClass::OnTimer)
-	EVT_COMMAND(ID_EVENT_VERSION_UPDATES_ON_DIALOG, EVENT_VERSION_CHECK, t4p::VersionUpdateDialogClass::OnUpdateCheckComplete)
 END_EVENT_TABLE()

@@ -26,8 +26,6 @@
 #define __T4P_NEWUSERFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/NewUserFeatureForms.h>
-#include <wx/wizard.h>
 
 namespace t4p {
 
@@ -41,81 +39,8 @@ class NewUserFeatureClass : public t4p::FeatureClass {
 public:
 
 	NewUserFeatureClass(t4p::AppClass& app);
-
-private:
-
-	void OnAppReady(wxCommandEvent& event);
-
-	void OnTimer(wxTimerEvent& event);
-
-	void OnWizardCancel(wxWizardEvent& event);
-
-	wxTimer Timer;
-
-	DECLARE_EVENT_TABLE()
 };
-
-/**
- * The new user dialog will prompt the user to fill in settings needed
- * by Triumph to run properly.  This dialog will only be shown once
- * to the user - the first time the program is run on a machine.
-- */
-class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
-
-public:
-
-	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals, 
-		t4p::PreferencesClass& preferences, wxFileName& configFileDir);
-
-	bool TransferDataFromWindow();
-
-private:
-
-	void OnUpdateUi(wxUpdateUIEvent& event);
-
-	t4p::PreferencesClass& Preferences;
-
-	wxFileName& ConfigFileDir;
-
-	DECLARE_EVENT_TABLE()
-};
-
-/**
- * The dialog that shows the user the file extensions to associate to
- * a type (language) 
- */
-class NewUserAssociationsPanelClass : public NewUserAssociationsPanelGeneratedClass {
-
-public:
-
-	NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
-
-private:
-
-	t4p::GlobalsClass& Globals;
-
-};
-
-/**
- * The dialog that shows the user the php settings
- */
-class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClass {
-
-public:
-
-	NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
-
-	bool TransferDataFromWindow();
-
-private:
-
-	void OnUpdateUi(wxUpdateUIEvent& event);
-
-	t4p::GlobalsClass& Globals;
-
-	DECLARE_EVENT_TABLE()
-};
-
+ 
 }
 
 #endif

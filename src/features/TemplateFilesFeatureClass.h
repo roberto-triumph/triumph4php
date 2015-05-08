@@ -26,10 +26,8 @@
 #define __TEMPLATEFILES_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <features/wxformbuilder/TemplateFilesFeatureForms.h>
 #include <globals/TemplateFileTagClass.h>
 #include <actions/ActionClass.h>
-#include <wx/imaglist.h>
 
 namespace t4p {
 
@@ -52,8 +50,6 @@ public:
 	TemplateFilesFeatureClass(t4p::AppClass& app);
 
 	void SetCurrentUrl(t4p::UrlTagClass url);
-	
-	void AddViewMenuItems(wxMenu* viewMenu);
 
 	UrlTagFinderClass& Urls();
 
@@ -63,71 +59,9 @@ public:
 	 * panel appropriately.
 	 */
 	void StartDetection();
-
-	/**
-	 * @return wxString the currently opened file. Note that this may not be
-	 *         a valid file (new, untitled files).
-	 */
-	wxString CurrentFile();
-
-	/**
-	 * Opens the given file. file must be a full path.
-	 */
-	void OpenFile(wxString file);
 	
 private:
 	
-	/**
-	 * show (or create) the view files window and start the calculations if needed
-	 */
-	void OnTemplateFilesMenu(wxCommandEvent& event);
-
-	/**
-	 * when the template file detection process completes update the variable tree
-	 */
-	void OnTemplateDetectionComplete(t4p::ActionEventClass& event);
-		
-	void ShowPanel();
-	
-	DECLARE_EVENT_TABLE()
-};
-
-class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
-	
-public:
-
-	TemplateFilesFeatureClass& Feature;
-	
-	TemplateFilesPanelClass(wxWindow* parent, int id, TemplateFilesFeatureClass& feature);
-
-	void UpdateResults();
-
-	void ClearResults();
-
-	void UpdateControllers();
-	
-protected:
-
-	void OnHelpButton(wxCommandEvent& event);
-
-	void OnCurrentButton(wxCommandEvent& event);
-
-	void OnControllerChoice(wxCommandEvent& event);
-
-	void OnActionChoice(wxCommandEvent& event);
-
-	void OnTreeItemActivated(wxTreeEvent& event);
-
-private:
-
-	enum {
-		IMAGE_TEMPLATE_FOLDER = 0,
-		IMAGE_TEMPLATE_FOLDER_OPEN,
-		IMAGE_TEMPLATE_FILE,
-		IMAGE_TEMPLATE_VARIABLE
-	};
-
-	wxImageList ImageList;
 };
 
 }

@@ -27,30 +27,36 @@
 #include <globals/Number.h>
 #include <Triumph.h>
 
-// max amount of menu items to show
-// the 100 is due to the menu ids allocated to each feature in
-// the FeatureClass MenuIds enum
-static size_t MAX_CONFIG_MENU_ITEMS = 100;
+t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass()
+: ProjectLabel()
+, ConfigTags() {
+	
+}
+
+t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src)
+: ProjectLabel()
+, ConfigTags() {
+	Copy(src);
+}
+
+t4p::ConfigFilesFeaturePairClass& t4p::ConfigFilesFeaturePairClass::operator=(const t4p::ConfigFilesFeaturePairClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::ConfigFilesFeaturePairClass::Copy(const t4p::ConfigFilesFeaturePairClass& src) {
+	ProjectLabel = src.ProjectLabel;
+	ConfigTags = src.ConfigTags;
+}
 
 t4p::ConfigFilesFeatureClass::ConfigFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) 
-	, ConfigPairs()
-	, ConfigTags()
-	, ConfigMenu(NULL) {
+	, ConfigTags() {
 
 }
 
-void t4p::ConfigFilesFeatureClass::AddNewMenu(wxMenuBar* menuBar) {
-	ConfigMenu = new wxMenu();
-	menuBar->Append(ConfigMenu, _("Project Configs"));
-
-	// at this point the projects are not loaded yet must wait
-	// until projects are loaded so that we can load 
-	// the detected config files
-}
-
-void t4p::ConfigFilesFeatureClass::RebuildMenu() {
-	ConfigPairs.clear();
+bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& configPairs) {
+	configPairs.clear();
 	ConfigTags.clear();
 
 	// get the menus; need to keep them in memory
@@ -69,7 +75,7 @@ void t4p::ConfigFilesFeatureClass::RebuildMenu() {
 		std::vector<t4p::ProjectClass>::const_iterator project;
 		for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
 			if (project->IsEnabled) {
-				ConfigPair pair;
+				t4p::ConfigFilesFeaturePairClass pair;
 				pair.ProjectLabel = project->Label;
 				std::vector<t4p::ConfigTagClass>::const_iterator configTag;
 				for (configTag = allConfigTags.begin(); configTag != allConfigTags.end(); ++configTag) {
@@ -80,47 +86,16 @@ void t4p::ConfigFilesFeatureClass::RebuildMenu() {
 					}
 				}
 				if (!pair.ConfigTags.empty()) {
-					ConfigPairs.push_back(pair);
+					configPairs.push_back(pair);
 				}
 			}
 		}
 	}
-	while (ConfigMenu->GetMenuItemCount() > 0) {
-
-		// use destroy because these are all submenus
-		ConfigMenu->Destroy(ConfigMenu->FindItemByPosition(0)->GetId());
-	}
-	std::vector<ConfigPair>::const_iterator configPair;
-	std::vector<t4p::ConfigTagClass>::const_iterator config;
-	size_t i = 0;
-
-	// make sure to not make more menu items than are allowed.
-	for (configPair = ConfigPairs.begin(); configPair != ConfigPairs.end() && i < MAX_CONFIG_MENU_ITEMS; ++configPair) {
-		wxMenu* submenu = new wxMenu();
-		for (config = configPair->ConfigTags.begin(); config != configPair->ConfigTags.end(); ++config) {
-			submenu->Append(t4p::CONFIG_DETECTORS + i, config->MenuLabel() , config->ConfigFileName.GetFullPath(), wxITEM_NORMAL);
-			i++;
-			if (i >= MAX_CONFIG_MENU_ITEMS) {
-				break;
-			}
-		}
-		wxString projectLabel(configPair->ProjectLabel);
-		projectLabel.Replace(wxT("&"), wxT("&&"));
-		ConfigMenu->AppendSubMenu(submenu, projectLabel);
-	}
+	return !configPairs.empty();
 }
 
-void t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete(t4p::ActionEventClass& event) {
-	RebuildMenu();
-}
-
-void t4p::ConfigFilesFeatureClass::OnConfigFilesDetected(t4p::ActionEventClass& event) {
-	RebuildMenu();
-}
-
-void t4p::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
-	size_t index = event.GetId() - t4p::CONFIG_DETECTORS;
-	if (t4p::NumberLessThan(index, MAX_CONFIG_MENU_ITEMS) && index <ConfigTags.size()) {
+void t4p::ConfigFilesFeatureClass::OpenConfigItem(size_t index) {
+	if (t4p::NumberLessThan(index, t4p::ConfigFilesFeatureClass::MAX_CONFIG_MENU_ITEMS) && index <ConfigTags.size()) {
 		wxFileName fileName = ConfigTags[index].ConfigFileName;
 		t4p::OpenFileCommandEventClass cmd(fileName.GetFullPath());
 		App.EventSink.Publish(cmd);
@@ -142,10 +117,6 @@ void t4p::ConfigFilesFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event
 	}
 }
 
-
 BEGIN_EVENT_TABLE(t4p::ConfigFilesFeatureClass, t4p::FeatureClass) 
-	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT,  t4p::ConfigFilesFeatureClass::OnDetectorDbInitComplete)
-	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR, t4p::ConfigFilesFeatureClass::OnConfigFilesDetected)
-	EVT_MENU_RANGE(t4p::CONFIG_DETECTORS, t4p::CONFIG_DETECTORS + MAX_CONFIG_MENU_ITEMS, t4p::ConfigFilesFeatureClass::OnConfigMenuItem)
 	EVT_APP_FILE_SAVED(t4p::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

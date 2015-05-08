@@ -19,45 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @copyright  2014 Roberto Perpuly
+ * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <features/JavascriptFeatureClass.h>
+#include <views/HtmlViewClass.h>
+#include <code_control/CodeControlClass.h>
 
-static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
+static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);
 
 	// dont match braces inside strings or comments.
-	return wxSTC_C_COMMENT == style || wxSTC_C_STRING == style || wxSTC_C_CHARACTER == style;
+	return wxSTC_CSS_COMMENT == style || wxSTC_CSS_DOUBLESTRING == style || wxSTC_CSS_SINGLESTRING == style;
 }
 
-
-t4p::JavascriptCodeCompletionProviderClass::JavascriptCodeCompletionProviderClass()
+t4p::HtmlCodeCompletionProviderClass::HtmlCodeCompletionProviderClass()
 : CodeCompletionProviderClass() {
 	
 }
 
-bool t4p::JavascriptCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
+bool t4p::HtmlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
 	
 	// not yet implemented
 	return false;
 }
 
-void t4p::JavascriptCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+void t4p::HtmlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 	
 }
 
-t4p::JavascriptBraceMatchStylerClass::JavascriptBraceMatchStylerClass()
+
+t4p::CssBraceMatchStylerClass::CssBraceMatchStylerClass()
 : BraceMatchStylerClass() {
 	
 }
 
-bool t4p::JavascriptBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
-	return t4p::FILE_TYPE_JS == type;
+bool t4p::CssBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
+	return t4p::FILE_TYPE_CSS == type;
 }
 
-void t4p::JavascriptBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
-	if (!InCommentOrStringStyle(ctrl, posToCheck)) {
+void t4p::CssBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posToCheck) {
+	if (!InCssCommentOrStringStyle(ctrl, posToCheck)) {
 		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
 		if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
 			posToCheck = posToCheck - 1;
@@ -83,19 +84,19 @@ void t4p::JavascriptBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, in
 	}
 }
 
-t4p::JavascriptFeatureClass::JavascriptFeatureClass(t4p::AppClass& app)
-: FeatureClass(app)
-, JavascriptCompletionProvider() 
-, BraceStyler() {
+t4p::HtmlViewClass::HtmlViewClass()
+: FeatureViewClass()
+, HtmlCompletionProvider() 
+, CssBraceStyler() {
 	
 }
 
-void t4p::JavascriptFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-	event.GetCodeControl()->RegisterCompletionProvider(&JavascriptCompletionProvider);
-	event.GetCodeControl()->RegisterBraceMatchStyler(&BraceStyler);
+void t4p::HtmlViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+	event.GetCodeControl()->RegisterCompletionProvider(&HtmlCompletionProvider);
+	event.GetCodeControl()->RegisterBraceMatchStyler(&CssBraceStyler);
 }
 
-BEGIN_EVENT_TABLE(t4p::JavascriptFeatureClass, t4p::FeatureClass)
-	EVT_APP_FILE_NEW(t4p::JavascriptFeatureClass::OnAppFileOpened)
-	EVT_APP_FILE_OPEN(t4p::JavascriptFeatureClass::OnAppFileOpened)
+BEGIN_EVENT_TABLE(t4p::HtmlViewClass, t4p::FeatureViewClass)
+	EVT_APP_FILE_NEW(t4p::HtmlViewClass::OnAppFileOpened)
+	EVT_APP_FILE_OPEN(t4p::HtmlViewClass::OnAppFileOpened)
 END_EVENT_TABLE()

@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <main_frame/MainFrameClass.h>
+#include <views/FeatureViewClass.h>
 #include <features/FeatureClass.h>
 #include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
@@ -40,16 +41,14 @@ static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
 static int ID_STATUS_BAR_TIMER = wxNewId();
 
-t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureClass*>& features,
-										t4p::AppClass& app,
-										t4p::PreferencesClass& preferences)
+t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& featureViews,
+										t4p::AppClass& app)
 	: MainFrameGeneratedClass(NULL)
 	, AuiManager()
 	, StatusBarTimer(this, ID_STATUS_BAR_TIMER)
-	, Features(features)
+	, FeatureViews(featureViews)
 	, Listener(this)
 	, App(app)
-	, Preferences(preferences)
 	, ToolBar(NULL)
 	, ToolsNotebook(NULL)
 	, OutlineNotebook(NULL) {
@@ -65,7 +64,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureClass*>& featu
 	
 	// when the notebook is empty we want to accept dragged files
 	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
-	Notebook->CodeControlOptions = &Preferences.CodeControlOptions;
+	Notebook->CodeControlOptions = &App.Preferences.CodeControlOptions;
 	Notebook->Globals = &App.Globals;
 	Notebook->EventSink = &App.EventSink;
 	
@@ -133,7 +132,9 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		App.EventSink.Publish(exitEvent);
 		
 		// need to detach the window from the keyboard BEFORE the window is invalidated
-		Preferences.KeyProfiles.GetSelProfile()->DetachAll();	
+		// clearing the menu shortcuts because the menu is about to be gone
+		App.Preferences.KeyProfiles.GetSelProfile()->DetachAll();
+		App.Preferences.ClearAllShortcuts();
 
 		// need to remove the logging to the messages tab. We need to do this
 		// so that because a log message will try to be written to the 
@@ -145,23 +146,15 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		wxLog::DontCreateOnDemand();
 		App.Sequences.Stop();
 
+		App.EventSink.RemoveHandler(&Listener);
 		App.RunningThreads.RemoveEventHandler(this);
 		App.SqliteRunningThreads.RemoveEventHandler(this);
-		App.RunningThreads.Shutdown();
-		App.SqliteRunningThreads.Shutdown();
+		App.DeleteFeatureViews();
 		
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
 		// threads that are running
 		Notebook->CloseAllPages();
-
-		// delete the features first so that we can destroy
-		// the windows without worrying if the features
-		// may access them.
-		// only delete features until after we close the notebook code pages,
-		// so that the features can get the file closed events and perform
-		// any cleanup
-		App.DeleteFeatures();
 
 		while (ToolsNotebook->GetPageCount() > 0) {
 			ToolsNotebook->DeletePage(0);
@@ -171,6 +164,10 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		}
 		event.Skip();
 	}
+}
+
+void t4p::MainFrameClass::CreateNewCodeCtrl() {
+	Notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 }
 
 void t4p::MainFrameClass::OnFileSave(wxCommandEvent& event) {
@@ -229,7 +226,13 @@ void t4p::MainFrameClass::OnFileClose(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
-	Close();
+	if (Close()) {
+		
+		// on mac, we don't close the app when the user closes the
+		// main frame. *But* this handler is for the exit menu item,
+		// this means that the user really wants to stop the app.
+		App.SetExitOnFrameDelete(true);
+	}
 }
 
 void t4p::MainFrameClass::OnFileRevert(wxCommandEvent& event) {
@@ -385,11 +388,8 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 	wxFileName settingsDir = t4p::SettingsDirAsset();
 	bool changedSettingsDir = false;
 	bool needsRetag = false;
-	PreferencesDialogClass prefDialog(this, App.Globals, Preferences, settingsDir, changedSettingsDir, needsRetag);
-	
-	for (size_t i = 0; i < Features.size(); ++i) {
-		Features[i]->AddPreferenceWindow(prefDialog.GetBookCtrl());
-	}
+	PreferencesDialogClass prefDialog(this, App.Globals, App.Preferences, settingsDir, changedSettingsDir, needsRetag);
+	App.AddPreferencesWindows(prefDialog.GetBookCtrl());
 	prefDialog.Prepare();
 	int exitCode = prefDialog.ShowModal();
 	if (wxOK == exitCode) {
@@ -433,7 +433,7 @@ void t4p::MainFrameClass::OnViewToggleTools(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::PreferencesSaved() {
-	Preferences.EnableSelectedProfile(this);
+	App.Preferences.EnableSelectedProfile(this);
 	Notebook->RefreshCodeControlOptions();
 }
 
@@ -449,18 +449,18 @@ void t4p::MainFrameClass::SetApplicationFont() {
 	//       this code makes them smaller
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
-		SetFont(Preferences.ApplicationFont);
+		SetFont(App.Preferences.ApplicationFont);
 		
 		// so that the tabs use the same font
-		Notebook->SetFont(Preferences.ApplicationFont);
-		Notebook->SetNormalFont(Preferences.ApplicationFont);
-		ToolsNotebook->SetFont(Preferences.ApplicationFont);
-		ToolsNotebook->SetNormalFont(Preferences.ApplicationFont);
-		OutlineNotebook->SetFont(Preferences.ApplicationFont);
-		OutlineNotebook->SetNormalFont(Preferences.ApplicationFont);
+		Notebook->SetFont(App.Preferences.ApplicationFont);
+		Notebook->SetNormalFont(App.Preferences.ApplicationFont);
+		ToolsNotebook->SetFont(App.Preferences.ApplicationFont);
+		ToolsNotebook->SetNormalFont(App.Preferences.ApplicationFont);
+		OutlineNotebook->SetFont(App.Preferences.ApplicationFont);
+		OutlineNotebook->SetNormalFont(App.Preferences.ApplicationFont);
 		
 		// so that the toolbar buttons use the same font
-		ToolBar->SetFont(Preferences.ApplicationFont);
+		ToolBar->SetFont(App.Preferences.ApplicationFont);
 	}
 }
 
@@ -612,46 +612,47 @@ void t4p::MainFrameClass::AuiManagerUpdate() {
 	AuiManager.Update();
 }
 
-void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
+void t4p::MainFrameClass::LoadFeatureView(t4p::FeatureViewClass& view) {
 	
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus
-	feature->InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, &AuiManager, GetMenuBar());
+	view.InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook, 
+		&AuiManager, GetMenuBar());
 	
 	//  when adding the separators, we dont want a separator at the very end
 	// we dont need separators if the feature did not add any menu items
 	size_t oldFileMenuCount = FileMenu->GetMenuItemCount();
-	feature->AddFileMenuItems(FileMenu);
+	view.AddFileMenuItems(FileMenu);
 	if (oldFileMenuCount != FileMenu->GetMenuItemCount() && oldFileMenuCount > 0) {
 		FileMenu->InsertSeparator(oldFileMenuCount);
 	}
 
 	size_t oldEditMenuCount = EditMenu->GetMenuItemCount();
-	feature->AddEditMenuItems(EditMenu);
+	view.AddEditMenuItems(EditMenu);
 	if (oldEditMenuCount != EditMenu->GetMenuItemCount() && oldEditMenuCount > 0) {
 		EditMenu->InsertSeparator(oldEditMenuCount);
 	}
 
 	size_t oldViewMenuCount = ViewMenu->GetMenuItemCount();
-	feature->AddViewMenuItems(ViewMenu);
+	view.AddViewMenuItems(ViewMenu);
 	if (oldViewMenuCount != ViewMenu->GetMenuItemCount() && oldViewMenuCount > 0) {
 		ViewMenu->InsertSeparator(oldViewMenuCount);
 	}
 
 	size_t oldSearchMenuCount = SearchMenu->GetMenuItemCount();
-	feature->AddSearchMenuItems(SearchMenu);
+	view.AddSearchMenuItems(SearchMenu);
 	if (oldSearchMenuCount != SearchMenu->GetMenuItemCount() && oldSearchMenuCount > 0) {
 		SearchMenu->InsertSeparator(oldSearchMenuCount);
 	}
 
 	size_t oldHelpMenuCount = HelpMenu->GetMenuItemCount();
-	feature->AddHelpMenuItems(HelpMenu);
+	view.AddHelpMenuItems(HelpMenu);
 	if (oldHelpMenuCount != HelpMenu->GetMenuItemCount() && oldHelpMenuCount > 0) {
 		HelpMenu->InsertSeparator(oldHelpMenuCount);
 	}
 
 	wxMenuBar* menuBar = GetMenuBar();
-	feature->AddNewMenu(menuBar);
+	view.AddNewMenu(menuBar);
 
 	// new menus may have been added; push the Help menu all the way to the end
 	int helpIndex = menuBar->FindMenu(_("&Help"));
@@ -659,7 +660,6 @@ void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
 		menuBar->Remove(helpIndex);
 		menuBar->Insert(menuBar->GetMenuCount(), HelpMenu, _("&Help"));
 	}
-	
 	
 	// move preferences menu to the end, similar to most other programs
 	wxMenuItem* preferencesMenu = EditMenu->Remove(wxID_PREFERENCES);
@@ -669,8 +669,8 @@ void t4p::MainFrameClass::LoadFeature(t4p::FeatureClass* feature) {
 	wxMenuItem* exitMenu = FileMenu->Remove(wxID_EXIT);
 	FileMenu->Append(exitMenu);
 
-	feature->AddToolBarItems(ToolBar);
-	feature->AddWindows();
+	view.AddToolBarItems(ToolBar);
+	view.AddWindows();
 }
 
 void t4p::MainFrameClass::RealizeToolbar() {
@@ -705,8 +705,8 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		contextMenu.AppendSeparator();
 		contextMenu.Append(wxID_FIND, _("Find"));
 		contextMenu.AppendSeparator();
-		for (size_t i = 0; i < Features.size(); ++i) {
-			Features[i]->AddCodeControlClassContextMenuItems(&contextMenu);
+		for (size_t i = 0; i < FeatureViews.size(); ++i) {
+			FeatureViews[i]->AddCodeControlClassContextMenuItems(&contextMenu);
 		}
 		
 		bool isTextSelected = !codeWindow->GetSelectedText().IsEmpty();
@@ -850,7 +850,7 @@ void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 		else if (it->first == wxID_CLOSE) {
 			cmd.AddShortcut(wxT("CTRL+W"));
 		}
-		Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
+		App.Preferences.DefaultKeyboardShortcutCmds.push_back(cmd);
 	}
 }
 

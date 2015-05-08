@@ -28,7 +28,6 @@
 #include <globals/Events.h>
 #include <wx/volume.h>
 #include <wx/platinfo.h>
-#include <wx/valgen.h>
 #include <algorithm>
 #include <map>
 
@@ -108,31 +107,6 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 	}
 }
 
-/**
- * @return map of the code controls that have opened files (as opposed to new files being edited)
- *         key is the full path of the file being edited, value is the code control itself
- */
-static std::map<wxString, t4p::CodeControlClass*> OpenedFiles(t4p::NotebookClass* notebook) {
-	std::map<wxString, t4p::CodeControlClass*> openedFiles;
-	if (!notebook) {
-		return openedFiles;
-	}
-	size_t size = notebook->GetPageCount();
-	if (size > 0) {
-
-		// loop through all of the opened files to get the files to
-		// be checked
-		// no need to check new files as they are not yet in the file system
-		for (size_t i = 0; i < size; ++i) {
-			t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-			if (ctrl && !ctrl->IsNew()) {
-				openedFiles[ctrl->GetFileName()] = ctrl;
-			}
-		}
-	}
-	return openedFiles;
-}
-
 t4p::FileWatcherFeatureClass::FileWatcherFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , Enabled(true)
@@ -148,6 +122,7 @@ t4p::FileWatcherFeatureClass::FileWatcherFeatureClass(t4p::AppClass& app)
 , PathsExternallyDeleted() 
 , PathsExternallyRenamed()
 , LastWatcherEventTime() 
+, OpenedFiles()
 , IsWatchError(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
@@ -205,11 +180,6 @@ void t4p::FileWatcherFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		FsWatcher = NULL;
 	}
 	StartWatch();
-}
-
-void t4p::FileWatcherFeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	t4p::FileWatcherPreferencesPanelClass* prefs = new t4p::FileWatcherPreferencesPanelClass(parent, *this);
-	parent->AddPage(prefs, _("File Watcher"));
 }
 
 void t4p::FileWatcherFeatureClass::StartWatch() {
@@ -335,9 +305,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 		}
 	}
 	
-	std::map<wxString, t4p::CodeControlClass*> openedFiles = OpenedFiles(GetNotebook());
-
-	HandleNonOpenedFiles(openedFiles, pathsRenamed);
+	HandleNonOpenedFiles(OpenedFiles, pathsRenamed);
 	if (IsWatchError) {
 		HandleWatchError();
 	}
@@ -353,11 +321,11 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 }
 
 
-void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
+void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(const std::vector<wxString>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
 	std::map<wxString, int>::iterator f;
 	for (f = FilesExternallyModified.begin(); f != FilesExternallyModified.end(); ++f) {
 		wxString fullPath = f->first;
-		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
+		bool isOpened = std::find(openedFiles.begin(), openedFiles.end(), fullPath) != openedFiles.end();
 		if (!isOpened) {
 			// file is not open. notify the app that a file was externally modified
 			wxCommandEvent modifiedEvt(t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED);
@@ -373,7 +341,7 @@ void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(std::map<wxString, t4p::
 	}
 	for (f = FilesExternallyDeleted.begin(); f != FilesExternallyDeleted.end(); ++f) {
 		wxString fullPath = f->first;
-		bool isOpened = openedFiles.find(fullPath) != openedFiles.end();
+		bool isOpened = std::find(openedFiles.begin(), openedFiles.end(), fullPath) != openedFiles.end();
 		if (!isOpened) {
 
 			// file is not open. notify the app that a file was externally deleted
@@ -464,10 +432,23 @@ void t4p::FileWatcherFeatureClass::HandleWatchError() {
 		);
 		msg += dirsDeleted;
 		msg = wxGetTranslation(msg);
-		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, GetMainWindow());
+		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, NULL);
 	}
 
 	StartWatch();
+}
+
+void t4p::FileWatcherFeatureClass::TrackOpenedFile(wxString fullPath) {
+	OpenedFiles.push_back(fullPath);
+}
+
+void t4p::FileWatcherFeatureClass::UntrackOpenedFile(wxString fullPath) {
+	std::vector<wxString>::iterator it = std::find(OpenedFiles.begin(), OpenedFiles.end(), fullPath);
+	
+	while (it != OpenedFiles.end()) {
+		it = OpenedFiles.erase(it);
+		it = std::find(it, OpenedFiles.end(), fullPath);
+	}
 }
 
 t4p::VolumeListActionClass::VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
@@ -509,13 +490,6 @@ t4p::VolumeListEventClass::VolumeListEventClass(int id,
 
 wxEvent* t4p::VolumeListEventClass::Clone() const {
 	return new t4p::VolumeListEventClass(GetId(), LocalVolumes);
-}
-
-t4p::FileWatcherPreferencesPanelClass::FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature)
-: FileWatcherPreferencesPanelGeneratedClass(parent, wxID_ANY)
-, Feature(feature) {
-	wxGenericValidator validator(&Feature.Enabled);
-	Enabled->SetValidator(validator);
 }
 
 const wxEventType t4p::EVENT_ACTION_VOLUME_LIST = wxNewEventType();

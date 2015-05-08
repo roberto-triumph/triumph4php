@@ -38,35 +38,12 @@ class TestFeatureClass : public FeatureClass {
 public:
 
 	TestFeatureClass(t4p::AppClass& app);
-		
-	/**
-	 * This feature will have no Edit menu items
-	 */
-	void AddEditMenuItems(wxMenu* editMenu);
-
-	/**
-	 * This feature will have one toolbar button, when clicked the Go() method will get called
-	 */
-	void AddToolBarItems(wxAuiToolBar* toolBar);
-	
-	/**
-	 * This feature will have no extra windows.
-	 */
-	void AddWindows();
-	
-	/**
-	 * This feature will have no context menu items
-	 */
-	void AddCodeControlClassContextMenuItems(wxMenu* menu);
-	
-private:	
-
+			
 	/**
 	 * the actual code that will get executed when the "GO" button is clicked
 	 */
-	void Go(wxCommandEvent& event);
+	void Go();
 	
-	DECLARE_EVENT_TABLE()
 };
 
 }

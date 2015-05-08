@@ -373,9 +373,11 @@ solution "triumph4php"
 			curlconfiguration("Debug", _ACTION)
 			boostconfiguration("Debug", _ACTION)
 			
-			-- use the local update server in debug  
+			-- use the local update server in debug 
+			-- instantiate the test feature
 			defines { 
-				string.format("T4P_UPDATE_HOST=%s", 'updates.localhost')
+				string.format("T4P_UPDATE_HOST=%s", 'updates.localhost'),
+				"T4P_USE_TEST_FEATURE=1"
 			}
 
 		configuration "Release"
@@ -388,8 +390,10 @@ solution "triumph4php"
 			boostconfiguration("Release", _ACTION)
 			
 			-- use the public update server in release
+			-- no need to instantiate in the test feature
 			defines { 
-				string.format("T4P_UPDATE_HOST=%s", 'updates.triumph4php.com')
+				string.format("T4P_UPDATE_HOST=%s", 'updates.triumph4php.com'),
+				"T4P_USE_TEST_FEATURE=0"
 			}
 
 	project "tests"

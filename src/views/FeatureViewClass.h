@@ -1,0 +1,384 @@
+/**
+ * This software is released under the terms of the MIT License
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @copyright  2015 Roberto Perpuly
+ * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
+#ifndef T4P_FEATUREVIEWCLASS_H__
+#define T4P_FEATUREVIEWCLASS_H__
+
+#include <main_frame/PreferencesClass.h>
+#include <globals/FileTypeClass.h>
+#include <wx/event.h>
+#include <wx/aui/aui.h>
+#include <map>
+#include <vector>
+
+namespace t4p {
+
+// forward declaration, defined in another file
+class StatusBarWithGaugeClass;
+class NotebookClass;
+class CodeControlClass;
+
+/**
+ * A feature view encapsulates the GUI of the application; it 
+ * has access to the main frame, the tools, outline, and code notebooks,
+ * the status bar gauge, and menus.
+ * 
+ * 
+ * Window locations: Left (skinny window), Bottom (wide window), Main (Center). Features can create 
+ * as many windows as they see fit (in any location).
+ * 
+ * Actions: Feature can define actions, menu items for those actions, 
+ *          Also, context menu items for those actions, feature will be given the selected text
+ * 
+ * Toolbars: Features will be given the ability to define toolbar buttons or other controls, either 
+ * left-justified or right-justified.
+ * 
+ * Feature views will be given:
+ * 1) StatusBarWithGaugeClass to show progress to the user
+ * 2) The tools window notebook.  features can add their windows
+ * 3) The code notebook.  Features can query which is the currently opened file, any 
+ *    selected text, etc...
+ * 4) Note that unless specified, all pointers that a feature view is given (Notebook, status 
+ *    bar, etc.. ) will be taken care of by the application and the feature SHOULD NOT delete 
+ *    them.  However, any pointers created by the feature view will need to be deleted
+ *    by the feature itself.  wxWindow pointers usually do not need to be deleted 
+ *    because the wxWidgets framework manages them.
+ *
+ * Lifecycle:
+ * There is at most 1 instance of any one feature view class, however there
+ * may be zero instances in Mac OS X where an application may be running without
+ * a main frame.
+ * 
+ * This class is meant to be inherited by all classes that desire to add
+ * dialogs, panels, or menu items to the app. They should contain very little
+ * application logic; that should be delegated to other classes.
+ */
+class FeatureViewClass : public wxEvtHandler {
+
+public:
+	
+	FeatureViewClass();
+	
+	/**
+	 * Set the windows. All of these pointers will NOT be
+	 * owned by this class. The caller will still retain ownership.
+	 * 
+	 * @param StatusBarWithGaugeClass& statusBarWithGauge the status bar.
+	 * @param NotebookClass& notebook the opened source code files
+	 * @param wxAuiNotebook& toolsNotebook the parent window for all feature windows
+	 * @param wxAuiNotebook& outlineNotebook the parent window for all outline type windows (left side)
+	 * @param wxAuiManager auiManager the AUI manager used to update the frame
+	 * @param wxMenuBar* menuBar the application menu bar
+	 */
+	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, 
+		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
+		wxMenuBar* menuBar);
+	
+	/**
+	 * Add menu items to the view menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the view menu to add items to.
+	 */
+	virtual void AddViewMenuItems(wxMenu* viewMenu);
+
+	/**
+	 * Add menu items to the search menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the view menu to add items to.
+	 */
+	virtual void AddSearchMenuItems(wxMenu* searchMenu);
+
+	/**
+	 * Add menu items to the file menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the tools menu to add items to.
+	 */
+	virtual void AddFileMenuItems(wxMenu* fileMenu);
+
+	/**
+	 * Add menu items to the edit menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the tools menu to add items to.
+	 */
+	virtual void AddEditMenuItems(wxMenu* editMenu);
+
+	/**
+	 * Add menu items to the help menu for this feature. Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * 
+	 * @param wxMenu* menu the tools menu to add items to.
+	 */
+	virtual void AddHelpMenuItems(wxMenu* helpMenu);
+	
+	/**
+	 * Feature may create its own menu. The feature should override this method if it desires to create an entirely new menu.
+	 * Remeber to use the MenuIds enum when building
+	 * menu items.
+	 * @param wxMenuBar* the menu bar to insert the new menu to
+	 */
+	virtual void AddNewMenu(wxMenuBar* menuBar);
+
+	/**
+	 * Adds items to the toolbar.  These items will be left aligned.
+	 */
+	virtual void AddToolBarItems(wxAuiToolBar* toolBar);
+	
+	/**
+	 * Adds an arbritary window to the application. Use the AuiManager property  (AuiManager.AddPane) to add
+	 * items. No need to call AuiManager.Update(), the application will do it.
+	 */
+	virtual void AddWindows();
+	
+	/**
+	 * Add a tab to the preferences window. This method is invoked only when the user chooses Edit ... Preferences
+	 * 
+	 * @param wxBookCtrlBase* the parent that will contain all preference dialogs.  Once the feature's window is added, the 
+	 * parent will take care of deletion. Note that to add a dialog you will need to call wxBookCtrlBase::AddPage
+	 */
+	virtual void AddPreferenceWindow(wxBookCtrlBase* parent);
+	
+	/**
+	 * This method will be called every time the user right-clicks on an active code control window. Features may define
+	 * special menu items  to be shown to the user when the user right-clicks on a code control. The active code control 
+	 * can then be accessed via the NotebookClass.
+	 * 
+	 * @param wxMenu* menu the context menu to add items to.
+	 */
+	virtual void AddCodeControlClassContextMenuItems(wxMenu* menu);
+	
+	/**
+	 * Subclasses can override this method to create their own shortcuts that will get serialized /deserialized
+	 * properly; also by using this method the shortcuts will get registered properly; plus it will allow the user to
+	 * edit the shortcuts via the preferences dialog.
+	 * @param shortcuts the list of shortcuts to add to
+	 */
+	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
+
+protected:
+
+	/**
+	 * This is a helper method that will add each of the given menu items as a 
+	 * shortcut.  The map will contain the menu Item IDs; each of these IDs will
+	 * be used to lookup the Menu Item in the Menu Bar, and a DynamicCmd will be
+	 * created based on the menu item. The map value (wxString) will be used as 
+	 * the DynamicCmd's identifier.
+	 * For example, if the map contains
+	 *
+	 *   menuItems[wxID_OPEN] = "Open-File"
+	 *   menuItems[wxID_CLOSE] = "Close-File" 
+	 *
+	 * Then this method will create 2 DynamicCmds, assuming that the menu bar has
+	 * menu items with the IDs wxID_OPEN and wxID_CLOSE.  "Open-File" will be the 
+	 * identifier for the first command and "Close-File" will be the identifier for
+	 * the second command.
+	 * If a menu item is not found, and assertion is triggered.
+	 */
+	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
+	
+	/**
+	 * Finds the tools window with the given window ID and returns it.
+	 * 
+	 * @param int windowId the window ID to look for
+	 * @return wxWindow* the window, could be NULL if window was not found
+	 */
+	wxWindow* FindToolsWindow(int windowId) const;
+	
+		/**
+	 * Finds the outline window with the given window ID and returns it.
+	 * 
+	 * @param int windowId the window ID to look for
+	 * @return wxWindow* the window, could be NULL if window was not found
+	 */
+	wxWindow* FindOutlineWindow(int windowId) const;
+	
+	/**
+	 * Check to see if the given window is the tools window that's currently active
+	 * @param int windowId
+	 * @return bool true if the window with the given windowId is the selected (active) tools window.
+	 */
+	bool IsToolsWindowSelected(int windowId) const;
+
+	/**
+	 * Check to see if the given window is the tools window that's currently active
+	 * This method is useful when a feature creates multiple tools windows
+	 *
+	 * @param wxString name the window name to check (wxWindow::GetName())
+	 * @return bool true if the selected (active) tools window's name is equal to the given name.
+	 */
+	bool IsToolsWindowSelectedByName(const wxString& name) const;
+
+	/**
+	 * Check to see if the given window is the outline window that's currently active
+	 * @param int windowId
+	 * @return bool true if the window with the given windowId is the selected (active) outline window.
+	 */
+	bool IsOutlineWindowSelected(int windowId) const;
+	
+	/**
+	 * Returns the top-level window.
+	 * 
+	 * @return wxWindow* the main window
+	 */
+	wxWindow* GetMainWindow() const;
+	
+		/**
+	 * Do NOT delete the pointer
+	 * @return wxAuiNotebook* the parent of all tool windows. guaranteed to be not null.
+	 */
+	wxAuiNotebook* GetToolsNotebook() const;
+	
+	/**
+	 * Do NOT delete the pointer
+	 * @return wxAuiNotebook* the parent of all outline windows. guaranteed to be not null.
+	 */
+	wxAuiNotebook* GetOutlineNotebook() const;
+
+	/**
+	 * The source code control notebook. Guaranteed to be not null.
+	 * 
+	 * @return NotebookClass*
+	 */
+	NotebookClass* GetNotebook() const;
+
+	/**
+	 * Set the given page to be the selected page for the tools notebook
+	 * @param wxWindow the window that the tools notebook will be visible
+	 */
+	void SetFocusToToolsWindow(wxWindow* window);
+
+	/**
+	 * Set the given page to be the selected page for the outline notebook
+	 * @param wxWindow the window that the tools notebook will be visible
+	 */
+	void SetFocusToOutlineWindow(wxWindow* window);
+	
+	/**
+	 * Add a window to the tool notebook. Once added, this class will take care of memory management for the window pointer.
+	 * 
+	 * @param wxWindow* window the window to add
+	 * @param wxString tabName the name that will show up in the window's tab
+	 * @param wxString windowName the name that will be given to the window (wxWindow::SetName)
+	 * @param bitmap the image that gets place in the notebook tab for this window
+	 * @return bool true if window was added.
+	 */
+	bool AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap);
+
+	/**
+	 * Add a window to the outline notebook. Once added, this class will take care of memory management for the window pointer.
+	 * 
+	 * @param wxWindow* window the window to add
+	 * @param wxString name the name that will show up in the window's tab
+	 * @param bitmap the image that gets place in the notebook tab for this window
+	 * @return bool true if window was added.
+	 */
+	bool AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap = wxNullBitmap);
+	
+	/**
+	 * Get the currently selected code control. This may be NULL if the editor's content pane is
+	 * focused on something other than a code control.
+	 * 
+	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 */
+	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	  * Creates a new code control that is primed with the global editor
+	  * options. code control will be tied to the application code Notebook.
+	  * 
+	  * @param tabName the name that will go on the tab of the new page
+	  *        This can be empty; if empty then a default message is shown
+	  * @param mode the document mode that the control will be editing
+	  * @return CodeControlClass* this class will own the pointer, DONT delete it
+	  */
+	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+	
+	/**
+	 * Returns the text that's currently selected in the currently active code control.
+	 * 
+	 * @retun wxString the selected text.  If no text is selected, or there is not opened code control, 
+	 *        an empty string is returned
+	 */
+	wxString GetSelectedText() const;
+	
+	/**
+	 * The status bar that the feature can use to display a gauge to the user. Do NOT delete the pointer.
+	 * 
+	 * @return StatusBarWithGaugeClass*
+	 */	
+	StatusBarWithGaugeClass* GetStatusBarWithGauge() const;
+	
+	/**
+	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI
+	 * needs to be re-drawn.
+	 * 
+	 * @var wxAuiManager*
+	 */
+	wxAuiManager* AuiManager;
+
+private:
+	
+	/**
+	 * The widget that feature uses to display status to the user.
+	 * 
+	 * @var StatusBarWithGaugeClass*
+	 */
+	StatusBarWithGaugeClass* StatusBarWithGauge;
+
+	/**
+	 * The container for the source code windows.
+	 * 
+	 * @var NotebookClass*
+	 */
+	NotebookClass* Notebook;
+	
+	/**
+	 * Parent container that will hold all features' tools windows.
+	 * 
+	 * @var wxAuiNotebook*
+	 */
+	wxAuiNotebook* ToolsNotebook;
+
+	/**
+	 * Parent container that will hold all features' outline windows.
+	 * 
+	 * @var wxAuiNotebook*
+	 */
+	wxAuiNotebook* OutlineNotebook;
+
+	/**
+	 * The Application-wide menu bar.
+	 */
+	wxMenuBar* MenuBar;
+	
+};
+
+}
+
+#endif

@@ -23,23 +23,27 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <globals/GlobalsClass.h>
-#include <features/EditorMessagesFeatureClass.h>
-#include <features/FeatureClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/GlobalsChangeHandlerClass.h>
 #include <actions/SequenceClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
+#include <FeatureFactoryClass.h>
 #include <wx/app.h>
 #include <wx/event.h>
 #include <wx/string.h>
 #include <wx/timer.h>
 #include <vector>
+#include <wx/bookctrl.h>
 
 namespace t4p {
 
 // forward declaration
 class MainFrameClass;
+class FeatureClass;
+class FeatureViewClass;
+class MacCommonMenuBarClass;
+class FeatureFactoryClass;
 
 // defined below
 class AppClass;
@@ -161,13 +165,40 @@ public:
 	 * delete features from memory in a safe way
 	 */
 	void DeleteFeatures();
+	
+	/**
+	 * Deletes all views. This is done when the main frame is closed, because
+	 * frames could have pointers to windows.Feature views are deleted when]
+	 * the main frame is closed.
+	 */
+	void DeleteFeatureViews();
+	
+	/**
+	 * Adds all features' preferences panels into the given parent.
+	 * 
+	 * @param parent the parent book control
+	 */
+	void AddPreferencesWindows(wxBookCtrlBase* parent);
+	
+	/**
+	 * creates the application main frame 
+	 */
+	void CreateFrame();
+	
+	/**
+	 * creates a new empty buffer and attaches it to the notebook. 
+	 */
+	void CreateNewCodeCtrl();
 
 private:
 
 	/**
-	 * Parses any command line arguments.  Returns false if arguments are invalid.
+	 * Parses any command line arguments.  
+	 * @param [out] filenames the files given as arguments
+	 *        to the app.
+	 * @return false if arguments are invalid.
 	 */
-	bool CommandLine();
+	bool CommandLine(std::vector<wxString>& filenames);
 
 	/**
 	 * create features. only instantiates and nothing else
@@ -183,12 +214,22 @@ private:
 	 * when the app is re-activated, tell the features about it
 	 */
 	void OnActivateApp(wxActivateEvent& event);
+	
+	/**
+	 * handlers for the "common" menu; the menu that is shown when
+	 * the user has closed the main frame but the app is still running.
+	 */
+	void OnCommonMenuFileOpen(wxCommandEvent& event);
+	void OnCommonMenuFileNew(wxCommandEvent& event);
 
 	/**
-	 * Additional functionality
+	 * Almost all functionality is encapsulated in features; the 
+	 * app just creates them and hangs on to them until the end. 
+	 * Each feature is created only once at app start and is
+	 * deleted at app end.
 	 */
-	std::vector<FeatureClass*> Features;
-
+	t4p::FeatureFactoryClass FeatureFactory;
+	
 	/**
 	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
 	 * window is initially shown to the user. We want to show the main
@@ -204,11 +245,12 @@ private:
 	 * The main application frame.
 	 */
 	MainFrameClass* MainFrame;
-
+	
 	/**
-	 * Shows the user various editor messages (not related to their code)
+	 * mac-specific functionality when main frame has been closed but
+	 * app is still running.
 	 */
-	EditorMessagesFeatureClass* EditorMessagesFeature;
+	MacCommonMenuBarClass* MacCommonMenuBar;
 
 	/**
 	 * TRUE if the EVENT_APP_READY has already been generated.

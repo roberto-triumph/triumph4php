@@ -28,7 +28,7 @@
 #include <globals/ProjectClass.h>
 #include <main_frame/wxformbuilder/MainFrameForms.h>
 #include <widgets/NotebookClass.h>
-#include <features/FeatureClass.h>
+#include <widgets/StatusBarWithGaugeClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
 #include <actions/ActionClass.h>
@@ -43,6 +43,9 @@ class AppClass;
 
 // defined at the bottom of this file
 class MainFrameClass;
+
+// forward declarations, defined in other files
+class FeatureViewClass;
 
 /**
  * This class is used to listen for app events.  It is a separate class
@@ -95,8 +98,15 @@ class MainFrameClass : public MainFrameGeneratedClass {
 
 public:
 	
-	MainFrameClass(const std::vector<FeatureClass*>& features, AppClass&  app,
-		PreferencesClass& preferences);
+	/**
+	 * @brief 
+	 * @param featureViews the views (to get menu bars, toolbars). This class
+	 *        will not own the pointers, although the main fram will tell the
+	 *        app to delete them when the user closes the main frame
+	 * @param app the application, used to get the preferences
+	 * 
+	 */
+	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, AppClass&  app);
 	
 	~MainFrameClass();
 	
@@ -119,10 +129,9 @@ public:
 	void FileOpenLine(const wxString& fullPath, int lineNumber);
 
 	/**
-	 * get all of the feature's extra windows and menus and attach them to the main frame.
-	 * This class will not own this pointer
+	 * get all of the feature view's extra windows and menus and attach them to the main frame.
 	 */
-	void LoadFeature(FeatureClass* feature);
+	void LoadFeatureView(FeatureViewClass& view);
 
 	/**
 	 * this should be called whenever a new window is added.
@@ -163,6 +172,12 @@ public:
 	 * and it makes the app feel sluggish.
 	 */
 	void StartStatusBarTimer();
+
+	/**
+	 * creates a new code control and attaches it to the
+	 * notebook 
+	 */
+	void CreateNewCodeCtrl();
 
 protected:
 
@@ -210,7 +225,7 @@ private:
 	 * 
 	 * @return StatusBarWithGaugeClass do NOT delete the pointer.  This class will take care of memory management.
 	 */
-	StatusBarWithGaugeClass* GetStatusBarWithGauge();
+	t4p::StatusBarWithGaugeClass* GetStatusBarWithGauge();
 	
 	/**
 	 * When a page is modified, enable the save button
@@ -356,9 +371,9 @@ private:
 	wxTimer StatusBarTimer;
 
 	/**
-	 * Additional functionality
+	 * Additional functionality, this class will not own the pointers
 	 */
-	const std::vector<FeatureClass*>& Features;
+	const std::vector<FeatureViewClass*>& FeatureViews;
 
 	/**
 	 * Used to listen for app events.
@@ -369,13 +384,6 @@ private:
 	 * The application global
 	 */
 	AppClass& App;
-
-	/**
-	 * The user preferences
-	 * 
-	 * @var PreferencesClass;
-	 */
-	PreferencesClass& Preferences;
 
 	/**
 	 * The toolbar instance

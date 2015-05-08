@@ -1,0 +1,342 @@
+diff --git a/src/features/FeatureClass.cpp b/src/features/FeatureClass.cpp
+index 7709cef..03326c4 100644
+--- a/src/features/FeatureClass.cpp
++++ b/src/features/FeatureClass.cpp
+@@ -27,28 +27,12 @@
+ #include <wx/artprov.h>
+ 
+ t4p::FeatureClass::FeatureClass(t4p::AppClass& app)
+-	: App(app)
+-	, AuiManager(NULL)	
+-	, StatusBarWithGauge(NULL)
+-	, Notebook(NULL)
+-	, ToolsNotebook(NULL)
+-	, OutlineNotebook(NULL)
+-	, MenuBar(NULL) {
++	: App(app) {
+ }
+ 
+ t4p::FeatureClass::~FeatureClass() {
+ }
+ 
+-void t4p::FeatureClass::InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+-	wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar) {
+-	StatusBarWithGauge = statusBarWithGauge;
+-	Notebook = notebook;
+-	ToolsNotebook = toolsNotebook;
+-	OutlineNotebook = outlineNotebook;
+-	AuiManager = auiManager;
+-	MenuBar = menuBar;
+-}
+-
+ t4p::NotebookClass* t4p::FeatureClass::GetNotebook() const {
+ 	return Notebook;
+ }
+@@ -57,31 +41,6 @@ t4p::EnvironmentClass* t4p::FeatureClass::GetEnvironment() {
+ 	return &App.Globals.Environment;
+ }
+ 
+-void t4p::FeatureClass::AddViewMenuItems(wxMenu* viewMenu) {
+-}
+-
+-void t4p::FeatureClass::AddSearchMenuItems(wxMenu* searchMenu) {
+-}
+-
+-void t4p::FeatureClass::AddFileMenuItems(wxMenu* fileMenu) {
+-}
+-
+-void t4p::FeatureClass::AddEditMenuItems(wxMenu* editMenu) {
+-}
+-
+-void t4p::FeatureClass::AddHelpMenuItems(wxMenu* editMenu) {
+-}
+-
+-void t4p::FeatureClass::AddNewMenu(wxMenuBar* menuBar) {
+-}
+-
+-void t4p::FeatureClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+-}
+-
+-void t4p::FeatureClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {
+-
+-}
+-
+ bool t4p::FeatureClass::AddToolsWindow(wxWindow* window, wxString tabName, wxString windowName, const wxBitmap& bitmap) {
+ 	if (!windowName.IsEmpty()) {
+ 		window->SetName(windowName);
+@@ -205,18 +164,9 @@ wxString t4p::FeatureClass::GetSelectedText() const {
+ 	return selectedText;
+ }
+ 
+-void t4p::FeatureClass::AddWindows() {
+-}
+-
+-void t4p::FeatureClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+-}
+-
+ void t4p::FeatureClass::LoadPreferences(wxConfigBase* config) {
+ }
+ 
+-void t4p::FeatureClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+-}
+-
+ wxWindow* t4p::FeatureClass::GetMainWindow() const {
+ 	return ToolsNotebook->GetParent();
+ }
+@@ -229,13 +179,4 @@ t4p::CodeControlClass* t4p::FeatureClass::CreateCodeControl(const wxString& tabN
+ 	}
+ 	t4p::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
+ 	return ctrl;
+-}
+-
+-void t4p::FeatureClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<t4p::DynamicCmdClass>& shortcuts) {
+-	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
+-		wxMenuItem* item = MenuBar->FindItem(it->first);
+-		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
+-		t4p::DynamicCmdClass cmd(item, it->second);
+-		shortcuts.push_back(cmd);
+-	}
+ }
+\ No newline at end of file
+diff --git a/src/features/FeatureClass.h b/src/features/FeatureClass.h
+index 9f980b0..a299339 100644
+--- a/src/features/FeatureClass.h
++++ b/src/features/FeatureClass.h
+@@ -39,9 +39,6 @@ namespace t4p {
+ // forward declaration to prevent #include of the AppClass
+ class AppClass;
+ 
+-// forward declaration to prevent #include of the TagCacheClass
+-class TagCacheClass;
+-
+ /**
+  * ATTN: Use this enum to build the Feature menus
+  * Since wxKeyBinder uses menu IDs to serialize the shortcuts, the menu IDs
+@@ -102,31 +99,16 @@ enum MenuIds {
+  * Test (PHPUnit, Simple test)
+  * PECL installer
+  * 
+- * 
+- * Window locations: Left (skinny window), Bottom (wide window), Main (Center). Features can create as many windows
+- * as they see fit (maybe in any location??).
+- * 
+- * Actions: Feature can define actions, menu items for those actions, 
+- *          Also, context menu items for those actions, feature will be given the selected text
+- * 
+- * Toolbars: Features will be given the ability to define toolbar buttons or other controls, either left-justified or right-justified.
+- * 
+- * 
+  * Features will be given:
+  * 1) The GlobalsClass that holds all application-wide data structures. 
+- * 2) StatusBarWithGaugeClass to show progress to the user
+- * 3) The tools window notebook.  features can add their windows
+- * 4) The code notebook.  Features can query which is the currently opened file, any selected text, etc...
+- * 5) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the 
++ * 2) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the 
+  *    Apache class may not be initialized to point at a proper config file.
+- * 6) Note that unless specified, all pointers that a feature is given (Notebook, status bar, etc.. )will be taken care of by the 
+- *    application and the feature SHOULD NOT delete them.  However, any pointers created by the feature will need to be deleted
+- *    by the feature itself.  wxWindow pointers usually do not need to be deleted because the wxWidgets framework manages them.
+  *  
+  * Lifecycle:
+- *  + One instance of feature per application.  features are created during program startup and deleted during application exit.
+- *  + During startup, AddMenuItems method is called. The feature can override this method to create menu items.
+- *    Features inherit from wxEvtHandler, so event tables or Connect method may be used to listen for menu or any other window) events
++ *  + One instance of feature per application.  features are created during program startup and 
++ *    deleted during application exit.
++ *  + Features inherit from wxEvtHandler, so event tables or Connect method may be used to listen 
++ *    for menu or any other window) events
+  *
+  * Events:
+  * The application has an "Event Sink", any interesting events are posted to the event sink. These can be
+@@ -144,7 +126,6 @@ enum MenuIds {
+ class FeatureClass : public wxEvtHandler {
+ 
+ public:
+-
+ 	
+ 	/**
+ 	 * The application event dispatcher. Also holds all 'global' structures and settings.
+@@ -164,111 +145,13 @@ public:
+ 	virtual ~FeatureClass();
+ 
+ 	/**
+-	 * Set the windows. All of these pointers will NOT be
+-	 * owned by this class. The caller will still retain ownership.
+-	 * 
+-	 * @param StatusBarWithGaugeClass& statusBarWithGauge the status bar.
+-	 * @param NotebookClass& notebook the opened source code files
+-	 * @param wxAuiNotebook& toolsNotebook the parent window for all feature windows
+-	 * @param wxAuiNotebook& outlineNotebook the parent window for all outline type windows (left side)
+-	 * @param wxAuiManager auiManager the AUI manager used to update the frame
+-	 * @param wxMenuBar* menuBar the application menu bar
+-	 */
+-	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+-		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, wxMenuBar* menuBar);
+-		
+-	/**
+-	 * Add menu items to the view menu for this feature. Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * 
+-	 * @param wxMenu* menu the view menu to add items to.
+-	 */
+-	virtual void AddViewMenuItems(wxMenu* viewMenu);
+-
+-	/**
+-	 * Add menu items to the search menu for this feature. Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * 
+-	 * @param wxMenu* menu the view menu to add items to.
+-	 */
+-	virtual void AddSearchMenuItems(wxMenu* searchMenu);
+-
+-	/**
+-	 * Add menu items to the file menu for this feature. Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * 
+-	 * @param wxMenu* menu the tools menu to add items to.
+-	 */
+-	virtual void AddFileMenuItems(wxMenu* fileMenu);
+-
+-	/**
+-	 * Add menu items to the edit menu for this feature. Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * 
+-	 * @param wxMenu* menu the tools menu to add items to.
+-	 */
+-	virtual void AddEditMenuItems(wxMenu* editMenu);
+-
+-	/**
+-	 * Add menu items to the help menu for this feature. Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * 
+-	 * @param wxMenu* menu the tools menu to add items to.
+-	 */
+-	virtual void AddHelpMenuItems(wxMenu* helpMenu);
+-	
+-	/**
+-	 * Feature may create its own menu. The feature should override this method if it desires to create an entirely new menu.
+-	 * Remeber to use the MenuIds enum when building
+-	 * menu items.
+-	 * @param wxMenuBar* the menu bar to insert the new menu to
+-	 */
+-	virtual void AddNewMenu(wxMenuBar* menuBar);
+-
+-	/**
+-	 * Adds items to the toolbar.  These items will be left aligned.
+-	 */
+-	virtual void AddToolBarItems(wxAuiToolBar* toolBar);
+-	
+-	/**
+-	 * Adds an arbritary window to the application. Use the AuiManager property  (AuiManager.AddPane) to add
+-	 * items. No need to call AuiManager.Update(), the application will do it.
+-	 */
+-	virtual void AddWindows();
+-	
+-	/**
+-	 * Add a tab to the preferences window. This method is invoked only when the user chooses Edit ... Preferences
+-	 * 
+-	 * @param wxBookCtrlBase* the parent that will contain all preference dialogs.  Once the feature's window is added, the 
+-	 * parent will take care of deletion. Note that to add a dialog you will need to call wxBookCtrlBase::AddPage
+-	 */
+-	virtual void AddPreferenceWindow(wxBookCtrlBase* parent);
+-	
+-	/**
+-	 * This method will be called every time the user right-clicks on an active code control window. Features may define
+-	 * special menu items  to be shown to the user when the user right-clicks on a code control. The active code control 
+-	 * can then be accessed via the NotebookClass.
+-	 * 
+-	 * @param wxMenu* menu the context menu to add items to.
+-	 */
+-	virtual void AddCodeControlClassContextMenuItems(wxMenu* menu);
+-	
+-	/**
+ 	 * This method will be called during application startup; the feature should load the preferences from persistent 
+ 	 * storage (confg) here
+ 	 * 
+ 	 * @param wxConfigBase* the config where settings are stored.
+ 	 */
+ 	virtual void LoadPreferences(wxConfigBase* config);
+-	
+-	/**
+-	 * Subclasses can override this method to create their own shortcuts that will get serialized /deserialized
+-	 * properly; also by using this method the shortcuts will get registered properly; plus it will allow the user to
+-	 * edit the shortcuts via the preferences dialog.
+-	 * @param shortcuts the list of shortcuts to add to
+-	 */
+-	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+-	
++		
+ protected:
+ 	
+ 	/**
+@@ -410,68 +293,7 @@ protected:
+ 	  */
+ 	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+ 
+-	/**
+-	 * This is a helper method that will add each of the given menu items as a 
+-	 * shortcut.  The map will contain the menu Item IDs; each of these IDs will
+-	 * be used to lookup the Menu Item in the Menu Bar, and a DynamicCmd will be
+-	 * created based on the menu item. The map value (wxString) will be used as 
+-	 * the DynamicCmd's identifier.
+-	 * For example, if the map contains
+-	 *
+-	 *   menuItems[wxID_OPEN] = "Open-File"
+-	 *   menuItems[wxID_CLOSE] = "Close-File" 
+-	 *
+-	 * Then this method will create 2 DynamicCmds, assuming that the menu bar has
+-	 * menu items with the IDs wxID_OPEN and wxID_CLOSE.  "Open-File" will be the 
+-	 * identifier for the first command and "Close-File" will be the identifier for
+-	 * the second command.
+-	 * If a menu item is not found, and assertion is triggered.
+-	 */
+-	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
+-	 
+-	/**
+-	 * The AUI Manager is needed in cases where the different windows are repositioned programatically and the entire AUI
+-	 * needs to be re-drawn.
+-	 * 
+-	 * @var wxAuiManager*
+-	 */
+-	wxAuiManager* AuiManager;
+-
+-	private:
+-	
+-	/**
+-	 * The widget that feature uses to display status to the user.
+-	 * 
+-	 * @var StatusBarWithGaugeClass*
+-	 */
+-	StatusBarWithGaugeClass* StatusBarWithGauge;
+-
+-	/**
+-	 * The container for the source code windows.
+-	 * 
+-	 * @var NotebookClass*
+-	 */
+-	NotebookClass* Notebook;
+-	
+-	/**
+-	 * Parent container that will hold all features' tools windows.
+-	 * 
+-	 * @var wxAuiNotebook*
+-	 */
+-	wxAuiNotebook* ToolsNotebook;
+-
+-	/**
+-	 * Parent container that will hold all features' outline windows.
+-	 * 
+-	 * @var wxAuiNotebook*
+-	 */
+-	wxAuiNotebook* OutlineNotebook;
+-
+-	/**
+-	 * The Application-wide menu bar.
+-	 */
+-	wxMenuBar* MenuBar;
+-	
++	private:	
+ };
+ 
+ }

@@ -33,6 +33,34 @@
 namespace t4p {
 
 /**
+* pair together a project name and the config files for that
+* project, that way we can build the submenus.
+*/
+class ConfigFilesFeaturePairClass {
+	
+public:
+	
+	/**
+	 * the label of the project that the config files were
+	 * found in
+	 */
+	wxString ProjectLabel;
+	
+	/**
+	 * the config files that were found in this project.
+	 */
+	std::vector<t4p::ConfigTagClass> ConfigTags;
+	
+	ConfigFilesFeaturePairClass();
+	
+	ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src);
+	
+	ConfigFilesFeaturePairClass& operator=(const t4p::ConfigFilesFeaturePairClass& src);
+	
+	void Copy(const t4p::ConfigFilesFeaturePairClass& src);
+};
+
+/**
  * This feature will take all of the detected config files and
  * will populate a menu with config files from each project.
  * The config files are detected with the help of ConfigTagDetectorActionClass
@@ -40,24 +68,33 @@ namespace t4p {
  */
 class ConfigFilesFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
+	
+	/**
+	 * max amount of menu items to show
+	 * the 100 is due to the menu ids allocated to each feature in
+	 * the FeatureClass MenuIds enum
+	 */
+	const static size_t MAX_CONFIG_MENU_ITEMS = 100;
 
 	ConfigFilesFeatureClass(t4p::AppClass& app);
 
-	void AddNewMenu(wxMenuBar* menuBar);
-
-private:
-
 	/**
-	 * pair together a project name and the config files for that
-	 * project, that way we can build the submenus.
+	 * organizes all of the detected config files by grouping
+	 * them into separate vectors, one vector per project.
+	 * This method is required for the menu handlers to work.
 	 */
-	struct ConfigPair {
-		wxString ProjectLabel;
-		std::vector<t4p::ConfigTagClass> ConfigTags;
-	};
-
-	std::vector<ConfigPair> ConfigPairs;
+	bool BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& pairs);
+	 
+	 /**
+	 * When a menu item is selected; open the corresponding config
+	 * file
+	 * 
+	 * @param index index into ConfigTags
+	 */
+	void OpenConfigItem(size_t index);
+	
+private:
 
 	/**
 	 * Read all of the detected config tags into memory; that way we can
@@ -67,39 +104,11 @@ private:
 	std::vector<t4p::ConfigTagClass> ConfigTags;
 
 	/**
-	 * we will attach this to the menu bar; it will be
-	 * owned up by wxMenuBar
-	 */
-	wxMenu* ConfigMenu;
-
-	/**
-	 * recreate the menu based from the loaded ConfigTags.
-	 */
-	void RebuildMenu();
-
-	/**
-	 * when the config detectors have finished running, load all of the
-	 * projects' config files and build the menu.
-	 */
-	void OnConfigFilesDetected(t4p::ActionEventClass& event);
-
-	/**
-	 * When a menu item is selected; open the corresponding config
-	 * file
-	 */
-	void OnConfigMenuItem(wxCommandEvent& event);
-
-	/**
 	 * when a file has been saved; check to see if it is one of the config
 	 * files that has been changed.  If, so the trigger database
 	 * detection
 	 */
 	void OnFileSaved(t4p::CodeControlEventClass& event);
-
-	/**
-	 * when the detector cache has been loaded rebuild the menu
-	 */
-	void OnDetectorDbInitComplete(t4p::ActionEventClass& event);
 
 	DECLARE_EVENT_TABLE()
 };
