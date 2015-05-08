@@ -161,6 +161,13 @@ public:
 	 * the breakpoints that the user has set.
 	 */
 	std::vector<t4p::BreakpointWithHandleClass> Breakpoints;
+
+	/**
+	 * holds the background thread that the server action is running
+	 * in. This is public so that the view can register itself
+	 * to listen for debugger events.
+	 */
+	t4p::RunningThreadsClass RunningThreads;
 	
 	/**
 	 * configuration options for xdebug
@@ -312,26 +319,16 @@ public:
 	 * store breakpoints to disk.
 	 */
 	void SaveConfig();
-
-private:
-
+	
 	// handlers for menu items
-	void OnStartDebugger(wxCommandEvent& event);
-	void OnStopDebugger(wxCommandEvent& event);
-	void OnStepInto(wxCommandEvent& event);
-	void OnStepOver(wxCommandEvent& event);
-	void OnStepOut(wxCommandEvent& event);
-	void OnContinue(wxCommandEvent& event);
+	void StepInto();
+	void StepOver();
+	void StepOut();
+	void Continue();
+	void Finish();
+	void GoToExecutingLine();
 	
-	void OnFinish(wxCommandEvent& event);
-	void OnGoToExecutingLine(wxCommandEvent& event);
-	
-	// handlers to begin/stop listening on server
-	void OnAppReady(wxCommandEvent& event);
-	void OnAppExit(wxCommandEvent& event);
-	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-	void OnAppFileClosed(t4p::CodeControlEventClass& event);
-	
+		
 	/**
 	 * starts listening for incoming xdebug connections
 	 * @param doOpenDebuggerPanel if TRUE the debugger panel will
@@ -349,6 +346,14 @@ private:
 	 *        on (to send the server the close message)
 	 */
 	void StopDebugger(int port);
+	
+private:
+
+	// handlers to begin/stop listening on server
+	void OnAppReady(wxCommandEvent& event);
+	void OnAppExit(wxCommandEvent& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * handler for saving preferences to disk
@@ -375,12 +380,6 @@ private:
 	 * contents.
 	 */
 	void OnDebuggerShowFull(wxCommandEvent& event);
-
-	/**
-	 * holds the background thread that the server action is running
-	 * in
-	 */
-	t4p::RunningThreadsClass RunningThreads;
 
 	/**
 	 * this event sink is used to "pass" debug commands such as step out,

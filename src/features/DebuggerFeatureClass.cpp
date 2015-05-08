@@ -314,10 +314,10 @@ void t4p::DebuggerOptionsClass::Copy(const t4p::DebuggerOptionsClass& src) {
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) 
 , Breakpoints() 
+, RunningThreads() 
 , Options()
 , IsDebuggerSessionActive(false)
 , Cmd()
-, RunningThreads() 
 , EventSinkLocker() 
 , CurrentStackFunction()
 , LastStackFunction()
@@ -372,10 +372,6 @@ void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlF
 	}
 }
 
-void t4p::DebuggerFeatureClass::OnStopDebugger(wxCommandEvent& event) {
-	StopDebugger(Options.Port);
-}
-
 void t4p::DebuggerFeatureClass::StopDebugger(int port) {
 	
 	// this is our (triumph's) message telling the listener that we should no longer accept
@@ -414,7 +410,7 @@ bool t4p::DebuggerFeatureClass::RemoveBreakpointAtLine(const wxString& fileName,
 	// the user wants to remove the breakpoint
 	bool found = false;
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
-	while (it != Breakpoints.end()) {
+	while (it != Breakpoints.end() && !found) {
 		if (it->Breakpoint.LineNumber == lineNumber
 			&& it->Breakpoint.Filename == fileName) {
 			found = true;
@@ -480,10 +476,6 @@ bool t4p::DebuggerFeatureClass::AddBreakpointAtLine(const wxString& fileName, in
 	return !found;
 }
 
-void t4p::DebuggerFeatureClass::OnStartDebugger(wxCommandEvent& event) {
-	StartDebugger(true);
-}
-
 void t4p::DebuggerFeatureClass::StartDebugger(bool doOpenDebuggerPanel) {
 	if (IsDebuggerSessionActive) {
 		return;
@@ -494,7 +486,7 @@ void t4p::DebuggerFeatureClass::StartDebugger(bool doOpenDebuggerPanel) {
 	
 	if (doOpenDebuggerPanel) {
 		wxCommandEvent refreshEvt(t4p::EVENT_DEBUGGER_OPEN_PANEL);
-		App.EventSink.Post(refreshEvt);
+		App.EventSink.Publish(refreshEvt);
 	}
 
 	t4p::DebuggerServerActionClass* action = new t4p::DebuggerServerActionClass(RunningThreads, ID_ACTION_DEBUGGER, EventSinkLocker);
@@ -503,7 +495,7 @@ void t4p::DebuggerFeatureClass::StartDebugger(bool doOpenDebuggerPanel) {
 	IsDebuggerServerActive = true;
 }
 
-void t4p::DebuggerFeatureClass::OnStepInto(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::StepInto() {
 	PostCmd(
 		Cmd.StepInto()
 	);
@@ -515,7 +507,7 @@ void t4p::DebuggerFeatureClass::OnStepInto(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnStepOver(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::StepOver() {
 	PostCmd(
 		Cmd.StepOver()
 	);
@@ -527,7 +519,7 @@ void t4p::DebuggerFeatureClass::OnStepOver(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnStepOut(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::StepOut() {
 	PostCmd(
 		Cmd.StepOut()
 	);
@@ -539,7 +531,7 @@ void t4p::DebuggerFeatureClass::OnStepOut(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnContinue(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::Continue() {
 	PostCmd(
 		Cmd.Run()
 	);
@@ -551,7 +543,7 @@ void t4p::DebuggerFeatureClass::OnContinue(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnFinish(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::Finish() {
 	
 	// finish is a special command
 	// 1. disable all breakpoints
@@ -578,7 +570,7 @@ void t4p::DebuggerFeatureClass::OnFinish(wxCommandEvent& event) {
 	);
 }
 
-void t4p::DebuggerFeatureClass::OnGoToExecutingLine(wxCommandEvent& event) {
+void t4p::DebuggerFeatureClass::GoToExecutingLine() {
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
@@ -802,22 +794,6 @@ BEGIN_EVENT_TABLE(t4p::DebuggerFeatureClass, t4p::FeatureClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::DebuggerFeatureClass::OnAppExit)
 	EVT_APP_FILE_OPEN(t4p::DebuggerFeatureClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::DebuggerFeatureClass::OnAppFileClosed)
-	
-	EVT_MENU(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
-	EVT_MENU(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
-	EVT_MENU(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
-	EVT_MENU(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
-	EVT_MENU(t4p::MENU_DEBUGGER + 5, t4p::DebuggerFeatureClass::OnContinue)
-	EVT_MENU(t4p::MENU_DEBUGGER + 8, t4p::DebuggerFeatureClass::OnStopDebugger)
-	EVT_MENU(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
-	EVT_MENU(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)
-
-	EVT_TOOL(t4p::MENU_DEBUGGER + 0, t4p::DebuggerFeatureClass::OnStartDebugger)
-	EVT_TOOL(t4p::MENU_DEBUGGER + 2, t4p::DebuggerFeatureClass::OnStepInto)
-	EVT_TOOL(t4p::MENU_DEBUGGER + 3, t4p::DebuggerFeatureClass::OnStepOver)
-	EVT_TOOL(t4p::MENU_DEBUGGER + 4, t4p::DebuggerFeatureClass::OnStepOut)
-	EVT_TOOL(t4p::MENU_DEBUGGER + 9, t4p::DebuggerFeatureClass::OnFinish)
-	EVT_TOOL(t4p::MENU_DEBUGGER + 10, t4p::DebuggerFeatureClass::OnGoToExecutingLine)
 
 	EVT_DBGP_INIT(t4p::DebuggerFeatureClass::OnDbgpInit)
 	EVT_DBGP_STATUS(t4p::DebuggerFeatureClass::OnDbgpStatus)

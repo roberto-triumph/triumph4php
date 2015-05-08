@@ -153,15 +153,11 @@ public:
 
 	DetectorFeatureClass(t4p::AppClass& app);
 
-private:
-
-	void OnRunUrlDetectors(wxCommandEvent& event);
-	void OnRunTemplateFileDetectors(wxCommandEvent& event);
-	void OnRunTagDetectors(wxCommandEvent& event);
-	void OnRunDatabaseDetectors(wxCommandEvent& event);
-	void OnRunConfigDetectors(wxCommandEvent& event);
-	
-	DECLARE_EVENT_TABLE()
+	void RunUrlDetectors();
+	void RunTemplateFileDetectors();
+	void RunTagDetectors();
+	void RunDatabaseDetectors();
+	void RunConfigDetectors();
 
 };
 

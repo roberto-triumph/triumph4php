@@ -42,15 +42,13 @@ public:
 
 	void LoadPreferences(wxConfigBase* config);
 	
+	void ShowChangeLog();
+
 private:
 		
-	void OnHelpChangelog(wxCommandEvent& event);
-	
 	void OnAppReady(wxCommandEvent& event);
 	
 	void OnSavePreferences(wxCommandEvent& event);
-	
-	void ShowChangeLog();
 	
 	/**
 	 * the last version of the app that was opened.

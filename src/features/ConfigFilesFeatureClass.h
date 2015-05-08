@@ -86,6 +86,14 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 	 */
 	bool BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& pairs);
 	 
+	 /**
+	 * When a menu item is selected; open the corresponding config
+	 * file
+	 * 
+	 * @param index index into ConfigTags
+	 */
+	void OpenConfigItem(size_t index);
+	
 private:
 
 	/**
@@ -94,12 +102,6 @@ private:
 	 * as the menu ID).
 	 */
 	std::vector<t4p::ConfigTagClass> ConfigTags;
-
-	/**
-	 * When a menu item is selected; open the corresponding config
-	 * file
-	 */
-	void OnConfigMenuItem(wxCommandEvent& event);
 
 	/**
 	 * when a file has been saved; check to see if it is one of the config

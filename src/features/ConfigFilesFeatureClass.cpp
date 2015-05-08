@@ -94,9 +94,7 @@ bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFiles
 	return !configPairs.empty();
 }
 
-
-void t4p::ConfigFilesFeatureClass::OnConfigMenuItem(wxCommandEvent& event) {
-	size_t index = event.GetId() - t4p::CONFIG_DETECTORS;
+void t4p::ConfigFilesFeatureClass::OpenConfigItem(size_t index) {
 	if (t4p::NumberLessThan(index, t4p::ConfigFilesFeatureClass::MAX_CONFIG_MENU_ITEMS) && index <ConfigTags.size()) {
 		wxFileName fileName = ConfigTags[index].ConfigFileName;
 		t4p::OpenFileCommandEventClass cmd(fileName.GetFullPath());
@@ -120,10 +118,5 @@ void t4p::ConfigFilesFeatureClass::OnFileSaved(t4p::CodeControlEventClass& event
 }
 
 BEGIN_EVENT_TABLE(t4p::ConfigFilesFeatureClass, t4p::FeatureClass) 
-	EVT_MENU_RANGE(
-		t4p::CONFIG_DETECTORS, 
-		t4p::CONFIG_DETECTORS + t4p::ConfigFilesFeatureClass::MAX_CONFIG_MENU_ITEMS, 
-		t4p::ConfigFilesFeatureClass::OnConfigMenuItem
-	)
 	EVT_APP_FILE_SAVED(t4p::ConfigFilesFeatureClass::OnFileSaved)
 END_EVENT_TABLE()

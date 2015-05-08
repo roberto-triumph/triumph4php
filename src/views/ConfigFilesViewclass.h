@@ -65,6 +65,12 @@ public:
 	void OnConfigFilesDetected(t4p::ActionEventClass& event);
 	
 	/**
+	 * When a menu item is selected; open the corresponding config
+	 * file
+	 */
+	void OnConfigMenuItem(wxCommandEvent& event);
+	
+	/**
 	 * The feature gives this view the list of config tags
 	 * in all current projects.
 	 */

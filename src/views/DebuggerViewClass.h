@@ -38,6 +38,8 @@ public:
 
 	DebuggerViewClass(t4p::DebuggerFeatureClass& feature);
 	
+	~DebuggerViewClass();
+	
 	void AddNewMenu(wxMenuBar* menuBar);
 	
 	void AddViewMenuItems(wxMenu* menu);
@@ -127,12 +129,21 @@ private:
 	void OnDebuggerOpenPanel(wxCommandEvent& event);
 	
 	// menu handlers
+	void OnStartDebugger(wxCommandEvent& event);
+	void OnStopDebugger(wxCommandEvent& event);
+	void OnStepInto(wxCommandEvent& event);
+	void OnStepOver(wxCommandEvent& event);
+	void OnStepOut(wxCommandEvent& event);
+	void OnContinue(wxCommandEvent& event);
+	void OnContinueToCursor(wxCommandEvent& event);
+	void OnFinish(wxCommandEvent& event);
+	void OnToggleBreakpoint(wxCommandEvent& event);
+	void OnGoToExecutingLine(wxCommandEvent& event);
 	void OnViewDebuggerVariables(wxCommandEvent& event);
 	void OnViewDebuggerLog(wxCommandEvent& event);
 	void OnViewDebuggerBreakpoints(wxCommandEvent& event);
 	void OnViewDebuggerEval(wxCommandEvent& event);
-	void OnToggleBreakpoint(wxCommandEvent& event);
-	void OnContinueToCursor(wxCommandEvent& event);
+
 	
 	// debugger event handlers; update the debugger panels
 	void OnDbgpError(t4p::DbgpErrorEventClass& event);

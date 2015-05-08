@@ -40,9 +40,17 @@ class ChangelogViewClass : public t4p::FeatureViewClass {
 
 public:
 	
-	ChangelogViewClass();
+	ChangelogViewClass(t4p::ChangelogFeatureClass& feature);
 	
 	void AddHelpMenuItems(wxMenu* helpMenu);
+	
+private:
+	
+	void OnHelpChangelog(wxCommandEvent& event);
+	
+	t4p::ChangelogFeatureClass& Feature;
+	
+	DECLARE_EVENT_TABLE()
 };
 
 }

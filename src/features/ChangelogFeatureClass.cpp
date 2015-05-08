@@ -65,10 +65,6 @@ void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
 	}
 }
 
-void t4p::ChangelogFeatureClass::OnHelpChangelog(wxCommandEvent& event) {
-	ShowChangeLog();
-}
-
 void t4p::ChangelogFeatureClass::OnSavePreferences(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfigBase::Get(false);
 	config->Write(wxT("Changelog/LastVersion"), LastVersion);
@@ -84,6 +80,5 @@ void t4p::ChangelogFeatureClass::ShowChangeLog() {
 
 
 BEGIN_EVENT_TABLE(t4p::ChangelogFeatureClass, t4p::FeatureClass)
-	EVT_MENU(t4p::MENU_CHANGELOG + 0, t4p::ChangelogFeatureClass::OnHelpChangelog)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::ChangelogFeatureClass::OnAppReady)
 END_EVENT_TABLE()

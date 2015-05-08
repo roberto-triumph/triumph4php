@@ -258,7 +258,7 @@ t4p::DetectorFeatureClass::DetectorFeatureClass(t4p::AppClass &app)
 
 }
 
-void t4p::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::RunUrlDetectors() {
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
@@ -272,7 +272,7 @@ void t4p::DetectorFeatureClass::OnRunUrlDetectors(wxCommandEvent& event) {
 	App.Sequences.Build(actions);
 }
 
-void t4p::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::RunTemplateFileDetectors() {
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));
 		return;
@@ -301,7 +301,7 @@ void t4p::DetectorFeatureClass::OnRunTemplateFileDetectors(wxCommandEvent& event
 	}
 }
 
-void t4p::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::RunTagDetectors() {
 	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
@@ -311,7 +311,7 @@ void t4p::DetectorFeatureClass::OnRunTagDetectors(wxCommandEvent& event) {
 	App.Sequences.Build(actions);
 }
 
-void t4p::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::RunDatabaseDetectors() {
 	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
@@ -321,7 +321,7 @@ void t4p::DetectorFeatureClass::OnRunDatabaseDetectors(wxCommandEvent& event) {
 	App.Sequences.Build(actions);
 }
 
-void t4p::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
+void t4p::DetectorFeatureClass::RunConfigDetectors() {
 	std::vector<t4p::GlobalActionClass*> actions;
 
 	// the sequence class will own this pointer
@@ -331,10 +331,3 @@ void t4p::DetectorFeatureClass::OnRunConfigDetectors(wxCommandEvent& event) {
 	App.Sequences.Build(actions);
 }
 
-BEGIN_EVENT_TABLE(t4p::DetectorFeatureClass, t4p::FeatureClass)
-	EVT_MENU(t4p::MENU_DETECTORS + 5, t4p::DetectorFeatureClass::OnRunUrlDetectors)
-	EVT_MENU(t4p::MENU_DETECTORS + 6, t4p::DetectorFeatureClass::OnRunTemplateFileDetectors)
-	EVT_MENU(t4p::MENU_DETECTORS + 7, t4p::DetectorFeatureClass::OnRunTagDetectors)
-	EVT_MENU(t4p::MENU_DETECTORS + 8, t4p::DetectorFeatureClass::OnRunDatabaseDetectors)
-	EVT_MENU(t4p::MENU_DETECTORS + 9, t4p::DetectorFeatureClass::OnRunConfigDetectors)
-END_EVENT_TABLE()

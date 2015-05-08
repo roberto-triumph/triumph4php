@@ -51,6 +51,11 @@ public:
 	void OnViewTagDetectors(wxCommandEvent& event);
 	void OnViewDatabaseDetectors(wxCommandEvent& event);
 	void OnViewConfigDetectors(wxCommandEvent& event);
+	void OnRunUrlDetectors(wxCommandEvent& event);
+	void OnRunTemplateFileDetectors(wxCommandEvent& event);
+	void OnRunTagDetectors(wxCommandEvent& event);
+	void OnRunDatabaseDetectors(wxCommandEvent& event);
+	void OnRunConfigDetectors(wxCommandEvent& event);
 	
 	void OnPreferencesSaved(wxCommandEvent& event);
 	
