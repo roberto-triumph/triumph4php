@@ -33,7 +33,6 @@
 
 static int ID_NEW_USER_DIALOG = wxNewId();
 static int ID_NEW_USER_PHP_SETTINGS = wxNewId();
-static int ID_NEW_USER_WIZARD = wxNewId();
 static int ID_NEW_USER_TIMER = wxNewId();
 
 t4p::NewUserViewClass::NewUserViewClass(t4p::NewUserFeatureClass& feature)
@@ -301,7 +300,7 @@ BEGIN_EVENT_TABLE(t4p::NewUserPhpSettingsPanelClass, NewUserPhpSettingsPanelGene
 	EVT_UPDATE_UI(ID_NEW_USER_PHP_SETTINGS, t4p::NewUserPhpSettingsPanelClass::OnUpdateUi)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(t4p::NewUserViewClass, t4p::FeatureClass)
+BEGIN_EVENT_TABLE(t4p::NewUserViewClass, t4p::FeatureViewClass)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::NewUserViewClass::OnAppReady)
 	EVT_TIMER(ID_NEW_USER_TIMER, t4p::NewUserViewClass::OnTimer)
 	EVT_WIZARD_CANCEL(wxID_ANY, t4p::NewUserViewClass::OnWizardCancel)
