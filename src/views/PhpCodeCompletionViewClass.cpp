@@ -787,7 +787,7 @@ void t4p::PhpBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 	}
 }
 
-BEGIN_EVENT_TABLE(t4p::PhpCodeCompletionViewClass, t4p::FeatureClass)
+BEGIN_EVENT_TABLE(t4p::PhpCodeCompletionViewClass, t4p::FeatureViewClass)
 	EVT_APP_FILE_OPEN(t4p::PhpCodeCompletionViewClass::OnAppFileOpened)
 	EVT_APP_FILE_NEW(t4p::PhpCodeCompletionViewClass::OnAppFileOpened)
 	EVT_STC_AUTOCOMP_SELECTION(wxID_ANY, t4p::PhpCodeCompletionViewClass::OnAutoCompletionSelected)
