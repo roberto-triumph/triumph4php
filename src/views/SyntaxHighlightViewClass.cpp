@@ -317,6 +317,7 @@ void t4p::SyntaxHighlightViewClass::OnFileNew(t4p::CodeControlEventClass& event)
 }
 
 void t4p::SyntaxHighlightViewClass::OnFileOpen(t4p::CodeControlEventClass& event) {
+	LoadMarkerBitmaps();
 	ApplyPreferences(event.GetCodeControl(), Feature.App.Preferences.CodeControlOptions);
 }
 
@@ -429,11 +430,25 @@ void t4p::SyntaxHighlightViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 void t4p::SyntaxHighlightViewClass::OnAppReady(wxCommandEvent& event) {
 	
 	// load the images once at startup
-	SearchHitGoodBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier"));
-	SearchHitBadBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
-	BookmarkBitmap = t4p::AutoCompleteImageAsset(wxT("bookmark"));
-	BreakpointBitmap = t4p::AutoCompleteImageAsset(wxT("breakpoint"));
-	ExecutionLineBitmap = t4p::AutoCompleteImageAsset(wxT("arrow-right"));
+	LoadMarkerBitmaps();
+}
+
+void t4p::SyntaxHighlightViewClass::LoadMarkerBitmaps() {
+	if (!SearchHitGoodBitmap.IsOk()) {
+		SearchHitGoodBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier"));
+	}
+	if (!SearchHitBadBitmap.IsOk()) {
+		SearchHitBadBitmap = t4p::AutoCompleteImageAsset(wxT("magnifier-exclamation"));
+	}
+	if (!BookmarkBitmap.IsOk()) {
+		BookmarkBitmap = t4p::AutoCompleteImageAsset(wxT("bookmark"));
+	}
+	if (!BreakpointBitmap.IsOk()) {
+		BreakpointBitmap = t4p::AutoCompleteImageAsset(wxT("breakpoint"));
+	}
+	if (!ExecutionLineBitmap.IsOk()) {
+		ExecutionLineBitmap = t4p::AutoCompleteImageAsset(wxT("arrow-right"));
+	}
 }
 
 t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, 

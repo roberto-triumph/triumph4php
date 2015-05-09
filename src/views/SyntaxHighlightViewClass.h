@@ -121,6 +121,12 @@ private:
 	 */
 	void OnAppReady(wxCommandEvent& event);
 	
+	/**
+	 * loads the bitmaps that are used as STC markers
+	 * from disk.
+	 */
+	void LoadMarkerBitmaps();
+	
 	t4p::SyntaxHighlightFeatureClass& Feature;
 	
 	// bitmaps to show in the margin for search hits
