@@ -27,7 +27,7 @@
 
 #include <wx/event.h>
 #include <wx/menu.h>
-#include <memory.h>
+#include <memory>
 
 namespace t4p {
 
