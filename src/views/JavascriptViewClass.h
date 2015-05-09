@@ -27,7 +27,7 @@
 
 #include <views/FeatureViewClass.h>
 #include <code_control/CodeControlClass.h>
-#include <globals/events.h>
+#include <globals/Events.h>
 
 namespace t4p {
 
