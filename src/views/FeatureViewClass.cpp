@@ -26,8 +26,63 @@
 #include <widgets/NotebookClass.h>
 
 t4p::FeatureViewClass::FeatureViewClass() 
-: wxEvtHandler() {}void t4p::FeatureViewClass::InitWindow(		StatusBarWithGaugeClass* statusBarWithGauge, 		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 		wxMenuBar* menuBar) {	AuiManager = auiManager;	StatusBarWithGauge = statusBarWithGauge;	Notebook = notebook;	ToolsNotebook = toolsNotebook;	OutlineNotebook = outlineNotebook;	MenuBar = menuBar;
-}void t4p::FeatureViewClass::AddViewMenuItems(wxMenu* viewMenu) {}void t4p::FeatureViewClass::AddSearchMenuItems(wxMenu* searchMenu) {}void t4p::FeatureViewClass::AddFileMenuItems(wxMenu* fileMenu) {}void t4p::FeatureViewClass::AddEditMenuItems(wxMenu* editMenu) {}void t4p::FeatureViewClass::AddHelpMenuItems(wxMenu* editMenu) {}void t4p::FeatureViewClass::AddNewMenu(wxMenuBar* menuBar) {}void t4p::FeatureViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {}void t4p::FeatureViewClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {}void t4p::FeatureViewClass::AddWindows() {}void t4p::FeatureViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {}void t4p::FeatureViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {}void t4p::FeatureViewClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<t4p::DynamicCmdClass>& shortcuts) {	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {		wxMenuItem* item = MenuBar->FindItem(it->first);		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);		t4p::DynamicCmdClass cmd(item, it->second);		shortcuts.push_back(cmd);	}}
+: wxEvtHandler() {
+}
+
+void t4p::FeatureViewClass::InitWindow(
+		StatusBarWithGaugeClass* statusBarWithGauge, 
+		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
+		wxMenuBar* menuBar) {
+	AuiManager = auiManager;
+	StatusBarWithGauge = statusBarWithGauge;
+	Notebook = notebook;
+	ToolsNotebook = toolsNotebook;
+	OutlineNotebook = outlineNotebook;
+	MenuBar = menuBar;
+}
+
+void t4p::FeatureViewClass::AddViewMenuItems(wxMenu* viewMenu) {
+}
+
+void t4p::FeatureViewClass::AddSearchMenuItems(wxMenu* searchMenu) {
+}
+
+void t4p::FeatureViewClass::AddFileMenuItems(wxMenu* fileMenu) {
+}
+
+void t4p::FeatureViewClass::AddEditMenuItems(wxMenu* editMenu) {
+}
+
+void t4p::FeatureViewClass::AddHelpMenuItems(wxMenu* editMenu) {
+}
+
+void t4p::FeatureViewClass::AddNewMenu(wxMenuBar* menuBar) {
+}
+
+void t4p::FeatureViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
+}
+
+void t4p::FeatureViewClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts) {
+}
+
+void t4p::FeatureViewClass::AddWindows() {
+}
+
+void t4p::FeatureViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
+}
+
+void t4p::FeatureViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+}
+
+void t4p::FeatureViewClass::AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<t4p::DynamicCmdClass>& shortcuts) {
+	for (std::map<int, wxString>::iterator it = menuItemIds.begin(); it != menuItemIds.end(); ++it) {
+		wxMenuItem* item = MenuBar->FindItem(it->first);
+		wxASSERT_MSG(item, wxT("Menu item not found:") + it->second);
+		t4p::DynamicCmdClass cmd(item, it->second);
+		shortcuts.push_back(cmd);
+	}
+}
 
 wxWindow* t4p::FeatureViewClass::FindToolsWindow(int windowId) const {
 	return wxWindow::FindWindowById(windowId, GetToolsNotebook());

@@ -22,13 +22,20 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <views/ChangelogViewClass.h>#include <features/ChangelogFeatureClass.h>
+#include <views/ChangelogViewClass.h>
+#include <features/ChangelogFeatureClass.h>
 
 t4p::ChangelogViewClass::ChangelogViewClass(t4p::ChangelogFeatureClass& feature)
 : FeatureViewClass()
-, Feature(feature){
+, Feature(feature)
+{
 
-}void t4p::ChangelogViewClass::AddHelpMenuItems(wxMenu* helpMenu) {	helpMenu->Append(t4p::MENU_CHANGELOG + 0, _("See ChangeLog"),		_("Open the triumph4php ChangeLog file"), wxITEM_NORMAL);}
+}
+
+void t4p::ChangelogViewClass::AddHelpMenuItems(wxMenu* helpMenu) {
+	helpMenu->Append(t4p::MENU_CHANGELOG + 0, _("See ChangeLog"),
+		_("Open the triumph4php ChangeLog file"), wxITEM_NORMAL);
+}
 
 void t4p::ChangelogViewClass::OnHelpChangelog(wxCommandEvent& event) {
 	Feature.ShowChangeLog();
