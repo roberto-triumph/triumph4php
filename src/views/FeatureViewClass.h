@@ -331,6 +331,14 @@ protected:
 	  * 
 	  */
 	 void LoadCodeControl(const wxString& fileName);
+	 
+	 /**
+	  * @return all of the opened code controls. Be very careful with 
+	  *         these pointers, as the user can close files at any time
+	  *         and the pointers will be deleted.  You should not store
+	  *         the pointers at all.
+	  */
+	 std::vector<t4p::CodeControlClass*> AllCodeControls() const;
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.

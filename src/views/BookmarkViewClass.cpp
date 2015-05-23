@@ -101,10 +101,9 @@ void t4p::BookmarkViewClass::OnEditClearAllBookmarks(wxCommandEvent& event) {
 	Feature.Bookmarks.clear();
 	
 	// remove any existing bookmarks from the code controls also
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		ctrl->BookmarkClearAll();
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		ctrls[i]->BookmarkClearAll();
 	}
 }
 

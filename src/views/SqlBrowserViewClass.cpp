@@ -968,10 +968,9 @@ void t4p::SqlBrowserViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 void  t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	int num = 1;
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); i++) {
-		wxString name = notebook->GetPageText(i);
-		if (name.EndsWith(wxT(".sql")) || name.Index(_("SQL Browser")) == 0) {
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		if (ctrls[i]->GetFileType() == t4p::FILE_TYPE_SQL) {
 			num++;
 		}
 	}

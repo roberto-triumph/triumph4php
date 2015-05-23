@@ -174,3 +174,13 @@ void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
 	t4p::NotebookClass* notebook = GetNotebook();
 	notebook->LoadPage(fileName);
 }
+
+std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
+	std::vector<t4p::CodeControlClass*> ctrls;
+	t4p::NotebookClass* notebook = GetNotebook();
+	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+		ctrls.push_back(ctrl);
+	}
+	return ctrls;
+}
