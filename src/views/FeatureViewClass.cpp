@@ -185,8 +185,12 @@ std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() con
 	return ctrls;
 }
 
-t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) {
+t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
 	t4p::NotebookClass* notebook = GetNotebook();
 	return notebook->FindCodeControl(fullPath);
+}
 
+std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
+	t4p::NotebookClass* notebook = GetNotebook();
+	return notebook->GetOpenedFiles();
 }

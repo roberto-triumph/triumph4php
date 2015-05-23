@@ -33,6 +33,9 @@
 
 namespace t4p {
 
+// forward declaration, defined below
+class FindInFilesViewClass;
+
 /** Implementing FindInFilesPanelGeneratedClass */
 class FindInFilesResultsPanelClass : public FindInFilesResultsPanelGeneratedClass {
 protected:
@@ -58,12 +61,12 @@ public:
 	 * Construct a new FindInFilesResultsPanelClass 
 	 * 
 	 * @param wxWindow* parent the parent window
-	 * @param NotebookClass* notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
+	 * @param view the view class gives us access to the opened files, so that we can search their contents
 	 * @param StatusBarWithGaugeClass* gauge the object used to create gauge for showing progress. The pointer will NOT be managed 
 	 *        (deleted) by this class. 
 	 * @param runningThreads manages the background search thread
 	 */
-	FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, StatusBarWithGaugeClass* gauge,
+	FindInFilesResultsPanelClass(wxWindow* parent, t4p::FindInFilesViewClass& view, StatusBarWithGaugeClass* gauge,
 		t4p::RunningThreadsClass& runningThreads);
 	
 	~FindInFilesResultsPanelClass();
@@ -121,7 +124,7 @@ private:
 	 * To open the files 
 	 * @var NotebookClass
 	 */
-	NotebookClass* Notebook;
+	t4p::FindInFilesViewClass& View;
 	
 	/**
 	 * To display status bar to the user

@@ -144,12 +144,12 @@ static std::vector<wxString> FilesFromHits(const std::vector<t4p::FindInFilesHit
 	return files;
 }
 
-t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, NotebookClass* notebook, 
+t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, t4p::FindInFilesViewClass& view, 
 		StatusBarWithGaugeClass* gauge, t4p::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
 	, RunningThreads(runningThreads)
-	, Notebook(notebook)
+	, View(view)
 	, Gauge(gauge)
 	, MatchedFiles(0) 
 	, RunningActionId(0) {
@@ -199,7 +199,7 @@ void t4p::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
 		return;
 	}
-	std::vector<wxString> skipFiles = Notebook->GetOpenedFiles();
+	std::vector<wxString> skipFiles = View.AllOpenedFiles();
 	t4p::FindInFilesBackgroundReaderClass* reader = 
 		new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
@@ -224,8 +224,9 @@ void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 	if (FindInFiles.Prepare() && finder.Prepare()) {
 
 		// search the opened files
-		for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
-			CodeControlClass* codeControl = Notebook->GetCodeControl(i);
+		std::vector<t4p::CodeControlClass*> codeCtrls = View.AllCodeControls();
+		for (size_t i = 0; i < codeCtrls.size(); ++i) {
+			CodeControlClass* codeControl = codeCtrls[i];
 			wxString fileName = codeControl->GetFileName();
 
 			// make sure to respect the wildcard filter and the find path here too
@@ -297,9 +298,8 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 	}
 	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
-	CodeControlClass* codeControl = 
-			Notebook->GetCodeControl(Notebook->GetSelection());	
-			
+	CodeControlClass* codeControl = View.GetCurrentCodeControl();
+	
 	// if user changed tab, GetLastReplacementText would return false and nothing will be replaced
 	UnicodeString text = codeControl->GetSafeText();
 	if (codeControl) {		
@@ -332,8 +332,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent&
 	}
 	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
-	CodeControlClass* codeControl = 
-			Notebook->GetCodeControl(Notebook->GetSelection());	
+	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 			
 	// if user changed tab, the new tab would be modified; this is clear to the user
 	 if (codeControl) {
@@ -365,8 +364,9 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 		if (finder.Prepare()) {
 
 			// replace the open files
-			for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
-				CodeControlClass* codeControl = Notebook->GetCodeControl(i);
+			std::vector<t4p::CodeControlClass*> codeCtrls = View.AllCodeControls();
+			for (size_t i = 0; i < codeCtrls.size(); ++i) {
+				CodeControlClass* codeControl = codeCtrls[i];
 				UnicodeString text = codeControl->GetSafeText();
 			
 				// only update code control when there are replacements made
@@ -379,7 +379,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
 		t4p::FindInFilesBackgroundReaderClass* reader = 
 			new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
-		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), Notebook->GetOpenedFiles());
+		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), View.AllOpenedFiles());
 		RunningActionId = RunningThreads.Queue(reader);
 		SetStatus(_("Find In Files In Progress"));
 		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
@@ -496,8 +496,8 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	}
 	wxString fileName = AllHits[i].FileName;
 	int line = AllHits[i].LineNumber;
-	Notebook->LoadPage(fileName);
-	CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	View.LoadCodeControl(fileName);
+	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
 			
 		// search for the expression and highlight it. search from the start of the line.
@@ -811,7 +811,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFiles(wxCommandEvent& event) {
 	FindInFilesDialogClass dialog(GetMainWindow(), Feature, *this);
 	if (dialog.ShowModal() == wxID_OK) {
 		t4p::FindInFilesResultsPanelClass* panel = new t4p::FindInFilesResultsPanelClass(GetToolsNotebook(), 
-			GetNotebook(), GetStatusBarWithGauge(), Feature.App.RunningThreads);
+			*this, GetStatusBarWithGauge(), Feature.App.RunningThreads);
 		wxBitmap findBitmap = wxNullBitmap;
 		if (Feature.PreviousFindInFiles.ReplaceExpression.isEmpty()) {
 			findBitmap = t4p::BitmapImageAsset(wxT("find-in-files"));

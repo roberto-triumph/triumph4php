@@ -179,8 +179,54 @@ public:
 	 * @param shortcuts the list of shortcuts to add to
 	 */
 	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-
+	
+	/**
+	 * Opens an existing file, or if the file is already opened, just sets it to be
+	 * the active page.
+	 * 
+	 * A word about error handling:
+	 * The full path must exist; if not then the user will be shown a warning message 
+	 * about the file not existing.
+	 * 
+	 * @param fullPath the full path of the file to open
+	 * 
+	 */
+	void LoadCodeControl(const wxString& fullPath);
+	
+	/**
+	 * Search all opened code controls for the code control that contains the 
+	 * contents of the given file. 
+	 * 
+	 * @param fullPath full path of the file to look for
+	 * @return CodeControlClass* the code control that contains the contents of
+	 *         the given file, or NULL if the file is not open.
+	 */
+	t4p::CodeControlClass* FindCodeControl(const wxString& fullPath) const;
+	 
+	/**
+	 * @return all of the opened code controls. Be very careful with 
+	 *         these pointers, as the user can close files at any time
+	 *         and the pointers will be deleted.  You should not store
+	 *         the pointers at all.
+	 */
+	std::vector<t4p::CodeControlClass*> AllCodeControls() const;
+	
+	/**
+	 * @return vector containing full paths to all of the files that are opened.
+	 *         If the editor has opened buffers that are not yet saved to a file,
+	 *         this method will also return those; this means that the returned vector
+	 *         may contain strings that are not valid full paths.
+	 */
+	std::vector<wxString> AllOpenedFiles() const;
+	
+	/**
+	 * Get the currently selected code control. This may be NULL if the editor's content pane is
+	 * focused on something other than a code control.
+	 * 
+	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 */
+	CodeControlClass* GetCurrentCodeControl() const;
+	
 protected:
 
 	/**
@@ -301,14 +347,6 @@ protected:
 	bool AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap = wxNullBitmap);
 	
 	/**
-	 * Get the currently selected code control. This may be NULL if the editor's content pane is
-	 * focused on something other than a code control.
-	 * 
-	 * @return CodeControlClass* the code control that has focus; can be NULL
-	 */
-	CodeControlClass* GetCurrentCodeControl() const;
-	
-	/**
 	 * Creates a new code control that is primed with the global editor
 	 * options. code control will be tied to the application code Notebook.
 	 * 
@@ -319,36 +357,6 @@ protected:
 	 */
 	CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
 	 
-	/**
-	 * Opens an existing file, or if the file is already opened, just sets it to be
-	 * the active page.
-	 * 
-	 * A word about error handling:
-	 * The full path must exist; if not then the user will be shown a warning message 
-	 * about the file not existing.
-	 * 
-	 * @param fullPath the full path of the file to open
-	 * 
-	 */
-	void LoadCodeControl(const wxString& fullPath);
-	
-	/**
-	 * Search all opened code controls for the code control that contains the 
-	 * contents of the given file. 
-	 * 
-	 * @param fullPath full path of the file to look for
-	 * @return CodeControlClass* the code control that contains the contents of
-	 *         the given file, or NULL if the file is not open.
-	 */
-	t4p::CodeControlClass* FindCodeControl(const wxString& fullPath);
-	 
-	/**
-	 * @return all of the opened code controls. Be very careful with 
-	 *         these pointers, as the user can close files at any time
-	 *         and the pointers will be deleted.  You should not store
-	 *         the pointers at all.
-	 */
-	std::vector<t4p::CodeControlClass*> AllCodeControls() const;
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
