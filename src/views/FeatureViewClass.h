@@ -366,6 +366,18 @@ protected:
 	 wxString GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl);
 	 
 	/**
+	 * Search all opened code controls for the code control that contains the 
+	 * contents of the given file. If the code control is found, it is focused
+	 * on.
+	 * 
+	 * @param fullPath full path of the file to look for
+	 * @return CodeControlClass* the code control that contains the contents of
+	 *         the given file, or NULL if the file is not open.
+	 */
+	t4p::CodeControlClass* FindCodeControlAndSelect(const wxString& fullPath) const;
+	
+	 
+	/**
 	 * Returns the text that's currently selected in the currently active code control.
 	 * 
 	 * @retun wxString the selected text.  If no text is selected, or there is not opened code control, 

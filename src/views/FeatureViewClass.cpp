@@ -204,3 +204,19 @@ wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* co
 	}
 	return ret;
 }
+
+t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
+	t4p::NotebookClass* notebook = GetNotebook();
+	t4p::CodeControlClass* codeCtrl = notebook->FindCodeControl(fullPath);
+	if (codeCtrl) {
+		int currentSelectionIndex = notebook->GetSelection();
+		int pageIndex = notebook->GetPageIndex(codeCtrl);
+		
+		// the bookmark may be in a page that is not active, need to
+		// swith notebook tabs if needed
+		if (pageIndex != currentSelectionIndex) {
+			notebook->SetSelection(pageIndex);
+		}
+	}
+	return codeCtrl;
+}
