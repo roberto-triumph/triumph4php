@@ -997,7 +997,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::Cod
 }
 
 void t4p::SqlBrowserViewClass::OnRun(wxCommandEvent& event) {
-	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl && ctrl->GetFileType() == t4p::FILE_TYPE_SQL) {
 		
 		// look for results panel that corresponds to the current code control
@@ -1189,16 +1189,14 @@ void t4p::SqlBrowserViewClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEventCl
 }
 
 void t4p::SqlBrowserViewClass::NewSqlBuffer(const wxString& sql) {
-	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_SQL);
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = CreateCodeControl("", t4p::FILE_TYPE_SQL);
 	if (ctrl) {
 		ctrl->SetText(sql);
 	}
 }
 
 void t4p::SqlBrowserViewClass::NewTextBuffer(const wxString& text) {
-	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_TEXT);
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = CreateCodeControl("", t4p::FILE_TYPE_TEXT);
 	if (ctrl) {
 		ctrl->SetText(text);
 	}
