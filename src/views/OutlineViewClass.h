@@ -113,10 +113,8 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 * @param int windowId the window ID
 	 * @param OutlineFeatureClass& feature the object that will execute the business logic. 
 	 * @param OutlineViewClass& view another object that will execute the business logic. 
-	 * @param NotebookClass* notebook we need to listen to the notebook page change events so that the outline is updated to show
-	 *        an outline of the newly opened page
 	 */
-	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, OutlineViewClass& view, NotebookClass* notebook);
+	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, OutlineViewClass& view);
 	
 	/**
 	 * update the status label
@@ -202,11 +200,6 @@ private:
 	 */
 	OutlineViewClass& View;
 	
-	/**
-	 * The notebook to listen (for page changing) events  to
-	 */
-	NotebookClass* Notebook;
-
 	/**
 	 * if TRUE outline will show class methods
 	 */
