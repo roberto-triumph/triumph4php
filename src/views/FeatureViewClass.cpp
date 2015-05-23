@@ -194,3 +194,13 @@ std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
 	t4p::NotebookClass* notebook = GetNotebook();
 	return notebook->GetOpenedFiles();
 }
+
+wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
+	t4p::NotebookClass* notebook = GetNotebook();
+	int pos = notebook->GetPageIndex(codeCtrl);
+	wxString ret;
+	if (pos >= 0) {
+		ret = notebook->GetPageText(pos);
+	}
+	return ret;
+}

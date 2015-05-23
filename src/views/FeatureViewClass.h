@@ -357,7 +357,14 @@ protected:
 	 */
 	CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
 	 
-	
+	/**
+	 * @param codeCtrl the code control to get the text for
+	 * @return the text that is in the notebook tab for this code control
+	 *         empty string is the given code control is not part of the
+	 *         code notebook.
+	 */
+	 wxString GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl);
+	 
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
 	 * 

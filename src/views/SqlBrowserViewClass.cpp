@@ -984,8 +984,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::Cod
 	t4p::SqlQueryClass query;
 	t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
 		query, Feature, *this);
-	t4p::NotebookClass* codeNotebook = GetNotebook();
-	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
+	wxString tabText = GetCodeNotebookTabText(codeControl);
 
 	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 	// are from this feature
@@ -1070,7 +1069,8 @@ void t4p::SqlBrowserViewClass::OnSqlDetectMenu(wxCommandEvent& event) {
 }
 
 void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
+	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1099,7 +1099,8 @@ void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& 
 }
 
 void t4p::SqlBrowserViewClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
-	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
+	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
