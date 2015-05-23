@@ -309,36 +309,43 @@ protected:
 	CodeControlClass* GetCurrentCodeControl() const;
 	
 	/**
-	  * Creates a new code control that is primed with the global editor
-	  * options. code control will be tied to the application code Notebook.
-	  * 
-	  * @param tabName the name that will go on the tab of the new page
-	  *        This can be empty; if empty then a default message is shown
-	  * @param mode the document mode that the control will be editing
-	  * @return CodeControlClass* this class will own the pointer, DONT delete it
-	  */
-	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+	 * Creates a new code control that is primed with the global editor
+	 * options. code control will be tied to the application code Notebook.
+	 * 
+	 * @param tabName the name that will go on the tab of the new page
+	 *        This can be empty; if empty then a default message is shown
+	 * @param mode the document mode that the control will be editing
+	 * @return CodeControlClass* this class will own the pointer, DONT delete it
+	 */
+	CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
 	 
-	 /**
-	  * Opens an existing file, or if the file is already opened, just sets it to be
-	  * the active page.
-	  * 
-	  * A word about error handling:
-	  * The full path must exist; if not then the user will be shown a warning message 
-	  * about the file not existing.
-	  * 
-	  * @param fileName the full path of the file to open
-	  * 
-	  */
-	 void LoadCodeControl(const wxString& fileName);
+	/**
+	 * Opens an existing file, or if the file is already opened, just sets it to be
+	 * the active page.
+	 * 
+	 * A word about error handling:
+	 * The full path must exist; if not then the user will be shown a warning message 
+	 * about the file not existing.
+	 * 
+	 * @param fileName the full path of the file to open
+	 * 
+	 */
+	void LoadCodeControl(const wxString& fileName);
+	
+	/**
+	 * 
+	 * @param fileName full path of the file to look for
+	 * @return 
+	 */
+	void FindCodeControl(const wxString& fileName);
 	 
-	 /**
-	  * @return all of the opened code controls. Be very careful with 
-	  *         these pointers, as the user can close files at any time
-	  *         and the pointers will be deleted.  You should not store
-	  *         the pointers at all.
-	  */
-	 std::vector<t4p::CodeControlClass*> AllCodeControls() const;
+	/**
+	 * @return all of the opened code controls. Be very careful with 
+	 *         these pointers, as the user can close files at any time
+	 *         and the pointers will be deleted.  You should not store
+	 *         the pointers at all.
+	 */
+	std::vector<t4p::CodeControlClass*> AllCodeControls() const;
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
