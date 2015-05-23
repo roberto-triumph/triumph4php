@@ -121,8 +121,7 @@ private:
 	t4p::RunningThreadsClass& RunningThreads;
 		
 	/**
-	 * To open the files 
-	 * @var NotebookClass
+	 * To open the files
 	 */
 	t4p::FindInFilesViewClass& View;
 	
