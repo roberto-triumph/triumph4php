@@ -327,17 +327,20 @@ protected:
 	 * The full path must exist; if not then the user will be shown a warning message 
 	 * about the file not existing.
 	 * 
-	 * @param fileName the full path of the file to open
+	 * @param fullPath the full path of the file to open
 	 * 
 	 */
-	void LoadCodeControl(const wxString& fileName);
+	void LoadCodeControl(const wxString& fullPath);
 	
 	/**
+	 * Search all opened code controls for the code control that contains the 
+	 * contents of the given file. 
 	 * 
-	 * @param fileName full path of the file to look for
-	 * @return 
+	 * @param fullPath full path of the file to look for
+	 * @return CodeControlClass* the code control that contains the contents of
+	 *         the given file, or NULL if the file is not open.
 	 */
-	void FindCodeControl(const wxString& fileName);
+	t4p::CodeControlClass* FindCodeControl(const wxString& fullPath);
 	 
 	/**
 	 * @return all of the opened code controls. Be very careful with 
