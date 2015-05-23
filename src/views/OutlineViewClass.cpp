@@ -110,7 +110,7 @@ void t4p::OutlineViewClass::JumpToResource(int tagId) {
 	t4p::TagClass tag;
 	bool found = Feature.App.Globals.TagCache.FindById(tagId, tag);
 	if (found) {
-		GetNotebook()->LoadPage(tag.GetFullPath());
+		LoadCodeControl(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
 			int32_t position, 

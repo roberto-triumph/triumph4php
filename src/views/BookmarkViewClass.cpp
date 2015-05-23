@@ -161,7 +161,7 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 	else {
 		
 		// need to open the file first
-		GetNotebook()->LoadPage(bookmark.FileName.GetFullPath());
+		LoadCodeControl(bookmark.FileName.GetFullPath());
 		t4p::CodeControlClass* newlyOpenedCtrl = GetCurrentCodeControl();
 		
 		// now we add all bookmarks for the newly opened file

@@ -169,3 +169,8 @@ t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& 
 	t4p::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
 	return ctrl;
 }
+
+void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
+	t4p::NotebookClass* notebook = GetNotebook();
+	notebook->LoadPage(fileName);
+}

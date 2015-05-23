@@ -318,6 +318,19 @@ protected:
 	  * @return CodeControlClass* this class will own the pointer, DONT delete it
 	  */
 	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+	 
+	 /**
+	  * Opens an existing file, or if the file is already opened, just sets it to be
+	  * the active page.
+	  * 
+	  * A word about error handling:
+	  * The full path must exist; if not then the user will be shown a warning message 
+	  * about the file not existing.
+	  * 
+	  * @param fileName the full path of the file to open
+	  * 
+	  */
+	 void LoadCodeControl(const wxString& fileName);
 	
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
