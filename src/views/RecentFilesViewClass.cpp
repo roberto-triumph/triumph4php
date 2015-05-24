@@ -68,7 +68,7 @@ void t4p::RecentFilesViewClass::OnRecentFileMenu(wxCommandEvent &event) {
 			remove = wxYES == ret;
 		}
 		else {
-			GetNotebook()->LoadPage(fileName);
+			LoadCodeControl(fileName);
 		}
 		if (remove) {
 			if (index < Feature.FileHistory.GetCount()) {

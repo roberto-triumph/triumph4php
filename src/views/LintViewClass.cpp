@@ -59,12 +59,11 @@ const int ID_MENU_ADD_SUPRESSION = wxNewId();
  */
 static const int MAX_LINT_ERROR_FILES = 100;
 
-t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id, t4p::NotebookClass* notebook,
+t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id,
 														t4p::LintFeatureClass& feature,
 														t4p::LintViewClass& view,
 														wxWindow* topWindow)
 	: LintResultsGeneratedPanelClass(parent, id) 
-	, Notebook(notebook) 
 	, Feature(feature)
 	, View(view)
 	, TopWindow(topWindow)
@@ -327,8 +326,11 @@ void t4p::LintResultsPanelClass::GoToAndDisplayLintError(int index) {
 	pelet::LintResultsClass results = Feature.LintErrors[index];
 
 	wxString file = t4p::IcuToWx(results.UnicodeFilename);
-	Notebook->LoadPage(file);
-	Notebook->GetCurrentCodeControl()->MarkLintErrorAndGoto(results);
+	View.LoadCodeControl(file);
+	t4p::CodeControlClass* codeCtrl = View.GetCurrentCodeControl();
+	if (codeCtrl) {
+		codeCtrl->MarkLintErrorAndGoto(results);
+	}
 }
 
 void t4p::LintResultsPanelClass::SelectNextError() {
@@ -359,7 +361,7 @@ void t4p::LintResultsPanelClass::ShowLintError(int index) {
 	if (!t4p::NumberLessThan(index, Feature.LintErrors.size())) {
 		return;
 	}
-	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (!codeControl) {
 		return;
 	}
@@ -454,7 +456,7 @@ void t4p::LintViewClass::StartLint() {
 			}
 			else {
 				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
-						GetNotebook(), Feature, *this, GetMainWindow());
+						Feature, *this, GetMainWindow());
 				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
 				SetFocusToToolsWindow(resultsPanel);

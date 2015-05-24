@@ -185,7 +185,7 @@ void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const 
 		t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, fileName.GetFullPath());
 		return;
 	}
-	GetNotebook()->LoadPage(tag.GetFullPath());
+	LoadCodeControl(tag.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
 		int32_t position, 
@@ -215,7 +215,7 @@ void t4p::TagViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
 }
 
 void t4p::TagViewClass::OpenFile(wxString fileName) {
-	GetNotebook()->LoadPage(fileName);
+	LoadCodeControl(fileName);
 }
 
 void t4p::TagViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {

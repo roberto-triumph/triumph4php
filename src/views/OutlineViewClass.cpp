@@ -110,7 +110,7 @@ void t4p::OutlineViewClass::JumpToResource(int tagId) {
 	t4p::TagClass tag;
 	bool found = Feature.App.Globals.TagCache.FindById(tagId, tag);
 	if (found) {
-		GetNotebook()->LoadPage(tag.GetFullPath());
+		LoadCodeControl(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
 			int32_t position, 
@@ -141,12 +141,9 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 
 	}
 	else {
-		t4p::NotebookClass* notebook = GetNotebook();
-		if (notebook != NULL) {
-			outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, Feature, *this, notebook);
-			wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
-			AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
-		}
+		outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, Feature, *this);
+		wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
+		AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
 	}
 
 	// get all classes / functions for the active file
@@ -167,8 +164,9 @@ void t4p::OutlineViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& eve
 	if (window != NULL && IsOutlineWindowSelected(ID_WINDOW_OUTLINE)) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
-
-		t4p::CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(event.GetSelection());
+		
+		t4p::NotebookClass* notebook = (t4p::NotebookClass*)event.GetEventObject();
+		t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(event.GetSelection());
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<UnicodeString> searchStrings;
 			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
@@ -182,8 +180,9 @@ void t4p::OutlineViewClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& even
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-		int currentPage = event.GetSelection();
-		CodeControlClass* codeCtrl = GetNotebook()->GetCodeControl(currentPage);
+		
+		t4p::NotebookClass* notebook = (t4p::NotebookClass*)event.GetEventObject();
+		CodeControlClass* codeCtrl = notebook->GetCodeControl(event.GetSelection());
 		if (codeCtrl) {
 			outlineViewPanel->RemoveFileFromOutline(codeCtrl->GetFileName());
 		}
@@ -215,13 +214,12 @@ void t4p::OutlineViewClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventC
 }
 
 t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, 
-		OutlineViewClass& view, NotebookClass* notebook)
+		OutlineViewClass& view)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
 	, OutlinedTags()
 	, ImageList(NULL)
 	, Feature(feature)
 	, View(view)
-	, Notebook(notebook)
 	, ShowMethods(true)
 	, ShowProperties(true)
 	, ShowConstants(true) 
@@ -476,8 +474,9 @@ void t4p::OutlineViewPanelClass::OnSyncButton(wxCommandEvent& event) {
 	OutlinedTags.clear();
 	Tree->DeleteAllItems();
 	std::vector<UnicodeString> searchStrings;
-	for (size_t i = 0; i < Notebook->GetPageCount(); i++) {
-		t4p::CodeControlClass* codeCtrl = Notebook->GetCodeControl(i);
+	std::vector<t4p::CodeControlClass*> codeCtrls = View.AllCodeControls();
+	for (size_t i = 0; i < codeCtrls.size(); i++) {
+		t4p::CodeControlClass* codeCtrl = codeCtrls[i];
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
 		}

@@ -134,10 +134,6 @@ bool t4p::FeatureViewClass::IsOutlineWindowSelected(int windowId) const {
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
 
-t4p::NotebookClass* t4p::FeatureViewClass::GetNotebook() const {
-	return Notebook;
-}
-
 wxAuiNotebook* t4p::FeatureViewClass::GetToolsNotebook() const {
 	return ToolsNotebook;
 }
@@ -216,11 +212,59 @@ wxString t4p::FeatureViewClass::GetSelectedText() const {
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& tabName, t4p::FileType type) const {
-	t4p::NotebookClass* notebook = GetNotebook();
-	notebook->AddTriumphPage(type);
+	Notebook->AddTriumphPage(type);
 	if (!tabName.IsEmpty()) {
-		notebook->SetPageText(notebook->GetSelection(), tabName);
+		Notebook->SetPageText(Notebook->GetSelection(), tabName);
 	}
-	t4p::CodeControlClass* ctrl = notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
 	return ctrl;
+}
+
+void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
+	Notebook->LoadPage(fileName);
+}
+
+std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
+	std::vector<t4p::CodeControlClass*> ctrls;
+	for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
+		ctrls.push_back(ctrl);
+	}
+	return ctrls;
+}
+
+t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
+	return Notebook->FindCodeControl(fullPath);
+}
+
+std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
+	return Notebook->GetOpenedFiles();
+}
+
+wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
+	int pos = Notebook->GetPageIndex(codeCtrl);
+	wxString ret;
+	if (pos >= 0) {
+		ret = Notebook->GetPageText(pos);
+	}
+	return ret;
+}
+
+t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
+	t4p::CodeControlClass* codeCtrl = Notebook->FindCodeControl(fullPath);
+	if (codeCtrl) {
+		int currentSelectionIndex = Notebook->GetSelection();
+		int pageIndex = Notebook->GetPageIndex(codeCtrl);
+		
+		// the bookmark may be in a page that is not active, need to
+		// swith notebook tabs if needed
+		if (pageIndex != currentSelectionIndex) {
+			Notebook->SetSelection(pageIndex);
+		}
+	}
+	return codeCtrl;
+}
+
+void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
+	Notebook->DeletePage(Notebook->GetPageIndex(codeCtrl));
 }

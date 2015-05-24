@@ -322,10 +322,9 @@ void t4p::SyntaxHighlightViewClass::OnFileOpen(t4p::CodeControlEventClass& event
 }
 
 void t4p::SyntaxHighlightViewClass::OnPreferencesSaved(wxCommandEvent& event) {
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		ApplyPreferences(ctrl, Feature.App.Preferences.CodeControlOptions);
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		ApplyPreferences(ctrls[i], Feature.App.Preferences.CodeControlOptions);
 	}
 }
 

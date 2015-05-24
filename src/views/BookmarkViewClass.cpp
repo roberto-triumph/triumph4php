@@ -101,10 +101,9 @@ void t4p::BookmarkViewClass::OnEditClearAllBookmarks(wxCommandEvent& event) {
 	Feature.Bookmarks.clear();
 	
 	// remove any existing bookmarks from the code controls also
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		ctrl->BookmarkClearAll();
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		ctrls[i]->BookmarkClearAll();
 	}
 }
 
@@ -133,35 +132,14 @@ void t4p::BookmarkViewClass::OnEditPreviousBookmark(wxCommandEvent& event) {
 }
 
 void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
-	t4p::NotebookClass* notebook = GetNotebook();
-	
-	t4p::CodeControlClass* bookmarkCtrl = NULL;
-	int selectionIndex = -1;
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
-		if (!ctrl->IsNew()) {
-			wxFileName ctrlFileName(ctrl->GetFileName());
-			if (ctrlFileName == bookmark.FileName) {
-				selectionIndex = i;
-				bookmarkCtrl = ctrl;
-				break;
-			}
-		}
-	}
-	
+	t4p::CodeControlClass* bookmarkCtrl = FindCodeControlAndSelect(bookmark.FileName.GetFullPath());
 	if (bookmarkCtrl) {
-		
-		// the bookmark may be in a page that is not active, need to
-		// swith notebook tabs if needed
-		if (selectionIndex != notebook->GetSelection()) {
-			notebook->SetSelection(selectionIndex);
-		}
 		bookmarkCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
 	}
 	else {
 		
 		// need to open the file first
-		GetNotebook()->LoadPage(bookmark.FileName.GetFullPath());
+		LoadCodeControl(bookmark.FileName.GetFullPath());
 		t4p::CodeControlClass* newlyOpenedCtrl = GetCurrentCodeControl();
 		
 		// now we add all bookmarks for the newly opened file

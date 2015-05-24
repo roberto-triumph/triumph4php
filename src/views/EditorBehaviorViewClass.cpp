@@ -252,10 +252,10 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 
 
 void t4p::EditorBehaviorViewClass::SetFeaturesOnNotebook() {
-	t4p::NotebookClass* notebook = GetNotebook();
 	t4p::CodeControlOptionsClass options = Feature.App.Preferences.CodeControlOptions;
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		SetFeatures(options, notebook->GetCodeControl(i));
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		SetFeatures(options, ctrls[i]);
 	}
 }
 

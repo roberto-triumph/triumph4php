@@ -62,7 +62,7 @@ void t4p::FileCabinetViewClass::OnViewFileCabinet(wxCommandEvent& event) {
 }
 
 void t4p::FileCabinetViewClass::OnEditAddCurrentFileToCabinet(wxCommandEvent& event) {
-	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (!ctrl || ctrl->IsNew()) {
 		return;
 	}

@@ -43,9 +43,8 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, NotebookClass* notebook, 
-		t4p::LintFeatureClass& feature, t4p::LintViewClass& lintView,
-		wxWindow* topWindow);
+	LintResultsPanelClass(wxWindow *parent, int id, t4p::LintFeatureClass& feature, 
+		t4p::LintViewClass& lintView, wxWindow* topWindow);
 	
 	/**
 	 * @param doEnable TRUE if the button should be enabled
@@ -132,8 +131,6 @@ public:
 	void OnAddSuppression(wxCommandEvent& event);
 
 private:
-
-	NotebookClass* Notebook;
 
 	t4p::LintFeatureClass& Feature;
 	

@@ -357,10 +357,9 @@ void t4p::DebuggerViewClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
 	}
 	else {
 		Feature.ResetDebugger();
-
-		t4p::NotebookClass* notebook = GetNotebook();
-		for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-			t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(i);
+		std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
+		for (size_t i = 0; i < codeCtrls.size(); ++i) {
+			t4p::CodeControlClass* codeCtrl = codeCtrls[i];
 			codeCtrl->ExecutionMarkRemove();
 		}
 
@@ -594,7 +593,7 @@ void t4p::DebuggerViewClass::BreakpointRemove(const t4p::BreakpointWithHandleCla
 	// if the breakpoint is located in an opened file and has a marker
 	// lets remove the marker.  note that the file may not be open and that's
 	// not unexpected.
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	t4p::CodeControlClass* codeCtrl = FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
 	if (codeCtrl) {
 		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
 	}
@@ -625,7 +624,7 @@ void t4p::DebuggerViewClass::BreakpointDisable(const t4p::BreakpointWithHandleCl
 	// if the breakpoint is located in an opened file and has a marker
 	// lets remove the marker.  note that the file may not be open and that's
 	// not unexpected.
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	t4p::CodeControlClass* codeCtrl = FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
 	if (codeCtrl) {
 		codeCtrl->BreakpointRemove(breakpointWithHandle.Breakpoint.LineNumber);
 	}
@@ -656,7 +655,7 @@ void t4p::DebuggerViewClass::BreakpointEnable(const t4p::BreakpointWithHandleCla
 	// lets add the marker.  note that the file may not be open and that's
 	// not unexpected.
 	int newHandle = -1;
-	t4p::CodeControlClass* codeCtrl = GetNotebook()->FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
+	t4p::CodeControlClass* codeCtrl = FindCodeControl(breakpointWithHandle.Breakpoint.Filename);
 	if (codeCtrl) {
 		codeCtrl->BreakpointMarkAt(breakpointWithHandle.Breakpoint.LineNumber, newHandle);
 	}

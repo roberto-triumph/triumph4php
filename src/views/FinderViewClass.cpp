@@ -85,7 +85,7 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 	// show the find panel 
 	wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 	if (!window) {
-		window = new FinderPanelClass(parent, ID_FIND_PANEL, Feature.Finder, GetNotebook(), AuiManager);
+		window = new FinderPanelClass(parent, ID_FIND_PANEL, Feature.Finder, *this, AuiManager);
 		if (!AuiManager->AddPane(window, 
 			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
 			window->Destroy();
@@ -174,7 +174,7 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 	// show the replace panel
 	wxWindow* window = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (!window) {
-		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, Feature.FinderReplace, GetNotebook(), AuiManager);
+		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, Feature.FinderReplace, *this, AuiManager);
 		if (!AuiManager->AddPane(window, 
 			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
 			window->Destroy();
@@ -236,11 +236,11 @@ void t4p::FinderViewClass::OnFinderHit(t4p::FinderHitEventClass& event) {
 
 t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId, 
 											  t4p::FinderClass& finder,
-											  t4p::NotebookClass* notebook, wxAuiManager* auiManager)
+											  t4p::FinderViewClass& view, wxAuiManager* auiManager)
 		: FinderPanelGeneratedClass(parent, windowId)
 		, Finder(finder)
 		, ComboBoxHistory(FindText)
-		, Notebook(notebook)
+		, View(view)
 		, AuiManager(auiManager) 
 		, CurrentInsertionPointFind(0) {
 	t4p::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
@@ -301,9 +301,8 @@ void t4p::FinderPanelClass::FindPrevious() {
 void t4p::FinderPanelClass::Find(bool findNext) {
 	
 	// only search when notebook has a current tab
-	CodeControlClass* codeControl = 
-			Notebook->GetCodeControl(Notebook->GetSelection());	
-	if (Notebook->GetPageCount() && codeControl) {
+	CodeControlClass* codeControl = View.GetCurrentCodeControl();
+	if (codeControl) {
 		
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
@@ -370,7 +369,7 @@ void t4p::FinderPanelClass::OnCloseButton(wxCommandEvent& event) {
 
 	// give focus back to the code control
 	// better user experience
-	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->SetFocus();
 	}
@@ -408,7 +407,7 @@ void t4p::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 
 		// give focus back to the code control
 		// better user experience
-		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
@@ -419,12 +418,12 @@ void t4p::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 }
 
 t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder,
-												t4p::NotebookClass* notebook, wxAuiManager* auiManager)
+												t4p::FinderViewClass& view, wxAuiManager* auiManager)
 		: ReplacePanelGeneratedClass(parent, windowId)
 		, Finder(finder)
 		, FindHistory(FindText)
 		, ReplaceHistory(ReplaceWithText)
-		, Notebook(notebook)
+		, View(view)
 		, AuiManager(auiManager)
 		, CurrentInsertionPointFind(0) 
 		, CurrentInsertionPointReplace(0) {
@@ -494,9 +493,8 @@ void t4p::ReplacePanelClass::FindPrevious() {
 void t4p::ReplacePanelClass::Find(bool findNext) {
 	
 	// only search when notebook has a current tab
-	CodeControlClass* codeControl = 
-			Notebook->GetCodeControl(Notebook->GetSelection());	
-	if (Notebook->GetPageCount() && codeControl) {
+	CodeControlClass* codeControl = View.GetCurrentCodeControl();
+	if (codeControl) {
 		
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
@@ -564,7 +562,7 @@ void t4p::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
 
 	// give focus back to the code control
 	// better user experience
-	t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+	t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
 		codeControl->SetFocus();
 	}
@@ -572,8 +570,7 @@ void t4p::ReplacePanelClass::OnCloseButton(wxCommandEvent& event) {
 
 void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
-		t4p::CodeControlClass* codeControl = 
-				Notebook->GetCodeControl(Notebook->GetSelection());	
+		t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		int32_t position = 0,
 			length = 0;
 		UnicodeString replaceText;
@@ -598,8 +595,7 @@ void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow() && Finder.Prepare()) {
 		
 		// if user changed tabs, GetLastReplacementText will return false
-		CodeControlClass* codeControl = 
-				Notebook->GetCodeControl(Notebook->GetSelection());
+		CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		 if (codeControl) {
 			 UnicodeString text = codeControl->GetSafeText();
 			 int matches = Finder.ReplaceAllMatches(text);
@@ -614,8 +610,7 @@ void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 }
 
 void t4p::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl = 
-			Notebook->GetCodeControl(Notebook->GetSelection());	
+	t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 			
 	// if user changes to new tab, undo will undo changes to that file
 	 if (codeControl) {
@@ -655,7 +650,7 @@ void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 
 		// give focus back to the code control
 		// better user experience
-		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
@@ -683,7 +678,7 @@ void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 
 		// give focus back to the code control
 		// better user experience
-		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
+		t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		if (codeControl) {
 			codeControl->SetFocus();
 		}

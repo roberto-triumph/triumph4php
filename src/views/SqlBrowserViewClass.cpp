@@ -968,10 +968,9 @@ void t4p::SqlBrowserViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 
 void  t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 	int num = 1;
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); i++) {
-		wxString name = notebook->GetPageText(i);
-		if (name.EndsWith(wxT(".sql")) || name.Index(_("SQL Browser")) == 0) {
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		if (ctrls[i]->GetFileType() == t4p::FILE_TYPE_SQL) {
 			num++;
 		}
 	}
@@ -985,8 +984,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::Cod
 	t4p::SqlQueryClass query;
 	t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
 		query, Feature, *this);
-	t4p::NotebookClass* codeNotebook = GetNotebook();
-	wxString tabText = codeNotebook->GetPageText(codeNotebook->GetPageIndex(codeControl));
+	wxString tabText = GetCodeNotebookTabText(codeControl);
 
 	// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 	// are from this feature
@@ -997,7 +995,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::Cod
 }
 
 void t4p::SqlBrowserViewClass::OnRun(wxCommandEvent& event) {
-	t4p::CodeControlClass* ctrl = GetNotebook()->GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl && ctrl->GetFileType() == t4p::FILE_TYPE_SQL) {
 		
 		// look for results panel that corresponds to the current code control
@@ -1071,7 +1069,8 @@ void t4p::SqlBrowserViewClass::OnSqlDetectMenu(wxCommandEvent& event) {
 }
 
 void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
+	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1100,7 +1099,8 @@ void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& 
 }
 
 void t4p::SqlBrowserViewClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
-	t4p::CodeControlClass* contentWindow = GetNotebook()->GetCodeControl(event.GetSelection());
+	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
+	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1189,16 +1189,14 @@ void t4p::SqlBrowserViewClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEventCl
 }
 
 void t4p::SqlBrowserViewClass::NewSqlBuffer(const wxString& sql) {
-	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_SQL);
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = CreateCodeControl("", t4p::FILE_TYPE_SQL);
 	if (ctrl) {
 		ctrl->SetText(sql);
 	}
 }
 
 void t4p::SqlBrowserViewClass::NewTextBuffer(const wxString& text) {
-	GetNotebook()->AddTriumphPage(t4p::FILE_TYPE_TEXT);
-	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	t4p::CodeControlClass* ctrl = CreateCodeControl("", t4p::FILE_TYPE_TEXT);
 	if (ctrl) {
 		ctrl->SetText(text);
 	}

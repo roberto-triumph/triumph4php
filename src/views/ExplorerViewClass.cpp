@@ -120,7 +120,7 @@ void t4p::ExplorerViewClass::OnProjectOutline(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_OUTLINE);
 	t4p::ExplorerOutlinePanelClass* panel = NULL;
 	if (!window) {
-		panel =  new t4p::ExplorerOutlinePanelClass(GetOutlineNotebook(), ID_EXPLORER_OUTLINE, Feature, GetNotebook());
+		panel =  new t4p::ExplorerOutlinePanelClass(GetOutlineNotebook(), ID_EXPLORER_OUTLINE, Feature, *this);
 		AddOutlineWindow(panel, _("Explorer"));
 	}
 	else {
@@ -184,7 +184,7 @@ void t4p::ExplorerViewClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, GetNotebook());
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -212,7 +212,7 @@ void t4p::ExplorerViewClass::OnAppProjectCreated(wxCommandEvent& event) {
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	if (!window) {
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, GetNotebook());
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -235,7 +235,7 @@ void t4p::ExplorerViewClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	if (!window) {
-		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, GetNotebook());
+		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
 	}
 	else {
@@ -656,12 +656,12 @@ int t4p::FileListingWidgetClass::ListImageId(const wxFileName& fileName) {
 
 
 t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
-	t4p::NotebookClass* notebook)
+	t4p::ExplorerViewClass& view)
 : ModalExplorerGeneratedPanelClass(parent, id) 
 , FilesImageList(NULL)
 , SourcesImageList(NULL)
 , Feature(feature) 
-, Notebook(notebook)
+, View(view)
 , FilterChoice(ID_FILTER_ALL) {
 	FileListing = new t4p::FileListingClass(*this);
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
@@ -1037,7 +1037,7 @@ void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const
 	
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
-	t4p::CodeControlClass* ctrl = Notebook->FindCodeControl(oldFile.GetFullPath());
+	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
 	if (!ctrl) {
 		return;
 	}
@@ -1065,10 +1065,10 @@ void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const
 	if (wxID_OK == choiceDialog.ShowModal()) {
 		int sel = choiceDialog.GetSelection();
 		if (0 == sel || 2 == sel) {
-			Notebook->DeletePage(Notebook->GetPageIndex(ctrl));
+			View.CloseCodeControl(ctrl);
 		}
 		if (0 == sel || 1 == sel) {
-			Notebook->LoadPage(newFile.GetFullPath());
+			View.LoadCodeControl(newFile.GetFullPath());
 		}
 		if (1 == sel) {
 			ctrl->TreatAsNew();
@@ -1081,11 +1081,11 @@ void t4p::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 }
 
 t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
-	t4p::NotebookClass* notebook)
-: ExplorerOutlineGeneratedPanelClass(parent, id) 
+	t4p::ExplorerViewClass& view)
+: ExplorerOutlineGeneratedPanelClass(parent, id)
 , FilesImageList(NULL)
-, Feature(feature) 
-, Notebook(notebook)
+, Feature(feature)
+, View(view)
 , FilterChoice(ID_FILTER_ALL) {
 	FileListing = new t4p::FileListingClass(*this);
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
@@ -1434,7 +1434,7 @@ void t4p::ExplorerOutlinePanelClass::RenamePrompt(const wxFileName& oldFile, con
 	
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
-	t4p::CodeControlClass* ctrl = Notebook->FindCodeControl(oldFile.GetFullPath());
+	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
 	if (!ctrl) {
 		return;
 	}
@@ -1462,10 +1462,10 @@ void t4p::ExplorerOutlinePanelClass::RenamePrompt(const wxFileName& oldFile, con
 	if (wxID_OK == choiceDialog.ShowModal()) {
 		int sel = choiceDialog.GetSelection();
 		if (0 == sel || 2 == sel) {
-			Notebook->DeletePage(Notebook->GetPageIndex(ctrl));
+			View.CloseCodeControl(ctrl);
 		}
 		if (0 == sel || 1 == sel) {
-			Notebook->LoadPage(newFile.GetFullPath());
+			View.LoadCodeControl(newFile.GetFullPath());
 		}
 		if (1 == sel) {
 			ctrl->TreatAsNew();

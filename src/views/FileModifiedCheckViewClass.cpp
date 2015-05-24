@@ -41,15 +41,15 @@ t4p::FileModifiedCheckViewClass::FileModifiedCheckViewClass(t4p::FileModifiedChe
 
 
 void t4p::FileModifiedCheckViewClass::OpenedCodeControlCheck() {
-	t4p::NotebookClass* notebook = GetNotebook();
 	
 	// loop through all of the opened files to get the files to
 	// be checked
 	// be careful to skip new buffers since they are not yet
 	// in the file system
 	std::vector<t4p::FileModifiedTimeClass> filesToPoll;
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
+	for (size_t i = 0; i < ctrls.size(); ++i) {
+		t4p::CodeControlClass* ctrl = ctrls[i];
 		if (!ctrl->IsNew()) {
 			wxString ctrlFileName = ctrl->GetFileName();		
 			t4p::FileModifiedTimeClass modTime;
@@ -202,9 +202,8 @@ void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p:
 		if (wxID_OK == choiceDialog.ShowModal()) {
 			int sel = choiceDialog.GetSelection();
 			t4p::CodeControlClass* ctrl = renamedCtrl->second;
-			t4p::NotebookClass* notebook = GetNotebook();
 			if (0 == sel || 2 == sel) {
-				notebook->DeletePage(notebook->GetPageIndex(ctrl));
+				CloseCodeControl(ctrl);
 			}
 			if (0 == sel || 1 == sel) {
 				t4p::OpenFileCommandEventClass openCmd(newFile);
@@ -228,9 +227,9 @@ void t4p::FileModifiedCheckViewClass::OnFileModifiedPollComplete(t4p::FilesModif
 	std::map<wxString, t4p::CodeControlClass*> filesDeletedToPrompt;
 	std::map<wxString, int> filesDeleted;
 
-	t4p::NotebookClass* notebook = GetNotebook();
-	for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebook->GetCodeControl(i);
+	std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
+	for (size_t i = 0; i < codeCtrls.size(); ++i) {
+		t4p::CodeControlClass* ctrl = codeCtrls[i];
 		wxFileName ctrlFileName(ctrl->GetFileName());
 		if (std::find(event.Modified.begin(), event.Modified.end(), ctrl->GetFileName()) != event.Modified.end()) {
 			filesModifiedToPrompt[ctrl->GetFileName()] = ctrl;

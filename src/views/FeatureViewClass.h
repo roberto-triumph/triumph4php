@@ -179,8 +179,66 @@ public:
 	 * @param shortcuts the list of shortcuts to add to
 	 */
 	virtual void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-
-
+	
+	/**
+	 * Opens an existing file, or if the file is already opened, just sets it to be
+	 * the active page.
+	 * 
+	 * A word about error handling:
+	 * The full path must exist; if not then the user will be shown a warning message 
+	 * about the file not existing.
+	 * 
+	 * @param fullPath the full path of the file to open
+	 * 
+	 */
+	void LoadCodeControl(const wxString& fullPath);
+	
+	/**
+	 * Search all opened code controls for the code control that contains the 
+	 * contents of the given file. 
+	 * 
+	 * @param fullPath full path of the file to look for
+	 * @return CodeControlClass* the code control that contains the contents of
+	 *         the given file, or NULL if the file is not open.
+	 */
+	t4p::CodeControlClass* FindCodeControl(const wxString& fullPath) const;
+	 
+	/**
+	 * @return all of the opened code controls. Be very careful with 
+	 *         these pointers, as the user can close files at any time
+	 *         and the pointers will be deleted.  You should not store
+	 *         the pointers at all.
+	 */
+	std::vector<t4p::CodeControlClass*> AllCodeControls() const;
+	
+	/**
+	 * @return vector containing full paths to all of the files that are opened.
+	 *         If the editor has opened buffers that are not yet saved to a file,
+	 *         this method will also return those; this means that the returned vector
+	 *         may contain strings that are not valid full paths.
+	 */
+	std::vector<wxString> AllOpenedFiles() const;
+	
+	/**
+	 * Get the currently selected code control. This may be NULL if the editor's content pane is
+	 * focused on something other than a code control.
+	 * 
+	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 */
+	CodeControlClass* GetCurrentCodeControl() const;
+	
+	/**
+	 * tell the app to close the given code control immediately.  The code control
+	 * will be removed from its notebook, and its contents will be cleared from
+	 * memory.
+	 * 
+	 * This method should only be called after the user has verified that its
+	 * OK to close, since the contents are not saved.
+	 * 
+	 * @param codeCtrl the code control to close
+	 */
+	void CloseCodeControl(t4p::CodeControlClass* codeCtrl);
+	
 protected:
 
 	/**
@@ -261,13 +319,6 @@ protected:
 	wxAuiNotebook* GetOutlineNotebook() const;
 
 	/**
-	 * The source code control notebook. Guaranteed to be not null.
-	 * 
-	 * @return NotebookClass*
-	 */
-	NotebookClass* GetNotebook() const;
-
-	/**
 	 * Set the given page to be the selected page for the tools notebook
 	 * @param wxWindow the window that the tools notebook will be visible
 	 */
@@ -301,24 +352,36 @@ protected:
 	bool AddOutlineWindow(wxWindow* window, wxString name, const wxBitmap& bitmap = wxNullBitmap);
 	
 	/**
-	 * Get the currently selected code control. This may be NULL if the editor's content pane is
-	 * focused on something other than a code control.
+	 * Creates a new code control that is primed with the global editor
+	 * options. code control will be tied to the application code Notebook.
 	 * 
-	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 * @param tabName the name that will go on the tab of the new page
+	 *        This can be empty; if empty then a default message is shown
+	 * @param mode the document mode that the control will be editing
+	 * @return CodeControlClass* this class will own the pointer, DONT delete it
 	 */
-	CodeControlClass* GetCurrentCodeControl() const;
-	
+	CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+	 
 	/**
-	  * Creates a new code control that is primed with the global editor
-	  * options. code control will be tied to the application code Notebook.
-	  * 
-	  * @param tabName the name that will go on the tab of the new page
-	  *        This can be empty; if empty then a default message is shown
-	  * @param mode the document mode that the control will be editing
-	  * @return CodeControlClass* this class will own the pointer, DONT delete it
-	  */
-	 CodeControlClass* CreateCodeControl(const wxString& tabName, t4p::FileType type) const;
+	 * @param codeCtrl the code control to get the text for
+	 * @return the text that is in the notebook tab for this code control
+	 *         empty string is the given code control is not part of the
+	 *         code notebook.
+	 */
+	 wxString GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl);
+	 
+	/**
+	 * Search all opened code controls for the code control that contains the 
+	 * contents of the given file. If the code control is found, it is focused
+	 * on.
+	 * 
+	 * @param fullPath full path of the file to look for
+	 * @return CodeControlClass* the code control that contains the contents of
+	 *         the given file, or NULL if the file is not open.
+	 */
+	t4p::CodeControlClass* FindCodeControlAndSelect(const wxString& fullPath) const;
 	
+	 
 	/**
 	 * Returns the text that's currently selected in the currently active code control.
 	 * 

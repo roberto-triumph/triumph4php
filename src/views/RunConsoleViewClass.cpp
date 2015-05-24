@@ -736,7 +736,7 @@ void t4p::RunConsoleViewClass::OnCommandButtonClick(wxCommandEvent& event) {
 }
 
 void t4p::RunConsoleViewClass::LoadPage(const wxString& fileName) {
-	GetNotebook()->LoadPage(fileName);
+	LoadCodeControl(fileName);
 }
 
 void t4p::RunConsoleViewClass::OnAppCommandRun(wxCommandEvent& event) {
