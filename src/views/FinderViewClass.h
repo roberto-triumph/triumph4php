@@ -135,12 +135,12 @@ public:
 	 * @param wxWindow* parent the parent window
 	 * @param int windowId the window ID
 	 * @param finder the finder instance to use for searching
-	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
+	 * @param view the view holds the code controls to be searched
 	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
 	 *        delete the pointer, it is up to the caller.
 	 
 	 */
-	FinderPanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
+	FinderPanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, t4p::FinderViewClass& view, wxAuiManager* auiManager);
 
 	/**
 	 * The focus will  be set on the find text box.
@@ -205,10 +205,9 @@ private:
 	ComboBoxHistoryClass ComboBoxHistory;
 	
 	/**
-	 * The source of text to search in
-	 * @var t4p::NotebookClass
+	 * To get the source of text to search in
 	 */
-	NotebookClass* Notebook;
+	t4p::FinderViewClass& View;
 	
 	/**
 	 * The AUI Manager is needed in order to hide this panel based on keyboard shortcuts. This class will NOT
@@ -270,11 +269,11 @@ public:
 	 * @param wxWindow* parent the parent window
 	 * @param int windowId the window ID
 	 * @param finder the object that does the searching
-	 * @param NotebookClass notebook the object that holds the text. The pointer will NOT be managed (deleted) by this class. 
+	 * @param view to get the text to search in
 	 * @param wxAuiManager* auiManager used to hide this panel.  This class will NOT
 	 *        delete the pointer, it is up to the caller.
 	 */
-	ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, NotebookClass* notebook, wxAuiManager* auiManager);
+	ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder, t4p::FinderViewClass& view, wxAuiManager* auiManager);
 
 	/**
 	 * Enables/disables replace buttons
@@ -357,10 +356,9 @@ private:
 	ComboBoxHistoryClass ReplaceHistory;
 	
 	/**
-	 * The source of text to search in
-	 * @var t4p::NotebookClass
+	 * To get The source of text to search in
 	 */
-	NotebookClass* Notebook;
+	t4p::FinderViewClass& View;
 	
 	/**
 	 * The AUI Manager is needed in order to hide this panel based on keyboard shortcuts. This class will NOT

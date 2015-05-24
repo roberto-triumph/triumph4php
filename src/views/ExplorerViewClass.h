@@ -187,7 +187,7 @@ private:
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 	public:
 	
-	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
+	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::ExplorerViewClass& view);
 	~ModalExplorerPanelClass();
 
 	void FillSourcesList(const std::vector<wxFileName>& sourceDirs);
@@ -223,10 +223,10 @@ private:
 	t4p::ExplorerFeatureClass& Feature;
 	
 	/**
-	 * the notebook that contains the opened code controls, used 
+	 * the view  contains the opened code controls, used 
 	 * during file renames
 	 */
-	t4p::NotebookClass* Notebook;
+	t4p::ExplorerViewClass& View;
 	
 	/**
 	 * this class will own the pointer
@@ -276,7 +276,7 @@ private:
 class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
 	public:
 	
-	ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::NotebookClass* notebook);
+	ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::ExplorerViewClass& view);
 	~ExplorerOutlinePanelClass();
 
 	void RefreshDir(const wxFileName& dir);
@@ -305,10 +305,10 @@ private:
 	t4p::ExplorerFeatureClass& Feature;
 	
 	/**
-	 * the notebook that contains the opened code controls, used 
+	 * the view contains the opened code controls, used 
 	 * during file renames
 	 */
-	t4p::NotebookClass* Notebook;
+	t4p::ExplorerViewClass& View;
 	
 	/**
 	 * this class will own the pointer

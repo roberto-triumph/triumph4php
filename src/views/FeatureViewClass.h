@@ -227,6 +227,18 @@ public:
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
 	
+	/**
+	 * tell the app to close the given code control immediately.  The code control
+	 * will be removed from its notebook, and its contents will be cleared from
+	 * memory.
+	 * 
+	 * This method should only be called after the user has verified that its
+	 * OK to close, since the contents are not saved.
+	 * 
+	 * @param codeCtrl the code control to close
+	 */
+	void CloseCodeControl(t4p::CodeControlClass* codeCtrl);
+	
 protected:
 
 	/**
@@ -305,13 +317,6 @@ protected:
 	 * @return wxAuiNotebook* the parent of all outline windows. guaranteed to be not null.
 	 */
 	wxAuiNotebook* GetOutlineNotebook() const;
-
-	/**
-	 * The source code control notebook. Guaranteed to be not null.
-	 * 
-	 * @return NotebookClass*
-	 */
-	NotebookClass* GetNotebook() const;
 
 	/**
 	 * Set the given page to be the selected page for the tools notebook
