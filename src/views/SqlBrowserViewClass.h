@@ -33,6 +33,7 @@
 #include <globals/DatabaseTagClass.h>
 #include <language/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
+#include <globals/Events.h>
 #include <wx/txtstrm.h>
 #include <vector>
 #include <unicode/unistr.h>

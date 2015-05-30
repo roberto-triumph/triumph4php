@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <globals/ConfigTagClass.h>
+#include <globals/Events.h>
 #include <actions/ActionClass.h>
 #include <vector>
 

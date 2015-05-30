@@ -28,6 +28,7 @@
 #include <features/FeatureClass.h>
 #include <globals/TemplateFileTagClass.h>
 #include <actions/ActionClass.h>
+#include <globals/UrlTagClass.h>
 
 namespace t4p {
 

@@ -36,6 +36,7 @@
 #include <language/PhpIdentifierLintClass.h>
 #include <language/LintSuppressionClass.h>
 #include <language/PhpFunctionCallLintClass.h>
+#include <language/TagCacheClass.h>
 
 namespace t4p {
 

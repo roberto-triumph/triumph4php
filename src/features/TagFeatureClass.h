@@ -31,6 +31,7 @@
 #include <actions/ProjectTagActionClass.h>
 #include <actions/TagCacheSearchActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>
+#include <globals/Events.h>
 #include <wx/string.h>
 #include <queue>
 

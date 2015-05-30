@@ -31,6 +31,7 @@
 #include <pelet/LanguageDiscoveryClass.h>
 #include <pelet/TokenClass.h>
 #include <language/SymbolTableClass.h>
+#include <globals/Events.h>
 
 namespace t4p {
 

@@ -59,11 +59,12 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize,
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 
-	// when the notebook is empty we want to accept dragged files
-	Notebook->SetDropTarget(new FileDropTargetClass(Notebook));
-	Notebook->CodeControlOptions = &App.Preferences.CodeControlOptions;
-	Notebook->Globals = &App.Globals;
-	Notebook->EventSink = &App.EventSink;
+	Notebook->InitApp(
+		&App.Preferences.CodeControlOptions,
+		&App.Preferences,
+		&App.Globals,
+		&App.EventSink
+	);
 
 	ToolsNotebook = new wxAuiNotebook(this, t4p::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
@@ -120,10 +121,6 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		}
 	}
 	if (destroy) {
-
-		// delete the DropTarget that was created in the constructor
-		Notebook->SetDropTarget(NULL);
-
 		wxCommandEvent exitEvent(t4p::EVENT_APP_EXIT);
 		App.EventSink.Publish(exitEvent);
 
@@ -256,7 +253,7 @@ void t4p::MainFrameClass::PreferencesSaved() {
 }
 
 void t4p::MainFrameClass::SetApplicationFont() {
-
+	
 	// ATTN: this method will only work on startup (before the
 	// main frame is drawn. have not found a way to have the font
 	// changes apply to all windows /panels that are already

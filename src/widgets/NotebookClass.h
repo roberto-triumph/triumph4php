@@ -26,14 +26,18 @@
 #define __T4P_NOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
-#include <globals/GlobalsClass.h>
-#include <globals/Events.h>
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
 #include <wx/dnd.h>
 #include <vector>
 
 namespace t4p {
+
+// forward declarations; defined in other files
+class PreferencesClass;
+class GlobalsClass;
+class EventSinkClass;
+
 /**
  * This class contains logic relating to the workings of the
  * notebook (source code editor tabs).
@@ -74,6 +78,20 @@ public:
 		long style = wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_WINDOWLIST_BUTTON);
 	
 	~NotebookClass();
+
+	/**
+	 * initialize the triumph data structures for this notebook.
+	 * This class will not own these pointers.
+	 *
+	 * @param options
+	 * @param preferences
+	 * @param globals
+	 * @param eventSink
+	 */
+	void InitApp(t4p::CodeControlOptionsClass* options,
+		t4p::PreferencesClass* preferences,
+		t4p::GlobalsClass* globals,
+		t4p::EventSinkClass* eventSink);
 
 	/**
 	 * Changes the text of the page tab to mark it having changes that have 

@@ -28,6 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/FileWatcherFeatureForms.h>
 #include <features/FileWatcherFeatureClass.h>
+#include <globals/Events.h>
 
 namespace t4p {
 

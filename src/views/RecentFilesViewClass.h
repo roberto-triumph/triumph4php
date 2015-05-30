@@ -27,6 +27,7 @@
 
 #include <views/FeatureViewClass.h>
 #include <features/RecentFilesFeatureClass.h>
+#include <globals/Events.h>
 #include <wx/docview.h>
 
 namespace t4p {

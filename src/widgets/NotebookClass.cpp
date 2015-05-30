@@ -27,6 +27,9 @@
 #include <globals/Assets.h>
 #include <search/FindInFilesClass.h>
 #include <Triumph.h>
+#include <main_frame/PreferencesClass.h>
+#include <globals/GlobalsClass.h>
+#include <globals/Events.h>
 #include <globals/Errors.h>
 #include <globals/Number.h>
 #include <widgets/FileTypeImageList.h>
@@ -49,10 +52,36 @@ t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, TabIndexRightClickEvent(-1) {
 	
 	ImageList = NULL;
+
+	// when the notebook is empty we want to accept dragged files
+	SetDropTarget(new FileDropTargetClass(this));
 }
 
 t4p::NotebookClass::~NotebookClass() {
+
+	// delete the DropTarget that was created in the constructor
+	SetDropTarget(NULL);
 	delete ContextMenu;
+}
+
+void t4p::NotebookClass::InitApp(t4p::CodeControlOptionsClass* options,
+		t4p::PreferencesClass* preferences,
+		t4p::GlobalsClass* globals,
+		t4p::EventSinkClass* eventSink) {
+	CodeControlOptions = options;
+	Globals = globals;
+	EventSink = eventSink;
+
+	// so that all dialogs / panels use the same font
+	// ATTN: on linux, default fonts are too big
+	//       this code makes them smaller
+	wxPlatformInfo info;
+	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
+
+		// so that the tabs use the same font
+		SetFont(preferences->ApplicationFont);
+		SetNormalFont(preferences->ApplicationFont);
+	}
 }
 
 t4p::CodeControlClass* t4p::NotebookClass::GetCodeControl(size_t pageNumber) const {

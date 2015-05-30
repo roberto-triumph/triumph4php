@@ -29,6 +29,7 @@
 #include <features/RunBrowserFeatureClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <code_control/CodeControlClass.h>
+#include <globals/Events.h>
 #include <wx/string.h>
 #include <vector>
 #include <memory>

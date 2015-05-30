@@ -26,8 +26,10 @@
 #define OUTLINE_VIEW_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
+#include <globals/Events.h>
 #include <pelet/TokenClass.h>
 #include <actions/ActionClass.h>
+#include <language/TagCacheClass.h>
 #include <vector>
 
 namespace t4p {
