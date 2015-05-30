@@ -194,12 +194,8 @@ const wxEventType t4p::EVENT_CMD_RUN_COMMAND = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DATA_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN = wxNewEventType();
 const wxEventType t4p::EVENT_CMD_APP_USER_ATTENTION = wxNewEventType();
-const long t4p::ID_TOOLS_NOTEBOOK = 1003;
-const long t4p::ID_OUTLINE_NOTEBOOK = 1002;
 
-/*
- *ATTN: this is hardcoded because of the way that the notebook is created
- * within the MainFrameForms (created by wxFormBuilder)
- */
-const long t4p::ID_CODE_NOTEBOOK = 1001;
+const long t4p::ID_TOOLS_NOTEBOOK = wxNewId();
+const long t4p::ID_OUTLINE_NOTEBOOK = wxNewId();
+const long t4p::ID_CODE_NOTEBOOK = wxNewId();
 

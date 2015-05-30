@@ -25,18 +25,38 @@
 #include <views/FeatureViewClass.h>
 #include <widgets/NotebookClass.h>
 
+/**
+ * Fetch the code notebooks that are part of the main windows.
+ * This function depends on the fact that all notebook class
+ * objects have the same window name (NotebookClass)
+ *
+ * @param aui the aui manager
+ * @return
+ */
+static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
+	std::vector<t4p::NotebookClass*> notebooks;
+	wxWindowList& children = mainWindow->GetChildren();
+	wxWindowList::iterator it;
+	for (it = children.begin(); it != children.end(); ++it) {
+		wxWindow* child = *it;
+		if (child->GetName() == wxT("NotebookClass")) {
+			notebooks.push_back((t4p::NotebookClass*)child);
+		}
+	}
+	return notebooks;
+}
+
 t4p::FeatureViewClass::FeatureViewClass() 
 : wxEvtHandler() {
 }
 
 void t4p::FeatureViewClass::InitWindow(
 		StatusBarWithGaugeClass* statusBarWithGauge, 
-		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+		wxAuiNotebook* toolsNotebook,
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
 		wxMenuBar* menuBar, wxAuiToolBar* toolBar) {
 	AuiManager = auiManager;
 	StatusBarWithGauge = statusBarWithGauge;
-	Notebook = notebook;
 	ToolsNotebook = toolsNotebook;
 	OutlineNotebook = outlineNotebook;
 	MenuBar = menuBar;
@@ -192,14 +212,22 @@ bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
-	return Notebook->GetCurrentCodeControl();
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return NULL;
+	}
+	return notebooks[0]->GetCurrentCodeControl();
 }
 
 bool t4p::FeatureViewClass::GetCurrentCodeControlWithNotebook(
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const {
-	if (Notebook->GetCurrentCodeControl()) {
-		*notebook = Notebook;
-		*codeCtrl = Notebook->GetCurrentCodeControl();
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return false;
+	}
+	if (notebooks[0]->GetCurrentCodeControl()) {
+		*notebook = notebooks[0];
+		*codeCtrl = notebooks[0]->GetCurrentCodeControl();
 		return true;
 	}
 	return false;
@@ -223,59 +251,93 @@ wxString t4p::FeatureViewClass::GetSelectedText() const {
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& tabName, t4p::FileType type) const {
-	Notebook->AddTriumphPage(type);
-	if (!tabName.IsEmpty()) {
-		Notebook->SetPageText(Notebook->GetSelection(), tabName);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return NULL;
 	}
-	t4p::CodeControlClass* ctrl = Notebook->GetCurrentCodeControl();
+	notebooks[0]->AddTriumphPage(type);
+	if (!tabName.IsEmpty()) {
+		notebooks[0]->SetPageText(notebooks[0]->GetSelection(), tabName);
+	}
+	t4p::CodeControlClass* ctrl = notebooks[0]->GetCurrentCodeControl();
 	return ctrl;
 }
 
 void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
-	Notebook->LoadPage(fileName);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return;
+	}
+	notebooks[0]->LoadPage(fileName);
 }
 
 std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
 	std::vector<t4p::CodeControlClass*> ctrls;
-	for (size_t i = 0; i < Notebook->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return ctrls;
+	}
+	for (size_t i = 0; i < notebooks[0]->GetPageCount(); ++i) {
+		t4p::CodeControlClass* ctrl = notebooks[0]->GetCodeControl(i);
 		ctrls.push_back(ctrl);
 	}
 	return ctrls;
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
-	return Notebook->FindCodeControl(fullPath);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return NULL;
+	}
+	return notebooks[0]->FindCodeControl(fullPath);
 }
 
 std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
-	return Notebook->GetOpenedFiles();
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		std::vector<wxString> empty;
+		return empty;
+	}
+	return notebooks[0]->GetOpenedFiles();
 }
 
 wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
-	int pos = Notebook->GetPageIndex(codeCtrl);
 	wxString ret;
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return ret;
+	}
+
+	int pos = notebooks[0]->GetPageIndex(codeCtrl);
 	if (pos >= 0) {
-		ret = Notebook->GetPageText(pos);
+		ret = notebooks[0]->GetPageText(pos);
 	}
 	return ret;
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
-	t4p::CodeControlClass* codeCtrl = Notebook->FindCodeControl(fullPath);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return NULL;
+	}
+	t4p::CodeControlClass* codeCtrl = notebooks[0]->FindCodeControl(fullPath);
 	if (codeCtrl) {
-		int currentSelectionIndex = Notebook->GetSelection();
-		int pageIndex = Notebook->GetPageIndex(codeCtrl);
+		int currentSelectionIndex = notebooks[0]->GetSelection();
+		int pageIndex = notebooks[0]->GetPageIndex(codeCtrl);
 		
 		// the bookmark may be in a page that is not active, need to
 		// swith notebook tabs if needed
 		if (pageIndex != currentSelectionIndex) {
-			Notebook->SetSelection(pageIndex);
+			notebooks[0]->SetSelection(pageIndex);
 		}
 	}
 	return codeCtrl;
 }
 
 void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
-	Notebook->DeletePage(Notebook->GetPageIndex(codeCtrl));
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.empty()) {
+		return;
+	}
+	notebooks[0]->DeletePage(notebooks[0]->GetPageIndex(codeCtrl));
 }

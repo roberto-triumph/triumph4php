@@ -5,16 +5,12 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#include "../../widgets/NotebookClass.h"
-
 #include "MainFrameForms.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
 BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_CLOSE( MainFrameGeneratedClass::_wxFB_OnClose )
-	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
-	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
 	EVT_MENU( wxID_EXIT, MainFrameGeneratedClass::_wxFB_OnFileExit )
 	EVT_MENU( wxID_PREFERENCES, MainFrameGeneratedClass::_wxFB_OnEditPreferences )
 	EVT_MENU( ID_VIEW_TOGGLE_TOOLS, MainFrameGeneratedClass::_wxFB_OnViewToggleTools )
@@ -29,14 +25,9 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 {
 	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
 	
-	wxBoxSizer* Sizer;
-	Sizer = new wxBoxSizer( wxVERTICAL );
+	MainSizer = new wxBoxSizer( wxVERTICAL );
 	
-	Notebook = new t4p::NotebookClass( this, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TAB_MOVE|wxAUI_NB_WINDOWLIST_BUTTON );
-	
-	Sizer->Add( Notebook, 1, wxEXPAND | wxALL, 5 );
-	
-	this->SetSizer( Sizer );
+	this->SetSizer( MainSizer );
 	this->Layout();
 	MenuBar = new wxMenuBar( 0 );
 	FileMenu = new wxMenu();

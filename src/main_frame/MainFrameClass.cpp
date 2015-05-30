@@ -39,6 +39,27 @@
 static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
 
+/**
+ * Fetch the code notebooks that are part of the main frame.
+ * This function depends on the fact that all notebook class
+ * objects have the same window name (NotebookClass)
+ *
+ * @param aui the aui manager
+ * @return
+ */
+static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
+	std::vector<t4p::NotebookClass*> notebooks;
+	wxWindowList& children = mainWindow->GetChildren();
+	wxWindowList::iterator it;
+	for (it = children.begin(); it != children.end(); ++it) {
+		wxWindow* child = *it;
+		if (child->GetName() == wxT("NotebookClass")) {
+			notebooks.push_back((t4p::NotebookClass*)child);
+		}
+	}
+	return notebooks;
+}
+
 t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& featureViews,
 										t4p::AppClass& app)
 	: MainFrameGeneratedClass(NULL)
@@ -59,7 +80,15 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize,
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 
-	Notebook->InitApp(
+	t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, t4p::ID_CODE_NOTEBOOK,
+		wxDefaultPosition, wxDefaultSize,
+		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
+
+		// very important that the name be given, this is how we find the
+		// notebooks when iterating through the frame's children
+		"NotebookClass"
+	);
+	codeNotebook->InitApp(
 		&App.Preferences.CodeControlOptions,
 		&App.Preferences,
 		&App.Globals,
@@ -74,7 +103,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	SetApplicationFont();
 
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
-	AuiManager.AddPane(Notebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
+	AuiManager.AddPane(codeNotebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
 		).PaneBorder(false).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(1));
@@ -139,7 +168,10 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 }
 
 void t4p::MainFrameClass::CreateNewCodeCtrl() {
-	Notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+	if (!notebooks.empty()) {
+		notebooks[0]->AddTriumphPage(t4p::FILE_TYPE_PHP);
+	}
 }
 
 void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
@@ -312,7 +344,7 @@ void t4p::MainFrameClass::LoadFeatureView(t4p::FeatureViewClass& view) {
 
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus
-	view.InitWindow(GetStatusBarWithGauge(), Notebook, ToolsNotebook, OutlineNotebook,
+	view.InitWindow(GetStatusBarWithGauge(), ToolsNotebook, OutlineNotebook,
 		&AuiManager, GetMenuBar(), ToolBar);
 
 	//  when adding the separators, we dont want a separator at the very end
@@ -383,7 +415,13 @@ void t4p::MainFrameClass::RealizeToolbar() {
 }
 
 void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
-	CodeControlClass* codeWindow = Notebook->GetCurrentCodeControl();
+
+	// TODO: does not work with multiple notebooks
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+	if (notebooks.empty()) {
+		return;
+	}
+	CodeControlClass* codeWindow = notebooks[0]->GetCurrentCodeControl();
 
 	// only show the user if and only if
 	// user clicked inside of the code control
@@ -473,20 +511,23 @@ void t4p::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 }
 
 void t4p::MainFrameClass::UpdateTitleBar() {
-	if (Notebook->GetPageCount() > 0) {
-		t4p::CodeControlClass* codeControl = Notebook->GetCurrentCodeControl();
-		if (codeControl) {
-			wxString fileName = codeControl->GetFileName();
-			if (fileName.IsEmpty()) {
 
-				// file name empty means this is a new file, use the tab text
-				fileName = Notebook->GetPageText(Notebook->GetPageIndex(codeControl));
-			}
-			SetTitle(_("Triumph4PHP: ") + fileName);
-		}
-	}
-	else {
+	// TODO: does not work with multiple notebooks
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+	if (notebooks.empty()) {
 		SetTitle(_("Triumph4PHP"));
+		return;
+	}
+
+	t4p::CodeControlClass* codeControl = notebooks[0]->GetCurrentCodeControl();
+	if (codeControl) {
+		wxString fileName = codeControl->GetFileName();
+		if (fileName.IsEmpty()) {
+
+			// file name empty means this is a new file, use the tab text
+			fileName = notebooks[0]->GetPageText(notebooks[0]->GetPageIndex(codeControl));
+		}
+		SetTitle(_("Triumph4PHP: ") + fileName);
 	}
 }
 

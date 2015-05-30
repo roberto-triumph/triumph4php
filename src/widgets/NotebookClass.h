@@ -75,7 +75,8 @@ public:
 	NotebookClass(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, 
 		const wxSize& size = wxDefaultSize, 
-		long style = wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_WINDOWLIST_BUTTON);
+		long style = wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_WINDOWLIST_BUTTON,
+		const wxString& name = wxEmptyString);
 	
 	~NotebookClass();
 

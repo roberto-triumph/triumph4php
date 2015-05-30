@@ -93,7 +93,7 @@ public:
 	 * @param wxToolBar* toolBar the application tool bar
 	 */
 	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, 
-		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
+		wxAuiNotebook* toolsNotebook,
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
 		wxMenuBar* menuBar, wxAuiToolBar* toolBar);
 	
@@ -446,13 +446,6 @@ private:
 	 */
 	StatusBarWithGaugeClass* StatusBarWithGauge;
 
-	/**
-	 * The container for the source code windows.
-	 * 
-	 * @var NotebookClass*
-	 */
-	NotebookClass* Notebook;
-	
 	/**
 	 * Parent container that will hold all features' tools windows.
 	 * 

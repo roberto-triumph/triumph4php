@@ -10,19 +10,16 @@
 
 #include <wx/intl.h>
 
-namespace t4p{ class NotebookClass; }
-
-#include <wx/gdicmn.h>
-#include <wx/aui/auibook.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-#include <wx/string.h>
 #include <wx/sizer.h>
+#include <wx/gdicmn.h>
+#include <wx/string.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/menu.h>
+#include <wx/font.h>
+#include <wx/colour.h>
+#include <wx/settings.h>
 #include <wx/frame.h>
 #include <wx/stattext.h>
 #include <wx/hyperlink.h>
@@ -45,8 +42,6 @@ class MainFrameGeneratedClass : public wxFrame
 		
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
-		void _wxFB_OnContentNotebookPageChanged( wxAuiNotebookEvent& event ){ OnContentNotebookPageChanged( event ); }
-		void _wxFB_OnContentNotebookPageClose( wxAuiNotebookEvent& event ){ OnContentNotebookPageClose( event ); }
 		void _wxFB_OnFileExit( wxCommandEvent& event ){ OnFileExit( event ); }
 		void _wxFB_OnEditPreferences( wxCommandEvent& event ){ OnEditPreferences( event ); }
 		void _wxFB_OnViewToggleTools( wxCommandEvent& event ){ OnViewToggleTools( event ); }
@@ -61,7 +56,6 @@ class MainFrameGeneratedClass : public wxFrame
 		enum
 		{
 			ID_MAINFRAMEGENERATEDCLASS = 1000,
-			ID_NOTEBOOK,
 			ID_VIEW_TOGGLE_TOOLS,
 			ID_VIEW_TOGGLE_OUTLINE,
 			ID_MENUITEMMANUAL,
@@ -69,7 +63,7 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_MENUITEMLICENSE,
 		};
 		
-		t4p::NotebookClass* Notebook;
+		wxBoxSizer* MainSizer;
 		wxMenuBar* MenuBar;
 		wxMenu* FileMenu;
 		wxMenu* EditMenu;
@@ -79,8 +73,6 @@ class MainFrameGeneratedClass : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnContentNotebookPageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
-		virtual void OnContentNotebookPageClose( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditPreferences( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewToggleTools( wxCommandEvent& event ) { event.Skip(); }

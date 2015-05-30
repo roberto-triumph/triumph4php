@@ -42,7 +42,7 @@ int ID_CLOSE_ALL_TABS = wxNewId();
 int ID_CLOSE_TAB = wxNewId();
 
 t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
-	const wxPoint& pos, const wxSize& size, long style)
+	const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
 	, Globals(NULL)
@@ -50,8 +50,8 @@ t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, ContextMenu(NULL)
 	, NewPageNumber(1) 
 	, TabIndexRightClickEvent(-1) {
-	
 	ImageList = NULL;
+	SetName(name);
 
 	// when the notebook is empty we want to accept dragged files
 	SetDropTarget(new FileDropTargetClass(this));
