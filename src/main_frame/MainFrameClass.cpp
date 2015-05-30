@@ -228,7 +228,6 @@ void t4p::MainFrameClass::OnViewToggleTools(wxCommandEvent& event) {
 
 void t4p::MainFrameClass::PreferencesSaved() {
 	App.Preferences.EnableSelectedProfile(this);
-	Notebook->RefreshCodeControlOptions();
 }
 
 void t4p::MainFrameClass::SetApplicationFont() {

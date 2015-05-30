@@ -372,6 +372,8 @@ void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
 	if (!doVeto) {
 		t4p::NotebookClass* notebook = NULL;
 		t4p::CodeControlClass* codeCtrl = NULL;
+
+		// TODO: does not work with multiple notebooks
 		if (GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
 
 			// veto the close if the user cancelled the save dialog

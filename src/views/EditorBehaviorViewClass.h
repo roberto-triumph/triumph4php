@@ -84,6 +84,8 @@ private:
 	void OnEditContentAssist(wxCommandEvent& event);
 	void OnEditCallTip(wxCommandEvent& event);
 
+	void OnPreferencesSaved(wxCommandEvent& event);
+
  	/**
  	 * Handle the Undo popup menu event
 	 */

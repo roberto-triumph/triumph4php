@@ -535,6 +535,16 @@ void t4p::EditorBehaviorViewClass::OnRedo(wxCommandEvent& event) {
 	}
 }
 
+void t4p::EditorBehaviorViewClass::OnPreferencesSaved(wxCommandEvent& event) {
+
+	// TODO: does not work with multiple notebooks
+	t4p::NotebookClass* notebook = NULL;
+	t4p::CodeControlClass* codeCtrl = NULL;
+	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
+		notebook->RefreshCodeControlOptions();
+	}
+}
+
 t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
 	: EditorBehaviorPanelGeneratedClass(parent) {
 	wxGenericValidator enableCodeFoldingValidator(&options.EnableCodeFolding);
@@ -780,5 +790,6 @@ BEGIN_EVENT_TABLE(t4p::EditorBehaviorViewClass, t4p::FeatureViewClass)
 	
 	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 20, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorViewClass::OnEditorCommand)
 
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EditorBehaviorViewClass::OnPreferencesSaved)
 END_EVENT_TABLE()
 
