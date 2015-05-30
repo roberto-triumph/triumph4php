@@ -126,7 +126,6 @@ public:
 	 */
 	void OnCmdFileOpen(t4p::OpenFileCommandEventClass& event);
 
-
 	/**
 	 * Toggle various widgets on or off based on the application state.
 	 */
@@ -150,6 +149,18 @@ public:
 	 * various metrics (cursor position, dirty state)
 	 */
 	void OnCodeNotebookPageClosed(wxAuiNotebookEvent& event);
+
+	/**
+	 * When the app frame is closed, check to see if there are "dirty"
+	 * files that need to be saved.
+	 */
+	void OnAppFrameClose(wxNotifyEvent& event);
+
+	/**
+	 * @return bool TRUE if there is at least one opened file that needs
+	 *         to be saved using an elevated (privilege / root) access.
+	 */
+	bool NeedsElevatedSave();
 
 	t4p::FileOperationsFeatureClass& Feature;
 

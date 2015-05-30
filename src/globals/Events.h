@@ -383,10 +383,26 @@ extern const wxEventType EVENT_APP_READY;
 extern const wxEventType EVENT_APP_ACTIVATED;
 
 /**
+ * This is a one-time event that gets generated when the user wants to close
+ * the application main frame. Event handlers have a chance to veto the
+ * event to prevent the user from closing the main frame. The event is of
+ * type wxNotifyEvent.
+ */
+extern const wxEventType EVENT_APP_FRAME_CLOSE;
+
+typedef void (wxEvtHandler::*NotifyEventFunction)(wxNotifyEvent&);
+#define EVT_APP_FRAME_CLOSE(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FRAME_CLOSE, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( NotifyEventFunction, & fn ), (wxObject *) NULL ),
+
+
+/**
  * This is a one-time event that gets generated after the user has clicked the
  * Exit or Close button on the main frame AND the user has chosen to 
  * not save the open files (or has already saved them).  Features can
- * do any final cleanup in this event handler.
+ * do any final cleanup in this event handler. Note that in OS X, the
+ * application will stay running even after this event is generated.
  */
 extern const wxEventType EVENT_APP_EXIT;
 

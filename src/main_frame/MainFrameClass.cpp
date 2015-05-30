@@ -96,29 +96,9 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 	bool destroy = true;
 	if (event.CanVeto()) {
 
-		// if we have any files that are saved using privilege mode
-		// lets tell the user to save them first.  we don't
-		// want to close the app while the async save process
-		// is running
-		for (size_t i = 0; i < Notebook->GetPageCount(); i++) {
-			t4p::CodeControlClass* ctrl = Notebook->GetCodeControl(i);
-			wxString filename = ctrl->GetFileName();
-			if (!ctrl->IsNew() && ctrl->IsModified()
-				&& !filename.empty()
-				&& wxFileName::FileExists(filename)
-				&& !wxFileName::IsFileWritable(filename)) {
-				wxMessageBox(
-					_("You have modified files that need to be saved with escalated privileges.\n") +
-					_("Please save those files or discard the changes before exiting"),
-					_("Triumph")
-				);
-				destroy = false;
-				break;
-			}
-		}
-		if (destroy) {
-			destroy = Notebook->SaveAllModifiedPages();
-		}
+		wxNotifyEvent evtFrame(t4p::EVENT_APP_FRAME_CLOSE);
+		App.EventSink.Publish(evtFrame);
+		destroy = evtFrame.IsAllowed();
 	}
 	if (destroy) {
 		wxCommandEvent exitEvent(t4p::EVENT_APP_EXIT);
@@ -147,7 +127,6 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 		// cleanup all open code controls and tabs. this is because
 		// we want to destroy those items because they may have
 		// threads that are running
-		Notebook->CloseAllPages();
 
 		while (ToolsNotebook->GetPageCount() > 0) {
 			ToolsNotebook->DeletePage(0);
@@ -267,8 +246,6 @@ void t4p::MainFrameClass::SetApplicationFont() {
 		SetFont(App.Preferences.ApplicationFont);
 
 		// so that the tabs use the same font
-		Notebook->SetFont(App.Preferences.ApplicationFont);
-		Notebook->SetNormalFont(App.Preferences.ApplicationFont);
 		ToolsNotebook->SetFont(App.Preferences.ApplicationFont);
 		ToolsNotebook->SetNormalFont(App.Preferences.ApplicationFont);
 		OutlineNotebook->SetFont(App.Preferences.ApplicationFont);
@@ -557,7 +534,6 @@ void t4p::MainFrameClass::OnStcSavePointReached(wxStyledTextEvent& event) {
 void t4p::MainFrameClass::OnStcSavedPointLeft(wxStyledTextEvent& event) {
 	App.EventSink.Publish(event);
 }
-
 
 t4p::AppEventListenerForFrameClass::AppEventListenerForFrameClass(t4p::MainFrameClass* mainFrame)
 	: wxEvtHandler()

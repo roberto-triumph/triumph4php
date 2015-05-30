@@ -353,6 +353,54 @@ void t4p::FileOperationsViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	event.Skip();
 }
 
+void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
+	bool doVeto = false;
+
+	// if we have any files that are saved using privilege mode
+	// lets tell the user to save them first.  we don't
+	// want to close the app while the async save process
+	// is running
+	bool needsElevation = NeedsElevatedSave();
+	if (needsElevation) {
+		wxMessageBox(
+			_("You have modified files that need to be saved with escalated privileges.\n") +
+			_("Please save those files or discard the changes before exiting"),
+			_("Triumph")
+		);
+		doVeto = true;
+	}
+	if (!doVeto) {
+		t4p::NotebookClass* notebook = NULL;
+		t4p::CodeControlClass* codeCtrl = NULL;
+		if (GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
+
+			// veto the close if the user cancelled the save dialog
+			doVeto = !notebook->SaveAllModifiedPages();
+		}
+	}
+
+	if (doVeto) {
+		event.Veto();
+	}
+}
+
+bool t4p::FileOperationsViewClass::NeedsElevatedSave() {
+	bool needsElevation = false;
+	std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
+	for (size_t i = 0; i < codeCtrls.size(); i++) {
+		t4p::CodeControlClass* ctrl = codeCtrls[i];
+		wxString filename = ctrl->GetFileName();
+		if (!ctrl->IsNew() && ctrl->IsModified()
+			&& !filename.empty()
+			&& wxFileName::FileExists(filename)
+			&& !wxFileName::IsFileWritable(filename)) {
+			needsElevation = true;
+			break;
+		}
+	}
+	return needsElevation;
+}
+
 BEGIN_EVENT_TABLE(t4p::FileOperationsViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_FILE_OPERATIONS + 0, t4p::FileOperationsViewClass::OnFilePhpNew)
 	EVT_MENU(t4p::MENU_FILE_OPERATIONS + 1, t4p::FileOperationsViewClass::OnFileSqlNew)
@@ -377,4 +425,5 @@ BEGIN_EVENT_TABLE(t4p::FileOperationsViewClass, t4p::FeatureViewClass)
 
 	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::FileOperationsViewClass::OnCodeNotebookPageChanged)
 	EVT_AUINOTEBOOK_PAGE_CLOSED(t4p::ID_CODE_NOTEBOOK, t4p::FileOperationsViewClass::OnCodeNotebookPageClosed)
+	EVT_APP_FRAME_CLOSE(t4p::FileOperationsViewClass::OnAppFrameClose)
 END_EVENT_TABLE()
