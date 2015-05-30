@@ -42,23 +42,12 @@ class MainFrameGeneratedClass : public wxFrame
 {
 	DECLARE_EVENT_TABLE()
 	private:
-		wxMenuItem* m_separator4;
 		wxMenuItem* m_separator3;
 		
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
 		void _wxFB_OnContentNotebookPageChanged( wxAuiNotebookEvent& event ){ OnContentNotebookPageChanged( event ); }
 		void _wxFB_OnContentNotebookPageClose( wxAuiNotebookEvent& event ){ OnContentNotebookPageClose( event ); }
-		void _wxFB_OnFilePhpNew( wxCommandEvent& event ){ OnFilePhpNew( event ); }
-		void _wxFB_OnFileSqlNew( wxCommandEvent& event ){ OnFileSqlNew( event ); }
-		void _wxFB_OnFileCssNew( wxCommandEvent& event ){ OnFileCssNew( event ); }
-		void _wxFB_OnFileTextNew( wxCommandEvent& event ){ OnFileTextNew( event ); }
-		void _wxFB_OnFileOpen( wxCommandEvent& event ){ OnFileOpen( event ); }
-		void _wxFB_OnFileSave( wxCommandEvent& event ){ OnFileSave( event ); }
-		void _wxFB_OnFileSaveAs( wxCommandEvent& event ){ OnFileSaveAs( event ); }
-		void _wxFB_OnFileSaveAll( wxCommandEvent& event ){ OnFileSaveAll( event ); }
-		void _wxFB_OnFileRevert( wxCommandEvent& event ){ OnFileRevert( event ); }
-		void _wxFB_OnFileClose( wxCommandEvent& event ){ OnFileClose( event ); }
 		void _wxFB_OnFileExit( wxCommandEvent& event ){ OnFileExit( event ); }
 		void _wxFB_OnEditCut( wxCommandEvent& event ){ OnEditCut( event ); }
 		void _wxFB_OnEditCopy( wxCommandEvent& event ){ OnEditCopy( event ); }
@@ -80,12 +69,6 @@ class MainFrameGeneratedClass : public wxFrame
 		{
 			ID_MAINFRAMEGENERATEDCLASS = 1000,
 			ID_NOTEBOOK,
-			ID_FILE_PHP_NEW,
-			ID_FILE_SQL_NEW,
-			ID_FILE_CSS_NEW,
-			ID_FILE_TEXT_NEW_FILE,
-			ID_FILE_SAVE_ALL,
-			ID_FILE_REVERT,
 			ID_EDIT_CONTENT_ASSIST,
 			ID_EDIT_CALL_TIP,
 			ID_VIEW_TOGGLE_TOOLS,
@@ -107,16 +90,6 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnContentNotebookPageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnContentNotebookPageClose( wxAuiNotebookEvent& event ) { event.Skip(); }
-		virtual void OnFilePhpNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileSqlNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileCssNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileTextNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileOpen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileSaveAs( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileSaveAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileRevert( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFileClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditCut( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditCopy( wxCommandEvent& event ) { event.Skip(); }

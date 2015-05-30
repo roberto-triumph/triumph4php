@@ -66,8 +66,6 @@ public:
 
 private:
 
-	void OnCmdFileOpen(t4p::OpenFileCommandEventClass& event);
-
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
@@ -111,24 +109,6 @@ public:
 	~MainFrameClass();
 	
 	/**
-	 * Loads the given files into the application, one page for each file.
-	 * File names must be fully qualified.
-	 */
-	void FileOpen(const std::vector<wxString>& filenames);
-	
-	/**
-	 * Loads the given file into the application, and goes to the
-	 * position. highlights to the given length
-	 */
-	void FileOpenPosition(const wxString& fullPath, int startingPos, int length);
-	
-	/**
-	 * Loads the given file into the application, and goes to the
-	 * given line. line number is 1 based.
-	 */
-	void FileOpenLine(const wxString& fullPath, int lineNumber);
-
-	/**
 	 * get all of the feature view's extra windows and menus and attach them to the main frame.
 	 */
 	void LoadFeatureView(FeatureViewClass& view);
@@ -152,11 +132,6 @@ public:
 	 * Updates the title bar with the name of the file being edited.
 	 */
 	void UpdateTitleBar();
-
-	/**
-	 * repaint the status bar; cursor line position
-	 */
-	void UpdateStatusBar();
 	
 	/**
 	 * need to call this once all items have been added to the toolbar
@@ -164,18 +139,8 @@ public:
 	void RealizeToolbar();
 
 	/**
-	 * after the application starts, start the status bar timer.
-	 * The status bar timer will update the status bar info (line, column)
-	 * at specific intervals instead of in a EVT_STC_UPDATEUI event.
-	 * Updating the status bar text triggers a refresh of the whole
-	 * status bar (and it seems that the entire app is refreshed too)
-	 * and it makes the app feel sluggish.
-	 */
-	void StartStatusBarTimer();
-
-	/**
 	 * creates a new code control and attaches it to the
-	 * notebook 
+	 * notebook
 	 */
 	void CreateNewCodeCtrl();
 
@@ -187,17 +152,6 @@ protected:
 	/**
 	 * Top Menu Bar handlers
 	 */
-	void OnFileSave(wxCommandEvent& event);
-	void OnFilePhpNew(wxCommandEvent& event);
-	void OnFileSqlNew(wxCommandEvent& event);
-	void OnFileCssNew(wxCommandEvent& event);
-	void OnFileTextNew(wxCommandEvent& event);
-	void OnFileRun(wxCommandEvent& event);
-	void OnFileOpen(wxCommandEvent& event);
-	void OnFileSaveAs(wxCommandEvent& event);
-	void OnFileSaveAll(wxCommandEvent& event);
-	void OnFileRevert(wxCommandEvent& event);
-	void OnFileClose(wxCommandEvent& event);
 	void OnFileExit(wxCommandEvent& event);
 	void OnEditCut(wxCommandEvent& event);
 	void OnEditCopy(wxCommandEvent& event);
@@ -219,42 +173,26 @@ protected:
 	void OnContextMenu(wxContextMenuEvent& event);	
 	
 private:
-	
+
 	/**
 	 * Status bar accessor.  This status bar allows features to easily add gauges to the status bar.
-	 * 
+	 *
 	 * @return StatusBarWithGaugeClass do NOT delete the pointer.  This class will take care of memory management.
 	 */
 	t4p::StatusBarWithGaugeClass* GetStatusBarWithGauge();
-	
+
 	/**
 	 * When a page is modified, enable the save button
 	 */
-	void EnableSave(wxStyledTextEvent& event);
-	
+	void OnStcSavePointReached(wxStyledTextEvent& event);
+
 	/**
 	 * When a page is saved, disable the save button
 	 */
-	void DisableSave(wxStyledTextEvent& event);
-	
-	/**
-	 * Change the state of various menus / buttons
-	 * when page is changed.
-	 */
-	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
+	void OnStcSavedPointLeft(wxStyledTextEvent& event);
 
 	/**
-	 * Save the currently active tab.
-	 */
-	void SaveCurrentFile(wxCommandEvent& event);
-
-	/**
-	 * Creates the toolbar buttons
-	 */
-	void CreateToolBarButtons();
-	
-	/**
-	 * Toggle various widgets on or off based on the application state. 
+	 * Toggle various widgets on or off based on the application state.
 	 */
 	void OnUpdateUi(wxUpdateUIEvent& event);
 
@@ -354,21 +292,11 @@ private:
 	void SetApplicationFont();
 
 	/**
-	 * at regular intervals, update the status bar text
-	 */
-	void OnStatusBarTimer(wxTimerEvent& event);
-
-	/**
 	 * GUI framework object, used to programatically position the different windows
 	 * 
 	 * @var wxAuiManager
 	 */
 	wxAuiManager AuiManager;
-
-	/**
-	 * timer to update the status bar at a regular intervals
-	 */
-	wxTimer StatusBarTimer;
 
 	/**
 	 * Additional functionality, this class will not own the pointers

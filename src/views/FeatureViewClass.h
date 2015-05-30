@@ -90,11 +90,12 @@ public:
 	 * @param wxAuiNotebook& outlineNotebook the parent window for all outline type windows (left side)
 	 * @param wxAuiManager auiManager the AUI manager used to update the frame
 	 * @param wxMenuBar* menuBar the application menu bar
+	 * @param wxToolBar* toolBar the application tool bar
 	 */
 	void InitWindow(StatusBarWithGaugeClass* statusBarWithGauge, 
 		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
-		wxMenuBar* menuBar);
+		wxMenuBar* menuBar, wxAuiToolBar* toolBar);
 	
 	/**
 	 * Add menu items to the view menu for this feature. Remeber to use the MenuIds enum when building
@@ -222,10 +223,31 @@ public:
 	/**
 	 * Get the currently selected code control. This may be NULL if the editor's content pane is
 	 * focused on something other than a code control.
+	 *
+	 * Be very careful with the returned pointer, as the user can close files at any time
+	 * and the pointers will be deleted.  You should not store
+ 	 * the pointer at all.
 	 * 
 	 * @return CodeControlClass* the code control that has focus; can be NULL
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
+
+	/**
+	 * Get the currently selected code control along with its notebook. This may be NULL if the
+	 * editor's content pane is focused on something other than a code control, or there are zero
+	 * files opened. The method will set the notebook and code control pointers to
+	 * the out parameters.
+	 *
+	 * Be very careful with the returned pointers, as the user can close files at any time
+	 * and the pointers will be deleted.  You should not store these pointers at all.
+	 *
+	 * @param [out] CodeControlClass* the code control that has focus; can be NULL
+	 * @params[out] NotebookClass* the notebook that is the parent of the code control that has
+	 * focus; can be NULL
+	 * @return bool TRUE if we could get the code control that is being focused on. If TRUE, then
+	 *         the codeCtrl and notebook params will be written to and will be valid.
+	 */
+	bool GetCurrentCodeControlWithNotebook(t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const;
 	
 	/**
 	 * tell the app to close the given code control immediately.  The code control
@@ -405,6 +427,16 @@ protected:
 	 */
 	wxAuiManager* AuiManager;
 
+	/**
+	 * The Application-wide menu bar.
+	 */
+	wxMenuBar* MenuBar;
+
+	/**
+	 * The Application-wide tool bar.
+	 */
+	wxAuiToolBar* ToolBar;
+
 private:
 	
 	/**
@@ -434,11 +466,6 @@ private:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* OutlineNotebook;
-
-	/**
-	 * The Application-wide menu bar.
-	 */
-	wxMenuBar* MenuBar;
 	
 };
 

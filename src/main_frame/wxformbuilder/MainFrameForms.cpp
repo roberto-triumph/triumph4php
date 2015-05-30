@@ -15,16 +15,6 @@ BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_CLOSE( MainFrameGeneratedClass::_wxFB_OnClose )
 	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
 	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
-	EVT_MENU( ID_FILE_PHP_NEW, MainFrameGeneratedClass::_wxFB_OnFilePhpNew )
-	EVT_MENU( ID_FILE_SQL_NEW, MainFrameGeneratedClass::_wxFB_OnFileSqlNew )
-	EVT_MENU( ID_FILE_CSS_NEW, MainFrameGeneratedClass::_wxFB_OnFileCssNew )
-	EVT_MENU( ID_FILE_TEXT_NEW_FILE, MainFrameGeneratedClass::_wxFB_OnFileTextNew )
-	EVT_MENU( wxID_OPEN, MainFrameGeneratedClass::_wxFB_OnFileOpen )
-	EVT_MENU( wxID_SAVE, MainFrameGeneratedClass::_wxFB_OnFileSave )
-	EVT_MENU( wxID_SAVEAS, MainFrameGeneratedClass::_wxFB_OnFileSaveAs )
-	EVT_MENU( ID_FILE_SAVE_ALL, MainFrameGeneratedClass::_wxFB_OnFileSaveAll )
-	EVT_MENU( ID_FILE_REVERT, MainFrameGeneratedClass::_wxFB_OnFileRevert )
-	EVT_MENU( wxID_CLOSE, MainFrameGeneratedClass::_wxFB_OnFileClose )
 	EVT_MENU( wxID_EXIT, MainFrameGeneratedClass::_wxFB_OnFileExit )
 	EVT_MENU( wxID_CUT, MainFrameGeneratedClass::_wxFB_OnEditCut )
 	EVT_MENU( wxID_COPY, MainFrameGeneratedClass::_wxFB_OnEditCopy )
@@ -56,53 +46,6 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	this->Layout();
 	MenuBar = new wxMenuBar( 0 );
 	FileMenu = new wxMenu();
-	wxMenuItem* MenuItemFilePhpNew;
-	MenuItemFilePhpNew = new wxMenuItem( FileMenu, ID_FILE_PHP_NEW, wxString( _("New &PHP File") ) + wxT('\t') + wxT("CTRL+N"), _("Create a new PHP File"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFilePhpNew );
-	
-	wxMenuItem* MenuItemFileSqlNew;
-	MenuItemFileSqlNew = new wxMenuItem( FileMenu, ID_FILE_SQL_NEW, wxString( _("New S&QL File") ) , _("Create a new SQL File"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileSqlNew );
-	
-	wxMenuItem* MenuItemFileCssNew;
-	MenuItemFileCssNew = new wxMenuItem( FileMenu, ID_FILE_CSS_NEW, wxString( _("New &CSS File") ) , _("Create a new CSS File"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileCssNew );
-	
-	wxMenuItem* MenuItemFileTextNew;
-	MenuItemFileTextNew = new wxMenuItem( FileMenu, ID_FILE_TEXT_NEW_FILE, wxString( _("New Te&xt File") ) , _("Create a new text file"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileTextNew );
-	
-	m_separator4 = FileMenu->AppendSeparator();
-	
-	wxMenuItem* MenuItemFileOpen;
-	MenuItemFileOpen = new wxMenuItem( FileMenu, wxID_OPEN, wxString( _("&Open") ) , _("Open a file"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileOpen );
-	
-	wxMenuItem* MenuItemFileSave;
-	MenuItemFileSave = new wxMenuItem( FileMenu, wxID_SAVE, wxString( _("Save") ) + wxT('\t') + wxT("CTRL+S"), _("Save the current file to disk"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileSave );
-	MenuItemFileSave->Enable( false );
-	
-	wxMenuItem* MenuItemFileSaveAs;
-	MenuItemFileSaveAs = new wxMenuItem( FileMenu, wxID_SAVEAS, wxString( _("Save &As") ) , wxEmptyString, wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileSaveAs );
-	MenuItemFileSaveAs->Enable( false );
-	
-	wxMenuItem* MenuItemSaveAll;
-	MenuItemSaveAll = new wxMenuItem( FileMenu, ID_FILE_SAVE_ALL, wxString( _("Save A&ll") ) + wxT('\t') + wxT("CTRL+SHIFT+S"), wxEmptyString, wxITEM_NORMAL );
-	FileMenu->Append( MenuItemSaveAll );
-	MenuItemSaveAll->Enable( false );
-	
-	wxMenuItem* MenuItemRevert;
-	MenuItemRevert = new wxMenuItem( FileMenu, ID_FILE_REVERT, wxString( _("Revert") ) , _("Reload the file from Disk"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemRevert );
-	MenuItemRevert->Enable( false );
-	
-	wxMenuItem* MenuItemFileClose;
-	MenuItemFileClose = new wxMenuItem( FileMenu, wxID_CLOSE, wxString( _("Close") ) , _("Close the current file"), wxITEM_NORMAL );
-	FileMenu->Append( MenuItemFileClose );
-	MenuItemFileClose->Enable( false );
-	
 	wxMenuItem* MenuItemFileExit;
 	MenuItemFileExit = new wxMenuItem( FileMenu, wxID_EXIT, wxString( _("Exit") ) , _("Exit this program"), wxITEM_NORMAL );
 	FileMenu->Append( MenuItemFileExit );

@@ -77,6 +77,7 @@ class DebuggerFeatureClass;
 class FileCabinetFeatureClass;
 class PhpCodeCompletionFeatureClass;
 class TestFeatureClass;
+class FileOperationsFeatureClass;
 
 
 class FeatureFactoryClass {
@@ -120,6 +121,7 @@ public:
 	
 	t4p::AppClass& App;
 
+	t4p::FileOperationsFeatureClass*       FileOperations;
 	t4p::EnvironmentFeatureClass*          Environment;
 	t4p::FindInFilesFeatureClass*          FindInFiles;
 	t4p::FinderFeatureClass*               Finder;
@@ -150,6 +152,7 @@ public:
 	t4p::FileCabinetFeatureClass*          FileCabinet;
 	t4p::PhpCodeCompletionFeatureClass*    PhpCodeCompletion;
 	t4p::TestFeatureClass*                 Test;
+
 
 };
 

@@ -88,11 +88,14 @@
 #include <features/TestFeatureClass.h>
 #include <views/TestViewClass.h>
 #include <views/EditorMessagesViewClass.h>
+#include <features/FileOperationsFeatureClass.h>
+#include <views/FileOperationsViewClass.h>
 
 t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 : Features()
 , FeatureViews()
-, App(app) 
+, App(app)
+, FileOperations(NULL)
 , Environment(NULL)
 , FindInFiles(NULL)
 , Finder(NULL)
@@ -136,6 +139,7 @@ void t4p::FeatureFactoryClass::DeleteFeatures() {
 		delete Features[i];
 	}
 	Features.clear();
+	FileOperations = NULL;
 	Environment = NULL;
 	FindInFiles = NULL;
 	Finder = NULL;
@@ -180,6 +184,8 @@ bool t4p::FeatureFactoryClass::CreateFeatures() {
 	if (!Features.empty()) {
 		return false;
 	}
+	FileOperations = new t4p::FileOperationsFeatureClass(App);
+	Features.push_back(FileOperations);
 	Environment = new t4p::EnvironmentFeatureClass(App);
 	Features.push_back(Environment);
 	FindInFiles = new t4p::FindInFilesFeatureClass(App);
@@ -251,7 +257,12 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	if (!FeatureViews.empty()) {
 		return false;
 	}
-	
+
+	// ATTN: currently the way that views are added to the vector
+	// determines the order of the menu items
+	// that is why the FileOperations view is first
+	FeatureViews.push_back(new t4p::FileOperationsViewClass(*FileOperations));
+
 	FeatureViews.push_back(new t4p::EnvironmentViewClass(*Environment));
 	FeatureViews.push_back(new t4p::FindInFilesViewClass(*FindInFiles));
 	FeatureViews.push_back(new t4p::FinderViewClass(*Finder));

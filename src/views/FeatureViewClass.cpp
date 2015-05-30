@@ -33,13 +33,14 @@ void t4p::FeatureViewClass::InitWindow(
 		StatusBarWithGaugeClass* statusBarWithGauge, 
 		NotebookClass* notebook, wxAuiNotebook* toolsNotebook, 
 		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
-		wxMenuBar* menuBar) {
+		wxMenuBar* menuBar, wxAuiToolBar* toolBar) {
 	AuiManager = auiManager;
 	StatusBarWithGauge = statusBarWithGauge;
 	Notebook = notebook;
 	ToolsNotebook = toolsNotebook;
 	OutlineNotebook = outlineNotebook;
 	MenuBar = menuBar;
+	ToolBar = toolBar;
 }
 
 void t4p::FeatureViewClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -192,6 +193,16 @@ bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, co
 
 t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
 	return Notebook->GetCurrentCodeControl();
+}
+
+bool t4p::FeatureViewClass::GetCurrentCodeControlWithNotebook(
+		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const {
+	if (Notebook->GetCurrentCodeControl()) {
+		*notebook = Notebook;
+		*codeCtrl = Notebook->GetCurrentCodeControl();
+		return true;
+	}
+	return false;
 }
 
 wxWindow* t4p::FeatureViewClass::GetMainWindow() const {

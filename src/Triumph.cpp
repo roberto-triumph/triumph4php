@@ -132,7 +132,11 @@ bool t4p::AppClass::OnInit() {
 	if (CommandLine(filenames)) {
 		CreateFrame();
 		if (!filenames.empty()) {
-			MainFrame->FileOpen(filenames);
+			for (size_t i = 0; i < filenames.size(); i++) {
+				wxCommandEvent evt(t4p::EVENT_CMD_FILE_OPEN);
+				evt.SetString(filenames[i]);
+				EventSink.Post(evt);
+			}
 		}
 		Timer.Start(1000, wxTIMER_CONTINUOUS);
 		return true;

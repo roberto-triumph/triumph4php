@@ -43,9 +43,9 @@ namespace t4p {
  *
  * In addition, the application main frame
  * frame will publish the following events to the event sink; this way any functionality
- * that wants to receive menu events, tool bar events, or AUI events can do so 
+ * that wants to receive menu events, tool bar events, STC events, or AUI events can do so
  * automatically. ** HERE 'most of them' MEANS ALL EVENTS THAT HAVE A MENU ID
- * THAT IS WITHIN THE MenuIds::MENU_START to MenuIds::MENU_END !! 
+ * THAT IS WITHIN THE MenuIds::MENU_START to MenuIds::MENU_END, and a few stock menu IDs !!
  *
  * EVT_MENU (most of them)
  * EVT_TOOL (most of them)
@@ -58,6 +58,9 @@ namespace t4p {
  * EVT_AUITOOLBAR_OVERFLOW_CLICK (all of them)
  * EVT_AUITOOLBAR_RIGHT_CLICK (all of them)
  * EVT_AUITOOLBAR_TOOL_DROPDOWN (all of them)
+ * EVT_STC_SAVEPOINT_LEFT (for all code controls)
+ * EVT_STC_SAVEPOINT_REACHED (for all code controls)
+ *
  *
  * The event sink is NOT suitable for inter-thread communication, use EventSinkWithLocker
  * for communication among theads
