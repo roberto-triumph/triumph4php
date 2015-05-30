@@ -96,6 +96,7 @@ t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 , FeatureViews()
 , App(app)
 , FileOperations(NULL)
+, EditorBehavior(NULL)
 , Environment(NULL)
 , FindInFiles(NULL)
 , Finder(NULL)
@@ -119,7 +120,6 @@ t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 , TotalSearch(NULL)
 , DocComment(NULL)
 , SyntaxHighlight(NULL)
-, EditorBehavior(NULL)
 , Changelog(NULL)
 , Bookmark(NULL)
 , Debugger(NULL)
@@ -140,6 +140,7 @@ void t4p::FeatureFactoryClass::DeleteFeatures() {
 	}
 	Features.clear();
 	FileOperations = NULL;
+	EditorBehavior = NULL;
 	Environment = NULL;
 	FindInFiles = NULL;
 	Finder = NULL;
@@ -186,6 +187,8 @@ bool t4p::FeatureFactoryClass::CreateFeatures() {
 	}
 	FileOperations = new t4p::FileOperationsFeatureClass(App);
 	Features.push_back(FileOperations);
+	EditorBehavior = new t4p::EditorBehaviorFeatureClass(App);
+	Features.push_back(EditorBehavior);
 	Environment = new t4p::EnvironmentFeatureClass(App);
 	Features.push_back(Environment);
 	FindInFiles = new t4p::FindInFilesFeatureClass(App);
@@ -232,8 +235,6 @@ bool t4p::FeatureFactoryClass::CreateFeatures() {
 	Features.push_back(DocComment);
 	SyntaxHighlight = new t4p::SyntaxHighlightFeatureClass(App);
 	Features.push_back(SyntaxHighlight);
-	EditorBehavior = new t4p::EditorBehaviorFeatureClass(App);
-	Features.push_back(EditorBehavior);
 	Changelog = new t4p::ChangelogFeatureClass(App);
 	Features.push_back(Changelog);
 	Bookmark = new t4p::BookmarkFeatureClass(App);
@@ -262,6 +263,7 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	// determines the order of the menu items
 	// that is why the FileOperations view is first
 	FeatureViews.push_back(new t4p::FileOperationsViewClass(*FileOperations));
+	FeatureViews.push_back(new t4p::EditorBehaviorViewClass(*EditorBehavior));
 
 	FeatureViews.push_back(new t4p::EnvironmentViewClass(*Environment));
 	FeatureViews.push_back(new t4p::FindInFilesViewClass(*FindInFiles));
@@ -286,7 +288,6 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	FeatureViews.push_back(new t4p::TotalSearchViewClass(*TotalSearch));
 	FeatureViews.push_back(new t4p::DocCommentViewClass(*DocComment));
 	FeatureViews.push_back(new t4p::SyntaxHighlightViewClass(*SyntaxHighlight));
-	FeatureViews.push_back(new t4p::EditorBehaviorViewClass(*EditorBehavior));
 	FeatureViews.push_back(new t4p::ChangelogViewClass(*Changelog));
 	FeatureViews.push_back(new t4p::BookmarkViewClass(*Bookmark));
 	FeatureViews.push_back(new t4p::DebuggerViewClass(*Debugger));

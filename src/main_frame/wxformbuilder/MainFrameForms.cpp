@@ -16,12 +16,6 @@ BEGIN_EVENT_TABLE( MainFrameGeneratedClass, wxFrame )
 	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageChanged )
 	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_NOTEBOOK, MainFrameGeneratedClass::_wxFB_OnContentNotebookPageClose )
 	EVT_MENU( wxID_EXIT, MainFrameGeneratedClass::_wxFB_OnFileExit )
-	EVT_MENU( wxID_CUT, MainFrameGeneratedClass::_wxFB_OnEditCut )
-	EVT_MENU( wxID_COPY, MainFrameGeneratedClass::_wxFB_OnEditCopy )
-	EVT_MENU( wxID_PASTE, MainFrameGeneratedClass::_wxFB_OnEditPaste )
-	EVT_MENU( wxID_SELECTALL, MainFrameGeneratedClass::_wxFB_OnEditSelectAll )
-	EVT_MENU( ID_EDIT_CONTENT_ASSIST, MainFrameGeneratedClass::_wxFB_OnEditContentAssist )
-	EVT_MENU( ID_EDIT_CALL_TIP, MainFrameGeneratedClass::_wxFB_OnEditCallTip )
 	EVT_MENU( wxID_PREFERENCES, MainFrameGeneratedClass::_wxFB_OnEditPreferences )
 	EVT_MENU( ID_VIEW_TOGGLE_TOOLS, MainFrameGeneratedClass::_wxFB_OnViewToggleTools )
 	EVT_MENU( ID_VIEW_TOGGLE_OUTLINE, MainFrameGeneratedClass::_wxFB_OnViewToggleOutline )
@@ -53,34 +47,6 @@ MainFrameGeneratedClass::MainFrameGeneratedClass( wxWindow* parent, wxWindowID i
 	MenuBar->Append( FileMenu, _("&File") ); 
 	
 	EditMenu = new wxMenu();
-	wxMenuItem* MenuItemEditCut;
-	MenuItemEditCut = new wxMenuItem( EditMenu, wxID_CUT, wxString( _("Cut") ) + wxT('\t') + wxT("CTRL+X"), _("Cut the selected text"), wxITEM_NORMAL );
-	EditMenu->Append( MenuItemEditCut );
-	
-	wxMenuItem* MenuItemEditCopy;
-	MenuItemEditCopy = new wxMenuItem( EditMenu, wxID_COPY, wxString( _("Copy") ) + wxT('\t') + wxT("CTRL+C"), _("Copy the selected text to the clipboard"), wxITEM_NORMAL );
-	EditMenu->Append( MenuItemEditCopy );
-	
-	wxMenuItem* MenuItemEditPaste;
-	MenuItemEditPaste = new wxMenuItem( EditMenu, wxID_PASTE, wxString( _("Paste") ) + wxT('\t') + wxT("CTRL+V"), _("Paste the text from the clipboard"), wxITEM_NORMAL );
-	EditMenu->Append( MenuItemEditPaste );
-	
-	wxMenuItem* MenuItemSelectAll;
-	MenuItemSelectAll = new wxMenuItem( EditMenu, wxID_SELECTALL, wxString( _("Select All") ) + wxT('\t') + wxT("CTRL+A"), _("Select Entire Text"), wxITEM_NORMAL );
-	EditMenu->Append( MenuItemSelectAll );
-	
-	m_separator3 = EditMenu->AppendSeparator();
-	
-	wxMenuItem* MenuItemEditContentAssist;
-	MenuItemEditContentAssist = new wxMenuItem( EditMenu, ID_EDIT_CONTENT_ASSIST, wxString( _("Content Assist") ) + wxT('\t') + wxT("CTRL+Space"), wxEmptyString, wxITEM_NORMAL );
-	EditMenu->Append( MenuItemEditContentAssist );
-	MenuItemEditContentAssist->Enable( false );
-	
-	wxMenuItem* MenuItemEditCallTip;
-	MenuItemEditCallTip = new wxMenuItem( EditMenu, ID_EDIT_CALL_TIP, wxString( _("Display Call Tip") ) + wxT('\t') + wxT("CTRL+SHIFT+SPACE"), wxEmptyString, wxITEM_NORMAL );
-	EditMenu->Append( MenuItemEditCallTip );
-	MenuItemEditCallTip->Enable( false );
-	
 	wxMenuItem* MenuItemEditPreferences;
 	MenuItemEditPreferences = new wxMenuItem( EditMenu, wxID_PREFERENCES, wxString( _("Preferences") ) , wxEmptyString, wxITEM_NORMAL );
 	EditMenu->Append( MenuItemEditPreferences );

@@ -42,19 +42,12 @@ class MainFrameGeneratedClass : public wxFrame
 {
 	DECLARE_EVENT_TABLE()
 	private:
-		wxMenuItem* m_separator3;
 		
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
 		void _wxFB_OnContentNotebookPageChanged( wxAuiNotebookEvent& event ){ OnContentNotebookPageChanged( event ); }
 		void _wxFB_OnContentNotebookPageClose( wxAuiNotebookEvent& event ){ OnContentNotebookPageClose( event ); }
 		void _wxFB_OnFileExit( wxCommandEvent& event ){ OnFileExit( event ); }
-		void _wxFB_OnEditCut( wxCommandEvent& event ){ OnEditCut( event ); }
-		void _wxFB_OnEditCopy( wxCommandEvent& event ){ OnEditCopy( event ); }
-		void _wxFB_OnEditPaste( wxCommandEvent& event ){ OnEditPaste( event ); }
-		void _wxFB_OnEditSelectAll( wxCommandEvent& event ){ OnEditSelectAll( event ); }
-		void _wxFB_OnEditContentAssist( wxCommandEvent& event ){ OnEditContentAssist( event ); }
-		void _wxFB_OnEditCallTip( wxCommandEvent& event ){ OnEditCallTip( event ); }
 		void _wxFB_OnEditPreferences( wxCommandEvent& event ){ OnEditPreferences( event ); }
 		void _wxFB_OnViewToggleTools( wxCommandEvent& event ){ OnViewToggleTools( event ); }
 		void _wxFB_OnViewToggleOutline( wxCommandEvent& event ){ OnViewToggleOutline( event ); }
@@ -69,8 +62,6 @@ class MainFrameGeneratedClass : public wxFrame
 		{
 			ID_MAINFRAMEGENERATEDCLASS = 1000,
 			ID_NOTEBOOK,
-			ID_EDIT_CONTENT_ASSIST,
-			ID_EDIT_CALL_TIP,
 			ID_VIEW_TOGGLE_TOOLS,
 			ID_VIEW_TOGGLE_OUTLINE,
 			ID_MENUITEMMANUAL,
@@ -91,12 +82,6 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnContentNotebookPageChanged( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnContentNotebookPageClose( wxAuiNotebookEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditCut( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditCopy( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditPaste( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditSelectAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditContentAssist( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditCallTip( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditPreferences( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewToggleTools( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnViewToggleOutline( wxCommandEvent& event ) { event.Skip(); }

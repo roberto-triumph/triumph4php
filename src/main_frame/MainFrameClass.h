@@ -153,13 +153,7 @@ protected:
 	 * Top Menu Bar handlers
 	 */
 	void OnFileExit(wxCommandEvent& event);
-	void OnEditCut(wxCommandEvent& event);
-	void OnEditCopy(wxCommandEvent& event);
-	void OnEditPaste(wxCommandEvent& event);
-	void OnEditSelectAll(wxCommandEvent& event);
 	void OnEditPreferences(wxCommandEvent& event);
-	void OnEditContentAssist(wxCommandEvent& event);
-	void OnEditCallTip(wxCommandEvent& event);
 	void OnViewToggleTools(wxCommandEvent& event);
 	void OnViewToggleOutline(wxCommandEvent& event);
 	void OnHelpAbout(wxCommandEvent& event);
@@ -195,51 +189,6 @@ private:
 	 * Toggle various widgets on or off based on the application state.
 	 */
 	void OnUpdateUi(wxUpdateUIEvent& event);
-
- 	/**
- 	 * Handle the Undo popup menu event
-	 */
-	void OnUndo(wxCommandEvent& event);
-
-	/**
-	 * Handle the Redo popup menu event
-	 */
-	void OnRedo(wxCommandEvent& event);
-
-	/**
-	 * handle the cut line menu event
-	 */
-	void OnCutLine(wxCommandEvent& event);
-
-	/**
-	 * handle the duplicate line menu event
-	 */
-	void OnDuplicateLine(wxCommandEvent& event);
-
-	/**
-	 * handle the delete line menu event
-	 */
-	void OnDeleteLine(wxCommandEvent& event);
-
-	/**
-	 * handle the transpose line menu event
-	 */
-	void OnTransposeLine(wxCommandEvent& event);
-
-	/**
-	 * handle the copy line menu event
-	 */
-	void OnCopyLine(wxCommandEvent& event);
-
-	/**
-	 * handle the lowercase selected menu event
-	 */
-	void OnLowecase(wxCommandEvent& event);
-
-	/**
-	 * handle the uppercase selected menu event
-	 */
-	void OnUppercase(wxCommandEvent& event);
 
 	/**
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list

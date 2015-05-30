@@ -62,6 +62,17 @@ void t4p::EditorBehaviorViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 }
 
 void t4p::EditorBehaviorViewClass::AddEditMenuItems(wxMenu* editMenu) {
+	editMenu->Append(wxID_UNDO, _("Undo"), _("Reverts the most recent change"), wxITEM_NORMAL);
+	editMenu->Append(wxID_REDO, _("Redo"), _("Un-reverts the most recent undo"), wxITEM_NORMAL);
+
+	editMenu->Append(wxID_CUT, _("Cut"), _("Cut the selected text and place in the clipboard"), wxITEM_NORMAL);
+	editMenu->Append(wxID_COPY, _("Copy"), _("Copy the selected text to the clipboard"), wxITEM_NORMAL);
+	editMenu->Append(wxID_PASTE, _("Paste"), _("Paste the current contents of the clipboard"), wxITEM_NORMAL);
+	editMenu->Append(wxID_SELECTALL, _("Select All"), _("Select the entire contents of the control"), wxITEM_NORMAL);
+	editMenu->AppendSeparator();
+	editMenu->Append(t4p::MENU_BEHAVIOR + 10, _("Complete Symbol"), _("Show an autocompletion box of possible matches of the current symbol"), wxITEM_NORMAL);
+	editMenu->Append(t4p::MENU_BEHAVIOR + 11, _("Show Call Tip"), _("Display the function signature of the symbol at the current caret position"), wxITEM_NORMAL);
+
 	wxMenu* subMenu = new wxMenu();
 	subMenu->Append(t4p::MENU_BEHAVIOR + 7, _("Unix (LF)"), _("Convert Line ending to UNIX"));
 	subMenu->Append(t4p::MENU_BEHAVIOR + 8, _("Windows (CRLF)"), _("Convert Line ending to Windows"));
@@ -76,14 +87,62 @@ void t4p::EditorBehaviorViewClass::AddViewMenuItems(wxMenu* menu) {
 	menu->Append(t4p::MENU_BEHAVIOR + 6, _("Reset Zoom\tCTRL+0"), _("Reset Zoom"));
 }
 
+void t4p::EditorBehaviorViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
+	std::map<int, wxString> cmds;
+	cmds[wxID_UNDO] = wxT("Edit-Undo");
+	cmds[wxID_REDO] = wxT("Edit-Redo");
+	cmds[wxID_CUT] = wxT("Edit-Cut");
+	cmds[wxID_COPY] = wxT("Edit-Copy");
+	cmds[wxID_PASTE] = wxT("Edit-Paste");
+	cmds[wxID_SELECTALL] = wxT("Edit-Select All");
+	cmds[t4p::MENU_BEHAVIOR + 10] = wxT("Edit-Complete Symbol");
+	cmds[t4p::MENU_BEHAVIOR + 11] = wxT("Edit-Call Tip");
+
+	AddDynamicCmd(cmds, shortcuts);
+}
+
+void t4p::EditorBehaviorViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
+	bool hasEditors = !AllCodeControls().empty();
+
+	wxMenuItem* menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 10);
+	menuItem->Enable(hasEditors);
+	menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 11);
+	menuItem->Enable(hasEditors);
+
+	event.Skip();
+}
+
 void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	
 	// no need to delete moreMenu pointer, the contextMenu will delete it for us
 	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	bool isTextSelected = false;
+	bool canPaste = false;
+	bool canUndo = false;
+	bool canRedo = false;
 	if (codeCtrl) {
 		isTextSelected = !codeCtrl->GetSelectedText().IsEmpty();
+		canPaste = codeCtrl->CanPaste();
+		canUndo = codeCtrl->CanUndo();
+		canRedo = codeCtrl->CanRedo();
 	}
+
+	menu->Append(wxID_CUT, _("Cut"));
+	menu->Append(wxID_COPY, _("Copy"));
+	menu->Append(wxID_PASTE, _("Paste"));
+	menu->Append(wxID_UNDO, _("Undo"));
+	menu->Append(wxID_REDO, _("Redo"));
+	menu->Append(wxID_SELECTALL, _("Select All"));
+	menu->AppendSeparator();
+	menu->Append(wxID_FIND, _("Find"));
+	menu->AppendSeparator();
+
+	menu->Enable(wxID_CUT, isTextSelected);
+	menu->Enable(wxID_COPY, isTextSelected);
+	menu->Enable(wxID_PASTE, canPaste);
+	menu->Enable(wxID_UNDO, canUndo);
+	menu->Enable(wxID_REDO, canRedo);
+
 	AddKeyboardCommands(menu, isTextSelected);
 	
 	// update the menu accelerators to be the ones configured by the
@@ -348,6 +407,134 @@ void t4p::EditorBehaviorViewClass::OnEditorCommand(wxCommandEvent& event) {
 	ctrl->CmdKeyExecute(cmdId);
 }
 
+void t4p::EditorBehaviorViewClass::OnEditContentAssist(wxCommandEvent& event) {
+	CodeControlClass* page = GetCurrentCodeControl();
+	if (page) {
+		page->HandleAutoCompletion();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnEditCallTip(wxCommandEvent& event) {
+	CodeControlClass* page = GetCurrentCodeControl();
+	if (page) {
+		page->HandleCallTip(0, true);
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnEditCut(wxCommandEvent& event) {
+
+	// need to handle cut in all text controls
+	wxWindow* obj = wxWindow::FindFocus();
+	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
+	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
+	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
+	CodeControlClass* code = GetCurrentCodeControl();
+	if (t != NULL) {
+		t->Cut();
+	}
+	else if (combo != NULL) {
+		combo->Cut();
+	}
+	else if (stc != NULL) {
+		stc->Cut();
+	}
+	else if (code != NULL) {
+		code->Cut();
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnEditCopy(wxCommandEvent& event) {
+
+	// need to handle copy in all text controls
+	wxWindow* obj = wxWindow::FindFocus();
+	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
+	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
+	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
+	CodeControlClass* code = GetCurrentCodeControl();
+	if (t != NULL) {
+		t->Copy();
+	}
+	else if (combo != NULL) {
+		combo->Copy();
+	}
+	else if (stc != NULL) {
+		stc->Copy();
+	}
+	else if (code != NULL) {
+		code->Copy();
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnEditPaste(wxCommandEvent& event) {
+
+	// need to handle paste in all text controls
+	wxWindow* obj = wxWindow::FindFocus();
+	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
+	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
+	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
+	CodeControlClass* code = GetCurrentCodeControl();
+	if (t != NULL) {
+		t->Paste();
+	}
+	else if (combo != NULL) {
+		combo->Paste();
+	}
+	else if (stc != NULL) {
+		stc->Paste();
+	}
+	else if (code != NULL) {
+		code->Paste();
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnEditSelectAll(wxCommandEvent& event) {
+
+	// need to handle select All in all text controls
+	wxWindow* obj = wxWindow::FindFocus();
+	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
+	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
+	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
+	CodeControlClass* code = GetCurrentCodeControl();
+	if (t != NULL) {
+		t->SelectAll();
+	}
+	else if (combo != NULL) {
+		combo->SelectAll();
+	}
+	else if (stc != NULL) {
+		stc->SelectAll();
+	}
+	else if (code != NULL) {
+		code->SelectAll();
+	}
+	else {
+		event.Skip();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnUndo(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl =  GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->Undo();
+	}
+}
+
+void t4p::EditorBehaviorViewClass::OnRedo(wxCommandEvent& event) {
+	t4p::CodeControlClass* codeControl =  GetCurrentCodeControl();
+	if (codeControl) {
+		codeControl->Redo();
+	}
+}
+
 t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
 	: EditorBehaviorPanelGeneratedClass(parent) {
 	wxGenericValidator enableCodeFoldingValidator(&options.EnableCodeFolding);
@@ -579,8 +766,19 @@ BEGIN_EVENT_TABLE(t4p::EditorBehaviorViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 7, t4p::EditorBehaviorViewClass::OnEditConvertEols)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 8, t4p::EditorBehaviorViewClass::OnEditConvertEols)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 9, t4p::EditorBehaviorViewClass::OnEditConvertEols)
+
+	EVT_MENU(wxID_CUT, t4p::EditorBehaviorViewClass::OnEditCut)
+	EVT_MENU(wxID_COPY, t4p::EditorBehaviorViewClass::OnEditCopy)
+	EVT_MENU(wxID_PASTE, t4p::EditorBehaviorViewClass::OnEditPaste)
+	EVT_MENU(wxID_SELECTALL, t4p::EditorBehaviorViewClass::OnEditSelectAll)
+	EVT_MENU(wxID_UNDO, t4p::EditorBehaviorViewClass::OnUndo)
+	EVT_MENU(wxID_REDO, t4p::EditorBehaviorViewClass::OnRedo)
+	EVT_MENU(t4p::MENU_BEHAVIOR + 10, t4p::EditorBehaviorViewClass::OnEditContentAssist)
+	EVT_MENU(t4p::MENU_BEHAVIOR + 11, t4p::EditorBehaviorViewClass::OnEditCallTip)
+
+	EVT_UPDATE_UI(wxID_ANY, t4p::EditorBehaviorViewClass::OnUpdateUi)
 	
-	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 10, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorViewClass::OnEditorCommand)
+	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 20, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorViewClass::OnEditorCommand)
 
 END_EVENT_TABLE()
 

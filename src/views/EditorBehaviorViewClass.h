@@ -49,6 +49,8 @@ public:
 	
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
+	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
+
 private:
 
 	/**
@@ -73,6 +75,29 @@ private:
 	void OnZoomReset(wxCommandEvent& event);
 	void OnEditConvertEols(wxCommandEvent& event);
 	void OnEditorCommand(wxCommandEvent& event);
+
+	// Top Menu Bar handlers
+	void OnEditCut(wxCommandEvent& event);
+	void OnEditCopy(wxCommandEvent& event);
+	void OnEditPaste(wxCommandEvent& event);
+	void OnEditSelectAll(wxCommandEvent& event);
+	void OnEditContentAssist(wxCommandEvent& event);
+	void OnEditCallTip(wxCommandEvent& event);
+
+ 	/**
+ 	 * Handle the Undo popup menu event
+	 */
+	void OnUndo(wxCommandEvent& event);
+
+	/**
+	 * Handle the Redo popup menu event
+	 */
+	void OnRedo(wxCommandEvent& event);
+
+	/**
+	 * Toggle various widgets on or off based on the application state.
+	 */
+	void OnUpdateUi(wxUpdateUIEvent& event);
 
 	t4p::EditorBehaviorFeatureClass& Feature;
 

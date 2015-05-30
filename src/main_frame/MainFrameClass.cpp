@@ -176,106 +176,6 @@ void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 	}
 }
 
-void t4p::MainFrameClass::OnEditCut(wxCommandEvent& event) {
-
-	// need to handle cut in all text controls
-	wxWindow* obj = wxWindow::FindFocus();
-	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
-	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
-	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
-	CodeControlClass* code = Notebook->GetCurrentCodeControl();
-	if (t != NULL) {
-		t->Cut();
-	}
-	else if (combo != NULL) {
-		combo->Cut();
-	}
-	else if (stc != NULL) {
-		stc->Cut();
-	}
-	else if (code != NULL) {
-		code->Cut();
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void t4p::MainFrameClass::OnEditCopy(wxCommandEvent& event) {
-
-	// need to handle copy in all text controls
-	wxWindow* obj = wxWindow::FindFocus();
-	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
-	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
-	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
-	CodeControlClass* code = Notebook->GetCurrentCodeControl();
-	if (t != NULL) {
-		t->Copy();
-	}
-	else if (combo != NULL) {
-		combo->Copy();
-	}
-	else if (stc != NULL) {
-		stc->Copy();
-	}
-	else if (code != NULL) {
-		code->Copy();
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void t4p::MainFrameClass::OnEditPaste(wxCommandEvent& event) {
-
-	// need to handle paste in all text controls
-	wxWindow* obj = wxWindow::FindFocus();
-	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
-	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
-	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
-	CodeControlClass* code = Notebook->GetCurrentCodeControl();
-	if (t != NULL) {
-		t->Paste();
-	}
-	else if (combo != NULL) {
-		combo->Paste();
-	}
-	else if (stc != NULL) {
-		stc->Paste();
-	}
-	else if (code != NULL) {
-		code->Paste();
-	}
-	else {
-		event.Skip();
-	}
-}
-
-void t4p::MainFrameClass::OnEditSelectAll(wxCommandEvent& event) {
-
-	// need to handle select All in all text controls
-	wxWindow* obj = wxWindow::FindFocus();
-	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
-	wxStyledTextCtrl* stc = wxDynamicCast(obj, wxStyledTextCtrl);
-	wxComboBox* combo = wxDynamicCast(obj, wxComboBox);
-	CodeControlClass* code = Notebook->GetCurrentCodeControl();
-	if (t != NULL) {
-		t->SelectAll();
-	}
-	else if (combo != NULL) {
-		combo->SelectAll();
-	}
-	else if (stc != NULL) {
-		stc->SelectAll();
-	}
-	else if (code != NULL) {
-		code->SelectAll();
-	}
-	else {
-		event.Skip();
-	}
-}
-
 void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 
 	// make sure that no existing project index or wipe action is running
@@ -386,20 +286,6 @@ void t4p::MainFrameClass::PreferencesExternallyUpdated() {
 	PreferencesSaved();
 }
 
-void t4p::MainFrameClass::OnEditContentAssist(wxCommandEvent& event) {
-	CodeControlClass* page = Notebook->GetCurrentCodeControl();
-	if (page) {
-		page->HandleAutoCompletion();
-	}
-}
-
-void t4p::MainFrameClass::OnEditCallTip(wxCommandEvent& event) {
-	CodeControlClass* page = Notebook->GetCurrentCodeControl();
-	if (page) {
-		page->HandleCallTip(0, true);
-	}
-}
-
 void t4p::MainFrameClass::OnHelpAbout(wxCommandEvent& event) {
 	wxAboutDialogInfo info;
 	info.SetCopyright(wxT("(c)2009-2013 Roberto Perpuly"));
@@ -433,14 +319,7 @@ void t4p::MainFrameClass::OnHelpManual(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	bool hasEditors = Notebook->GetPageCount() > 0;
-
-	wxMenuItem* menuItem = MenuBar->FindItem(ID_EDIT_CONTENT_ASSIST);
-	menuItem->Enable(hasEditors);
-	menuItem = MenuBar->FindItem(ID_EDIT_CALL_TIP);
-	menuItem->Enable(hasEditors);
-
-	event.Skip();
+	App.EventSink.Publish(event);
 }
 
 void t4p::MainFrameClass::AuiManagerUpdate() {
@@ -540,27 +419,10 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		// make sure to turn off any call tips; they hide the popup menu
 		codeWindow->SetAsHidden(true);
 		wxMenu contextMenu;
-		contextMenu.Append(wxID_CUT, _("Cut"));
-		contextMenu.Append(wxID_COPY, _("Copy"));
-		contextMenu.Append(wxID_PASTE, _("Paste"));
-		contextMenu.Append(wxID_UNDO, _("Undo"));
-		contextMenu.Append(wxID_REDO, _("Redo"));
-		contextMenu.Append(wxID_SELECTALL, _("Select All"));
-		contextMenu.AppendSeparator();
-		contextMenu.Append(wxID_FIND, _("Find"));
-		contextMenu.AppendSeparator();
 		for (size_t i = 0; i < FeatureViews.size(); ++i) {
 			FeatureViews[i]->AddCodeControlClassContextMenuItems(&contextMenu);
 		}
-
-		bool isTextSelected = !codeWindow->GetSelectedText().IsEmpty();
-		contextMenu.Enable(wxID_CUT, isTextSelected);
-		contextMenu.Enable(wxID_COPY, isTextSelected);
-		contextMenu.Enable(wxID_PASTE, codeWindow->CanPaste());
-		contextMenu.Enable(wxID_UNDO, codeWindow->CanUndo());
-		contextMenu.Enable(wxID_REDO, codeWindow->CanRedo());
 		PopupMenu(&contextMenu);
-
 		codeWindow->SetAsHidden(false);
 	}
 	else {
@@ -570,81 +432,13 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	}
 }
 
-void t4p::MainFrameClass::OnUndo(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->Undo();
-	}
-}
-
-void t4p::MainFrameClass::OnRedo(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->Redo();
-	}
-}
-
-void t4p::MainFrameClass::OnCutLine(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LINECUT);
-	}
-}
-
-void t4p::MainFrameClass::OnDuplicateLine(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDUPLICATE);
-	}
-}
-
-void t4p::MainFrameClass::OnDeleteLine(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LINEDELETE);
-	}
-}
-
-void t4p::MainFrameClass::OnTransposeLine(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LINETRANSPOSE);
-	}
-}
-
-void t4p::MainFrameClass::OnCopyLine(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LINECOPY);
-	}
-}
-
-void t4p::MainFrameClass::OnLowecase(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_LOWERCASE);
-	}
-}
-
-void t4p::MainFrameClass::OnUppercase(wxCommandEvent& event) {
-	t4p::CodeControlClass* codeControl =  Notebook->GetCurrentCodeControl();
-	if (codeControl) {
-		codeControl->CmdKeyExecute(wxSTC_CMD_UPPERCASE);
-	}
-}
-
 void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
 
 	// ATTN: when a new menu item is added to the form builder
 	// we will need to add an entry here so that shortcuts
 	// work properly
 	std::map<int, wxString>defaultMenus;
-	defaultMenus[wxID_CUT] = wxT("Edit-Cut");
-	defaultMenus[wxID_COPY] = wxT("Edit-Copy");
-	defaultMenus[wxID_PASTE] = wxT("Edit-Paste");
-	defaultMenus[wxID_SELECTALL] = wxT("Edit-Select All");
-	defaultMenus[ID_EDIT_CONTENT_ASSIST] = wxT("Edit-Content Assist");
-	defaultMenus[ID_EDIT_CALL_TIP] = wxT("Edit-Call Tip");
+
 	defaultMenus[wxID_PREFERENCES] = wxT("Edit-Preferences");
 	defaultMenus[ID_VIEW_TOGGLE_TOOLS] = wxT("View-Tools");
 	defaultMenus[ID_VIEW_TOGGLE_OUTLINE] = wxT("View-Outline");
@@ -806,12 +600,6 @@ void t4p::AppEventListenerForFrameClass::OnAppRequestUserAttention(wxCommandEven
 BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_CONTEXT_MENU(t4p::MainFrameClass::OnContextMenu)
 
-
-	// these are context menu handlers; the menu handlers are already accounted for
-	// in the MainFrameGeneratedClass
-	EVT_MENU(wxID_UNDO, t4p::MainFrameClass::OnUndo)
-	EVT_MENU(wxID_REDO, t4p::MainFrameClass::OnRedo)
-
 	// ATTN: STOP! DO NOT HANDLE ANY APP EVENTS HERE! SEE AppEventListenerForFrameClass
 
 	// we want to propagate these events to the features, we will do so here
@@ -830,6 +618,12 @@ BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	EVT_MENU(wxID_SAVE, t4p::MainFrameClass::OnAnyMenuCommandEvent)
 	EVT_MENU(wxID_SAVEAS, t4p::MainFrameClass::OnAnyMenuCommandEvent)
 	EVT_MENU(wxID_CLOSE, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_CUT, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_COPY, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_PASTE, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_SELECTALL, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_UNDO, t4p::MainFrameClass::OnAnyMenuCommandEvent)
+	EVT_MENU(wxID_REDO, t4p::MainFrameClass::OnAnyMenuCommandEvent)
 
 	EVT_TOOL(wxID_OPEN, t4p::MainFrameClass::OnAnyMenuCommandEvent)
 	EVT_TOOL(wxID_SAVE, t4p::MainFrameClass::OnAnyMenuCommandEvent)

@@ -122,6 +122,7 @@ public:
 	t4p::AppClass& App;
 
 	t4p::FileOperationsFeatureClass*       FileOperations;
+	t4p::EditorBehaviorFeatureClass*       EditorBehavior;
 	t4p::EnvironmentFeatureClass*          Environment;
 	t4p::FindInFilesFeatureClass*          FindInFiles;
 	t4p::FinderFeatureClass*               Finder;
@@ -145,7 +146,6 @@ public:
 	t4p::TotalSearchFeatureClass*          TotalSearch;
 	t4p::DocCommentFeatureClass*           DocComment;
 	t4p::SyntaxHighlightFeatureClass*      SyntaxHighlight;
-	t4p::EditorBehaviorFeatureClass*       EditorBehavior;
 	t4p::ChangelogFeatureClass*            Changelog;
 	t4p::BookmarkFeatureClass*             Bookmark;
 	t4p::DebuggerFeatureClass*             Debugger;
