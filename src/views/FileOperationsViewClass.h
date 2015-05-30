@@ -28,6 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <features/FileOperationsFeatureClass.h>
 #include <globals/Events.h>
+#include <wx/stc/stc.h>
 
 namespace t4p {
 
@@ -141,14 +142,14 @@ public:
 	 * code that is active.  In this event, we need to upate the
 	 * various metrics (cursor position, dirty state)
 	 */
-	void OnCodeNotebookPageChanged(wxAuiNotebookEvent& event);
+	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 
 	/**
 	 * When a code notebook page closes, it means that a new source
 	 * code that is active.  In this event, we need to upate the
 	 * various metrics (cursor position, dirty state)
 	 */
-	void OnCodeNotebookPageClosed(wxAuiNotebookEvent& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	/**
 	 * When the app frame is closed, check to see if there are "dirty"

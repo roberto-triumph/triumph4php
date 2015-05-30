@@ -28,6 +28,7 @@
 #include <globals/Assets.h>
 #include <widgets/FilePickerValidatorClass.h>
 #include <widgets/Buttons.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <wx/wupdlock.h>
 #include <wx/stdpaths.h>

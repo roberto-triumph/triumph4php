@@ -1068,9 +1068,8 @@ void t4p::SqlBrowserViewClass::OnSqlDetectMenu(wxCommandEvent& event) {
 	Feature.DetectMetadata();
 }
 
-void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
-	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
-	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
+void t4p::SqlBrowserViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* contentWindow = event.GetCodeControl();
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1098,9 +1097,8 @@ void t4p::SqlBrowserViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& 
 	}
 }
 
-void t4p::SqlBrowserViewClass::OnContentNotebookPageClose(wxAuiNotebookEvent& event) {
-	t4p::NotebookClass* codeNotebook = (t4p::NotebookClass*) event.GetEventObject();
-	t4p::CodeControlClass* contentWindow = codeNotebook->GetCodeControl(event.GetSelection());
+void t4p::SqlBrowserViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
+	t4p::CodeControlClass* contentWindow = event.GetCodeControl();
 	if (contentWindow) {
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); i++) {
@@ -1682,8 +1680,8 @@ BEGIN_EVENT_TABLE(t4p::SqlBrowserViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_SQL + 1, t4p::SqlBrowserViewClass::OnSqlConnectionMenu)
 	EVT_MENU(t4p::MENU_SQL + 2, t4p::SqlBrowserViewClass::OnRun)
 	EVT_MENU(t4p::MENU_SQL + 3, t4p::SqlBrowserViewClass::OnSqlDetectMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::SqlBrowserViewClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, t4p::SqlBrowserViewClass::OnContentNotebookPageClose)
+	EVT_APP_FILE_PAGE_CHANGED(t4p::SqlBrowserViewClass::OnAppFilePageChanged)
+	EVT_APP_FILE_CLOSED(t4p::SqlBrowserViewClass::OnAppFileClosed)
 	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_TOOLS_NOTEBOOK, t4p::SqlBrowserViewClass::OnToolsNotebookPageClose)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_EXIT, t4p::SqlBrowserViewClass::OnAppExit)
 	EVT_APP_DB_TABLE_DATA_OPEN(t4p::SqlBrowserViewClass::OnCmdTableDataOpen)

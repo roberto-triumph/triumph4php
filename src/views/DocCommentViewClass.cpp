@@ -24,6 +24,7 @@
  */
 #include <views/DocCommentViewClass.h>
 #include <features/DocCommentFeatureClass.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <unicode/unistr.h>
 #include <wx/tokenzr.h>

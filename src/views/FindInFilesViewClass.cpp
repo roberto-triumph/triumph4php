@@ -31,6 +31,7 @@
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <widgets/DataViewGrid.h>
 #include <globals/Errors.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>

@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <views/RecentFilesViewClass.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 
 t4p::RecentFilesViewClass::RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature)

@@ -28,6 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <features/BookmarkFeatureClass.h>
 #include <globals/Events.h>
+#include <wx/stc/stc.h>
 
 namespace t4p {
 

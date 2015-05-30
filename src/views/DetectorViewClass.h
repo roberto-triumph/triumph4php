@@ -30,6 +30,7 @@
 #include <views/wxformbuilder/DetectorFeatureForms.h>
 #include <features/DetectorFeatureClass.h>
 #include <globals/UrlTagClass.h>
+#include <globals/Events.h>
 #include <wx/imaglist.h>
 
 namespace t4p {

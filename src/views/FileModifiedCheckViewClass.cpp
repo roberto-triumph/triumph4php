@@ -24,6 +24,7 @@
  */
 #include <views/FileModifiedCheckViewClass.h>
 #include <features/FileModifiedCheckFeatureClass.h>
+#include <code_control/CodeControlClass.h>
 #include <globals/Errors.h>
 #include <globals/Events.h>
 #include <Triumph.h>

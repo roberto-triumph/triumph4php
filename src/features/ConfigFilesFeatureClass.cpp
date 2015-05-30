@@ -25,6 +25,7 @@
 #include <features/ConfigFilesFeatureClass.h>
 #include <actions/ConfigTagDetectorActionClass.h>
 #include <globals/Number.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 
 t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass()

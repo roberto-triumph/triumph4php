@@ -33,6 +33,7 @@
 #include <widgets/ListWidget.h>
 #include <language/DbgpEventClass.h>
 #include <actions/DebuggerServerActionClass.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/valgen.h>
 
 const static int ID_PANEL_DEBUGGER = wxNewId();

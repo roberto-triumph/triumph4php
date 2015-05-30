@@ -30,6 +30,7 @@
 #include <views/wxformbuilder/TagFeatureForms.h>
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <widgets/GaugeDialogClass.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/string.h>
 
 namespace t4p {

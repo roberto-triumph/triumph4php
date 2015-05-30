@@ -27,6 +27,7 @@
 #include <main_frame/PreferencesClass.h>
 #include <Triumph.h>
 #include <wx/valgen.h>
+#include <wx/stc/stc.h>
 
 static int SciCommands[][2] = {
 

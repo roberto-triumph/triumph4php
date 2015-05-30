@@ -27,7 +27,6 @@
 
 #include <globals/ProjectClass.h>
 #include <main_frame/wxformbuilder/MainFrameForms.h>
-#include <widgets/NotebookClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
@@ -35,6 +34,7 @@
 #include <actions/SequenceClass.h>
 #include <wx/aui/aui.h>
 #include <wx/wizard.h>
+#include <wx/stc/stc.h>
 
 namespace t4p {
 
@@ -72,9 +72,9 @@ private:
 
 	void OnAppReady(wxCommandEvent& event);
 	
-	void OnCodeNotebookPageChanged(wxAuiNotebookEvent& event);
+	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 	
-	void OnCodeNotebookPageClosed(wxAuiNotebookEvent& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	void OnAppFileCreated(wxCommandEvent& event);
 

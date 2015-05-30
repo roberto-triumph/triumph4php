@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <views/FileWatcherViewClass.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/valgen.h>
 
 t4p::FileWatcherViewClass::FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature)

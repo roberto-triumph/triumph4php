@@ -25,6 +25,7 @@
 #include <views/FinderViewClass.h>
 #include <features/FinderFeatureClass.h>
 #include <globals/String.h>
+#include <code_control/CodeControlClass.h>
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <widgets/Buttons.h>

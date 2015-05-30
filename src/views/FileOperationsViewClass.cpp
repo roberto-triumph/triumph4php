@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <views/FileOperationsViewClass.h>
+#include <widgets/NotebookClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
@@ -255,14 +256,14 @@ void t4p::FileOperationsViewClass::SaveCurrentFile(wxCommandEvent& event) {
 	}
 }
 
-void t4p::FileOperationsViewClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
+void t4p::FileOperationsViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
 	UpdateStatusBar();
 
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
 
-		int newPage = event.GetSelection();
+		int newPage = notebook->GetPageIndex(event.GetCodeControl());
 		bool isPageModified = notebook->IsPageModified(newPage);
 		ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, isPageModified);
 		ToolBar->Refresh();
@@ -301,7 +302,7 @@ void t4p::FileOperationsViewClass::OnStatusBarTimer(wxTimerEvent& event) {
 }
 
 
-void t4p::FileOperationsViewClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::FileOperationsViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 
 	// in case all notebook tabs have been closed, we need to refresh the cursor position
 	UpdateStatusBar();
@@ -425,7 +426,7 @@ BEGIN_EVENT_TABLE(t4p::FileOperationsViewClass, t4p::FeatureViewClass)
 	EVT_TIMER(ID_STATUS_BAR_TIMER, t4p::FileOperationsViewClass::OnStatusBarTimer)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::FileOperationsViewClass::OnAppReady)
 
-	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::FileOperationsViewClass::OnCodeNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(t4p::ID_CODE_NOTEBOOK, t4p::FileOperationsViewClass::OnCodeNotebookPageClosed)
+	EVT_APP_FILE_PAGE_CHANGED(t4p::FileOperationsViewClass::OnAppFilePageChanged)
+	EVT_APP_FILE_CLOSED(t4p::FileOperationsViewClass::OnAppFileClosed)
 	EVT_APP_FRAME_CLOSE(t4p::FileOperationsViewClass::OnAppFrameClose)
 END_EVENT_TABLE()

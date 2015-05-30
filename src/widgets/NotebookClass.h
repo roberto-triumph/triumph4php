@@ -266,12 +266,12 @@ protected:
 	 */
 	void OnPageChanging(wxAuiNotebookEvent& event);
 
-private:
-	
 	/**
-	 * Creates the right-click context menu.
+	 * When a page is changed tell the rest of the app
 	 */
-	void CreateContextMenu();
+	void OnPageChanged(wxAuiNotebookEvent& event);
+
+private:
 	
 	/**
 	 * Find out all the open files that have changes that have not been saved.
@@ -310,11 +310,7 @@ private:
 	 * handler for the "close page" context menu
 	 */
 	void OnMenuClosePage(wxCommandEvent& event);
-		
-	/**
-	 * The context menu for handling right-click options
-	 */
-	wxMenu* ContextMenu;
+
 	
 	/**
 	 * image list for icons in each tab

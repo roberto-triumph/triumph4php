@@ -27,6 +27,8 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <globals/Number.h>
+#include <search/FinderClass.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>

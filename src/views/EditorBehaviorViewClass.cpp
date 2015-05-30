@@ -25,9 +25,12 @@
 #include <views/EditorBehaviorViewClass.h>
 #include <features/EditorBehaviorFeatureClass.h>
 #include <globals/Assets.h>
+#include <code_control/CodeControlClass.h>
+#include <widgets/NotebookClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <Triumph.h>
 #include <wx/valgen.h>
+#include <wx/stc/stc.h>
 
 static int ID_SUBMENU_TRANSFORM = wxNewId();
 static int ID_SUBMENU_SELECTION = wxNewId();

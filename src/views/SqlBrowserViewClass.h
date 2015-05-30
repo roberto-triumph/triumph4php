@@ -34,6 +34,7 @@
 #include <language/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <globals/Events.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/txtstrm.h>
 #include <vector>
 #include <unicode/unistr.h>
@@ -590,13 +591,13 @@ private:
 	 * tools notebook to show the results panel that was created with
 	 * the currently shown code control.
 	 */
-	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
+	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * will unlink any results panel that is linked to the code control
 	 * that is about to be closed.
 	 */
-	void OnContentNotebookPageClose(wxAuiNotebookEvent& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	/**
 	 * when a results panel is closed, kill the running query

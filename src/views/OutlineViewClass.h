@@ -79,12 +79,12 @@ private:
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
-	void OnContentNotebookPageChanged(wxAuiNotebookEvent& event);
+	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 	
 	/**
 	 * when a file is closed, remove it from the outline tree
 	 */
-	void OnContentNotebookPageClosed(wxAuiNotebookEvent& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	/**
 	 * This method will get called by the EVENT_APP_FILE_OPENED event is generated;

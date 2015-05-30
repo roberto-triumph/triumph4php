@@ -28,6 +28,7 @@
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <globals/TagList.h>
+#include <code_control/CodeControlClass.h>
 #include <language/TagParserClass.h>
 #include <globals/Sqlite.h>
 #include <globals/Number.h>
@@ -155,7 +156,7 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 	}
 }
 
-void t4p::OutlineViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
 	// only change the outline if the user is looking at the outline.  otherwise, it gets 
@@ -165,8 +166,7 @@ void t4p::OutlineViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& eve
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
 		SetFocusToOutlineWindow(outlineViewPanel);
 		
-		t4p::NotebookClass* notebook = (t4p::NotebookClass*)event.GetEventObject();
-		t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(event.GetSelection());
+		t4p::CodeControlClass* codeCtrl = event.GetCodeControl();
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<UnicodeString> searchStrings;
 			searchStrings.push_back(t4p::WxToIcu(codeCtrl->GetFileName()));
@@ -176,13 +176,11 @@ void t4p::OutlineViewClass::OnContentNotebookPageChanged(wxAuiNotebookEvent& eve
 	event.Skip();
 }
 
-void t4p::OutlineViewClass::OnContentNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::OutlineViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
 		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-		
-		t4p::NotebookClass* notebook = (t4p::NotebookClass*)event.GetEventObject();
-		CodeControlClass* codeCtrl = notebook->GetCodeControl(event.GetSelection());
+		CodeControlClass* codeCtrl = event.GetCodeControl();
 		if (codeCtrl) {
 			outlineViewPanel->RemoveFileFromOutline(codeCtrl->GetFileName());
 		}
@@ -980,9 +978,8 @@ void t4p::FileSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 
 BEGIN_EVENT_TABLE(t4p::OutlineViewClass, FeatureViewClass)
 	EVT_MENU(t4p::MENU_OUTLINE, t4p::OutlineViewClass::OnOutlineMenu)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::OutlineViewClass::OnContentNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, 
-		t4p::OutlineViewClass::OnContentNotebookPageClosed)
+	EVT_APP_FILE_PAGE_CHANGED(t4p::OutlineViewClass::OnAppFilePageChanged)
+	EVT_APP_FILE_CLOSED(t4p::OutlineViewClass::OnAppFileClosed)
 	EVT_APP_FILE_OPEN(t4p::OutlineViewClass::OnAppFileOpened)
 	EVENT_OUTLINE_SEARCH_COMPLETE(wxID_ANY, t4p::OutlineViewClass::OnTagSearchComplete)
 END_EVENT_TABLE()

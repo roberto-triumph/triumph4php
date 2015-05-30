@@ -197,6 +197,13 @@ extern const wxEventType EVENT_APP_FILE_OPENED;
 extern const wxEventType EVENT_APP_FILE_NEW;
 
 /**
+ * Notification that a code control tab has been "changed" (made active).  This
+ * is analogous to the EVT_AUINOTEBOOK_PAGE_CHANGED event, but EVENT_APP_FILE_CHANGED event
+ * will give you access to code control tabs. The event will be of type CodeControlEventClass
+ */
+extern const wxEventType EVENT_APP_FILE_PAGE_CHANGED;
+
+/**
  * This is an event that will tell a feature that a file has been saved.
  * The feature will get a pointer to the CodeControl that was saved.
  * From the code control; the event handler can get the file name
@@ -328,7 +335,12 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
+#define EVT_APP_FILE_PAGE_CHANGED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_PAGE_CHANGED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+
 #define EVT_APP_FILE_REVERTED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_REVERTED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
@@ -633,12 +645,6 @@ extern const long ID_TOOLS_NOTEBOOK;
  * events for the outline notebook
  */
 extern const long ID_OUTLINE_NOTEBOOK;
-
-/**
- * The window ID of the source code notebook. Use this to connect to the notebook
- * events for the code notebook
- */
-extern const long ID_CODE_NOTEBOOK;
 
 }
 

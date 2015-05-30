@@ -24,6 +24,7 @@
  */
 #include <views/SyntaxHighlightViewClass.h>
 #include <features/SyntaxHighlightFeatureClass.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <globals/CodeControlOptionsClass.h>
 #include <code_control/CodeControlStyles.h>

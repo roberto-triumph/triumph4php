@@ -33,6 +33,7 @@
 #include <globals/Errors.h>
 #include <globals/Number.h>
 #include <widgets/FileTypeImageList.h>
+#include <code_control/CodeControlClass.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
@@ -47,7 +48,6 @@ t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	, CodeControlOptions(NULL)
 	, Globals(NULL)
 	, EventSink(NULL)
-	, ContextMenu(NULL)
 	, NewPageNumber(1) 
 	, TabIndexRightClickEvent(-1) {
 	ImageList = NULL;
@@ -55,13 +55,25 @@ t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 
 	// when the notebook is empty we want to accept dragged files
 	SetDropTarget(new FileDropTargetClass(this));
+
+	Connect(wxEVT_AUINOTEBOOK_PAGE_CLOSE, wxAuiNotebookEventHandler(t4p::NotebookClass::SavePageIfModified), NULL, this);
+	Connect(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP, wxAuiNotebookEventHandler(t4p::NotebookClass::ShowContextMenu), NULL, this);
+
+	// using OnPageChanging instead of OnPageChanged because onPageChanged
+	// generates multiple events (not quite sure why yet)
+	Connect(wxEVT_AUINOTEBOOK_PAGE_CHANGING, wxAuiNotebookEventHandler(t4p::NotebookClass::OnPageChanging), NULL, this);
+	Connect(wxEVT_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler(t4p::NotebookClass::OnPageChanged), NULL, this);
 }
 
 t4p::NotebookClass::~NotebookClass() {
 
 	// delete the DropTarget that was created in the constructor
 	SetDropTarget(NULL);
-	delete ContextMenu;
+
+	Disconnect(wxEVT_AUINOTEBOOK_PAGE_CLOSE, wxAuiNotebookEventHandler(t4p::NotebookClass::SavePageIfModified), NULL, this);
+	Disconnect(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP, wxAuiNotebookEventHandler(t4p::NotebookClass::ShowContextMenu), NULL, this);
+	Disconnect(wxEVT_AUINOTEBOOK_PAGE_CHANGING, wxAuiNotebookEventHandler(t4p::NotebookClass::OnPageChanging), NULL, this);
+	Disconnect(wxEVT_AUINOTEBOOK_PAGE_CHANGED, wxAuiNotebookEventHandler(t4p::NotebookClass::OnPageChanged), NULL, this);
 }
 
 void t4p::NotebookClass::InitApp(t4p::CodeControlOptionsClass* options,
@@ -478,17 +490,11 @@ bool t4p::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modifiedPag
 
 void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	TabIndexRightClickEvent = event.GetSelection();
-	if (NULL == ContextMenu) {
-		CreateContextMenu();
-	}
-	PopupMenu(ContextMenu);
-	event.Skip();
-}
 
-void t4p::NotebookClass::CreateContextMenu() {
-	ContextMenu = new wxMenu;
-	ContextMenu->Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
-	ContextMenu->Append(ID_CLOSE_TAB, wxT("Close This Tab"));
+	wxMenu menu;
+	menu.Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
+	menu.Append(ID_CLOSE_TAB, wxT("Close This Tab"));
+	PopupMenu(&menu);
 }
 
 void t4p::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
@@ -659,6 +665,17 @@ void t4p::NotebookClass::OnPageChanging(wxAuiNotebookEvent& event) {
 	event.Skip();
 }
 
+void t4p::NotebookClass::OnPageChanged(wxAuiNotebookEvent& event) {
+	int selected = event.GetSelection();
+	t4p::CodeControlClass* codeCtrl = GetCodeControl(selected);
+	if (codeCtrl) {
+		t4p::CodeControlEventClass ctrlEvt(t4p::EVENT_APP_FILE_PAGE_CHANGED, codeCtrl);
+		EventSink->Publish(ctrlEvt);
+	}
+	event.Skip();
+}
+
+
 void t4p::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
 
 	// get the tab that was right clicked; the tab right menu event holds
@@ -684,14 +701,6 @@ bool t4p::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArraySt
 }
 
 BEGIN_EVENT_TABLE(t4p::NotebookClass, wxAuiNotebook)
-	EVT_AUINOTEBOOK_PAGE_CLOSE(t4p::ID_CODE_NOTEBOOK, 
-		t4p::NotebookClass::SavePageIfModified)
-	EVT_AUINOTEBOOK_TAB_RIGHT_UP(t4p::ID_CODE_NOTEBOOK,
-		t4p::NotebookClass::ShowContextMenu)
 	EVT_MENU(ID_CLOSE_ALL_TABS, t4p::NotebookClass::OnCloseAllPages)
 	EVT_MENU(ID_CLOSE_TAB, t4p::NotebookClass::OnMenuClosePage)
-
-	// using OnPageChanging instead of OnPageChanged because onPageChanged
-	// generates multiple events (not quite sure why yet)
-	EVT_AUINOTEBOOK_PAGE_CHANGING(t4p::ID_CODE_NOTEBOOK, t4p::NotebookClass::OnPageChanging)
 END_EVENT_TABLE()

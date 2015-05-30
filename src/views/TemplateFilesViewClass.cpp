@@ -31,6 +31,7 @@
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/SequenceClass.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 

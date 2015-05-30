@@ -28,12 +28,14 @@
 #include <Triumph.h>
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
+#include <widgets/NotebookClass.h>
 #include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <wx/filename.h>
 #include <wx/wfstream.h>
 #include <wx/aboutdlg.h>
+#include <wx/stc/stc.h>
 #include <vector>
 
 static int ID_TOOLBAR = wxNewId();
@@ -80,7 +82,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize,
 		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 
-	t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, t4p::ID_CODE_NOTEBOOK,
+	t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, wxID_ANY,
 		wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
 
@@ -474,10 +476,7 @@ void t4p::MainFrameClass::OnAnyWizardEvent(wxWizardEvent& event) {
 
 void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 	if (event.GetEventType() == wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED) {
-		if (t4p::ID_CODE_NOTEBOOK == event.GetId()) {
-
-		}
-		else if (t4p::ID_TOOLS_NOTEBOOK == event.GetId()) {
+		if (t4p::ID_TOOLS_NOTEBOOK == event.GetId()) {
 			size_t count = ToolsNotebook->GetPageCount();
 
 			// this event is received AFTER the page is removed
@@ -593,7 +592,7 @@ void t4p::AppEventListenerForFrameClass::OnAppReady(wxCommandEvent& event) {
 	MainFrame->PreferencesExternallyUpdated();
 }
 
-void t4p::AppEventListenerForFrameClass::OnCodeNotebookPageChanged(wxAuiNotebookEvent& event) {
+void t4p::AppEventListenerForFrameClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
 	MainFrame->UpdateTitleBar();
 }
 
@@ -601,7 +600,7 @@ void t4p::AppEventListenerForFrameClass::OnAppFileCreated(wxCommandEvent& event)
 	MainFrame->UpdateTitleBar();
 }
 
-void t4p::AppEventListenerForFrameClass::OnCodeNotebookPageClosed(wxAuiNotebookEvent& event) {
+void t4p::AppEventListenerForFrameClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	MainFrame->UpdateTitleBar();
 }
 
@@ -682,6 +681,6 @@ BEGIN_EVENT_TABLE(t4p::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_EXTERNALLY_UPDATED, t4p::AppEventListenerForFrameClass::OnPreferencesExternallyUpdated)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::AppEventListenerForFrameClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_APP_USER_ATTENTION, t4p::AppEventListenerForFrameClass::OnAppRequestUserAttention)
-	EVT_AUINOTEBOOK_PAGE_CHANGED(t4p::ID_CODE_NOTEBOOK, t4p::AppEventListenerForFrameClass::OnCodeNotebookPageChanged)
-	EVT_AUINOTEBOOK_PAGE_CLOSED(t4p::ID_CODE_NOTEBOOK, t4p::AppEventListenerForFrameClass::OnCodeNotebookPageClosed)
+	EVT_APP_FILE_PAGE_CHANGED(t4p::AppEventListenerForFrameClass::OnAppFilePageChanged)
+	EVT_APP_FILE_CLOSED(t4p::AppEventListenerForFrameClass::OnAppFileClosed)
 END_EVENT_TABLE()

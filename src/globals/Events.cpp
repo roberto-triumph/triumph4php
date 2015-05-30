@@ -173,6 +173,7 @@ const wxEventType t4p::EVENT_APP_EXIT = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_CREATED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_NEW = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_PAGE_CHANGED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_SAVED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_REVERTED = wxNewEventType();
@@ -197,5 +198,4 @@ const wxEventType t4p::EVENT_CMD_APP_USER_ATTENTION = wxNewEventType();
 
 const long t4p::ID_TOOLS_NOTEBOOK = wxNewId();
 const long t4p::ID_OUTLINE_NOTEBOOK = wxNewId();
-const long t4p::ID_CODE_NOTEBOOK = wxNewId();
 

@@ -26,6 +26,7 @@
 #include <actions/DebuggerServerActionClass.h>
 #include <globals/Errors.h>
 #include <globals/Number.h>
+#include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <istream>
 #include <string>
