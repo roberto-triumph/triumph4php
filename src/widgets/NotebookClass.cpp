@@ -145,7 +145,8 @@ void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookCla
 
 	src->RemovePage(pageIndex);
 
-	// remove the dirty indicator
+	// remove the dirty indicator, so that we get just the file name itself
+	// which is needed to determine the file type icon
 	if (fileName.EndsWith(wxT("*"))) {
 		fileName = fileName.SubString(0, fileName.size() - 2);
 	}
@@ -337,7 +338,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 	// each new page; we can no longer safely  freeze/thaw here because then thaw
 	// would be called n + 1 times and GTK does not like that.
 	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
+	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX && doFreeze) {
 		this->Freeze();
 	}
 	bool found = false;
@@ -393,7 +394,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			t4p::EditorLogError(t4p::ERR_FILE_TOO_LARGE, filename);
 		}
 	}
-	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT && doFreeze) {
+	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX && doFreeze) {
 		this->Thaw();
 	}
 }
@@ -406,13 +407,13 @@ void t4p::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
 	// each new page; we can no longer safely  freeze/thaw here because then thaw
 	// would be called n + 1 times and GTK does not like that.
 	wxPlatformInfo info;
-	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX) {
 		this->Freeze();
 	}
 	for (size_t i = 0; i < filenames.size(); ++i) {
 		LoadPage(filenames[i], false);
 	}
-	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+	if (info.GetOperatingSystemId() != wxOS_UNIX_LINUX) {
 		this->Thaw();
 	}
 }

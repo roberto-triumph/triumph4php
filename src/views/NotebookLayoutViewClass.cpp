@@ -26,6 +26,38 @@
 #include <widgets/NotebookClass.h>
 #include <Triumph.h>
 
+/**
+ * removes all but 1 of the code notebooks from the application.
+ * The code controls from the removed notebooks will be added to the
+ * remaining notebook.
+ *
+ * Note that the aui manager is not updated in this function, so that
+ * callers can continue to make changes to AUI panes before refreshing
+ * the manager.
+ *
+ * @param mainWindow
+ * @param auiManager
+ */
+static void RemoveExtraNotebooks(wxWindow* mainWindow, wxAuiManager* auiManager) {
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
+	if (notebooks.size() == 1) {
+		return;
+	}
+	t4p::NotebookClass* firstNotebook = notebooks[0];
+
+	for (size_t i = 1; i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		auiManager->DetachPane(notebook);
+
+		// move the code controls for this notebook to the
+		// first notebook
+		while (notebook->GetPageCount() > 0) {
+			t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(0);
+			firstNotebook->Adopt(codeCtrl, notebook);
+		}
+		notebook->Destroy();
+	}
+}
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
 : FeatureViewClass()
@@ -113,6 +145,8 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event) {
+	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
+
 	int columnCount = 1;
 	if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 4)) {
 		columnCount = 2;
@@ -148,6 +182,8 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateGrid(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
+	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
+
 	int rowCount = 1;
 	if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 2)) {
 		rowCount = 2;
@@ -180,24 +216,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookReset(wxCommandEvent& event) {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
-	if (notebooks.size() == 1) {
-		return;
-	}
-	t4p::NotebookClass* firstNotebook = notebooks[0];
-
-	for (size_t i = 1; i < notebooks.size(); i++) {
-		t4p::NotebookClass* notebook = notebooks[i];
-		AuiManager->DetachPane(notebook);
-
-		// move the code controls for this notebook to the
-		// first notebook
-		while (notebook->GetPageCount() > 0) {
-			t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(0);
-			firstNotebook->Adopt(codeCtrl, notebook);
-		}
-		notebook->Destroy();
-	}
+	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
 	AuiManager->Update();
 }
 
