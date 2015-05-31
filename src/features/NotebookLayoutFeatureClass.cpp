@@ -1,4 +1,4 @@
-#include "NotebookPaneViewClass.h"/**
+/**
  * This software is released under the terms of the MIT License
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,11 +22,9 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <views/NotebookPaneViewClass.h>
+#include <features/NotebookLayoutFeatureClass.h>
 
-t4p::NotebookPaneViewClass::NotebookPaneViewClass() 
-: FeatureViewClass() {
+t4p::NotebookLayoutFeatureClass::NotebookLayoutFeatureClass(t4p::AppClass& app)
+: FeatureClass(app) {
 
 }
-
-

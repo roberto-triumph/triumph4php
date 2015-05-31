@@ -30,8 +30,9 @@
  * This function depends on the fact that all notebook class
  * objects have the same window name (NotebookClass)
  *
- * @param aui the aui manager
- * @return
+ * @param mainWindow the main frame
+ * @return vector all of the code notebooks that are in the
+ *         main application frame
  */
 static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
 	std::vector<t4p::NotebookClass*> notebooks;
@@ -44,6 +45,52 @@ static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
 		}
 	}
 	return notebooks;
+}
+
+/**
+ * Returns the code control that has focus.
+ * @param mainWindow
+ * @return the code control that has focus, or NULL if focus is on
+ *         another window
+ */
+static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
+	t4p::CodeControlClass* codeCtrl = NULL;
+	wxWindow* focusWindow = wxWindow::FindFocus();
+	if (!focusWindow) {
+		return codeCtrl;
+	}
+
+	// we don't just want to cast since we don't know if the focused window
+	// is a code control. We find out if the focus is anywhere inside a
+	// notebook; either the notebook itself, or one of its tabs or borders.
+	// the focused window is in one of the code notebooks
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
+			codeCtrl = notebook->GetCurrentCodeControl();
+		}
+	}
+	return codeCtrl;
+}
+
+static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
+		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) {
+	bool found = false;
+	*codeCtrl = FindFocusedCodeControl(mainWindow);
+	if (!(*codeCtrl)) {
+		return found;
+	}
+
+	// get the notebook parent for the focused code control
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
+			*notebook = notebooks[i];
+			found = true;
+		}
+	}
+	return found;
 }
 
 t4p::FeatureViewClass::FeatureViewClass() 
@@ -212,25 +259,12 @@ bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return NULL;
-	}
-	return notebooks[0]->GetCurrentCodeControl();
+	return FindFocusedCodeControl(GetMainWindow());
 }
 
 bool t4p::FeatureViewClass::GetCurrentCodeControlWithNotebook(
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return false;
-	}
-	if (notebooks[0]->GetCurrentCodeControl()) {
-		*notebook = notebooks[0];
-		*codeCtrl = notebooks[0]->GetCurrentCodeControl();
-		return true;
-	}
-	return false;
+	return FindFocusedCodeControlWithNotebook(GetMainWindow(), codeCtrl, notebook);
 }
 
 wxWindow* t4p::FeatureViewClass::GetMainWindow() const {
@@ -251,84 +285,118 @@ wxString t4p::FeatureViewClass::GetSelectedText() const {
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& tabName, t4p::FileType type) const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return NULL;
+	t4p::NotebookClass* notebook = NULL;
+	t4p::CodeControlClass* codeCtrl = NULL;
+	t4p::CodeControlClass* newCtrl = NULL;
+	if (!GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
+
+		// as a last resort, add to the first notebook
+		std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+		if (!notebooks.empty()) {
+			notebook = notebooks[0];
+		}
 	}
-	notebooks[0]->AddTriumphPage(type);
-	if (!tabName.IsEmpty()) {
-		notebooks[0]->SetPageText(notebooks[0]->GetSelection(), tabName);
+	if (notebook) {
+		notebook->AddTriumphPage(type);
+		if (!tabName.IsEmpty()) {
+			notebook->SetPageText(notebook->GetSelection(), tabName);
+		}
+		newCtrl = notebook->GetCurrentCodeControl();
 	}
-	t4p::CodeControlClass* ctrl = notebooks[0]->GetCurrentCodeControl();
-	return ctrl;
+	return newCtrl;
 }
 
 void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
+
+	// is this file already loaded? if so, just set focus to it. need to look
+	// at all of the notebooks
+	t4p::CodeControlClass* existing = FindCodeControlAndSelect(fileName);
+	if (existing) {
 		return;
 	}
-	notebooks[0]->LoadPage(fileName);
+
+	// file is not open, open it now. put the new file in the notebook
+	// that currently has focus
+	t4p::NotebookClass* currentNotebook = NULL;
+	t4p::CodeControlClass* currentCode = NULL;
+	if (GetCurrentCodeControlWithNotebook(&currentCode, &currentNotebook)) {
+		currentNotebook->LoadPage(fileName);
+		return;
+	}
+
+	// as a final precaution, put the file in the first notebook
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (!notebooks.empty()) {
+		notebooks[0]->LoadPage(fileName);
+	}
 }
 
 std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
 	std::vector<t4p::CodeControlClass*> ctrls;
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return ctrls;
-	}
-	for (size_t i = 0; i < notebooks[0]->GetPageCount(); ++i) {
-		t4p::CodeControlClass* ctrl = notebooks[0]->GetCodeControl(i);
-		ctrls.push_back(ctrl);
+	for (size_t n = 0 ; n < notebooks.size(); ++n) {
+		t4p::NotebookClass* notebook = notebooks[n];
+		for (size_t p = 0; p < notebook->GetPageCount(); ++p) {
+			t4p::CodeControlClass* ctrl = notebook->GetCodeControl(p);
+			ctrls.push_back(ctrl);
+		}
 	}
 	return ctrls;
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return NULL;
+	t4p::CodeControlClass* code = NULL;
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		code = notebook->FindCodeControl(fullPath);
+		if (code) {
+			return code;
+		}
 	}
-	return notebooks[0]->FindCodeControl(fullPath);
+	return code;
 }
 
 std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		std::vector<wxString> empty;
-		return empty;
+	std::vector<wxString> allFiles;
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		std::vector<wxString> files = notebook->GetOpenedFiles();
+		allFiles.insert(allFiles.end(), files.begin(), files.end());
 	}
-	return notebooks[0]->GetOpenedFiles();
+	return allFiles;
 }
 
 wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
 	wxString ret;
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return ret;
-	}
-
-	int pos = notebooks[0]->GetPageIndex(codeCtrl);
-	if (pos >= 0) {
-		ret = notebooks[0]->GetPageText(pos);
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		int pos = notebook->GetPageIndex(codeCtrl);
+		if (pos != wxNOT_FOUND) {
+			ret = notebook->GetPageText(pos);
+			return ret;
+		}
 	}
 	return ret;
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return NULL;
-	}
-	t4p::CodeControlClass* codeCtrl = notebooks[0]->FindCodeControl(fullPath);
-	if (codeCtrl) {
-		int currentSelectionIndex = notebooks[0]->GetSelection();
-		int pageIndex = notebooks[0]->GetPageIndex(codeCtrl);
-		
-		// the bookmark may be in a page that is not active, need to
-		// swith notebook tabs if needed
-		if (pageIndex != currentSelectionIndex) {
-			notebooks[0]->SetSelection(pageIndex);
+	t4p::CodeControlClass* codeCtrl = NULL;
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		codeCtrl = notebook->FindCodeControl(fullPath);
+		if (codeCtrl) {
+			int currentSelectionIndex = notebook->GetSelection();
+			int pageIndex = notebook->GetPageIndex(codeCtrl);
+
+			// the bookmark may be in a page that is not active, need to
+			// swith notebook tabs if needed
+			if (pageIndex != currentSelectionIndex) {
+				notebook->SetSelection(pageIndex);
+			}
 		}
 	}
 	return codeCtrl;
@@ -336,8 +404,12 @@ t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxS
 
 void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
 	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.empty()) {
-		return;
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		int pageIndex = notebook->GetPageIndex(codeCtrl);
+		if (pageIndex != wxNOT_FOUND) {
+			notebook->DeletePage(pageIndex);
+			break;
+		}
 	}
-	notebooks[0]->DeletePage(notebooks[0]->GetPageIndex(codeCtrl));
 }

@@ -22,22 +22,46 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef FEATUREVIEWCLASS_H__
-#define FEATUREVIEWCLASS_H__
+#ifndef NOTEBOOKLAYOUTFEATUREVIEWCLASS_H__
+#define NOTEBOOKLAYOUTFEATUREVIEWCLASS_H__
+
+#include <views/FeatureViewClass.h>
+#include <features/FeatureClass.h>
+#include <features/NotebookLayoutFeatureClass.h>
+#include <wx/menu.h>
 
 namespace t4p {
 
 /**
- * The NotebookPaneFeatureClass view ...
+ * The NotebookLayoutViewClass view allows the user to create multiple
+ * notebooks.  This allows for the user to view files side-by-side in
+ * a vertical or horizontal manner.
  */
-class NotebookPaneFeatureClassViewClass : public t4p::FeatureViewClass {
+class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 
 public:
 
-    NotebookPaneFeatureClassViewClass();
+	NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
+
+	void AddViewMenuItems(wxMenu* viewMenu);
+
+private:
+
+	/**
+	 * handler for the notebook menu event
+	 * @param event
+	 */
+	void OnNotebookMenu(wxCommandEvent& event);
+
+	/**
+	 * To get access to the globals; needed by the notebook.
+	 */
+	t4p::NotebookLayoutFeatureClass& Feature;
+
+	DECLARE_EVENT_TABLE()
 };
 
 }
 
 #endif
-
+

@@ -784,6 +784,12 @@ private:
 	 */
 	void PropagateToEventSink(wxStyledTextEvent& event);
 
+	/**
+	 * When a new code control has been focused on propagate it
+	 * to the event sink.
+	 */
+	void OnSetFocus(wxFocusEvent& event);
+
 	/*
 	* The file that was loaded.
 	*/

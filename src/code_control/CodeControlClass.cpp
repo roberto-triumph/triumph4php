@@ -1331,6 +1331,12 @@ void t4p::CodeControlClass::PropagateToEventSink(wxStyledTextEvent& event) {
 	EventSink.Publish(event);
 }
 
+void t4p::CodeControlClass::OnSetFocus(wxFocusEvent& event) {
+	t4p::CodeControlEventClass changedEvt(t4p::EVENT_APP_FILE_PAGE_CHANGED, this);
+	EventSink.Publish(changedEvt);
+	event.Skip();
+}
+
 const wxEventType t4p::EVT_MOTION_ALT = wxNewEventType();
 
 BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
@@ -1349,4 +1355,5 @@ BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
 	EVT_STC_CALLTIP_CLICK(wxID_ANY, t4p::CodeControlClass::PropagateToEventSink)
 	EVT_STC_AUTOCOMP_SELECTION(wxID_ANY, t4p::CodeControlClass::PropagateToEventSink)
 	EVT_TIMER(wxID_ANY, t4p::CodeControlClass::OnTimerComplete)
+	EVT_SET_FOCUS(t4p::CodeControlClass::OnSetFocus)
 END_EVENT_TABLE()

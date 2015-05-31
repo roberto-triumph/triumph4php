@@ -90,6 +90,8 @@
 #include <views/EditorMessagesViewClass.h>
 #include <features/FileOperationsFeatureClass.h>
 #include <views/FileOperationsViewClass.h>
+#include <features/NotebookLayoutFeatureClass.h>
+#include <views/NotebookLayoutViewClass.h>
 
 t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 : Features()
@@ -125,6 +127,7 @@ t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 , Debugger(NULL)
 , FileCabinet(NULL)
 , PhpCodeCompletion(NULL)
+, NotebookLayout(NULL)
 , Test(NULL) {
 
 }
@@ -170,6 +173,7 @@ void t4p::FeatureFactoryClass::DeleteFeatures() {
 	Debugger = NULL;
 	FileCabinet = NULL;
 	PhpCodeCompletion = NULL;
+	NotebookLayout = NULL;
 	Test = NULL;
 }
 
@@ -245,6 +249,8 @@ bool t4p::FeatureFactoryClass::CreateFeatures() {
 	Features.push_back(FileCabinet);
 	PhpCodeCompletion = new t4p::PhpCodeCompletionFeatureClass(App);
 	Features.push_back(PhpCodeCompletion);
+	NotebookLayout = new t4p::NotebookLayoutFeatureClass(App);
+	Features.push_back(NotebookLayout);
 #if T4P_USE_TEST_FEATURE
 	Test = new t4p::TestFeatureClass(App);
 	Features.push_back(Test);
@@ -293,6 +299,7 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	FeatureViews.push_back(new t4p::DebuggerViewClass(*Debugger));
 	FeatureViews.push_back(new t4p::FileCabinetViewClass(*FileCabinet));
 	FeatureViews.push_back(new t4p::PhpCodeCompletionViewClass(*PhpCodeCompletion));
+	FeatureViews.push_back(new t4p::NotebookLayoutViewClass(*NotebookLayout));
 #if T4P_USE_TEST_FEATURE
 	FeatureViews.push_back(new t4p::TestViewClass(*Test));
 #endif

@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef T4P_FeatureFactoryClass_H__
-#define T4P_FeatureFactoryClass_H__
+#ifndef T4P_FEATUREFACTORYCLASS_H__
+#define T4P_FEATUREFACTORYCLASS_H__
 
 #include <vector>
 
@@ -78,7 +78,7 @@ class FileCabinetFeatureClass;
 class PhpCodeCompletionFeatureClass;
 class TestFeatureClass;
 class FileOperationsFeatureClass;
-
+class NotebookLayoutFeatureClass;
 
 class FeatureFactoryClass {
 
@@ -151,6 +151,7 @@ public:
 	t4p::DebuggerFeatureClass*             Debugger;
 	t4p::FileCabinetFeatureClass*          FileCabinet;
 	t4p::PhpCodeCompletionFeatureClass*    PhpCodeCompletion;
+	t4p::NotebookLayoutFeatureClass*       NotebookLayout;
 	t4p::TestFeatureClass*                 Test;
 
 

@@ -22,22 +22,25 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef FEATUREVIEWCLASS_H__
-#define FEATUREVIEWCLASS_H__
+#ifndef NOTEBOOKLAYOUTFEATURECLASS_H__
+#define NOTEBOOKLAYOUTFEATURECLASS_H__
+
+#include <features/FeatureClass.h>
 
 namespace t4p {
 
 /**
- * The NotebookPaneViewClass view ...
+ * The NotebookLayoutFeatureClass gives a view access to
+ * the application.
  */
-class NotebookPaneViewClassViewClass : public t4p::FeatureViewClass {
+class NotebookLayoutFeatureClass : public t4p::FeatureClass {
 
 public:
 
-    NotebookPaneViewClassViewClass();
+    NotebookLayoutFeatureClass(t4p::AppClass& app);
 };
 
 }
 
 #endif
-
+

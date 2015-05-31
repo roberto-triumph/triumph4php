@@ -46,8 +46,9 @@ static int ID_SEQUENCE_GAUGE = wxNewId();
  * This function depends on the fact that all notebook class
  * objects have the same window name (NotebookClass)
  *
- * @param aui the aui manager
- * @return
+ * @param mainWindow the main frame
+ * @return vector all of the code notebooks that are in the
+ *         main application frame
  */
 static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
 	std::vector<t4p::NotebookClass*> notebooks;
@@ -60,6 +61,52 @@ static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
 		}
 	}
 	return notebooks;
+}
+
+/**
+ * Returns the code control that has focus.
+ * @param mainWindow
+ * @return the code control that has focus, or NULL if focus is on
+ *         another window
+ */
+static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
+	t4p::CodeControlClass* codeCtrl = NULL;
+	wxWindow* focusWindow = wxWindow::FindFocus();
+	if (!focusWindow) {
+		return codeCtrl;
+	}
+
+	// we don't just want to cast since we don't know if the focused window
+	// is a code control. We find out if the focus is anywhere inside a
+	// notebook; either the notebook itself, or one of its tabs or borders.
+	// the focused window is in one of the code notebooks
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
+			codeCtrl = notebook->GetCurrentCodeControl();
+		}
+	}
+	return codeCtrl;
+}
+
+static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
+		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) {
+	bool found = false;
+	*codeCtrl = FindFocusedCodeControl(mainWindow);
+	if (!(*codeCtrl)) {
+		return found;
+	}
+
+	// get the notebook parent for the focused code control
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	for (size_t i = 0; i < notebooks.size(); ++i) {
+		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
+			*notebook = notebooks[i];
+			found = true;
+		}
+	}
+	return found;
 }
 
 t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& featureViews,
@@ -106,9 +153,9 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
 	AuiManager.AddPane(codeNotebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
-		).PaneBorder(false).Gripper(false).Floatable(false).Resizable(true));
+		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
-		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(1));
+		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(0));
 	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Name(wxT("outline")).Left().Caption(
         _("Outlines")).Floatable(false).MinSize(260, -1).Hide());
 
@@ -417,14 +464,8 @@ void t4p::MainFrameClass::RealizeToolbar() {
 }
 
 void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
-
-	// TODO: does not work with multiple notebooks
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
-	if (notebooks.empty()) {
-		return;
-	}
-	CodeControlClass* codeWindow = notebooks[0]->GetCurrentCodeControl();
-
+	CodeControlClass* codeWindow = FindFocusedCodeControl(this);
+	
 	// only show the user if and only if
 	// user clicked inside of the code control
 	if (codeWindow != NULL && event.GetEventObject() == codeWindow) {
@@ -494,9 +535,43 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 				AuiManager.Update();
 			}
 		}
+		else {
+			// this is a code notebook
+			// for code notebooks; we want to keep 1, but if the user
+			// removes pages from the 2-N notebook, then we kill the
+			// empty notebook
+			std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+			wxAuiNotebook* codeNotebook = wxDynamicCast(event.GetEventObject(), wxAuiNotebook);
+			if (notebooks.size() > 1 && codeNotebook) {
+				size_t count = codeNotebook->GetPageCount();
+				if (count <= 0) {
+					AuiManager.DetachPane(codeNotebook);
+
+					// don't delete now; wait until events are processed
+					CallAfter(&t4p::MainFrameClass::DeleteEmptyCodeNotebooks);
+				}
+			}
+		}
 	}
 	App.EventSink.Publish(event);
 	event.Skip();
+}
+
+void t4p::MainFrameClass::DeleteEmptyCodeNotebooks() {
+
+	// we want to keep 1 code notebook, even if empty
+	std::vector<t4p:: NotebookClass*> notebooks = CodeNotebooks(this);
+	std::vector<t4p:: NotebookClass*>::iterator it = notebooks.begin();
+	while (it != notebooks.end() && notebooks.size() > 1) {
+		if ((*it)->GetPageCount() <= 0) {
+			(*it)->Destroy();
+			it = notebooks.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+	AuiManager.Update();
 }
 
 void t4p::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
@@ -510,24 +585,19 @@ void t4p::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 }
 
 void t4p::MainFrameClass::UpdateTitleBar() {
-
-	// TODO: does not work with multiple notebooks
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
-	if (notebooks.empty()) {
+	t4p::CodeControlClass* codeControl = NULL;
+	t4p::NotebookClass* notebook = NULL;
+	if (!FindFocusedCodeControlWithNotebook(this, &codeControl, &notebook)) {
 		SetTitle(_("Triumph4PHP"));
 		return;
 	}
+	wxString fileName = codeControl->GetFileName();
+	if (fileName.IsEmpty()) {
 
-	t4p::CodeControlClass* codeControl = notebooks[0]->GetCurrentCodeControl();
-	if (codeControl) {
-		wxString fileName = codeControl->GetFileName();
-		if (fileName.IsEmpty()) {
-
-			// file name empty means this is a new file, use the tab text
-			fileName = notebooks[0]->GetPageText(notebooks[0]->GetPageIndex(codeControl));
-		}
-		SetTitle(_("Triumph4PHP: ") + fileName);
+		// file name empty means this is a new file, use the tab text
+		fileName = notebook->GetPageText(notebook->GetPageIndex(codeControl));
 	}
+	SetTitle(_("Triumph4PHP: ") + fileName);
 }
 
 void t4p::MainFrameClass::OnSequenceStart(wxCommandEvent& event) {
