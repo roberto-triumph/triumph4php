@@ -42,28 +42,6 @@ static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();
 
 /**
- * Fetch the code notebooks that are part of the main frame.
- * This function depends on the fact that all notebook class
- * objects have the same window name (NotebookClass)
- *
- * @param mainWindow the main frame
- * @return vector all of the code notebooks that are in the
- *         main application frame
- */
-static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
-	std::vector<t4p::NotebookClass*> notebooks;
-	wxWindowList& children = mainWindow->GetChildren();
-	wxWindowList::iterator it;
-	for (it = children.begin(); it != children.end(); ++it) {
-		wxWindow* child = *it;
-		if (child->GetName() == wxT("NotebookClass")) {
-			notebooks.push_back((t4p::NotebookClass*)child);
-		}
-	}
-	return notebooks;
-}
-
-/**
  * Returns the code control that has focus.
  * @param mainWindow
  * @return the code control that has focus, or NULL if focus is on
@@ -80,7 +58,7 @@ static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
 	// is a code control. We find out if the focus is anywhere inside a
 	// notebook; either the notebook itself, or one of its tabs or borders.
 	// the focused window is in one of the code notebooks
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
@@ -99,7 +77,7 @@ static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
 	}
 
 	// get the notebook parent for the focused code control
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
 			*notebook = notebooks[i];
@@ -217,7 +195,7 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 }
 
 void t4p::MainFrameClass::CreateNewCodeCtrl() {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
 	if (!notebooks.empty()) {
 		notebooks[0]->AddTriumphPage(t4p::FILE_TYPE_PHP);
 	}
@@ -540,7 +518,7 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 			// for code notebooks; we want to keep 1, but if the user
 			// removes pages from the 2-N notebook, then we kill the
 			// empty notebook
-			std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(this);
+			std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
 			wxAuiNotebook* codeNotebook = wxDynamicCast(event.GetEventObject(), wxAuiNotebook);
 			if (notebooks.size() > 1 && codeNotebook) {
 				size_t count = codeNotebook->GetPageCount();
@@ -560,7 +538,7 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 void t4p::MainFrameClass::DeleteEmptyCodeNotebooks() {
 
 	// we want to keep 1 code notebook, even if empty
-	std::vector<t4p:: NotebookClass*> notebooks = CodeNotebooks(this);
+	std::vector<t4p:: NotebookClass*> notebooks = t4p::CodeNotebooks(this);
 	std::vector<t4p:: NotebookClass*>::iterator it = notebooks.begin();
 	while (it != notebooks.end() && notebooks.size() > 1) {
 		if ((*it)->GetPageCount() <= 0) {

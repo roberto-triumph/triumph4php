@@ -238,7 +238,17 @@ public:
 	 * @return vector<wxString>
 	 */
 	std::vector<wxString> GetOpenedFiles() const;
-	
+
+	/**
+	 * Adopts the given code control into this notebook. After a call to
+	 * this method, codeCtrl will be in this notebook and it will be removed
+	 * from src
+	 *
+	 * @param codeCtrl the page to remove from src and into this
+	 * @param src the parent of codeCtrl
+	 */
+	void Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookClass* src);
+
 protected:
 	
 	/**
@@ -319,9 +329,10 @@ private:
 	wxImageList* ImageList;
 		
 	/**
-	 * To give a friendly number to new files. 
+	 * To give a friendly number to new files. This is shared
+	 * among all notebooks.
 	 */
-	int NewPageNumber;	
+	static int NewPageNumber;
 
 	/**
 	 * the tab index that was last right-clicked on
@@ -356,6 +367,22 @@ private:
 
 	NotebookClass* Notebook;
 };
+
+/**
+ * Fetch the code notebooks that are part of the main frame.
+ * This function depends on the fact that all notebook class
+ * objects have the same window name (NotebookClass)
+ *
+ * Be very careful with
+ * these pointers, as the user can close notebooks at any time
+ * and the pointers will be deleted.  You should not store
+ * the pointers at all.
+ *
+ * @param mainWindow the main frame
+ * @return vector all of the code notebooks that are in the
+ *         main application frame.
+ */
+std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow);
 
 }
 #endif /*__T4P_NOTEBOOKCLASS_H_*/

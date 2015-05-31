@@ -49,9 +49,35 @@ private:
 
 	/**
 	 * handler for the notebook menu event
-	 * @param event
 	 */
 	void OnNotebookMenu(wxCommandEvent& event);
+
+	/**
+	 * Create notebooks as 2, or 3 columns
+	 */
+	void OnNotebookCreateColumns(wxCommandEvent& event);
+
+	/**
+	 * Create notebooks as 2 or 3 rows
+	 */
+	void OnNotebookCreateRows(wxCommandEvent& event);
+
+	/**
+	 * Create notebooks as 2x2, or 3x2, or 2x3 grid
+	 */
+	void OnNotebookCreateGrid(wxCommandEvent& event);
+
+
+	/**
+	 * Create a single notebook
+	 */
+	void OnNotebookReset(wxCommandEvent& event);
+
+	/**
+	 * @return NotebookClass already initialized with the App
+	 *         data structures
+	 */
+	t4p::NotebookClass* NewNotebook();
 
 	/**
 	 * To get access to the globals; needed by the notebook.

@@ -42,13 +42,27 @@
 int ID_CLOSE_ALL_TABS = wxNewId();
 int ID_CLOSE_TAB = wxNewId();
 
+std::vector<t4p::NotebookClass*> t4p::CodeNotebooks(wxWindow* mainWindow) {
+	std::vector<t4p::NotebookClass*> notebooks;
+	wxWindowList& children = mainWindow->GetChildren();
+	wxWindowList::iterator it;
+	for (it = children.begin(); it != children.end(); ++it) {
+		wxWindow* child = *it;
+		if (child->GetName() == wxT("NotebookClass")) {
+			notebooks.push_back((t4p::NotebookClass*)child);
+		}
+	}
+	return notebooks;
+}
+
+int t4p::NotebookClass::NewPageNumber = 1;
+
 t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
 	, Globals(NULL)
 	, EventSink(NULL)
-	, NewPageNumber(1) 
 	, TabIndexRightClickEvent(-1) {
 	ImageList = NULL;
 	SetName(name);
@@ -117,6 +131,28 @@ t4p::CodeControlClass* t4p::NotebookClass::FindCodeControl(const wxString& fullP
 
 t4p::CodeControlClass* t4p::NotebookClass::GetCurrentCodeControl() const {
 	return GetCodeControl(GetSelection());
+}
+
+void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookClass* src) {
+	int pageIndex = src->GetPageIndex(codeCtrl);
+	if (pageIndex == wxNOT_FOUND) {
+		return;
+	}
+
+	wxWindow* tab = src->GetPage(pageIndex);
+	wxString tabName = src->GetPageText(pageIndex);
+	wxString fileName = src->GetPageText(pageIndex);
+
+	src->RemovePage(pageIndex);
+
+	// remove the dirty indicator
+	if (fileName.EndsWith(wxT("*"))) {
+		fileName = fileName.SubString(0, fileName.size() - 2);
+	}
+
+	// GetPageImage is not implemented in wxAuiNotebook
+	int tabImageId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(fileName));
+	AddPage(tab, tabName, tabImageId);
 }
 
 void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {

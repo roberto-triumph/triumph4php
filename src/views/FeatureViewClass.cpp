@@ -26,28 +26,6 @@
 #include <widgets/NotebookClass.h>
 
 /**
- * Fetch the code notebooks that are part of the main windows.
- * This function depends on the fact that all notebook class
- * objects have the same window name (NotebookClass)
- *
- * @param mainWindow the main frame
- * @return vector all of the code notebooks that are in the
- *         main application frame
- */
-static std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow) {
-	std::vector<t4p::NotebookClass*> notebooks;
-	wxWindowList& children = mainWindow->GetChildren();
-	wxWindowList::iterator it;
-	for (it = children.begin(); it != children.end(); ++it) {
-		wxWindow* child = *it;
-		if (child->GetName() == wxT("NotebookClass")) {
-			notebooks.push_back((t4p::NotebookClass*)child);
-		}
-	}
-	return notebooks;
-}
-
-/**
  * Returns the code control that has focus.
  * @param mainWindow
  * @return the code control that has focus, or NULL if focus is on
@@ -64,7 +42,7 @@ static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
 	// is a code control. We find out if the focus is anywhere inside a
 	// notebook; either the notebook itself, or one of its tabs or borders.
 	// the focused window is in one of the code notebooks
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
@@ -83,7 +61,7 @@ static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
 	}
 
 	// get the notebook parent for the focused code control
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
 			*notebook = notebooks[i];
@@ -291,7 +269,7 @@ t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& 
 	if (!GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
 
 		// as a last resort, add to the first notebook
-		std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+		std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 		if (!notebooks.empty()) {
 			notebook = notebooks[0];
 		}
@@ -325,7 +303,7 @@ void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
 	}
 
 	// as a final precaution, put the file in the first notebook
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	if (!notebooks.empty()) {
 		notebooks[0]->LoadPage(fileName);
 	}
@@ -333,7 +311,7 @@ void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
 
 std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
 	std::vector<t4p::CodeControlClass*> ctrls;
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	for (size_t n = 0 ; n < notebooks.size(); ++n) {
 		t4p::NotebookClass* notebook = notebooks[n];
 		for (size_t p = 0; p < notebook->GetPageCount(); ++p) {
@@ -345,7 +323,7 @@ std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() con
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	t4p::CodeControlClass* code = NULL;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -358,7 +336,7 @@ t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fu
 }
 
 std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	std::vector<wxString> allFiles;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -370,7 +348,7 @@ std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
 
 wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
 	wxString ret;
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int pos = notebook->GetPageIndex(codeCtrl);
@@ -383,7 +361,7 @@ wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	t4p::CodeControlClass* codeCtrl = NULL;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -403,7 +381,7 @@ t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxS
 }
 
 void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int pageIndex = notebook->GetPageIndex(codeCtrl);
