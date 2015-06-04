@@ -217,6 +217,19 @@ bool t4p::FeatureViewClass::AddToolsWindow(wxWindow* window, wxString tabName, w
 	if (ToolsNotebook->AddPage(window, tabName, true, bitmap)) {
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(ToolsNotebook).Show();
+			
+			// there may be code notebooks may be in the bottom dock; we want the tools
+			// to be at the bottom-most position; we need to calculate the "layer"
+			int layer = 0;
+			wxAuiPaneInfoArray infos = AuiManager->GetAllPanes();
+			for (size_t i = 0; i < infos.size(); i++) {
+				if (infos[i].dock_direction == wxAUI_DOCK_BOTTOM && infos[i].dock_layer > layer) {
+					layer = infos[i].dock_layer;
+				}
+			}
+			if (layer > 0) {
+				AuiManager->GetPane(ToolsNotebook).Layer(layer + 1);
+			}
 			AuiManager->Update();
 		}
 		return true;

@@ -60,6 +60,12 @@ public:
 	 * This class will NOT own this pointer.
 	 */
 	GlobalsClass* Globals;
+	
+	/**
+	 * This object is used to get the preferences
+	 * This class will NOT own this pointer.
+	 */
+	PreferencesClass* Preferences;
 
 	/**
 	 * This object will be used to publish app events. When an editor tab is closed;
@@ -261,6 +267,20 @@ public:
 	 * @param src the parent of codeCtrl
 	 */
 	void Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookClass* src);
+	
+	/**
+	 * Creates a new notebook and moves the currently selected tab
+	 * into the newly created notebook. The new notebook is
+	 * created in the same row as this notebook.
+	 */
+	void SplitHorizontally();
+	
+	/**
+	 * Creates a new notebook and moves the currently selected tab
+	 * into the newly created notebook. The new notebook is
+	 * created in the same column as this notebook.
+	 */
+	void SplitVertically();
 
 protected:
 	
@@ -333,7 +353,12 @@ private:
 	 * handler for the "close page" context menu
 	 */
 	void OnMenuClosePage(wxCommandEvent& event);
-
+	
+	/**
+	 * handler for the "split horizontally" and "split vertically" 
+	 * context menu
+	 */
+	void OnMenuSplit(wxCommandEvent& event);
 	
 	/**
 	 * image list for icons in each tab

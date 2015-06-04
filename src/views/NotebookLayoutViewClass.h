@@ -35,7 +35,10 @@ namespace t4p {
 /**
  * The NotebookLayoutViewClass view allows the user to create multiple
  * notebooks.  This allows for the user to view files side-by-side in
- * a vertical or horizontal manner.
+ * a vertical or horizontal manner. The user is able to quiickly
+ * create 2 - 3 columns, or 2 - 3 rows of notebooks. The user can
+ * also split a notebook at any time.
+ * 
  */
 class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 

@@ -88,80 +88,30 @@ void t4p::NotebookLayoutViewClass::AddViewMenuItems(wxMenu* viewMenu) {
 void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 	t4p::NotebookClass* currentNotebook = NULL;
 	t4p::CodeControlClass* codeCtrl = NULL;
-	wxSize newNotebookSize(400, 400);
-	int row = 0;
-	int position = 0;
-	int layer = 0;
-	int insertLevel = wxAUI_INSERT_PANE;
-	int direction = wxAUI_DOCK_CENTER;
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
-		newNotebookSize = currentNotebook->GetSize();
-
-		wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(currentNotebook);
-		row = currentNotebookInfo.dock_row;
-		position = currentNotebookInfo.dock_pos;
-		layer = currentNotebookInfo.dock_layer;
-		direction =currentNotebookInfo.dock_direction;
 		if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 0)) {
 
 			// splitting horizontally
-			// if we are splitting the center notebook, then
-			// we split horizontally by putting the new notebook
-			// in a new dock position (bottom)
-			if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
-				direction = wxAUI_DOCK_BOTTOM;
-			}
-			else {
-				position++;
-			}
-			newNotebookSize.Scale(1, 0.5);
+			currentNotebook->SplitHorizontally();
 		}
 		else if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 1)) {
 
 			// splitting vertically
-			// if we are splitting the center notebook, then
-			// we split vertically by putting the new notebook
-			// in a new dock position (right)
-			if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
-				direction = wxAUI_DOCK_RIGHT;
-			}
-			else {
-				row++;
-				insertLevel = wxAUI_INSERT_ROW;
-			}
-			newNotebookSize.Scale(0.5, 1);
+			currentNotebook->SplitVertically();
 		}
 	}
-
-	t4p::NotebookClass* newNotebook = NewNotebook();
-	newNotebook->SetSize(newNotebookSize);
-	newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-	AuiManager->InsertPane(newNotebook,
-		wxAuiPaneInfo()
-			.Layer(layer).Row(row).Position(position)
-			.Direction(direction)
-			.Gripper(false).Resizable(true).Floatable(false)
-			.Resizable(true).PaneBorder(false).CaptionVisible(false)
-			.CloseButton(false),
-		insertLevel
-	);
-	
-	// when there are more than 2 notebooks, given them names so
-	// that the user can tell them apart (for "moving tabs" purposes)
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
-	if (notebooks.size() > 2) {
-		for (size_t i = 0; i < notebooks.size(); i++) {
-			wxAuiPaneInfo& info = AuiManager->GetPane(notebooks[i]);
-			info.Name(wxString::Format("Notebook %ld", i + 1));
-			info.Caption(wxString::Format("Notebook %ld", i + 1));
-			info.CaptionVisible(true);
-		}
-	}
-
-	AuiManager->Update();
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event) {
+	
+	//
+	// Implementation notes:
+	// rows are created by using AUI's docking and layers
+	// notebooks are placed in the right dock; each
+	// notebook in its own layer so that each notebook
+	// takes up an entire column.
+	//
+	
 	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
 
 	int columnCount = 1;
@@ -182,7 +132,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	wxSize newNotebookSize(400, 400);
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
-		wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(currentNotebook);
 		newNotebookSize.Scale(1.0 / columnCount, 1);
 	}
 
@@ -218,6 +167,14 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateGrid(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
+	
+	//
+	// Implementation notes:
+	// rows are created by using AUI's docking and layers
+	// notebooks are placed in the bottom dock; each
+	// notebook in its own layer so that each notebook
+	// takes up an entire row.
+	//
 	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
 
 	int rowCount = 1;
@@ -238,7 +195,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	wxSize newNotebookSize(400, 400);
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
-		wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(currentNotebook);
 		newNotebookSize.Scale(1, 1.0 / rowCount);
 	}
 
@@ -276,7 +232,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookReset(wxCommandEvent& event) {
 }
 
 t4p::NotebookClass* t4p::NotebookLayoutViewClass::NewNotebook() {
-		t4p::NotebookClass* newNotebook = new t4p::NotebookClass(
+	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(
 		GetMainWindow(),
 		wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS |
