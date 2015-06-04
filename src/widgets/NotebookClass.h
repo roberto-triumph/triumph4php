@@ -70,6 +70,12 @@ public:
 	EventSinkClass* EventSink;
 	
 	/**
+	 * The AUI manager, used to get the notebook captions. This class will
+	 * not own this pointer.
+	 */
+	wxAuiManager* AuiManager;
+	
+	/**
 	 * Constructor. Parent is needed, all others are optional.
 	 */
 	NotebookClass(wxWindow* parent, wxWindowID id = wxID_ANY, 
@@ -88,11 +94,13 @@ public:
 	 * @param preferences
 	 * @param globals
 	 * @param eventSink
+	 * @param auiManager
 	 */
 	void InitApp(t4p::CodeControlOptionsClass* options,
 		t4p::PreferencesClass* preferences,
 		t4p::GlobalsClass* globals,
-		t4p::EventSinkClass* eventSink);
+		t4p::EventSinkClass* eventSink,
+		wxAuiManager* auiManager);
 
 	/**
 	 * Changes the text of the page tab to mark it having changes that have 
@@ -234,6 +242,11 @@ public:
 	void CloseCurrentPage();
 	
 	/**
+	 * closes the given tab index; prompting to save the file if file is dirty
+	 */
+	void ClosePage(int index);
+	
+	/**
 	 * Return the full paths of the file names
 	 * @return vector<wxString>
 	 */
@@ -270,6 +283,11 @@ protected:
 	 * Handle the 'Close All Tabs' event
 	 */
 	void OnCloseAllPages(wxCommandEvent& event);
+	
+	/**
+	 * Handle the 'Move This Tab To Notebook ...' event
+	 */
+	void OnMovePage(wxCommandEvent& event);
 
 	/**
 	 * When a page is changed; enable/disable its tool tips
@@ -310,11 +328,6 @@ private:
 	 * will use the close source code event to re-trigger project indexing.
 	 */
 	void OnNotebookPageClose(wxAuiNotebookEvent& evt);
-
-	/**
-	 * closes the given tab index; prompting to save the file if file is dirty
-	 */
-	void ClosePage(int index);
 
 	/**
 	 * handler for the "close page" context menu

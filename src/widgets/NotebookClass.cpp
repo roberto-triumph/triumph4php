@@ -39,8 +39,14 @@
 #include <wx/file.h>
 #include <wx/wupdlock.h>
 
-int ID_CLOSE_ALL_TABS = wxNewId();
-int ID_CLOSE_TAB = wxNewId();
+static const int ID_CLOSE_ALL_TABS = wxNewId();
+static const int ID_CLOSE_TAB = wxNewId();
+static const int ID_MOVE_TAB_TO_NOTEBOOK_1 = wxNewId();
+static const int ID_MOVE_TAB_TO_NOTEBOOK_2 = wxNewId();
+static const int ID_MOVE_TAB_TO_NOTEBOOK_3 = wxNewId();
+static const int ID_MOVE_TAB_TO_NOTEBOOK_4 = wxNewId();
+
+int t4p::NotebookClass::NewPageNumber = 1;
 
 std::vector<t4p::NotebookClass*> t4p::CodeNotebooks(wxWindow* mainWindow) {
 	std::vector<t4p::NotebookClass*> notebooks;
@@ -55,14 +61,13 @@ std::vector<t4p::NotebookClass*> t4p::CodeNotebooks(wxWindow* mainWindow) {
 	return notebooks;
 }
 
-int t4p::NotebookClass::NewPageNumber = 1;
-
 t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
 	, Globals(NULL)
 	, EventSink(NULL)
+	, AuiManager(NULL)
 	, TabIndexRightClickEvent(-1) {
 	ImageList = NULL;
 	SetName(name);
@@ -93,10 +98,12 @@ t4p::NotebookClass::~NotebookClass() {
 void t4p::NotebookClass::InitApp(t4p::CodeControlOptionsClass* options,
 		t4p::PreferencesClass* preferences,
 		t4p::GlobalsClass* globals,
-		t4p::EventSinkClass* eventSink) {
+		t4p::EventSinkClass* eventSink,
+		wxAuiManager* auiManager) {
 	CodeControlOptions = options;
 	Globals = globals;
 	EventSink = eventSink;
+	AuiManager = auiManager;
 
 	// so that all dialogs / panels use the same font
 	// ATTN: on linux, default fonts are too big
@@ -154,6 +161,11 @@ void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookCla
 	// GetPageImage is not implemented in wxAuiNotebook
 	int tabImageId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(fileName));
 	AddPage(tab, tabName, tabImageId);
+	
+	// notify the app that a page was moved
+	t4p::CodeControlEventClass moveEvt(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, codeCtrl);
+	moveEvt.SetEventObject(this);
+	EventSink->Publish(moveEvt);
 }
 
 void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
@@ -527,16 +539,56 @@ bool t4p::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modifiedPag
 
 void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	TabIndexRightClickEvent = event.GetSelection();
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
 
 	wxMenu menu;
 	menu.Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
 	menu.Append(ID_CLOSE_TAB, wxT("Close This Tab"));
+	if (notebooks.size() == 2) {
+		menu.Append(ID_MOVE_TAB_TO_NOTEBOOK_1, wxT("Move This Tab To Other Notebook"));
+	}
+	else if (notebooks.size() > 2) {
+		for (size_t i = 0; i < notebooks.size(); i++) {
+			if (notebooks[i] != this) {
+				wxAuiPaneInfo info = AuiManager->GetPane(notebooks[i]);
+				wxString menuItem = wxT("Move This Tab To ") + info.caption;
+				menu.Append(ID_MOVE_TAB_TO_NOTEBOOK_1 + i, menuItem);
+			}
+		}
+	}
+	
 	PopupMenu(&menu);
 }
 
 void t4p::NotebookClass::OnCloseAllPages(wxCommandEvent& event) {
 	if (SaveAllModifiedPages()) {
 		CloseAllPages();
+	}
+}
+
+void t4p::NotebookClass::OnMovePage(wxCommandEvent& event) {
+	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
+	if (!ctrl) {
+		return;
+	}
+	
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
+	
+	// when there are 2  notebooks, then just move from one to the other
+	if (notebooks.size() == 2) {
+		if (notebooks[0] == this) {
+			notebooks[1]->Adopt(ctrl, this);
+		}
+		else if (notebooks[1] == this) {
+			notebooks[0]->Adopt(ctrl, this);
+		}
+	}
+	else {
+		int index = event.GetId() - ID_MOVE_TAB_TO_NOTEBOOK_1;
+		if (index >= 0 && index < notebooks.size()) {
+			t4p::NotebookClass* destNotebook = notebooks[index];
+			destNotebook->Adopt(ctrl, this);
+		}
 	}
 }
 
@@ -556,7 +608,8 @@ void t4p::NotebookClass::CloseAllPages() {
 		// tab index
 		evt.SetSelection(0);
 		evt.SetEventObject(this);
-		EventSink->Publish(evt);
+		ProcessEvent(evt);
+		///EventSink->Publish(evt);
 	}
 }
 
@@ -597,7 +650,8 @@ void t4p::NotebookClass::ClosePage(int index) {
 		// tab index
 		evt.SetSelection(index);
 		evt.SetEventObject(this);
-		EventSink->Publish(evt);
+		ProcessEvent(evt);
+		////EventSink->Publish(evt);
 	}
 }
 
@@ -740,4 +794,5 @@ bool t4p::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArraySt
 BEGIN_EVENT_TABLE(t4p::NotebookClass, wxAuiNotebook)
 	EVT_MENU(ID_CLOSE_ALL_TABS, t4p::NotebookClass::OnCloseAllPages)
 	EVT_MENU(ID_CLOSE_TAB, t4p::NotebookClass::OnMenuClosePage)
+	EVT_MENU_RANGE(ID_MOVE_TAB_TO_NOTEBOOK_1, ID_MOVE_TAB_TO_NOTEBOOK_4, t4p::NotebookClass::OnMovePage)
 END_EVENT_TABLE()

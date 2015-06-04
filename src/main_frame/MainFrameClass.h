@@ -74,6 +74,8 @@ private:
 	
 	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 	
+	void OnAppFileNotebookChanged(t4p::CodeControlEventClass& event);
+	
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	void OnAppFileCreated(wxCommandEvent& event);
@@ -143,6 +145,12 @@ public:
 	 * notebook
 	 */
 	void CreateNewCodeCtrl();
+	
+	/**
+	 * Checks code notebooks to see if they have any more pages;if a notebook
+	 * does not have any pages it is scheduled for deletion 
+	 */
+	void UpdateNotebooks();
 
 protected:
 

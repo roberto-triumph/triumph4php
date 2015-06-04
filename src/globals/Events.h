@@ -199,9 +199,17 @@ extern const wxEventType EVENT_APP_FILE_NEW;
 /**
  * Notification that a code control tab has been "changed" (made active).  This
  * is analogous to the EVT_AUINOTEBOOK_PAGE_CHANGED event, but EVENT_APP_FILE_CHANGED event
- * will give you access to code control tabs. The event will be of type CodeControlEventClass
+ * will give you access to code control tabs. The event will be of type CodeControlEventClass.
+
  */
 extern const wxEventType EVENT_APP_FILE_PAGE_CHANGED;
+
+/**
+ * Notification that a code control tab has been moved from one notebook to
+ * another. The event will be of type CodeControlEventClass. The event object
+ * is the source notebook (the notebook that the code control was removed from).
+ */
+extern const wxEventType EVENT_APP_FILE_NOTEBOOK_CHANGED;
 
 /**
  * This is an event that will tell a feature that a file has been saved.
@@ -338,6 +346,11 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 
 #define EVT_APP_FILE_PAGE_CHANGED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_PAGE_CHANGED, wxID_ANY, -1, \
+    (wxObjectEventFunction) (wxEventFunction) \
+    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+
+#define EVT_APP_FILE_NOTEBOOK_CHANGED(fn) \
+	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
 

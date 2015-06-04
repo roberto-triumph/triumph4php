@@ -119,7 +119,8 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 		&App.Preferences.CodeControlOptions,
 		&App.Preferences,
 		&App.Globals,
-		&App.EventSink
+		&App.EventSink,
+		&AuiManager
 	);
 
 	ToolsNotebook = new wxAuiNotebook(this, t4p::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize,
@@ -514,25 +515,59 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 			}
 		}
 		else {
-			// this is a code notebook
-			// for code notebooks; we want to keep 1, but if the user
-			// removes pages from the 2-N notebook, then we kill the
-			// empty notebook
-			std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
-			wxAuiNotebook* codeNotebook = wxDynamicCast(event.GetEventObject(), wxAuiNotebook);
-			if (notebooks.size() > 1 && codeNotebook) {
-				size_t count = codeNotebook->GetPageCount();
-				if (count <= 0) {
-					AuiManager.DetachPane(codeNotebook);
-
-					// don't delete now; wait until events are processed
-					CallAfter(&t4p::MainFrameClass::DeleteEmptyCodeNotebooks);
-				}
-			}
+			// wxAuiNotebook* codeNotebook = wxDynamicCast(event.GetEventObject(), wxAuiNotebook);
+			UpdateNotebooks();
 		}
 	}
 	App.EventSink.Publish(event);
 	event.Skip();
+}
+
+void t4p::MainFrameClass::UpdateNotebooks() {
+	
+	// this is a code notebook
+	// for code notebooks; we want to keep 1, but if the user
+	// removes pages from the 2-N notebook, then we kill the
+	// empty notebook
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
+	int remainingNotebooks = notebooks.size();
+	bool hasDetached = false;
+	for (size_t i = 0; i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		if (remainingNotebooks > 1 && notebook->GetPageCount() == 0) {
+			AuiManager.DetachPane(notebook);
+			hasDetached = true;
+			remainingNotebooks--;
+		}
+	}
+	if (hasDetached) {
+		
+		// do we still have a center pane? we need one, otherwise there 
+		// is a big gap
+		bool hasCenter = false;
+		for (size_t i = 0; i < notebooks.size(); i++) {
+			wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
+			if (info.IsOk() && info.dock_direction == wxAUI_DOCK_CENTER) {
+				hasCenter = true;
+			}
+		}
+		if (!hasCenter) {
+			
+			// no center pane, make one notebook be the center pane
+			for (size_t i = 0; i < notebooks.size(); i++) {
+				wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
+				if (info.IsOk()) {
+					info.CenterPane();
+					break;
+				}
+			}
+		}
+		AuiManager.Update();
+		
+		
+		// don't delete now; wait until events are processed
+		CallAfter(&t4p::MainFrameClass::DeleteEmptyCodeNotebooks);
+	}
 }
 
 void t4p::MainFrameClass::DeleteEmptyCodeNotebooks() {
@@ -547,6 +582,15 @@ void t4p::MainFrameClass::DeleteEmptyCodeNotebooks() {
 		}
 		else {
 			++it;
+		}
+	}
+	
+	if (notebooks.size() <= 2) {
+		
+		// in case the caption was previously visible due to > 2 notebooks
+		for (size_t i = 0; i < notebooks.size(); i++) {
+			wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
+			info.CaptionVisible(false);
 		}
 	}
 	AuiManager.Update();
@@ -644,6 +688,10 @@ void t4p::AppEventListenerForFrameClass::OnAppFilePageChanged(t4p::CodeControlEv
 	MainFrame->UpdateTitleBar();
 }
 
+void t4p::AppEventListenerForFrameClass::OnAppFileNotebookChanged(t4p::CodeControlEventClass& event) {
+	MainFrame->UpdateNotebooks();
+}
+
 void t4p::AppEventListenerForFrameClass::OnAppFileCreated(wxCommandEvent& event) {
 	MainFrame->UpdateTitleBar();
 }
@@ -730,5 +778,6 @@ BEGIN_EVENT_TABLE(t4p::AppEventListenerForFrameClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::AppEventListenerForFrameClass::OnAppReady)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_APP_USER_ATTENTION, t4p::AppEventListenerForFrameClass::OnAppRequestUserAttention)
 	EVT_APP_FILE_PAGE_CHANGED(t4p::AppEventListenerForFrameClass::OnAppFilePageChanged)
+	EVT_APP_FILE_NOTEBOOK_CHANGED(t4p::AppEventListenerForFrameClass::OnAppFileNotebookChanged)
 	EVT_APP_FILE_CLOSED(t4p::AppEventListenerForFrameClass::OnAppFileClosed)
 END_EVENT_TABLE()

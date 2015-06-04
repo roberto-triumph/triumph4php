@@ -57,6 +57,11 @@ static void RemoveExtraNotebooks(wxWindow* mainWindow, wxAuiManager* auiManager)
 		}
 		notebook->Destroy();
 	}
+	
+	// in case the caption was visible due to > 2 notebooks
+	wxAuiPaneInfo& info = auiManager->GetPane(firstNotebook);
+	info.CaptionVisible(false);
+	info.Name("Notebook 1");
 }
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
@@ -140,6 +145,18 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 			.CloseButton(false),
 		insertLevel
 	);
+	
+	// when there are more than 2 notebooks, given them names so
+	// that the user can tell them apart (for "moving tabs" purposes)
+	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetMainWindow());
+	if (notebooks.size() > 2) {
+		for (size_t i = 0; i < notebooks.size(); i++) {
+			wxAuiPaneInfo& info = AuiManager->GetPane(notebooks[i]);
+			info.Name(wxString::Format("Notebook %ld", i + 1));
+			info.Caption(wxString::Format("Notebook %ld", i + 1));
+			info.CaptionVisible(true);
+		}
+	}
 
 	AuiManager->Update();
 }
@@ -156,7 +173,12 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	}
 
 	t4p::NotebookClass* currentNotebook = NULL;
+	t4p::NotebookClass* firstNotebook = NULL;
 	t4p::CodeControlClass* codeCtrl = NULL;
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	if (!notebooks.empty()) {
+		firstNotebook = notebooks[0];
+	}
 	wxSize newNotebookSize(400, 400);
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
@@ -169,11 +191,25 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 		newNotebook->SetSize(newNotebookSize);
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 		wxAuiPaneInfo info;
-		info.Right().Row(i - 1).Position(0)
+		info.Right().Row(0).Position(0).Layer(i)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false);
+		
+		// when there are more than 2 notebooks, given them names so
+		// that the user can tell them apart (for "moving tabs" purposes)
+		if (columnCount > 2) {
+			info.Name(wxString::Format("Notebook %d", i + 1));
+			info.Caption(wxString::Format("Notebook %d", i + 1));
+			info.CaptionVisible(true);
+		}
 		AuiManager->AddPane(newNotebook, info);
+	}
+	if (firstNotebook && columnCount > 2) {
+		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
+		currentNotebookInfo.Name("Notebook 1");
+		currentNotebookInfo.Caption("Notebook 1");
+		currentNotebookInfo.CaptionVisible(true);
 	}
 	AuiManager->Update();
 }
@@ -193,7 +229,12 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	}
 
 	t4p::NotebookClass* currentNotebook = NULL;
+	t4p::NotebookClass* firstNotebook = NULL;
 	t4p::CodeControlClass* codeCtrl = NULL;
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	if (!notebooks.empty()) {
+		firstNotebook = notebooks[0];
+	}
 	wxSize newNotebookSize(400, 400);
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
@@ -206,11 +247,25 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 		newNotebook->SetSize(newNotebookSize);
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 		wxAuiPaneInfo info;
-		info.Bottom().Row(i - 1).Position(0)
+		info.Bottom().Row(0).Position(0).Layer(i)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false);
-		AuiManager->AddPane(newNotebook, info);
+		
+		// when there are more than 2 notebooks, given them names so
+		// that the user can tell them apart (for "moving tabs" purposes)
+		if (rowCount > 2) {
+			info.Name(wxString::Format("Notebook %d", i + 1));
+			info.Caption(wxString::Format("Notebook %d", i + 1));
+			info.CaptionVisible(true);
+		}
+		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_DOCK);
+	}
+	if (firstNotebook && rowCount > 2) {
+		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
+		currentNotebookInfo.Name("Notebook 1");
+		currentNotebookInfo.Caption("Notebook 1");
+		currentNotebookInfo.CaptionVisible(true);
 	}
 	AuiManager->Update();
 }
@@ -235,7 +290,8 @@ t4p::NotebookClass* t4p::NotebookLayoutViewClass::NewNotebook() {
 		&Feature.App.Preferences.CodeControlOptions,
 		&Feature.App.Preferences,
 		&Feature.App.Globals,
-		&Feature.App.EventSink
+		&Feature.App.EventSink,
+		AuiManager
 	);
 	return newNotebook;
 }

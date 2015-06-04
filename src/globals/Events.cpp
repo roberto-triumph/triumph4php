@@ -174,6 +174,7 @@ const wxEventType t4p::EVENT_APP_FILE_OPENED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_CREATED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_NEW = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_PAGE_CHANGED = wxNewEventType();
+const wxEventType t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_SAVED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_CLOSED = wxNewEventType();
 const wxEventType t4p::EVENT_APP_FILE_REVERTED = wxNewEventType();

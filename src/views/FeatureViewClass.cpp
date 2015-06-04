@@ -386,7 +386,7 @@ void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int pageIndex = notebook->GetPageIndex(codeCtrl);
 		if (pageIndex != wxNOT_FOUND) {
-			notebook->DeletePage(pageIndex);
+			notebook->ClosePage(pageIndex);
 			break;
 		}
 	}
