@@ -539,11 +539,9 @@ void t4p::EditorBehaviorViewClass::OnRedo(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnPreferencesSaved(wxCommandEvent& event) {
-
-	// TODO: does not work with multiple notebooks
-	t4p::NotebookClass* notebook = NULL;
-	t4p::CodeControlClass* codeCtrl = NULL;
-	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
+	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	for (size_t i = 0; i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->RefreshCodeControlOptions();
 	}
 }

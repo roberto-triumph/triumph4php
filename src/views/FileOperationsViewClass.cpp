@@ -31,6 +31,57 @@
 
 static const int ID_STATUS_BAR_TIMER = wxNewId();
 
+/**
+ * @param notebooks
+ * @param mainWindow
+ * @return boolean TRUE if the user has decided to save or ignore the changes.
+ *         When this function returns FALSE, it means that the user wants to
+ *         cancel the app exit. (ie does not want to quit)
+ */
+static bool SaveAllModifiedPages(std::vector<t4p::NotebookClass*> notebooks, wxWindow* mainWindow) {
+	std::vector<int> modifiedPageIndexes;
+	std::vector<wxString> modifiedPageNames;
+	std::vector<int> notebookIndexes;
+	bool changed = true;
+	
+	for (size_t n = 0; n < notebooks.size(); n++) {
+		t4p::NotebookClass* notebook = notebooks[n];
+		for (size_t p = 0; p < notebook->GetPageCount(); ++p) {
+			if (notebook->IsPageModified(p)) {
+				modifiedPageIndexes.push_back(modifiedPageNames.size());
+				notebookIndexes.push_back(n);
+				wxString pageName = notebook->GetPageText(p);
+				if (pageName.EndsWith(wxT("*"))) {
+					pageName = pageName.SubString(0, pageName.size() - 2);
+				}
+				modifiedPageNames.push_back(pageName);
+			}
+		}
+	}
+	if (modifiedPageIndexes.size()) {
+		wxArrayString modifiedPageNamesArray;
+		for (size_t i = 0; i < modifiedPageNames.size(); ++i) {
+			modifiedPageNamesArray.Add(modifiedPageNames[i]);
+		}
+		wxMultiChoiceDialog dialog(mainWindow, wxT(
+			"Do you wish to save any files before exiting?"),
+			wxT("Save Files"), modifiedPageNamesArray, 
+			wxDEFAULT_DIALOG_STYLE | wxOK | wxCANCEL | wxRESIZE_BORDER);
+		dialog.Center();
+		if (wxID_CANCEL == dialog.ShowModal()) {
+			changed = false;
+		}
+		else {
+			wxArrayInt selections = dialog.GetSelections();
+			for (size_t i = 0; i < selections.size(); ++i) {
+				t4p::NotebookClass* notebook = notebooks[notebookIndexes[selections[i]]];
+				notebook->SavePage(modifiedPageIndexes[selections[i]], false);
+			}
+		}
+	}
+	return changed;
+}
+
 t4p::FileOperationsViewClass::FileOperationsViewClass(t4p::FileOperationsFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature)
@@ -371,15 +422,8 @@ void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
 		doVeto = true;
 	}
 	if (!doVeto) {
-		t4p::NotebookClass* notebook = NULL;
-		t4p::CodeControlClass* codeCtrl = NULL;
-
-		// TODO: does not work with multiple notebooks
-		if (GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
-
-			// veto the close if the user cancelled the save dialog
-			doVeto = !notebook->SaveAllModifiedPages();
-		}
+		std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+		doVeto = !SaveAllModifiedPages(notebooks, GetMainWindow());
 	}
 
 	if (doVeto) {
