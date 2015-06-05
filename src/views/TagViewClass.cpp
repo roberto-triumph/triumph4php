@@ -726,7 +726,7 @@ void t4p::TagSearchDialogClass::OnTagCacheSearchComplete(t4p::TagCacheSearchComp
 	}
 }
 
-BEGIN_EVENT_TABLE(t4p::TagViewClass, wxEvtHandler)
+BEGIN_EVENT_TABLE(t4p::TagViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_RESOURCE + 0, t4p::TagViewClass::OnProjectWipeAndIndex)
 	EVT_MENU(t4p::MENU_RESOURCE + 1, t4p::TagViewClass::OnJump)
 	EVT_MENU(t4p::MENU_RESOURCE + 3, t4p::TagViewClass::OnJump)

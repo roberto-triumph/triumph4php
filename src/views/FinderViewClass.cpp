@@ -793,7 +793,7 @@ BEGIN_EVENT_TABLE(t4p::ReplacePanelClass, ReplacePanelGeneratedClass)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, t4p::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(t4p::FinderViewClass, wxEvtHandler) 
+BEGIN_EVENT_TABLE(t4p::FinderViewClass, t4p::FeatureViewClass) 
 	EVT_MENU(t4p::MENU_FINDER + 0, t4p::FinderViewClass::OnEditFind)
 	EVT_MENU(t4p::MENU_FINDER + 1, t4p::FinderViewClass::OnEditFindNext)
 	EVT_MENU(t4p::MENU_FINDER + 2, t4p::FinderViewClass::OnEditFindPrevious)

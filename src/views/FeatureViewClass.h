@@ -38,6 +38,7 @@ namespace t4p {
 class StatusBarWithGaugeClass;
 class NotebookClass;
 class CodeControlClass;
+class CodeControlEventClass;
 
 /**
  * A feature view encapsulates the GUI of the application; it 
@@ -221,30 +222,35 @@ public:
 	std::vector<wxString> AllOpenedFiles() const;
 	
 	/**
-	 * Get the currently selected code control. This may be NULL if the editor's content pane is
-	 * focused on something other than a code control.
-	 *
+	 * Get the currently selected code control.  This is not necessarily the 
+	 * window that has focus, as in wxWindow::FindFocus(). We 
+	 * cannot ask which code control has focus because we may
+	 * want to know the LAST code control to have focus in certain cases;
+	 * for example if the user clicked on a toolbar button, the focus will
+	 * be on the toolbar button, but what we really want to know is which
+	 * code control had focus before the user clicked the button.
+	 * 
 	 * Be very careful with the returned pointer, as the user can close files at any time
 	 * and the pointers will be deleted.  You should not store
  	 * the pointer at all.
 	 * 
-	 * @return CodeControlClass* the code control that has focus; can be NULL
+	 * @return CodeControlClass* the code control that has or last had focus; can be NULL
+	 *         if there are no files currently open.
 	 */
 	CodeControlClass* GetCurrentCodeControl() const;
 
 	/**
-	 * Get the currently selected code control along with its notebook. This may be NULL if the
-	 * editor's content pane is focused on something other than a code control, or there are zero
-	 * files opened. The method will set the notebook and code control pointers to
+	 * Get the currently selected code control along with its notebook. The same rules as
+	 * GetCurrentCodeControl() apply. This method will set the notebook and code control pointers to
 	 * the out parameters.
 	 *
 	 * Be very careful with the returned pointers, as the user can close files at any time
 	 * and the pointers will be deleted.  You should not store these pointers at all.
 	 *
-	 * @param [out] CodeControlClass* the code control that has focus; can be NULL
-	 * @params[out] NotebookClass* the notebook that is the parent of the code control that has
+	 * @param [out] CodeControlClass* the code control that has or last had focus; can be NULL
+	 * @param [out] NotebookClass* the notebook that is the parent of the code control that has
 	 * focus; can be NULL
-	 * @return bool TRUE if we could get the code control that is being focused on. If TRUE, then
+	 * @return bool TRUE if we could get the code control that is being focused on or last had focus. If TRUE, then
 	 *         the codeCtrl and notebook params will be written to and will be valid.
 	 */
 	bool GetCurrentCodeControlWithNotebook(t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const;
@@ -459,6 +465,29 @@ private:
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* OutlineNotebook;
+	
+	/**
+	 * This class will not own this pointer. This pointer
+	 * may be invalid for a little while, as the user closes
+	 * a code control.
+	 * 
+	 * @var t4p::CodeControlClass the code control that has focus.
+	 */
+	t4p::CodeControlClass* CurrentFocusCodeControl;
+	
+	/**
+	 * Keep track of the code control that has focus. We 
+	 * cannot ask which code control has focus because we may
+	 * want to know the LAST code control to have focus in certain cases;
+	 * for example if the user clicked on a toolbar button, the focus will
+	 * be on the toolbar button, but what we really want to know is which
+	 * code control had focus before the user clicked the button.
+	 * 
+	 * @param event
+	 */
+	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
+	
+	DECLARE_EVENT_TABLE()
 	
 };
 

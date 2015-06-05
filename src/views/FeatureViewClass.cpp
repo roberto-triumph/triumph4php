@@ -24,19 +24,19 @@
  */
 #include <views/FeatureViewClass.h>
 #include <widgets/NotebookClass.h>
+#include <globals/Events.h>
 
 /**
- * Returns the code control that has focus.
- * @param mainWindow
+ * Checks that the given possible code control is in fact part of 
+ * a notebook.
+ * 
+ * @param possible a window to test
+ * @param mainWindow the main app frame
  * @return the code control that has focus, or NULL if focus is on
  *         another window
  */
-static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
+static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* possible, wxWindow* mainWindow) {
 	t4p::CodeControlClass* codeCtrl = NULL;
-	wxWindow* focusWindow = wxWindow::FindFocus();
-	if (!focusWindow) {
-		return codeCtrl;
-	}
 
 	// we don't just want to cast since we don't know if the focused window
 	// is a code control. We find out if the focus is anywhere inside a
@@ -45,17 +45,19 @@ static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
 	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
-		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
-			codeCtrl = notebook->GetCurrentCodeControl();
+		int index = notebook->GetPageIndex(possible);
+		if (index != wxNOT_FOUND) {
+			codeCtrl = notebook->GetCodeControl(index);
+			break;
 		}
 	}
 	return codeCtrl;
 }
 
-static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
+static bool EnsureValidCodeControlWithNotebook(t4p::CodeControlClass* possible, wxWindow* mainWindow,
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) {
 	bool found = false;
-	*codeCtrl = FindFocusedCodeControl(mainWindow);
+	*codeCtrl = EnsureValidCodeControl(possible, mainWindow);
 	if (!(*codeCtrl)) {
 		return found;
 	}
@@ -72,7 +74,14 @@ static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
 }
 
 t4p::FeatureViewClass::FeatureViewClass() 
-: wxEvtHandler() {
+: wxEvtHandler() 
+, AuiManager(NULL)
+, MenuBar(NULL)
+, ToolBar(NULL)
+, StatusBarWithGauge(NULL) 
+, ToolsNotebook(NULL)
+, OutlineNotebook(NULL)
+, CurrentFocusCodeControl(NULL) {
 }
 
 void t4p::FeatureViewClass::InitWindow(
@@ -250,12 +259,12 @@ bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
-	return FindFocusedCodeControl(GetMainWindow());
+	return EnsureValidCodeControl(CurrentFocusCodeControl, GetMainWindow());
 }
 
 bool t4p::FeatureViewClass::GetCurrentCodeControlWithNotebook(
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const {
-	return FindFocusedCodeControlWithNotebook(GetMainWindow(), codeCtrl, notebook);
+	return EnsureValidCodeControlWithNotebook(CurrentFocusCodeControl, GetMainWindow(), codeCtrl, notebook);
 }
 
 wxWindow* t4p::FeatureViewClass::GetMainWindow() const {
@@ -404,3 +413,11 @@ void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
 		}
 	}
 }
+
+void t4p::FeatureViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
+	CurrentFocusCodeControl = event.GetCodeControl();
+}
+
+BEGIN_EVENT_TABLE(t4p::FeatureViewClass, wxEvtHandler)
+	EVT_APP_FILE_PAGE_CHANGED(t4p::FeatureViewClass::OnAppFilePageChanged)
+END_EVENT_TABLE()

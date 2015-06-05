@@ -515,7 +515,6 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 			}
 		}
 		else {
-			// wxAuiNotebook* codeNotebook = wxDynamicCast(event.GetEventObject(), wxAuiNotebook);
 			UpdateNotebooks();
 		}
 	}

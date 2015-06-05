@@ -260,7 +260,7 @@ void t4p::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	}
 }
 
-BEGIN_EVENT_TABLE(t4p::TemplateFilesViewClass, wxEvtHandler) 
+BEGIN_EVENT_TABLE(t4p::TemplateFilesViewClass, t4p::FeatureViewClass) 
 	EVT_MENU(t4p::MENU_TEMPLATE_FILES + 0, t4p::TemplateFilesViewClass::OnTemplateFilesMenu)
 	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, t4p::TemplateFilesViewClass::OnTemplateDetectionComplete)
 END_EVENT_TABLE()

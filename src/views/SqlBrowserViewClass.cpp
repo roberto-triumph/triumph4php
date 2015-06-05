@@ -1095,6 +1095,7 @@ void t4p::SqlBrowserViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& 
 			}
 		}
 	}
+	event.Skip();
 }
 
 void t4p::SqlBrowserViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {

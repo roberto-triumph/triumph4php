@@ -678,7 +678,7 @@ void t4p::MultipleSelectDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-BEGIN_EVENT_TABLE(t4p::ProjectViewClass, wxEvtHandler)
+BEGIN_EVENT_TABLE(t4p::ProjectViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_PROJECT + 0, t4p::ProjectViewClass::OnProjectDefine)
 	EVT_MENU(t4p::MENU_PROJECT + 1, t4p::ProjectViewClass::OnCreateNewProject)
 END_EVENT_TABLE()
