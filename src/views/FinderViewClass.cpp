@@ -89,7 +89,13 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 	if (!window) {
 		window = new FinderPanelClass(parent, ID_FIND_PANEL, Feature.Finder, *this, AuiManager);
 		wxAuiPaneInfo info;
-		info.Bottom().Row(1).Floatable(false)
+		
+		// always put the finder panel at row 1
+		// row=1 means that it will show up above the 
+		// tools notebook (row = 0) but below any code
+		// notebooks (row=2+)
+		int row = 1;
+		info.Bottom().Row(row).Floatable(false)
 			.CaptionVisible(false).CloseButton(false);
 		if (!AuiManager->InsertPane(window, info, wxAUI_INSERT_ROW)) {
 			window->Destroy();
@@ -180,7 +186,13 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 	if (!window) {
 		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, Feature.FinderReplace, *this, AuiManager);
 		wxAuiPaneInfo info;
-		info.Bottom().Row(1).Floatable(false)
+		
+		// always put the finder panel at row 1
+		// row=1 means that it will show up above the 
+		// tools notebook (row = 0) but below any code
+		// notebooks (row=2+)
+		int row = 1;
+		info.Bottom().Row(row).Floatable(false)
 			.DockFixed(true).CaptionVisible(false)
 			.CloseButton(false);
 		if (!AuiManager->InsertPane(window, info, wxAUI_INSERT_ROW)) {

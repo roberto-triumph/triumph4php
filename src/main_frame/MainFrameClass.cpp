@@ -131,10 +131,14 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	SetApplicationFont();
 
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
+	// tools notebook will be placed at row = 0 because we want it at the bottom
+	// of the frame even if there are split notebooks or the finder panel is 
+	// visible.
+	int row = 0;
 	AuiManager.AddPane(codeNotebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
 		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
-		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Row(0));
+		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Row(row));
 	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Name(wxT("outline")).Left().Caption(
         _("Outlines")).Floatable(false).MinSize(260, -1).Hide());
 

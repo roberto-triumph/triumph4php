@@ -71,7 +71,7 @@ class ChangeDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		ChangeDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 250,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		ChangeDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~ChangeDialogGeneratedClass();
 	
 };
@@ -82,9 +82,6 @@ ChangeDialogGeneratedClass::ChangeDialogGeneratedClass( wxWindow* parent, wxWind
 	
 	wxFlexGridSizer* BodySizer;
 	BodySizer = new wxFlexGridSizer( 2, 1, 0, 0 );
-	BodySizer->AddGrowableCol( 0 );
-	BodySizer->AddGrowableRow( 0 );
-	BodySizer->AddGrowableRow( 1 );
 	BodySizer->SetFlexibleDirection( wxBOTH );
 	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -94,7 +91,7 @@ ChangeDialogGeneratedClass::ChangeDialogGeneratedClass( wxWindow* parent, wxWind
 	FormSizer->AddGrowableRow( 0 );
 	FormSizer->AddGrowableRow( 1 );
 	FormSizer->AddGrowableRow( 2 );
-	FormSizer->SetFlexibleDirection( wxBOTH );
+	FormSizer->SetFlexibleDirection( wxHORIZONTAL );
 	FormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	LayerLabel = new wxStaticText( this, wxID_ANY, wxT("Layer"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -144,20 +141,20 @@ ChangeDialogGeneratedClass::~ChangeDialogGeneratedClass()
 }
 
 
-class ChangeDialogClass : public ChangeDialog {
+class ChangeDialogClass : public ChangeDialogGeneratedClass {
 
 public:
 
 ChangeDialogClass(wxWindow* parent, wxString name, int& dock, int& row, int& position, int& layer) 
-: ChangeDialog(parent, wxID_ANY,  "Change " + name) {
+: ChangeDialogGeneratedClass(parent, wxID_ANY,  "Change " + name) {
 	wxGenericValidator valRow(&row);
-	m_spinCtrl2->SetValidator(valRow);
+	Row->SetValidator(valRow);
 	
 	wxGenericValidator valPosition(&position);
-	m_spinCtrl3->SetValidator(valPosition);
+	Position->SetValidator(valPosition);
 	
 	wxGenericValidator valLayer(&layer);
-	m_spinCtrl1->SetValidator(valLayer);
+	Layer->SetValidator(valLayer);
 	
 	TransferDataToWindow();
 }
