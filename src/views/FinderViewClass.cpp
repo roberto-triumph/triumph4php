@@ -29,6 +29,7 @@
 #include <widgets/UnicodeStringValidatorClass.h>
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <widgets/Buttons.h>
+#include <widgets/AuiManager.h>
 #include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/numdlg.h>
@@ -87,8 +88,10 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 	if (!window) {
 		window = new FinderPanelClass(parent, ID_FIND_PANEL, Feature.Finder, *this, AuiManager);
-		if (!AuiManager->AddPane(window, 
-			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
+		wxAuiPaneInfo info;
+		info.Bottom().Row(1).Floatable(false)
+			.CaptionVisible(false).CloseButton(false);
+		if (!AuiManager->InsertPane(window, info, wxAUI_INSERT_ROW)) {
 			window->Destroy();
 			window = NULL;
 		}
@@ -176,8 +179,11 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (!window) {
 		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, Feature.FinderReplace, *this, AuiManager);
-		if (!AuiManager->AddPane(window, 
-			wxAuiPaneInfo().Bottom().Row(1).Floatable(false).DockFixed(true).CaptionVisible(false).CloseButton(false))) {
+		wxAuiPaneInfo info;
+		info.Bottom().Row(1).Floatable(false)
+			.DockFixed(true).CaptionVisible(false)
+			.CloseButton(false);
+		if (!AuiManager->InsertPane(window, info, wxAUI_INSERT_ROW)) {
 			window->Destroy();
 			window = NULL;
 		}
@@ -191,7 +197,8 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
 		}
-		AuiManager->GetPane(window).Show();
+		int layers = t4p::AuiLayerCount(*AuiManager);
+		AuiManager->GetPane(window).Layer(layers).Show();
 		panel->SetFocusOnFindText();
 	}
 	parent->Thaw();

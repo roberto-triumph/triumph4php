@@ -38,6 +38,7 @@
 #include <wx/filename.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
+#include <widgets/AuiManager.h>
 
 static const int ID_CLOSE_ALL_TABS = wxNewId();
 static const int ID_CLOSE_TAB = wxNewId();
@@ -790,7 +791,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 	int row = currentNotebookInfo.dock_row;
 	int position = currentNotebookInfo.dock_pos;
 	int layer = currentNotebookInfo.dock_layer;
-	int insertLevel = wxAUI_INSERT_PANE;
+	int insertLevel = wxAUI_INSERT_ROW;
 	int direction = currentNotebookInfo.dock_direction;
 	
 	// splitting horizontally
@@ -799,6 +800,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 	// in a new dock position (bottom)
 	if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
 		direction = wxAUI_DOCK_BOTTOM;
+		row = t4p::AuiRowCount(*AuiManager) + 1;
 	}
 	else {
 		position++;

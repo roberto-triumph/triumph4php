@@ -140,7 +140,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 		newNotebook->SetSize(newNotebookSize);
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 		wxAuiPaneInfo info;
-		info.Right().Row(0).Position(0).Layer(i)
+		info.Right().Row(i).Position(0).Layer(0)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false);
@@ -152,7 +152,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 			info.Caption(wxString::Format("Notebook %d", i + 1));
 			info.CaptionVisible(true);
 		}
-		AuiManager->AddPane(newNotebook, info);
+		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_ROW);
 	}
 	if (firstNotebook && columnCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
@@ -203,7 +203,10 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 		newNotebook->SetSize(newNotebookSize);
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 		wxAuiPaneInfo info;
-		info.Bottom().Row(0).Position(0).Layer(i)
+		
+		// i+2 because we want the tools notebook and the find/replace
+		// panels below these notebook splits
+		info.Bottom().Row(i + 2).Position(0)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false);
@@ -215,7 +218,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 			info.Caption(wxString::Format("Notebook %d", i + 1));
 			info.CaptionVisible(true);
 		}
-		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_DOCK);
+		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_ROW);
 	}
 	if (firstNotebook && rowCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);

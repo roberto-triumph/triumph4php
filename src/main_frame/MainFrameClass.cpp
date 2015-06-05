@@ -134,7 +134,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	AuiManager.AddPane(codeNotebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
 		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
-		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Layer(0));
+		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Row(0));
 	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Name(wxT("outline")).Left().Caption(
         _("Outlines")).Floatable(false).MinSize(260, -1).Hide());
 
