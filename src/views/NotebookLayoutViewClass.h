@@ -47,6 +47,8 @@ public:
 	NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
 
 	void AddViewMenuItems(wxMenu* viewMenu);
+	
+	void AddToolBarItems(wxAuiToolBar* toolBar);
 
 private:
 

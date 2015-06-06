@@ -25,6 +25,7 @@
 #include <views/NotebookLayoutViewClass.h>
 #include <widgets/NotebookClass.h>
 #include <Triumph.h>
+#include <globals/Assets.h>
 
 /**
  * removes all but 1 of the code notebooks from the application.
@@ -82,7 +83,22 @@ void t4p::NotebookLayoutViewClass::AddViewMenuItems(wxMenu* viewMenu) {
 	subMenu->Append(t4p::MENU_NOTEBOOK_PANE + 0, _("Split Horizontally"), _("Create a new code notebook"), wxITEM_NORMAL);
 	subMenu->Append(t4p::MENU_NOTEBOOK_PANE + 1, _("Split Vertically"), _("Create a new code notebook"), wxITEM_NORMAL);
 
-	viewMenu->AppendSubMenu(subMenu, _("Notebook Panes"), _("Create Notebooks"));
+	viewMenu->AppendSubMenu(subMenu, _("Notebook Layout"), _("Create Multiple Code Notebooks"));
+}
+
+void t4p::NotebookLayoutViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
+	toolBar->AddTool(t4p::MENU_NOTEBOOK_PANE + 4,
+		_("1 row, 2 Columns"),
+		t4p::BitmapImageAsset(wxT("layout-2-equal-vertical")),
+		_("Create 2 Notebooks, One to the right of the other"),
+		wxITEM_NORMAL
+	);
+	toolBar->AddTool(t4p::MENU_NOTEBOOK_PANE + 2,
+		_("2 Rows, 1 Column"),
+		t4p::BitmapImageAsset(wxT("layout-2-equal-horizontal")),
+		_("Create 2 Notebooks, One on top of the other"),
+		wxITEM_NORMAL
+	);
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {

@@ -105,7 +105,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	App.RunningThreads.AddEventHandler(this);
 	App.SqliteRunningThreads.AddEventHandler(this);
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize,
-		  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
+		  wxAUI_TB_DEFAULT_STYLE);
 
 	t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, wxID_ANY,
 		wxDefaultPosition, wxDefaultSize,
