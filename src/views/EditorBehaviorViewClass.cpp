@@ -28,6 +28,7 @@
 #include <code_control/CodeControlClass.h>
 #include <widgets/NotebookClass.h>
 #include <main_frame/PreferencesClass.h>
+#include <widgets/AuiManager.h>
 #include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/stc/stc.h>
@@ -539,7 +540,7 @@ void t4p::EditorBehaviorViewClass::OnRedo(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnPreferencesSaved(wxCommandEvent& event) {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiAllCodeNotebooks(*AuiManager);
 	for (size_t i = 0; i < notebooks.size(); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->RefreshCodeControlOptions();

@@ -24,6 +24,7 @@
  */
 #include <wx/wx.h>
 #include <wx/aui/aui.h>
+#include <wx/stc/stc.h>
 
 #include <wx/string.h>
 #include <wx/stattext.h>
@@ -53,6 +54,7 @@ const static int ID_MENU_ADJUST_4 = wxNewId();
 const static int ID_MENU_ADJUST_5 = wxNewId();
 const static int ID_MENU_ADJUST_6 = wxNewId();
 const static int ID_MENU_ADJUST_7 = wxNewId();
+const static int ID_MENU_MOVE_7 = wxNewId();
 
 class ChangeDialogGeneratedClass : public wxDialog 
 {
@@ -180,6 +182,7 @@ public:
 private:
 
 	void OnAdjust(wxCommandEvent& event);
+	void OnMovePanel7(wxCommandEvent& event);
 	wxAuiManager AuiManager;
 	
 	DECLARE_EVENT_TABLE()
@@ -202,15 +205,27 @@ MyFrame::MyFrame() :
 	wxAuiNotebook* book = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB);
 		
-	wxPanel* panel1 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 380));
+	wxPanel* panel1 = new wxPanel(this, wxID_ANY, wxDefaultPosition);
 	wxPanel* panel2 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
 	wxPanel* panel3 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
 	wxPanel* panel4 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
 	wxPanel* panel5 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
 	wxPanel* panel6 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
-	wxPanel* panel7 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
+	wxPanel* panel7 = new wxPanel(this, wxID_ANY, wxDefaultPosition);
+	wxStyledTextCtrl* txt = new wxStyledTextCtrl(panel7);
+	wxBoxSizer* panel7Sizer =  new wxBoxSizer(wxVERTICAL);
+	panel7Sizer->Add(txt, wxSizerFlags().Expand().Proportion(1));
+	panel7->SetSizerAndFit(panel7Sizer);
+	txt->SetText("# this is some code for panel 7\n\n");
+	panel7->Layout();
 		
-	new wxTextCtrl(panel1, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(640, 380), wxTE_MULTILINE);
+	txt = new wxStyledTextCtrl(panel1);
+	wxBoxSizer* contentSizer =  new wxBoxSizer(wxVERTICAL);
+	contentSizer->Add(txt, wxSizerFlags().Expand().Proportion(1));
+	panel1->SetSizerAndFit(contentSizer);
+	panel1->Layout();
+	txt->SetText("# this is some code for panel 1\n\n");
+	
 	new wxTextCtrl(panel2, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(640, 24), 0);
 	book->AddPage(panel1, wxT("Code"));
 	
@@ -241,6 +256,7 @@ MyFrame::MyFrame() :
 	menu->Append(ID_MENU_ADJUST_5, "adjust panel 5", "adjust panel 5", wxITEM_NORMAL);
 	menu->Append(ID_MENU_ADJUST_6, "adjust panel 6", "adjust panel 6", wxITEM_NORMAL);
 	menu->Append(ID_MENU_ADJUST_7, "adjust panel 7", "adjust panel 7", wxITEM_NORMAL);
+	menu->Append(ID_MENU_MOVE_7, "move panel 7", "move panel 7 to the bottom", wxITEM_NORMAL);
 	bar->Append(menu, "File");
 	SetMenuBar(bar);
 }
@@ -289,6 +305,18 @@ void MyFrame::OnAdjust(wxCommandEvent& event) {
 	}
 }
 
+void MyFrame::OnMovePanel7(wxCommandEvent& event) {
+	wxAuiPaneInfo panelInfo = AuiManager.GetPane("panel7");
+	if (!panelInfo.IsOk()) {
+		wxMessageBox("Panel does not exist.");
+		return;
+	}
+	wxWindow* panel7 = panelInfo.window;
+	panelInfo.Bottom().Row(0);
+	AuiManager.InsertPane(panel7, panelInfo, wxAUI_INSERT_ROW);
+	AuiManager.Update();
+}
+
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_MENU_ADJUST_1, MyFrame::OnAdjust)
 	EVT_MENU(ID_MENU_ADJUST_2, MyFrame::OnAdjust)
@@ -297,4 +325,5 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_MENU_ADJUST_5, MyFrame::OnAdjust)
 	EVT_MENU(ID_MENU_ADJUST_6, MyFrame::OnAdjust)
 	EVT_MENU(ID_MENU_ADJUST_7, MyFrame::OnAdjust)
+	EVT_MENU(ID_MENU_MOVE_7, MyFrame::OnMovePanel7)
 END_EVENT_TABLE()

@@ -34,35 +34,26 @@
 #include <globals/Number.h>
 #include <widgets/FileTypeImageList.h>
 #include <code_control/CodeControlClass.h>
+#include <widgets/AuiManager.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
-#include <widgets/AuiManager.h>
 
 static const int ID_CLOSE_ALL_TABS = wxNewId();
 static const int ID_CLOSE_TAB = wxNewId();
 static const int ID_SPLIT_HORIZONTALLY = wxNewId();
 static const int ID_SPLIT_VERTICALLY = wxNewId();
+
+// we only have 5 notebooks at most right now
+// see widgets/AuiManager.h for more details
 static const int ID_MOVE_TAB_TO_NOTEBOOK_1 = wxNewId();
 static const int ID_MOVE_TAB_TO_NOTEBOOK_2 = wxNewId();
 static const int ID_MOVE_TAB_TO_NOTEBOOK_3 = wxNewId();
 static const int ID_MOVE_TAB_TO_NOTEBOOK_4 = wxNewId();
+static const int ID_MOVE_TAB_TO_NOTEBOOK_5 = wxNewId();
 
 int t4p::NotebookClass::NewPageNumber = 1;
-
-std::vector<t4p::NotebookClass*> t4p::CodeNotebooks(wxWindow* mainWindow) {
-	std::vector<t4p::NotebookClass*> notebooks;
-	wxWindowList& children = mainWindow->GetChildren();
-	wxWindowList::iterator it;
-	for (it = children.begin(); it != children.end(); ++it) {
-		wxWindow* child = *it;
-		if (child->GetName() == wxT("NotebookClass")) {
-			notebooks.push_back((t4p::NotebookClass*)child);
-		}
-	}
-	return notebooks;
-}
 
 t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
 	const wxPoint& pos, const wxSize& size, long style, const wxString& name)
@@ -544,13 +535,16 @@ bool t4p::NotebookClass::GetModifiedPageNames(std::vector<wxString>& modifiedPag
 
 void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	TabIndexRightClickEvent = event.GetSelection();
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
+	t4p::NotebookClass* hiddenNotebook = t4p::AuiNextHiddenCodeNotebook(*AuiManager);
 
 	wxMenu menu;
 	menu.Append(ID_CLOSE_ALL_TABS, wxT("Close All Tabs"));
 	menu.Append(ID_CLOSE_TAB, wxT("Close This Tab"));
-	menu.Append(ID_SPLIT_VERTICALLY, wxT("Split Vertically"));
-	menu.Append(ID_SPLIT_HORIZONTALLY, wxT("Split Horizontally"));
+	if (hiddenNotebook) {
+		menu.Append(ID_SPLIT_VERTICALLY, wxT("Split Vertically"));
+		menu.Append(ID_SPLIT_HORIZONTALLY, wxT("Split Horizontally"));
+	}
 	if (notebooks.size() == 2) {
 		menu.Append(ID_MOVE_TAB_TO_NOTEBOOK_1, wxT("Move This Tab To Other Notebook"));
 	}
@@ -579,7 +573,7 @@ void t4p::NotebookClass::OnMovePage(wxCommandEvent& event) {
 		return;
 	}
 	
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	
 	// when there are 2  notebooks, then just move from one to the other
 	if (notebooks.size() == 2) {
@@ -786,6 +780,11 @@ void t4p::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
 
 
 void t4p::NotebookClass::SplitHorizontally() {
+	t4p::NotebookClass* newNotebook = t4p::AuiNextHiddenCodeNotebook(*AuiManager);
+	if (!newNotebook) {
+		return;
+	}
+	
 	wxSize newNotebookSize = GetSize();
 	wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(this);
 	int row = currentNotebookInfo.dock_row;
@@ -798,25 +797,26 @@ void t4p::NotebookClass::SplitHorizontally() {
 	// if we are splitting the center notebook, then
 	// we split horizontally by putting the new notebook
 	// in a new dock position (bottom)
+	// see widgets/AuiManager.h for more info about AUI docks,
+	// row, and position.
 	if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
 		direction = wxAUI_DOCK_BOTTOM;
-		row = t4p::AuiRowCount(*AuiManager) + 1;
+		
+		// 2 because we always want the finder panel and the tools
+		// notebook to be closest to the bottom
+		row = 2;
+		insertLevel = wxAUI_INSERT_ROW;
 	}
-	else {
+	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
 		position++;
+		insertLevel = wxAUI_INSERT_PANE;
+	}
+	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
+		row++;
+		insertLevel = wxAUI_INSERT_ROW;
 	}
 	newNotebookSize.Scale(1, 0.5);
 
-	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(GetParent(), 
-		wxID_ANY, wxDefaultPosition, newNotebookSize,
-		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS |
-		wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
-
-		// very important that the name be given, this is how we find the
-		// notebooks when iterating through the frame's children
-		wxT("NotebookClass")
-	);
-	newNotebook->InitApp(CodeControlOptions, Preferences, Globals, EventSink, AuiManager);
 	if (GetPageCount() > 1) {
 		newNotebook->Adopt(GetCurrentCodeControl(), this);
 	}
@@ -832,15 +832,14 @@ void t4p::NotebookClass::SplitHorizontally() {
 			.CloseButton(false),
 		insertLevel
 	);
+	AuiManager->GetPane(newNotebook).Show();
 	
 	// when there are more than 2 notebooks, given them names so
 	// that the user can tell them apart (for "moving tabs" purposes)
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	if (notebooks.size() > 2) {
 		for (size_t i = 0; i < notebooks.size(); i++) {
 			wxAuiPaneInfo& info = AuiManager->GetPane(notebooks[i]);
-			info.Name(wxString::Format("Notebook %ld", i + 1));
-			info.Caption(wxString::Format("Notebook %ld", i + 1));
 			info.CaptionVisible(true);
 		}
 	}
@@ -849,6 +848,10 @@ void t4p::NotebookClass::SplitHorizontally() {
 }
 
 void t4p::NotebookClass::SplitVertically() {
+	t4p::NotebookClass* newNotebook = t4p::AuiNextHiddenCodeNotebook(*AuiManager);
+	if (!newNotebook) {
+		return;
+	}
 	wxSize newNotebookSize = GetSize();
 	wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(this);
 	int row = currentNotebookInfo.dock_row;
@@ -860,26 +863,23 @@ void t4p::NotebookClass::SplitVertically() {
 	// splitting vertically
 	// if we are splitting the center notebook, then
 	// we split vertically by putting the new notebook
-	// in a new dock position (right)
+	// in a new dock row (right)
+	// see widgets/AuiManager.h for more info about AUI docks,
+	// row, and position.
 	if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
 		direction = wxAUI_DOCK_RIGHT;
-	}
-	else {
-		row++;
+		row = t4p::AuiRowCount(*AuiManager, wxAUI_DOCK_RIGHT);
 		insertLevel = wxAUI_INSERT_ROW;
 	}
+	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
+		row--;
+		insertLevel = wxAUI_INSERT_ROW;
+	}
+	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
+		position++;
+		insertLevel = wxAUI_INSERT_PANE;
+	}
 	newNotebookSize.Scale(0.5, 1);
-
-	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(GetParent(),
-		wxID_ANY, wxDefaultPosition, newNotebookSize,
-		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS |
-		wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
-
-		// very important that the name be given, this is how we find the
-		// notebooks when iterating through the frame's children
-		wxT("NotebookClass")
-	);
-	newNotebook->InitApp(CodeControlOptions, Preferences, Globals, EventSink, AuiManager);
 	if (GetPageCount() > 1) {
 		newNotebook->Adopt(GetCurrentCodeControl(), this);
 	}
@@ -895,10 +895,11 @@ void t4p::NotebookClass::SplitVertically() {
 			.CloseButton(false),
 		insertLevel
 	);
+	AuiManager->GetPane(newNotebook).Show();
 	
 	// when there are more than 2 notebooks, given them names so
 	// that the user can tell them apart (for "moving tabs" purposes)
-	std::vector<t4p::NotebookClass*> notebooks = CodeNotebooks(GetParent());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	if (notebooks.size() > 2) {
 		for (size_t i = 0; i < notebooks.size(); i++) {
 			wxAuiPaneInfo& info = AuiManager->GetPane(notebooks[i]);
@@ -939,5 +940,5 @@ BEGIN_EVENT_TABLE(t4p::NotebookClass, wxAuiNotebook)
 	EVT_MENU(ID_CLOSE_TAB, t4p::NotebookClass::OnMenuClosePage)
 	EVT_MENU(ID_SPLIT_HORIZONTALLY, t4p::NotebookClass::OnMenuSplit)
 	EVT_MENU(ID_SPLIT_VERTICALLY, t4p::NotebookClass::OnMenuSplit)
-	EVT_MENU_RANGE(ID_MOVE_TAB_TO_NOTEBOOK_1, ID_MOVE_TAB_TO_NOTEBOOK_4, t4p::NotebookClass::OnMovePage)
+	EVT_MENU_RANGE(ID_MOVE_TAB_TO_NOTEBOOK_1, ID_MOVE_TAB_TO_NOTEBOOK_5, t4p::NotebookClass::OnMovePage)
 END_EVENT_TABLE()

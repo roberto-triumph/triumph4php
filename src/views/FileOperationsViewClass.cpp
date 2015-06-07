@@ -25,6 +25,7 @@
 #include <views/FileOperationsViewClass.h>
 #include <widgets/NotebookClass.h>
 #include <Triumph.h>
+#include <widgets/AuiManager.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 
@@ -422,7 +423,7 @@ void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
 		doVeto = true;
 	}
 	if (!doVeto) {
-		std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+		std::vector<t4p::NotebookClass*> notebooks = t4p::AuiAllCodeNotebooks(*AuiManager);
 		doVeto = !SaveAllModifiedPages(notebooks, GetMainWindow());
 	}
 

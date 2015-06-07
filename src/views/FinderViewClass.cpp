@@ -209,8 +209,11 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
 		}
-		int layers = t4p::AuiLayerCount(*AuiManager);
-		AuiManager->GetPane(window).Layer(layers).Show();
+		
+		// row == 1 means that the finder bar goes below any code
+		// notebook but above the tools notebook
+		int row = 1;
+		AuiManager->GetPane(window).Row(row).Show();
 		panel->SetFocusOnFindText();
 	}
 	parent->Thaw();

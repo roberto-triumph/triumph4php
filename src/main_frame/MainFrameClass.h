@@ -249,12 +249,6 @@ private:
 	void SetApplicationFont();
 
 	/**
-	 * delete the empty notebooks. This is usually done right after
-	 * the user closes a code control.
-	 */
-	void DeleteEmptyCodeNotebooks();
-
-	/**
 	 * GUI framework object, used to programatically position the different windows
 	 * 
 	 * @var wxAuiManager

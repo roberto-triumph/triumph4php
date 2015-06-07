@@ -26,6 +26,7 @@
 #include <widgets/NotebookClass.h>
 #include <widgets/AuiManager.h>
 #include <globals/Events.h>
+#include <wx/wupdlock.h>
 
 /**
  * Checks that the given possible code control is in fact part of 
@@ -33,17 +34,19 @@
  * 
  * @param possible a window to test
  * @param mainWindow the main app frame
+ * @param auiManager the AUI manager, used to get the notebooks
  * @return the code control that has focus, or NULL if focus is on
  *         another window
  */
-static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* possible, wxWindow* mainWindow) {
+static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* possible, 
+		wxWindow* mainWindow, wxAuiManager& auiManager) {
 	t4p::CodeControlClass* codeCtrl = NULL;
 
 	// we don't just want to cast since we don't know if the focused window
 	// is a code control. We find out if the focus is anywhere inside a
 	// notebook; either the notebook itself, or one of its tabs or borders.
 	// the focused window is in one of the code notebooks
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(auiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int index = notebook->GetPageIndex(possible);
@@ -56,15 +59,16 @@ static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* poss
 }
 
 static bool EnsureValidCodeControlWithNotebook(t4p::CodeControlClass* possible, wxWindow* mainWindow,
+		wxAuiManager& auiManager,
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) {
 	bool found = false;
-	*codeCtrl = EnsureValidCodeControl(possible, mainWindow);
+	*codeCtrl = EnsureValidCodeControl(possible, mainWindow, auiManager);
 	if (!(*codeCtrl)) {
 		return found;
 	}
 
 	// get the notebook parent for the focused code control
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(auiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
 			*notebook = notebooks[i];
@@ -227,13 +231,6 @@ bool t4p::FeatureViewClass::AddToolsWindow(wxWindow* window, wxString tabName, w
 	if (ToolsNotebook->AddPage(window, tabName, true, bitmap)) {
 		if (NULL != AuiManager) {
 			AuiManager->GetPane(ToolsNotebook).Show();
-			
-			// there may be code notebooks may be in the bottom dock; we want the tools
-			// to be at the bottom-most position; we need to calculate the "layer"
-			int layer = t4p::AuiLayerCount(*AuiManager);
-			if (layer > 0) {
-				AuiManager->GetPane(ToolsNotebook).Layer(layer + 1);
-			}
 			AuiManager->Update();
 		}
 		return true;
@@ -254,12 +251,17 @@ bool t4p::FeatureViewClass::AddOutlineWindow(wxWindow* window, wxString name, co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::GetCurrentCodeControl() const {
-	return EnsureValidCodeControl(CurrentFocusCodeControl, GetMainWindow());
+	return EnsureValidCodeControl(
+		CurrentFocusCodeControl, GetMainWindow(), *AuiManager
+	);
 }
 
 bool t4p::FeatureViewClass::GetCurrentCodeControlWithNotebook(
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) const {
-	return EnsureValidCodeControlWithNotebook(CurrentFocusCodeControl, GetMainWindow(), codeCtrl, notebook);
+	return EnsureValidCodeControlWithNotebook(
+		CurrentFocusCodeControl, GetMainWindow(), *AuiManager,
+		codeCtrl, notebook
+	);
 }
 
 wxWindow* t4p::FeatureViewClass::GetMainWindow() const {
@@ -286,12 +288,13 @@ t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& 
 	if (!GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
 
 		// as a last resort, add to the first notebook
-		std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+		std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 		if (!notebooks.empty()) {
 			notebook = notebooks[0];
 		}
 	}
 	if (notebook) {
+		wxWindowUpdateLocker locker(notebook);
 		notebook->AddTriumphPage(type);
 		if (!tabName.IsEmpty()) {
 			notebook->SetPageText(notebook->GetSelection(), tabName);
@@ -320,7 +323,7 @@ void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
 	}
 
 	// as a final precaution, put the file in the first notebook
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	if (!notebooks.empty()) {
 		notebooks[0]->LoadPage(fileName);
 	}
@@ -328,7 +331,7 @@ void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
 
 std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() const {
 	std::vector<t4p::CodeControlClass*> ctrls;
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	for (size_t n = 0 ; n < notebooks.size(); ++n) {
 		t4p::NotebookClass* notebook = notebooks[n];
 		for (size_t p = 0; p < notebook->GetPageCount(); ++p) {
@@ -340,7 +343,7 @@ std::vector<t4p::CodeControlClass*> t4p::FeatureViewClass::AllCodeControls() con
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fullPath) const {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	t4p::CodeControlClass* code = NULL;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -353,7 +356,7 @@ t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControl(const wxString& fu
 }
 
 std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	std::vector<wxString> allFiles;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -365,7 +368,7 @@ std::vector<wxString> t4p::FeatureViewClass::AllOpenedFiles() const {
 
 wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* codeCtrl) {
 	wxString ret;
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int pos = notebook->GetPageIndex(codeCtrl);
@@ -378,7 +381,7 @@ wxString t4p::FeatureViewClass::GetCodeNotebookTabText(t4p::CodeControlClass* co
 }
 
 t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxString& fullPath) const {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	t4p::CodeControlClass* codeCtrl = NULL;
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
@@ -398,7 +401,7 @@ t4p::CodeControlClass* t4p::FeatureViewClass::FindCodeControlAndSelect(const wxS
 }
 
 void t4p::FeatureViewClass::CloseCodeControl(t4p::CodeControlClass* codeCtrl) {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		int pageIndex = notebook->GetPageIndex(codeCtrl);

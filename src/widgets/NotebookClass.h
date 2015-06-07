@@ -406,21 +406,5 @@ private:
 	NotebookClass* Notebook;
 };
 
-/**
- * Fetch the code notebooks that are part of the main frame.
- * This function depends on the fact that all notebook class
- * objects have the same window name (NotebookClass)
- *
- * Be very careful with
- * these pointers, as the user can close notebooks at any time
- * and the pointers will be deleted.  You should not store
- * the pointers at all.
- *
- * @param mainWindow the main frame
- * @return vector all of the code notebooks that are in the
- *         main application frame.
- */
-std::vector<t4p::NotebookClass*> CodeNotebooks(wxWindow* mainWindow);
-
 }
 #endif /*__T4P_NOTEBOOKCLASS_H_*/

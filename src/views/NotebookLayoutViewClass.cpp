@@ -26,48 +26,13 @@
 #include <widgets/NotebookClass.h>
 #include <Triumph.h>
 #include <globals/Assets.h>
-
-/**
- * removes all but 1 of the code notebooks from the application.
- * The code controls from the removed notebooks will be added to the
- * remaining notebook.
- *
- * Note that the aui manager is not updated in this function, so that
- * callers can continue to make changes to AUI panes before refreshing
- * the manager.
- *
- * @param mainWindow
- * @param auiManager
- */
-static void RemoveExtraNotebooks(wxWindow* mainWindow, wxAuiManager* auiManager) {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
-	if (notebooks.size() == 1) {
-		return;
-	}
-	t4p::NotebookClass* firstNotebook = notebooks[0];
-
-	for (size_t i = 1; i < notebooks.size(); i++) {
-		t4p::NotebookClass* notebook = notebooks[i];
-		auiManager->DetachPane(notebook);
-
-		// move the code controls for this notebook to the
-		// first notebook
-		while (notebook->GetPageCount() > 0) {
-			t4p::CodeControlClass* codeCtrl = notebook->GetCodeControl(0);
-			firstNotebook->Adopt(codeCtrl, notebook);
-		}
-		notebook->Destroy();
-	}
-	
-	// in case the caption was visible due to > 2 notebooks
-	wxAuiPaneInfo& info = auiManager->GetPane(firstNotebook);
-	info.CaptionVisible(false);
-	info.Name("Notebook 1");
-}
+#include <widgets/AuiManager.h>
+#include <wx/wupdlock.h>
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
 : FeatureViewClass()
-, Feature(feature) {
+///, Feature(feature) 
+{
 
 }
 
@@ -127,8 +92,8 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	// notebook in its own layer so that each notebook
 	// takes up an entire column.
 	//
-	
-	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
+	wxWindowUpdateLocker locker(GetMainWindow());
+	t4p::AuiResetCodeNotebooks(*AuiManager);
 
 	int columnCount = 1;
 	if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 4)) {
@@ -141,7 +106,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	t4p::NotebookClass* currentNotebook = NULL;
 	t4p::NotebookClass* firstNotebook = NULL;
 	t4p::CodeControlClass* codeCtrl = NULL;
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiAllCodeNotebooks(*AuiManager);
 	if (!notebooks.empty()) {
 		firstNotebook = notebooks[0];
 	}
@@ -149,32 +114,30 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
 		newNotebookSize.Scale(1.0 / columnCount, 1);
+		currentNotebook->SetSize(newNotebookSize);
 	}
 
-	for (int i = 1; i < columnCount; i++) {
-		t4p::NotebookClass* newNotebook = NewNotebook();
-		newNotebook->SetSize(newNotebookSize);
-		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-		wxAuiPaneInfo info;
-		info.Right().Row(i).Position(0).Layer(0)
+	for (int i = 1; i < columnCount && i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		notebook->SetSize(newNotebookSize);
+		if (notebook->GetPageCount() == 0) {
+			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+		}
+		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
+		info.Right().Row(i - 1).Position(0).Layer(0)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
-			.CloseButton(false);
+			.CloseButton(false).Show().BestSize(newNotebookSize);
 		
 		// when there are more than 2 notebooks, given them names so
 		// that the user can tell them apart (for "moving tabs" purposes)
 		if (columnCount > 2) {
-			info.Name(wxString::Format("Notebook %d", i + 1));
-			info.Caption(wxString::Format("Notebook %d", i + 1));
-			info.CaptionVisible(true);
+			info.CaptionVisible(true).CloseButton(false);
 		}
-		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_ROW);
 	}
 	if (firstNotebook && columnCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
-		currentNotebookInfo.Name("Notebook 1");
-		currentNotebookInfo.Caption("Notebook 1");
-		currentNotebookInfo.CaptionVisible(true);
+		currentNotebookInfo.CaptionVisible(true).CloseButton(false);
 	}
 	AuiManager->Update();
 }
@@ -191,7 +154,8 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	// notebook in its own layer so that each notebook
 	// takes up an entire row.
 	//
-	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
+	wxWindowUpdateLocker locker(GetMainWindow());
+	t4p::AuiResetCodeNotebooks(*AuiManager);
 
 	int rowCount = 1;
 	if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 2)) {
@@ -204,7 +168,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	t4p::NotebookClass* currentNotebook = NULL;
 	t4p::NotebookClass* firstNotebook = NULL;
 	t4p::CodeControlClass* codeCtrl = NULL;
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(GetMainWindow());
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiAllCodeNotebooks(*AuiManager);
 	if (!notebooks.empty()) {
 		firstNotebook = notebooks[0];
 	}
@@ -212,63 +176,40 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		newNotebookSize = currentNotebook->GetSize();
 		newNotebookSize.Scale(1, 1.0 / rowCount);
+		currentNotebook->SetSize(newNotebookSize);
 	}
 
-	for (int i = 1; i < rowCount; i++) {
-		t4p::NotebookClass* newNotebook = NewNotebook();
-		newNotebook->SetSize(newNotebookSize);
-		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-		wxAuiPaneInfo info;
+	for (int i = 1; i < rowCount && i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		notebook->SetSize(newNotebookSize);
+		if (notebook->GetPageCount() == 0) {
+			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+		}
+		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
 		
 		// i+2 because we want the tools notebook and the find/replace
 		// panels below these notebook splits
 		info.Bottom().Row(i + 2).Position(0)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
-			.CloseButton(false);
+			.CloseButton(false).Show().BestSize(newNotebookSize);
 		
 		// when there are more than 2 notebooks, given them names so
 		// that the user can tell them apart (for "moving tabs" purposes)
 		if (rowCount > 2) {
-			info.Name(wxString::Format("Notebook %d", i + 1));
-			info.Caption(wxString::Format("Notebook %d", i + 1));
-			info.CaptionVisible(true);
+			info.CaptionVisible(true).CloseButton(false);
 		}
-		AuiManager->InsertPane(newNotebook, info, wxAUI_INSERT_ROW);
 	}
 	if (firstNotebook && rowCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
-		currentNotebookInfo.Name("Notebook 1");
-		currentNotebookInfo.Caption("Notebook 1");
 		currentNotebookInfo.CaptionVisible(true);
 	}
 	AuiManager->Update();
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookReset(wxCommandEvent& event) {
-	RemoveExtraNotebooks(GetMainWindow(), AuiManager);
+	t4p::AuiResetCodeNotebooks(*AuiManager);
 	AuiManager->Update();
-}
-
-t4p::NotebookClass* t4p::NotebookLayoutViewClass::NewNotebook() {
-	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(
-		GetMainWindow(),
-		wxID_ANY, wxDefaultPosition, wxDefaultSize,
-		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS |
-		wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
-
-		// very important that the name be given, this is how we find the
-		// notebooks when iterating through the frame's children
-		wxT("NotebookClass")
-	);
-	newNotebook->InitApp(
-		&Feature.App.Preferences.CodeControlOptions,
-		&Feature.App.Preferences,
-		&Feature.App.Globals,
-		&Feature.App.EventSink,
-		AuiManager
-	);
-	return newNotebook;
 }
 
 BEGIN_EVENT_TABLE(t4p::NotebookLayoutViewClass, t4p::FeatureViewClass)

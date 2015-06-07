@@ -29,6 +29,7 @@
 #include <main_frame/PreferencesDialogClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
 #include <widgets/NotebookClass.h>
+#include <widgets/AuiManager.h>
 #include <globals/Assets.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
@@ -47,7 +48,7 @@ static int ID_SEQUENCE_GAUGE = wxNewId();
  * @return the code control that has focus, or NULL if focus is on
  *         another window
  */
-static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
+static t4p::CodeControlClass* FindFocusedCodeControl( wxAuiManager& auiManager) {
 	t4p::CodeControlClass* codeCtrl = NULL;
 	wxWindow* focusWindow = wxWindow::FindFocus();
 	if (!focusWindow) {
@@ -58,7 +59,7 @@ static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
 	// is a code control. We find out if the focus is anywhere inside a
 	// notebook; either the notebook itself, or one of its tabs or borders.
 	// the focused window is in one of the code notebooks
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(auiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		if (focusWindow == notebook || notebook->IsDescendant(focusWindow)) {
@@ -68,16 +69,16 @@ static t4p::CodeControlClass* FindFocusedCodeControl(wxWindow* mainWindow) {
 	return codeCtrl;
 }
 
-static bool FindFocusedCodeControlWithNotebook(wxWindow* mainWindow,
+static bool FindFocusedCodeControlWithNotebook(wxAuiManager& auiManager,
 		t4p::CodeControlClass** codeCtrl, t4p::NotebookClass** notebook) {
 	bool found = false;
-	*codeCtrl = FindFocusedCodeControl(mainWindow);
+	*codeCtrl = FindFocusedCodeControl(auiManager);
 	if (!(*codeCtrl)) {
 		return found;
 	}
 
 	// get the notebook parent for the focused code control
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(mainWindow);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(auiManager);
 	for (size_t i = 0; i < notebooks.size(); ++i) {
 		if (notebooks[i]->GetPageIndex(*codeCtrl) != wxNOT_FOUND) {
 			*notebook = notebooks[i];
@@ -107,22 +108,20 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	ToolBar = new wxAuiToolBar(this, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize,
 		  wxAUI_TB_DEFAULT_STYLE);
 
-	t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, wxID_ANY,
-		wxDefaultPosition, wxDefaultSize,
-		wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON,
-
-		// very important that the name be given, this is how we find the
-		// notebooks when iterating through the frame's children
-		"NotebookClass"
-	);
-	codeNotebook->InitApp(
-		&App.Preferences.CodeControlOptions,
-		&App.Preferences,
-		&App.Globals,
-		&App.EventSink,
-		&AuiManager
-	);
-
+	for (int i = 1; i <= t4p::AUI_MAX_CODE_NOTEBOOKS; i++) {
+		t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, wxID_ANY,
+			wxDefaultPosition, wxDefaultSize,
+			wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON
+		);
+		codeNotebook->InitApp(
+			&App.Preferences.CodeControlOptions,
+			&App.Preferences,
+			&App.Globals,
+			&App.EventSink,
+			&AuiManager
+		);
+		t4p::AuiAddCodeNotebook(AuiManager, codeNotebook, i);
+	}
 	ToolsNotebook = new wxAuiNotebook(this, t4p::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_TAB_MOVE);
 	OutlineNotebook = new wxAuiNotebook(this, t4p::ID_OUTLINE_NOTEBOOK, wxDefaultPosition, wxDefaultSize,
@@ -135,8 +134,6 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	// of the frame even if there are split notebooks or the finder panel is 
 	// visible.
 	int row = 0;
-	AuiManager.AddPane(codeNotebook, wxAuiPaneInfo().Name(wxT("content")).CentrePane(
-		).PaneBorder(true).Gripper(false).Floatable(false).Resizable(true));
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
 		_("Tools")).Floatable(false).MinSize(-1, 260).Hide().Row(row));
 	AuiManager.AddPane(OutlineNotebook, wxAuiPaneInfo().Name(wxT("outline")).Left().Caption(
@@ -200,7 +197,7 @@ void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 }
 
 void t4p::MainFrameClass::CreateNewCodeCtrl() {
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(AuiManager);
 	if (!notebooks.empty()) {
 		notebooks[0]->AddTriumphPage(t4p::FILE_TYPE_PHP);
 	}
@@ -447,7 +444,7 @@ void t4p::MainFrameClass::RealizeToolbar() {
 }
 
 void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
-	CodeControlClass* codeWindow = FindFocusedCodeControl(this);
+	CodeControlClass* codeWindow = FindFocusedCodeControl(AuiManager);
 	
 	// only show the user if and only if
 	// user clicked inside of the code control
@@ -532,71 +529,21 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 	// for code notebooks; we want to keep 1, but if the user
 	// removes pages from the 2-N notebook, then we kill the
 	// empty notebook
-	std::vector<t4p::NotebookClass*> notebooks = t4p::CodeNotebooks(this);
-	int remainingNotebooks = notebooks.size();
-	bool hasDetached = false;
+	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(AuiManager);
+	bool hasHidden = false;
 	for (size_t i = 0; i < notebooks.size(); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
-		if (remainingNotebooks > 1 && notebook->GetPageCount() == 0) {
-			AuiManager.DetachPane(notebook);
-			hasDetached = true;
-			remainingNotebooks--;
+		if (notebook->GetPageCount() == 0) {
+			wxAuiPaneInfo& info = AuiManager.GetPane(notebook);
+			if (info.IsOk() && info.dock_direction != wxAUI_DOCK_CENTER) {
+				info.Hide();
+				hasHidden = true;
+			}
 		}
 	}
-	if (hasDetached) {
-		
-		// do we still have a center pane? we need one, otherwise there 
-		// is a big gap
-		bool hasCenter = false;
-		for (size_t i = 0; i < notebooks.size(); i++) {
-			wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
-			if (info.IsOk() && info.dock_direction == wxAUI_DOCK_CENTER) {
-				hasCenter = true;
-			}
-		}
-		if (!hasCenter) {
-			
-			// no center pane, make one notebook be the center pane
-			for (size_t i = 0; i < notebooks.size(); i++) {
-				wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
-				if (info.IsOk()) {
-					info.CenterPane();
-					break;
-				}
-			}
-		}
+	if (hasHidden) {
 		AuiManager.Update();
-		
-		
-		// don't delete now; wait until events are processed
-		CallAfter(&t4p::MainFrameClass::DeleteEmptyCodeNotebooks);
 	}
-}
-
-void t4p::MainFrameClass::DeleteEmptyCodeNotebooks() {
-
-	// we want to keep 1 code notebook, even if empty
-	std::vector<t4p:: NotebookClass*> notebooks = t4p::CodeNotebooks(this);
-	std::vector<t4p:: NotebookClass*>::iterator it = notebooks.begin();
-	while (it != notebooks.end() && notebooks.size() > 1) {
-		if ((*it)->GetPageCount() <= 0) {
-			(*it)->Destroy();
-			it = notebooks.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-	
-	if (notebooks.size() <= 2) {
-		
-		// in case the caption was previously visible due to > 2 notebooks
-		for (size_t i = 0; i < notebooks.size(); i++) {
-			wxAuiPaneInfo& info = AuiManager.GetPane(notebooks[i]);
-			info.CaptionVisible(false);
-		}
-	}
-	AuiManager.Update();
 }
 
 void t4p::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
@@ -612,7 +559,7 @@ void t4p::MainFrameClass::OnAnyAuiToolbarEvent(wxAuiToolBarEvent& event) {
 void t4p::MainFrameClass::UpdateTitleBar() {
 	t4p::CodeControlClass* codeControl = NULL;
 	t4p::NotebookClass* notebook = NULL;
-	if (!FindFocusedCodeControlWithNotebook(this, &codeControl, &notebook)) {
+	if (!FindFocusedCodeControlWithNotebook(AuiManager, &codeControl, &notebook)) {
 		SetTitle(_("Triumph4PHP"));
 		return;
 	}

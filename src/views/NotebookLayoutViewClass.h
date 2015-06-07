@@ -72,22 +72,15 @@ private:
 	 */
 	void OnNotebookCreateGrid(wxCommandEvent& event);
 
-
 	/**
 	 * Create a single notebook
 	 */
 	void OnNotebookReset(wxCommandEvent& event);
 
 	/**
-	 * @return NotebookClass already initialized with the App
-	 *         data structures
-	 */
-	t4p::NotebookClass* NewNotebook();
-
-	/**
 	 * To get access to the globals; needed by the notebook.
 	 */
-	t4p::NotebookLayoutFeatureClass& Feature;
+	////t4p::NotebookLayoutFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
 };
