@@ -26,6 +26,7 @@
 #include <widgets/NotebookClass.h>
 #include <Triumph.h>
 #include <globals/Assets.h>
+#include <globals/Number.h>
 #include <widgets/AuiManager.h>
 #include <wx/wupdlock.h>
 
@@ -117,7 +118,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 		currentNotebook->SetSize(newNotebookSize);
 	}
 
-	for (int i = 1; i < columnCount && i < notebooks.size(); i++) {
+	for (int i = 1; i < columnCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->SetSize(newNotebookSize);
 		if (notebook->GetPageCount() == 0) {
@@ -179,7 +180,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 		currentNotebook->SetSize(newNotebookSize);
 	}
 
-	for (int i = 1; i < rowCount && i < notebooks.size(); i++) {
+	for (int i = 1; i < rowCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->SetSize(newNotebookSize);
 		if (notebook->GetPageCount() == 0) {
