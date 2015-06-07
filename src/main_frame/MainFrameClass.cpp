@@ -531,6 +531,7 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 	// empty notebook
 	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(AuiManager);
 	bool hasHidden = false;
+	int finalVisible = notebooks.size();
 	for (size_t i = 0; i < notebooks.size(); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		if (notebook->GetPageCount() == 0) {
@@ -538,7 +539,14 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 			if (info.IsOk() && info.dock_direction != wxAUI_DOCK_CENTER) {
 				info.Hide();
 				hasHidden = true;
+				finalVisible--;
 			}
+		}
+	}
+	if (finalVisible <= 2) {
+		// if we have 2 or less notebooks, hide the captions as they are not useful
+		for (size_t i = 0; i < notebooks.size(); i++) {
+			AuiManager.GetPane(notebooks[i]).CaptionVisible(false);
 		}
 	}
 	if (hasHidden) {
