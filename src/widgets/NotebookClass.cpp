@@ -586,7 +586,7 @@ void t4p::NotebookClass::OnMovePage(wxCommandEvent& event) {
 	}
 	else {
 		int index = event.GetId() - ID_MOVE_TAB_TO_NOTEBOOK_1;
-		if (index >= 0 && index < notebooks.size()) {
+		if (index >= 0 && t4p::NumberLessThan(index, notebooks.size())) {
 			t4p::NotebookClass* destNotebook = notebooks[index];
 			destNotebook->Adopt(ctrl, this);
 		}
@@ -940,5 +940,9 @@ BEGIN_EVENT_TABLE(t4p::NotebookClass, wxAuiNotebook)
 	EVT_MENU(ID_CLOSE_TAB, t4p::NotebookClass::OnMenuClosePage)
 	EVT_MENU(ID_SPLIT_HORIZONTALLY, t4p::NotebookClass::OnMenuSplit)
 	EVT_MENU(ID_SPLIT_VERTICALLY, t4p::NotebookClass::OnMenuSplit)
-	EVT_MENU_RANGE(ID_MOVE_TAB_TO_NOTEBOOK_1, ID_MOVE_TAB_TO_NOTEBOOK_5, t4p::NotebookClass::OnMovePage)
+	EVT_MENU(ID_MOVE_TAB_TO_NOTEBOOK_1, t4p::NotebookClass::OnMovePage)
+	EVT_MENU(ID_MOVE_TAB_TO_NOTEBOOK_2, t4p::NotebookClass::OnMovePage)
+	EVT_MENU(ID_MOVE_TAB_TO_NOTEBOOK_3, t4p::NotebookClass::OnMovePage)
+	EVT_MENU(ID_MOVE_TAB_TO_NOTEBOOK_4, t4p::NotebookClass::OnMovePage)
+	EVT_MENU(ID_MOVE_TAB_TO_NOTEBOOK_5, t4p::NotebookClass::OnMovePage)
 END_EVENT_TABLE()
