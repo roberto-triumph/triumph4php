@@ -28,12 +28,10 @@
 
 #include <wx/imaglist.h>
 #include <wx/filename.h>
+#include <globals/FileTypeClass.h>
 
 namespace t4p {
 
-// forward declaration; declared in another file
-class FileTypeClass;
-	
 /**
  * The file types that we have an icon for
  */
@@ -70,6 +68,17 @@ void FileTypeImageList(wxImageList& imgList);
  *         this function returns t4p::IMGLIST_PHP
  */
 int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileName);
+
+/**
+ * @param fileTypes the configured file type extensions
+ * @param type the file type to check
+ * @return int Images enum entry that corresponds with the give
+ *         fileName.
+ *         For example, if fileName is "/home/user/index.php" then
+ *         this function returns t4p::IMGLIST_PHP
+ */
+int FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type);
+
 
 }
 

@@ -90,3 +90,38 @@ int t4p::FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& 
 	}
 	return t4p::IMGLIST_NONE;
 }
+
+int t4p::FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type) {
+	switch (type) {
+	case t4p::FILE_TYPE_PHP:
+		return t4p::IMGLIST_PHP;
+	case t4p::FILE_TYPE_SQL:
+		return t4p::IMGLIST_SQL;
+	case t4p::FILE_TYPE_CSS:
+		return t4p::IMGLIST_CSS;
+	case t4p::FILE_TYPE_JS:
+		return t4p::IMGLIST_JS;
+	case t4p::FILE_TYPE_CONFIG:
+		return t4p::IMGLIST_CONFIG;
+	case t4p::FILE_TYPE_CRONTAB:
+		return t4p::IMGLIST_CRONTAB;
+	case t4p::FILE_TYPE_YAML:
+		return t4p::IMGLIST_YAML;
+	case t4p::FILE_TYPE_XML:
+		return t4p::IMGLIST_XML;
+	case t4p::FILE_TYPE_RUBY:
+		return t4p::IMGLIST_RUBY;
+	case t4p::FILE_TYPE_LUA:
+		return t4p::IMGLIST_LUA;
+	case t4p::FILE_TYPE_MARKDOWN:
+		return t4p::IMGLIST_MARKDOWN;
+	case t4p::FILE_TYPE_BASH:
+		return t4p::IMGLIST_BASH;
+	case t4p::FILE_TYPE_DIFF:
+		return t4p::IMGLIST_DIFF;
+	case t4p::FILE_TYPE_TEXT:
+		return t4p::IMGLIST_MISC;
+	default:
+		return t4p::IMGLIST_NONE;
+	}
+}

@@ -28,7 +28,80 @@
 #include <globals/Assets.h>
 #include <globals/Number.h>
 #include <widgets/AuiManager.h>
-#include <wx/wupdlock.h>
+
+/**
+ * Moves all of the code notebooks from the hidden notebooks into the
+ * first visible notebook
+ *
+ * @param auiManager the AUI manager of the main frame
+ * @param ctrls all of the opened code controls
+ */
+static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::CodeControlClass*> ctrls) {
+	std::vector<t4p::NotebookClass*> visible = t4p::AuiVisibleCodeNotebooks(auiManager);
+	std::vector<t4p::NotebookClass*> all = t4p::AuiAllCodeNotebooks(auiManager);
+	std::vector<t4p::NotebookClass*> hidden;
+	for (size_t i = 0; i < all.size(); i++) {
+		t4p::NotebookClass* notebook = all[i];
+		if (!auiManager.GetPane(notebook).IsShown()) {
+			hidden.push_back(notebook);
+		}
+	}
+
+	// go through the hidden notebooks and move code controls
+	// from the hidden notebook into a visible notebook
+	for (size_t i = 0; i < hidden.size(); i++) {
+		t4p::NotebookClass* notebook = hidden[i];
+
+		// if a notebook is no longer shown we want to move the code controls
+		// that it had to another notebook (one that is shown).
+		// in the rare case that there are no shown notebooks, just remove them
+		// (closing will trigger a save prompt if needed)
+		while (notebook->GetPageCount() > 0) {
+			t4p::CodeControlClass* code = notebook->GetCodeControl(0);
+			if (!visible.empty()) {
+				visible[0]->Adopt(code, notebook);
+			}
+			else {
+				notebook->ClosePage(0);
+			}
+		}
+	}
+
+	// special case: if there are N visible code controls
+	// and we have N visible notebooks, put 1 code control
+	// in each notebook.
+	if (ctrls.size() == visible.size()) {
+		for (size_t i = 0; i < ctrls.size(); i++) {
+			t4p::CodeControlClass* ctrl = ctrls[i];
+			bool moved = false;
+			for (size_t a = 0; !moved && a < all.size(); a++) {
+				t4p::NotebookClass* ctrlNotebook = all[a];
+				int index = ctrlNotebook->GetPageIndex(ctrl);
+				if (index != wxNOT_FOUND && visible[i] != ctrlNotebook) {
+					visible[i]->Adopt(ctrl, ctrlNotebook);
+					moved = true;
+					break;
+				}
+				else if (visible[i] == ctrlNotebook) {
+					
+					// the code control is already at a visible notebook.
+					// move on to the next code control
+					moved = true;
+					break;
+				}
+			}
+		}
+	}
+
+	// in case that a notebook does not have any code controls
+	// add an empty file, this is for asthetic purposes
+	for (size_t i = 0; i < visible.size(); i++) {
+		t4p::NotebookClass* notebook = visible[i];
+		if (notebook->GetPageCount() == 0) {
+			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+		}
+	}
+}
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
 : FeatureViewClass()
@@ -88,12 +161,13 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	
 	//
 	// Implementation notes:
-	// rows are created by using AUI's docking and layers
-	// notebooks are placed in the right dock; each
-	// notebook in its own layer so that each notebook
-	// takes up an entire column.
+	// see src/widgets/AuiManager.h for more info about how panes
+	// are laid out in Triumph, and how split are formed
 	//
-	wxWindowUpdateLocker locker(GetMainWindow());
+
+	// not using a wxWindowUpateLocker because I need precise control
+	// on where to thaw the window, see below
+	GetMainWindow()->Freeze();
 	t4p::AuiResetCodeNotebooks(*AuiManager);
 
 	int columnCount = 1;
@@ -121,9 +195,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 	for (int i = 1; i < columnCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->SetSize(newNotebookSize);
-		if (notebook->GetPageCount() == 0) {
-			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-		}
 		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
 		info.Right().Row(i - 1).Position(0).Layer(0)
 			.Gripper(false).Resizable(true).Floatable(false)
@@ -136,26 +207,31 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 			info.CaptionVisible(true).CloseButton(false);
 		}
 	}
+
 	if (firstNotebook && columnCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
 		currentNotebookInfo.CaptionVisible(true).CloseButton(false);
 	}
-	AuiManager->Update();
-}
 
-void t4p::NotebookLayoutViewClass::OnNotebookCreateGrid(wxCommandEvent& event) {
+	GetMainWindow()->Thaw();
+	AuiManager->Update();
+
+	// make sure to call this AFTER thawing the main window
+	// if we don't then app stops being rendered
+	RedistributeCodeControls(*AuiManager, AllCodeControls());
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	
 	//
 	// Implementation notes:
-	// rows are created by using AUI's docking and layers
-	// notebooks are placed in the bottom dock; each
-	// notebook in its own layer so that each notebook
-	// takes up an entire row.
+	// see src/widgets/AuiManager.h for more info about how panes
+	// are laid out in Triumph, and how split are formed
 	//
-	wxWindowUpdateLocker locker(GetMainWindow());
+
+	// not using a wxWindowUpateLocker because I need precise control
+	// on where to thaw the window, see below
+	GetMainWindow()->Freeze();
 	t4p::AuiResetCodeNotebooks(*AuiManager);
 
 	int rowCount = 1;
@@ -183,9 +259,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 	for (int i = 1; i < rowCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->SetSize(newNotebookSize);
-		if (notebook->GetPageCount() == 0) {
-			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-		}
+
 		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
 		
 		// i+2 because we want the tools notebook and the find/replace
@@ -201,11 +275,18 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 			info.CaptionVisible(true).CloseButton(false);
 		}
 	}
+
 	if (firstNotebook && rowCount > 2) {
 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
 		currentNotebookInfo.CaptionVisible(true);
 	}
+
+	GetMainWindow()->Thaw();
 	AuiManager->Update();
+
+	// make sure to call this AFTER thawing the main window
+	// if we don't then app stops being rendered
+	RedistributeCodeControls(*AuiManager, AllCodeControls());
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookReset(wxCommandEvent& event) {

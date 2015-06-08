@@ -141,23 +141,17 @@ void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookCla
 	if (pageIndex == wxNOT_FOUND) {
 		return;
 	}
-
-	wxWindow* tab = src->GetPage(pageIndex);
 	wxString tabName = src->GetPageText(pageIndex);
-	wxString fileName = src->GetPageText(pageIndex);
-
 	src->RemovePage(pageIndex);
+	AdoptOrphan(codeCtrl, tabName);
+}
 
-	// remove the dirty indicator, so that we get just the file name itself
-	// which is needed to determine the file type icon
-	if (fileName.EndsWith(wxT("*"))) {
-		fileName = fileName.SubString(0, fileName.size() - 2);
-	}
+void t4p::NotebookClass::AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString tabName) {
 
 	// GetPageImage is not implemented in wxAuiNotebook
-	int tabImageId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(fileName));
-	AddPage(tab, tabName, tabImageId);
-	
+	int tabImageId = t4p::FileTypeImageIdFromType(Globals->FileTypes, codeCtrl->GetFileType());
+	AddPage(codeCtrl, tabName, tabImageId);
+
 	// notify the app that a page was moved
 	t4p::CodeControlEventClass moveEvt(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, codeCtrl);
 	moveEvt.SetEventObject(this);

@@ -263,10 +263,20 @@ public:
 	 * this method, codeCtrl will be in this notebook and it will be removed
 	 * from src
 	 *
-	 * @param codeCtrl the page to remove from src and into this
+	 * @param codeCtrl the page to remove from src and add into this
 	 * @param src the parent of codeCtrl
 	 */
 	void Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookClass* src);
+
+	/**
+	 * Adopts the given code control into this notebook, assuming that the code
+	 * control is not a page of any other notebook. After a call to
+	 * this method, codeCtrl will be in this notebook.
+	 *
+	 * @param codeCtrl the page to add into this notebook
+	 * @param tabName the name to put in the tab
+	 */
+	void AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString tabName);
 	
 	/**
 	 * Creates a new notebook and moves the currently selected tab
