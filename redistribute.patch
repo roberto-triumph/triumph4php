@@ -1,0 +1,329 @@
+diff --git a/src/views/NotebookLayoutViewClass.cpp b/src/views/NotebookLayoutViewClass.cpp
+index 0e9a970..93de4a5 100644
+--- a/src/views/NotebookLayoutViewClass.cpp
++++ b/src/views/NotebookLayoutViewClass.cpp
+@@ -28,7 +28,85 @@
+ #include <globals/Assets.h>
+ #include <globals/Number.h>
+ #include <widgets/AuiManager.h>
+-#include <wx/wupdlock.h>
++
++/**
++ * Moves all of the code notebooks from the hidden notebooks into the
++ * first visible notebook
++ *
++ * @param auiManager the AUI manager of the main frame
++ * @param ctrls all of the opened code controls
++ */
++static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::CodeControlClass*> ctrls) {
++	std::vector<t4p::NotebookClass*> visible = t4p::AuiVisibleCodeNotebooks(auiManager);
++	std::vector<t4p::NotebookClass*> all = t4p::AuiAllCodeNotebooks(auiManager);
++	std::vector<t4p::NotebookClass*> hidden;
++	for (size_t i = 0; i < all.size(); i++) {
++		t4p::NotebookClass* notebook = all[i];
++		if (!auiManager.GetPane(notebook).IsShown()) {
++			hidden.push_back(notebook);
++		}
++	}
++
++	// go through the hidden notebooks and move code controls
++	// from the hidden notebook into a visible notebook
++	for (size_t i = 0; i < hidden.size(); i++) {
++		t4p::NotebookClass* notebook = hidden[i];
++
++		// if a notebook is no longer shown we want to move the code controls
++		// that it had to another notebook (one that is shown).
++		// in the rare case that there are no shown notebooks, just remove them
++		// (closing will trigger a save prompt if needed)
++		while (notebook->GetPageCount() > 0) {
++			t4p::CodeControlClass* code = notebook->GetCodeControl(0);
++			if (!visible.empty()) {
++				visible[0]->Adopt(code, notebook);
++			}
++			else {
++				notebook->ClosePage(0);
++			}
++		}
++	}
++
++	// special case: if there are N visible code controls
++	// and we have N visible notebooks, put 1 code control
++	// in each notebook.
++	if (ctrls.size() == visible.size()) {
++		std::vector<wxString> tabNames;
++
++		// remove the code controls so our distribution
++		// algorithm is simpler
++		for (size_t i = 0; i < ctrls.size(); i++) {
++			t4p::CodeControlClass* ctrl = ctrls[i];
++			for (size_t a = 0; a < all.size(); a++) {
++				int index = all[a]->GetPageIndex(ctrl) != wxNOT_FOUND;
++				if (index) {
++					tabNames.push_back(all[a]->GetPageText(index));
++				}
++			}
++		}
++		for (size_t i = 0; i < visible.size(); i++) {
++			while (visible[i]->GetPageCount() > 0) {
++				visible[i]->RemovePage(0);
++			}
++		}
++
++		for (size_t i = 0; i < ctrls.size(); i++) {
++			t4p::CodeControlClass* ctrl = ctrls[i];
++
++			// visible, ctrls, and tabNames are parallel arrays
++			visible[i]->AdoptOrphan(ctrl, tabNames[i]);
++		}
++	}
++
++	// in case that a notebook does not have any code controls
++	// add an empty file, this is for asthetic purposes
++	for (size_t i = 0; i < visible.size(); i++) {
++		t4p::NotebookClass* notebook = visible[i];
++		if (notebook->GetPageCount() == 0) {
++			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
++		}
++	}
++}
+ 
+ t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
+ : FeatureViewClass()
+@@ -88,12 +166,13 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
+ 	
+ 	//
+ 	// Implementation notes:
+-	// rows are created by using AUI's docking and layers
+-	// notebooks are placed in the right dock; each
+-	// notebook in its own layer so that each notebook
+-	// takes up an entire column.
++	// see src/widgets/AuiManager.h for more info about how panes
++	// are laid out in Triumph, and how split are formed
+ 	//
+-	wxWindowUpdateLocker locker(GetMainWindow());
++
++	// not using a wxWindowUpateLocker because I need precise control
++	// on where to thaw the window, see below
++	GetMainWindow()->Freeze();
+ 	t4p::AuiResetCodeNotebooks(*AuiManager);
+ 
+ 	int columnCount = 1;
+@@ -121,9 +200,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
+ 	for (int i = 1; i < columnCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
+ 		t4p::NotebookClass* notebook = notebooks[i];
+ 		notebook->SetSize(newNotebookSize);
+-		if (notebook->GetPageCount() == 0) {
+-			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+-		}
+ 		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
+ 		info.Right().Row(i - 1).Position(0).Layer(0)
+ 			.Gripper(false).Resizable(true).Floatable(false)
+@@ -136,26 +212,31 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
+ 			info.CaptionVisible(true).CloseButton(false);
+ 		}
+ 	}
++
+ 	if (firstNotebook && columnCount > 2) {
+ 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
+ 		currentNotebookInfo.CaptionVisible(true).CloseButton(false);
+ 	}
++
++	GetMainWindow()->Thaw();
+ 	AuiManager->Update();
+-}
+ 
+-void t4p::NotebookLayoutViewClass::OnNotebookCreateGrid(wxCommandEvent& event) {
++	// make sure to call this AFTER thawing the main window
++	// if we don't then app stops being rendered
++	RedistributeCodeControls(*AuiManager, AllCodeControls());
+ }
+ 
+ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
+ 	
+ 	//
+ 	// Implementation notes:
+-	// rows are created by using AUI's docking and layers
+-	// notebooks are placed in the bottom dock; each
+-	// notebook in its own layer so that each notebook
+-	// takes up an entire row.
++	// see src/widgets/AuiManager.h for more info about how panes
++	// are laid out in Triumph, and how split are formed
+ 	//
+-	wxWindowUpdateLocker locker(GetMainWindow());
++
++	// not using a wxWindowUpateLocker because I need precise control
++	// on where to thaw the window, see below
++	GetMainWindow()->Freeze();
+ 	t4p::AuiResetCodeNotebooks(*AuiManager);
+ 
+ 	int rowCount = 1;
+@@ -183,9 +264,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
+ 	for (int i = 1; i < rowCount && t4p::NumberLessThan(i, notebooks.size()); i++) {
+ 		t4p::NotebookClass* notebook = notebooks[i];
+ 		notebook->SetSize(newNotebookSize);
+-		if (notebook->GetPageCount() == 0) {
+-			notebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+-		}
++
+ 		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
+ 		
+ 		// i+2 because we want the tools notebook and the find/replace
+@@ -201,11 +280,18 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
+ 			info.CaptionVisible(true).CloseButton(false);
+ 		}
+ 	}
++
+ 	if (firstNotebook && rowCount > 2) {
+ 		wxAuiPaneInfo& currentNotebookInfo = AuiManager->GetPane(firstNotebook);
+ 		currentNotebookInfo.CaptionVisible(true);
+ 	}
++
++	GetMainWindow()->Thaw();
+ 	AuiManager->Update();
++
++	// make sure to call this AFTER thawing the main window
++	// if we don't then app stops being rendered
++	RedistributeCodeControls(*AuiManager, AllCodeControls());
+ }
+ 
+ void t4p::NotebookLayoutViewClass::OnNotebookReset(wxCommandEvent& event) {
+diff --git a/src/widgets/FileTypeImageList.cpp b/src/widgets/FileTypeImageList.cpp
+index 7f52bde..8150cb5 100644
+--- a/src/widgets/FileTypeImageList.cpp
++++ b/src/widgets/FileTypeImageList.cpp
+@@ -90,3 +90,38 @@ int t4p::FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName&
+ 	}
+ 	return t4p::IMGLIST_NONE;
+ }
++
++int t4p::FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type) {
++	switch (type) {
++	case t4p::FILE_TYPE_PHP:
++		return t4p::IMGLIST_PHP;
++	case t4p::FILE_TYPE_SQL:
++		return t4p::IMGLIST_SQL;
++	case t4p::FILE_TYPE_CSS:
++		return t4p::IMGLIST_CSS;
++	case t4p::FILE_TYPE_JS:
++		return t4p::IMGLIST_JS;
++	case t4p::FILE_TYPE_CONFIG:
++		return t4p::IMGLIST_CONFIG;
++	case t4p::FILE_TYPE_CRONTAB:
++		return t4p::IMGLIST_CRONTAB;
++	case t4p::FILE_TYPE_YAML:
++		return t4p::IMGLIST_YAML;
++	case t4p::FILE_TYPE_XML:
++		return t4p::IMGLIST_XML;
++	case t4p::FILE_TYPE_RUBY:
++		return t4p::IMGLIST_RUBY;
++	case t4p::FILE_TYPE_LUA:
++		return t4p::IMGLIST_LUA;
++	case t4p::FILE_TYPE_MARKDOWN:
++		return t4p::IMGLIST_MARKDOWN;
++	case t4p::FILE_TYPE_BASH:
++		return t4p::IMGLIST_BASH;
++	case t4p::FILE_TYPE_DIFF:
++		return t4p::IMGLIST_DIFF;
++	case t4p::FILE_TYPE_TEXT:
++		return t4p::IMGLIST_MISC;
++	default:
++		return t4p::IMGLIST_NONE;
++	}
++}
+diff --git a/src/widgets/FileTypeImageList.h b/src/widgets/FileTypeImageList.h
+index 743fbc2..1047414 100644
+--- a/src/widgets/FileTypeImageList.h
++++ b/src/widgets/FileTypeImageList.h
+@@ -28,12 +28,10 @@
+ 
+ #include <wx/imaglist.h>
+ #include <wx/filename.h>
++#include <globals/FileTypeClass.h>
+ 
+ namespace t4p {
+ 
+-// forward declaration; declared in another file
+-class FileTypeClass;
+-	
+ /**
+  * The file types that we have an icon for
+  */
+@@ -71,6 +69,17 @@ void FileTypeImageList(wxImageList& imgList);
+  */
+ int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileName);
+ 
++/**
++ * @param fileTypes the configured file type extensions
++ * @param type the file type to check
++ * @return int Images enum entry that corresponds with the give
++ *         fileName.
++ *         For example, if fileName is "/home/user/index.php" then
++ *         this function returns t4p::IMGLIST_PHP
++ */
++int FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type);
++
++
+ }
+ 
+ #endif
+\ No newline at end of file
+diff --git a/src/widgets/NotebookClass.cpp b/src/widgets/NotebookClass.cpp
+index f770a22..7b92da9 100644
+--- a/src/widgets/NotebookClass.cpp
++++ b/src/widgets/NotebookClass.cpp
+@@ -141,23 +141,17 @@ void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookCla
+ 	if (pageIndex == wxNOT_FOUND) {
+ 		return;
+ 	}
+-
+-	wxWindow* tab = src->GetPage(pageIndex);
+ 	wxString tabName = src->GetPageText(pageIndex);
+-	wxString fileName = src->GetPageText(pageIndex);
+-
+ 	src->RemovePage(pageIndex);
++	AdoptOrphan(codeCtrl, tabName);
++}
+ 
+-	// remove the dirty indicator, so that we get just the file name itself
+-	// which is needed to determine the file type icon
+-	if (fileName.EndsWith(wxT("*"))) {
+-		fileName = fileName.SubString(0, fileName.size() - 2);
+-	}
++void t4p::NotebookClass::AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString tabName) {
+ 
+ 	// GetPageImage is not implemented in wxAuiNotebook
+-	int tabImageId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(fileName));
+-	AddPage(tab, tabName, tabImageId);
+-	
++	int tabImageId = t4p::FileTypeImageIdFromType(Globals->FileTypes, codeCtrl->GetFileType());
++	AddPage(codeCtrl, tabName, tabImageId);
++
+ 	// notify the app that a page was moved
+ 	t4p::CodeControlEventClass moveEvt(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, codeCtrl);
+ 	moveEvt.SetEventObject(this);
+diff --git a/src/widgets/NotebookClass.h b/src/widgets/NotebookClass.h
+index 138a3cd..44cd57b 100644
+--- a/src/widgets/NotebookClass.h
++++ b/src/widgets/NotebookClass.h
+@@ -263,10 +263,20 @@ public:
+ 	 * this method, codeCtrl will be in this notebook and it will be removed
+ 	 * from src
+ 	 *
+-	 * @param codeCtrl the page to remove from src and into this
++	 * @param codeCtrl the page to remove from src and add into this
+ 	 * @param src the parent of codeCtrl
+ 	 */
+ 	void Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookClass* src);
++
++	/**
++	 * Adopts the given code control into this notebook, assuming that the code
++	 * control is not a page of any other notebook. After a call to
++	 * this method, codeCtrl will be in this notebook.
++	 *
++	 * @param codeCtrl the page to add into this notebook
++	 * @param tabName the name to put in the tab
++	 */
++	void AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString tabName);
+ 	
+ 	/**
+ 	 * Creates a new notebook and moves the currently selected tab
