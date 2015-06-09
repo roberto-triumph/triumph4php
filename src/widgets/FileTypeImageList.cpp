@@ -91,7 +91,7 @@ int t4p::FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& 
 	return t4p::IMGLIST_NONE;
 }
 
-int t4p::FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type) {
+int t4p::FileTypeImageIdFromType(t4p::FileType type) {
 	switch (type) {
 	case t4p::FILE_TYPE_PHP:
 		return t4p::IMGLIST_PHP;

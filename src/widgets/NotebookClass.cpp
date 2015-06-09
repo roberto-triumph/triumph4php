@@ -147,10 +147,15 @@ void t4p::NotebookClass::Adopt(t4p::CodeControlClass* codeCtrl, t4p::NotebookCla
 }
 
 void t4p::NotebookClass::AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString tabName) {
-
+	if (NULL == ImageList) {
+		ImageList = new wxImageList(16, 16);
+		t4p::FileTypeImageList(*ImageList);
+		AssignImageList(ImageList);
+	}
+	
 	// GetPageImage is not implemented in wxAuiNotebook
-	int tabImageId = t4p::FileTypeImageIdFromType(Globals->FileTypes, codeCtrl->GetFileType());
-	AddPage(codeCtrl, tabName, tabImageId);
+	int tabImageId = t4p::FileTypeImageIdFromType(codeCtrl->GetFileType());
+	AddPage(codeCtrl, tabName, false, tabImageId);
 
 	// notify the app that a page was moved
 	t4p::CodeControlEventClass moveEvt(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, codeCtrl);

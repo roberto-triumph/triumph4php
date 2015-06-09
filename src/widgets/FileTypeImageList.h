@@ -70,14 +70,13 @@ void FileTypeImageList(wxImageList& imgList);
 int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileName);
 
 /**
- * @param fileTypes the configured file type extensions
  * @param type the file type to check
- * @return int Images enum entry that corresponds with the give
- *         fileName.
- *         For example, if fileName is "/home/user/index.php" then
+ * @return int Images enum entry that corresponds with the given
+ *         file type.
+ *         For example, if type id t4p::FILE_TYPE_PPHP then
  *         this function returns t4p::IMGLIST_PHP
  */
-int FileTypeImageIdFromType(const t4p::FileTypeClass& fileTypes, t4p::FileType type);
+int FileTypeImageIdFromType(t4p::FileType type);
 
 
 }
