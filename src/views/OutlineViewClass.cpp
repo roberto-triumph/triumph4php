@@ -163,9 +163,6 @@ void t4p::OutlineViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& eve
 	// annoying if the user is looking at run output, switches PHP files, and the outline
 	// gets changed.
 	if (window != NULL && IsOutlineWindowSelected(ID_WINDOW_OUTLINE)) {
-		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
-		SetFocusToOutlineWindow(outlineViewPanel);
-		
 		t4p::CodeControlClass* codeCtrl = event.GetCodeControl();
 		if (codeCtrl && !codeCtrl->GetFileName().IsEmpty()) {
 			std::vector<UnicodeString> searchStrings;
