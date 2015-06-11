@@ -543,10 +543,33 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 			}
 		}
 	}
+	
 	if (finalVisible <= 2) {
 		// if we have 2 or less notebooks, hide the captions as they are not useful
 		for (size_t i = 0; i < notebooks.size(); i++) {
 			AuiManager.GetPane(notebooks[i]).CaptionVisible(false);
+		}
+	}
+	
+	// if the center notebook no longer has pages, then transfer
+	// the pages from another notebook into the center notebook
+	// we do this because the notebook layout and split notebooks
+	// code relies on there always being a notebook in center pane and it
+	// being visible.
+	for (size_t i = 0; i < notebooks.size(); i++) {
+		t4p::NotebookClass* notebook = notebooks[i];
+		if (notebook->GetPageCount() == 0 && notebooks.size() > 1) {
+			wxAuiPaneInfo& info = AuiManager.GetPane(notebook);
+			if (info.IsOk() && info.dock_direction == wxAUI_DOCK_CENTER) {
+				
+				// get another notebook
+				t4p::NotebookClass* src = i > 0 ? notebooks[i - 1] : notebooks[i + 1];
+				while (src->GetPageCount() > 0) {
+					t4p::CodeControlClass* code = src->GetCodeControl(0);
+					notebook->Adopt(code, src);
+				}
+				AuiManager.GetPane(src).Hide();
+			}
 		}
 	}
 	if (hasHidden) {
