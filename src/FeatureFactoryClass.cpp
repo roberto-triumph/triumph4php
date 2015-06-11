@@ -302,6 +302,8 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	FeatureViews.push_back(new t4p::PhpCodeCompletionViewClass(*PhpCodeCompletion));
 	FeatureViews.push_back(new t4p::NotebookLayoutViewClass(*NotebookLayout));
 	FeatureViews.push_back(new t4p::NavigationViewClass());
+	FeatureViews.push_back(new t4p::JavascriptViewClass());
+	FeatureViews.push_back(new t4p::HtmlViewClass());
 #if T4P_USE_TEST_FEATURE
 	FeatureViews.push_back(new t4p::TestViewClass(*Test));
 #endif
