@@ -28,6 +28,7 @@
 #include <widgets/AuiManager.h>
 #include <widgets/ListWidget.h>
 #include <widgets/FileTypeImageList.h>
+#include <globals/Number.h>
 
 t4p::NavigationViewClass::NavigationViewClass() 
 : FeatureViewClass() {
@@ -58,7 +59,7 @@ void t4p::NavigationViewClass::OnEditNavigatePane(wxCommandEvent& event) {
 		);
 		if (dialog.ShowModal() == wxOK && choice.Notebook) {
 			if (choice.PageIndex != wxNOT_FOUND &&
-					choice.PageIndex < choice.Notebook->GetPageCount()) {
+					t4p::NumberLessThan(choice.PageIndex, choice.Notebook->GetPageCount())) {
 				choice.Notebook->SetSelection(choice.PageIndex);
 				wxWindow* window = choice.Notebook->GetPage(choice.PageIndex);
 				if (window && (choice.Notebook == tools || choice.Notebook == outline)) {
@@ -221,7 +222,7 @@ void t4p::NavigationViewDialogClass::OnPanelItemActivated(wxListEvent& event) {
 	int outlineMax = OutlineNotebook->GetPageCount();
 	int toolsMin = OutlineNotebook->GetPageCount();
 	int toolsMax = OutlineNotebook->GetPageCount() + ToolsNotebook->GetPageCount();
-		if (selected >= outlineMin && selected < outlineMax) {
+	if (selected >= outlineMin && selected < outlineMax) {
 		for (size_t i = 0; i < OutlineNotebook->GetPageCount(); i++) {
 			if (selected == i) {
 				Choice.Notebook = OutlineNotebook;
