@@ -92,6 +92,7 @@
 #include <views/FileOperationsViewClass.h>
 #include <features/NotebookLayoutFeatureClass.h>
 #include <views/NotebookLayoutViewClass.h>
+#include <views/NavigationViewClass.h>
 
 t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 : Features()
@@ -300,6 +301,7 @@ bool t4p::FeatureFactoryClass::CreateViews() {
 	FeatureViews.push_back(new t4p::FileCabinetViewClass(*FileCabinet));
 	FeatureViews.push_back(new t4p::PhpCodeCompletionViewClass(*PhpCodeCompletion));
 	FeatureViews.push_back(new t4p::NotebookLayoutViewClass(*NotebookLayout));
+	FeatureViews.push_back(new t4p::NavigationViewClass());
 #if T4P_USE_TEST_FEATURE
 	FeatureViews.push_back(new t4p::TestViewClass(*Test));
 #endif
