@@ -203,7 +203,7 @@ void t4p::NavigationViewDialogClass::OnPanelsListKeyDown(wxKeyEvent& event) {
 }
 
 void t4p::NavigationViewDialogClass::OnFileItemActivated(wxListEvent& event) {
-	int selected = event.GetIndex();
+	size_t selected = (size_t)event.GetIndex();
 	for (size_t i = 0; i < CodeNotebooks.size() && !Choice.Notebook; i++) {
 		for (size_t p = 0; p < CodeNotebooks[i]->GetPageCount()  && !Choice.Notebook; p++) {
 			if (selected == (i + p)) {
@@ -217,14 +217,14 @@ void t4p::NavigationViewDialogClass::OnFileItemActivated(wxListEvent& event) {
 }
 
 void t4p::NavigationViewDialogClass::OnPanelItemActivated(wxListEvent& event) {
-	int selected = event.GetIndex();
-	int outlineMin = 0;
-	int outlineMax = OutlineNotebook->GetPageCount();
-	int toolsMin = OutlineNotebook->GetPageCount();
-	int toolsMax = OutlineNotebook->GetPageCount() + ToolsNotebook->GetPageCount();
+	size_t selected = event.GetIndex();
+	size_t outlineMin = 0;
+	size_t outlineMax = OutlineNotebook->GetPageCount();
+	size_t toolsMin = OutlineNotebook->GetPageCount();
+	size_t toolsMax = OutlineNotebook->GetPageCount() + ToolsNotebook->GetPageCount();
 	if (selected >= outlineMin && selected < outlineMax) {
 		for (size_t i = 0; i < OutlineNotebook->GetPageCount(); i++) {
-			if (((int)selected) == i) {
+			if (selected == i) {
 				Choice.Notebook = OutlineNotebook;
 				Choice.PageIndex = i;
 				break;
