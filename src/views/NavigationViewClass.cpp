@@ -224,7 +224,7 @@ void t4p::NavigationViewDialogClass::OnPanelItemActivated(wxListEvent& event) {
 	int toolsMax = OutlineNotebook->GetPageCount() + ToolsNotebook->GetPageCount();
 	if (selected >= outlineMin && selected < outlineMax) {
 		for (size_t i = 0; i < OutlineNotebook->GetPageCount(); i++) {
-			if (selected == i) {
+			if (((int)selected) == i) {
 				Choice.Notebook = OutlineNotebook;
 				Choice.PageIndex = i;
 				break;
