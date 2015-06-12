@@ -545,6 +545,8 @@ void t4p::EditorBehaviorViewClass::OnPreferencesSaved(wxCommandEvent& event) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->RefreshCodeControlOptions();
 	}
+	
+	SetFeaturesOnNotebook();
 }
 
 t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::CodeControlOptionsClass& options)
