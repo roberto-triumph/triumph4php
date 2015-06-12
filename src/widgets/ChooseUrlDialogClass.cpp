@@ -28,11 +28,13 @@
 t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, 
 													  t4p::UrlTagFinderClass& urls,
 													  const std::vector<t4p::ProjectClass>& projects,
+													  const t4p::FileTypeClass& fileType,
 													  t4p::UrlTagClass& chosenUrl)
 	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
 	, UrlTagFinder(urls)
 	, ChosenUrl(chosenUrl) 
-	, Projects() {
+	, Projects() 
+	, FileType(fileType) {
 
 	// get some urls to prepopulate the list
 	std::vector<t4p::UrlTagClass> allUrlTags = GetFilteredUrls(wxT("http://"));
@@ -175,7 +177,8 @@ std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrls(const w
 }
 
 
-std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProject(const wxString& filter, const t4p::ProjectClass& project) {
+std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProject(
+		const wxString& filter, const t4p::ProjectClass& project) {
 	std::vector<wxFileName> dirs;
 	std::vector<t4p::SourceClass>::const_iterator src;
 	for (src = project.Sources.begin(); src != project.Sources.end(); ++src) {
@@ -190,7 +193,7 @@ std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProjec
 	while (url != filteredUrls.end()) {
 		wxFileName fileName = url->FileName;
 		wxString fullPath = fileName.GetFullPath();
-		if (!project.IsAPhpSourceFile(fullPath)) {
+		if (!project.IsAPhpSourceFile(fullPath, FileType)) {
 			url =  filteredUrls.erase(url);
 		}
 		else {

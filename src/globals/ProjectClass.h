@@ -26,6 +26,7 @@
 #define PROJECTCLASS_H_
 
 #include <search/DirectorySearchClass.h>
+#include <globals/FileTypeClass.h>
 #include <wx/string.h>
 #include <vector>
 
@@ -50,53 +51,6 @@ public:
 	 */
 	std::vector<t4p::SourceClass> Sources;
 	
-	/**
-	 * The wildcard patterns that will be used to find PHP files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> PhpFileExtensions;
-
-	/**
-	 * The wildcard patterns that will be used to find CSS files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> CssFileExtensions;
-
-	/**
-	 * The wildcard patterns that will be used to find SQL files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> SqlFileExtensions;
-
-	/**
-	 * The wildcard patterns that will be used to find JS files in this
-	 * project.
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> JsFileExtensions;
-
-	/**
-	 * The wildcard patterns that will be used to find miscalleneous files in this
-	 * project. Misc. files are files that do not contain code but still want
-	 * to open them in the editor.
-	 *
-	 * Each item in the array will be one wildcard expression; where each
-	 * expression can contain either a '*' or a '?' for use in the
-	 * wxMatchWild() function.
-	 */
-	std::vector<wxString> MiscFileExtensions;
-
 	/**
 	 * If TRUE, this project is enabled and is used by Triumph.
 	 */
@@ -128,35 +82,39 @@ public:
 	 * for recursing into this project to find all of the PHP Source
 	 * code files in this project.
 	 *
+	 * @param fileTypes the configured file type extensions
 	 * @return all of this project's source directories
 	 * but with the PHP extensions added to each source.
 	 */
-	std::vector<t4p::SourceClass> AllPhpSources() const;
+	std::vector<t4p::SourceClass> AllPhpSources(const t4p::FileTypeClass& fileType) const;
 
 	/**
 	 * This method will return a list of sources suitable for recursing into
 	 * this project to find all relevant files; ie PHP, CSS, SQL,
 	 * and all misc file extensions.
 	 *
+	 * @param fileTypes the configured file type extensions
 	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
 	 * and misc file extensions) added to each sources. 
 	 */
-	std::vector<t4p::SourceClass> AllSources() const;
+	std::vector<t4p::SourceClass> AllSources(const t4p::FileTypeClass& fileType) const;
 
 	/**
+	 *
+	 * @params fullPath the full path to check
+	 * @param fileTypes the configured file type extensions
 	 * @return TRUE if given full path is a PHP file, as determined by
-	 * the sources directories and the php file 
-	 * extensions wilcard.
+	 * the sources directories and the file type php extensions.
 	 */
-	bool IsAPhpSourceFile(const wxString& fullPath) const;
+	bool IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
 
 	
 	/**
-	 * @return TRUE if given full path is a file, as determined by
-	 * the sources directories and the php file 
-	 * extensions wilcard.
+	 * @return TRUE if given full path is a "source" file; TRUE if 
+	 *         the given file's extension is any of the fileType's 
+	 *         extensions
 	 */
-	bool IsASourceFile(const wxString& fullPath) const;
+	bool IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
 
 	/**
 	 * @return bool TRUE if this project has AT LEAST 1 source
@@ -182,7 +140,7 @@ public:
 	 * return the CssFileExtensions + SqlFileExtensions + MiscFileExtensions for this project.
 	 * @return all extension wilcards except for PHP wildcards
 	 */
-	std::vector<wxString> GetNonPhpExtensions() const;
+	std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
 
 private:
 	

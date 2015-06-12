@@ -27,6 +27,7 @@
 
 #include <globals/TagClass.h>
 #include <language/ParsedTagFinderClass.h>
+#include <globals/FileTypeClass.h>
 #include <vector>
 
 namespace t4p {
@@ -48,8 +49,10 @@ void TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches);
  * @param matches the tags list to modify
  * @param projects matches from these projects will be kept; all others will be erased.
  *        this method will not own the project pointers
+ * @param fileTypes the configured file types
  */
-void TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, std::vector<t4p::ProjectClass*> projects);
+void TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, 
+	std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType);
 
 
 }

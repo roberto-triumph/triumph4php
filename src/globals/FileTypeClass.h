@@ -118,6 +118,12 @@ public:
 
 	FileTypeClass();
 	
+	FileTypeClass(const t4p::FileTypeClass& src);
+	
+	t4p::FileTypeClass& operator=(const t4p::FileTypeClass& src);
+	
+	void Copy(const t4p::FileTypeClass& src);
+	
 	/**
 	 * The methods below returns the list of wildcard file extensions for
 	 * the specified file type, each wildcard on its own string

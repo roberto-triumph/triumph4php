@@ -776,7 +776,7 @@ void t4p::FileSearchDialogClass::Search() {
 
 	// no need to show jump to results for native functions
 	t4p::TagListRemoveNativeMatches(MatchingTags);
-	t4p::TagListKeepMatchesFromProjects(MatchingTags, projects);
+	t4p::TagListKeepMatchesFromProjects(MatchingTags, projects, Feature.App.Globals.FileTypes);
 	ShowTags(search, MatchingTags);
 }
 

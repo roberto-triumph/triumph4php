@@ -52,7 +52,6 @@ void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir) {
 	t4p::SourceClass srcProject;
 	srcProject.RootDirectory.Assign(sourceDir);
 	project.AddSource(srcProject);
-	project.PhpFileExtensions.push_back(wxT("*.php"));
 	
 	Globals.Projects.push_back(project);
 }

@@ -81,6 +81,11 @@ private:
 	 * Queue of projects to be indexed.
 	 */
 	std::vector<t4p::ProjectClass> Projects;
+	
+	/**
+	 * the relevant file extensions that we want to look at
+	 */
+	t4p::FileTypeClass FileTypes;
 
 	/**
 	 * The object that will be used to traverse the file system.

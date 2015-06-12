@@ -927,8 +927,7 @@ void t4p::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.FileTypes.MiscFileExtensionsString;
+			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT("; ...");
 
 		wxString allFiles = wxT("*");
 		wxString phpExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString;
@@ -1363,8 +1362,7 @@ void t4p::ExplorerOutlinePanelClass::OnFilterButtonLeftDown(wxMouseEvent& event)
 		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT(";") + 
-			Feature.App.Globals.FileTypes.MiscFileExtensionsString;
+			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT("; ...");
 
 		wxString allFiles = wxT("*");
 		wxString phpExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString;

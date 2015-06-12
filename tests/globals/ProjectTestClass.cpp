@@ -32,17 +32,19 @@ class ProjectFixtureClass :  public FileTestFixtureClass {
 public:
 
 	t4p::ProjectClass Project;
+	t4p::FileTypeClass FileType;
 
 	ProjectFixtureClass() 
 	: FileTestFixtureClass(wxT("project_test"))
-	, Project() {
-		Project.IsEnabled = true;
-		Project.CssFileExtensions.push_back(wxT("*.css"));
-		Project.MiscFileExtensions.push_back(wxT("*.txt"));
-		Project.PhpFileExtensions.push_back(wxT("*.php"));
-		Project.SqlFileExtensions.push_back(wxT("*.sql"));
+	, Project() 
+	, FileType() {
 		Project.Label = wxT("unit test project");
-		
+		Project.IsEnabled = true;
+		FileType.CssFileExtensionsString = wxT("*.css");
+		FileType.MiscFileExtensionsString = wxT("*.txt");
+		FileType.PhpFileExtensionsString = wxT("*.php");
+		FileType.SqlFileExtensionsString = wxT("*.sql");
+		FileType.ConfigFileExtensionsString = wxT("*.ini");
 	}
 
 	void AddSrc(const wxString& srcDir, wxString includeWildcards = wxT("*.*"), wxString excludeWildcards = wxEmptyString) {
@@ -70,7 +72,7 @@ TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
 
 TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
 	AddSrc(wxT("controllers"), wxT("*.php"), wxT("cache.php"));
-	std::vector<t4p::SourceClass> sources = Project.AllPhpSources();
+	std::vector<t4p::SourceClass> sources = Project.AllPhpSources(FileType);
 	CHECK_VECTOR_SIZE(1, sources);
 
 	t4p::SourceClass actual = sources[0];
@@ -82,33 +84,44 @@ TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
 TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnExcludedWildcards) {
 	AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
 
-	std::vector<t4p::SourceClass> sources = Project.AllSources();
+	std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
 	CHECK_VECTOR_SIZE(1, sources);
 
 	t4p::SourceClass actual = sources[0];
 	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
-	CHECK_EQUAL(wxT("*.css;*.txt;*.php;*.sql"), actual.IncludeWildcardsString());
+	CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
+	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
+}
+
+TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnIniWildcards) {
+	AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
+
+	std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
+	CHECK_VECTOR_SIZE(1, sources);
+
+	t4p::SourceClass actual = sources[0];
+	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
+	CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
 	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
 }
 
 TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnFalseWhenAnUnknownWildcard) {
 	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
 	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.tmp");
-	CHECK_EQUAL(false, Project.IsASourceFile(fileToCheck));
+	CHECK_EQUAL(false, Project.IsASourceFile(fileToCheck, FileType));
 }
 
 TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnTrueWhenKnownWildcard) {
 	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
 	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.css");
-	CHECK(Project.IsASourceFile(fileToCheck));
+	CHECK(Project.IsASourceFile(fileToCheck, FileType));
 }
 
 TEST_FIXTURE(ProjectFixtureClass, GetNonPhpExtesions) {
-	std::vector<wxString> exts = Project.GetNonPhpExtensions();
-	CHECK_VECTOR_SIZE(3, exts);
-	CHECK_EQUAL(wxT("*.css"), exts[0]);
-	CHECK_EQUAL(wxT("*.txt"), exts[1]);
-	CHECK_EQUAL(wxT("*.sql"), exts[2]);
+	std::vector<wxString> exts = Project.GetNonPhpExtensions(FileType);
+	std::vector<wxString> expected = FileType.GetNonPhpFileExtensions();
+	
+	CHECK_VECTOR_SIZE(expected.size(), exts);
 }
 
 }

@@ -70,7 +70,7 @@ std::vector<t4p::SourceClass> t4p::GlobalsClass::AllEnabledPhpSources() const {
 	std::vector<t4p::SourceClass>::const_iterator src;
 	for (it = Projects.begin(); it != Projects.end(); ++it) {
 		if (it->IsEnabled) {
-			std::vector<t4p::SourceClass> phpSources = it->AllPhpSources();
+			std::vector<t4p::SourceClass> phpSources = it->AllPhpSources(FileTypes);
 			allSources.insert(allSources.end(), phpSources.begin(), phpSources.end());
 		}
 	}
@@ -115,7 +115,7 @@ bool t4p::GlobalsClass::IsAPhpSourceFile(const wxString& fullPath) const {
 	bool isPhp = false;
 	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && !isPhp; ++it) {
-		isPhp = it->IsAPhpSourceFile(fullPath);
+		isPhp = it->IsAPhpSourceFile(fullPath, FileTypes);
 	}
 	return isPhp;
 }
@@ -127,7 +127,7 @@ bool t4p::GlobalsClass::IsASourceFile(const wxString& fullPath) const {
 	bool isInSource = false;
 	std::vector<t4p::ProjectClass>::const_iterator it;
 	for (it = Projects.begin(); it != Projects.end() && !isInSource; ++it) {
-		isInSource = it->IsASourceFile(fullPath);
+		isInSource = it->IsASourceFile(fullPath, FileTypes);
 	}
 	return isInSource;
 }
@@ -154,14 +154,6 @@ void t4p::GlobalsClass::ClearDetectedInfos() {
 			++it;
 		}
 	}
-}
-
-void t4p::GlobalsClass::AssignFileExtensions(t4p::ProjectClass &project) const {
-	project.PhpFileExtensions = FileTypes.GetPhpFileExtensions();
-	project.CssFileExtensions = FileTypes.GetCssFileExtensions();
-	project.SqlFileExtensions = FileTypes.GetSqlFileExtensions();
-	project.MiscFileExtensions = FileTypes.GetMiscFileExtensions();
-	project.JsFileExtensions = FileTypes.GetJsFileExtensions();
 }
 
 std::vector<t4p::TemplateFileTagClass> t4p::GlobalsClass::CurrentTemplates() const {

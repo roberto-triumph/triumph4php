@@ -230,16 +230,6 @@ public:
 	void ClearDetectedInfos();
 
 	/**
-	 * copies the file filters into the project; we 
-	 * let the user define the file filters globally and we use
-	 * this method to propagate the setting to all projects
-	 *
-	 * @param project set the file filters on the given project
-	 */
-	void AssignFileExtensions(t4p::ProjectClass& project) const;
-
-	
-	/**
 	 * The current template files that have been calculated to be used
 	 * by the CurrentUrl.
 	 */

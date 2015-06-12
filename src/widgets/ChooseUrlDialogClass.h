@@ -39,9 +39,9 @@ namespace t4p {
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	
 public:
-
 	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls, 
 		const std::vector<t4p::ProjectClass>& projects,
+		const t4p::FileTypeClass& fileType,
 		UrlTagClass& chosenUrl);
 	
 protected:
@@ -98,7 +98,8 @@ private:
 	 *
 	 * @return the urls that match filter and the project. 
 	 */
-	std::vector<t4p::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, const t4p::ProjectClass& project);
+	std::vector<t4p::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, 
+		const t4p::ProjectClass& project);
 
 	/**
 	 * fills the url list box with the given urls. any previously existing urls in the 
@@ -128,6 +129,11 @@ private:
 	 * by project
 	 */
 	std::vector<t4p::ProjectClass> Projects;
+	
+	/**
+	 * The configured file type extensions.
+	 */
+	const t4p::FileTypeClass& FileType;
 };
 
 }

@@ -83,20 +83,6 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 	if (wxOK == dialog.ShowModal()) {
 		std::vector<t4p::ProjectClass>::iterator project;
 
-		
-		// for new projects we need to fill in the file extensions
-		// the rest of the app assumes they are already filled in
-		for (project = Feature.App.Globals.Projects.begin(); project != Feature.App.Globals.Projects.end(); ++project) {
-
-			// need to set these; as they set in app load too
-			Feature.App.Globals.AssignFileExtensions(*project);
-		}
-
-		// need to set the same for the touched projects too since they are a deep copy
-		for (project = touchedProjects.begin(); project != touchedProjects.end(); ++project) {
-			Feature.App.Globals.AssignFileExtensions(*project);
-		}
-
 		wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 		Feature.App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();

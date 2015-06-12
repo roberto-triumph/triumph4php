@@ -27,37 +27,15 @@
 #include <globals/Assets.h>
 #include <vector>
 
-static wxString Join(const std::vector<wxString>& list, const wxString& separator) {
-	wxString joined;
-	for (size_t i = 0; i < list.size(); ++i) {
-		joined.Append(list[i]);
-		if (i < (list.size() - 1)) {
-			joined.Append(separator);
-		}
-	}
-	return joined;
-}
-
-
 t4p::ProjectClass::ProjectClass()
 	: Label()
 	, Sources()
-	, PhpFileExtensions()
-	, CssFileExtensions()
-	, SqlFileExtensions()
-	, JsFileExtensions()
-	, MiscFileExtensions()
 	, IsEnabled(true) {
 }
 
 t4p::ProjectClass::ProjectClass(const t4p::ProjectClass& project)
 	: Label(project.Label)
 	, Sources(project.Sources)
-	, PhpFileExtensions(project.PhpFileExtensions)
-	, CssFileExtensions(project.CssFileExtensions)
-	, SqlFileExtensions(project.SqlFileExtensions) 
-	, JsFileExtensions(project.JsFileExtensions) 
-	, MiscFileExtensions(project.MiscFileExtensions)
 	, IsEnabled(project.IsEnabled) {
 }
 
@@ -65,11 +43,6 @@ void t4p::ProjectClass::operator=(const t4p::ProjectClass& project) {
 	Label = project.Label;
 	Sources = project.Sources;
 	IsEnabled = project.IsEnabled;
-	PhpFileExtensions = project.PhpFileExtensions;
-	CssFileExtensions = project.CssFileExtensions;
-	SqlFileExtensions = project.SqlFileExtensions;
-	JsFileExtensions = project.JsFileExtensions;
-	MiscFileExtensions = project.MiscFileExtensions;
 }
 
 void t4p::ProjectClass::AddSource(const t4p::SourceClass& src) { 
@@ -80,32 +53,24 @@ void t4p::ProjectClass::ClearSources() {
 	Sources.clear();
 }
 
-std::vector<t4p::SourceClass> t4p::ProjectClass::AllPhpSources() const {
-	wxString phpExtensionsString = Join(PhpFileExtensions, wxT(";"));
-	
+std::vector<t4p::SourceClass> t4p::ProjectClass::AllPhpSources(const t4p::FileTypeClass& fileType) const {
 	std::vector<t4p::SourceClass>::const_iterator src;
 	std::vector<t4p::SourceClass> phpSources;
 	for (src = Sources.begin(); src != Sources.end(); ++src) {
 		t4p::SourceClass phpSrc;
 		phpSrc.RootDirectory = src->RootDirectory;
-		phpSrc.SetIncludeWildcards(phpExtensionsString);
+		phpSrc.SetIncludeWildcards(fileType.PhpFileExtensionsString);
 		phpSrc.SetExcludeWildcards(src->ExcludeWildcardsString());
 		phpSources.push_back(phpSrc);
 	}
 	return phpSources;
 }
 
-std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources() const {
+std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources(const t4p::FileTypeClass& fileType) const {
 	
 	// get all extensions we know about
-	std::vector<wxString> allExtensions;
-	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
-	wxString allExtensionsString = Join(allExtensions, wxT(";"));
-
+	wxString allExtensionsString = fileType.GetAllSourceFileExtensionsString();
+	
 	// make the new sources to return
 	std::vector<t4p::SourceClass>::const_iterator src;
 	std::vector<t4p::SourceClass> allSources;
@@ -119,19 +84,19 @@ std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources() const {
 	return allSources;
 }
 
-bool t4p::ProjectClass::IsAPhpSourceFile(const wxString& fullPath) const {
+bool t4p::ProjectClass::IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const {
 	bool matches = false;
 	
 	// a file is considered a PHP file if its in a source directory and it matches
 	// the PHP file extensions
-	std::vector<t4p::SourceClass> phpSources = AllPhpSources();
+	std::vector<t4p::SourceClass> phpSources = AllPhpSources(fileType);
 	for (size_t i = 0; i < phpSources.size() && !matches; ++i) {
 		matches = phpSources[i].Contains(fullPath);
 	}
 	return matches;
 }
 
-bool t4p::ProjectClass::IsASourceFile(const wxString& fullPath) const {
+bool t4p::ProjectClass::IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const {
 	bool matches = false;
 
 	// first do a directory check  only. since AllSources() clones the 
@@ -147,13 +112,7 @@ bool t4p::ProjectClass::IsASourceFile(const wxString& fullPath) const {
 
 		// a file is considered a file if its in a source directory and it matches
 		// any of the recognized file extensions
-		std::vector<wxString> allExtensions;
-		allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
-		allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
-		allExtensions.insert(allExtensions.end(), PhpFileExtensions.begin(), PhpFileExtensions.end());
-		allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
-		allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
-
+		std::vector<wxString> allExtensions = fileType.GetAllSourceFileExtensions();
 		std::vector<wxString>::const_iterator s;
 		for (s = allExtensions.begin(); !matches && s != allExtensions.end(); ++s) {
 			matches = wxMatchWild(*s, fullPath);
@@ -178,11 +137,7 @@ wxString t4p::ProjectClass::RelativeFileName(const wxString& fullPath) const {
 	return relativeName;
 }
 
-std::vector<wxString> t4p::ProjectClass::GetNonPhpExtensions() const {
-	std::vector<wxString> allExtensions;
-	allExtensions.insert(allExtensions.end(), CssFileExtensions.begin(), CssFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), MiscFileExtensions.begin(), MiscFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), SqlFileExtensions.begin(), SqlFileExtensions.end());
-	allExtensions.insert(allExtensions.end(), JsFileExtensions.begin(), JsFileExtensions.end());
+std::vector<wxString> t4p::ProjectClass::GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const {
+	std::vector<wxString> allExtensions = fileType.GetNonPhpFileExtensions();
 	return allExtensions;
 }

@@ -81,7 +81,7 @@ bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFiles
 				std::vector<t4p::ConfigTagClass>::const_iterator configTag;
 				for (configTag = allConfigTags.begin(); configTag != allConfigTags.end(); ++configTag) {
 					wxString fullPath = configTag->ConfigFileName.GetFullPath();
-					if (project->IsASourceFile(fullPath)) {
+					if (project->IsASourceFile(fullPath, App.Globals.FileTypes)) {
 						ConfigTags.push_back(*configTag);
 						pair.ConfigTags.push_back(*configTag);
 					}

@@ -79,6 +79,47 @@ t4p::FileTypeClass::FileTypeClass()
 {
 }
 
+t4p::FileTypeClass::FileTypeClass(const t4p::FileTypeClass& src) 
+: PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
+, CssFileExtensionsString(wxT("*.css"))
+, SqlFileExtensionsString(wxT("*.sql"))
+, JsFileExtensionsString(wxT("*.js"))
+, ConfigFileExtensionsString(wxT("*.conf;*.ini;.htaccess"))
+, CrontabFileExtensionsString(wxT("crontab"))
+, YamlFileExtensionsString(wxT("*.yml"))
+, XmlFileExtensionsString(wxT("*.xml"))
+, RubyFileExtensionsString(wxT("*.rb;Capfile"))
+, LuaFileExtensionsString(wxT("*.lua"))
+, MarkdownFileExtensionsString(wxT("*.md"))
+, BashFileExtensionsString(wxT("*.sh"))
+, DiffFileExtensionsString(wxT("*.diff;*.patch"))
+, MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
+	Copy(src);
+}
+
+t4p::FileTypeClass& t4p::FileTypeClass::operator=(const t4p::FileTypeClass& src) {
+	Copy(src);
+	return *this;
+}
+
+void t4p::FileTypeClass::Copy(const t4p::FileTypeClass& src) {
+	
+	// copy in a thread-safe way
+	CssFileExtensionsString        = CssFileExtensionsString.c_str();
+	PhpFileExtensionsString        = PhpFileExtensionsString.c_str();
+	SqlFileExtensionsString        = SqlFileExtensionsString.c_str();
+	JsFileExtensionsString         = JsFileExtensionsString.c_str();
+	ConfigFileExtensionsString     = ConfigFileExtensionsString.c_str();
+	CrontabFileExtensionsString    = CrontabFileExtensionsString.c_str();
+	YamlFileExtensionsString       = YamlFileExtensionsString.c_str();
+	XmlFileExtensionsString        = XmlFileExtensionsString.c_str();
+	RubyFileExtensionsString       = RubyFileExtensionsString.c_str();
+	LuaFileExtensionsString        = LuaFileExtensionsString.c_str();
+	MarkdownFileExtensionsString   = MarkdownFileExtensionsString.c_str();
+	BashFileExtensionsString       = BashFileExtensionsString.c_str();
+	DiffFileExtensionsString       = DiffFileExtensionsString.c_str();
+}
+
 std::vector<wxString> t4p::FileTypeClass::GetPhpFileExtensions() const {
 	return Explode(PhpFileExtensionsString);
 }
@@ -244,3 +285,4 @@ bool t4p::FileTypeClass::HasAnyExtension(const wxString& fullPath) const {
 		|| HasADiffExtension(fullPath)
 		|| HasAMiscExtension(fullPath);
 }
+

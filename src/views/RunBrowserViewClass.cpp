@@ -305,7 +305,8 @@ void t4p::RunBrowserViewClass::OnUrlSearchTool(wxCommandEvent& event) {
 }
 
 void t4p::RunBrowserViewClass::ShowUrlDialog() {
-	t4p::ChooseUrlDialogClass dialog(GetMainWindow(), Feature.App.Globals.UrlTagFinder, Feature.App.Globals.Projects, Feature.App.Globals.CurrentUrl);
+	t4p::ChooseUrlDialogClass dialog(GetMainWindow(), Feature.App.Globals.UrlTagFinder, 
+		Feature.App.Globals.Projects, Feature.App.Globals.FileTypes, Feature.App.Globals.CurrentUrl);
 	if (wxOK == dialog.ShowModal() && !Feature.App.Globals.CurrentUrl.Url.BuildURI().IsEmpty()) {
 				
 		// 'select' the URL (make it the current in the toolbar)
@@ -395,7 +396,7 @@ void t4p::RunBrowserViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	wxString fileName = control->GetFileName();
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	for (project = Feature.App.Globals.Projects.begin(); project != Feature.App.Globals.Projects.end(); ++project) {
-		if (project->IsEnabled && project->IsAPhpSourceFile(fileName)) {
+		if (project->IsEnabled && project->IsAPhpSourceFile(fileName, Feature.App.Globals.FileTypes)) {
 			IsUrlCacheStale = true;
 			break;
 		}

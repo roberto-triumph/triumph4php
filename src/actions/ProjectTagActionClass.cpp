@@ -30,6 +30,7 @@
 t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId) 
 	: GlobalActionClass(runningThreads, eventId)
 	, Projects()
+	, FileTypes()
 	, DirectorySearch()
 	, TagFinderList()
 	, DoTouchedProjects(false) 
@@ -54,11 +55,12 @@ bool t4p::ProjectTagActionClass::Init(t4p::GlobalsClass& globals) {
 		Projects.clear();
 		std::vector<t4p::ProjectClass>::const_iterator project;
 		for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-			if (project->IsEnabled && !project->AllPhpSources().empty()) {
+			if (project->IsEnabled && !project->AllPhpSources(FileTypes).empty()) {
 				Projects.push_back(*project);
 			}
 		}
 	}
+	FileTypes = globals.FileTypes;
 	return !Projects.empty();
 }
 
@@ -69,7 +71,7 @@ void t4p::ProjectTagActionClass::BackgroundWork() {
 		FilesTotal = 0;
 
 		t4p::ProjectClass project = Projects[i];
-		if (DirectorySearch.Init(project.AllSources(), t4p::DirectorySearchClass::PRECISE)) {
+		if (DirectorySearch.Init(project.AllSources(FileTypes), t4p::DirectorySearchClass::PRECISE)) {
 			FilesTotal = DirectorySearch.GetTotalFileCount();
 			SetStatus(_("Tag Cache / ") + project.Label);			
 			IterateDirectory();
@@ -245,7 +247,7 @@ bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	bool isFileFromProject = false;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {
-		if (project->IsEnabled && project->IsASourceFile(FileName.GetFullPath())) {
+		if (project->IsEnabled && project->IsASourceFile(FileName.GetFullPath(), globals.FileTypes)) {
 			isFileFromProject = true;
 			Project = *project;
 			break;

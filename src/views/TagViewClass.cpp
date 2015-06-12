@@ -141,7 +141,8 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 					std::vector<t4p::TagClass>::const_iterator tag;
 					for (tag = matches.begin(); tag != matches.end(); ++tag) {
 						for (project = Feature.App.Globals.Projects.begin(); project != Feature.App.Globals.Projects.end(); ++project) {
-							if (project->IsAPhpSourceFile(openedFile.GetFullPath()) && project->IsAPhpSourceFile(tag->FullPath)) {
+							if (project->IsAPhpSourceFile(openedFile.GetFullPath(), Feature.App.Globals.FileTypes) 
+									&& project->IsAPhpSourceFile(tag->FullPath, Feature.App.Globals.FileTypes)) {
 								tagProjectMatch = *tag;
 								tagProjectMatchCount++;
 							}

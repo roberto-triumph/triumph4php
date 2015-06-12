@@ -476,7 +476,8 @@ void t4p::TemplateFileTagsDetectorPanelClass::Init() {
 
 void t4p::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& event) {
 	TestUrl.Reset();
-	t4p::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, TestUrl);
+	t4p::ChooseUrlDialogClass dialog(this, Globals.UrlTagFinder, Globals.Projects, 
+		Globals.FileTypes, TestUrl);
 	if (dialog.ShowModal() == wxOK) {
 		UrlToTest->SetValue(TestUrl.Url.BuildURI());
 		t4p::CallStackActionClass* action = new t4p::CallStackActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);

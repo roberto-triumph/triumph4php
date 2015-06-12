@@ -38,13 +38,14 @@ void t4p::TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches) {
 	}
 }
 
-void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, std::vector<t4p::ProjectClass*> projects) {
+void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, 
+		std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType) {
 	std::vector<t4p::TagClass>::iterator tag = matches.begin();
 	std::vector<t4p::ProjectClass*>::const_iterator project;
 	while (tag != matches.end()) {
 		bool isInProjects = false;
 		for (project = projects.begin(); project != projects.end(); ++project) {
-			isInProjects = (*project)->IsASourceFile(tag->GetFullPath());
+			isInProjects = (*project)->IsASourceFile(tag->GetFullPath(), fileType);
 			if (isInProjects) {
 				break;
 			}

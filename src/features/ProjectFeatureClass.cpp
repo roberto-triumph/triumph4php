@@ -92,7 +92,6 @@ void t4p::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 				}
 			}
 			if (newProject.HasSources()) {
-				App.Globals.AssignFileExtensions(newProject);
 				App.Globals.Projects.push_back(newProject);
 				projectIndex++;
 			}
@@ -151,12 +150,6 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 			config->Write(keyExclude, source.ExcludeWildcardsString());
 		}
 	}
-
-	// also, update the projects to have new file extesions
-	std::vector<t4p::ProjectClass>::iterator project;
-	for (project = App.Globals.Projects.begin(); project != App.Globals.Projects.end(); ++project) {
-		App.Globals.AssignFileExtensions(*project);
-	}
 }
 
 void t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
@@ -184,10 +177,6 @@ void t4p::ProjectFeatureClass::CreateProject(const wxString& dir, bool doTag) {
 	newProject.IsEnabled = true;
 
 	App.Globals.Projects.push_back(newProject);
-
-	// for new projects we need to fill in the file extensions
-	// the rest of the app assumes they are already filled in
-	App.Globals.AssignFileExtensions(newProject);
 
 	wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 	App.EventSink.Publish(evt);
