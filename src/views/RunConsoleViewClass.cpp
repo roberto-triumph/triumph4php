@@ -578,6 +578,8 @@ void t4p::RunConsoleViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>
 	menuItemIds[t4p::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
 	menuItemIds[t4p::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
 	AddDynamicCmd(menuItemIds, shortcuts);
+	
+	FillCommandPanel();
 }
 
 void t4p::RunConsoleViewClass::AddWindows() {
