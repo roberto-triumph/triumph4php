@@ -129,7 +129,7 @@ bool t4p::TemplateFileTagsDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	return Process.Init(cmdLine, ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, wxFileName(), ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> t4p::TemplateFileTagsDetectorActionClass::DetectorScripts() {

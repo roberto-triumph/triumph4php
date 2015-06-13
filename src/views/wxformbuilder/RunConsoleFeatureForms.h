@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Sep 12 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -23,6 +23,7 @@
 #include <wx/filepicker.h>
 #include <wx/checkbox.h>
 #include <wx/dialog.h>
+#include <wx/frame.h>
 #include <wx/listbox.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -68,13 +69,14 @@ class CliCommandEditDialogGeneratedClass : public wxDialog
 		wxStaticText* ExecutableLabel;
 		wxTextCtrl* Executable;
 		wxFilePickerCtrl* ExecutableFilePicker;
+		wxStaticText* WorkingDirectoryLabel;
+		wxDirPickerCtrl* WorkingDirectory;
 		wxStaticText* ArgumentsLabel;
 		wxTextCtrl* Arguments;
 		wxStaticText* DescriptionLabel;
 		wxTextCtrl* Description;
 		wxCheckBox* WaitForArguments;
 		wxCheckBox* ShowInToolbar;
-		wxStaticText* HelpLabel;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
@@ -89,8 +91,24 @@ class CliCommandEditDialogGeneratedClass : public wxDialog
 	
 	public:
 		
-		CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add/Edit Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 422,396 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add/Edit Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 422,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~CliCommandEditDialogGeneratedClass();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class MyFrame1
+///////////////////////////////////////////////////////////////////////////////
+class MyFrame1 : public wxFrame 
+{
+	private:
+	
+	protected:
+	
+	public:
+		
+		MyFrame1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~MyFrame1();
 	
 };
 

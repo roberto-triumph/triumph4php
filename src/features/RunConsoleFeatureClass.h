@@ -48,6 +48,12 @@ public:
 	 * binary name if the binary is already in the PATH.
 	 */
 	wxString Executable;
+	
+	/**
+	 * The full path to the directory where the command will
+	 * run from.
+	 */
+	wxFileName WorkingDirectory;
 
 	/**
 	 * all of the arguments to give to the executable

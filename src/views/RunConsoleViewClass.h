@@ -124,9 +124,10 @@ public:
 	 * Set to run the given command
 	 * 
 	 * @param cmdLine entire command line to run
+	 * @param workingDirectory the startng directory where the command line runs
 	 * @aparam waitForArgument if TRUE then
 	 */
-	void SetToRunCommand(const wxString& cmdLine, bool waitForArguments);
+	void SetToRunCommand(const wxString& cmdLine, const wxFileName& workingDirectory, bool waitForArguments);
 	
 	/**
 	 * Handle the 'Run' button
@@ -156,6 +157,11 @@ private:
 	 * The command to run
 	 */
 	wxString CommandString;
+	
+	/**
+	 * The command's CWD / PWD
+	 */
+	wxFileName  WorkingDirectory;
 	
 	/**
 	 * Used to run the process asynchronously
@@ -301,12 +307,13 @@ private:
 	 * @param command runs the given command and shows the output
 	 *        panel. Note that the command may not actually start running
 	 *        if waitForArguments is set.
+	 * @param workingDirectory the command's CWD / PWD
 	 * @param waitForAguments boolean if true then command will not run
 	 *        if false, command will run right away
 	 * @param inNewWindow, if TRUE then a new console output window will
 	 * be created. Otherwise, the current output window may be used.
 	 */
-	void RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow);
+	void RunCommand(const wxString& cmdLine, const wxFileName& workingDirectory, bool waitForArguments, bool inNewWindow);
 	
 	// update the menu when files are loaded / closed
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);

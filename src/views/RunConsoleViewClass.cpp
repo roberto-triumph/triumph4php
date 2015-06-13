@@ -29,6 +29,7 @@
 #include <globals/Number.h>
 #include <search/FinderClass.h>
 #include <code_control/CodeControlClass.h>
+#include <widgets/DirPickerValidatorClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/filename.h>
@@ -43,6 +44,8 @@ t4p::CliCommandEditDialogClass::CliCommandEditDialogClass(wxWindow* parent, int 
 	: CliCommandEditDialogGeneratedClass(parent, id) {
 	wxGenericValidator executableValidator(&command.Executable);
 	Executable->SetValidator(executableValidator);
+	t4p::DirPickerValidatorClass workingDirectoryValidator(&command.WorkingDirectory);
+	WorkingDirectory->SetValidator(workingDirectoryValidator);
 	wxGenericValidator argumentsValidator(&command.Arguments);
 	Arguments->SetValidator(argumentsValidator);
 	wxGenericValidator descriptionValidator(&command.Description);
@@ -203,6 +206,7 @@ t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
 													   t4p::RunConsoleViewClass& view)
 	: RunConsolePanelGeneratedClass(parent, id)
 	, CommandString()
+	, WorkingDirectory()
 	, ProcessWithHeartbeat(*this)
 	, Gauge(gauge)
 	, Feature(feature)
@@ -237,11 +241,13 @@ void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	evt.Skip();
 }
 
-void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine, bool waitForArguments) {
+void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const wxFileName& workingDirectory,
+		bool waitForArguments) {
 	
 	// cannot run new files that have not been saved yet
 	if (!cmdLine.empty()) {
 		CommandString = cmdLine;
+		WorkingDirectory = workingDirectory;
 		TransferDataToWindow();
 
 		// if user chose the 'with arguments' then do not proceed let the user put in arguments
@@ -267,7 +273,7 @@ void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	if (!CurrentPid && TransferDataFromWindow() && !CommandString.IsEmpty()) {
 		Command->Enable(false);
 		RunButton->SetLabel(_("Stop"));
-		if (ProcessWithHeartbeat.Init(CommandString, ID_PROCESS, CurrentPid)) {
+		if (ProcessWithHeartbeat.Init(CommandString, WorkingDirectory, ID_PROCESS, CurrentPid)) {
 			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);	
 		}
 		else {
@@ -603,7 +609,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCli(wxCommandEvent& event) {
 				RunConsolePanelClass* runConsolePanel = (t4p::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 				inNewWindow = cmd.CmdLine() != runConsolePanel->GetCommand();
 			}
-			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, inNewWindow);
+			RunCommand(cmd.CmdLine(), cmd.WorkingDirectory, cmd.WaitForArguments, inNewWindow);
 		}
 		else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
@@ -625,7 +631,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) 
 			cmd.Executable = Feature.App.Globals.Environment.Php.PhpExecutablePath;
 			cmd.Arguments = code->GetFileName();
 			cmd.WaitForArguments = (t4p::MENU_RUN_PHP + 3) == event.GetId();
-			RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
+			RunCommand(cmd.CmdLine(), cmd.WorkingDirectory, cmd.WaitForArguments, true);
 		}
 		else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
@@ -633,7 +639,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) 
 	}
 }
 
-void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow) {
+void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFileName& workingDirectory, bool waitForArguments, bool inNewWindow) {
 	if (inNewWindow) {
 		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
 			GetStatusBarWithGauge(), Feature, *this);
@@ -641,7 +647,7 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine, bool waitForA
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
 		wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run"));
 		if (AddToolsWindow(window, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap)) {
-			window->SetToRunCommand(cmdLine, waitForArguments);
+			window->SetToRunCommand(cmdLine, workingDirectory, waitForArguments);
 		}
 	}
 	else {
@@ -666,7 +672,7 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine, bool waitForA
 		if (runConsolePanel) {
 			
 			// window already created, will just re-run the command that's already there
-			runConsolePanel->SetToRunCommand(cmdLine, waitForArguments);
+			runConsolePanel->SetToRunCommand(cmdLine, wxFileName(), waitForArguments);
 		}
 	}
 }
@@ -753,7 +759,7 @@ void t4p::RunConsoleViewClass::OnCommandButtonClick(wxCommandEvent& event) {
 	index = index - (t4p::MENU_RUN_PHP + 5);
 	if (t4p::NumberLessThan(index, Feature.CliCommands.size())) {
 		t4p::CliCommandClass cmd = Feature.CliCommands[index];
-		RunCommand(cmd.CmdLine(), cmd.WaitForArguments, true);
+		RunCommand(cmd.CmdLine(), cmd.WorkingDirectory, cmd.WaitForArguments, true);
 	}
 }
 
@@ -762,7 +768,7 @@ void t4p::RunConsoleViewClass::LoadPage(const wxString& fileName) {
 }
 
 void t4p::RunConsoleViewClass::OnAppCommandRun(wxCommandEvent& event) {
-	RunCommand(event.GetString(), false, false);
+	RunCommand(event.GetString(), wxFileName(), false, false);
 }
 
 BEGIN_EVENT_TABLE(t4p::RunConsolePanelClass, wxPanel) 

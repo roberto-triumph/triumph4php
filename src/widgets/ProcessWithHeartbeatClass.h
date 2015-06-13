@@ -28,6 +28,7 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 #include <wx/process.h>
+#include <wx/filename.h>
 #include <map>
 
 namespace t4p {
@@ -82,13 +83,15 @@ public:
 	 * Start a process ASYNCHRONOUSLY
 	 *
 	 * @param command the command to start (with arguments as well)
+	 * @param workingDirectory the CWD of the command. This param is optional
+	 *        an empty filename can be passed in.
 	 * @param int eventId event ID will be used when an EVENT_PROCESS_* is genereated
 	 *        this way the caller can correlate a command to an event.
 	 * @param pid the PID of the new process will be set here
 	 * @return bool TRUE if the command was started successfully. if FALSE then 
 	 *         command is invalid or command is not found.
 	 */
-	bool Init(wxString command, int eventId, long& pid);
+	bool Init(wxString command, const wxFileName& workingDirectory, int eventId, long& pid);
 
 	/**
 	 * stop a running process.

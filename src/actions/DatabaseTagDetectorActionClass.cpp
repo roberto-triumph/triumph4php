@@ -126,7 +126,7 @@ bool t4p::DatabaseTagDetectorActionClass::NextDetection() {
 
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	return Process.Init(cmdLine, ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, wxFileName(), ID_DATABASE_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> t4p::DatabaseTagDetectorActionClass::DetectorScripts() {

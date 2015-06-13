@@ -52,14 +52,19 @@ t4p::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	}
 }
 
-bool t4p::ProcessWithHeartbeatClass::Init(wxString command, int eventId, long& pid) {
+bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& workingDir, 
+		int eventId, long& pid) {
 	wxProcess* newProcess = new wxProcess(this, eventId);
 	EventId = eventId;
 	newProcess->Redirect();
-
+	wxExecuteEnv* env = new wxExecuteEnv;
+	if (workingDir.IsOk()) {
+		env->cwd = workingDir.GetPath();
+	}
+	
 	// dont use newProcess::GetPid(), it seems to always return zero.
 	// http://forums.wxwidgets.org/viewtopic.php?t=13559
-	pid = wxExecute(command, wxEXEC_ASYNC, newProcess);
+	pid = wxExecute(command, wxEXEC_ASYNC, newProcess, env);
 	if (pid != 0) {
 		std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 		if (it != RunningProcesses.end()) {

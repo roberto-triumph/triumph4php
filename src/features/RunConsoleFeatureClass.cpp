@@ -36,6 +36,7 @@ static const int ID_PROCESS = wxNewId();
 
 t4p::CliCommandClass::CliCommandClass()
 	: Executable()
+	, WorkingDirectory()
 	, Arguments()
 	, Description()
 	, WaitForArguments(false)
@@ -44,6 +45,7 @@ t4p::CliCommandClass::CliCommandClass()
 
 void t4p::CliCommandClass::Copy(const t4p::CliCommandClass& src) {
 	Executable = src.Executable;
+	WorkingDirectory = src.WorkingDirectory;
 	Arguments = src.Arguments;
 	Description = src.Description;
 	WaitForArguments = src.WaitForArguments;
@@ -77,6 +79,8 @@ void t4p::RunConsoleFeatureClass::LoadPreferences(wxConfigBase* config) {
 			t4p::CliCommandClass newCommand;
 			wxString key = groupName + wxT("/Executable");
 			newCommand.Executable = config->Read(key);
+			key = groupName + wxT("/WorkingDirectory");
+			newCommand.WorkingDirectory.AssignDir(config->Read(key));
 			key = groupName + wxT("/Arguments");
 			newCommand.Arguments = config->Read(key);
 			key = groupName + wxT("/Description");
@@ -106,15 +110,17 @@ void t4p::RunConsoleFeatureClass::PersistCommands() {
 		} while (config->GetNextGroup(groupName, index));
 	}
 	for (size_t i = 0; i < CliCommands.size(); ++i) {
-		wxString key = wxString::Format(wxT("CliCommand_%d/Executable"), i);
+		wxString key = wxString::Format(wxT("CliCommand_%ld/Executable"), i);
 		config->Write(key, CliCommands[i].Executable);
-		key = wxString::Format(wxT("CliCommand_%d/Arguments"), i);
+		key = wxString::Format(wxT("CliCommand_%ld/WorkingDirectory"), i);
+		config->Write(key, CliCommands[i].WorkingDirectory.GetPath());
+		key = wxString::Format(wxT("CliCommand_%ld/Arguments"), i);
 		config->Write(key, CliCommands[i].Arguments);
-		key = wxString::Format(wxT("CliCommand_%d/Description"), i);
+		key = wxString::Format(wxT("CliCommand_%ld/Description"), i);
 		config->Write(key, CliCommands[i].Description);
-		key = wxString::Format(wxT("CliCommand_%d/ShowInToolbar"), i);
+		key = wxString::Format(wxT("CliCommand_%ld/ShowInToolbar"), i);
 		config->Write(key, CliCommands[i].ShowInToolbar);
-		key = wxString::Format(wxT("CliCommand_%d/WaitForArguments"), i);
+		key = wxString::Format(wxT("CliCommand_%ld/WaitForArguments"), i);
 		config->Write(key, CliCommands[i].WaitForArguments);
 	}
 	config->Flush();

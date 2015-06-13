@@ -132,7 +132,7 @@ bool t4p::UrlTagDetectorActionClass::NextDetection() {
 	}
 	wxString cmdLine = params.BuildCmdLine();
 	long pid;
-	return Process.Init(cmdLine, ID_URL_TAG_DETECTOR_PROCESS, pid);
+	return Process.Init(cmdLine, wxFileName(), ID_URL_TAG_DETECTOR_PROCESS, pid);
 }
 
 std::vector<wxString> t4p::UrlTagDetectorActionClass::DetectorScripts() {
