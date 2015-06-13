@@ -194,11 +194,6 @@ private:
 	void OnStcSavedPointLeft(wxStyledTextEvent& event);
 
 	/**
-	 * Toggle various widgets on or off based on the application state.
-	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
-
-	/**
 	 * Add the shortcuts for this frame's menu bar into the preference's shortcut list
 	 */
 	void DefaultKeyboardShortcuts();

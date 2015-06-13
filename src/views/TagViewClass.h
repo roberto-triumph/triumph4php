@@ -57,16 +57,14 @@ public:
 	
 private:
 
-	void OnProjectsUpdated(wxCommandEvent& event);
-
-	void OnAppFileClosed(t4p::CodeControlEventClass& event);
-	
-	void OnAppExit(wxCommandEvent& event);
-	
 	/**
 	 * Toggle various widgets on or off based on the application state. 
 	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+	void OnProjectsUpdated(t4p::ProjectEventClass& event);
+	
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
+	
+	void OnAppExit(wxCommandEvent& event);
 	
 	/**
 	 * Wipe the cache and re-index all of the enabled projects.
@@ -149,6 +147,12 @@ private:
 	void OnWorkingCacheComplete(t4p::WorkingCacheCompleteEventClass& event);
 	
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
+
+	/**
+	 * on app ready, enable/disable the menu item depending on whether we have
+	 * loaded a project
+	 */
+	void OnAppReady(wxCommandEvent& event);
 	
 	/**
 	 * most application logic is stored here.

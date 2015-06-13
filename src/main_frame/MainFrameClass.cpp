@@ -352,10 +352,6 @@ void t4p::MainFrameClass::OnHelpManual(wxCommandEvent& event) {
 	wxLaunchDefaultBrowser(wxT("http://docs.triumph4php.com/"), 0);
 }
 
-void t4p::MainFrameClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	App.EventSink.Publish(event);
-}
-
 void t4p::MainFrameClass::AuiManagerUpdate() {
 	AuiManager.GetPane(wxT("content")).Hide();
 	AuiManager.GetPane(wxT("tools")).Hide();
@@ -744,8 +740,7 @@ BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	// make sure some STC events are propagated
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, t4p::MainFrameClass::OnStcSavePointReached)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, t4p::MainFrameClass::OnStcSavedPointLeft)
-	EVT_UPDATE_UI(wxID_ANY, t4p::MainFrameClass::OnUpdateUi)
-
+	
 	// make sure to show status of running sequences
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_START, t4p::MainFrameClass::OnSequenceStart)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::MainFrameClass::OnSequenceComplete)

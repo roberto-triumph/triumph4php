@@ -105,17 +105,6 @@ void t4p::EditorBehaviorViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdCl
 	AddDynamicCmd(cmds, shortcuts);
 }
 
-void t4p::EditorBehaviorViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	bool hasEditors = !AllCodeControls().empty();
-
-	wxMenuItem* menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 10);
-	menuItem->Enable(hasEditors);
-	menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 11);
-	menuItem->Enable(hasEditors);
-
-	event.Skip();
-}
-
 void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
 	
 	// no need to delete moreMenu pointer, the contextMenu will delete it for us
@@ -392,10 +381,31 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 
 void t4p::EditorBehaviorViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	SetFeatures(Feature.App.Preferences.CodeControlOptions, event.GetCodeControl());
+	MenuUpdate();
 }
 
 void t4p::EditorBehaviorViewClass::OnAppFileNew(t4p::CodeControlEventClass& event) {
 	SetFeatures(Feature.App.Preferences.CodeControlOptions, event.GetCodeControl());
+	MenuUpdate();
+}
+
+void t4p::EditorBehaviorViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
+	
+	// since this gets called when the code control is ABOUT to be closed
+	// the count of code controls is 1 but it wil soon be zero
+	bool hasEditors = AllCodeControls().size() > 1;
+	wxMenuItem* menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 10);
+	menuItem->Enable(hasEditors);
+	menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 11);
+	menuItem->Enable(hasEditors);
+}
+
+void t4p::EditorBehaviorViewClass::MenuUpdate() {
+	bool hasEditors = !AllCodeControls().empty();
+	wxMenuItem* menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 10);
+	menuItem->Enable(hasEditors);
+	menuItem = MenuBar->FindItem(t4p::MENU_BEHAVIOR + 11);
+	menuItem->Enable(hasEditors);
 }
 
 void t4p::EditorBehaviorViewClass::OnEditorCommand(wxCommandEvent& event) {
@@ -765,12 +775,14 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	else {
 		Edit->Clear();
 		event.Skip();
+		
 	}
 }
 
 BEGIN_EVENT_TABLE(t4p::EditorBehaviorViewClass, t4p::FeatureViewClass)
 	EVT_APP_FILE_OPEN(t4p::EditorBehaviorViewClass::OnAppFileOpened)
 	EVT_APP_FILE_NEW(t4p::EditorBehaviorViewClass::OnAppFileNew)
+	EVT_APP_FILE_CLOSED(t4p::EditorBehaviorViewClass::OnAppFileClosed)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 1, t4p::EditorBehaviorViewClass::OnToggleWordWrap)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 2, t4p::EditorBehaviorViewClass::OnToggleIndentationGuides)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 3, t4p::EditorBehaviorViewClass::OnToggleWhitespace)
@@ -788,10 +800,7 @@ BEGIN_EVENT_TABLE(t4p::EditorBehaviorViewClass, t4p::FeatureViewClass)
 	EVT_MENU(wxID_UNDO, t4p::EditorBehaviorViewClass::OnUndo)
 	EVT_MENU(wxID_REDO, t4p::EditorBehaviorViewClass::OnRedo)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 10, t4p::EditorBehaviorViewClass::OnEditContentAssist)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 11, t4p::EditorBehaviorViewClass::OnEditCallTip)
-
-	EVT_UPDATE_UI(wxID_ANY, t4p::EditorBehaviorViewClass::OnUpdateUi)
-	
+	EVT_MENU(t4p::MENU_BEHAVIOR + 11, t4p::EditorBehaviorViewClass::OnEditCallTip)	
 	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 20, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorViewClass::OnEditorCommand)
 
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EditorBehaviorViewClass::OnPreferencesSaved)

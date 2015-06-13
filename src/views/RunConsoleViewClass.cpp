@@ -671,13 +671,33 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine, bool waitForA
 	}
 }
 
-void t4p::RunConsoleViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
-	bool hasEditors = NULL != GetCurrentCodeControl();
+void t4p::RunConsoleViewClass::OnAppFileNew(t4p::CodeControlEventClass& ctrl) {
+	MenuUpdate(false);
+}
+
+void t4p::RunConsoleViewClass::OnAppFileOpened(t4p::CodeControlEventClass& ctrl) {
+	MenuUpdate(false);
+}
+
+void t4p::RunConsoleViewClass::OnAppFileClosed(t4p::CodeControlEventClass& ctrl) {
+	MenuUpdate(true);
+}
+
+void t4p::RunConsoleViewClass::MenuUpdate(bool isClosingPage) {
+	bool hasEditors = false;
+	if (isClosingPage) {
+
+		// we get notified of the page closing before the page is actually
+		// removed
+		hasEditors = AllCodeControls().size() > 1;
+	}
+	else {
+		hasEditors = !AllCodeControls().empty();
+	}
 	RunCliMenuItem->Enable(hasEditors);
 	RunCliInNewWindowMenuItem->Enable(hasEditors);
 	RunCliWithArgsMenuItem->Enable(hasEditors);
 	RunCliWithArgsInNewWindowMenuItem->Enable(hasEditors);
-	event.Skip();
 }
 
 void t4p::RunConsoleViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -757,11 +777,14 @@ BEGIN_EVENT_TABLE(t4p::RunConsoleViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_RUN_PHP + 2, t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(t4p::MENU_RUN_PHP + 3, t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow)
 	EVT_MENU(t4p::MENU_RUN_PHP + 4, t4p::RunConsoleViewClass::OnRunSavedCommands)
-	EVT_UPDATE_UI(wxID_ANY, t4p::RunConsoleViewClass::OnUpdateUi)
 
 	// take up all the rest of the IDs for the command buttons
 	EVT_MENU_RANGE(t4p::MENU_RUN_PHP + 5, t4p::MENU_RUN_PHP + 55, 
 	t4p::RunConsoleViewClass::OnCommandButtonClick)
+	
+	EVT_APP_FILE_NEW(t4p::RunConsoleViewClass::OnAppFileNew)
+	EVT_APP_FILE_OPEN(t4p::RunConsoleViewClass::OnAppFileOpened)
+	EVT_APP_FILE_CLOSED(t4p::RunConsoleViewClass::OnAppFileClosed)
 
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_CMD_RUN_COMMAND, t4p::RunConsoleViewClass::OnAppCommandRun)
 END_EVENT_TABLE()

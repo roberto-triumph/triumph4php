@@ -308,10 +308,15 @@ private:
 	 */
 	void RunCommand(const wxString& cmdLine, bool waitForArguments, bool inNewWindow);
 	
+	// update the menu when files are loaded / closed
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+	void OnAppFileNew(t4p::CodeControlEventClass& event);
+	
 	/**
 	 * disable menus when source code notebook is empty
 	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+	void MenuUpdate(bool isClosingPage);
 
 	/**
 	 * show the dialog CRUD for commands

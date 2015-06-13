@@ -130,7 +130,7 @@ public:
 	/**
 	 * Toggle various widgets on or off based on the application state.
 	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+	void MenuUpdate(bool isClosingPage);
 
 	/**
 	 * Start the timer that will notify us when to update the status bar
@@ -150,6 +150,10 @@ public:
 	 * various metrics (cursor position, dirty state)
 	 */
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);
+	
+	// update the menu bars on these events
+	void OnAppFileOpened(t4p::CodeControlEventClass& event);
+	void OnAppFileNew(t4p::CodeControlEventClass& event);
 
 	/**
 	 * When the app frame is closed, check to see if there are "dirty"

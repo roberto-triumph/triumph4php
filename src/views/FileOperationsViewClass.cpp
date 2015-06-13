@@ -276,6 +276,8 @@ void t4p::FileOperationsViewClass::EnableSave(wxStyledTextEvent& event) {
 void t4p::FileOperationsViewClass::DisableSave(wxStyledTextEvent& event) {
 	ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, false);
 	ToolBar->Refresh();
+	
+	MenuUpdate(false);
 
 	// if I don't call this then the stretch sizer on the toolbar disappears
 	// before was using ToolBar->AddStretchSpacer(1); which needed the Layout call
@@ -310,6 +312,7 @@ void t4p::FileOperationsViewClass::SaveCurrentFile(wxCommandEvent& event) {
 
 void t4p::FileOperationsViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
 	UpdateStatusBar();
+	MenuUpdate(false);
 
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
@@ -358,6 +361,15 @@ void t4p::FileOperationsViewClass::OnAppFileClosed(t4p::CodeControlEventClass& e
 
 	// in case all notebook tabs have been closed, we need to refresh the cursor position
 	UpdateStatusBar();
+	MenuUpdate(true);
+}
+
+void t4p::FileOperationsViewClass::OnAppFileNew(t4p::CodeControlEventClass& event) {
+	MenuUpdate(false);
+}
+
+void t4p::FileOperationsViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
+	MenuUpdate(false);
 }
 
 void t4p::FileOperationsViewClass::UpdateStatusBar() {
@@ -380,13 +392,22 @@ void t4p::FileOperationsViewClass::UpdateStatusBar() {
 	}
 }
 
-void t4p::FileOperationsViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 	bool hasEditors = false;
 	int currentPage = -1;
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
-		hasEditors = notebook->GetPageCount() > 0;
+		if (isClosingPage) {
+			
+			// since we get the close event BEFORE the code control
+			// is removed
+			hasEditors = notebook->GetPageCount() > 1;
+		}
+		else {
+			hasEditors = notebook->GetPageCount() > 0;
+		}
+		
 		currentPage = notebook->GetSelection();
 	}
 
@@ -397,13 +418,13 @@ void t4p::FileOperationsViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	menuItem->Enable(hasEditors && NULL != codeControl);
 	menuItem = MenuBar->FindItem(wxID_CLOSE);
 	menuItem->Enable(hasEditors);
+	menuItem = MenuBar->FindItem(t4p::MENU_FILE_OPERATIONS + 4);
+	menuItem->Enable(hasEditors);
 	menuItem = MenuBar->FindItem(t4p::MENU_FILE_OPERATIONS + 5);
 	menuItem->Enable(
 		hasEditors && notebook && notebook->IsPageModified(currentPage) &&
 		NULL != codeControl && !codeControl->IsNew()
 	);
-
-	event.Skip();
 }
 
 void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
@@ -464,8 +485,6 @@ BEGIN_EVENT_TABLE(t4p::FileOperationsViewClass, t4p::FeatureViewClass)
 
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, t4p::FileOperationsViewClass::DisableSave)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, t4p::FileOperationsViewClass::EnableSave)
-	EVT_UPDATE_UI(wxID_ANY, t4p::FileOperationsViewClass::OnUpdateUi)
-
 	EVT_CMD_FILE_OPEN(t4p::FileOperationsViewClass::OnCmdFileOpen)
 
 	EVT_TIMER(ID_STATUS_BAR_TIMER, t4p::FileOperationsViewClass::OnStatusBarTimer)
@@ -473,5 +492,7 @@ BEGIN_EVENT_TABLE(t4p::FileOperationsViewClass, t4p::FeatureViewClass)
 
 	EVT_APP_FILE_PAGE_CHANGED(t4p::FileOperationsViewClass::OnAppFilePageChanged)
 	EVT_APP_FILE_CLOSED(t4p::FileOperationsViewClass::OnAppFileClosed)
+	EVT_APP_FILE_NEW(t4p::FileOperationsViewClass::OnAppFileNew)
+	EVT_APP_FILE_OPEN(t4p::FileOperationsViewClass::OnAppFileOpened)
 	EVT_APP_FRAME_CLOSE(t4p::FileOperationsViewClass::OnAppFrameClose)
 END_EVENT_TABLE()

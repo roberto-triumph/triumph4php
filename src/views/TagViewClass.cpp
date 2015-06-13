@@ -210,9 +210,8 @@ void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const 
 	}
 }
 
-void t4p::TagViewClass::OnUpdateUi(wxUpdateUIEvent& event) {
+void t4p::TagViewClass::OnProjectsUpdated(t4p::ProjectEventClass& event) {
 	ProjectIndexMenu->Enable(Feature.App.Globals.HasSources());
-	event.Skip();
 }
 
 void t4p::TagViewClass::OpenFile(wxString fileName) {
@@ -400,6 +399,10 @@ void t4p::TagViewClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
 	else if (!matchError.empty()) {
 		GetStatusBarWithGauge()->SetColumn0Text(matchError);
 	}
+}
+
+void t4p::TagViewClass::OnAppReady(wxCommandEvent& event) {
+	ProjectIndexMenu->Enable(Feature.App.Globals.HasSources());
 }
 
 t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
@@ -731,11 +734,11 @@ BEGIN_EVENT_TABLE(t4p::TagViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_RESOURCE + 0, t4p::TagViewClass::OnProjectWipeAndIndex)
 	EVT_MENU(t4p::MENU_RESOURCE + 1, t4p::TagViewClass::OnJump)
 	EVT_MENU(t4p::MENU_RESOURCE + 3, t4p::TagViewClass::OnJump)
-	EVT_UPDATE_UI(wxID_ANY, t4p::TagViewClass::OnUpdateUi)
 
 	EVT_APP_FILE_CLOSED(t4p::TagViewClass::OnAppFileClosed)
 	EVT_APP_FILE_OPEN(t4p::TagViewClass::OnAppFileOpened)
 	EVT_APP_FILE_REVERTED(t4p::TagViewClass::OnAppFileReverted)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::TagViewClass::OnAppReady)
 	
 	// we will treat file new and file opened the same
 	EVT_APP_FILE_NEW(t4p::TagViewClass::OnAppFileOpened)
@@ -746,6 +749,8 @@ BEGIN_EVENT_TABLE(t4p::TagViewClass, t4p::FeatureViewClass)
 	EVT_TIMER(ID_REPARSE_TIMER, t4p::TagViewClass::OnTimerComplete)
 	EVT_WORKING_CACHE_COMPLETE(ID_WORKING_CACHE, t4p::TagViewClass::OnWorkingCacheComplete)
 	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, t4p::TagViewClass::OnActionComplete)
+	EVT_APP_PROJECTS_UPDATED(t4p::TagViewClass::OnProjectsUpdated)
+	EVT_APP_PROJECTS_REMOVED(t4p::TagViewClass::OnProjectsUpdated)
 	
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, t4p::TagViewClass::OnCodeControlHotspotClick)
 END_EVENT_TABLE()

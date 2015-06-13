@@ -66,6 +66,7 @@ private:
 	
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAppFileNew(t4p::CodeControlEventClass& event);
+	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 	
 	void OnToggleWordWrap(wxCommandEvent& event);
 	void OnToggleIndentationGuides(wxCommandEvent& event);
@@ -99,7 +100,7 @@ private:
 	/**
 	 * Toggle various widgets on or off based on the application state.
 	 */
-	void OnUpdateUi(wxUpdateUIEvent& event);
+	void MenuUpdate();
 
 	t4p::EditorBehaviorFeatureClass& Feature;
 

@@ -603,13 +603,12 @@ void t4p::NotebookClass::CloseAllPages() {
 		// notify owner that the tab has been closed
 		// we must do it here; aui notebook's DeletePage does not
 		// generate events
-		wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, this->GetId());
+		wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, this->GetId());
 
 		// tab index
 		evt.SetSelection(0);
 		evt.SetEventObject(this);
 		ProcessEvent(evt);
-		///EventSink->Publish(evt);
 	}
 }
 
@@ -619,28 +618,27 @@ void t4p::NotebookClass::CloseCurrentPage() {
 }
 
 void t4p::NotebookClass::ClosePage(int index) {
-	bool isPageClosed = false;
+	bool doDeletePage = false;
 	if (IsPageModified(index)) {
 		wxString pageName = GetPageText(index);
 		if (pageName.EndsWith(wxT("*"))) {
 			pageName = pageName.SubString(0, pageName.size() -2);
 		}
 		wxString msg = pageName + wxT(" has not been saved. Save changes?");
-		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
+			int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL != response) {
 			if (wxYES == response && !SavePage(index, true)) {
 				//something drastic. dont know how to handle it
 			}
-			DeletePage(index);
-			isPageClosed = true;
+			doDeletePage = true;
 		}
 	}
 	else {
-		DeletePage(index);
-		isPageClosed = true;
+		doDeletePage = true;
 	}
-	if (isPageClosed) {
+	if (doDeletePage) {
+		DeletePage(index);
 
 		// notify owner that the tab has been closed
 		// we must do it here; aui notebook's DeletePage does not
@@ -651,7 +649,6 @@ void t4p::NotebookClass::ClosePage(int index) {
 		evt.SetSelection(index);
 		evt.SetEventObject(this);
 		ProcessEvent(evt);
-		////EventSink->Publish(evt);
 	}
 }
 
