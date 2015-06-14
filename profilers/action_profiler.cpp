@@ -171,14 +171,13 @@ void MyApp::BuildGlobals() {
 
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
-
+	
 	Globals.TagCacheDbFileName = tagDbFileName;
 	Globals.DetectorCacheDbFileName = detectorTagDbFileName;
 	
 	// create a project
 	CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
 	CreateProject(wxT("symfony"), wxT("C:\\Users\\roberto\\Documents\\php_projects\\symfony"));
-
 }
 
 void MyApp::CreateProject(wxString projectName, wxString rootDir) {
@@ -189,7 +188,6 @@ void MyApp::CreateProject(wxString projectName, wxString rootDir) {
         src1.RootDirectory.AssignDir(rootDir);
         src1.SetIncludeWildcards(wxT("*.php"));
         project1.AddSource(src1);
-        Globals.AssignFileExtensions(project1);
         Globals.Projects.push_back(project1);
 }
 
