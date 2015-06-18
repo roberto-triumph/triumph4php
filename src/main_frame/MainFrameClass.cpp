@@ -89,7 +89,7 @@ static bool FindFocusedCodeControlWithNotebook(wxAuiManager& auiManager,
 }
 
 t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& featureViews,
-										t4p::AppClass& app)
+										t4p::AppClass& app, wxApp& guiApp, wxTimer& configModifiedTimer)
 	: MainFrameGeneratedClass(NULL)
 	, AuiManager()
 	, FeatureViews(featureViews)
@@ -97,7 +97,9 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	, App(app)
 	, ToolBar(NULL)
 	, ToolsNotebook(NULL)
-	, OutlineNotebook(NULL) {
+	, OutlineNotebook(NULL)
+	, GuiApp(guiApp)
+	, ConfigModifiedTimer(configModifiedTimer) {
 	AuiManager.SetManagedWindow(this);
 	StatusBarWithGaugeClass* gauge = new StatusBarWithGaugeClass(this);
 	SetStatusBar(gauge);
@@ -209,7 +211,7 @@ void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 		// on mac, we don't close the app when the user closes the
 		// main frame. *But* this handler is for the exit menu item,
 		// this means that the user really wants to stop the app.
-		App.SetExitOnFrameDelete(true);
+		GuiApp.SetExitOnFrameDelete(true);
 	}
 }
 
@@ -238,7 +240,7 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		App.SqliteRunningThreads.StopAll();
 	}
 
-	App.StopConfigModifiedCheck();
+	ConfigModifiedTimer.Stop();
 
 	wxFileName settingsDir = t4p::SettingsDirAsset();
 	bool changedSettingsDir = false;

@@ -104,9 +104,13 @@ public:
 	 *        will not own the pointers, although the main fram will tell the
 	 *        app to delete them when the user closes the main frame
 	 * @param app the application, used to get the preferences
+	 * @param guiApp to change the "exit on frame close" option
+	 * @param configModifiedTimer to stop checking for updates to the
+	 *        config file while the user is making changes to the app preferences
 	 * 
 	 */
-	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, AppClass&  app);
+	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, 
+		AppClass&  app, wxApp& guiApp, wxTimer& configModifiedTimer);
 	
 	~MainFrameClass();
 	
@@ -285,6 +289,17 @@ private:
 	 */
 	wxAuiNotebook* OutlineNotebook;
 	
+	/**
+	 * The running wxApp
+	 */
+	wxApp& GuiApp;
+
+	/**
+	 * to stop checking for config changes when the 
+	 * user is actually editing the preferences
+	 */
+	wxTimer& ConfigModifiedTimer;
+
 	DECLARE_EVENT_TABLE()
 };
 

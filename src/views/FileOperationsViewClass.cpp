@@ -103,6 +103,12 @@ void t4p::FileOperationsViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 4, _("Save A&ll\tCTRL+SHIFT+S"), _("Save all opened files to disk"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 5, _("&Revert"), _("Reload the file from Disk"), wxITEM_NORMAL);
 	fileMenu->Append(wxID_CLOSE, _("&Close"), _("Close the current file"), wxITEM_NORMAL);
+	
+	fileMenu->Enable(wxID_SAVE, false);
+	fileMenu->Enable(wxID_SAVEAS, false);
+	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 4, false); // save all
+	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 5, false); // revert
+	fileMenu->Enable(wxID_CLOSE, false);
 }
 
 void t4p::FileOperationsViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -248,23 +254,7 @@ void t4p::FileOperationsViewClass::OnFileRevert(wxCommandEvent& event) {
 void t4p::FileOperationsViewClass::EnableSave(wxStyledTextEvent& event) {
 	ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, true);
 	ToolBar->Refresh();
-
-	// if I don't call this then the stretch sizer on the toolbar disappears
-	// before was using ToolBar->AddStretchSpacer(1); which needed the Layout call
-	//Layout();  commenting this out because it is causing find/find in files replace all matches in file to not work
-	MenuBar->Enable(wxID_SAVEAS, true);
-	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 5, true);
-
-	// if at least one document needs to be saved, enable the save all menu
-	bool someModified = false;
-	std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
-	for (size_t i = 0; i < codeCtrls.size(); ++i) {
-		t4p::CodeControlClass* ctrl = codeCtrls[i];
-		if (ctrl) {
-			someModified |= ctrl->GetModify();
-		}
-	}
-	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 4, someModified);
+	MenuUpdate(false);
 
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
@@ -278,23 +268,7 @@ void t4p::FileOperationsViewClass::DisableSave(wxStyledTextEvent& event) {
 	ToolBar->Refresh();
 	
 	MenuUpdate(false);
-
-	// if I don't call this then the stretch sizer on the toolbar disappears
-	// before was using ToolBar->AddStretchSpacer(1); which needed the Layout call
-	//Layout(); commenting this out because it is causing find/find in files replace all matches in file to not work
-	MenuBar->Enable(wxID_SAVEAS, false);
-	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 5, false);
-
-	bool someModified = false;
-	std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
-	for (size_t i = 0; i < codeCtrls.size(); ++i) {
-		t4p::CodeControlClass* ctrl = codeCtrls[i];
-		if (ctrl) {
-			someModified |= ctrl->GetModify();
-		}
-	}
-	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 4, someModified);
-
+	
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
@@ -322,11 +296,6 @@ void t4p::FileOperationsViewClass::OnAppFilePageChanged(t4p::CodeControlEventCla
 		bool isPageModified = notebook->IsPageModified(newPage);
 		ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, isPageModified);
 		ToolBar->Refresh();
-
-		// if I don't call this then the stretch sizer on the toolbar disappears
-		//Layout(); commenting this out because it is causing find/find in files replace all matches in file to not work
-		MenuBar->Enable(wxID_SAVE, isPageModified);
-		MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 5, isPageModified);
 	}
 	event.Skip();
 }
@@ -410,21 +379,24 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 		
 		currentPage = notebook->GetSelection();
 	}
-
-	wxMenuItem* menuItem;
-	menuItem = MenuBar->FindItem(wxID_SAVE);
-	menuItem->Enable(hasEditors && notebook && notebook->IsPageModified(currentPage));
-	menuItem = MenuBar->FindItem(wxID_SAVEAS);
-	menuItem->Enable(hasEditors && NULL != codeControl);
-	menuItem = MenuBar->FindItem(wxID_CLOSE);
-	menuItem->Enable(hasEditors);
-	menuItem = MenuBar->FindItem(t4p::MENU_FILE_OPERATIONS + 4);
-	menuItem->Enable(hasEditors);
-	menuItem = MenuBar->FindItem(t4p::MENU_FILE_OPERATIONS + 5);
-	menuItem->Enable(
+		// if at least one document needs to be saved, enable the save all menu
+	bool someModified = false;
+	std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
+	for (size_t i = 0; i < codeCtrls.size(); ++i) {
+		t4p::CodeControlClass* ctrl = codeCtrls[i];
+		if (ctrl) {
+			someModified |= ctrl->GetModify();
+		}
+	}
+	
+	MenuBar->Enable(wxID_SAVE, hasEditors && notebook && notebook->IsPageModified(currentPage));
+	MenuBar->Enable(wxID_SAVEAS, hasEditors && NULL != codeControl);
+	MenuBar->Enable(wxID_CLOSE, hasEditors);
+	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 4, someModified); // save all
+	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 5,
 		hasEditors && notebook && notebook->IsPageModified(currentPage) &&
 		NULL != codeControl && !codeControl->IsNew()
-	);
+	); // revert
 }
 
 void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {

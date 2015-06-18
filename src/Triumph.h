@@ -39,47 +39,11 @@
 namespace t4p {
 
 // forward declaration
-class MainFrameClass;
 class FeatureClass;
 class FeatureViewClass;
-class MacCommonMenuBarClass;
 class FeatureFactoryClass;
 
-// defined below
-class AppClass;
-
-/**
- * We use this to generate a one-time ready event that features can
- * listen for when they want to perform something
- * right after the main frame has been shown to the
- * user for the first time. We also use this to check for changes
- * to the global config file.
- */
-class AppTimerClass : public wxTimer {
-
-public:
-
-	/**
-	 * create AND begin the timer
-	 */
-	AppTimerClass(t4p::AppClass& app);
-
-	/**
-	 * when the timer ends, generate an EVENT_APP_READY event
-	 */
-	void Notify();
-
-private:
-
-	t4p::AppClass& App;
-
-	void OnConfigFileModified(t4p::FilesModifiedEventClass& event);
-
-	DECLARE_EVENT_TABLE()
-
-};
-
-class AppClass : public wxApp {
+class AppClass {
 
 public:
 
@@ -135,15 +99,15 @@ public:
 	 * by another instance of this application
 	 */
 	wxDateTime ConfigLastModified;
+	
+	AppClass(wxTimer& configModifiedTimer);
+
+	~AppClass();
 
 	/** 
 	 * Initialize the application 
 	 */
-	virtual bool OnInit();
-	
-	AppClass();
-
-	~AppClass();
+	void Init();
 
 	void LoadPreferences();
 
@@ -154,12 +118,6 @@ public:
 	 * modification check fails and the user will not be prompted to reload the config
 	 */
 	void UpdateConfigModifiedTime();
-
-	/**
-	 * stop watching the confid file for external modifications. This would be done
-	 * when the user is editing the config from within the application.
-	 */
-	void StopConfigModifiedCheck();
 
 	/**
 	 * delete features from memory in a safe way
@@ -181,14 +139,11 @@ public:
 	void AddPreferencesWindows(wxBookCtrlBase* parent);
 	
 	/**
-	 * creates the application main frame 
+	 * @return TRUE if this app is active (in the foreground)
 	 */
-	void CreateFrame();
-	
-	/**
-	 * creates a new empty buffer and attaches it to the notebook. 
-	 */
-	void CreateNewCodeCtrl();
+	bool IsActive() {
+		return wxTheApp? wxTheApp->IsActive() : false;
+	};
 
 private:
 
@@ -204,24 +159,14 @@ private:
 	 * create features. only instantiates and nothing else
 	 */
 	void CreateFeatures();
-
+	
+public: // temp public, should be private
 	/**
 	 * asks features for any windows they want to create
 	 */
 	void FeatureWindows();
-
-	/**
-	 * when the app is re-activated, tell the features about it
-	 */
-	void OnActivateApp(wxActivateEvent& event);
 	
-	/**
-	 * handlers for the "common" menu; the menu that is shown when
-	 * the user has closed the main frame but the app is still running.
-	 */
-	void OnCommonMenuFileOpen(wxCommandEvent& event);
-	void OnCommonMenuFileNew(wxCommandEvent& event);
-
+public: // temp public, should be private
 	/**
 	 * Almost all functionality is encapsulated in features; the 
 	 * app just creates them and hangs on to them until the end. 
@@ -229,37 +174,11 @@ private:
 	 * deleted at app end.
 	 */
 	t4p::FeatureFactoryClass FeatureFactory;
-	
-	/**
-	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
-	 * window is initially shown to the user. We want to show the main
-	 * window to the user as fast as possible to make the app seem
-	 * fast.
-	 * Also, in this timer we will check for external updates to the 
-	 * global config file; and if the global config file has changed
-	 * reload those changes
-	 */
-	t4p::AppTimerClass Timer;
 
-	/**
-	 * The main application frame.
-	 */
-	MainFrameClass* MainFrame;
-	
-	/**
-	 * mac-specific functionality when main frame has been closed but
-	 * app is still running.
-	 */
-	MacCommonMenuBarClass* MacCommonMenuBar;
+private:
 
-	/**
-	 * TRUE if the EVENT_APP_READY has already been generated.
-	 */
-	bool IsAppReady;
-
-	friend class t4p::AppTimerClass;
-
-	DECLARE_EVENT_TABLE()
+	// config modified timer
+	wxTimer& Timer;
 };
 
 }

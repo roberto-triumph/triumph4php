@@ -22,22 +22,24 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <main_frame/MacCommonMenuBarClass.h>
+#include <cstdarg>
+#include <UnitTest++.h>
+#include <unicode/uclean.h>
+#include <soci/mysql/soci-mysql.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 
-t4p::MacCommonMenuBarClass::MacCommonMenuBarClass(wxApp& app)
-: App(app) 
-, CommonMenuBar() {
+#include <iostream>
+
+
+int main(int argc, char** argv) {
+
+	int ret = ret = UnitTest::RunAllTests();
+
+	// calling cleanup here so that we can run this binary through a memory leak detector 
+	// ICU will cache many things and that will cause the detector to output "possible leaks"
+	u_cleanup();
 	
-	// on mac, let the app stay running when the main frame is 
-	// closed.  this is the correct behavior (like most mac apps)
-	#ifdef __WXMAC__
-		App.SetExitOnFrameDelete(false);
-		CommonMenuBar.reset(new wxMenuBar());
-		wxMenu* menu = new wxMenu();
-		menu->Append(ID_COMMON_MENU_NEW, _("New File"),  _("Create a new file"), wxITEM_NORMAL);
-		menu->Append(ID_COMMON_MENU_OPEN, _("Open File"),  _("Open an existing file"), wxITEM_NORMAL);
-		CommonMenuBar->Append(menu, _("File"));
-		wxMenuBar::MacSetCommonMenuBar(CommonMenuBar.get());
-	#endif
+	// clean up the MySQL library. Same reason as the ICU cleanup.
+	mysql_library_end();
+	sqlite_api::sqlite3_shutdown();			
 }
-

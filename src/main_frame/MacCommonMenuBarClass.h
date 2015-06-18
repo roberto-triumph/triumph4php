@@ -27,12 +27,10 @@
 
 #include <wx/event.h>
 #include <wx/menu.h>
+#include <wx/app.h>
 #include <memory>
 
 namespace t4p {
-
-// forward declaration, defined in another file
-class AppClass;
 
 /**
  * The man common menu bar is the menu bar that is
@@ -64,11 +62,11 @@ public:
 		ID_COMMON_MENU_OPEN
 	};
 	
-	MacCommonMenuBarClass(t4p::AppClass& app);
+	MacCommonMenuBarClass(wxApp& app);
 	
 	private:
 	
-	t4p::AppClass& App;
+	wxApp& App;
 	
 	/**
 	 * menubar that is shown when the main frame is not around.

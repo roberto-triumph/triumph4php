@@ -449,6 +449,71 @@ solution "triumph4php"
 			wxconfiguration("Release", _ACTION)
 			boostconfiguration("Debug", _ACTION)
 
+	project "view_tests"
+		language "C++"
+		kind "ConsoleApp"
+		files {
+			"view_tests/**.cpp",
+			"view_tests/**.h",
+			"src/actions/**.cpp",
+			"src/code_control/**.cpp",
+			"src/features/**.cpp",
+			"src/globals/**.cpp",
+			"src/language/**.cpp",
+			"src/main_frame/**.cpp",
+			"src/search/**.cpp",
+			"src/views/**.cpp",
+			"src/widgets/**.cpp",
+			"src/FeatureFactoryClass.cpp",
+			"src/Triumph.cpp",
+			"lib/pelet/src/**.cpp"
+		}
+		
+		-- these will be used by the SqlResourceFinder tests
+		-- note the use of single quotes, MSW builds will fail if we
+		-- use double quotes because visual studio already escapes
+		-- defines with double quotes
+		defines {
+			string.format("T4P_DB_USER=%s", T4P_DB_USER)
+		}
+
+		-- handle empty password correctly; just don't define the macro
+		-- this is so that the next word of the generated command line does
+		-- not become the password
+		if string.len(T4P_DB_PASSWORD) > 0 then
+			defines {
+				string.format("T4P_DB_PASSWORD=%s", T4P_DB_PASSWORD)
+			}
+		end;
+		includedirs { 
+			"lib/UnitTest++/src/", 
+			"lib/pelet/include",
+			"src/", 
+			"view_tests/", 
+			"lib/keybinder/include"
+		}
+		links { 
+			"unit_test++",
+			"keybinder"
+		}
+
+		configuration "Debug"
+			pickywarnings(_ACTION)
+			sociconfiguration("Debug")
+			icuconfiguration("Debug", _ACTION)
+			wxconfiguration("Debug", _ACTION)
+			boostconfiguration("Debug", _ACTION)
+			curlconfiguration("Debug", _ACTION)
+			wxappconfiguration("Debug", _ACTION)
+		configuration "Release"
+			pickywarnings(_ACTION)
+			sociconfiguration("Release")
+			icuconfiguration("Release", _ACTION)
+			wxconfiguration("Release", _ACTION)
+			curlconfiguration("Release", _ACTION)
+			boostconfiguration("Release", _ACTION)
+			wxappconfiguration("Release", _ACTION)
+
 	project "tag_finder_profiler"
 		language "C++"
 		kind "ConsoleApp"
