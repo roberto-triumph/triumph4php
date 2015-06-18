@@ -33,7 +33,7 @@
 
 int main(int argc, char** argv) {
 
-	int ret = ret = UnitTest::RunAllTests();
+	int ret = UnitTest::RunAllTests();
 
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
@@ -41,5 +41,6 @@ int main(int argc, char** argv) {
 	
 	// clean up the MySQL library. Same reason as the ICU cleanup.
 	mysql_library_end();
-	sqlite_api::sqlite3_shutdown();			
+	sqlite_api::sqlite3_shutdown();
+	return ret;
 }
