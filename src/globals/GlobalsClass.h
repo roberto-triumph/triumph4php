@@ -29,7 +29,7 @@
 #include <globals/EnvironmentClass.h>
 #include <globals/UrlTagClass.h>
 #include <globals/ProjectClass.h>
-#include <globals/SqlResourceFinderClass.h>
+#include <language_sql/SqlResourceFinderClass.h>
 #include <globals/TemplateFileTagClass.h>
 #include <language_php/TagCacheClass.h>
 #include <globals/FileTypeClass.h>

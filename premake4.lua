@@ -405,6 +405,7 @@ solution "triumph4php"
 			"src/globals/*.cpp",
 			"src/actions/*.cpp",
 			"src/language_php/*.cpp",
+			"src/language_sql/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"lib/pelet/src/*.cpp"
@@ -460,6 +461,7 @@ solution "triumph4php"
 			"src/features/**.cpp",
 			"src/globals/**.cpp",
 			"src/language_php/**.cpp",
+			"src/language_sql/**.cpp",
 			"src/main_frame/**.cpp",
 			"src/search/**.cpp",
 			"src/views/**.cpp",
@@ -521,6 +523,7 @@ solution "triumph4php"
 			"profilers/tag_finder_profiler.cpp",
 			"src/globals/*.cpp",
 			"src/language_php/*.cpp",
+			"src/language_sql/*.cpp",
 			"src/search/*.cpp",
 			"lib/pelet/src/*.cpp"
 		}
@@ -544,6 +547,7 @@ solution "triumph4php"
 		files {
 			"profilers/call_stack_profiler.cpp",
 			"src/language_php/*.cpp",
+			"src/language_sql/*.cpp",
 			"src/globals/*.cpp",
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
@@ -573,6 +577,7 @@ solution "triumph4php"
 			"src/actions/*.cpp",
 			"src/globals/*.cpp",
 			"src/language_php/*.cpp",
+			"src/language_sql/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"profilers/action_profiler.cpp",
@@ -626,6 +631,7 @@ solution "triumph4php"
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/globals/*.cpp",
 			"src/language_php/*.cpp",
+			"src/language_sql/*.cpp",
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
 			"lib/pelet/src/*.cpp"

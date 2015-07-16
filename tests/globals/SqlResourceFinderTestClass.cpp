@@ -26,7 +26,7 @@
 #include <DatabaseTestFixtureClass.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
-#include <globals/SqlResourceFinderClass.h>
+#include <language_sql/SqlResourceFinderClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <TriumphChecks.h>

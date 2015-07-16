@@ -22,7 +22,7 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <language_php/SqlLexicalAnalyzerClass.h>
+#include <language_sql/SqlLexicalAnalyzerClass.h>
 #include <UnitTest++.h>
 #include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
 
