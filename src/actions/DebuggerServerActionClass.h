@@ -26,7 +26,7 @@
 #define __T4P_DEBUGGERSERVERACTIONCLASS_H__
 
 #include <actions/ActionClass.h>
-#include <language/DbgpEventClass.h>
+#include <language_php/DbgpEventClass.h>
 #include <globals/Events.h>
 #include <wx/thread.h>
 #include <boost/asio.hpp>

@@ -27,7 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <language/ParsedTagFinderClass.h>
+#include <language_php/ParsedTagFinderClass.h>
 #include <actions/ProjectTagActionClass.h>
 #include <actions/TagCacheSearchActionClass.h>
 #include <code_control/ResourceCacheBuilderClass.h>

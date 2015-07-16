@@ -29,7 +29,7 @@
 #include <globals/Errors.h>
 #include <globals/TagList.h>
 #include <code_control/CodeControlClass.h>
-#include <language/TagParserClass.h>
+#include <language_php/TagParserClass.h>
 #include <globals/Sqlite.h>
 #include <globals/Number.h>
 #include <widgets/TreeItemDataStringClass.h>

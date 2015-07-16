@@ -27,7 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
-#include <language/DbgpEventClass.h>
+#include <language_php/DbgpEventClass.h>
 #include <globals/Events.h>
 #include <wx/stc/stc.h>
 #include <vector>

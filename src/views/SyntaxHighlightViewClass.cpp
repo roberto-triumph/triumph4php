@@ -29,7 +29,7 @@
 #include <globals/CodeControlOptionsClass.h>
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>
-#include <language/Keywords.h>
+#include <language_php/Keywords.h>
 
 //------------------------------------------------------------------------
 // setting the various wxStyledTextCtrl options

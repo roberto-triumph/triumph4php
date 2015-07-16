@@ -27,7 +27,7 @@
 
 #include <actions/ActionClass.h>
 #include <globals/GlobalsClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/TagCacheClass.h>
 #include <unicode/unistr.h>
 #include <wx/string.h>
 #include <vector>

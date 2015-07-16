@@ -29,7 +29,7 @@
 #include <features/FeatureClass.h>
 #include <globals/ProjectClass.h>
 #include <globals/DatabaseTagClass.h>
-#include <language/SqlLexicalAnalyzerClass.h>
+#include <language_php/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <wx/thread.h>
 #include <wx/txtstrm.h>

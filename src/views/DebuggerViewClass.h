@@ -28,7 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/DebuggerFeatureForms.h>
 #include <features/DebuggerFeatureClass.h>
-#include <language/DbgpEventClass.h>
+#include <language_php/DbgpEventClass.h>
 
 namespace t4p {
 

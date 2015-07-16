@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/TagWipeActionClass.h>
-#include <language/TagParserClass.h>
-#include <language/DetectorDbClass.h>
+#include <language_php/TagParserClass.h>
+#include <language_php/DetectorDbClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/FileName.h>

@@ -26,7 +26,7 @@
 #define __RESOURCECACHEBUILDERTHREADCLASS_H__
 
 #include <actions/ActionClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/TagCacheClass.h>
 
 namespace t4p {
 

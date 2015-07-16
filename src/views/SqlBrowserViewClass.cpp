@@ -32,7 +32,7 @@
 #include <widgets/Buttons.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
-#include <language/Keywords.h>
+#include <language_php/Keywords.h>
 #include <Triumph.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>

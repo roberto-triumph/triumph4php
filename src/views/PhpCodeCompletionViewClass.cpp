@@ -27,7 +27,7 @@
 #include <Triumph.h>
 #include <wx/tokenzr.h>
 #include <algorithm>
-#include <language/Keywords.h>
+#include <language_php/Keywords.h>
 #include <globals/Assets.h>
 
 enum AutoCompletionImages {

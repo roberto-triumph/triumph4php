@@ -31,7 +31,7 @@
 #include <globals/ProjectClass.h>
 #include <globals/SqlResourceFinderClass.h>
 #include <globals/TemplateFileTagClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/TagCacheClass.h>
 #include <globals/FileTypeClass.h>
 #include <vector>
 

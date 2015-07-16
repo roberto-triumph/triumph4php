@@ -29,7 +29,7 @@
 #include <globals/Events.h>
 #include <pelet/TokenClass.h>
 #include <actions/ActionClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/TagCacheClass.h>
 #include <vector>
 
 namespace t4p {

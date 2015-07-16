@@ -31,7 +31,7 @@
 #include <widgets/TreeList.h>
 #include <widgets/DirPickerValidatorClass.h>
 #include <widgets/ListWidget.h>
-#include <language/DbgpEventClass.h>
+#include <language_php/DbgpEventClass.h>
 #include <actions/DebuggerServerActionClass.h>
 #include <code_control/CodeControlClass.h>
 #include <wx/valgen.h>

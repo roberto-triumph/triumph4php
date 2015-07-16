@@ -23,12 +23,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <features/OutlineFeatureClass.h>
-#include <language/SymbolTableClass.h>
+#include <language_php/SymbolTableClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <globals/TagList.h>
-#include <language/TagParserClass.h>
+#include <language_php/TagParserClass.h>
 #include <globals/Sqlite.h>
 #include <globals/Number.h>
 #include <Triumph.h>

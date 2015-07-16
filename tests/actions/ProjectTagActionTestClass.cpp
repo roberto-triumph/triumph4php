@@ -27,7 +27,7 @@
 #include <ActionTestFixtureClass.h>
 #include <FileTestFixtureClass.h>
 #include <actions/ProjectTagActionClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/TagCacheClass.h>
 #include <globals/Assets.h>
 #include <wx/event.h>
 #include <soci/soci.h>

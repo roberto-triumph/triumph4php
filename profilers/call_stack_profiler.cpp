@@ -23,9 +23,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#include <language/TagCacheClass.h>
-#include <language/TagFinderList.h>
-#include <language/CallStackClass.h>
+#include <language_php/TagCacheClass.h>
+#include <language_php/TagFinderList.h>
+#include <language_php/CallStackClass.h>
 #include <actions/TagDetectorActionClass.h>
 #include <actions/CallStackActionClass.h>
 #include <globals/Assets.h>

@@ -26,7 +26,7 @@
 #define __T4P_TAGLIST_H__
 
 #include <globals/TagClass.h>
-#include <language/ParsedTagFinderClass.h>
+#include <language_php/ParsedTagFinderClass.h>
 #include <globals/FileTypeClass.h>
 #include <vector>
 

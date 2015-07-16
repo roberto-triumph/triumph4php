@@ -25,7 +25,7 @@
 #include <actions/TagCacheSearchActionClass.h>
 #include <globals/FileName.h>
 #include <globals/Assets.h>
-#include <language/TagFinderList.h>
+#include <language_php/TagFinderList.h>
 #include <globals/TagList.h>
 
 t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,

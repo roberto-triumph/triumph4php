@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <code_control/ResourceCacheBuilderClass.h>
-#include <language/TagFinderList.h>
+#include <language_php/TagFinderList.h>
 #include <globals/Assets.h>
 #include <globals/GlobalsClass.h>
 

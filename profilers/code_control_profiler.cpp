@@ -30,7 +30,7 @@
 #include <globals/Assets.h>
 #include <globals/Events.h>
 #include <globals/GlobalsClass.h>
-#include <language/TagFinderList.h>
+#include <language_php/TagFinderList.h>
 #include <code_control/CodeControlStyles.h>
 #include <code_control/CodeControlClass.h>
 #include <search/FindInFilesClass.h>

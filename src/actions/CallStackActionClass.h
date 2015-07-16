@@ -26,7 +26,7 @@
 #define __T4P_CALLSTACKACTIONCLASS_H__
 
 #include <actions/GlobalActionClass.h>
-#include <language/CallStackClass.h>
+#include <language_php/CallStackClass.h>
 
 namespace t4p {
 

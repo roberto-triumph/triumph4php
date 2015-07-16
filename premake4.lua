@@ -27,7 +27,7 @@
 includes = os.matchfiles("premake/*.lua")
 for key, scriptFile in ipairs(includes) do
 	dofile(scriptFile)
-end 
+end
 
 -- load opts after functions, premake_opts_* files make use of the trim function
 if os.is("windows") then
@@ -72,7 +72,7 @@ function wxconfiguration(config, action)
 		-- wxWidgets framework needs these
 		-- tell wxWidgets to import DLL symbols
 		-- wxwidgets uses "unsafe" functions, kill these warnings
-		-- although the flag is technically not needed since wx/defs.h sets the #define, 
+		-- although the flag is technically not needed since wx/defs.h sets the #define,
 		-- we do it here because not all profiler programs include the entire wxWidgets framework
 		defines { "WIN32", "_DEBUG", "_WINDOWS", "WXUSINGDLL", "_CRT_SECURE_NO_WARNINGS" }
 
@@ -128,29 +128,29 @@ function sociconfiguration(config)
 		MYSQL_LIB_DIR,
 		SQLITE_LIB_DIR
 	}
-	if os.is "windows" then 
+	if os.is "windows" then
 		includedirs {
 			SOCI_INCLUDE_DIR,
 			SOCI_INCLUDE_DIR .. "/soci",
 			MYSQL_INCLUDE_DIR,
 			SQLITE_INCLUDE_DIR
 		}
-		links { 
-			"soci_core_3_1", 
-			"soci_mysql_3_1", 
-			"soci_sqlite3_3_1" 
+		links {
+			"soci_core_3_1",
+			"soci_mysql_3_1",
+			"soci_sqlite3_3_1"
 		}
 		-- premake adds the lib prefix, we must take it away
-		links { 
+		links {
 			string.match(MYSQL_LIB_NAME, "^([%w_]+)%.lib$"),
-			string.match(SQLITE_LIB_NAME , "^([%w_]+)%.lib$") 
+			string.match(SQLITE_LIB_NAME , "^([%w_]+)%.lib$")
 		}
-		
+
 		-- grab the libraries from the build directory.  the ones from
-		-- from the install directory (lib/soci/triumph) do not work (programs 
+		-- from the install directory (lib/soci/triumph) do not work (programs
 		-- that use them crash)
 		libdirs { SOCI_LIB_DIR }
-	else 
+	else
 		if config == "Debug" then
 			includedirs {
 				SOCI_DEBUG_INCLUDE_DIR,
@@ -175,21 +175,21 @@ function sociconfiguration(config)
         if (config == "Release") then
 			libdirs { SOCI_RELEASE_LIB_DIR }
 		end
-		links { 
-			"soci_core", 
-			"soci_mysql", 
-			"soci_sqlite3" 
+		links {
+			"soci_core",
+			"soci_mysql",
+			"soci_sqlite3"
 		}
 
 		if os.is "linux" then
-			links { 
+			links {
 				string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.so$"),
-				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.so$") 
+				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.so$")
 			}
 		elseif os.is "macosx" then
-			links { 
+			links {
 				string.match(MYSQL_LIB_NAME, "^lib([%w_]+)%.dylib$"),
-				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.dylib$") 
+				string.match(SQLITE_LIB_NAME, "^lib([%w_]+)%.dylib$")
 			}
 		end
 	end
@@ -198,12 +198,12 @@ end
 -- the curl configuration
 -- for MSW, we use the version we compiled with the curl action
 -- for linux, we use the system wide version
-function curlconfiguration(config, action)	
-	if action == "vs2008" and config == "Debug" then	
+function curlconfiguration(config, action)
+	if action == "vs2008" and config == "Debug" then
 		includedirs { CURL_DEBUG_INCLUDE_DIR }
 		libdirs { CURL_DEBUG_LIB_DIR }
 		links { 'libcurl_debug' }
-	elseif action == "vs2008" and config == "Release" then	
+	elseif action == "vs2008" and config == "Release" then
 		includedirs { CURL_RELEASE_INCLUDE_DIR }
 		libdirs { CURL_RELEASE_LIB_DIR }
 		links { 'libcurl' }
@@ -217,18 +217,18 @@ end
 -- the boost configuration
 -- for MSW, we use the version we compiled with the boost action
 -- for linux, we use the system wide version
-function boostconfiguration(config, action)	
-	if action == "vs2008" and config == "Debug" then	
+function boostconfiguration(config, action)
+	if action == "vs2008" and config == "Debug" then
 		includedirs { BOOST_DEBUG_INCLUDE_DIR }
 		libdirs { BOOST_DEBUG_LIB_DIR }
-		
+
 		-- we dont want asio to use boost.time or boost.regex since we
 		-- don't otherwise use them
 		-- WIN32_LEAN_AND_MEAN to prevent "winsock.h already defined" errors
 		-- when putting wxWidgets and asio together
-		-- _WIN32_WINNT=0x0501 to prevent asio warnings 
+		-- _WIN32_WINNT=0x0501 to prevent asio warnings
 		-- "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately"
-		-- note 2: 
+		-- note 2:
 		-- define BOOST_ALL_DYN_LINK so that boost does not attempt to link
 		-- against the static version of the libs. boost has some
 		-- #pragma magic that attempts to load in the appropriate version
@@ -239,20 +239,20 @@ function boostconfiguration(config, action)
 		-- of the library, AND because boost's shared lib is not
 		-- prefixed with "lib" so "link {}" cannot be used as premake
 		-- always adds the prefix.
-		defines { 
-			'BOOST_DATE_TIME_NO_LIB', 
-			'BOOST_REGEX_NO_LIB', 
+		defines {
+			'BOOST_DATE_TIME_NO_LIB',
+			'BOOST_REGEX_NO_LIB',
 			'WIN32_LEAN_AND_MEAN' ,
 			'_WIN32_WINNT=0x0501',
 			'BOOST_ALL_DYN_LINK'
 		}
-	elseif action == "vs2008" and config == "Release" then	
+	elseif action == "vs2008" and config == "Release" then
 		includedirs { BOOST_RELEASE_INCLUDE_DIR }
 		libdirs { BOOST_RELEASE_LIB_DIR }
-		defines { 
-			'BOOST_DATE_TIME_NO_LIB', 
-			'BOOST_REGEX_NO_LIB', 
-			'WIN32_LEAN_AND_MEAN', 
+		defines {
+			'BOOST_DATE_TIME_NO_LIB',
+			'BOOST_REGEX_NO_LIB',
+			'WIN32_LEAN_AND_MEAN',
 			'_WIN32_WINNT=0x0501',
 			'BOOST_ALL_DYN_LINK'
 		}
@@ -260,8 +260,8 @@ function boostconfiguration(config, action)
 		includedirs { BOOST_INCLUDE_DIR }
 		libdirs { BOOST_RELEASE_LIB_DIR }
 		links { "boost_system" }
-		defines { 
-			'BOOST_DATE_TIME_NO_LIB', 
+		defines {
+			'BOOST_DATE_TIME_NO_LIB',
 			'BOOST_REGEX_NO_LIB'
 		}
 	end
@@ -286,7 +286,7 @@ end
 solution "triumph4php"
 
 	location (BUILD_SCRIPTS_DIR)
-	
+
 	configurations { "Release", "Debug"}
 
 	-- the location of the assets (images, sql scripts, etc)
@@ -297,19 +297,19 @@ solution "triumph4php"
 	defines {
 		string.format("T4P_ASSET_DIR=%s", string.gsub(T4P_ASSET_DIR, '\\', '/'))
 	}
-	
+
 	if os.is "linux" then
-		configuration "gmake or codelite" 
+		configuration "gmake or codelite"
 
 			-- link against our own version of wxWidgets / SOCI instead of any installed in the system
 			linkoptions { string.format("-Wl,-rpath=%s", T4P_LIB_DIR)  }
 	elseif os.is "macosx" then
-		
-		-- this is a workaround for a premake issue where it will use 
+
+		-- this is a workaround for a premake issue where it will use
 		-- bad compiler flags "-Wl,x" for a workaround that is longer
 		-- needed in GCC, but it just prevents clang from compiling
 		-- see http://industriousone.com/topic/how-remove-flags-ldflags
-		flags { "Symbols" } 
+		flags { "Symbols" }
 	end
 
 	configuration "Debug"
@@ -323,20 +323,20 @@ solution "triumph4php"
 	project "triumph4php"
 		language "C++"
 		kind "WindowedApp"
-		
+
 		if os.is "windows" then
 			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "premake/*.lua", "README.md", "src/Triumph.rc" }
-		else 
+		else
 			files { "src/**.cpp", "src/**.h", "src/**.re", "*.lua", "premake/*.lua", "README.md" }
 		end
-		includedirs { 
-			"src/", 
-			"lib/keybinder/include/", 
+		includedirs {
+			"src/",
+			"lib/keybinder/include/",
 			"lib/pelet/include"
 		}
 		links { "keybinder", "pelet" }
 		defines { "PELET_USE_DLL"}
-		
+
 		if os.is "macosx" then
 			configuration { "Debug" }
 				postbuildcommands {
@@ -372,10 +372,10 @@ solution "triumph4php"
 			wxappconfiguration("Debug", _ACTION)
 			curlconfiguration("Debug", _ACTION)
 			boostconfiguration("Debug", _ACTION)
-			
-			-- use the local update server in debug 
+
+			-- use the local update server in debug
 			-- instantiate the test feature
-			defines { 
+			defines {
 				string.format("T4P_UPDATE_HOST=%s", 'updates.localhost'),
 				"T4P_USE_TEST_FEATURE=1"
 			}
@@ -388,10 +388,10 @@ solution "triumph4php"
 			wxappconfiguration("Release", _ACTION)
 			curlconfiguration("Release", _ACTION)
 			boostconfiguration("Release", _ACTION)
-			
+
 			-- use the public update server in release
 			-- no need to instantiate in the test feature
-			defines { 
+			defines {
 				string.format("T4P_UPDATE_HOST=%s", 'updates.triumph4php.com'),
 				"T4P_USE_TEST_FEATURE=0"
 			}
@@ -404,7 +404,7 @@ solution "triumph4php"
 			"tests/**.h",
 			"src/globals/*.cpp",
 			"src/actions/*.cpp",
-			"src/language/*.cpp",
+			"src/language_php/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"lib/pelet/src/*.cpp"
@@ -426,13 +426,13 @@ solution "triumph4php"
 				string.format("T4P_DB_PASSWORD=%s", T4P_DB_PASSWORD)
 			}
 		end;
-		includedirs { 
-			"lib/UnitTest++/src/", 
+		includedirs {
+			"lib/UnitTest++/src/",
 			"lib/pelet/include",
-			"src/", 
-			"tests/", 
+			"src/",
+			"tests/",
 		}
-		links { 
+		links {
 			"unit_test++"
 		}
 
@@ -459,7 +459,7 @@ solution "triumph4php"
 			"src/code_control/**.cpp",
 			"src/features/**.cpp",
 			"src/globals/**.cpp",
-			"src/language/**.cpp",
+			"src/language_php/**.cpp",
 			"src/main_frame/**.cpp",
 			"src/search/**.cpp",
 			"src/views/**.cpp",
@@ -468,7 +468,7 @@ solution "triumph4php"
 			"src/Triumph.cpp",
 			"lib/pelet/src/**.cpp"
 		}
-		
+
 		-- these will be used by the SqlResourceFinder tests
 		-- note the use of single quotes, MSW builds will fail if we
 		-- use double quotes because visual studio already escapes
@@ -485,14 +485,14 @@ solution "triumph4php"
 				string.format("T4P_DB_PASSWORD=%s", T4P_DB_PASSWORD)
 			}
 		end;
-		includedirs { 
-			"lib/UnitTest++/src/", 
+		includedirs {
+			"lib/UnitTest++/src/",
 			"lib/pelet/include",
-			"src/", 
-			"view_tests/", 
+			"src/",
+			"view_tests/",
 			"lib/keybinder/include"
 		}
-		links { 
+		links {
 			"unit_test++",
 			"keybinder"
 		}
@@ -520,7 +520,7 @@ solution "triumph4php"
 		files {
 			"profilers/tag_finder_profiler.cpp",
 			"src/globals/*.cpp",
-			"src/language/*.cpp",
+			"src/language_php/*.cpp",
 			"src/search/*.cpp",
 			"lib/pelet/src/*.cpp"
 		}
@@ -543,7 +543,7 @@ solution "triumph4php"
 		kind "ConsoleApp"
 		files {
 			"profilers/call_stack_profiler.cpp",
-			"src/language/*.cpp",
+			"src/language_php/*.cpp",
 			"src/globals/*.cpp",
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
@@ -554,7 +554,7 @@ solution "triumph4php"
 			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
-		
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
@@ -565,21 +565,21 @@ solution "triumph4php"
 			sociconfiguration("Release")
 			icuconfiguration("Release", _ACTION)
 			wxconfiguration("Release", _ACTION)
-                        
+
 	project "action_profiler"
 		language "C++"
 		kind "WindowedApp"
 		files {
 			"src/actions/*.cpp",
 			"src/globals/*.cpp",
-			"src/language/*.cpp",
+			"src/language_php/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"profilers/action_profiler.cpp",
 			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src", "lib/pelet/include" }
-		
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
@@ -625,13 +625,13 @@ solution "triumph4php"
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"src/widgets/StatusBarWithGaugeClass.cpp",
 			"src/globals/*.cpp",
-			"src/language/*.cpp",
+			"src/language_php/*.cpp",
 			"src/search/*.cpp",
 			"src/actions/ActionClass.cpp",
 			"lib/pelet/src/*.cpp"
 		}
 		includedirs { "src/", "lib/pelet/include" }
-		
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
@@ -691,7 +691,7 @@ solution "triumph4php"
 		-- this is needed so that symbols are exported
 		defines { "DLL_EXPORTS", "WXMAKINGDLL_KEYBINDER" }
 		includedirs { "lib/keybinder/include" }
-		
+
 		-- for mac osx, change the shared library ID so that
 		-- it is the full path, that way we can run the executable
 		-- from any location and the lib will always be found
@@ -735,7 +735,7 @@ solution "triumph4php"
 		configuration { "gmake or codelite" }
 			-- prevent warning: deprecated conversion from string constant to char*
 			buildoptions { "-Wno-write-strings" }
-	
+
 	project "pelet"
 		language "C++"
 		kind "SharedLib"
@@ -750,7 +750,7 @@ solution "triumph4php"
 		includedirs { "lib/pelet/include" }
 		defines { "PELET_MAKING_DLL" }
 		pickywarnings(_ACTION)
-		
+
 		-- for mac osx, change the shared library ID so that
 		-- it is the full path, that way we can run the executable
 		-- from any location and the lib will always be found
@@ -794,7 +794,7 @@ solution "triumph4php"
 		configuration "Release"
 			pickywarnings(_ACTION)
 			icuconfiguration("Release", _ACTION)
-			
+
 	project "icu_file_tutorial"
 		language "C++"
 		kind "ConsoleApp"
@@ -849,7 +849,7 @@ solution "triumph4php"
 		language "C++"
 		kind "ConsoleApp"
 		files { "tutorials/soci_tutorial.cpp" }
-		
+
 		configuration "Debug"
 			pickywarnings(_ACTION)
 			sociconfiguration("Debug")
@@ -860,7 +860,7 @@ solution "triumph4php"
 	project "running_threads_tutorial"
 		language "C++"
 		kind "WindowedApp"
-		files { 
+		files {
 			"tutorials/running_threads_tutorial.cpp",
 			"src/actions/ActionClass.cpp"
 		}

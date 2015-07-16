@@ -26,7 +26,7 @@
 #include <actions/TotalTagSearchActionClass.h>
 #include <globals/FileName.h>
 #include <globals/Assets.h>
-#include <language/TagFinderList.h>
+#include <language_php/TagFinderList.h>
 #include <globals/TagList.h>
 #include <globals/FileCabinetItemClass.h>
 #include <soci/soci.h>

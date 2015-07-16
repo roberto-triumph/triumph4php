@@ -24,7 +24,7 @@
  */
 #include <actions/GlobalActionClass.h>
 #include <search/DirectorySearchClass.h>
-#include <language/TagFinderList.h>
+#include <language_php/TagFinderList.h>
 #include <pelet/TokenClass.h>
 #include <vector>
 

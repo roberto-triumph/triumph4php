@@ -31,7 +31,7 @@
 #include <views/wxformbuilder/SqlBrowserFeatureForms.h>
 #include <globals/ProjectClass.h>
 #include <globals/DatabaseTagClass.h>
-#include <language/SqlLexicalAnalyzerClass.h>
+#include <language_php/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <globals/Events.h>
 #include <code_control/CodeControlClass.h>

@@ -32,11 +32,11 @@
 #include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
 #include <features/BackgroundFileReaderClass.h>
-#include <language/PhpVariableLintClass.h>
-#include <language/PhpIdentifierLintClass.h>
-#include <language/LintSuppressionClass.h>
-#include <language/PhpFunctionCallLintClass.h>
-#include <language/TagCacheClass.h>
+#include <language_php/PhpVariableLintClass.h>
+#include <language_php/PhpIdentifierLintClass.h>
+#include <language_php/LintSuppressionClass.h>
+#include <language_php/PhpFunctionCallLintClass.h>
+#include <language_php/TagCacheClass.h>
 
 namespace t4p {
 
