@@ -28,6 +28,7 @@
 #include <wx/string.h>
 #include <wx/filename.h>
 #include <globals/Sqlite.h>
+#include <globals/SqliteFinderClass.h>
 
 namespace t4p {
 

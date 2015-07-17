@@ -28,6 +28,7 @@
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
 #include <globals/Sqlite.h>
+#include <globals/SqliteFinderClass.h>
 
 namespace t4p {
 

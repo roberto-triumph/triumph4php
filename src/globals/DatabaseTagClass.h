@@ -27,6 +27,7 @@
  
  #include <unicode/unistr.h>
  #include <globals/Sqlite.h>
+ #include <globals/SqliteFinderClass.h>
  #include <vector>
  #include <wx/longlong.h>
  #include <wx/thread.h>

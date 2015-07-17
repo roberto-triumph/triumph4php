@@ -27,6 +27,7 @@
 #define __T4P_DETECTEDTAGFINDERCLASS_H__
 
 #include <globals/Sqlite.h>
+#include <globals/SqliteResultClass.h>
 #include <globals/TagClass.h>
 
 namespace t4p {

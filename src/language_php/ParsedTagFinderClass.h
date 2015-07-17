@@ -27,6 +27,8 @@
 
 #include <globals/TagClass.h>
 #include <globals/Sqlite.h>
+#include <globals/SqliteResultClass.h>
+#include <globals/SqliteFinderClass.h>
 #include <wx/string.h>
 #include <soci/soci.h>
 #include <unicode/unistr.h>

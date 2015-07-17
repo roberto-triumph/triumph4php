@@ -26,6 +26,7 @@
 #include <TriumphChecks.h>
 #include <SqliteTestFixtureClass.h>
 #include <globals/FileCabinetItemClass.h>
+#include <globals/SqliteFinderClass.h>
 #include <globals/String.h>
 #include <wx/platinfo.h>
 #include <iostream>

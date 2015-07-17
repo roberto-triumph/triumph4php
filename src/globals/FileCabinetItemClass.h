@@ -26,6 +26,7 @@
 #define __T4P_FILECABINETCLASS_H__
 
 #include <globals/Sqlite.h>
+#include <globals/SqliteResultClass.h>
 
 namespace t4p {
 	

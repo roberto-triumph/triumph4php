@@ -29,6 +29,7 @@
 #include <language_php/TagParserClass.h>
 #include <language_php/SymbolTableClass.h>
 #include <globals/Sqlite.h>
+#include <globals/SqliteResultClass.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <wx/thread.h>
