@@ -28,7 +28,7 @@
 
 #include <features/FeatureClass.h>
 #include <globals/ProjectClass.h>
-#include <globals/DatabaseTagClass.h>
+#include <language_sql/DatabaseTagClass.h>
 #include <language_sql/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <wx/thread.h>

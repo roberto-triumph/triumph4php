@@ -28,7 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
 #include <views/wxformbuilder/TemplateFilesFeatureForms.h>
-#include <globals/TemplateFileTagClass.h>
+#include <language_php/TemplateFileTagClass.h>
 #include <actions/ActionClass.h>
 #include <wx/imaglist.h>
 

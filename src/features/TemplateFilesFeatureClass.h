@@ -26,9 +26,9 @@
 #define __TEMPLATEFILES_FEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <globals/TemplateFileTagClass.h>
+#include <language_php/TemplateFileTagClass.h>
 #include <actions/ActionClass.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 
 namespace t4p {
 

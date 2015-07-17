@@ -22,7 +22,7 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/TemplateFileTagClass.h>
+#include <language_php/TemplateFileTagClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/String.h>
 #include <globals/Assets.h>

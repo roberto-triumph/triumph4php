@@ -26,7 +26,7 @@
 #define __T4P_CHOOSEURLDIALOGCLASS_H__
 
 #include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <wx/wx.h>
 

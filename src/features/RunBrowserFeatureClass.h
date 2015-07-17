@@ -26,7 +26,7 @@
 #define __RUNBROWSERFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 #include <actions/ActionClass.h>
 #include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>

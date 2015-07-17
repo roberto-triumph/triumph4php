@@ -29,7 +29,7 @@
 #include <actions/ActionClass.h>
 #include <views/wxformbuilder/DetectorFeatureForms.h>
 #include <features/DetectorFeatureClass.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 #include <globals/Events.h>
 #include <wx/imaglist.h>
 

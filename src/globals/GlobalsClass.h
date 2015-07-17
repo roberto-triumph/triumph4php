@@ -27,10 +27,10 @@
 #define __T4P_STRUCTSCLASS_H__
 
 #include <globals/EnvironmentClass.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <language_sql/SqlResourceFinderClass.h>
-#include <globals/TemplateFileTagClass.h>
+#include <language_php/TemplateFileTagClass.h>
 #include <language_php/TagCacheClass.h>
 #include <globals/FileTypeClass.h>
 #include <vector>

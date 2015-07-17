@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <DatabaseTestFixtureClass.h>
-#include <globals/DatabaseTagClass.h>
+#include <language_sql/DatabaseTagClass.h>
 #include <globals/String.h>
 #include <TriumphChecks.h>
 #include <soci.h>

@@ -28,7 +28,7 @@
 
 #include <wx/event.h>
 #include <actions/ActionClass.h>
-#include <globals/DatabaseTableTagClass.h>
+#include <language_php/DatabaseTableTagClass.h>
 #include <globals/TagClass.h>
 #include <globals/GlobalsClass.h>
 #include <unicode/unistr.h>

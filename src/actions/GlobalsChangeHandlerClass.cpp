@@ -23,7 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <actions/GlobalsChangeHandlerClass.h>
-#include <globals/DatabaseTagClass.h>
+#include <language_sql/DatabaseTagClass.h>
 #include <actions/GlobalActionClass.h>
 #include <globals/Errors.h>
 #include <soci/sqlite3/soci-sqlite3.h>

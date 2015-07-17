@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <SqliteTestFixtureClass.h>
-#include <globals/UrlTagClass.h>
+#include <language_php/UrlTagClass.h>
 #include <globals/String.h>
 #include <globals/Assets.h>
 #include <soci/soci.h>

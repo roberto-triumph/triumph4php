@@ -25,7 +25,7 @@
 #include <features/TemplateFilesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
-#include <globals/TemplateFileTagClass.h>
+#include <language_php/TemplateFileTagClass.h>
 #include <actions/CallStackActionClass.h>
 #include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/SequenceClass.h>

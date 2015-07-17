@@ -30,7 +30,7 @@
 #include <features/SqlBrowserFeatureClass.h>
 #include <views/wxformbuilder/SqlBrowserFeatureForms.h>
 #include <globals/ProjectClass.h>
-#include <globals/DatabaseTagClass.h>
+#include <language_sql/DatabaseTagClass.h>
 #include <language_sql/SqlLexicalAnalyzerClass.h>
 #include <actions/SqlMetaDataActionClass.h>
 #include <globals/Events.h>

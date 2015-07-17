@@ -26,7 +26,7 @@
 #define __T4P_CONFIGFILESFEATURECLASS_H__
 
 #include <features/FeatureClass.h>
-#include <globals/ConfigTagClass.h>
+#include <language_php/ConfigTagClass.h>
 #include <globals/Events.h>
 #include <actions/ActionClass.h>
 #include <vector>

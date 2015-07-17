@@ -22,7 +22,7 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/ConfigTagClass.h>
+#include <language_php/ConfigTagClass.h>
 #include <globals/String.h>
 #include <globals/Errors.h>
 
