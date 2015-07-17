@@ -26,8 +26,8 @@
 #include <globals/ProjectClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-void t4p::TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches) {
-	std::vector<t4p::TagClass>::iterator it = matches.begin();
+void t4p::TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches) {
+	std::vector<t4p::PhpTagClass>::iterator it = matches.begin();
 	while (it != matches.end()) {
 		if (it->IsNative) {
 			it = matches.erase(it);
@@ -38,9 +38,9 @@ void t4p::TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches) {
 	}
 }
 
-void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, 
+void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches, 
 		std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType) {
-	std::vector<t4p::TagClass>::iterator tag = matches.begin();
+	std::vector<t4p::PhpTagClass>::iterator tag = matches.begin();
 	std::vector<t4p::ProjectClass*>::const_iterator project;
 	while (tag != matches.end()) {
 		bool isInProjects = false;

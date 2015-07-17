@@ -91,7 +91,7 @@ public:
 	std::vector<wxFileName> SourceDirs;
 	t4p::TagFinderListClass TagFinderList;
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<t4p::TagClass> ResourceMatches;
+	std::vector<t4p::PhpTagClass> ResourceMatches;
 	bool DoDuckTyping;
 	bool DoFullyQualifiedMatchOnly;
 	t4p::SymbolTableMatchErrorClass Error;
@@ -632,7 +632,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
 	);
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("MyCl"));
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, tags);
@@ -652,7 +652,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 	DoFullyQualifiedMatchOnly = true;
 	Init(sourceCode);	
 	ToClass(UNICODE_STRING_SIMPLE("My"));
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(1, tags);
@@ -672,7 +672,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndF
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE(""), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(2, tags);
@@ -947,7 +947,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(2, tags);
@@ -968,7 +968,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	);
 	Init(sourceCode);
 	ToFunction(UNICODE_STRING_SIMPLE("unknown"));
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, true, false, Error);
 	CHECK_VECTOR_SIZE(0, tags);
@@ -987,7 +987,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, false, false, Error);
 	CHECK_VECTOR_SIZE(0, tags);
@@ -1007,7 +1007,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableA
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("work"), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, true, false, Error);
 	CHECK_VECTOR_SIZE(2, tags);
@@ -1060,7 +1060,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("unknownFunc"), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, tags);
@@ -1080,7 +1080,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("workB"), true, false);
 	ExpressionAppendChain(UNICODE_STRING_SIMPLE("prop"), false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, tags);
@@ -1099,7 +1099,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 	);
 	Init(sourceCode);	
 	ToProperty(UNICODE_STRING_SIMPLE("$my"), UNICODE_STRING_SIMPLE("wor"), false, false);
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	CompletionSymbolTable.ResourceMatches(ParsedVariable, Scope, SourceDirs, TagFinderList, 
 		tags, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
 	CHECK_VECTOR_SIZE(0, tags);
@@ -1224,7 +1224,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(sourceStmt.get_backend());
 	sourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
 		
-	int type = t4p::TagClass::METHOD;
+	int type = t4p::PhpTagClass::METHOD;
 	std::string sql = "INSERT INTO detected_tags";
 	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static) ";
 	sql += "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

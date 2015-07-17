@@ -523,7 +523,7 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentL
  *        needs to be a fully qualified function name.
  * @param isMethod TRUE if the search should be restricted to methods (from all classes)
  * @param isStatic TRUE if the search should be restriced to static methods ('::')
- * @param functionTag the TagClass that was found; will contain the function signature
+ * @param functionTag the t4p::PhpTagClass that was found; will contain the function signature
  * @return bool TRUE if functionName was found ONLY ONCE in the tag cache
  */
 bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const UnicodeString& functionName, bool isMethod, bool isStatic) {

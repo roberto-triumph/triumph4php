@@ -74,9 +74,9 @@ t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
 , Signature()
 , Comment() 
 , IsStatic(0) {
-	TagTypes.push_back(t4p::TagClass::MEMBER);
-	TagTypes.push_back(t4p::TagClass::METHOD);
-	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
+	TagTypes.push_back(t4p::PhpTagClass::METHOD);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS_CONSTANT);
 }
 
 void t4p::DetectedTagExactMemberResultClass::DoBind(soci::statement&  stmt) {
@@ -100,7 +100,7 @@ void t4p::DetectedTagExactMemberResultClass::DoBind(soci::statement&  stmt) {
 
 void t4p::DetectedTagExactMemberResultClass::Next() {
 	Tag.Key = t4p::CharToIcu(Key.c_str());
-	Tag.Type = (t4p::TagClass::Types)Type;
+	Tag.Type = (t4p::PhpTagClass::Types)Type;
 	Tag.ClassName = t4p::CharToIcu(ClassName.c_str());
 	Tag.Identifier = t4p::CharToIcu(Identifier.c_str());
 	Tag.ReturnType = t4p::CharToIcu(ReturnType.c_str());

@@ -26,7 +26,7 @@
 #define T4P_TAGPARSERCLASS_H
 
 #include <search/DirectorySearchClass.h>
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <pelet/ParserClass.h>
 #include <wx/datetime.h>
 #include <wx/string.h>
@@ -374,7 +374,7 @@ private:
 	 * @param resources the list of resources that were parsed out
 	 * @param int the file that the resources are located in
 	 */
-	void PersistResources(const t4p::TagClass& resource, int fileTagId);
+	void PersistResources(const t4p::PhpTagClass& resource, int fileTagId);
 
 	/**
 	 * add all of the given trait resources into the database.

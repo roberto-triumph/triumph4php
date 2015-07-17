@@ -52,14 +52,14 @@ static UnicodeString QualifyName(const UnicodeString& namespaceName, const Unico
 	return qualifiedName;
 }
 
-std::vector<t4p::TagClass> AllResources(soci::session& session) {
+std::vector<t4p::PhpTagClass> AllResources(soci::session& session) {
 	std::string sql;
 	sql += "SELECT r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) ";
 	sql += " ORDER BY key";
 	
-	std::vector<t4p::TagClass> matches;
+	std::vector<t4p::PhpTagClass> matches;
 	int fileTagId;
 	int sourceId;
 	std::string key;
@@ -91,14 +91,14 @@ std::vector<t4p::TagClass> AllResources(soci::session& session) {
 		);
 		if (stmt.execute(true)) {
 			do {
-				t4p::TagClass tag;
+				t4p::PhpTagClass tag;
 				if (soci::i_ok == fileTagIdIndicator) {
 					tag.FileTagId = fileTagId;
 				}
 				tag.Key = t4p::CharToIcu(key.c_str());
 				tag.Identifier = t4p::CharToIcu(identifier.c_str());
 				tag.ClassName = t4p::CharToIcu(className.c_str());
-				tag.Type = (t4p::TagClass::Types)type;
+				tag.Type = (t4p::PhpTagClass::Types)type;
 				tag.NamespaceName = t4p::CharToIcu(namespaceName.c_str());
 				tag.Signature = t4p::CharToIcu(signature.c_str());
 				tag.ReturnType = t4p::CharToIcu(returnType.c_str());
@@ -446,12 +446,12 @@ void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const U
 		const UnicodeString& baseClassName,
 		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber) {
-	TagClass classItem;
+	t4p::PhpTagClass classItem;
 	classItem.Identifier = className;
 	classItem.ClassName = className;
 	classItem.NamespaceName = namespaceName;
 	classItem.Key = className;
-	classItem.Type = TagClass::CLASS;
+	classItem.Type = t4p::PhpTagClass::CLASS;
 	classItem.Signature = signature;
 	classItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	classItem.Comment = comment;
@@ -461,7 +461,7 @@ void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const U
 	if (IsNewNamespace(namespaceName)) {
 
 		// a tag for the namespace itself
-		t4p::TagClass namespaceItem = t4p::TagClass::MakeNamespace(namespaceName);
+		t4p::PhpTagClass namespaceItem = t4p::PhpTagClass::MakeNamespace(namespaceName);
 		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 
@@ -561,10 +561,10 @@ void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, cons
 
 void t4p::TagParserClass::DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, 
 		const UnicodeString& variableValue, const UnicodeString& comment, const int lineNumber) {
-	TagClass defineItem;
+	t4p::PhpTagClass defineItem;
 	defineItem.Identifier = variableName;
 	defineItem.Key = variableName;
-	defineItem.Type = TagClass::DEFINE;
+	defineItem.Type = t4p::PhpTagClass::DEFINE;
 	defineItem.Signature = variableValue;
 	defineItem.ReturnType = UNICODE_STRING_SIMPLE("");
 	defineItem.Comment = comment;
@@ -579,12 +579,12 @@ void t4p::TagParserClass::DefineDeclarationFound(const UnicodeString& namespaceN
 void t4p::TagParserClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments) {
-	TagClass item;
+	t4p::PhpTagClass item;
 	item.Identifier = methodName;
 	item.ClassName = className;
 	item.NamespaceName = namespaceName;
 	item.Key = methodName;
-	item.Type = TagClass::METHOD;
+	item.Type = t4p::PhpTagClass::METHOD;
 	if (!returnType.isEmpty()) {
 		item.Signature = returnType + UNICODE_STRING_SIMPLE(" ");
 	}
@@ -629,12 +629,12 @@ void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, cons
 		// this affects the code completion functionality
 		filteredProperty.findAndReplace(UNICODE_STRING_SIMPLE("$"), UNICODE_STRING_SIMPLE(""));
 	}
-	TagClass item;
+	t4p::PhpTagClass item;
 	item.Identifier = filteredProperty;
 	item.ClassName = className;
 	item.NamespaceName = namespaceName;
 	item.Key = filteredProperty;
-	item.Type = isConst ? TagClass::CLASS_CONSTANT : TagClass::MEMBER;
+	item.Type = isConst ? t4p::PhpTagClass::CLASS_CONSTANT : t4p::PhpTagClass::MEMBER;
 	item.Signature =  className + UNICODE_STRING_SIMPLE("::") + filteredProperty;
 	item.ReturnType = propertyType;
 	item.Comment = comment;
@@ -665,11 +665,11 @@ void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, cons
 
 void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, 
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
-	TagClass item;
+	t4p::PhpTagClass item;
 	item.Identifier = functionName;
 	item.NamespaceName = namespaceName;
 	item.Key = functionName;
-	item.Type = TagClass::FUNCTION;
+	item.Type = t4p::PhpTagClass::FUNCTION;
 	item.Signature = signature;
 	item.ReturnType = returnType;
 	item.Comment = comment;
@@ -678,7 +678,7 @@ void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, cons
 	PersistResources(item, CurrentFileTagId);
 		
 	if (IsNewNamespace(namespaceName)) {
-		t4p::TagClass namespaceItem = t4p::TagClass::MakeNamespace(namespaceName);
+		t4p::PhpTagClass namespaceItem = t4p::PhpTagClass::MakeNamespace(namespaceName);
 		PersistResources(namespaceItem, CurrentFileTagId);
 	}
 		
@@ -691,7 +691,7 @@ void t4p::TagParserClass::FunctionFound(const UnicodeString& namespaceName, cons
 bool t4p::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
 	std::string sql = "SELECT COUNT(*) FROM resources WHERE key = ? AND type = ?";
 	std::string nm = t4p::IcuToChar(namespaceName);
-	int type = t4p::TagClass::NAMESPACE;
+	int type = t4p::PhpTagClass::NAMESPACE;
 	int count = 0;
 	bool isNew = false;
 	try {
@@ -746,13 +746,13 @@ void t4p::TagParserClass::RemovePersistedResources(const std::vector<int>& fileT
 
 void t4p::TagParserClass::Print() {
 	UFILE *out = u_finit(stdout, NULL, NULL);
-	std::vector<t4p::TagClass> matches = AllResources(*Session);
+	std::vector<t4p::PhpTagClass> matches = AllResources(*Session);
 	u_fprintf(out, "resource count=%d\n", matches.size());
-	for (std::vector<t4p::TagClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
+	for (std::vector<t4p::PhpTagClass>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
 		switch (it->Type) {
-			case t4p::TagClass::CLASS :
-			case t4p::TagClass::DEFINE :
-			case t4p::TagClass::FUNCTION :
+			case t4p::PhpTagClass::CLASS :
+			case t4p::PhpTagClass::DEFINE :
+			case t4p::PhpTagClass::FUNCTION :
 
 				u_fprintf(out, "RESOURCE: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S Type=%d FileID=%d SourceID=%d\n",
 					it->Key.length(), it->Key.getBuffer(),
@@ -761,9 +761,9 @@ void t4p::TagParserClass::Print() {
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
 					it->Type, it->FileTagId, it->SourceId);
 				break;
-			case t4p::TagClass::CLASS_CONSTANT :
-			case t4p::TagClass::MEMBER :
-			case t4p::TagClass::METHOD :
+			case t4p::PhpTagClass::CLASS_CONSTANT :
+			case t4p::PhpTagClass::MEMBER :
+			case t4p::PhpTagClass::METHOD :
 				u_fprintf(out, "MEMBER: Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S ReturnType=%.*S Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
@@ -771,7 +771,7 @@ void t4p::TagParserClass::Print() {
 					it->NamespaceName.length(), it->NamespaceName.getBuffer(),
 					it->ReturnType.length(), it->ReturnType.getBuffer(), it->Type, it->FileTagId, it->SourceId);
 				break;
-			case t4p::TagClass::NAMESPACE :
+			case t4p::PhpTagClass::NAMESPACE :
 				u_fprintf(out, "NAMESPACE:Key=%.*S Identifier=%.*S ClassName=%.*S Namespace=%.*S  Type=%d FileID=%d SourceID=%d\n", 
 					it->Key.length(), it->Key.getBuffer(),
 					it->Identifier.length(), it->Identifier.getBuffer(),  
@@ -981,7 +981,7 @@ void t4p::TagParserClass::DeleteFromFile(const wxString& fullPath) {
 	}
 }
 
-void t4p::TagParserClass::PersistResources(const t4p::TagClass& resource, int fileTagId) {
+void t4p::TagParserClass::PersistResources(const t4p::PhpTagClass& resource, int fileTagId) {
 	if (!IsCacheInitialized) {
 		return;
 	}

@@ -327,7 +327,7 @@ void ProfileTagSearch() {
 
 	time = wxGetLocalTimeMillis();
 	
-	std::vector<t4p::TagClass> matches;
+	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
 	t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
 	tagFinder.Exec(result);

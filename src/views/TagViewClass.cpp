@@ -113,7 +113,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 		wxString term = codeControl->GetTextRange(startPos, endPos);
 	
 		wxString matchError;
-		std::vector<t4p::TagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
+		std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
 			codeControl->GetIdString(), codeControl->GetSafeText(), endPos, 
 			Feature.App.Globals.AllEnabledSourceDirectories(),
 			Feature.App.Globals,
@@ -135,10 +135,10 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 				// that the currently opened file is in.
 				wxFileName openedFile = codeControl->GetFileName();
 				int tagProjectMatchCount = 0;
-				t4p::TagClass tagProjectMatch;
+				t4p::PhpTagClass tagProjectMatch;
 				if (openedFile.IsOk() && !codeControl->IsNew()) {
 					std::vector<t4p::ProjectClass>::const_iterator project;
-					std::vector<t4p::TagClass>::const_iterator tag;
+					std::vector<t4p::PhpTagClass>::const_iterator tag;
 					for (tag = matches.begin(); tag != matches.end(); ++tag) {
 						for (project = Feature.App.Globals.Projects.begin(); project != Feature.App.Globals.Projects.end(); ++project) {
 							if (project->IsAPhpSourceFile(openedFile.GetFullPath(), Feature.App.Globals.FileTypes) 
@@ -153,7 +153,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 					LoadPageFromResource(term, tagProjectMatch);
 				}
 				else {
-					std::vector<t4p::TagClass> chosenResources;
+					std::vector<t4p::PhpTagClass> chosenResources;
 					t4p::TagSearchDialogClass dialog(GetMainWindow(), Feature.App.Globals, Feature.CacheStatus(), term, chosenResources);
 					dialog.Prepopulate(term, matches);
 					if (dialog.ShowModal() == wxOK) {
@@ -168,7 +168,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 }
 
 void t4p::TagViewClass::OnSearchForResource(wxCommandEvent& event) {
-	std::vector<t4p::TagClass> chosenResources;
+	std::vector<t4p::PhpTagClass> chosenResources;
 	wxString term;
 	t4p::TagSearchDialogClass dialog(GetMainWindow(), Feature.App.Globals, Feature.CacheStatus(), term, chosenResources);
 	if (dialog.ShowModal() == wxOK) {
@@ -179,7 +179,7 @@ void t4p::TagViewClass::OnSearchForResource(wxCommandEvent& event) {
 }
 
 
-void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const t4p::TagClass& tag) {
+void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const t4p::PhpTagClass& tag) {
 	t4p::TagSearchClass tagSearch(t4p::WxToIcu(finderQuery));
 	wxFileName fileName = tag.FileName();
 	if (!fileName.FileExists()) {
@@ -387,7 +387,7 @@ void t4p::TagViewClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
 	// to get
 	int endPos = ctrl->WordEndPosition(pos, true);
 	wxString matchError;
-	std::vector<t4p::TagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
+	std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
 		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
 		Feature.App.Globals.AllEnabledSourceDirectories(),
 		Feature.App.Globals,
@@ -409,7 +409,7 @@ t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 													  t4p::GlobalsClass& globals,
 													  wxString cacheStatus,
 													  wxString& term,
-													  std::vector<t4p::TagClass>& chosenResources)
+													  std::vector<t4p::PhpTagClass>& chosenResources)
 	: TagSearchDialogGeneratedClass(parent)
 	, RunningThreads()
 	, Globals(globals)
@@ -517,7 +517,7 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	EndModal(wxOK);
 }
 
-void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::TagClass>& allMatches) {
+void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::PhpTagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
@@ -541,15 +541,15 @@ void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, c
 			projectLabel = selectedProject->Label;
 		}
 		wxString matchLabel;
-		t4p::TagClass match = allMatches[i];
-		if (t4p::TagClass::MEMBER == match.Type || t4p::TagClass::METHOD == match.Type ||
-			t4p::TagClass::CLASS_CONSTANT == match.Type) {
+		t4p::PhpTagClass match = allMatches[i];
+		if (t4p::PhpTagClass::MEMBER == match.Type || t4p::PhpTagClass::METHOD == match.Type ||
+			t4p::PhpTagClass::CLASS_CONSTANT == match.Type) {
 			matchLabel += t4p::IcuToWx(match.ClassName);
 			matchLabel += wxT("::");
 			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
-		else if (t4p::TagClass::CLASS == match.Type || t4p::TagClass::FUNCTION == match.Type
-			|| t4p::TagClass::DEFINE == match.Type) {
+		else if (t4p::PhpTagClass::CLASS == match.Type || t4p::PhpTagClass::FUNCTION == match.Type
+			|| t4p::PhpTagClass::DEFINE == match.Type) {
 			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		else {
@@ -598,7 +598,7 @@ void t4p::TagSearchDialogClass::OnCancelButton(wxCommandEvent& event) {
 	EndModal(wxCANCEL);
 }
 
-void t4p::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vector<t4p::TagClass> &matches) {
+void t4p::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vector<t4p::PhpTagClass> &matches) {
 	MatchedResources = matches;
 	SearchText->SetValue(term);
 	ShowJumpToResults(term, MatchedResources);

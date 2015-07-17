@@ -274,7 +274,7 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 
 			// if the given string was a class name, return the class name
 			// if the given string was a method, return the method's return type
-			if (t4p::TagClass::CLASS == tagResults->Tag.Type) {
+			if (t4p::PhpTagClass::CLASS == tagResults->Tag.Type) {
 				type = fullyQualifiedClass;
 			}
 			else {
@@ -296,7 +296,7 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 		t4p::TagResultClass* tagResults = tagSearch.CreateExactResults();
 		if (NativeTagFinder.Exec(tagResults)) {
 			tagResults->Next();
-			type =  t4p::TagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
+			type =  t4p::PhpTagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
 		}
 		delete tagResults;
 
@@ -315,7 +315,7 @@ UnicodeString t4p::TagFinderListClass::ParentClassName(UnicodeString className, 
 	return parent;
 }
 
-void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches,
+void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	tagSearch.SetSourceDirs(sourceDirs);
 	t4p::TagResultClass* result = tagSearch.CreateExactResults();
@@ -353,7 +353,7 @@ void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch
 	}
 }
 
-void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches,
+void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	if (tagSearch.GetClassName().isEmpty() && tagSearch.GetMethodName().isEmpty() && tagSearch.GetNamespaceName().length() <= 1) {
 		
@@ -396,7 +396,7 @@ void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch,
 	}
 }
 
-void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches) {
+void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
 
 		// no class = impossible to have traits
@@ -405,20 +405,20 @@ void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagS
 	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), true, tagSearch.GetSourceDirs());
 	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
-		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::PhpTagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
-		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::PhpTagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 }
 
-void t4p::TagFinderListClass::NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches) {
+void t4p::TagFinderListClass::NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
 
 		// no class = impossible to have traits
@@ -427,13 +427,13 @@ void t4p::TagFinderListClass::NearMatchTraitAliasesFromAll(t4p::TagSearchClass& 
 	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(tagSearch.GetClassHierarchy(), tagSearch.GetMethodName(), false, tagSearch.GetSourceDirs());
 	if (IsTagFinderInit && TagFinder.Exec(&traitResult)) {
-		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::PhpTagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}
 	}
 	if (IsNativeTagFinderInit && NativeTagFinder.Exec(&traitResult)) {
-		std::vector<t4p::TagClass> traitAliases = traitResult.MatchesAsTags();
+		std::vector<t4p::PhpTagClass> traitAliases = traitResult.MatchesAsTags();
 		for (size_t i = 0; i < traitAliases.size(); ++i) {
 			matches.push_back(traitAliases[i]);
 		}

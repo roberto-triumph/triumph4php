@@ -28,7 +28,7 @@
 
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 
 namespace t4p {
 
@@ -60,7 +60,7 @@ public:
 	/**
 	 * this object is the current row of the result.
 	 */
-	t4p::TagClass Tag;
+	t4p::PhpTagClass Tag;
 
 	DetectedTagExactMemberResultClass();
 

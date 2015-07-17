@@ -203,25 +203,25 @@ public:
 	 * queries all tag finders for resources that match tagSearch exactly. Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
+	void ExactMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 	
 	/**
 	 * queries all tag finders for resources that nearly match tagSearch (begin with). Any matched tags are
 	 * appended to the matches vector.
 	 */
-	void NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches, const std::vector<wxFileName>& sourceDirs);
+	void NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches, const std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
 	 * appended to the matches vector.
 	 */
-	void ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches);
+	void ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches);
 
 	/**
 	 * queries all tag finders for trait aliases of that match the given tagSearch extactly. Any matched tag are
 	 * appended to the matches vector.
 	 */
-	void NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::TagClass>& matches);
+	void NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches);
 
 private:
 

@@ -46,7 +46,7 @@ public:
 	
 	void OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber);
 	
-	void OpenPhpTag(const t4p::TagClass& tag);
+	void OpenPhpTag(const t4p::PhpTagClass& tag);
 	
 	void OpenDbTable(const t4p::DatabaseTableTagClass& tableTag);
 	

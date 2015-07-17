@@ -43,7 +43,7 @@ public:
 
 	wxString Label;
 
-	std::map<wxString, std::vector<t4p::TagClass> > Tags;
+	std::map<wxString, std::vector<t4p::PhpTagClass> > Tags;
 
 	OutlineSearchCompleteClass();
 

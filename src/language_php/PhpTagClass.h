@@ -37,7 +37,7 @@ namespace t4p {
 /**
  * This class represents each tag we have found in the user's source code.  
  */
-class TagClass {
+class PhpTagClass {
 
 public:
 
@@ -106,9 +106,9 @@ public:
 	
 	/**
 	 * The tag item type
-	 * @var TagClass::Type
+	 * @var t4p::PhpTagClass::Type
 	 */
-	TagClass::Types Type;
+	PhpTagClass::Types Type;
 
 	/**
 	 * TRUE if this is a protected member
@@ -172,29 +172,29 @@ public:
 	 */
 	int SourceId;
 	
-	TagClass();
-	TagClass(const t4p::TagClass& src);
+	PhpTagClass();
+	PhpTagClass(const t4p::PhpTagClass& src);
 
-	static t4p::TagClass MakeNamespace(const UnicodeString& namespaceName);
+	static t4p::PhpTagClass MakeNamespace(const UnicodeString& namespaceName);
 	
 	/**
-	 * Clones a TagClass
+	 * Clones a t4p::PhpTagClass
 	 */
-	void operator=(const TagClass& src);
-	void Copy(const t4p::TagClass& src);
+	void operator=(const t4p::PhpTagClass& src);
+	void Copy(const t4p::PhpTagClass& src);
 	
 	/**
 	 * Defined a comparison function so that sorting algorithms work for tag containers. A tag is "less"
 	 * than  another if Resource property is less than the other. (essentially containers are sorted by 
 	 * Resource).
 	 */
-	bool operator<(const TagClass& a) const;
+	bool operator<(const t4p::PhpTagClass& a) const;
 
 	/**
 	 * Defined a comparison function so for find function. This will compare tag names in an 
 	 * exact, case sensitive manner.
 	 */	
-	bool operator==(const TagClass& a) const;
+	bool operator==(const t4p::PhpTagClass& a) const;
 
 	/**
 	 * set all properties to empty string

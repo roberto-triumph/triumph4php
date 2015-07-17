@@ -27,7 +27,7 @@
 
 #include <globals/CodeControlOptionsClass.h>
 #include <search/FinderClass.h>
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <language_sql/DatabaseTagClass.h>
 #include <globals/FileTypeClass.h>
 #include <pelet/ParserClass.h>

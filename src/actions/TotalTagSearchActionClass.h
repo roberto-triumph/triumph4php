@@ -29,7 +29,7 @@
 #include <wx/event.h>
 #include <actions/ActionClass.h>
 #include <language_php/DatabaseTableTagClass.h>
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <globals/GlobalsClass.h>
 #include <unicode/unistr.h>
 #include <vector>
@@ -57,7 +57,7 @@ public:
 	/**
 	 * will only be valid when this result is a class, function, or method
 	 */
-	t4p::TagClass PhpTag;
+	t4p::PhpTagClass PhpTag;
 	
 	/**
 	 * will only be valid when this result is a database table
@@ -68,7 +68,7 @@ public:
 	
 	TotalTagResultClass();
 	TotalTagResultClass(const t4p::FileTagClass& file);
-	TotalTagResultClass(const t4p::TagClass& tag);
+	TotalTagResultClass(const t4p::PhpTagClass& tag);
 	TotalTagResultClass(const t4p::DatabaseTableTagClass& table);
 	
 	TotalTagResultClass(const t4p::TotalTagResultClass& src);

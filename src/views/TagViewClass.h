@@ -88,7 +88,7 @@ private:
 	 * @param finderQuery will be used to get the line number to scroll to
 	 * @param tag the tag to load
 	 */
-	void LoadPageFromResource(const wxString& finderQuery, const TagClass& tag);
+	void LoadPageFromResource(const wxString& finderQuery, const t4p::PhpTagClass& tag);
 	
 	/**
 	 * prepare to iterate through the given file. The name part of the given file must match the wildcard.
@@ -195,7 +195,7 @@ public:
 	 */
 	TagSearchDialogClass(wxWindow* parent, 
 		t4p::GlobalsClass& globals, wxString cacheStatus, wxString& term, 
-		std::vector<t4p::TagClass>& chosenResources);
+		std::vector<t4p::PhpTagClass>& chosenResources);
 	
 	~TagSearchDialogClass();
 
@@ -203,7 +203,7 @@ public:
 	 * @param text to place in the search text
 	 * @param matches to place in the results list
 	 */
-	void Prepopulate(const wxString& text, const std::vector<t4p::TagClass>& matches);
+	void Prepopulate(const wxString& text, const std::vector<t4p::PhpTagClass>& matches);
 
 protected:
 
@@ -242,7 +242,7 @@ private:
 	/**
 	 * Handle the results of the tag lookups.
 	 */
-	void ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::TagClass>& matches);
+	void ShowJumpToResults(const wxString& finderQuery, const std::vector<t4p::PhpTagClass>& matches);
 
 	/**
 	 * *STARTS* a search for a file that matches the given text. 
@@ -289,12 +289,12 @@ private:
 	 * List that will get populated with the files to be opened. These are the
 	 * files that the user selects.
 	 */
-	std::vector<t4p::TagClass>& ChosenResources;
+	std::vector<t4p::PhpTagClass>& ChosenResources;
 
 	/**
 	 * results of the most recent search
 	 */
-	std::vector<t4p::TagClass> MatchedResources;
+	std::vector<t4p::PhpTagClass> MatchedResources;
 
 	/**
 	 * we use a timer to see when the user has stopped typing. on a keypress,

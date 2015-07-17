@@ -405,7 +405,7 @@ private:
 		
 		wxFileName FileName;
 		
-		t4p::TagClass Resource;
+		t4p::PhpTagClass Resource;
 		
 		std::vector<pelet::ExpressionClass> CallArguments;
 		

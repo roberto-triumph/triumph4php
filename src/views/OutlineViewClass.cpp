@@ -58,11 +58,11 @@ static int ID_OUTLINE_MENU_TOGGLE_INHERITED = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_NAME = wxNewId();
 static int ID_OUTLINE_MENU_SORT_BY_TYPE = wxNewId();
 
-static bool SortTagsByName(const t4p::TagClass& a, const t4p::TagClass& b) {
+static bool SortTagsByName(const t4p::PhpTagClass& a, const t4p::PhpTagClass& b) {
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
 }
 
-static bool SortTagsByTypeAndName(const t4p::TagClass& a, const t4p::TagClass& b) {
+static bool SortTagsByTypeAndName(const t4p::PhpTagClass& a, const t4p::PhpTagClass& b) {
 	if (a.Type < b.Type) {
 		return true;
 	}
@@ -108,7 +108,7 @@ void t4p::OutlineViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& s
 }
 
 void t4p::OutlineViewClass::JumpToResource(int tagId) {
-	t4p::TagClass tag;
+	t4p::PhpTagClass tag;
 	bool found = Feature.App.Globals.TagCache.FindById(tagId, tag);
 	if (found) {
 		LoadCodeControl(tag.GetFullPath());
@@ -296,8 +296,8 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
 		}
 
-		std::map<wxString, std::vector<t4p::TagClass> >::iterator mapTag; 		
-		std::vector<t4p::TagClass>::const_iterator memberTag;
+		std::map<wxString, std::vector<t4p::PhpTagClass> >::iterator mapTag; 		
+		std::vector<t4p::PhpTagClass>::const_iterator memberTag;
 		for (mapTag = searchTag->Tags.begin(); mapTag != searchTag->Tags.end(); ++mapTag) {
 			wxTreeItemId parent;
 			if (mapTag->first.IsEmpty()) {
@@ -324,7 +324,7 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 	Tree->Thaw();
 }
 
-void t4p::OutlineViewPanelClass::TagToNode(const t4p::TagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
+void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeItemId& treeId, UnicodeString classNameNode) {
 
 	// for now never show dynamic resources since there is no way we can know where the source for them is.
 	int type = tag.Type;
@@ -345,10 +345,10 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::TagClass& tag, wxTreeItemI
 		// make sure that the inheritance check passes too
 		passesAccessCheck = passesAccessCheck && !isInheritedTag;
 	}
-	if (t4p::TagClass::DEFINE == type && !tag.IsDynamic) {
+	if (t4p::PhpTagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (t4p::TagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
+	else if (t4p::PhpTagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
 		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
@@ -369,7 +369,7 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::TagClass& tag, wxTreeItemI
 		}
 		Tree->AppendItem(treeId, label, image, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (t4p::TagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
+	else if (t4p::PhpTagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
 		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
@@ -413,13 +413,13 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::TagClass& tag, wxTreeItemI
 			}
 		}
 	}
-	else if (t4p::TagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
+	else if (t4p::PhpTagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
 		if (tag.ClassName != className) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1, new t4p::IdTreeItemDataClass(tag.Id));
 	}
-	else if (t4p::TagClass::FUNCTION == type && !tag.IsDynamic) {
+	else if (t4p::PhpTagClass::FUNCTION == type && !tag.IsDynamic) {
 		UnicodeString res = tag.Identifier;
 		wxString label = t4p::IcuToWx(res);
 
@@ -458,7 +458,7 @@ void t4p::OutlineViewPanelClass::OnHelpButton(wxCommandEvent& event) {
 }
 
 void t4p::OutlineViewPanelClass::OnAddButton(wxCommandEvent& event) {
-	std::vector<t4p::TagClass> tags;
+	std::vector<t4p::PhpTagClass> tags;
 	t4p::FileSearchDialogClass dialog(this->GetParent(), Feature, tags);
 	if (dialog.ShowModal() == wxOK) {
 		SearchTagsToOutline(tags);
@@ -498,11 +498,11 @@ void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	View.JumpToResource(idItemData->Id);
 }
 
-void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::TagClass>& tags) {
+void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::PhpTagClass>& tags) {
 
 	// each tag could be a file or a class tag. 
 	//if its a class tag, get all of members for the class
-	std::vector<t4p::TagClass>::const_iterator chosenTag;
+	std::vector<t4p::PhpTagClass>::const_iterator chosenTag;
 	std::vector<UnicodeString> searchStrings;
 		
 	for (chosenTag = tags.begin(); chosenTag != tags.end(); ++chosenTag) {
@@ -728,7 +728,7 @@ void t4p::OutlineViewPanelClass::OnSortByNameClick(wxCommandEvent& event) {
 	RedrawOutline();
 }
 
-t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::OutlineFeatureClass& feature, std::vector<t4p::TagClass>& chosenTags)
+t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::OutlineFeatureClass& feature, std::vector<t4p::PhpTagClass>& chosenTags)
 	: FileSearchDialogGeneratedClass(parent)
 	, Feature(feature)
 	, MatchingTags()
@@ -879,7 +879,7 @@ wxTreeItemId t4p::OutlineViewPanelClass::FindFileNode(const wxString& fullPath) 
 	return fileId;
 }
 
-void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std::vector<t4p::TagClass>& allMatches) {
+void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std::vector<t4p::PhpTagClass>& allMatches) {
 	wxArrayString files;
 	for (size_t i = 0; i < allMatches.size(); ++i) {
 		files.Add(allMatches[i].GetFullPath());
@@ -903,15 +903,15 @@ void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std
 			projectLabel = selectedProject->Label;
 		}
 		wxString matchLabel;
-		t4p::TagClass match = allMatches[i];
-		if (t4p::TagClass::MEMBER == match.Type || t4p::TagClass::METHOD == match.Type ||
-			t4p::TagClass::CLASS_CONSTANT == match.Type) {
+		t4p::PhpTagClass match = allMatches[i];
+		if (t4p::PhpTagClass::MEMBER == match.Type || t4p::PhpTagClass::METHOD == match.Type ||
+			t4p::PhpTagClass::CLASS_CONSTANT == match.Type) {
 			matchLabel += t4p::IcuToWx(match.ClassName);
 			matchLabel += wxT("::");
 			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
-		else if (t4p::TagClass::CLASS == match.Type || t4p::TagClass::FUNCTION == match.Type
-			|| t4p::TagClass::DEFINE == match.Type) {
+		else if (t4p::PhpTagClass::CLASS == match.Type || t4p::PhpTagClass::FUNCTION == match.Type
+			|| t4p::PhpTagClass::DEFINE == match.Type) {
 			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		else {

@@ -246,7 +246,7 @@ private:
 	 *
 	 * @param tags that the user chose
 	 */
-	void SearchTagsToOutline(const std::vector<t4p::TagClass>& tags);
+	void SearchTagsToOutline(const std::vector<t4p::PhpTagClass>& tags);
 	
 	/**
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
@@ -259,7 +259,7 @@ private:
 	 * @param tagRoot the tree node to append to
 	 * @param classNameNode the name of the class the tag belongs to (can be empty)
 	 */
-	void TagToNode(const t4p::TagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
+	void TagToNode(const t4p::PhpTagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
 
 	/**
 	 * @return the tree node for the given full path. search is done 
@@ -356,7 +356,7 @@ public:
 	 * @param chosenTags the tags that the user chose will be filled in here
 	 */
 	FileSearchDialogClass(wxWindow* parent, t4p::OutlineFeatureClass& feature, 
-		std::vector<t4p::TagClass>& chosenTags);
+		std::vector<t4p::PhpTagClass>& chosenTags);
 
 protected:
 
@@ -385,7 +385,7 @@ private:
 	/**
 	 * show the tags in the results list
 	 */
-	void ShowTags(const wxString& query, const std::vector<t4p::TagClass>& tags);
+	void ShowTags(const wxString& query, const std::vector<t4p::PhpTagClass>& tags);
 
 	/**
 	 * to get the project list and perform tag search
@@ -395,12 +395,12 @@ private:
 	/**
 	 * the tags that the were the result of the preivous search
 	 */
-	std::vector<t4p::TagClass> MatchingTags;
+	std::vector<t4p::PhpTagClass> MatchingTags;
 	
 	/**
 	 * the tags that the user chose
 	 */
-	std::vector<t4p::TagClass>& ChosenTags;
+	std::vector<t4p::PhpTagClass>& ChosenTags;
 };
 
 }

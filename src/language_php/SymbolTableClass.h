@@ -27,7 +27,7 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <globals/String.h>
 #include <unicode/unistr.h>
 #include <map>
@@ -362,7 +362,7 @@ public:
 		const std::vector<wxFileName>& sourceDirs,
 		t4p::TagFinderListClass& tagFinderList,
 		std::vector<UnicodeString>& autoCompleteVariableList,
-		std::vector<TagClass>& autoCompleteResourceList,
+		std::vector<t4p::PhpTagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error) const;
 
@@ -398,7 +398,7 @@ public:
 		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		t4p::TagFinderListClass& tagFinderList,
-		std::vector<TagClass>& resourceMatches,
+		std::vector<t4p::PhpTagClass>& resourceMatches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error) const;
 	
@@ -462,7 +462,7 @@ private:
 	 * @param scope the scope that containts the aliases to resolve against
 	 * @param tag a matched tag; will get modified an any namespace will be 'unresolved'
 	 */
-	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::TagClass& tag) const;
+	void UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::PhpTagClass& tag) const;
 
 	/**
 	 * Tokenizes the code (using the Lexer instance) and accumulates all variables from the final scope. This function

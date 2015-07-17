@@ -25,7 +25,7 @@
 #ifndef T4P_PARSEDTAGFINDERCLASS_H
 #define T4P_PARSEDTAGFINDERCLASS_H
 
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
 #include <globals/SqliteFinderClass.h>
@@ -325,12 +325,12 @@ class TagResultClass : public t4p::SqliteResultClass {
 
 public:
 
-	t4p::TagClass Tag;
+	t4p::PhpTagClass Tag;
 
 	TagResultClass();
 
 	// TODO: remove this method
-	std::vector<t4p::TagClass> Matches();
+	std::vector<t4p::PhpTagClass> Matches();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -385,7 +385,7 @@ public:
 
 	// TODO: remove this method
 	std::vector<t4p::FileTagClass> Matches();
-	std::vector<t4p::TagClass> MatchesAsTags();
+	std::vector<t4p::PhpTagClass> MatchesAsTags();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -460,7 +460,7 @@ public:
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
 	// TODO: remove this method
-	std::vector<t4p::TagClass> MatchesAsTags();
+	std::vector<t4p::PhpTagClass> MatchesAsTags();
 
 	/**
 	 * advance to the next row. after a call to this method, the Tag member variable will contain the 
@@ -1083,42 +1083,42 @@ public:
 	 * @return vector of tags all tags that were parsed from the given file that 
 	 *         are either a class, function, or define 
 	 */
-	std::vector<t4p::TagClass> ClassesFunctionsDefines(const wxString& fullPath);
+	std::vector<t4p::PhpTagClass> ClassesFunctionsDefines(const wxString& fullPath);
 
 	/**
 	 * Looks for a class or file tag, using exact, case insensitive matching. 
 	 * 
 	 * @param tagSearch the resources to look for
-	 * @return std::vector<TagClass> the matched resources
+	 * @return std::vector<t4p::PhpTagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> ExactClassOrFile(const t4p::TagSearchClass& tagSearch);
+	std::vector<t4p::PhpTagClass> ExactClassOrFile(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a class name using exact, case insensitive matching. Note that namespace
 	 * name must also match.
 	 * 
 	 * @param tagSearch the resources to look for
-	 * @return std::vector<TagClass> the matched resources
+	 * @return std::vector<t4p::PhpTagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> ExactClass(const t4p::TagSearchClass& tagSearch);
+	std::vector<t4p::PhpTagClass> ExactClass(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a function name using exact, case insensitive matching. Note that namespace
 	 * name must also match. 
 	 * 
 	 * @param tagSearch the resources to look for
-	 * @return std::vector<TagClass> the matched resources
+	 * @return std::vector<t4p::PhpTagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> ExactFunction(const t4p::TagSearchClass& tagSearch);
+	std::vector<t4p::PhpTagClass> ExactFunction(const t4p::TagSearchClass& tagSearch);
 
 	/**
 	 * Looks for a method name using exact, case insensitive matching.  The method name
@@ -1126,12 +1126,12 @@ public:
 	 * 
 	 * @param tagSearch the resources to look for
 	 * @param onlyStatic if TRUE, then only static methods will be returned
-	 * @return std::vector<TagClass> the matched resources
+	 * @return std::vector<t4p::PhpTagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
+	std::vector<t4p::PhpTagClass> ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
 
 	/**
 	 * Looks for a property name using exact, case insensitive matching.  The property name
@@ -1139,12 +1139,12 @@ public:
 	 * 
 	 * @param tagSearch the resources to look for
 	 * @param onlyStatic if TRUE, then only static properties (and constants) will be returned
-	 * @return std::vector<TagClass> the matched resources
+	 * @return std::vector<t4p::PhpTagClass> the matched resources
 	 *         Because this search is done on a database,
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
+	std::vector<t4p::PhpTagClass> ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic);
 	
 	/**
 	 * Looks for the class or file tag, using a near-match logic. Logic is as follows:
@@ -1168,7 +1168,7 @@ public:
 	 *         the returned list may contain matches from files that are no longer in 
 	 *         the file system.
 	 */
-	std::vector<t4p::TagClass> NearMatchClassesOrFiles(const t4p::TagSearchClass& tagSearch);
+	std::vector<t4p::PhpTagClass> NearMatchClassesOrFiles(const t4p::TagSearchClass& tagSearch);
 	
 	/**
 	 * Get the parent class of a given tag. For example, let's say source code contained two classes: AdminClass and 
@@ -1215,7 +1215,7 @@ public:
 	 * @param int32_t length the length of the tag [in the text]
 	 * @return bool true if match was found in text
 	 */
-	static bool GetResourceMatchPosition(const t4p::TagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
+	static bool GetResourceMatchPosition(const t4p::PhpTagClass& tag, const UnicodeString& text, int32_t& pos, int32_t& length);
 
 	/**
 	 * retrieves a tag by its ID
@@ -1224,7 +1224,7 @@ public:
 	 * @param tag out parameter, will be filled in with the tag data
 	 * @return bool TRUE if the ID was found
 	 */
-	bool FindById(int id, t4p::TagClass& tag);
+	bool FindById(int id, t4p::PhpTagClass& tag);
 	
 	/**
 	 * @param int fileTagId file to search for
@@ -1256,7 +1256,7 @@ public:
 	 * many items (10000+). Try to use the CollectXXX() methods as much as possible.
 	 * An example use of this method is when wanting to find all functions in a single file.
 	 */
-	std::vector<t4p::TagClass> All();
+	std::vector<t4p::PhpTagClass> All();
 
 	/**
 	 * check to see if this tag finder has the given file 
@@ -1300,7 +1300,7 @@ private:
 	 * @param doDefines if TRUE define tags will be collected
 	 * @param doFunctions if TRUE function tags will be collected
 	 */
-	std::vector<t4p::TagClass> NearMatchNonMembers(const t4p::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
+	std::vector<t4p::PhpTagClass> NearMatchNonMembers(const t4p::TagSearchClass& tagSearch, bool doClasses, bool doDefines, bool doFunctions);
 	
 	/**
 	 * Collects all resources that are class methods / properties and match the given Resource search.
@@ -1308,7 +1308,7 @@ private:
 	 * 
 	 * @param tagSearch the name of resources to look for
 	 */
-	std::vector<t4p::TagClass> NearMatchMembers(const t4p::TagSearchClass& tagSearch);
+	std::vector<t4p::PhpTagClass> NearMatchMembers(const t4p::TagSearchClass& tagSearch);
 			
 	/**
 	 * Extracts the parent class from a class signature.  The class signature, as parsed by the parser contains a string
@@ -1323,7 +1323,7 @@ private:
 	 * Look through all of the matches and verifies that the file still actually exists (file has not been deleted).
 	 * If the file was deleted, then the match is removed from the matches vector.
 	 */
-	void EnsureMatchesExist(std::vector<t4p::TagClass>& matches);
+	void EnsureMatchesExist(std::vector<t4p::PhpTagClass>& matches);
 	
 	/**
 	 * Get all of the traits that a given class uses. Checking is 

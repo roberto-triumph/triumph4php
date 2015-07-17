@@ -110,8 +110,8 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 	if (!IsCancelled()) {
 		std::vector<UnicodeString>::const_iterator search;
 		for (search = SearchStrings.begin(); !IsCancelled() && search != SearchStrings.end(); ++search) {
-			std::vector<t4p::TagClass> tags;
-			std::vector<t4p::TagClass>::const_iterator tag;
+			std::vector<t4p::PhpTagClass> tags;
+			std::vector<t4p::PhpTagClass>::const_iterator tag;
 			OutlineSearchCompleteClass tagSearchComplete;
 			tagSearchComplete.Label = t4p::IcuToWx(*search);
 			if (search->indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
@@ -121,7 +121,7 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				
 				// now for each class, collect all methods/properties for any class.
 				for (tag = tags.begin(); tag != tags.end(); ++tag) {
-					if (tag->Type == t4p::TagClass::CLASS) {
+					if (tag->Type == t4p::PhpTagClass::CLASS) {
 						wxString classLabel = t4p::IcuToWx(tag->Identifier);
 						if (!tag->NamespaceName.isEmpty()) {
 							classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);

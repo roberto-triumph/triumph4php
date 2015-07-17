@@ -51,19 +51,19 @@ static UnicodeString VariableName(const pelet::VariableClass& var) {
  * @param isParentCall if TRUE, then tag is visible if the tag is protected, or public
  * @return bool true if tag is visible
  */
-static bool IsResourceVisible(const t4p::TagClass& tag, const pelet::VariableClass& originalParsedVariable,
+static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::VariableClass& originalParsedVariable,
 		const pelet::ScopeClass& scope,
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
 	if (isStaticCall) {
 
 		// only static methods can be accessed with the '::' operator
-		passesStaticCheck = t4p::TagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
+		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
 	}
 	else {
 
 		// static methods can be accessed via the -> operator 
-		passesStaticCheck = t4p::TagClass::CLASS_CONSTANT != tag.Type;
+		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT != tag.Type;
 	}
 
 	// $this => can access this tag's private, parent's protected/public, other public
@@ -89,7 +89,7 @@ static bool IsResourceVisible(const t4p::TagClass& tag, const pelet::VariableCla
 	bool passesNamespaceCheck = true;			
 	UnicodeString name = VariableName(originalParsedVariable);
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\")) 
-		&& t4p::TagClass::CLASS == tag.Type) {
+		&& t4p::PhpTagClass::CLASS == tag.Type) {
 		
 		// if the tag is a global class and the current namespace is NOT the global namespace, 
 		// then the class cannot be accessed
@@ -212,11 +212,11 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				pelet::VariableClass parsedVariable(peletScope);
 
 				parsedVariable.ChainList = symbol.ChainList;
-				std::vector<t4p::TagClass> resourceMatches;
+				std::vector<t4p::PhpTagClass> resourceMatches;
 				symbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs,
 					tagFinderList, resourceMatches, doDuckTyping, false, error);
 				if (!resourceMatches.empty()) {
-					if (t4p::TagClass::CLASS == resourceMatches[0].Type) {
+					if (t4p::PhpTagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
 					}
 					else {
@@ -680,7 +680,7 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 															  const std::vector<wxFileName>& sourceDirs,
 															  t4p::TagFinderListClass& tagFinderList,
 															  std::vector<UnicodeString>& autoCompleteVariableList,
-															  std::vector<t4p::TagClass>& autoCompleteResourceList,
+															  std::vector<t4p::PhpTagClass>& autoCompleteResourceList,
 															  bool doDuckTyping,
 															  t4p::SymbolTableMatchErrorClass& error) const {
 		if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
@@ -719,7 +719,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 												  const pelet::ScopeClass& variableScope, 
 												  const std::vector<wxFileName>& sourceDirs,
 												  t4p::TagFinderListClass& tagFinderList,
-												  std::vector<t4p::TagClass>& resourceMatches,
+												  std::vector<t4p::PhpTagClass>& resourceMatches,
 												  bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												  t4p::SymbolTableMatchErrorClass& error) const {
 	std::vector<t4p::SymbolClass> scopeSymbols;
@@ -804,7 +804,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 		tagSearch.SetTraits(tagFinderList.ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
 		
 		// only do duck typing if needed. otherwise, make sure that we have a type match first.
-		std::vector<t4p::TagClass> matches;
+		std::vector<t4p::PhpTagClass> matches;
 		if (doDuckTyping || !typeToLookup.isEmpty()) {
 			if (doFullyQualifiedMatchOnly) {
 				tagFinderList.ExactMatchesFromAll(tagSearch, matches, sourceDirs);
@@ -820,7 +820,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 		// now we loop through the possbile matches and remove stuff that does not 
 		// make sense because of visibility rules
 		for (size_t i = 0; i < matches.size(); ++i) {
-			t4p::TagClass tag = matches[i];
+			t4p::PhpTagClass tag = matches[i];
 			bool isVisible = IsResourceVisible(tag, originalVariable, variableScope, isStaticCall, isThisCall, isParentCall);
 			if (isVisible) {
 				UnresolveNamespaceAlias(originalVariable, variableScope, tag);
@@ -929,7 +929,7 @@ void t4p::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVa
 	}
 }
 
-void t4p::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::TagClass& tag) const {
+void t4p::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& originalVariable, const pelet::ScopeClass& scope, t4p::PhpTagClass& tag) const {
 	UnicodeString name = tag.Identifier;
 	
 	// leave variables and fully qualified names alone

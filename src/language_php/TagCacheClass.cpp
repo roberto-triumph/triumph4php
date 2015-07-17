@@ -39,7 +39,7 @@
 static void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error, 
 	const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
 	const pelet::ScopeClass& variableScope, 
-	const std::vector<t4p::TagClass>& autoCompletionResourceMatches,
+	const std::vector<t4p::PhpTagClass>& autoCompletionResourceMatches,
 	wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
 		completeStatus = _("Nothing to complete");
@@ -323,17 +323,17 @@ t4p::FileTagResultClass* t4p::TagCacheClass::NearMatchFileTags(const UnicodeStri
 	return result;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::ExactClassOrFile(const UnicodeString& search) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::ExactClassOrFile(const UnicodeString& search) {
+	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(search);
 
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->ExactClassOrFile(tagSearch);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->ExactClassOrFile(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -341,17 +341,17 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactClassOrFile(const UnicodeStr
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::ExactClass(const UnicodeString& search) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::ExactClass(const UnicodeString& search) {
+	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(search);
 
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->ExactClass(tagSearch);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->ExactClass(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -359,17 +359,17 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactClass(const UnicodeString& s
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::ExactFunction(const UnicodeString& search) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::ExactFunction(const UnicodeString& search) {
+	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(search);
 
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->ExactFunction(tagSearch);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->ExactFunction(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -377,8 +377,8 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactFunction(const UnicodeString
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::ExactMethod(const UnicodeString& search, bool onlyStatic) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::ExactMethod(const UnicodeString& search, bool onlyStatic) {
+	std::vector<t4p::PhpTagClass> matches;
 
 	// method search is activated by not giving a class name
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("::") + search);
@@ -386,10 +386,10 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactMethod(const UnicodeString& 
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->ExactMethod(tagSearch, onlyStatic);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->ExactMethod(tagSearch, onlyStatic);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -397,8 +397,8 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactMethod(const UnicodeString& 
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::ExactProperty(const UnicodeString& search, bool onlyStatic) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::ExactProperty(const UnicodeString& search, bool onlyStatic) {
+	std::vector<t4p::PhpTagClass> matches;
 
 	// method search is activated by not giving a class name
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("::") + search);
@@ -406,10 +406,10 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactProperty(const UnicodeString
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->ExactProperty(tagSearch, onlyStatic);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->ExactProperty(tagSearch, onlyStatic);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -417,8 +417,8 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::ExactProperty(const UnicodeString
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::NearMatchClassesOrFiles(const UnicodeString& search) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::NearMatchClassesOrFiles(const UnicodeString& search) {
+	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
@@ -427,10 +427,10 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::NearMatchClassesOrFiles(const Uni
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
 		t4p::ParsedTagFinderClass* tagFinder = finders[i];
-		std::vector<t4p::TagClass> finderMatches = tagFinder->NearMatchClassesOrFiles(tagSearch);
+		std::vector<t4p::PhpTagClass> finderMatches = tagFinder->NearMatchClassesOrFiles(tagSearch);
 		size_t count = finderMatches.size();
 		for (size_t j = 0; j < count; ++j) {
-			t4p::TagClass tag = finderMatches[j];
+			t4p::PhpTagClass tag = finderMatches[j];
 			matches.push_back(tag);
 		}
 	}
@@ -476,7 +476,7 @@ void t4p::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName,
 													const pelet::ScopeClass& variableScope, 
 													const std::vector<wxFileName>& sourceDirs,
 													 std::vector<UnicodeString>& autoCompleteList,
-													 std::vector<t4p::TagClass>& resourceMatches,
+													 std::vector<t4p::PhpTagClass>& resourceMatches,
 													 bool doDuckTyping,
 													 t4p::SymbolTableMatchErrorClass& error) {
 	std::map<wxString, t4p::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
@@ -497,7 +497,7 @@ void t4p::TagCacheClass::ResourceMatches(const wxString& fileName,
 												const pelet::VariableClass& parsedVariable,
 												const pelet::ScopeClass& variableScope, 
 												const std::vector<wxFileName>& sourceDirs,
-												std::vector<t4p::TagClass>& matches,
+												std::vector<t4p::PhpTagClass>& matches,
 												bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 												t4p::SymbolTableMatchErrorClass& error) {
 	std::map<wxString, t4p::WorkingCacheClass*>::const_iterator itWorkingCache = WorkingCaches.find(fileName);
@@ -568,8 +568,8 @@ void t4p::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs) {
-	std::vector<t4p::TagClass> allMatches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs) {
+	std::vector<t4p::PhpTagClass> allMatches;
 
 	// add the double colon so that we search for all members
 	// first search for all members of the given class that is also in the given file
@@ -598,8 +598,8 @@ std::vector<t4p::TagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeString
 	return allMatches;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::AllClassesFunctionsDefines(const wxString& fullPath) {
-	std::vector<t4p::TagClass> allMatches;
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllClassesFunctionsDefines(const wxString& fullPath) {
+	std::vector<t4p::PhpTagClass> allMatches;
 
 	std::vector<t4p::ParsedTagFinderClass*> allTagFinders = AllFinders();
 	for (size_t j = 0; j < allTagFinders.size(); ++j) {
@@ -629,7 +629,7 @@ std::vector<UnicodeString> t4p::TagCacheClass::ParentClassesAndTraits(const Unic
 	return all;
 }
 
-bool t4p::TagCacheClass::FindById(int id, t4p::TagClass& tag) {
+bool t4p::TagCacheClass::FindById(int id, t4p::PhpTagClass& tag) {
 	bool found = false;
 	if (TagFinderList->IsTagFinderInit) {
 		found = TagFinderList->TagFinder.FindById(id, tag);
@@ -659,12 +659,12 @@ bool t4p::TagCacheClass::HasDir(const wxString& dir) {
 	return found;
 }
 
-std::vector<t4p::TagClass> t4p::TagCacheClass::GetTagsAtPosition(
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::GetTagsAtPosition(
 		const wxString& fileName, 
 		const UnicodeString& code, int posToCheck, 
 		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
 		wxString& status) {
-	std::vector<t4p::TagClass> matches;
+	std::vector<t4p::PhpTagClass> matches;
 	pelet::LexicalAnalyzerClass lexer;
 	pelet::ParserClass parser;
 	t4p::ScopeFinderClass scopeFinder;

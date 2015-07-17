@@ -25,7 +25,7 @@
 #ifndef T4P_TAGLIST_H
 #define T4P_TAGLIST_H
 
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 #include <language_php/ParsedTagFinderClass.h>
 #include <globals/FileTypeClass.h>
 #include <vector>
@@ -41,7 +41,7 @@ class ProjectClass;
  *
  * @param matches any native matches from this given vector will be removed
  */
-void TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches);
+void TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches);
 
 /**
  * Filter the given matches by only the matches that belong to the given projects.
@@ -51,7 +51,7 @@ void TagListRemoveNativeMatches(std::vector<t4p::TagClass>& matches);
  *        this method will not own the project pointers
  * @param fileTypes the configured file types
  */
-void TagListKeepMatchesFromProjects(std::vector<t4p::TagClass>& matches, 
+void TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
 	std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType);
 
 

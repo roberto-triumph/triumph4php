@@ -39,7 +39,7 @@ void t4p::TotalSearchFeatureClass::OpenFileTag(const t4p::FileTagClass& fileTag,
 	App.EventSink.Post(cmd);
 }
 
-void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::TagClass& tag) {
+void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::PhpTagClass& tag) {
 	UnicodeString content;
 	bool hasSignature = false;
 	wxString charset;

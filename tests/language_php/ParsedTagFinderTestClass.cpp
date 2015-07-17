@@ -112,7 +112,7 @@ public:
 	t4p::TagParserClass TagParser;
 	t4p::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<t4p::TagClass> Matches;
+	std::vector<t4p::PhpTagClass> Matches;
 	std::vector<t4p::FileTagClass> FileMatches;
 };
 
@@ -176,7 +176,7 @@ public:
 	t4p::TagParserClass TagParser;
 	t4p::ParsedTagFinderClass ParsedTagFinder;
 	wxString TestFile;
-	std::vector<t4p::TagClass> Matches;
+	std::vector<t4p::PhpTagClass> Matches;
 };
 
 class TagSearchTestClass {
@@ -341,12 +341,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_NAMESPACE_RESOURCE("\\", "UserClass", tag);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
 	CHECK_UNISTR_EQUALS("class UserClass", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** this is my class */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::CLASS, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::CLASS, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenClassNameDoesNotMatch) {
@@ -410,13 +410,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", tag);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\"), tag.NamespaceName);
 	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
 	CHECK_UNISTR_EQUALS("string public function getName()", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** returns the name @return string */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::METHOD, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::METHOD, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClassNameAndSecondMethodNameMatch) {
@@ -550,12 +550,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhen
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
 	CHECK_UNISTR_EQUALS("void", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::FUNCTION, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::FUNCTION, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWithVariableArgs) {
@@ -569,12 +569,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWith
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("printUser", tag.Identifier);
 	CHECK_UNISTR_EQUALS("void", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("function printUser($user)"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** print a user @return void */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::FUNCTION, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::FUNCTION, tag.Type);
 	CHECK(tag.HasVariableArgs);
 }
 
@@ -618,12 +618,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "name", tag);
 	CHECK_UNISTR_EQUALS("string", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::name"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the user name @var string */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::MEMBER, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::MEMBER, tag.Type);
 }
 
 
@@ -641,12 +641,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::MAX"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_MEMBER_RESOURCE("UserClass", "MAX", tag);
 	CHECK_UNISTR_EQUALS("int", tag.ReturnType);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("UserClass::MAX"), tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::CLASS_CONSTANT, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::CLASS_CONSTANT, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDefines) {
@@ -658,12 +658,12 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDe
 	));	
 	NearMatchTags(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("MAX_ITEMS", tag.Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), tag.ReturnType);
 	CHECK_UNISTR_EQUALS("1", tag.Signature);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("/** the max constant @var int */"), tag.Comment);
-	CHECK_EQUAL(t4p::TagClass::DEFINE, tag.Type);
+	CHECK_EQUAL(t4p::PhpTagClass::DEFINE, tag.Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCorrectClassMethod) {
@@ -1079,7 +1079,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
-	CHECK_EQUAL(t4p::TagClass::CLASS, Matches[0].Type);
+	CHECK_EQUAL(t4p::PhpTagClass::CLASS, Matches[0].Type);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrectClassMethod) {
@@ -1223,7 +1223,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForCon
 	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::__construct"));
 	 
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
 
@@ -1252,7 +1252,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 	ExactMatchTags(tagSearch);
 	
 	CHECK_VECTOR_SIZE(1, Matches);
-	t4p::TagClass tag = Matches[0];
+	t4p::PhpTagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
 	CHECK_UNISTR_EQUALS("name", tag.Identifier);
 }
@@ -1523,7 +1523,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 
-	std::vector<t4p::TagClass> all = ParsedTagFinder.All();
+	std::vector<t4p::PhpTagClass> all = ParsedTagFinder.All();
 
 	//  6 tags total
 	// namespace First\\Child 

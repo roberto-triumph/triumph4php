@@ -49,7 +49,7 @@ enum AutoCompletionImages {
  * @return the signature of the tag at the given index.
  * signature is in a format that is ready for the Scintilla call tip (with up or down arrows as appropriate)
  */
-static wxString PhpCallTipSignature(size_t index, const std::vector<t4p::TagClass>& resources) {
+static wxString PhpCallTipSignature(size_t index, const std::vector<t4p::PhpTagClass>& resources) {
 	wxString callTip;
 	size_t size = resources.size();
 	if (index >= size) {
@@ -283,15 +283,15 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 			
 			// a bunch of function, define, or class names
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-				t4p::TagClass res = AutoCompletionResourceMatches[i];
+				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
 				wxString postFix;
-				if (t4p::TagClass::DEFINE == res.Type) {
+				if (t4p::PhpTagClass::DEFINE == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_DEFINE);
 				}
-				else if (t4p::TagClass::FUNCTION == res.Type) {
+				else if (t4p::PhpTagClass::FUNCTION == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_FUNCTION);
 				}
-				else if (t4p::TagClass::CLASS == res.Type) {
+				else if (t4p::PhpTagClass::CLASS == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS);
 				}
 				autoCompleteList.push_back(t4p::IcuToWx(res.Identifier) + postFix);
@@ -308,28 +308,28 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 			
 			// an object / function "chain"
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-				t4p::TagClass res = AutoCompletionResourceMatches[i];
+				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
 				wxString comp = t4p::IcuToWx(res.Identifier);
 				wxString postFix;
-				if (t4p::TagClass::MEMBER == res.Type && res.IsPrivate) {
+				if (t4p::PhpTagClass::MEMBER == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_MEMBER);
 				}
-				else if (t4p::TagClass::MEMBER == res.Type && res.IsProtected) {
+				else if (t4p::PhpTagClass::MEMBER == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_MEMBER);
 				}
-				else if (t4p::TagClass::MEMBER == res.Type) {
+				else if (t4p::PhpTagClass::MEMBER == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_MEMBER);
 				}
-				else if (t4p::TagClass::METHOD == res.Type && res.IsPrivate) {
+				else if (t4p::PhpTagClass::METHOD == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_METHOD);
 				}
-				else if (t4p::TagClass::METHOD == res.Type && res.IsProtected) {
+				else if (t4p::PhpTagClass::METHOD == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_METHOD);
 				}
-				else if (t4p::TagClass::METHOD == res.Type) {
+				else if (t4p::PhpTagClass::METHOD == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_METHOD);
 				}
-				else if (t4p::TagClass::CLASS_CONSTANT == res.Type) {
+				else if (t4p::PhpTagClass::CLASS_CONSTANT == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS_CONSTANT);
 				}
 				autoCompleteList.push_back(comp + postFix);
@@ -513,7 +513,7 @@ void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextE
 		
 		bool handled = false;
 		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
-			t4p::TagClass res = AutoCompletionResourceMatches[i];
+			t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
 			if (res.Identifier == selected) {
 
 				// user had selected  a function /method name; let's add the 
@@ -523,11 +523,11 @@ void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextE
 				int startPos = ctrl->WordStartPosition(ctrl->GetCurrentPos(), true);
 				ctrl->SetSelection(startPos, ctrl->GetCurrentPos());
 				wxString status;
-				if ((t4p::TagClass::FUNCTION == res.Type || t4p::TagClass::METHOD == res.Type) && !res.HasParameters()) {
+				if ((t4p::PhpTagClass::FUNCTION == res.Type || t4p::PhpTagClass::METHOD == res.Type) && !res.HasParameters()) {
 					ctrl->ReplaceSelection(selected + wxT("()"));
 					ctrl->HandleCallTip(0, true);
 				}
-				else if (t4p::TagClass::FUNCTION == res.Type || t4p::TagClass::METHOD == res.Type) {
+				else if (t4p::PhpTagClass::FUNCTION == res.Type || t4p::PhpTagClass::METHOD == res.Type) {
 					ctrl->ReplaceSelection(selected + wxT("("));
 					ctrl->HandleCallTip(0, true);
 				}
@@ -623,7 +623,7 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 			CurrentCallTipResources.clear();
 			CurrentCallTipIndex = 0;
 
-			std::vector<t4p::TagClass> matches = Globals.TagCache.GetTagsAtPosition(
+			std::vector<t4p::PhpTagClass> matches = Globals.TagCache.GetTagsAtPosition(
 				ctrl->GetIdString(), ctrl->GetSafeText(), currentPos, 
 				Globals.AllEnabledSourceDirectories(),
 				Globals,
@@ -631,8 +631,8 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 			);
 			
 			for (size_t i = 0; i < matches.size(); ++i) {
-				t4p::TagClass tag = matches[i];
-				if (t4p::TagClass::FUNCTION == tag.Type || t4p::TagClass::METHOD == tag.Type) {
+				t4p::PhpTagClass tag = matches[i];
+				if (t4p::PhpTagClass::FUNCTION == tag.Type || t4p::PhpTagClass::METHOD == tag.Type) {
 					CurrentCallTipResources.push_back(tag);
 				}
 			}
@@ -655,8 +655,8 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 				}
 				while (result->More()) {
 					result->Next();
-					t4p::TagClass res = result->Tag;
-					if (t4p::TagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
+					t4p::PhpTagClass res = result->Tag;
+					if (t4p::PhpTagClass::METHOD == res.Type && UNICODE_STRING_SIMPLE("__construct") == res.Identifier) {
 						CurrentCallTipResources.push_back(res);
 					}
 				}

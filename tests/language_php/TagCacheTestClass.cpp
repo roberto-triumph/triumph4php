@@ -47,7 +47,7 @@ public:
 	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
-	std::vector<t4p::TagClass> Matches;
+	std::vector<t4p::PhpTagClass> Matches;
 	std::vector<wxFileName> SourceDirs;
 	soci::session* Session1;
 
@@ -130,7 +130,7 @@ public:
 	std::vector<wxFileName> SourceDirs;
 
 	std::vector<UnicodeString> VariableMatches;
-	std::vector<t4p::TagClass> TagMatches;
+	std::vector<t4p::PhpTagClass> TagMatches;
 	t4p::SymbolTableMatchErrorClass Error;
 	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;

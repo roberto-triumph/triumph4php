@@ -66,7 +66,7 @@ public:
 	
 	void SetFileTagId(int fileTagId);
 
-	void SetTagType(t4p::TagClass::Types type);
+	void SetTagType(t4p::PhpTagClass::Types type);
 
 protected:
 
@@ -89,7 +89,7 @@ public:
 
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
-	void AddTagType(t4p::TagClass::Types type);
+	void AddTagType(t4p::PhpTagClass::Types type);
 
 protected:
 
@@ -216,9 +216,9 @@ t4p::ExactMemberTagResultClass::ExactMemberTagResultClass()
 	, Keys()
 	, TagTypes()
 	, SourceDirs() {
-	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(t4p::TagClass::MEMBER);
-	TagTypes.push_back(t4p::TagClass::METHOD);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
+	TagTypes.push_back(t4p::PhpTagClass::METHOD);
 }
 
 void t4p::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
@@ -427,9 +427,9 @@ t4p::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 	, TagTypes()
 	, SourceDirs() 
 	, FileTagIdSearch(0) {
-	TagTypes.push_back(t4p::TagClass::DEFINE);
-	TagTypes.push_back(t4p::TagClass::CLASS);
-	TagTypes.push_back(t4p::TagClass::FUNCTION);
+	TagTypes.push_back(t4p::PhpTagClass::DEFINE);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS);
+	TagTypes.push_back(t4p::PhpTagClass::FUNCTION);
 }
 
 void t4p::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
@@ -442,7 +442,7 @@ void t4p::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std:
 	}
 }
 
-void t4p::ExactNonMemberTagResultClass::SetTagType(t4p::TagClass::Types type) {
+void t4p::ExactNonMemberTagResultClass::SetTagType(t4p::PhpTagClass::Types type) {
 	TagTypes.clear();
 	TagTypes.push_back(type);
 }
@@ -508,7 +508,7 @@ void t4p::NearMatchNonMemberTagResultClass::Set(const UnicodeString& key, const 
 	}
 }
 
-void t4p::NearMatchNonMemberTagResultClass::AddTagType(t4p::TagClass::Types type) {
+void t4p::NearMatchNonMemberTagResultClass::AddTagType(t4p::PhpTagClass::Types type) {
 	TagTypes.push_back(type);
 }
 
@@ -561,9 +561,9 @@ t4p::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 	, TagTypes()
 	, SourceDirs() 
 	, OnlyStatic(false) {
-	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(t4p::TagClass::MEMBER);
-	TagTypes.push_back(t4p::TagClass::METHOD);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
+	TagTypes.push_back(t4p::PhpTagClass::METHOD);
 }
 
 void t4p::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
@@ -579,14 +579,14 @@ void t4p::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName,
 
 void t4p::ExactMemberOnlyTagResultClass::SetMethodType(bool onlyStatic) {
 	TagTypes.clear();
-	TagTypes.push_back(t4p::TagClass::METHOD);
+	TagTypes.push_back(t4p::PhpTagClass::METHOD);
 	OnlyStatic = onlyStatic;
 }
 
 void t4p::ExactMemberOnlyTagResultClass::SetPropertyType(bool onlyStatic) {
 	TagTypes.clear();
-	TagTypes.push_back(t4p::TagClass::CLASS_CONSTANT);
-	TagTypes.push_back(t4p::TagClass::MEMBER);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS_CONSTANT);
+	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
 	OnlyStatic = onlyStatic;
 }
 
@@ -690,9 +690,9 @@ t4p::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
 	: TagResultClass()
 	, FullPath() 
 	, TagTypes() {
-	TagTypes.push_back(t4p::TagClass::CLASS);
-	TagTypes.push_back(t4p::TagClass::FUNCTION);
-	TagTypes.push_back(t4p::TagClass::DEFINE);
+	TagTypes.push_back(t4p::PhpTagClass::CLASS);
+	TagTypes.push_back(t4p::PhpTagClass::FUNCTION);
+	TagTypes.push_back(t4p::PhpTagClass::DEFINE);
 }
 
 void t4p::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
@@ -854,13 +854,13 @@ std::vector<t4p::FileTagClass> t4p::FileTagResultClass::Matches() {
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::FileTagResultClass::MatchesAsTags() {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::FileTagResultClass::MatchesAsTags() {
+	std::vector<t4p::PhpTagClass> matches;
 	while (More()) {
 		Next();
 		wxString path;
 		if (0 == LineNumber || GetLineCountFromFile(FileTag.FullPath) >= LineNumber) {
-			t4p::TagClass newTag;
+			t4p::PhpTagClass newTag;
 			wxFileName fileName(FileTag.FullPath);
 			newTag.FileTagId = FileTag.FileId;
 			newTag.Identifier = t4p::WxToIcu(fileName.GetFullName());
@@ -1025,8 +1025,8 @@ void t4p::TraitTagResultClass::Next() {
 	Fetch();
 }
 
-std::vector<t4p::TagClass> t4p::TraitTagResultClass::MatchesAsTags() {
-	std::vector<t4p::TagClass> tags;
+std::vector<t4p::PhpTagClass> t4p::TraitTagResultClass::MatchesAsTags() {
+	std::vector<t4p::PhpTagClass> tags;
 	while (More()) {
 		Next();
 
@@ -1045,7 +1045,7 @@ std::vector<t4p::TagClass> t4p::TraitTagResultClass::MatchesAsTags() {
 				useAlias = MemberName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
 			}
 			if (useAlias) {
-				t4p::TagClass res;
+				t4p::PhpTagClass res;
 				res.ClassName = TraitTag.TraitClassName;
 				res.Identifier = alias;
 				tags.push_back(res);
@@ -1060,7 +1060,7 @@ t4p::FunctionLookupClass::FunctionLookupClass()
 , FunctionName()
 , TagType(0)
 , Id(0) {
-	TagType = t4p::TagClass::FUNCTION;
+	TagType = t4p::PhpTagClass::FUNCTION;
 }
 
 void t4p::FunctionLookupClass::Set(const UnicodeString& functionName) {
@@ -1103,7 +1103,7 @@ t4p::ClassLookupClass::ClassLookupClass()
 , ClassName()
 , TagType(0)
 , Id(0) {
-	TagType = t4p::TagClass::CLASS;
+	TagType = t4p::PhpTagClass::CLASS;
 }
 
 void t4p::ClassLookupClass::Set(const UnicodeString& className) {
@@ -1147,7 +1147,7 @@ t4p::NamespaceLookupClass::NamespaceLookupClass()
 , NamespaceName()
 , TagType(0)
 , Id(0) {
-	TagType = t4p::TagClass::NAMESPACE;
+	TagType = t4p::PhpTagClass::NAMESPACE;
 }
 
 void t4p::NamespaceLookupClass::Set(const UnicodeString& namespaceName) {
@@ -1192,7 +1192,7 @@ t4p::MethodLookupClass::MethodLookupClass()
 , IsStaticTrue(0)
 , IsStaticFalse(0)
 , Id(0) {
-	TagType = t4p::TagClass::METHOD;
+	TagType = t4p::PhpTagClass::METHOD;
 }
 
 void t4p::MethodLookupClass::Set(const UnicodeString& methodName, bool isStatic) {
@@ -1257,8 +1257,8 @@ t4p::PropertyLookupClass::PropertyLookupClass()
 , IsStaticTrue(0)
 , IsStaticFalse(0)
 , Id(0) {
-	TagTypeMember = t4p::TagClass::MEMBER;
-	TagTypeConstant = t4p::TagClass::CLASS_CONSTANT;
+	TagTypeMember = t4p::PhpTagClass::MEMBER;
+	TagTypeConstant = t4p::PhpTagClass::CLASS_CONSTANT;
 }
 
 void t4p::PropertyLookupClass::Set(const UnicodeString& propertyName, bool isStatic) {
@@ -1324,7 +1324,7 @@ t4p::FunctionSignatureLookupClass::FunctionSignatureLookupClass()
 , Id(0) 
 , RowHasVariableArgs(0)
 , StdSignature() {
-	TagType = t4p::TagClass::FUNCTION;
+	TagType = t4p::PhpTagClass::FUNCTION;
 }
 
 void t4p::FunctionSignatureLookupClass::Set(const UnicodeString& functionName) {
@@ -1387,7 +1387,7 @@ t4p::MethodSignatureLookupClass::MethodSignatureLookupClass()
 , TagType(0)
 , Id(0) 
 , StdSignature() {
-	TagType = t4p::TagClass::METHOD;
+	TagType = t4p::PhpTagClass::METHOD;
 }
 
 void t4p::MethodSignatureLookupClass::Set(const UnicodeString& methodName, bool isStatic) {
@@ -1694,7 +1694,7 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
 		namespaceKey = QualifyName(GetNamespaceName(), GetClassName());
 		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMemberNamespaced = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMemberNamespaced->Set(namespaceKey, GetSourceDirs());
-		nearMatchNonMemberNamespaced->AddTagType(t4p::TagClass::NAMESPACE);
+		nearMatchNonMemberNamespaced->AddTagType(t4p::PhpTagClass::NAMESPACE);
 		results = nearMatchNonMemberNamespaced;
 	} 
 	else if (!ClassName.isEmpty()) {
@@ -1843,7 +1843,7 @@ void t4p::TagResultClass::Next() {
 	Tag.Key = t4p::CharToIcu(Key.c_str());
 	Tag.Identifier = t4p::CharToIcu(Identifier.c_str());
 	Tag.ClassName = t4p::CharToIcu(ClassName.c_str());
-	Tag.Type = (t4p::TagClass::Types)Type;
+	Tag.Type = (t4p::PhpTagClass::Types)Type;
 	Tag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
 	Tag.Signature = t4p::CharToIcu(Signature.c_str());
 	Tag.ReturnType = t4p::CharToIcu(ReturnType.c_str());
@@ -1866,8 +1866,8 @@ void t4p::TagResultClass::Next() {
 	Fetch();
 }
 
-std::vector<t4p::TagClass> t4p::TagResultClass::Matches() {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::TagResultClass::Matches() {
+	std::vector<t4p::PhpTagClass> matches;
 	while (More()) {
 		Next();
 		matches.push_back(Tag);
@@ -1875,7 +1875,7 @@ std::vector<t4p::TagClass> t4p::TagResultClass::Matches() {
 	return matches;
 }
 
-bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& tag, const UnicodeString& text, int32_t& pos, 
+bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass& tag, const UnicodeString& text, int32_t& pos, 
 		int32_t& length) {
 	size_t start = 0;
 	t4p::FinderClass finder;
@@ -1895,10 +1895,10 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& ta
 		t4p::FinderClass::EscapeRegEx(className);
 	}
 	switch (tag.Type) {
-		case TagClass::CLASS:
+		case t4p::PhpTagClass::CLASS:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			break;
-		case TagClass::METHOD:
+		case t4p::PhpTagClass::METHOD:
 			//advance past the class header so that if  a function with the same name exists we will skip it
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {			
@@ -1909,12 +1909,12 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& ta
 			// method may return a reference (&)
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + methodName + UNICODE_STRING_SIMPLE("\\s*\\(");
 			break;
-		case TagClass::FUNCTION:
+		case t4p::PhpTagClass::FUNCTION:
 
 			// function may return a reference (&)
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
 			break;
-		case TagClass::MEMBER:
+		case t4p::PhpTagClass::MEMBER:
 			//advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {			
@@ -1923,10 +1923,10 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& ta
 			start = pos + length;
 			finder.Expression = UNICODE_STRING_SIMPLE("\\s((var)|(public)|(protected)|(private)).+") + methodName + UNICODE_STRING_SIMPLE(".*;");
 			break;
-		case TagClass::DEFINE:
+		case t4p::PhpTagClass::DEFINE:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sdefine\\(\\s*('|\")") + className + UNICODE_STRING_SIMPLE("('|\")");
 			break;
-		case TagClass::CLASS_CONSTANT:
+		case t4p::PhpTagClass::CLASS_CONSTANT:
 			//advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {			
@@ -1945,9 +1945,9 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::TagClass& ta
 	return false;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
 	const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::TagClass> matches;
+	std::vector<t4p::PhpTagClass> matches;
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
@@ -1964,7 +1964,7 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
 			break;
 		case t4p::TagSearchClass::NAMESPACE_NAME:
 			nonMembers.Set(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()), tagSearch.GetSourceDirs());
-			nonMembers.SetTagType(t4p::TagClass::CLASS);
+			nonMembers.SetTagType(t4p::PhpTagClass::CLASS);
 			nonMembers.Exec(*Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
@@ -1975,7 +1975,7 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
 		case t4p::TagSearchClass::CLASS_NAME:
 		case t4p::TagSearchClass::CLASS_NAME_METHOD_NAME:
 			nonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
-			nonMembers.SetTagType(t4p::TagClass::CLASS);
+			nonMembers.SetTagType(t4p::PhpTagClass::CLASS);
 			nonMembers.Exec(*Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
@@ -1988,8 +1988,8 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles(
 	return matches;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::TagClass> matches;
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::PhpTagClass> matches;
 	
 	// when looking for members we need to look
 	// 1. in the class itself
@@ -2016,7 +2016,7 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p
 		
 		// do not limit, a class may have more than 100 members
 		allMembersResult.Exec(*Session, false);
-		std::vector<t4p::TagClass> memberMatches = allMembersResult.Matches();
+		std::vector<t4p::PhpTagClass> memberMatches = allMembersResult.Matches();
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 	}
@@ -2061,11 +2061,11 @@ UnicodeString t4p::ParsedTagFinderClass::ParentClassName(const UnicodeString& fu
 	t4p::ExactNonMemberTagResultClass exactResult;
 	exactResult.Set(fullyQualifiedClassName, sourceDirs);
 	exactResult.SetFileTagId(fileTagId);
-	exactResult.SetTagType(t4p::TagClass::CLASS);
+	exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 	exactResult.Exec(*Session, true);
-	std::vector<t4p::TagClass> matches = exactResult.Matches();
+	std::vector<t4p::PhpTagClass> matches = exactResult.Matches();
 	if (!matches.empty()) {
-		t4p::TagClass tag = matches[0];
+		t4p::PhpTagClass tag = matches[0];
 		parentClassName = ExtractParentClassFromSignature(tag.Signature);
 	}
 	return parentClassName;
@@ -2138,13 +2138,13 @@ UnicodeString t4p::ParsedTagFinderClass::ExtractParentClassFromSignature(const U
 	return parentClassName;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const t4p::TagSearchClass& tagSearch) {
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const t4p::TagSearchClass& tagSearch) {
 
 	// at one point there was a check here to see if the  tag files existed
 	// it was removed because it caused performance issues, since this method
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
-	std::vector<t4p::TagClass> allMatches;
+	std::vector<t4p::PhpTagClass> allMatches;
 	if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
 		t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 		t4p::FileTagResultClass fileTagResult;
@@ -2154,7 +2154,7 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const t4p
 	}
 	else {
 		t4p::ExactNonMemberTagResultClass exactResult;
-		exactResult.SetTagType(t4p::TagClass::CLASS);
+		exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 		exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
 		exactResult.Exec(*Session, true);
 		allMatches = exactResult.Matches();
@@ -2162,10 +2162,10 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const t4p
 	return allMatches;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::TagClass> allMatches;	
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::PhpTagClass> allMatches;	
 	t4p::ExactNonMemberTagResultClass exactResult;
-	exactResult.SetTagType(t4p::TagClass::CLASS);
+	exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()); 
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Exec(*Session, true);
@@ -2174,10 +2174,10 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::TagS
 	return allMatches;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::TagClass> allMatches;	
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p::TagSearchClass& tagSearch) {
+	std::vector<t4p::PhpTagClass> allMatches;	
 	t4p::ExactNonMemberTagResultClass exactResult;
-	exactResult.SetTagType(t4p::TagClass::FUNCTION);
+	exactResult.SetTagType(t4p::PhpTagClass::FUNCTION);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Exec(*Session, true);
@@ -2186,8 +2186,8 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p::T
 	return allMatches;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<t4p::TagClass> allMatches;	
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<t4p::PhpTagClass> allMatches;	
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetMethodType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
@@ -2197,8 +2197,8 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::Tag
 	return allMatches;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<t4p::TagClass> allMatches;	
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
+	std::vector<t4p::PhpTagClass> allMatches;	
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetPropertyType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
@@ -2208,10 +2208,10 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p::T
 	return allMatches;
 }
 
-void t4p::ParsedTagFinderClass::EnsureMatchesExist(std::vector<TagClass>& matches) {
+void t4p::ParsedTagFinderClass::EnsureMatchesExist(std::vector<t4p::PhpTagClass>& matches) {
 
 	// remove from matches that have a file that is no longer in the file system
-	std::vector<t4p::TagClass>::iterator it = matches.begin();
+	std::vector<t4p::PhpTagClass>::iterator it = matches.begin();
 	std::vector<int> fileTagIdsToRemove;
 	while (it != matches.end()) {
 
@@ -2333,19 +2333,19 @@ bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 	return foundFile;
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::All() {
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::All() {
 	t4p::AllTagsResultClass result;
 	result.Exec(*Session, false);
 
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
-	std::vector<t4p::TagClass> all;
+	std::vector<t4p::PhpTagClass> all;
 	while (result.More()) {
 		result.Next();
 		if (result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
 
 			// fully qualified methods
 		}
-		else if (result.Tag.Type != t4p::TagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
+		else if (result.Tag.Type != t4p::PhpTagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
 			
 			// fully qualified classes / functions (with namespace)
 		}
@@ -2361,8 +2361,8 @@ t4p::ParsedTagFinderClass::ParsedTagFinderClass()
 
 }
 
-std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
-	std::vector<t4p::TagClass> tags;
+std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ClassesFunctionsDefines(const wxString& fullPath) {
+	std::vector<t4p::PhpTagClass> tags;
 	t4p::TopLevelTagInFileResultClass result;
 	result.Set(fullPath);
 	result.Exec(*Session, false);
@@ -2371,8 +2371,8 @@ std::vector<t4p::TagClass> t4p::ParsedTagFinderClass::ClassesFunctionsDefines(co
 }
 
 void t4p::ParsedTagFinderClass::Print() {
-	std::vector<t4p::TagClass> tags = All();
-	std::vector<t4p::TagClass>::iterator tag;
+	std::vector<t4p::PhpTagClass> tags = All();
+	std::vector<t4p::PhpTagClass>::iterator tag;
 	for (tag = tags.begin(); tag != tags.end(); ++tag) {
 		printf("key=%s\n", t4p::IcuToChar(tag->Key).c_str());
 		printf("type=%d fileItemId=%d\n", tag->Type, tag->FileTagId);
@@ -2381,7 +2381,7 @@ void t4p::ParsedTagFinderClass::Print() {
 	}
 }
 
-bool t4p::ParsedTagFinderClass::FindById(int id, t4p::TagClass& tag) {
+bool t4p::ParsedTagFinderClass::FindById(int id, t4p::PhpTagClass& tag) {
 	t4p::TagByIdResultClass result;
 	result.Set(id);
 	bool found = Exec(&result);

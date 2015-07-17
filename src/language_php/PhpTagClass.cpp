@@ -22,10 +22,10 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#include <globals/TagClass.h>
+#include <language_php/PhpTagClass.h>
 
 
-t4p::TagClass::TagClass()
+t4p::PhpTagClass::PhpTagClass()
 	: Identifier()
 	, ClassName()
 	, NamespaceName()
@@ -48,7 +48,7 @@ t4p::TagClass::TagClass()
 		
 }
 
-t4p::TagClass::TagClass(const t4p::TagClass& src)
+t4p::PhpTagClass::PhpTagClass(const t4p::PhpTagClass& src)
 	: Identifier()
 	, ClassName()
 	, NamespaceName()
@@ -71,11 +71,11 @@ t4p::TagClass::TagClass(const t4p::TagClass& src)
 	Copy(src);
 }
 
-void t4p::TagClass::operator=(const TagClass& src) {
+void t4p::PhpTagClass::operator=(const t4p::PhpTagClass& src) {
 	Copy(src);
 }
 
-void t4p::TagClass::Copy(const t4p::TagClass& src) {
+void t4p::PhpTagClass::Copy(const t4p::PhpTagClass& src) {
 	Identifier = src.Identifier;
 	ClassName = src.ClassName;
 	NamespaceName = src.NamespaceName;
@@ -99,19 +99,19 @@ void t4p::TagClass::Copy(const t4p::TagClass& src) {
 	FileIsNew = src.FileIsNew;
 }
 
-bool t4p::TagClass::operator<(const t4p::TagClass& a) const {
+bool t4p::PhpTagClass::operator<(const t4p::PhpTagClass& a) const {
 	return Key.caseCompare(a.Key, 0) < 0;
 }
 
-bool t4p::TagClass::operator==(const t4p::TagClass& a) const {
+bool t4p::PhpTagClass::operator==(const t4p::PhpTagClass& a) const {
 	return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
 } 
 
-bool t4p::TagClass::IsKeyEqualTo(const UnicodeString& key) const {
+bool t4p::PhpTagClass::IsKeyEqualTo(const UnicodeString& key) const {
 	return Key.caseCompare(key, 0) == 0;
 }
 
-void t4p::TagClass::Clear() {
+void t4p::PhpTagClass::Clear() {
 	Identifier.remove();
 	ClassName.remove();
 	NamespaceName.remove();
@@ -133,36 +133,36 @@ void t4p::TagClass::Clear() {
 	FileIsNew = false;
 }
 
-t4p::TagClass t4p::TagClass::MakeNamespace(const UnicodeString& namespaceName) {
-	t4p::TagClass namespaceItem;
-	namespaceItem.Type = t4p::TagClass::NAMESPACE;
+t4p::PhpTagClass t4p::PhpTagClass::MakeNamespace(const UnicodeString& namespaceName) {
+	t4p::PhpTagClass namespaceItem;
+	namespaceItem.Type = t4p::PhpTagClass::NAMESPACE;
 	namespaceItem.NamespaceName = namespaceName;
 	namespaceItem.Identifier = namespaceName;
 	namespaceItem.Key = namespaceName;
 	return namespaceItem;
 }
 
-wxFileName t4p::TagClass::FileName() const {
+wxFileName t4p::PhpTagClass::FileName() const {
 	wxFileName fileName(FullPath);
 	return fileName;
 }
 
-wxString  t4p::TagClass::GetFullPath() const {
+wxString  t4p::PhpTagClass::GetFullPath() const {
 	return FullPath;
 }
 
-void t4p::TagClass::SetFullPath(const wxString& fullPath) {
+void t4p::PhpTagClass::SetFullPath(const wxString& fullPath) {
 	FullPath = fullPath;
 }
 
-bool t4p::TagClass::HasParameters() const {
+bool t4p::PhpTagClass::HasParameters() const {
 
 	// watch out for default argument of "array()"
 	// look for the function name followed by parentheses
 	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
 }
 
-UnicodeString t4p::TagClass::FullyQualifiedClassName() const {
+UnicodeString t4p::PhpTagClass::FullyQualifiedClassName() const {
 	UnicodeString qualifiedName = NamespaceName;
 	if (!qualifiedName.endsWith(UNICODE_STRING_SIMPLE("\\"))) {
 		qualifiedName.append(UNICODE_STRING_SIMPLE("\\"));

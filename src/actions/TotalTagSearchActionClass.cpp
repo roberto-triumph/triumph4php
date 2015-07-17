@@ -68,27 +68,27 @@ t4p::TotalTagResultClass::TotalTagResultClass(const t4p::TotalTagResultClass& sr
 	Copy(src);
 }
 
-t4p::TotalTagResultClass::TotalTagResultClass(const t4p::TagClass& phpTag) 
+t4p::TotalTagResultClass::TotalTagResultClass(const t4p::PhpTagClass& phpTag) 
 : FileTag()
 , PhpTag(phpTag)
 , TableTag() 
 , Type(t4p::TotalTagResultClass::CLASS_TAG) {
-	if (t4p::TagClass::CLASS == PhpTag.Type) {
+	if (t4p::PhpTagClass::CLASS == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::CLASS_TAG;
 	}
-	else if (t4p::TagClass::FUNCTION == PhpTag.Type) {
+	else if (t4p::PhpTagClass::FUNCTION == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
 	}
-	else if (t4p::TagClass::MEMBER == PhpTag.Type) {
+	else if (t4p::PhpTagClass::MEMBER == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (t4p::TagClass::METHOD == PhpTag.Type) {
+	else if (t4p::PhpTagClass::METHOD == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (t4p::TagClass::CLASS_CONSTANT == PhpTag.Type) {
+	else if (t4p::PhpTagClass::CLASS_CONSTANT == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
 	}
-	else if (t4p::TagClass::DEFINE == PhpTag.Type) {
+	else if (t4p::PhpTagClass::DEFINE == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
 	}
 }

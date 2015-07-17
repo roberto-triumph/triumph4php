@@ -249,8 +249,8 @@ void t4p::CallStackClass::Clear() {
 bool t4p::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
 		pelet::Versions version, t4p::CallStackClass::Errors& error) {
 	Clear();
-	t4p::TagClass nextResource;
-	nextResource.Type = t4p::TagClass::METHOD;
+	t4p::PhpTagClass nextResource;
+	nextResource.Type = t4p::PhpTagClass::METHOD;
 	nextResource.ClassName = className;
 	nextResource.Identifier = methodName;
 

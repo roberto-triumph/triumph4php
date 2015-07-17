@@ -293,27 +293,27 @@ public:
 	 * Will return only for full exact matches (it will call ExactClassOrFile
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<t4p::TagClass> matched resources. will be either files or classes 
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be either files or classes 
 	 */
-	std::vector<t4p::TagClass> ExactClassOrFile(const UnicodeString& search);
+	std::vector<t4p::PhpTagClass> ExactClassOrFile(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactClass
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<t4p::TagClass> matched resources. will be class tags only
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be class tags only
 	 */
-	std::vector<t4p::TagClass> ExactClass(const UnicodeString& search);
+	std::vector<t4p::PhpTagClass> ExactClass(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return only for full exact matches (it will call ExactFunction
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<t4p::TagClass> matched resources. will be function tags only
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be function tags only
 	 */
-	std::vector<t4p::TagClass> ExactFunction(const UnicodeString& search);
+	std::vector<t4p::PhpTagClass> ExactFunction(const UnicodeString& search);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -321,9 +321,9 @@ public:
 	 * on each tag finder). Note that matching methods from all classes are returned
 	 * @param search string to search for
 	 * @param onlyStatic if TRUE, then only static methods will be returned
-	 * @return std::vector<t4p::TagClass> matched resources. will be method tags only
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be method tags only
 	 */
-	std::vector<t4p::TagClass> ExactMethod(const UnicodeString& search, bool onlyStatic);
+	std::vector<t4p::PhpTagClass> ExactMethod(const UnicodeString& search, bool onlyStatic);
 
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -331,9 +331,9 @@ public:
 	 * on each tag finder). Note that matching properties/constants from all classes are returned.
 	 * @param search string to search for
 	 * @param onlyStatic if TRUE, then only static properties and constants will be returned
-	 * @return std::vector<t4p::TagClass> matched resources. will be function tags only
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be function tags only
 	 */
-	std::vector<t4p::TagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
+	std::vector<t4p::PhpTagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
 	
 	/**
 	 * Searches all the registered caches (working AND global caches)
@@ -341,9 +341,9 @@ public:
 	 * on each tag finder).
 	 *
 	 * @param string to search for
-	 * @return std::vector<t4p::TagClass> matched resources. will be either files or classes
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be either files or classes
 	 */
-	std::vector<t4p::TagClass> NearMatchClassesOrFiles(const UnicodeString& search);
+	std::vector<t4p::PhpTagClass> NearMatchClassesOrFiles(const UnicodeString& search);
 	
 	/**
 	 * prepares the given result against the global tag cache
@@ -374,7 +374,7 @@ public:
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
 	 */
-	std::vector<t4p::TagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs);
+	std::vector<t4p::PhpTagClass> AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs);
 
 	/**
 	 * gets all tags that were found in a single file. for classes, all of the class' members (including
@@ -384,7 +384,7 @@ public:
 	 * @return vector of tags; 
 	 *         all classes, functions or define's in the give file
 	 */
-	std::vector<t4p::TagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
+	std::vector<t4p::PhpTagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
 	
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed variable.
@@ -410,7 +410,7 @@ public:
 		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
 		std::vector<UnicodeString>& autoCompleteList,
-		std::vector<TagClass>& autoCompleteResourceList,
+		std::vector<t4p::PhpTagClass>& autoCompleteResourceList,
 		bool doDuckTyping,
 		SymbolTableMatchErrorClass& error);
 
@@ -435,7 +435,7 @@ public:
 		const pelet::VariableClass& parsedVariable, 
 		const pelet::ScopeClass& variableScope, 
 		const std::vector<wxFileName>& sourceDirs,
-		std::vector<TagClass>& matches,
+		std::vector<t4p::PhpTagClass>& matches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error);
 	
@@ -451,7 +451,7 @@ public:
 	 *        error message
 	 * @return tag matches
 	 */
-	std::vector<TagClass> GetTagsAtPosition(
+	std::vector<t4p::PhpTagClass> GetTagsAtPosition(
 		const wxString& fileName, 
 		const UnicodeString& code, int posToCheck,
 		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
@@ -491,7 +491,7 @@ public:
 	 * @param tag out parameter, will be filled in with the tag data
 	 * @return bool TRUE if the ID was found
 	 */
-	bool FindById(int id, t4p::TagClass& tag);
+	bool FindById(int id, t4p::PhpTagClass& tag);
 
 	/**
 	 * @param fullPath filename to delete tags that were found in filename.

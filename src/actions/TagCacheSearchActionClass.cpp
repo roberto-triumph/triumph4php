@@ -30,7 +30,7 @@
 
 t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
 																	const UnicodeString& searchString,
-																	const std::vector<t4p::TagClass>& tags)
+																	const std::vector<t4p::PhpTagClass>& tags)
 	: wxEvent(eventId, t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE)
 	, SearchString(searchString) 
 	, Tags(tags) {
@@ -70,7 +70,7 @@ void t4p::TagCacheSearchActionClass::BackgroundWork() {
 	if (IsCancelled()) {
 		return;
 	}
-	std::vector<t4p::TagClass> matches;
+	std::vector<t4p::PhpTagClass> matches;
 
 	// do exact match first, if that succeeds then don't bother doing near matches
 	t4p::TagResultClass* results = TagCache.ExactTags(SearchString, SearchDirs);

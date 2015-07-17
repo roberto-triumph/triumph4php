@@ -182,7 +182,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	int endPos = ctrl->WordEndPosition(pos, true);
 	pos = ctrl->WordStartPosition(pos, true);
 	wxString matchError;
-	std::vector<t4p::TagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
+	std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
 		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
 		Feature.App.Globals.AllEnabledSourceDirectories(),
 		Feature.App.Globals,
@@ -193,19 +193,19 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	bool hasContent = false;
 	bool isNativeTag = false;
 	wxString funcName = wxT("");
-	t4p::TagClass tag;
+	t4p::PhpTagClass tag;
 	if (!matches.empty()) {
 		tag = matches[0];
 		hasMatches = true;
 		isNativeTag = tag.IsNative;
 		funcName = t4p::IcuToWx(tag.Identifier);
-		if (tag.Type == t4p::TagClass::FUNCTION) {
+		if (tag.Type == t4p::PhpTagClass::FUNCTION) {
 			msg = t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
 			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
 		}
-		else if (tag.Type == t4p::TagClass::METHOD) {
+		else if (tag.Type == t4p::PhpTagClass::METHOD) {
 			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
 			msg += t4p::IcuToWx(tag.Identifier);
@@ -213,7 +213,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
 		}
-		else if (tag.Type == t4p::TagClass::MEMBER || tag.Type == t4p::TagClass::CLASS_CONSTANT) {
+		else if (tag.Type == t4p::PhpTagClass::MEMBER || tag.Type == t4p::PhpTagClass::CLASS_CONSTANT) {
 			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
 			msg += t4p::IcuToWx(tag.Identifier);

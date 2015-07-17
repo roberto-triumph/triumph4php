@@ -148,7 +148,7 @@ private:
 	 * The resources that are shown in the code completion list. Keeping these around
 	 * so that we can append the '(' for method calls.
 	 */
-	std::vector<t4p::TagClass> AutoCompletionResourceMatches;
+	std::vector<t4p::PhpTagClass> AutoCompletionResourceMatches;
 };
 
 /**
@@ -193,7 +193,7 @@ private:
 	/**
 	 * The resources used to populate the call tips
 	 */
-	std::vector<t4p::TagClass> CurrentCallTipResources;
+	std::vector<t4p::PhpTagClass> CurrentCallTipResources;
 	
 	/**
 	 * The tag signature currently being displayed in the calltip.

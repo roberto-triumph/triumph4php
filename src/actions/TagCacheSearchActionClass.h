@@ -50,10 +50,10 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
     /**
      * Will contain all of the resulting tags.
      */
-	std::vector<t4p::TagClass> Tags;
+	std::vector<t4p::PhpTagClass> Tags;
 
     TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
-		const std::vector<t4p::TagClass>& tags);
+		const std::vector<t4p::PhpTagClass>& tags);
     
     wxEvent* Clone() const;
 
