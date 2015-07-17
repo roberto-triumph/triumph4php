@@ -71,14 +71,14 @@ void t4p::UrlTagClass::Copy(const t4p::UrlTagClass& src) {
 	MethodName = src.MethodName.c_str();
 }
 
-t4p::UrlTagFinderClass::UrlTagFinderClass()
-	: SqliteFinderClass() {
+t4p::UrlTagFinderClass::UrlTagFinderClass(soci::session& session)
+	: SqliteFinderClass(session) {
 		
 }
 
 bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return ret;
 	}
 	std::string stdUrlWhere = t4p::WxToChar(url.BuildURI());
@@ -101,7 +101,7 @@ bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFil
 	}
 	sql += ")";
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::use(stdUrlWhere));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
@@ -128,7 +128,7 @@ bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFil
 
 bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
 	bool ret = false;
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return ret;
 	}
 	std::string stdClassNameWhere = t4p::WxToChar(className);
@@ -153,7 +153,7 @@ bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const 
 	}
 	sql += ")";
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(stdUrl));
 		stmt.exchange(soci::into(stdFullPath));
 		stmt.exchange(soci::into(stdClassName));
@@ -181,9 +181,6 @@ bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const 
 
 bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
-	if (!Session) {
-		return ret;
-	}
 	std::string stdFullPathWhere = t4p::WxToChar(fullPath);
 	
 	std::string stdUrl;
@@ -205,7 +202,7 @@ bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const st
 	}
 	sql += ")";
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(stdUrl));
 		stmt.exchange(soci::into(stdFullPath));
 		stmt.exchange(soci::into(stdClassName));
@@ -234,7 +231,7 @@ bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const st
 }
 
 void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs) {
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return;
 	}
 	std::string stdUrl = t4p::WxToChar(url.BuildURI());
@@ -251,7 +248,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 			}
 		}
 		sql += "))"; 
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::use(stdUrl));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
@@ -267,9 +264,6 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 }
 
 void t4p::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& matchedUrls) {
-	if (!Session) {
-		return;
-	}
 	std::string stdUrl;
 	std::string stdFullPath;
 	std::string stdClassName;
@@ -294,7 +288,7 @@ void t4p::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vecto
 	}
 	sql += ") LIMIT 100";
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(stdUrl));
 		stmt.exchange(soci::into(stdFullPath));
 		stmt.exchange(soci::into(stdClassName));
@@ -323,7 +317,7 @@ void t4p::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vecto
 }
 
 void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return;
 	}
 	try {
@@ -339,7 +333,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 			}
 		}
 		sql += "))"; 
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
 		}
@@ -354,7 +348,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 
 int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 	int totalCount = 0;
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return totalCount;
 	}
 	int dbCount;
@@ -374,7 +368,7 @@ int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 	sql += ")";
 	
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(dbCount));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
@@ -392,7 +386,7 @@ int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 
 std::vector<wxString> t4p::UrlTagFinderClass::AllControllerNames(const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> controllerNames;
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return controllerNames;
 	}
 	std::string controller;
@@ -411,7 +405,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllControllerNames(const std::vect
 	}
 	sql += ")";
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(controller));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
@@ -433,7 +427,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllControllerNames(const std::vect
 
 std::vector<wxString> t4p::UrlTagFinderClass::AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs) {
 	std::vector<wxString> methodNames;
-	if (!Session || sourceDirs.empty()) {
+	if (sourceDirs.empty()) {
 		return methodNames;
 	}
 	std::string methodName;
@@ -454,7 +448,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllMethodNames(const wxString& con
 	sql += ")";
 	
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(methodName));
 		stmt.exchange(soci::use(controllerWhere));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {

@@ -393,8 +393,8 @@ void t4p::SqlResourceColumnResultClass::Next() {
 	Fetch();
 }
 
-t4p::SqlResourceFinderClass::SqlResourceFinderClass() 
-	: SqliteFinderClass() {
+t4p::SqlResourceFinderClass::SqlResourceFinderClass(soci::session& session)
+	: SqliteFinderClass(session) {
 		
 }
 

@@ -58,7 +58,6 @@ void t4p::SqlMetaDataInitActionClass::Work(t4p::GlobalsClass& globals) {
 		*soci::factory_sqlite3(),
 		t4p::WxToChar(globals.TagCacheDbFileName.GetFullPath())
 	);
-	globals.SqlResourceFinder.InitSession(&globals.ResourceCacheSession);
 }
 
 wxString t4p::SqlMetaDataInitActionClass::GetLabel() const {
@@ -100,8 +99,7 @@ bool t4p::SqlMetaDataActionClass::Init(t4p::GlobalsClass& globals) {
 	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
 
 	// initialize the detected tag cache only the enabled projects
-	t4p::DatabaseTagFinderClass finder;
-	finder.InitSession(&globals.DetectorCacheSession);
+	t4p::DatabaseTagFinderClass finder(globals.DetectorCacheSession);
 	
 	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
 	std::vector<t4p::DatabaseTagClass>::const_iterator tag;

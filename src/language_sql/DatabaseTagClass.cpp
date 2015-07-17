@@ -466,8 +466,8 @@ void t4p::ConnectionIdentifierClass::Set(unsigned long id) {
 	ConnectionId = id;
 }
 
-t4p::DatabaseTagFinderClass::DatabaseTagFinderClass()
-	: SqliteFinderClass() {
+t4p::DatabaseTagFinderClass::DatabaseTagFinderClass(soci::session& session)
+	: SqliteFinderClass(session) {
 }
 
 std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {
@@ -497,7 +497,7 @@ std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::v
 		password;
 	int port;
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(label));
 		stmt.exchange(soci::into(schema));
 		stmt.exchange(soci::into(driver));

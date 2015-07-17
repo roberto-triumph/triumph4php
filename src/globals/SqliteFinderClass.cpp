@@ -25,31 +25,19 @@
 
 #include <globals/SqliteFinderClass.h>
 
-t4p::SqliteFinderClass::SqliteFinderClass() {
-	Session = NULL;
+t4p::SqliteFinderClass::SqliteFinderClass(soci::session& session)
+: Session(session) {
 }
 
 t4p::SqliteFinderClass::~SqliteFinderClass() {
 }
 
-void t4p::SqliteFinderClass::InitSession(soci::session* session) {
-	Session = session;
-}
-
-void t4p::SqliteFinderClass::ClearSession() {
-	Session = NULL;
-}
-
 bool t4p::SqliteFinderClass::Prepare(t4p::SqliteResultClass* result, bool doLimit) {
-	bool ret = result->Init(*Session, doLimit);
+	bool ret = result->Init(Session, doLimit);
 	return ret;
 }
 
 bool t4p::SqliteFinderClass::Exec(t4p::SqliteResultClass* result) {
-	bool ret = result->Exec(*Session, true);
+	bool ret = result->Exec(Session, true);
 	return ret;
-}
-
-bool t4p::SqliteFinderClass::IsInit() const {
-	return NULL != Session;
 }

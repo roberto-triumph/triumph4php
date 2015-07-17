@@ -25,36 +25,28 @@
 #include <language_php/TagFinderList.h>
 #include <language_php/ParsedTagFinderClass.h>
 #include <language_php/DetectedTagFinderResultClass.h>
+#include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
 t4p::TagFinderListClass::TagFinderListClass()
-	: TagParser() 
-	, TagFinder()
-	, NativeTagFinder()
-	, DetectedTagFinder()
+	: TagDbSession()
+	, NativeDbSession()
+	, DetectedTagDbSession()
+	, TagParser()
+	, TagFinder(TagDbSession)
+	, NativeTagFinder(NativeDbSession)
+	, DetectedTagFinder(DetectedTagDbSession)
 	, IsNativeTagFinderInit(false)
 	, IsTagFinderInit(false)
 	, IsDetectedTagFinderInit(false)
-	, TagDbSession(NULL)
-	, NativeDbSession(NULL)
-	, DetectedTagDbSession(NULL)
 {
 
 }
 t4p::TagFinderListClass::~TagFinderListClass() {
 	TagParser.Close();
-	if (TagDbSession) {
-		TagDbSession->close();
-		delete TagDbSession;
-	}
-	if (DetectedTagDbSession) {
-		DetectedTagDbSession->close();
-		delete DetectedTagDbSession;
-	}
-	if (NativeDbSession) {
-		NativeDbSession->close();
-		delete NativeDbSession;
-	}
+	TagDbSession.close();
+	DetectedTagDbSession.close();
+	NativeDbSession.close();
 }
 
 void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName, 
@@ -62,98 +54,73 @@ void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName,
 									   const std::vector<wxString>& miscFileExtensions,
 									   pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	wxASSERT_MSG(!TagDbSession, wxT("tag finder can only be initialized once"));
 	
 	// make sure to clone files and strings so
 	// that this cache object can be used
 	// in a background thread
 	t4p::DeepCopy(TagParser.PhpFileExtensions, phpFileExtensions);
 	t4p::DeepCopy(TagParser.MiscFileExtensions, miscFileExtensions);
-	TagDbSession = new soci::session;
 	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession);
-		TagFinder.InitSession(TagDbSession);
+		TagParser.Init(&TagDbSession);
 	}
 }
 
-void t4p::TagFinderListClass::AdoptGlobalTag(soci::session* globalSession,
-												 const std::vector<wxString>& phpFileExtensions, 
+void t4p::TagFinderListClass::CreateGlobalTag(const std::vector<wxString>& phpFileExtensions,
 												 const std::vector<wxString>& miscFileExtensions,
 												 pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	wxASSERT_MSG(!TagDbSession, wxT("tag finder can only be initialized once"));
-	
+
 	// make sure to clone files and strings so
 	// that this cache object can be used
 	// in a background thread
 	t4p::DeepCopy(TagParser.PhpFileExtensions, phpFileExtensions);
 	t4p::DeepCopy(TagParser.MiscFileExtensions, miscFileExtensions);
-	TagDbSession = globalSession;
-	IsTagFinderInit = NULL != globalSession;
+	TagDbSession.open(*soci::factory_sqlite3(), ":memory:");
+	wxString error;
+	IsTagFinderInit = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), TagDbSession, error);
+	wxASSERT_MSG(IsTagFinderInit, error);
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
-		TagParser.Init(TagDbSession);
-		TagFinder.InitSession(TagDbSession);
+		TagParser.Init(&TagDbSession);
 	}
 }
 
 void t4p::TagFinderListClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
-	DetectedTagDbSession = new soci::session;
 	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
-	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.InitSession(DetectedTagDbSession);
-	}
 }
 
-void t4p::TagFinderListClass::AdoptDetectorTag(soci::session* session) {
+void t4p::TagFinderListClass::CreateDetectorTag() {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
-	IsDetectedTagFinderInit = NULL != session;
-	DetectedTagDbSession = session;
-	if (IsDetectedTagFinderInit) {
-		DetectedTagFinder.InitSession(DetectedTagDbSession);
-	}
+
+	DetectedTagDbSession.open(*soci::factory_sqlite3(), ":memory:");
+	wxString error;
+	IsDetectedTagFinderInit = t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), DetectedTagDbSession, error);
+	wxASSERT_MSG(IsDetectedTagFinderInit, error);
 }
 
 void t4p::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) {
 	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("native tag finder can only be initialized once"));
-	wxASSERT_MSG(!NativeDbSession, wxT("native tag finder can only be initialized once"));
-	
-	NativeDbSession = new soci::session;
 	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
-	if (IsNativeTagFinderInit) {
-		NativeTagFinder.InitSession(NativeDbSession);
-	}
 }
 
-void t4p::TagFinderListClass::AdoptNativeTag(soci::session* session) {
-	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("native tag finder can only be initialized once"));
-	wxASSERT_MSG(!NativeDbSession, wxT("native tag finder can only be initialized once"));
-	
-	IsNativeTagFinderInit = NULL != session;
-	NativeDbSession = session;
-	if (IsNativeTagFinderInit) {
-		NativeTagFinder.InitSession(NativeDbSession);
-	}
-}
-
-bool t4p::TagFinderListClass::Open(soci::session* session, const wxString& dbName) {
+bool t4p::TagFinderListClass::Open(soci::session& session, const wxString& dbName) {
 	bool ret = false;
 	try {
 		std::string stdDbName = t4p::WxToChar(dbName);
 		
 		// we should be able to open this since it has been created by
 		// the TagCacheDbVersionActionClass
-		session->open(*soci::factory_sqlite3(), stdDbName);
+		session.open(*soci::factory_sqlite3(), stdDbName);
 
 		// set a busy handler so that if we attempt to query while the file is locked, we 
 		// sleep for a bit then try again
-		t4p::SqliteSetBusyTimeout(*session, 200);
+		t4p::SqliteSetBusyTimeout(session, 200);
 		ret = true;
 	} catch(std::exception const& e) {
-		session->close();
+		session.close();
 		wxString msg = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, msg);
 	}

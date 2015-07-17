@@ -29,8 +29,10 @@
 t4p::GlobalsClass::GlobalsClass()
 	: Environment()
 	, TagCache()
-	, UrlTagFinder()
-	, SqlResourceFinder()
+	, ResourceCacheSession()
+	, DetectorCacheSession()
+	, UrlTagFinder(ResourceCacheSession)
+	, SqlResourceFinder(ResourceCacheSession)
 	, DatabaseTags()
 	, Projects()
 	, CurrentUrl() 
@@ -38,15 +40,11 @@ t4p::GlobalsClass::GlobalsClass()
 	, FileTypes()
 	, TagCacheDbFileName(t4p::TagCacheAsset())
 	, DetectorCacheDbFileName(t4p::DetectorCacheAsset()) 
-	, ResourceCacheSession()
-	, DetectorCacheSession()
 	, LocalVolumes() {
 }
 
 void t4p::GlobalsClass::Close() {
 	TagCache.Clear();
-	UrlTagFinder.ClearSession();
-	SqlResourceFinder.ClearSession();
 	ResourceCacheSession.close();
 	DetectorCacheSession.close();
 }

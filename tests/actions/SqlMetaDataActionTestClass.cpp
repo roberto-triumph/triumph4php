@@ -50,7 +50,7 @@ public:
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, FileTestFixtureClass(wxT("metadata_fetch"))
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
-		, Results() {
+		, Results(Globals.ResourceCacheSession) {
 		t4p::DatabaseTagClass dbTag;
 		dbTag.Schema = UNICODE_STRING_SIMPLE("metadata_fetch");
 
@@ -64,7 +64,6 @@ public:
 		InitTagCache(TestProjectDir);
 		Globals.ResourceCacheSession.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
 		SqliteTestFixtureClass::CreateDatabase(Globals.ResourceCacheSession, t4p::ResourceSqlSchemaAsset());
-		Results.InitSession(&Globals.ResourceCacheSession);
 		CreateTable();
 	}
 

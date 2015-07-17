@@ -45,9 +45,7 @@ public:
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(SqliteTestFixtureClass::Session)
-		, Finder() {
-		soci::session& s = SqliteTestFixtureClass::Session;
-		Finder.InitSession(&s);
+		, Finder(SqliteTestFixtureClass::Session) {
 		DatabaseTag.Driver = t4p::DatabaseTagClass::MYSQL;
 		DatabaseTag.Schema = UNICODE_STRING_SIMPLE("sql_resource_finder");
 
@@ -73,11 +71,9 @@ public:
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(Session)
-		, Finder() 
+		, Finder(Session)
 		, SqliteFile() 
 		, TestSession() {
-		
-		Finder.InitSession(&Session);
 		
 		// create a sqlite db file
 		TouchTestDir();

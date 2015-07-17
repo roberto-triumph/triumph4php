@@ -52,14 +52,13 @@ public:
 		: FileTestFixtureClass(wxT("tag_finder"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
-		, ParsedTagFinder()
+		, ParsedTagFinder(Session)
 		, TestFile(wxT("test.php")) {
 		TagParser.Init(&Session);
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		if (wxDirExists(TestProjectDir)) {
 			RecursiveRmDir(TestProjectDir);
 		}
-		ParsedTagFinder.InitSession(&Session);
 	}
 	
 	/**
@@ -127,12 +126,11 @@ public:
 	ParsedTagFinderMemoryTestClass() 
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
-		, ParsedTagFinder()
+		, ParsedTagFinder(Session)
 		, TestFile(wxT("test.php"))
 		, Matches() {
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		TagParser.Init(&Session);
-		ParsedTagFinder.InitSession(&Session);
 	}
 	
 	/**
@@ -739,8 +737,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNativeFunctions) {
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
-	ParsedTagFinder.InitSession(&session);
+	Session.close();
+	Session.open(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
 
 	NearMatchTags(UNICODE_STRING_SIMPLE("array_key"));
 	CHECK_VECTOR_SIZE(2, Matches);
@@ -1715,11 +1713,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
 
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));;
-	ParsedTagFinder.InitSession(&session);
+	t4p::ParsedTagFinderClass finder(session);
 	
 	// still empty
-	CHECK(ParsedTagFinder.IsFileCacheEmpty());
-	CHECK(ParsedTagFinder.IsResourceCacheEmpty());
+	CHECK(finder.IsFileCacheEmpty());
+	CHECK(finder.IsResourceCacheEmpty());
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturnTags) {

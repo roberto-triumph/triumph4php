@@ -98,10 +98,6 @@ public:
 	std::vector<wxString> PhpExtensions;
 	std::vector<wxString> MiscExtensions;
 
-	soci::session* GlobalSession;
-	soci::session* NativeSession;
-	soci::session* DetectedTagSession;
-
 	SymbolTableCompletionTestClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, CompletionSymbolTable()
@@ -116,10 +112,7 @@ public:
 		, Error() 
 		, PhpExtensions()
 		, MiscExtensions() {
-
-		GlobalSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*GlobalSession, t4p::ResourceSqlSchemaAsset());
-		TagFinderList.AdoptGlobalTag(GlobalSession, PhpExtensions, MiscExtensions, pelet::PHP_53);
+		TagFinderList.CreateGlobalTag(PhpExtensions, MiscExtensions, pelet::PHP_53);
 	}
 
 	void Init(const UnicodeString& sourceCode) {
@@ -1159,8 +1152,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultiple
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
-	NativeSession = new soci::session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
-	TagFinderList.AdoptNativeTag(NativeSession);
+	TagFinderList.InitNativeTag(t4p::NativeFunctionsAsset());
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$pdo = new PDO;\n"
@@ -1183,8 +1175,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 	wxFileName sourceDir;
 	sourceDir.Assign(t4p::TagDetectorsGlobalAsset());
 	SourceDirs.push_back(sourceDir);
-	NativeSession = new soci::session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));
-	TagFinderList.AdoptNativeTag(NativeSession);
+	TagFinderList.InitNativeTag(t4p::NativeFunctionsAsset());
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
 		"$pdo = new PDO;\n"
@@ -1202,9 +1193,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs)
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
-	DetectedTagSession = new soci::session(*soci::factory_sqlite3(), ":memory:");
-	CreateDatabase(*DetectedTagSession, t4p::DetectorSqlSchemaAsset());
-	TagFinderList.AdoptDetectorTag(DetectedTagSession);
+	TagFinderList.CreateDetectorTag();
 	std::string key = "CI_Controller::email", 
 		className = "CI_Controller", 
 		methodName = "email", 
@@ -1218,7 +1207,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	
 	// create the source row
 	std::string stdDir = t4p::WxToChar("");
-	soci::statement sourceStmt = (DetectedTagSession->prepare << "INSERT INTO sources(directory) VALUES(?)",
+	soci::statement sourceStmt = (TagFinderList.DetectedTagDbSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
 		soci::use(stdDir));
 	sourceStmt.execute(true);
 	soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(sourceStmt.get_backend());
@@ -1228,7 +1217,7 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithDetectedTags) {
 	std::string sql = "INSERT INTO detected_tags";
 	sql += "(key, source_id, type, class_name, method_name, return_type, namespace_name, signature, comment, is_static) ";
 	sql += "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	soci::statement stmt = (DetectedTagSession->prepare << sql, 
+	soci::statement stmt = (TagFinderList.DetectedTagDbSession.prepare << sql,
 		soci::use(key), soci::use(sourceId), soci::use(type),
 		soci::use(className), soci::use(methodName), soci::use(returnType),
 		soci::use(namespaceName), soci::use(signature), soci::use(comment),

@@ -27,37 +27,38 @@
 #define T4P_SQLITEFINDERCLASS_H
 
 #include <globals/SqliteResultClass.h>
+#include <soci/soci.h>
 
 namespace t4p {
 
 /**
- * Class that holds connections to a SQLITE database. It will
- * close them when the class goes out of scope.
+ * A SqliteFinderClass holds a reference of a soci database connection
+ * and run many SqliteResultClass instances.
+ *
+ * Usage:
+ * -----
+ * The SqliteFinderClass is a very small class that delegates
+ * most of its work to SqliteResultClass, take a look at that
+ * class for more info.
  */
 class SqliteFinderClass {
 
-public:
-
-	SqliteFinderClass();
-
-	virtual ~SqliteFinderClass();
+	public:
 
 	/**
-	 * use an existing connection for this finder..
+	 * use an existing connection for this finder.
 	 * This method can used to have the the finder query either  a file-backed db or a memory db.
 	 * By using an in-memory database, lookups are faster.
-	 * Note that this method assumes that the schema has already been created.
+	 * The session does not necessarily have to be initialized at this point,
+	 * but it should definitely be initialized before calling Prepare() or
+	 * Exec()
 	 *
-	 * @param session the soci connection to use.  this class WILL NOT own the
-	 *        pointer,
+	 * @param session the soci connection to use.
 	 */
-	void InitSession(soci::session* session);
+	SqliteFinderClass(soci::session& session);
 
-	/**
-	 * removes the session
-	 */
-	void ClearSession();
-
+	virtual ~SqliteFinderClass();
+	
 	/**
 	 * prepares  a query against this sqlite db.
 	 *
@@ -78,15 +79,9 @@ public:
 protected:
 
 	/**
-	 * @return TRUE if this finder has an opened connection to a db
-	 */
-	bool IsInit() const;
-
-	/**
 	 * the opened connection to the detector databases.
-	 * This class will NOT own the pointer.
 	 */
-	soci::session* Session;
+	soci::session& Session;
 
 };
 

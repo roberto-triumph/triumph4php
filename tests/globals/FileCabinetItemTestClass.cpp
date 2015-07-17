@@ -38,9 +38,8 @@ public:
 
 	FileCabinetFixtureClass() 
 	: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
-	, SqliteFinder()
+	, SqliteFinder(Session)
 	, AllResults() {
-		SqliteFinder.InitSession(&Session);
 	}
 	
 	t4p::SqliteFinderClass SqliteFinder;

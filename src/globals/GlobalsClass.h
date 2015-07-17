@@ -58,6 +58,18 @@ public:
 	TagCacheClass TagCache;
 
 	/**
+	 * the opened connection to the resources tags db
+	 * @var session
+	 */
+	soci::session ResourceCacheSession;
+
+	/**
+	 * the opened connection to the detector tags db
+	 * @var session
+	 */
+	soci::session DetectorCacheSession;
+
+	/**
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
 	 * "current" URL.
 	 */
@@ -126,18 +138,6 @@ public:
 	 * @return the full path to the tag database that stores detected tags for all defined projects
 	 */
 	wxFileName DetectorCacheDbFileName;
-	
-	/**
-	 * the opened connection to the resources tags db
-	 * @var session
-	 */
-	soci::session ResourceCacheSession;
-
-	/**
-	 * the opened connection to the detector tags db
-	 * @var session
-	 */
-	soci::session DetectorCacheSession;
 	
 	/**
 	 * List of the local volumes that are mounted and writable.

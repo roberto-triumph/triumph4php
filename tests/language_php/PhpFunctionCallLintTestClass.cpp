@@ -78,11 +78,8 @@ public:
 		
 		// make the cache consume the source code file; to prime it with the resources because the
 		// function call linter won't work without the cache
-		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*session, t4p::ResourceSqlSchemaAsset()); 
-
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
-		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		tagFinderList->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		if (includeNativeFunctions) {
 			tagFinderList->InitNativeTag(t4p::NativeFunctionsAsset());
 		}

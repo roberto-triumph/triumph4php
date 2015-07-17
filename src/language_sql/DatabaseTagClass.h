@@ -434,7 +434,7 @@ class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 
-	DatabaseTagFinderClass();
+	DatabaseTagFinderClass(soci::session& session);
 
 	/**
 	 * @return all of the database tags in all of the attached databases

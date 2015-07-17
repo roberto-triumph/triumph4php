@@ -65,7 +65,7 @@ public:
 		: ActionTestFixtureClass()
 		, FileTestFixtureClass(wxT("project_tag_action"))
 		, ProjectTagAction(RunningThreads, ID_EVENT)
-		, Finder() {
+		, Finder(Session) {
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
 		CreateProject(AbsoluteDir(wxT("src_project_1")));
@@ -74,7 +74,6 @@ public:
 		bool init = t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), Session, error);
 		wxUnusedVar(init);
 		wxASSERT_MSG(init, error);
-		Finder.InitSession(&Session);
 	}
 };
 

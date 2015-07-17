@@ -78,7 +78,7 @@ class ConfigTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 
-	ConfigTagFinderClass();
+	ConfigTagFinderClass(soci::session& session);
 
 	/**
 	 * @return all of the configs tags in all attached sqlite dbs

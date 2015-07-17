@@ -44,12 +44,11 @@ public:
 
 	UrlTagFixtureClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
-		, Finder() 
+		, Finder(DetectorTagSession)
 		, SourceDirs() 
 		, SourceId(0) {
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(DetectorTagSession, t4p::DetectorSqlSchemaAsset());
-		Finder.InitSession(&DetectorTagSession);
 		
 		wxFileName tmpDir;
 		tmpDir.AssignDir(wxStandardPaths::Get().GetTempDir());

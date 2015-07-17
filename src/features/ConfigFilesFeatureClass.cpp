@@ -63,9 +63,8 @@ bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFiles
 	// get the menus; need to keep them in memory
 	// because we use the index to know which menu was selected
 	std::vector<t4p::ConfigTagClass> allConfigTags;
-	t4p::ConfigTagFinderClass finder;
 	if (App.Globals.DetectorCacheDbFileName.IsOk()) {
-		finder.InitSession(&App.Globals.DetectorCacheSession);
+		t4p::ConfigTagFinderClass finder(App.Globals.DetectorCacheSession);
 		std::vector<wxFileName> sourceDirs = App.Globals.AllEnabledSourceDirectories();
 		allConfigTags = finder.All(sourceDirs);
 	}

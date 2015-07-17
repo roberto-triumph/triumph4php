@@ -170,6 +170,11 @@ private:
 	t4p::TagCacheClass TagCache;
 
 	/**
+	 * connection to tags db
+	 */
+	soci::session Session;
+
+	/**
 	 * the thing to search for database table tags in
 	 */	
 	t4p::SqlResourceFinderClass SqlTagCache;
@@ -183,11 +188,6 @@ private:
 	 * directories to search in. If empty, then the entire cache will be searched.
 	 */
 	std::vector<wxFileName> SearchDirs;
-	
-	/**
-	 * connection to tags db
-	 */
-	soci::session Session;
 
 };
 

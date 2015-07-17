@@ -42,8 +42,7 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	}
 	std::string sqliteFile = t4p::WxToChar(globals.DetectorCacheDbFileName.GetFullPath());
 	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), sqliteFile);
-	globals.UrlTagFinder.InitSession(&globals.DetectorCacheSession);
-	
+
 	// reload the detected database tags
 	
 	// first remove all detected connections that were previously detected
@@ -61,8 +60,7 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	std::vector<wxFileName> sourceDirectories = globals.AllEnabledSourceDirectories();
 
 	// initialize the detected tag cache only the enabled projects
-	t4p::DatabaseTagFinderClass finder;
-	finder.InitSession(&globals.DetectorCacheSession);
+	t4p::DatabaseTagFinderClass finder(globals.DetectorCacheSession);
 	
 	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
 	std::vector<t4p::DatabaseTagClass>::const_iterator tag;

@@ -297,7 +297,7 @@ void ProfileTagParserOnLargeProject() {
 	}
 
 	t4p::TagParserClass tagParser;
-	t4p::ParsedTagFinderClass tagFinder;
+	t4p::ParsedTagFinderClass tagFinder(session);
 
 	t4p::DirectorySearchClass search;
 	wxLongLong time;
@@ -309,7 +309,6 @@ void ProfileTagParserOnLargeProject() {
 	time = wxGetLocalTimeMillis();
 	tagParser.PhpFileExtensions.push_back(wxT("*.php"));
 	tagParser.Init(&session);
-	tagFinder.InitSession(&session);
 	search.Init(DirName);
 	while (search.More()) {
 		search.Walk(tagParser);
@@ -320,8 +319,7 @@ void ProfileTagParserOnLargeProject() {
 
 void ProfileTagSearch() {
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(DbFileName));
-	t4p::ParsedTagFinderClass tagFinder;
-	tagFinder.InitSession(&session);
+	t4p::ParsedTagFinderClass tagFinder(session);
 	wxLongLong time;
 	size_t found = 0;
 

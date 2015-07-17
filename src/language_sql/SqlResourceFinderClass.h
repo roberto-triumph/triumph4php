@@ -257,7 +257,7 @@ class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 	
 public:
 
-	SqlResourceFinderClass();
+	SqlResourceFinderClass(soci::session& session);
 	
 	/**
 	 * @param info the connection to search in. only tables from this connection will be returned

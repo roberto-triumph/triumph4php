@@ -80,11 +80,8 @@ public:
 	}
 
 	void BuildCache() {
-		soci::session* session = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*session, t4p::ResourceSqlSchemaAsset()); 
-
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
-		tagFinderList->AdoptGlobalTag(session, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		tagFinderList->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		t4p::DirectorySearchClass search;
 		search.Init(TestProjectDir + wxT("src"));

@@ -112,10 +112,10 @@ t4p::TotalTagSearchActionClass::TotalTagSearchActionClass(t4p::RunningThreadsCla
 	int eventId) 
 : ActionClass(runningThreads, eventId) 
 , TagCache()
-, SqlTagCache() 
+, Session()
+, SqlTagCache(Session)
 , SearchString()
-, SearchDirs() 
-, Session() {
+, SearchDirs() {
 	
 }
 
@@ -137,7 +137,6 @@ void t4p::TotalTagSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const
 		*soci::factory_sqlite3(),
 		t4p::WxToChar(globals.TagCacheDbFileName.GetFullPath())
 	);
-	SqlTagCache.InitSession(&Session);
 }
 
 void t4p::TotalTagSearchActionClass::BackgroundWork() {

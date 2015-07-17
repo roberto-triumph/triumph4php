@@ -1073,7 +1073,7 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 	
-	ParsedTagFinderClass();
+	ParsedTagFinderClass(soci::session& session);
 
 	/**
 	 * Gets all classes, functions, and constants (defines) that were parsed from

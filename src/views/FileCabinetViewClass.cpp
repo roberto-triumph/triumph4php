@@ -86,7 +86,7 @@ void t4p::FileCabinetViewClass::OnEditAddCurrentFileToCabinet(wxCommandEvent& ev
 t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, 
 												  wxWindow* mainWindow)
 : FileCabinetPanelGeneratedClass(parent, id)
-, SqliteFinder()
+, SqliteFinder(feature.App.Globals.ResourceCacheSession)
 , FileCabinet()
 , Feature(feature) 
 , MainWindow(mainWindow) {
@@ -99,7 +99,6 @@ t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p:
 	ImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	
 	List->AssignImageList(ImageList, wxIMAGE_LIST_NORMAL);
-	SqliteFinder.InitSession(&Feature.App.Globals.ResourceCacheSession);
 	FillList();
 	
 	wxAcceleratorEntry entries[1];

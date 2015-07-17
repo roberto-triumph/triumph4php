@@ -1959,16 +1959,16 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles
 	switch (tagSearch.GetResourceType()) {
 		case t4p::TagSearchClass::FILE_NAME:
 		case t4p::TagSearchClass::FILE_NAME_LINE_NUMBER:
-			fileTagResult.Exec(*Session, true);
+			fileTagResult.Exec(Session, true);
 			matches = fileTagResult.MatchesAsTags();
 			break;
 		case t4p::TagSearchClass::NAMESPACE_NAME:
 			nonMembers.Set(QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()), tagSearch.GetSourceDirs());
 			nonMembers.SetTagType(t4p::PhpTagClass::CLASS);
-			nonMembers.Exec(*Session, true);
+			nonMembers.Exec(Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
-				fileTagResult.Exec(*Session, true);
+				fileTagResult.Exec(Session, true);
 				matches = fileTagResult.MatchesAsTags();
 			}
 			break;
@@ -1976,10 +1976,10 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles
 		case t4p::TagSearchClass::CLASS_NAME_METHOD_NAME:
 			nonMembers.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
 			nonMembers.SetTagType(t4p::PhpTagClass::CLASS);
-			nonMembers.Exec(*Session, true);
+			nonMembers.Exec(Session, true);
 			matches = nonMembers.Matches();
 			if (matches.empty()) {
-				fileTagResult.Exec(*Session, true);
+				fileTagResult.Exec(Session, true);
 				matches = fileTagResult.MatchesAsTags();
 			}
 			break;
@@ -2015,7 +2015,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		allMembersResult.Set(classesToSearch, UNICODE_STRING_SIMPLE(""), tagSearch.GetSourceDirs());
 		
 		// do not limit, a class may have more than 100 members
-		allMembersResult.Exec(*Session, false);
+		allMembersResult.Exec(Session, false);
 		std::vector<t4p::PhpTagClass> memberMatches = allMembersResult.Matches();
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
@@ -2028,12 +2028,12 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		// make sure to NOT get fully qualified  matches (key=identifier)
 		t4p::ExactMemberOnlyTagResultClass exactResult;
 		exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
-		exactResult.Exec(*Session, true);
+		exactResult.Exec(Session, true);
 		matches = exactResult.Matches();
 		if (matches.empty()) {
 			t4p::NearMatchMemberOnlyTagResultClass nearMatchResult;
 			nearMatchResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
-			nearMatchResult.Exec(*Session, true);
+			nearMatchResult.Exec(Session, true);
 
 			// use LIKE to get near matches
 			matches = nearMatchResult.Matches();
@@ -2047,7 +2047,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		// ClassName::MethodName
 		t4p::NearMatchMemberTagResultClass nearMatchMemberResult;
 		nearMatchMemberResult.SetNearMatchArgs(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetFileItemId(), tagSearch.GetSourceDirs());
-		nearMatchMemberResult.Exec(*Session, true);
+		nearMatchMemberResult.Exec(Session, true);
 		matches = nearMatchMemberResult.Matches();			
 	}
 	return matches;
@@ -2062,7 +2062,7 @@ UnicodeString t4p::ParsedTagFinderClass::ParentClassName(const UnicodeString& fu
 	exactResult.Set(fullyQualifiedClassName, sourceDirs);
 	exactResult.SetFileTagId(fileTagId);
 	exactResult.SetTagType(t4p::PhpTagClass::CLASS);
-	exactResult.Exec(*Session, true);
+	exactResult.Exec(Session, true);
 	std::vector<t4p::PhpTagClass> matches = exactResult.Matches();
 	if (!matches.empty()) {
 		t4p::PhpTagClass tag = matches[0];
@@ -2081,7 +2081,7 @@ std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const Un
 
 	t4p::TraitTagResultClass traitResult;
 	traitResult.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
-	if (traitResult.Exec(*Session, false)) {
+	if (traitResult.Exec(Session, false)) {
 		while (traitResult.More()) {
 			traitResult.Next();
 			t4p::TraitTagClass trait = traitResult.TraitTag;
@@ -2149,14 +2149,14 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const 
 		t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 		t4p::FileTagResultClass fileTagResult;
 		fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), true, tagSearch.GetSourceDirs());
-		fileTagResult.Exec(*Session, true);
+		fileTagResult.Exec(Session, true);
 		allMatches = fileTagResult.MatchesAsTags();
 	}
 	else {
 		t4p::ExactNonMemberTagResultClass exactResult;
 		exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 		exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
-		exactResult.Exec(*Session, true);
+		exactResult.Exec(Session, true);
 		allMatches = exactResult.Matches();
 	}
 	return allMatches;
@@ -2168,7 +2168,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::T
 	exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()); 
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
-	exactResult.Exec(*Session, true);
+	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
 	
 	return allMatches;
@@ -2180,7 +2180,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p
 	exactResult.SetTagType(t4p::PhpTagClass::FUNCTION);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
-	exactResult.Exec(*Session, true);
+	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
 	
 	return allMatches;
@@ -2191,7 +2191,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetMethodType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
-	exactResult.Exec(*Session, true);
+	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
 	
 	return allMatches;
@@ -2202,7 +2202,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetPropertyType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
-	exactResult.Exec(*Session, true);
+	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
 	
 	return allMatches;
@@ -2236,12 +2236,9 @@ void t4p::ParsedTagFinderClass::EnsureMatchesExist(std::vector<t4p::PhpTagClass>
 }
 
 bool t4p::ParsedTagFinderClass::IsFileCacheEmpty() {
-	if (!IsInit()) {
-		return true;
-	}
 	int fileItemId = 0;
 	try {
-		Session->once << "SELECT file_item_id FROM file_items LIMIT 1;", soci::into(fileItemId);
+		Session.once << "SELECT file_item_id FROM file_items LIMIT 1;", soci::into(fileItemId);
 	} catch (std::exception& e) {
 		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
@@ -2251,14 +2248,11 @@ bool t4p::ParsedTagFinderClass::IsFileCacheEmpty() {
 }
 
 bool t4p::ParsedTagFinderClass::IsResourceCacheEmpty() {
-	if (!IsInit()) {
-		return true;
-	}
 
 	// make sure only parsed tag came from the native functions file.
 	int count = 0;
 	try {
-		Session->once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
+		Session.once << "SELECT COUNT(*) FROM resources WHERE is_native = 0;", soci::into(count);
 	} catch (std::exception& e) {
 		wxString msg = t4p::CharToWx(e.what());
 		wxUnusedVar(msg);
@@ -2275,9 +2269,6 @@ bool t4p::ParsedTagFinderClass::HasFullPath(const wxString& fullPath) {
 
 bool t4p::ParsedTagFinderClass::HasDir(const wxString& dir) {
 	bool foundDir = false;
-	if (!IsInit()) {
-		return foundDir;
-	}
 
 	// at this point we dont store directories in the db, we look for a file
 	// that contains the dir in question
@@ -2287,7 +2278,7 @@ bool t4p::ParsedTagFinderClass::HasDir(const wxString& dir) {
 	std::string query = t4p::WxToChar(dirName.GetPathWithSep() + wxT("%"));
 	std::string sql = "SELECT full_path FROM file_items WHERE full_path LIKE ? LIMIT 1";
 	try {
-		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
+		soci::statement stmt = (Session.prepare << sql, soci::use(query),
 			soci::into(result)
 		);
 		if (stmt.execute(true) && !result.empty()) {
@@ -2302,9 +2293,6 @@ bool t4p::ParsedTagFinderClass::HasDir(const wxString& dir) {
 }
 
 bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag) {
-	if (!IsInit()) {
-		return false;
-	}
 	int fileTagId;
 	std::tm lastModified;
 	int isParsed;
@@ -2314,7 +2302,7 @@ bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 	std::string query = t4p::WxToChar(fullPath);
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
-		soci::statement stmt = (Session->prepare << sql, soci::use(query), 
+		soci::statement stmt = (Session.prepare << sql, soci::use(query),
 			soci::into(fileTagId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
 		);
 		foundFile = stmt.execute(true);
@@ -2335,7 +2323,7 @@ bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::All() {
 	t4p::AllTagsResultClass result;
-	result.Exec(*Session, false);
+	result.Exec(Session, false);
 
 	// remove the 'duplicates' ie. extra fully qualified entries to make lookups faster
 	std::vector<t4p::PhpTagClass> all;
@@ -2356,8 +2344,8 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::All() {
 	return all;
 }
 
-t4p::ParsedTagFinderClass::ParsedTagFinderClass()
-	: SqliteFinderClass() {
+t4p::ParsedTagFinderClass::ParsedTagFinderClass(soci::session& session)
+	: SqliteFinderClass(session) {
 
 }
 
@@ -2365,7 +2353,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ClassesFunctionsDefines
 	std::vector<t4p::PhpTagClass> tags;
 	t4p::TopLevelTagInFileResultClass result;
 	result.Set(fullPath);
-	result.Exec(*Session, false);
+	result.Exec(Session, false);
 	tags = result.Matches();
 	return tags;
 }
@@ -2395,14 +2383,12 @@ bool t4p::ParsedTagFinderClass::FindById(int id, t4p::PhpTagClass& tag) {
 wxString t4p::ParsedTagFinderClass::SourceDirFromFile(int fileTagId) {
 	wxString sourcePath;
 	std::string stdSourcePath;
-	if (Session) {
-		soci::statement stmt = (Session->prepare <<
-			"SELECT directory FROM sources s JOIN file_items f ON(s.source_id = f.source_id) WHERE f.file_item_id = ?",
-			soci::use(fileTagId), soci::into(stdSourcePath)
-		);
-		if (stmt.execute(true)) {
-			sourcePath = t4p::CharToWx(stdSourcePath.c_str());
-		}
+	soci::statement stmt = (Session.prepare <<
+		"SELECT directory FROM sources s JOIN file_items f ON(s.source_id = f.source_id) WHERE f.file_item_id = ?",
+		soci::use(fileTagId), soci::into(stdSourcePath)
+	);
+	if (stmt.execute(true)) {
+		sourcePath = t4p::CharToWx(stdSourcePath.c_str());
 	}
 	return sourcePath;
 }

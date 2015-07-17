@@ -104,7 +104,7 @@ class UrlTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
 		
-	UrlTagFinderClass();
+	UrlTagFinderClass(soci::session& session);
 
 	/**
 	 * check to see if the given URL exists in the Urls list; if the URL

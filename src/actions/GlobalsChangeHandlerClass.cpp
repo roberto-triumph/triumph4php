@@ -55,9 +55,9 @@ void t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(t4p::ActionEventClas
 		}
 	}
 
-	t4p::DatabaseTagFinderClass finder;
+
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	finder.InitSession(&session);
+	t4p::DatabaseTagFinderClass finder(session);
 	std::vector<wxFileName> sourceDirectories = Globals.AllEnabledSourceDirectories();
 
 	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);

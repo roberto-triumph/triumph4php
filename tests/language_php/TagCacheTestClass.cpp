@@ -59,8 +59,7 @@ public:
 		, PhpFileExtensions()
 		, MiscFileExtensions()
 		, Matches() 
-		, SourceDirs()
-		, Session1(NULL) {
+		, SourceDirs() {
 		Search.Init(TestProjectDir);
 		PhpFileExtensions.push_back(wxT("*.php"));
 		
@@ -68,8 +67,6 @@ public:
 		if (!wxDirExists(TestProjectDir)) {
 			wxMkdir(TestProjectDir, 0777);
 		}
-		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
-		CreateDatabase(*Session1, t4p::ResourceSqlSchemaAsset());
 	}
 
 	void NearMatchTags(const UnicodeString& search) {
@@ -89,7 +86,7 @@ public:
 
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
-		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		wxFileName srcDir;
 		srcDir.AssignDir(TestProjectDir + srcDirectory);
@@ -192,7 +189,7 @@ public:
 
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
-		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 		
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
@@ -229,7 +226,7 @@ public:
 
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
-		cache->AdoptGlobalTag(Session1, PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
+		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
 			
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);

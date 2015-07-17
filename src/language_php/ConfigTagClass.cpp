@@ -56,8 +56,8 @@ wxString t4p::ConfigTagClass::MenuLabel() const {
 	return label;
 }
 
-t4p::ConfigTagFinderClass::ConfigTagFinderClass()
-: SqliteFinderClass() {
+t4p::ConfigTagFinderClass::ConfigTagFinderClass(soci::session& session)
+: SqliteFinderClass(session) {
 
 }
 
@@ -85,7 +85,7 @@ std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vecto
 	sql += ")";
 	
 	try {
-		soci::statement stmt = Session->prepare << sql;
+		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(label));
 		stmt.exchange(soci::into(fullPath)); 
 		for (size_t i = 0; i < stdSourceDirectories.size(); ++i) {
