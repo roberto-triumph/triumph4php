@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __CALLSTACKCLASS_H__
-#define __CALLSTACKCLASS_H__
+#ifndef __CALLSTACKCLASS_H
+#define __CALLSTACKCLASS_H
 
 #include <pelet/ParserClass.h>
 #include <language_php/TagCacheClass.h>

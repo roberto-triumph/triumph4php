@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_HTMLVIEWCLASS__
-#define __T4P_HTMLVIEWCLASS__
+#ifndef T4P_HTMLVIEWCLASS__
+#define T4P_HTMLVIEWCLASS__
 
 #include <views/FeatureViewClass.h>
 #include <code_control/CodeControlClass.h>
@@ -90,4 +90,4 @@ private:
 
 }
 
-#endif // __T4P_HTMLVIEWCLASS__
+#endif // T4P_HTMLVIEWCLASS__

@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_PHPFUNCTIONCALLLINTCLASS__
-#define __T4P_PHPFUNCTIONCALLLINTCLASS__
+#ifndef T4P_PHPFUNCTIONCALLLINTCLASS__
+#define T4P_PHPFUNCTIONCALLLINTCLASS__
 
 #include <language_php/ParsedTagFinderClass.h>
 #include <pelet/ParserClass.h>
@@ -195,4 +195,4 @@ private:
 
 }
 
-#endif // __T4P_PHPFUNCTINOCALLLINTCLASS__
+#endif // T4P_PHPFUNCTINOCALLLINTCLASS__

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef TEST_FEATURECLASS_H__
-#define TEST_FEATURECLASS_H__
+#ifndef TEST_FEATURECLASS_H
+#define TEST_FEATURECLASS_H
 
 #include <features/FeatureClass.h>
 

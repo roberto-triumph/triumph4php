@@ -28,8 +28,8 @@
 #include <pelet/TokenClass.h>
 #include <vector>
 
-#ifndef __T4P_RESOURCECACHEACTIONCLASS_H__
-#define __T4P_RESOURCECACHEACTIONCLASS_H__
+#ifndef T4P_RESOURCECACHEACTIONCLASS_H
+#define T4P_RESOURCECACHEACTIONCLASS_H
 
 namespace t4p {
 

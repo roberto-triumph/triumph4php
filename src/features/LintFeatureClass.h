@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __LINTFEATURECLASS_H__
-#define __LINTFEATURECLASS_H__
+#ifndef __LINTFEATURECLASS_H
+#define __LINTFEATURECLASS_H
 
 #include <vector>
 #include <features/FeatureClass.h>

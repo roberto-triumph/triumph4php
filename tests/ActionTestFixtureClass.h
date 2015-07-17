@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __ACTIONTESTFIXTURECLASS_H__ 
-#define __ACTIONTESTFIXTURECLASS_H__ 
+#ifndef __ACTIONTESTFIXTURECLASS_H 
+#define __ACTIONTESTFIXTURECLASS_H 
 
 #include <wx/event.h>
 #include <wx/filename.h>

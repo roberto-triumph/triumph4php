@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __FINDINFFILESFEATURECLASS_H__
-#define __FINDINFFILESFEATURECLASS_H__
+#ifndef __FINDINFFILESFEATURECLASS_H
+#define __FINDINFFILESFEATURECLASS_H
 
 /**
 @file
@@ -275,4 +275,4 @@ private:
 };
 
 }
-#endif // __FINDINFFILESFEATURECLASS_H__
+#endif // __FINDINFFILESFEATURECLASS_H

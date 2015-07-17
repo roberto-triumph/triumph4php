@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_SQLITERESULTCLASS_H__
-#define __T4P_SQLITERESULTCLASS_H__
+#ifndef T4P_SQLITERESULTCLASS_H
+#define T4P_SQLITERESULTCLASS_H
 
 #include <soci/soci.h>
 #include <wx/string.h>

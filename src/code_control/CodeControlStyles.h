@@ -22,8 +22,8 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CODECONTROLSTYLES_H
-#define __T4P_CODECONTROLSTYLES_H
+#ifndef T4P_CODECONTROLSTYLES_H
+#define T4P_CODECONTROLSTYLES_H
 
 #include <globals/CodeControlOptionsClass.h>
 

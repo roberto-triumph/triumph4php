@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef PROJECTVIEWCLASS_H__
-#define PROJECTVIEWCLASS_H__
+#ifndef PROJECTVIEWCLASS_H
+#define PROJECTVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/ProjectFeatureClass.h>

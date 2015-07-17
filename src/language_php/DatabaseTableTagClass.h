@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_DATABASETABLETAGCLASS_H
-#define __T4P_DATABASETABLETAGCLASS_H
+#ifndef T4P_DATABASETABLETAGCLASS_H
+#define T4P_DATABASETABLETAGCLASS_H
 
 #include <wx/string.h>
 
@@ -58,4 +58,4 @@ public:
 
 }
 
-#endif // __T4P_DATABASETABLETAGCLASS_H
+#endif // T4P_DATABASETABLETAGCLASS_H

@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_TOTALSEARCHFEATURECLASS_H__
-#define __T4P_TOTALSEARCHFEATURECLASS_H__
+#ifndef T4P_TOTALSEARCHFEATURECLASS_H
+#define T4P_TOTALSEARCHFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <actions/TotalTagSearchActionClass.h>

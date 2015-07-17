@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RESOURCEVIEWCLASS_H__
-#define __RESOURCEVIEWCLASS_H__
+#ifndef __RESOURCEVIEWCLASS_H
+#define __RESOURCEVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/TagFeatureClass.h>
@@ -312,4 +312,4 @@ private:
 };
 
 }
-#endif // __RESOURCEFEATURECLASS_H__
+#endif // __RESOURCEFEATURECLASS_H

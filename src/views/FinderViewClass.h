@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef T4P_FINDERVIEWCLASS_H__
-#define T4P_FINDERVIEWCLASS_H__
+#ifndef T4P_FINDERVIEWCLASS_H
+#define T4P_FINDERVIEWCLASS_H
 
 #include <views/wxformbuilder/FinderFeatureForms.h>
 #include <views/FeatureViewClass.h>

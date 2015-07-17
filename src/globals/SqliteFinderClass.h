@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_SQLITEFINDERCLASS_H__
-#define __T4P_SQLITEFINDERCLASS_H__
+#ifndef T4P_SQLITEFINDERCLASS_H
+#define T4P_SQLITEFINDERCLASS_H
 
 #include <globals/SqliteResultClass.h>
 

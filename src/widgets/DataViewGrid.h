@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_DATAVIEWGRID_H__
-#define __T4P_DATAVIEWGRID_H__
+#ifndef T4P_DATAVIEWGRID_H
+#define T4P_DATAVIEWGRID_H
 
 #include <wx/dataview.h>
 

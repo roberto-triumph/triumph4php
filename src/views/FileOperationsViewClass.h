@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef FILEOPERATIONSVIEWCLASS_H__
-#define FILEOPERATIONSVIEWCLASS_H__
+#ifndef FILEOPERATIONSVIEWCLASS_H
+#define FILEOPERATIONSVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/FileOperationsFeatureClass.h>

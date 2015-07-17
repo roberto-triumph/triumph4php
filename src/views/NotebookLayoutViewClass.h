@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef NOTEBOOKLAYOUTFEATUREVIEWCLASS_H__
-#define NOTEBOOKLAYOUTFEATUREVIEWCLASS_H__
+#ifndef NOTEBOOKLAYOUTFEATUREVIEWCLASS_H
+#define NOTEBOOKLAYOUTFEATUREVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/FeatureClass.h>

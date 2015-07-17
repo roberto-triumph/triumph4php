@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __DATABASETESTFIXTURECLASS_H__
-#define __DATABASETESTFIXTURECLASS_H__
+#ifndef __DATABASETESTFIXTURECLASS_H
+#define __DATABASETESTFIXTURECLASS_H
 
 #include <soci.h>
 #include <string>

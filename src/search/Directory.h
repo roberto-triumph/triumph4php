@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_DIRECTORY_H_
-#define __T4P_DIRECTORY_H_
+#ifndef T4P_DIRECTORY_H_
+#define T4P_DIRECTORY_H_
 
 #include <wx/string.h>
 

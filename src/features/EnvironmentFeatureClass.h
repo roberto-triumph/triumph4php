@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __ENVIRONMENTFEATURECLASS_H__
-#define __ENVIRONMENTFEATURECLASS_H__
+#ifndef __ENVIRONMENTFEATURECLASS_H
+#define __ENVIRONMENTFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <features/BackgroundFileReaderClass.h>
@@ -119,4 +119,4 @@ private:
 };
 
 }
-#endif // __ENVIRONMENTFEATURECLASS_H__
+#endif // __ENVIRONMENTFEATURECLASS_H

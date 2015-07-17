@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RUNCONSOLEFEATURECLASS_H__
-#define __RUNCONSOLEFEATURECLASS_H__
+#ifndef __RUNCONSOLEFEATURECLASS_H
+#define __RUNCONSOLEFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
@@ -153,4 +153,4 @@ private:
 };
 
 }
-#endif // __RUNCONSOLEFEATURECLASS_H__
+#endif // __RUNCONSOLEFEATURECLASS_H

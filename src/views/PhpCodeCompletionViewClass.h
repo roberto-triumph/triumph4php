@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_PHPCODECOMPLETIONVIEWCLASS_H__
-#define __T4P_PHPCODECOMPLETIONVIEWCLASS_H__
+#ifndef T4P_PHPCODECOMPLETIONVIEWCLASS_H
+#define T4P_PHPCODECOMPLETIONVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/PhpCodeCompletionFeatureClass.h>
@@ -246,4 +246,4 @@ private:
 
 }
 
-#endif // __T4P_PHPCODECOMPLETIONVIEWCLASS_H__
+#endif // T4P_PHPCODECOMPLETIONVIEWCLASS_H

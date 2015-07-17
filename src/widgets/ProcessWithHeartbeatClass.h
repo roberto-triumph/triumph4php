@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __PROCESSWITHHEARTBEATCLASS_H__
-#define __PROCESSWITHHEARTBEATCLASS_H__
+#ifndef __PROCESSWITHHEARTBEATCLASS_H
+#define __PROCESSWITHHEARTBEATCLASS_H
 
 #include <wx/event.h>
 #include <wx/timer.h>

@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef T4P_FINDINFFILESVIEWCLASS_H__
-#define T4P_FINDINFFILESVIEWCLASS_H__
+#ifndef T4P_FINDINFFILESVIEWCLASS_H
+#define T4P_FINDINFFILESVIEWCLASS_H
 
 #include <views/wxformbuilder/FindInFilesFeatureForms.h>
 #include <features/FindInFilesFeatureClass.h>
@@ -357,4 +357,4 @@ private:
 };
 
 }
-#endif // __FINDINFFILESFEATURECLASS_H__
+#endif // __FINDINFFILESFEATURECLASS_H

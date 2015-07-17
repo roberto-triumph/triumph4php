@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_TREEITEMDATASTRINGCLASS_H__
-#define __T4P_TREEITEMDATASTRINGCLASS_H__
+#ifndef T4P_TREEITEMDATASTRINGCLASS_H
+#define T4P_TREEITEMDATASTRINGCLASS_H
 
 #include <wx/string.h>
 #include <wx/treectrl.h>

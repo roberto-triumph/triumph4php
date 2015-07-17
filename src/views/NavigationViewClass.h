@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_NAVIGATIONVIEWCLASS_H__
-#define __T4P_NAVIGATIONVIEWCLASS_H__
+#ifndef T4P_NAVIGATIONVIEWCLASS_H
+#define T4P_NAVIGATIONVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/NavigationViewForms.h>
@@ -125,4 +125,4 @@ private:
 
 }
 
-#endif // __T4P_NAVIGATIONVIEWCLASS_H__
+#endif // T4P_NAVIGATIONVIEWCLASS_H

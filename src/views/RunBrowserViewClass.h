@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RUNBROWSERVIEWCLASS_H__
-#define __RUNBROWSERVIEWCLASS_H__
+#ifndef __RUNBROWSERVIEWCLASS_H
+#define __RUNBROWSERVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/RunBrowserFeatureClass.h>

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_RECENTFILESVIEWCLASS_H__
-#define __T4P_RECENTFILESVIEWCLASS_H__
+#ifndef T4P_RECENTFILESVIEWCLASS_H
+#define T4P_RECENTFILESVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 #include <features/RecentFilesFeatureClass.h>

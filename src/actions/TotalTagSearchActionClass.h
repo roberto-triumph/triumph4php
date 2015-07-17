@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_TOTALTAGSEARCHACTIONCLASS_H__
-#define __T4P_TOTALTAGSEARCHACTIONCLASS_H__
+#ifndef T4P_TOTALTAGSEARCHACTIONCLASS_H
+#define T4P_TOTALTAGSEARCHACTIONCLASS_H
 
 #include <wx/event.h>
 #include <actions/ActionClass.h>
@@ -193,4 +193,4 @@ private:
 
 }
 
-#endif // __T4P_TOTALTAGSEARCHACTIONCLASS_H__
+#endif // T4P_TOTALTAGSEARCHACTIONCLASS_H

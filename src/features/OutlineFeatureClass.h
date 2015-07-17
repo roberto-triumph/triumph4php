@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef OUTLINE_VIEW_FEATURECLASS_H__
-#define OUTLINE_VIEW_FEATURECLASS_H__
+#ifndef OUTLINE_VIEW_FEATURECLASS_H
+#define OUTLINE_VIEW_FEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <globals/Events.h>

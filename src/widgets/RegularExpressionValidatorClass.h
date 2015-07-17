@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __FINDERVALIDATORCLASS_H__
-#define __FINDERVALIDATORCLASS_H__
+#ifndef __FINDERVALIDATORCLASS_H
+#define __FINDERVALIDATORCLASS_H
 
 #include <wx/validate.h>
 #include <wx/radiobox.h>

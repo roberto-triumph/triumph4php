@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_CHECKS_H__
-#define __T4P_CHECKS_H__
+#ifndef T4P_CHECKS_H
+#define T4P_CHECKS_H
 
 #include <wx/string.h> // so that UnitTest++ can compare wxStrings by their content
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++

@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLTIPFEATURECLASS_H__
-#define __T4P_CALLTIPFEATURECLASS_H__
+#ifndef T4P_CALLTIPFEATURECLASS_H
+#define T4P_CALLTIPFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <views/wxformbuilder/DocCommentFeatureForms.h>

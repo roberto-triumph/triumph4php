@@ -22,8 +22,8 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_SQLMETADATAACTIONCLASS_H__
-#define __T4P_SQLMETADATAACTIONCLASS_H__
+#ifndef T4P_SQLMETADATAACTIONCLASS_H
+#define T4P_SQLMETADATAACTIONCLASS_H
 
 #include <wx/event.h>
 #include <vector>

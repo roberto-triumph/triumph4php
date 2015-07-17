@@ -22,8 +22,8 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef T4P_CHANGELOGVIEWCLASS_H__
-#define T4P_CHANGELOGVIEWCLASS_H__
+#ifndef T4P_CHANGELOGVIEWCLASS_H
+#define T4P_CHANGELOGVIEWCLASS_H
 
 #include <views/FeatureViewClass.h>
 

@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_FILETYPEIMAGELIST_H__
-#define __T4P_FILETYPEIMAGELIST_H__
+#ifndef T4P_FILETYPEIMAGELIST_H
+#define T4P_FILETYPEIMAGELIST_H
 
 #include <wx/imaglist.h>
 #include <wx/filename.h>

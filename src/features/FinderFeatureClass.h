@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_FINDERFEATURECLASS_H_
-#define __T4P_FINDERFEATURECLASS_H_
+#ifndef T4P_FINDERFEATURECLASS_H_
+#define T4P_FINDERFEATURECLASS_H_
 
 #include <search/FinderClass.h>
 #include <features/FeatureClass.h>
@@ -142,4 +142,4 @@ public:
 };
 
 }
-#endif /*__T4P_FINDERFEATURECLASS_H_*/
+#endif /*T4P_FINDERFEATURECLASS_H_*/

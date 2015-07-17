@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
  
-#ifndef __T4P_FILETYPECLASS_H__
-#define __T4P_FILETYPECLASS_H__
+#ifndef T4P_FILETYPECLASS_H
+#define T4P_FILETYPECLASS_H
 
 #include <wx/string.h>
 #include <vector>
@@ -195,4 +195,4 @@ public:
 
 }
 
-#endif // __T4P_FILETYPECLASS_H__
+#endif // T4P_FILETYPECLASS_H

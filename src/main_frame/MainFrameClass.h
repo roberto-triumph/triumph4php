@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_MAINFRAMECLASS_H_
-#define __T4P_MAINFRAMECLASS_H_
+#ifndef T4P_MAINFRAMECLASS_H_
+#define T4P_MAINFRAMECLASS_H_
 
 #include <globals/ProjectClass.h>
 #include <main_frame/wxformbuilder/MainFrameForms.h>
@@ -304,4 +304,4 @@ private:
 };
 
 }
-#endif // __T4P_MAINFRAMECLASS_H_
+#endif // T4P_MAINFRAMECLASS_H_

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RUNBROWSERFEATURECLASS_H__
-#define __RUNBROWSERFEATURECLASS_H__
+#ifndef __RUNBROWSERFEATURECLASS_H
+#define __RUNBROWSERFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <language_php/UrlTagClass.h>

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_CALLSTACKACTIONCLASS_H__
-#define __T4P_CALLSTACKACTIONCLASS_H__
+#ifndef T4P_CALLSTACKACTIONCLASS_H
+#define T4P_CALLSTACKACTIONCLASS_H
 
 #include <actions/GlobalActionClass.h>
 #include <language_php/CallStackClass.h>

@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
  
-#ifndef __T4P_LISTWIDGET__
-#define __T4P_LISTWIDGET__
+#ifndef T4P_LISTWIDGET__
+#define T4P_LISTWIDGET__
 
 #include <wx/listctrl.h>
 #include <wx/string.h>

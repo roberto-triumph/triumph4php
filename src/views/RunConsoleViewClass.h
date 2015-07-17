@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __RUNCONSOLEVIEWCLASS_H__
-#define __RUNCONSOLEVIEWCLASS_H__
+#ifndef __RUNCONSOLEVIEWCLASS_H
+#define __RUNCONSOLEVIEWCLASS_H
 
 #include <views/wxformbuilder/RunConsoleFeatureForms.h>
 #include <views/FeatureViewClass.h>
@@ -361,4 +361,4 @@ private:
 };
 
 }
-#endif // __RUNCONSOLEFEATURECLASS_H__
+#endif // __RUNCONSOLEFEATURECLASS_H

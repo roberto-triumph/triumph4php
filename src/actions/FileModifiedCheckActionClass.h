@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_FILEMODFIIEDCHECKACTIONCLASS_H__
-#define __T4P_FILEMODFIIEDCHECKACTIONCLASS_H__
+#ifndef T4P_FILEMODFIIEDCHECKACTIONCLASS_H
+#define T4P_FILEMODFIIEDCHECKACTIONCLASS_H
 
 #include <actions/ActionClass.h>
 #include <wx/filename.h>

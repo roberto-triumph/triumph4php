@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_JAVASCRIPTVIEWCLASS__
-#define __T4P_JAVASCRIPTVIEWCLASS__
+#ifndef T4P_JAVASCRIPTVIEWCLASS__
+#define T4P_JAVASCRIPTVIEWCLASS__
 
 #include <views/FeatureViewClass.h>
 #include <code_control/CodeControlClass.h>
@@ -91,4 +91,4 @@ private:
 
 }
 
-#endif // __T4P_JAVASCRIPTVIEWCLASS__
+#endif // T4P_JAVASCRIPTVIEWCLASS__

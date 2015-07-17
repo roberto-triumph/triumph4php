@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_PHPLINTERRORCLASS__
-#define __T4P_PHPLINTERRORCLASS__
+#ifndef T4P_PHPLINTERRORCLASS__
+#define T4P_PHPLINTERRORCLASS__
 
 namespace t4p {
 
@@ -41,5 +41,5 @@ private:
 
 }
 
-#endif // __T4P_PHPLINTERRORCLASS__
+#endif // T4P_PHPLINTERRORCLASS__
 

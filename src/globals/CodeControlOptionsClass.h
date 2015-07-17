@@ -28,8 +28,8 @@
 #include <wx/config.h>
 #include <vector>
 
-#ifndef __CODECONTROLLASS_H___
-#define __CODECONTROLLASS_H___
+#ifndef __CODECONTROLLASS_H_
+#define __CODECONTROLLASS_H_
 
 namespace t4p {
 

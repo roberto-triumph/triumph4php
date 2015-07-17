@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __LINTVIEWCLASS_H__
-#define __LINTVIEWCLASS_H__
+#ifndef __LINTVIEWCLASS_H
+#define __LINTVIEWCLASS_H
 
 #include <vector>
 #include <views/FeatureViewClass.h>

@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_NOTEBOOKCLASS_H_
-#define __T4P_NOTEBOOKCLASS_H_
+#ifndef T4P_NOTEBOOKCLASS_H_
+#define T4P_NOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
 #include <wx/wx.h>
@@ -417,4 +417,4 @@ private:
 };
 
 }
-#endif /*__T4P_NOTEBOOKCLASS_H_*/
+#endif /*T4P_NOTEBOOKCLASS_H_*/

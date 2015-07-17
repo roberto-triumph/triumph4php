@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __BACKGROUNDFILEREADER_H__
-#define __BACKGROUNDFILEREADER_H__
+#ifndef __BACKGROUNDFILEREADER_H
+#define __BACKGROUNDFILEREADER_H
 
 #include <wx/string.h>
 #include <wx/event.h>

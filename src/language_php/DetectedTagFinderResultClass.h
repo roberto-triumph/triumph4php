@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_DETECTEDTAGFINDERCLASS_H__
-#define __T4P_DETECTEDTAGFINDERCLASS_H__
+#ifndef T4P_DETECTEDTAGFINDERCLASS_H
+#define T4P_DETECTEDTAGFINDERCLASS_H
 
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>

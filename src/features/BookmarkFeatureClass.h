@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P__BOOKMARKFEATURECLASS_H__
-#define __T4P__BOOKMARKFEATURECLASS_H__
+#ifndef T4P__BOOKMARKFEATURECLASS_H
+#define T4P__BOOKMARKFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 
@@ -106,4 +106,4 @@ public:
 
 }
 
-#endif // __T4P__BOOKMARKFEATURECLASS_H__
+#endif // T4P__BOOKMARKFEATURECLASS_H

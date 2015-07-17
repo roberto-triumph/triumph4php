@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef SQL_EDITOR_FEATURECLASS_H__
-#define SQL_EDITOR_FEATURECLASS_H__
+#ifndef SQL_EDITOR_FEATURECLASS_H
+#define SQL_EDITOR_FEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <globals/ProjectClass.h>

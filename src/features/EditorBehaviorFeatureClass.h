@@ -22,8 +22,8 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_EDITORFEATURECLASS_H__
-#define __T4P_EDITORFEATURECLASS_H__
+#ifndef T4P_EDITORFEATURECLASS_H
+#define T4P_EDITORFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <globals/CodeControlOptionsClass.h>
@@ -134,4 +134,4 @@ private:
 
 }
 
-#endif // __T4P_EDITORFEATURECLASS_H__
+#endif // T4P_EDITORFEATURECLASS_H

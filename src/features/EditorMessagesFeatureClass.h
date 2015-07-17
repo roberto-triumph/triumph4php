@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __EDITORMESSAGESFEATURECLASS_H__
-#define __EDITORMESSAGESFEATURECLASS_H__
+#ifndef __EDITORMESSAGESFEATURECLASS_H
+#define __EDITORMESSAGESFEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <wx/log.h>

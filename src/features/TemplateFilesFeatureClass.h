@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __TEMPLATEFILES_FEATURECLASS_H__
-#define __TEMPLATEFILES_FEATURECLASS_H__
+#ifndef __TEMPLATEFILES_FEATURECLASS_H
+#define __TEMPLATEFILES_FEATURECLASS_H
 
 #include <features/FeatureClass.h>
 #include <language_php/TemplateFileTagClass.h>

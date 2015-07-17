@@ -22,8 +22,8 @@
  * @copyright  2012 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __T4P_SEQUENCECLASS_H__
-#define __T4P_SEQUENCECLASS_H__
+#ifndef T4P_SEQUENCECLASS_H
+#define T4P_SEQUENCECLASS_H
 
 #include <globals/GlobalsClass.h>
 #include <actions/GlobalActionClass.h>

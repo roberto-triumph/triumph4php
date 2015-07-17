@@ -22,8 +22,8 @@
  * @copyright  2013 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __SQLITETESTFIXTURECLASS_H__
-#define __SQLITETESTFIXTURECLASS_H__
+#ifndef __SQLITETESTFIXTURECLASS_H
+#define __SQLITETESTFIXTURECLASS_H
 
 #include <soci.h>
 #include <string>

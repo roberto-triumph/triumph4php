@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-#ifndef __SQLLEXICALANALYERCLASS_H__
-#define __SQLLEXICALANALYERCLASS_H__
+#ifndef __SQLLEXICALANALYERCLASS_H
+#define __SQLLEXICALANALYERCLASS_H
 
 #include <pelet/UCharBufferedFileClass.h>
 #include <unicode/unistr.h>

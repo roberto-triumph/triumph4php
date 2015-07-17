@@ -23,8 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-#ifndef __T4P_SYNTAXHIGHLIGHTVIEWCLASS_H__
-#define __T4P_SYNTAXHIGHLIGHTVIEWCLASS_H__
+#ifndef T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
+#define T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
 
 #include <globals/Events.h>
 #include <views/FeatureViewClass.h>
@@ -143,4 +143,4 @@ private:
 
 }
 
-#endif // __T4P_SYNTAXHIGHLIGHTVIEWCLASS_H__
+#endif // T4P_SYNTAXHIGHLIGHTVIEWCLASS_H

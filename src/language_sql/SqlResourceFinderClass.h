@@ -22,8 +22,8 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #ifndef _SQLRESOURCEFINDERCLASS_H__
- #define _SQLRESOURCEFINDERCLASS_H__
+ #ifndef _SQLRESOURCEFINDERCLASS_H
+ #define _SQLRESOURCEFINDERCLASS_H
  
  #include <language_sql/DatabaseTagClass.h>
  #include <unicode/unistr.h>
