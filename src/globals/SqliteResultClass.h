@@ -33,8 +33,32 @@ namespace t4p {
 
 /**
  * Generic class that will encapsulate a single query, the prepared statement,
- * and the result. Subclassses will override the Exec() method and
- * create a statement for a query.
+ * and the result. Subclassses will override the DoPrepare(), DoBind(), and Next()
+ * methods in order to create specific queries.
+ *
+ * Usage
+ * -----
+ *
+ * There are 2 ways of using a SqliteResultClass
+ * 1. Use Exec(); this method creates a prepared statement and executes the
+ *    query in one shot
+ * 2. Call Init(), then call ReExec(); Init() creates a prepared statement
+ *    and ReExec changes the varaibles bound to the result set. This way
+ *    of using a SqliteResult ensures that a prepared statement is only
+ *    created once and re-used multiple times; this is the preferred method
+ *    to perform many lookup queries.
+ *
+ * Result Rows Iteration
+ * ---------------------
+ * Call More() as the loop condition, then Next() to get the results into
+ * the bound variables; like so:
+ *
+ *   while (result.More()) {
+ *     result.Next();
+ *     // at this this point the variables bound to the soci
+ *     // statement have been updated and can be used
+ *   }
+ *
  */
 class SqliteResultClass {
 
@@ -45,7 +69,7 @@ public:
 
 	/**
 	 * initializes this result by preparing the statement. Init
-	 * creates the statement in an exception-safe manner (no execeptions
+	 * creates the statement in an exception-safe manner (no exceptions
 	 * are thrown from this method)
 	 *
 	 * @param session the connection.  must be around for as long as this result is alive.
@@ -89,7 +113,7 @@ public:
 
 	/**
 	 * Executes the prepared statement again
-	 * This will be called if the variables that were bound to the
+	 * This should be called if the variables that were bound to the
 	 * statement were changed and the query need to be executed again
 	 *
 	 * @param error out parameter, will be set to the error message if one is encountered

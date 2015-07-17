@@ -24,7 +24,8 @@
  */
 #ifndef T4P_FILETAGS_H
 #define T4P_FILETAGS_H
- 
+
+#include <language_php/PhpTagClass.h>
 #include <wx/filename.h>
 #include <soci/soci.h>
 #include <vector>
@@ -42,6 +43,17 @@ namespace t4p {
 	 * @return list of file_item_id the file IDs for all files that are in the given directories
 	 */
 	std::vector<int> FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg);
+
+	/**
+	 * Inserts a file_items row into the database. No checks for duplicates
+	 * are made; the db is assumed to already contain the table. Upon success,
+	 * the newly created file_item_id is set on the tag instance.
+	 *
+	 * @param session the db connection to insert the file item to
+	 * @param fileTag the file tag to insert
+	 * @return bool TRUE if INSERT succeeded
+	 */
+	bool FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag);
 
 }
 #endif

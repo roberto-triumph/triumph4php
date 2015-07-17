@@ -42,7 +42,7 @@ public:
 		Source2;
 
 	DetectorDbTestFixtureClass() 
-		: SqliteTestFixtureClass()
+		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DetectorTagSession()
 		, DetectorDb()
 		, Source1() 

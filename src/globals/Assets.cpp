@@ -78,6 +78,14 @@ wxFileName t4p::ResourceSqlSchemaAsset() {
 	return sqlFile;
 }
 
+wxFileName t4p::JsTagsSqlSchemaAsset() {
+	wxFileName asset = AssetRootDir();
+    asset.AppendDir(wxT("sql"));
+
+	wxFileName sqlFile(asset.GetPath(), wxT("js_tags.sql"));
+	return sqlFile;
+}
+
 wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
 		wxImage::AddHandler(new wxXPMHandler);	

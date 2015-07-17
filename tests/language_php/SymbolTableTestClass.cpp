@@ -103,7 +103,7 @@ public:
 	soci::session* DetectedTagSession;
 
 	SymbolTableCompletionTestClass()
-		: SqliteTestFixtureClass()
+		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, CompletionSymbolTable()
 		, Scope()
 		, ParsedVariable(Scope)

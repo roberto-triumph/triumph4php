@@ -47,7 +47,7 @@ public:
 	
 	PhpFunctionCallLintTestFixtureClass()
 	: FileTestFixtureClass(wxT("php-function-call-lint"))
-	, SqliteTestFixtureClass() 
+	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()

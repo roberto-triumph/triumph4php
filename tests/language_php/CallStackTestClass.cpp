@@ -45,7 +45,7 @@ public:
 	
 	CallStackFixtureTestClass()
 		: FileTestFixtureClass(wxT("call_stack")) 
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache() 
 		, CallStack(TagCache)
 		, PhpFileExtensions() 

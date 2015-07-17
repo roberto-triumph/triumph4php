@@ -31,23 +31,29 @@
 
 static std::string ResourceSchemaSql = "";
 static std::string DetectorSchemaSql = "";
+static std::string JsTagsSchemaSql = "";
  
-SqliteTestFixtureClass::SqliteTestFixtureClass()
+SqliteTestFixtureClass::SqliteTestFixtureClass(const wxFileName& sqlScriptFile)
 	: Session()
 	, ConnectionString(":memory:") {
 	Session.open(*soci::factory_sqlite3(), ConnectionString);
-	CreateDatabase(Session, t4p::ResourceSqlSchemaAsset());
+	CreateDatabase(Session, sqlScriptFile);
 }
 
 void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFileName& sqlScriptFile) {
 	std::string schemaSql;
-	wxASSERT_MSG(sqlScriptFile == t4p::ResourceSqlSchemaAsset() || sqlScriptFile == t4p::DetectorSqlSchemaAsset(), 
-		wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() from Assets.h"));
+	wxASSERT_MSG(sqlScriptFile == t4p::ResourceSqlSchemaAsset() ||
+		sqlScriptFile == t4p::DetectorSqlSchemaAsset() ||
+		sqlScriptFile == t4p::JsTagsSqlSchemaAsset(),
+		wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() t4p::JsTagsSqlSchemaAsset() from Assets.h"));
 	if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
 		schemaSql = ResourceSchemaSql;
 	}
-	else {
+	else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
 		schemaSql = DetectorSchemaSql;
+	}
+	else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+		schemaSql = JsTagsSchemaSql;
 	}
 
 	if (schemaSql.empty()) {
@@ -62,9 +68,13 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 			ResourceSchemaSql = t4p::WxToChar(sql);
 			schemaSql = ResourceSchemaSql;
 		}
-		else {
+		else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
 			DetectorSchemaSql = t4p::WxToChar(sql);
 			schemaSql = DetectorSchemaSql;
+		}
+		else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+			JsTagsSchemaSql = t4p::WxToChar(sql);
+			schemaSql = JsTagsSchemaSql;
 		}
 	}
 	try {

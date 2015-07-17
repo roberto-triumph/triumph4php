@@ -48,7 +48,7 @@ public:
 
 	SqliteFixtureClass()
 		: FileTestFixtureClass(wxT("sqlite"))
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, EmptySession(*soci::factory_sqlite3(), ":memory:") {
 		ScriptFileName.Assign(TestProjectDir, wxT("script.sql"));
 	}

@@ -47,7 +47,7 @@ public:
 	SqlMetaDataActionTestFixtureClass()
 		: ActionTestFixtureClass()
 		, DatabaseTestFixtureClass("metadata_fetch") 
-		, SqliteTestFixtureClass() 
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, FileTestFixtureClass(wxT("metadata_fetch"))
 		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
 		, Results() {

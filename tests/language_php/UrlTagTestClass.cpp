@@ -43,7 +43,7 @@ public:
 	int SourceId;
 
 	UrlTagFixtureClass()
-		: SqliteTestFixtureClass()
+		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, Finder() 
 		, SourceDirs() 
 		, SourceId(0) {

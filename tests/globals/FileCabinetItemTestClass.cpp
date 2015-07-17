@@ -25,6 +25,7 @@
 #include <UnitTest++.h>
 #include <TriumphChecks.h>
 #include <SqliteTestFixtureClass.h>
+#include <globals/Assets.h>
 #include <globals/FileCabinetItemClass.h>
 #include <globals/SqliteFinderClass.h>
 #include <globals/String.h>
@@ -36,7 +37,7 @@ class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 public:
 
 	FileCabinetFixtureClass() 
-	: SqliteTestFixtureClass()
+	: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, SqliteFinder()
 	, AllResults() {
 		SqliteFinder.InitSession(&Session);

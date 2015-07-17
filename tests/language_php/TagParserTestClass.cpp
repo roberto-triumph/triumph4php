@@ -37,7 +37,7 @@ public:
 	t4p::TagParserClass TagParser;
 
 	TagParserTestFixtureClass() 
-		: SqliteTestFixtureClass()
+		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser() {
 		TagParser.Init(&Session);
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));

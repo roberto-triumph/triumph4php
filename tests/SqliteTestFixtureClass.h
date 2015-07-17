@@ -37,7 +37,11 @@ class SqliteTestFixtureClass {
 
 public:
 
-	SqliteTestFixtureClass();
+	/**
+	 * @param sqlScriptFile the file that contains the CREATE table statements
+	 *        to seed the database.
+	 */
+	SqliteTestFixtureClass(const wxFileName& sqlScriptFile);
 	
 	/**
 	 * cleans up the database

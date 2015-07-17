@@ -23,6 +23,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <language_php/FileTags.h>
+#include <globals/Sqlite.h>
 #include <globals/String.h>
 #include <algorithm>
 
@@ -60,4 +61,44 @@ std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vecto
 	std::vector<int>::iterator it = std::unique(fileTagIds.begin(), fileTagIds.end());
 	fileTagIds.erase(it, fileTagIds.end());
 	return fileTagIds;
+}
+
+bool t4p::FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag) {
+	std::string fullPath = t4p::WxToChar(fileTag.FullPath);
+	std::string name = t4p::WxToChar(fileTag.Name());
+	std::tm tm;
+	int isParsed = fileTag.IsParsed ? 1 : 0;
+	int isNew = fileTag.IsNew ? 1 : 0;
+	int sourceId = fileTag.SourceId;
+	if (fileTag.DateTime.IsValid()) {
+		wxDateTime::Tm wxTm = fileTag.DateTime.GetTm();
+		tm.tm_hour = wxTm.hour;
+		tm.tm_isdst = fileTag.DateTime.IsDST();
+		tm.tm_mday = wxTm.mday;
+		tm.tm_min = wxTm.min;
+		tm.tm_mon = wxTm.mon;
+		tm.tm_sec = wxTm.sec;
+		tm.tm_wday = fileTag.DateTime.GetWeekDay();
+		tm.tm_yday = fileTag.DateTime.GetDayOfYear();
+
+		// tm holds number of years since 1900 (2012 = 112)
+		tm.tm_year = wxTm.year - 1900;
+	}
+	bool success = false;
+	try {
+		soci::statement stmt = (session.prepare <<
+			"INSERT INTO file_items (file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?, ?)",
+			soci::use(sourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew)
+		);
+		stmt.execute(true);
+		fileTag.FileId = t4p::SqliteInsertId(stmt);
+		success = true;
+	} catch (std::exception& e) {
+
+		// ATTN: at some point bubble these exceptions up?
+		// to avoid unreferenced local variable warnings in MSVC
+		wxString msg = wxString::FromAscii(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+	return success;
 }

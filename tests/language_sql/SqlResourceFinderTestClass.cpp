@@ -42,7 +42,7 @@ public:
 
 	MysqlResourceFinderFixtureClass() 
 		: DatabaseTestFixtureClass("sql_resource_finder") 
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(SqliteTestFixtureClass::Session)
 		, Finder() {
@@ -70,7 +70,7 @@ public:
 
 	SqliteResourceFinderFixtureClass() 
 		: FileTestFixtureClass("sql_resource_finder") 
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(Session)
 		, Finder() 

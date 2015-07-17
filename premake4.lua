@@ -406,6 +406,7 @@ solution "triumph4php"
 			"src/actions/*.cpp",
 			"src/language_php/*.cpp",
 			"src/language_sql/*.cpp",
+			"src/language_js/*.cpp",
 			"src/search/*.cpp",
 			"src/widgets/ProcessWithHeartbeatClass.cpp",
 			"lib/pelet/src/*.cpp"

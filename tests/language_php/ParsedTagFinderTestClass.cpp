@@ -50,7 +50,7 @@ class ParsedTagFinderFileTestClass : public FileTestFixtureClass, public SqliteT
 public:	
 	ParsedTagFinderFileTestClass() 
 		: FileTestFixtureClass(wxT("tag_finder"))
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
 		, ParsedTagFinder()
 		, TestFile(wxT("test.php")) {
@@ -125,7 +125,7 @@ public:
 class ParsedTagFinderMemoryTestClass : public SqliteTestFixtureClass {
 public:	
 	ParsedTagFinderMemoryTestClass() 
-		: SqliteTestFixtureClass()
+		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
 		, ParsedTagFinder()
 		, TestFile(wxT("test.php"))

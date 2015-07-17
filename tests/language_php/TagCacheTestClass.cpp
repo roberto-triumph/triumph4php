@@ -53,7 +53,7 @@ public:
 
 	RegisterTestFixtureClass()
 		: FileTestFixtureClass(wxT("resource-cache"))
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache()
 		, Search() 
 		, PhpFileExtensions()
@@ -139,7 +139,7 @@ public:
 	
 	ExpressionCompletionMatchesFixtureClass() 
 		: FileTestFixtureClass(wxT("tag-cache"))
-		, SqliteTestFixtureClass()
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache()
 		, GlobalFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("global.php"))
 		, File1(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"))
@@ -216,7 +216,7 @@ public:
 
 	TagCacheSearchFixtureClass()
 		: FileTestFixtureClass(wxT("tag-cache"))
-		, SqliteTestFixtureClass() 
+		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache() 
 		, Search() 
 		, PhpFileExtensions() 

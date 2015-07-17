@@ -53,7 +53,7 @@ public:
 
 	PhpVariableLintTestFixtureClass() 
 	: FileTestFixtureClass(wxT("variable_lint")) 
-	, SqliteTestFixtureClass()
+	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()

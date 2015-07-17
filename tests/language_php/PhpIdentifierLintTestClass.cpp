@@ -53,7 +53,7 @@ public:
 
 	PhpIdentifierLintTestFixtureClass() 
 	: FileTestFixtureClass(wxT("identifier_lint")) 
-	, SqliteTestFixtureClass()
+	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()

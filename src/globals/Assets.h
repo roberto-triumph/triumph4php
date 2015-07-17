@@ -43,6 +43,11 @@ wxFileName NativeFunctionsAsset();
 wxFileName ResourceSqlSchemaAsset();
 
 /**
+ * @return the file location of the SQL script to create the JS tags database.
+ */
+wxFileName JsTagsSqlSchemaAsset();
+
+/**
  * @param the name of an image, minus the .xpm extension
  * @return the loaded bitmap of the given auto complete image.  The image name must exist; if it
  * does not an assertion is triggered.
