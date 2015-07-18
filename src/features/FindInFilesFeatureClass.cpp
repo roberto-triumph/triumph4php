@@ -166,7 +166,7 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 				hits.push_back(hit);
 
 			}
-			while (!destroy && FindInFiles.FindNext());
+			while (!destroy && FindInFiles.FindNext()); // NOLINT
 			if (!destroy && !hits.empty()) {
 
 				// PostEvent will change the ID of the event to the correct
