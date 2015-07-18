@@ -92,11 +92,11 @@ bool t4p::FinderClass::FindNext(const UnicodeString& text, int32_t start) {
 
 bool t4p::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
 	bool found = false;
-	if(t4p::FinderClass::EXACT == Mode) {
+	if (t4p::FinderClass::EXACT == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, true);
 	}
-	else if(t4p::FinderClass::CASE_INSENSITIVE == Mode) {
+	else if (t4p::FinderClass::CASE_INSENSITIVE == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, false);
 	}

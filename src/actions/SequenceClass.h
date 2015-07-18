@@ -220,7 +220,7 @@ typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(t4p::SequencePr
 #define EVT_SEQUENCE_PROGRESS(fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SEQUENCE_PROGRESS, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( SequenceProgressEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(SequenceProgressEventClassFunction, & fn), (wxObject *) NULL),
 
 
 }

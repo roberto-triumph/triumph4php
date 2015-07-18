@@ -51,8 +51,7 @@ public:
 
 		// all tests will need a file to resolve
 		CreateFixtureFile(PhpFile, wxString::FromAscii(
-			"<?php"
-		));
+			"<?php"));
 	}
 
 	/**
@@ -79,8 +78,7 @@ public:
 			"ServerRoot \"/etc/apache2\" \n"
 			"NameVirtualHost *:8080 \n"
 			"DocumentRoot \"") + TestProjectDir + wxString::FromAscii("\" \n"
-			"Listen 8080 \n"
-		));
+			"Listen 8080 \n"));
 	}
 
 	/**
@@ -101,8 +99,7 @@ public:
 			"  ServerName localhost.testing.com\n"
 			"  DocumentRoot ") + documentRoot + wxString::FromAscii("\n"
 			"  CustomLog /var/log/apache2/access.log combined\n"
-			"</VirtualHost>\n"
-		));
+			"</VirtualHost>\n"));
 	}
 
 	/**
@@ -116,8 +113,7 @@ public:
 			"NameVirtualHost *:80 \n"
 			"DocumentRoot \"") + TestProjectDir + wxString::FromAscii("\" \n"
 			"Listen 80 \n"
-			"Include ") + includeFile + wxString::FromAscii("\n"
-		));
+			"Include ") + includeFile + wxString::FromAscii("\n"));
 	}
 
 	/**
@@ -129,8 +125,7 @@ public:
 			"  ServerAdmin webmaster@localhost\n"
 			"  ServerName localhost.testing.com\n"
 			"  DocumentRoot ") + TestProjectDir + wxString::FromAscii("\n"
-			"</VirtualHost>\n"
-		));
+			"</VirtualHost>\n"));
 	}
 
 
@@ -144,8 +139,7 @@ public:
 			"  ServerAdmin webmaster@localhost\n"
 			"  DocumentRoot ") + TestProjectDir + wxString::FromAscii("\n"
 			"  ServerName localhost.testing.com\n"
-			"</VirtualHost>\n"
-		));
+			"</VirtualHost>\n"));
 	}
 
 	wxFileName TestProjectDirFileName() {
@@ -477,8 +471,7 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		CreateSubDirectoryFile(ConfigSubDirectory, HttpdFile, wxString::FromAscii(
 			"DocumentRoot \"") + documentRoot + wxString::FromAscii("\"\n"
 			"Listen 80 \n"
-			"\n"
-		));
+			"\n"));
 		Walk();
 
 		CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());

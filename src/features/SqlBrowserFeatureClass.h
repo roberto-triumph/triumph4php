@@ -69,7 +69,7 @@ typedef void (wxEvtHandler::*QueryCompleteEventClassFunction)(QueryCompleteEvent
 #define EVT_QUERY_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::QUERY_COMPLETE_EVENT, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( QueryCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(QueryCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 
 

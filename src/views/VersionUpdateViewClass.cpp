@@ -97,8 +97,7 @@ void t4p::VersionUpdateViewClass::OnTimer(wxTimerEvent& event) {
 		Timer.Stop();
 		wxString currentVersion = Feature.GetCurrentVersion();
 		t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
-			Feature.App.RunningThreads, ID_EVENT_VERSION_UPDATES, currentVersion
-		);
+			Feature.App.RunningThreads, ID_EVENT_VERSION_UPDATES, currentVersion);
 		Feature.App.RunningThreads.Queue(action);
 	}
 }

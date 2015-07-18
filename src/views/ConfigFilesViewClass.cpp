@@ -63,8 +63,7 @@ void t4p::ConfigFilesViewClass::RebuildMenu() {
 			submenu->Append(t4p::CONFIG_DETECTORS + i,
 				config->MenuLabel() ,
 				config->ConfigFileName.GetFullPath(),
-				wxITEM_NORMAL
-			);
+				wxITEM_NORMAL);
 			i++;
 			if (i >= t4p::ConfigFilesFeatureClass::MAX_CONFIG_MENU_ITEMS) {
 				break;

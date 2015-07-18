@@ -737,8 +737,7 @@ void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxMessageBox(
 			wxString::Format(_("shortcut %s is already defined to %s"), newShortcut.c_str(), existingCmd),
 			_("Edit Keyboard Command"),
-			wxCENTRE, this
-		);
+			wxCENTRE, this);
 		return;
 	}
 	TransferDataFromWindow();

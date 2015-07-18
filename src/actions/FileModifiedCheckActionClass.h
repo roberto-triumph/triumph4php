@@ -132,6 +132,6 @@ typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModified
 #define EVT_FILES_EXTERNALLY_MODIFIED_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FILES_EXTERNALLY_MODIFIED, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( FilesModifiedEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(FilesModifiedEventClassFunction, & fn), (wxObject *) NULL),
 
 #endif

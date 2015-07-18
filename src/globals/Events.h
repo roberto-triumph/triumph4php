@@ -327,68 +327,68 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 #define EVT_APP_FILE_NEW(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_SAVED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_SAVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_CLOSED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_CLOSED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_PAGE_CHANGED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_PAGE_CHANGED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_NOTEBOOK_CHANGED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NOTEBOOK_CHANGED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_FILE_REVERTED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_REVERTED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(CodeControlEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 
 #define EVT_APP_FILE_RENAMED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(RenameEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_DIR_RENAMED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(RenameEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
 
 #define EVT_CMD_FILE_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( OpenFileCommandEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(OpenFileCommandEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCommandEventClass&);
 
 #define EVT_APP_DB_TABLE_DATA_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(OpenDbTableCommandEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_DB_TABLE_DEFINITION_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(OpenDbTableCommandEventClassFunction, & fn), (wxObject *) NULL),
 
 /**
  * This is a one-time event that gets generated after the application main
@@ -419,7 +419,7 @@ typedef void (wxEvtHandler::*NotifyEventFunction)(wxNotifyEvent&);
 #define EVT_APP_FRAME_CLOSE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FRAME_CLOSE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( NotifyEventFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(NotifyEventFunction, & fn), (wxObject *) NULL),
 
 
 /**
@@ -599,12 +599,12 @@ typedef void (wxEvtHandler::*ProjectEventClassFunction)(ProjectEventClass&);
 #define EVT_APP_PROJECTS_REMOVED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_REMOVED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ProjectEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ProjectEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_APP_PROJECTS_UPDATED(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_PROJECTS_UPDATED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ProjectEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ProjectEventClassFunction, & fn), (wxObject *) NULL),
 
 /**
  * Tell the app to open a new file.

@@ -193,8 +193,7 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 			int confirm = wxMessageBox(
 				wxString::Format(_("Item no longer exists. Remove the item from the file cabinet?\n\n%s"), path),
 				_("File Cabinet"),
-				wxYES | wxNO
-			);
+				wxYES | wxNO);
 			if (wxYES == confirm) {
 				DeleteItemAt(index);
 			}

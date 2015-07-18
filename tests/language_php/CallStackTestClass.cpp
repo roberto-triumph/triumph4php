@@ -68,8 +68,7 @@ public:
 			"\t\t$data = array('title' => 'Welcome to the News Page');\n"
 			"\t\t$this->load->view('index', $data);\n"
 			"\t}\n"
-			"}\n"
-		);
+			"}\n");
 	}
 
 	void SetupFile(const wxString& fileName, const wxString& contents) {
@@ -298,8 +297,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 			"\t\t$this->load->view('index', $data);\n"
 			"\t\t$this->load->view('footer');\n"
 			"\t}\n"
-			"}\n"
-		);
+			"}\n");
 	SetupFile(wxT("news.php"), code);
 	BuildCache();
 
@@ -340,8 +338,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultiplePropertyCalls) {
 			"\tfunction index() {\n"
 			"\t\t$this->load->title = $this->title;\n"
 			"\t}\n"
-			"}\n"
-		);
+			"}\n");
 	SetupFile(wxT("news.php"), code);
 	BuildCache();
 

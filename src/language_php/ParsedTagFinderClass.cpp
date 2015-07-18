@@ -2278,8 +2278,7 @@ bool t4p::ParsedTagFinderClass::HasDir(const wxString& dir) {
 	std::string sql = "SELECT full_path FROM file_items WHERE full_path LIKE ? LIMIT 1";
 	try {
 		soci::statement stmt = (Session.prepare << sql, soci::use(query),
-			soci::into(result)
-		);
+			soci::into(result));
 		if (stmt.execute(true) && !result.empty()) {
 			foundDir = true;
 		}
@@ -2302,8 +2301,7 @@ bool t4p::ParsedTagFinderClass::FindFileTagByFullPathExact(const wxString& fullP
 	std::string sql = "SELECT file_item_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
 		soci::statement stmt = (Session.prepare << sql, soci::use(query),
-			soci::into(fileTagId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
-		);
+			soci::into(fileTagId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew));
 		foundFile = stmt.execute(true);
 		if (foundFile) {
 			fileTag.DateTime.Set(lastModified);

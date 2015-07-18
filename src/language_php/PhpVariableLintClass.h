@@ -109,7 +109,7 @@ public:
 
 	PhpVariableLintOptionsClass& operator=(const t4p::PhpVariableLintOptionsClass& src);
 
-	void Copy (const t4p::PhpVariableLintOptionsClass& src);
+	void Copy(const t4p::PhpVariableLintOptionsClass& src);
 
 };
 

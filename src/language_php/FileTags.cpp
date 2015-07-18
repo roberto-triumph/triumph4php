@@ -43,8 +43,7 @@ std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vecto
 	int fileItemId = 0;
 	try {
 		soci::statement stmt = (session.prepare << sql,
-			soci::into(fileItemId)
-		);
+			soci::into(fileItemId));
 		bool foundFile = stmt.execute(true);
 		if (foundFile) {
 			fileTagIds.push_back(fileItemId);
@@ -88,8 +87,7 @@ bool t4p::FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag) {
 	try {
 		soci::statement stmt = (session.prepare <<
 			"INSERT INTO file_items (file_item_id, source_id, full_path, name, last_modified, is_parsed, is_new) VALUES(NULL, ?, ?, ?, ?, ?, ?)",
-			soci::use(sourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew)
-		);
+			soci::use(sourceId), soci::use(fullPath), soci::use(name), soci::use(tm), soci::use(isParsed), soci::use(isNew));
 		stmt.execute(true);
 		fileTag.FileId = t4p::SqliteInsertId(stmt);
 		success = true;

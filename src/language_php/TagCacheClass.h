@@ -605,20 +605,20 @@ typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(t4p::Workin
 #define EVT_WORKING_CACHE_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_WORKING_CACHE_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( WorkingCacheCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(WorkingCacheCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(t4p::TagFinderListCompleteEventClass&);
 
 #define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(TagFinderListCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(t4p::TagFinderListCompleteEventClass&);
 
 #define EVT_TAG_FINDER_LIST_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_FINDER_LIST_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TagFinderListCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(TagFinderListCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 #endif

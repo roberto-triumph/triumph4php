@@ -79,8 +79,7 @@ public:
 		TouchTestDir();
 		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
 		TestSession.open(*soci::factory_sqlite3(),
-			t4p::WxToChar(SqliteFile.GetFullPath())
-		);
+			t4p::WxToChar(SqliteFile.GetFullPath()));
 
 		DatabaseTag.Driver = t4p::DatabaseTagClass::SQLITE;
 		DatabaseTag.FileName = SqliteFile;

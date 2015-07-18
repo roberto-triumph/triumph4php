@@ -55,8 +55,7 @@ public:
 		// create files in the dir, then the subdirs
 		for (int j = 0; j < 2; ++j) {
 			CreateFixtureFile(files[j], wxString::FromAscii(
-				"<?php"
-			));
+				"<?php"));
 		}
 		for (int i = 0; i < 2; ++i) {
 			wxString subDirectory = directories[i];
@@ -64,8 +63,7 @@ public:
 			subDirectory += wxFileName::GetPathSeparator();
 			for (int j = 0; j < 2; ++j) {
 				CreateFixtureFile(subDirectory + files[j], wxString::FromAscii(
-					"<?php"
-				));
+					"<?php"));
 			}
 		}
 	}

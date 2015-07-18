@@ -65,8 +65,7 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 			"made from this dialog may re-trigger a project index sequence, "
 			"you may not make modifications until the existing background task ends.\n"
 			"Would you like to stop the current background tasks? If you answer no, the "
-			"projects dialog will not be opened."
-		);
+			"projects dialog will not be opened.");
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, GetMainWindow());
 		if (wxYES != ret) {
@@ -118,8 +117,7 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 		// will be re-tagged
 		if (!touchedProjects.empty()) {
 			wxString msg = wxString::FromAscii(
-				"Would you like to re-tag your newly enabled projects at this time?"
-			);
+				"Would you like to re-tag your newly enabled projects at this time?");
 			msg = wxGetTranslation(msg);
 			int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
 			if (wxNO == ret) {
@@ -144,8 +142,7 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 			"made from this dialog may re-trigger a project index sequence, "
 			"you may not make modifications until the existing background task ends.\n"
 			"Would you like to stop the current background tasks? If you answer no, the "
-			"projects dialog will not be opened."
-		);
+			"projects dialog will not be opened.");
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, GetMainWindow());
 		if (wxYES != ret) {
@@ -172,8 +169,7 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 		wxString msg = wxString::FromAscii(
 			"Would you like to re-tag your newly created project at this time?\n"
 			"Tagging a project allows code completion, jump to resource,\n"
-			"and search for resources to work properly."
-		);
+			"and search for resources to work properly.");
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
 		bool doTag = wxYES == ret;
@@ -599,8 +595,7 @@ void t4p::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event
 					wxString::Format(_("There are %ld projects. Please choose directories to create projects for"), subDirs.size()),
 					_("Add Multiple"),
 					subDirs,
-					this
-				);
+					this);
 				if (choice > 0) {
 					cont = !selections.IsEmpty();
 				}

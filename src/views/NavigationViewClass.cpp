@@ -55,8 +55,7 @@ void t4p::NavigationViewClass::OnEditNavigatePane(wxCommandEvent& event) {
 		t4p::NavigationViewDialogClass dialog(GetMainWindow(),
 			*this, *AuiManager,
 			t4p::AuiVisibleCodeNotebooks(*AuiManager), outline,
-			tools, choice
-		);
+			tools, choice);
 		if (dialog.ShowModal() == wxOK && choice.Notebook) {
 			if (choice.PageIndex != wxNOT_FOUND &&
 					t4p::NumberLessThan(choice.PageIndex, choice.Notebook->GetPageCount())) {
@@ -106,8 +105,7 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 			column1.SetId(newRowNumber);
 			column1.SetText(value);
 			column1.SetImage(t4p::FileTypeImageIdFromType(
-				CodeNotebooks[i]->GetCodeControl(p)->GetFileType()
-			));
+				CodeNotebooks[i]->GetCodeControl(p)->GetFileType()));
 			FilesList->InsertItem(column1);
 
 			newRowNumber++;

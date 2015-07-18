@@ -93,8 +93,7 @@ bool t4p::SqliteTables(soci::session& session, std::vector<std::string>& tableNa
 		std::string tableName;
 		soci::statement stmt = (session.prepare <<
 			"SELECT tbl_name from sqlite_master WHERE type='table' AND NOT name = 'sqlite_sequence'",
-			soci::into(tableName)
-		);
+			soci::into(tableName));
 		if (stmt.execute(true)) {
 			do {
 				tableNames.push_back(tableName);

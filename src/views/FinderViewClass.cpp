@@ -691,11 +691,11 @@ void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsBackward);
 		event.Skip();
 	}
-	else if (event.GetKeyCode() == WXK_TAB ) {
+	else if (event.GetKeyCode() == WXK_TAB) {
 		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsForward);
 		event.Skip();
 	}
-	else  if (event.GetKeyCode() == WXK_ESCAPE) {
+	else if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
 

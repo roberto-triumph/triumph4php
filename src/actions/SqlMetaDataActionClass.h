@@ -116,6 +116,6 @@ typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEven
 #define EVT_SQL_META_DATA_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SQL_META_DATA_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( SqlMetaDataEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(SqlMetaDataEventClassFunction, & fn), (wxObject *) NULL),
 
 #endif

@@ -95,7 +95,7 @@ void t4p::FileOperationsViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	// use stock menu IDs so that default shortcuts are enabled on each different OS
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 0, _("New &PHP File\tCTRL+N"), _("Create a new PHP File"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 1, _("New S&QL File"), _("Create a new SQL File"), wxITEM_NORMAL);
-	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 2, _("New &CSS File"), _("Create a new CSS File"), wxITEM_NORMAL );
+	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 2, _("New &CSS File"), _("Create a new CSS File"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 3, _("New Te&xt File"), _("Create a new text file"), wxITEM_NORMAL);
 	fileMenu->Append(wxID_OPEN, _("&Open"), _("Open a file"), wxITEM_NORMAL);
 	fileMenu->Append(wxID_SAVE, _("&Save"), _("Save the current file to disk"), wxITEM_NORMAL);
@@ -411,8 +411,7 @@ void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {
 		wxMessageBox(
 			_("You have modified files that need to be saved with escalated privileges.\n") +
 			_("Please save those files or discard the changes before exiting"),
-			_("Triumph")
-		);
+			_("Triumph"));
 		doVeto = true;
 	}
 	if (!doVeto) {

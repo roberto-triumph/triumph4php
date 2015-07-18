@@ -144,7 +144,7 @@ typedef void (wxEvtHandler::*ExplorerEventClassFunction)(t4p::ExplorerEventClass
 #define EVT_EXPLORER_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_EXPLORER, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ExplorerEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ExplorerEventClassFunction, & fn), (wxObject *) NULL),
 
 
 /**
@@ -302,7 +302,7 @@ typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(t4p::ExplorerModi
 #define EVT_EXPLORER_MODIFY_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_EXPLORER_MODIFY, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ExplorerModifyEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ExplorerModifyEventClassFunction, & fn), (wxObject *) NULL),
 
 
 /**

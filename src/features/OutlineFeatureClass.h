@@ -80,7 +80,7 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
 #define EVENT_OUTLINE_SEARCH_COMPLETE(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_OUTLINE_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( OutlineSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(OutlineSearchCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 /**
  * class that will execute a query against the tag cache in the background.

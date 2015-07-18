@@ -370,8 +370,7 @@ bool t4p::CallStackClass::Persist(soci::session& session) {
 		session.once << "DELETE FROM call_stacks";
 		soci::statement stmt = (session.prepare <<
 			"INSERT INTO call_stacks(step_number, step_type, expression, source_id) VALUES (?, ?, ?, ?)",
-			soci::use(stepNumber), soci::use(stepType), soci::use(expression), soci::use(sourceId)
-		);
+			soci::use(stepNumber), soci::use(stepType), soci::use(expression), soci::use(sourceId));
 		for (std::vector<t4p::VariableSymbolClass>::const_iterator it = Variables.begin(); it != Variables.end(); ++it) {
 			stepType = it->TypeString();
 			expression = it->ToString();

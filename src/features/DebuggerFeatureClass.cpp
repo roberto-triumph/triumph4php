@@ -181,7 +181,7 @@ static void ConfigLoad(wxConfigBase* config,
 
 				config->Read(groupName + wxT("/Filename"), &breakpoint.Breakpoint.Filename);
 				config->Read(groupName + wxT("/LineNumber"), &breakpoint.Breakpoint.LineNumber);
-				config->Read(groupName + wxT("/IsEnabled"), &breakpoint.Breakpoint.IsEnabled );
+				config->Read(groupName + wxT("/IsEnabled"), &breakpoint.Breakpoint.IsEnabled);
 				config->Read(groupName + wxT("/BreakpointType"), &breakpoint.Breakpoint.BreakpointType);
 				config->Read(groupName + wxT("/Exception"), &breakpoint.Breakpoint.Exception);
 				config->Read(groupName + wxT("/Expression"), &breakpoint.Breakpoint.Expression);
@@ -422,8 +422,7 @@ bool t4p::DebuggerFeatureClass::RemoveBreakpointAtLine(const wxString& fileName,
 				std::vector<t4p::DbgpBreakpointClass> allBreakpoints;
 				t4p::DbgpBreakpointClass breakpointToRemove = it->Breakpoint;
 				PostCmd(
-					Cmd.BreakpointRemove(breakpointToRemove.BreakpointId)
-				);
+					Cmd.BreakpointRemove(breakpointToRemove.BreakpointId));
 			}
 			it = Breakpoints.erase(it);
 		}
@@ -459,9 +458,7 @@ bool t4p::DebuggerFeatureClass::AddBreakpointAtLine(const wxString& fileName, in
 				Cmd.BreakpointFile(
 					ToRemoteFilename(breakpointWithHandle.Breakpoint.Filename, Options.SourceCodeMappings),
 					breakpointWithHandle.Breakpoint.LineNumber,
-					breakpointWithHandle.Breakpoint.IsEnabled
-				)
-			);
+					breakpointWithHandle.Breakpoint.IsEnabled));
 		}
 
 		Breakpoints.push_back(breakpointWithHandle);
@@ -556,19 +553,14 @@ void t4p::DebuggerFeatureClass::Finish() {
 	for (it = Breakpoints.begin(); it != Breakpoints.end(); ++it) {
 		if (it->Breakpoint.IsEnabled) {
 			PostCmd(
-				Cmd.BreakpointDisable(it->Breakpoint.BreakpointId)
-			);
+				Cmd.BreakpointDisable(it->Breakpoint.BreakpointId));
 		}
 	}
-	PostCmd(
-		Cmd.Run()
-	);
+	PostCmd(Cmd.Run());
 
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
-	PostCmd(
-		Cmd.StackGet(0)
-	);
+	PostCmd(Cmd.StackGet(0));
 }
 
 void t4p::DebuggerFeatureClass::GoToExecutingLine() {
@@ -651,9 +643,7 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 			Cmd.BreakpointFile(
 				ToRemoteFilename(it->Breakpoint.Filename, Options.SourceCodeMappings),
 				it->Breakpoint.LineNumber,
-				it->Breakpoint.IsEnabled
-			)
-		);
+				it->Breakpoint.IsEnabled));
 	}
 
 	// mark the session as having been started

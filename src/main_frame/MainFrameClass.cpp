@@ -48,7 +48,7 @@ static int ID_SEQUENCE_GAUGE = wxNewId();
  * @return the code control that has focus, or NULL if focus is on
  *         another window
  */
-static t4p::CodeControlClass* FindFocusedCodeControl( wxAuiManager& auiManager) {
+static t4p::CodeControlClass* FindFocusedCodeControl(wxAuiManager& auiManager) {
 	t4p::CodeControlClass* codeCtrl = NULL;
 	wxWindow* focusWindow = wxWindow::FindFocus();
 	if (!focusWindow) {
@@ -113,15 +113,13 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 	for (int i = 1; i <= t4p::AUI_MAX_CODE_NOTEBOOKS; i++) {
 		t4p::NotebookClass* codeNotebook = new t4p::NotebookClass(this, wxID_ANY,
 			wxDefaultPosition, wxDefaultSize,
-			wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON
-		);
+			wxAUI_NB_CLOSE_ON_ACTIVE_TAB | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_TAB_MOVE | wxAUI_NB_WINDOWLIST_BUTTON);
 		codeNotebook->InitApp(
 			&App.Preferences.CodeControlOptions,
 			&App.Preferences,
 			&App.Globals,
 			&App.EventSink,
-			&AuiManager
-		);
+			&AuiManager);
 		t4p::AuiAddCodeNotebook(AuiManager, codeNotebook, i);
 	}
 	ToolsNotebook = new wxAuiNotebook(this, t4p::ID_TOOLS_NOTEBOOK, wxDefaultPosition, wxDefaultSize,
@@ -226,8 +224,7 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 			"made from this dialog may re-trigger a project index sequence, "
 			"you may not make modifications until the existing background task ends.\n"
 			"Would you like to stop the current background tasks? If you answer no, the "
-			"preferences dialog will not be opened."
-		);
+			"preferences dialog will not be opened.");
 		msg = wxGetTranslation(msg);
 		int ret = wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxYES_NO, this);
 		if (wxYES != ret) {
@@ -263,8 +260,7 @@ void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
 		if (needsRetag || changedSettingsDir) {
 			wxString msg = wxString::FromAscii(
 				"You have made a change that affects PHP resource tagging. Would "
-				"you like to re-tag your enabled projects at this time?"
-			);
+				"you like to re-tag your enabled projects at this time?");
 			msg = wxGetTranslation(msg);
 			int ret = wxMessageBox(msg, _("Tag Projects"), wxICON_QUESTION | wxYES_NO, this);
 			if (wxYES == ret) {

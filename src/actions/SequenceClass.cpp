@@ -355,8 +355,7 @@ void t4p::SequenceClass::SourceCheck() {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (!source->Exists()) {
 					t4p::EditorLogError(
-						t4p::ERR_INVALID_DIRECTORY, source->RootDirectory.GetPath()
-					);
+						t4p::ERR_INVALID_DIRECTORY, source->RootDirectory.GetPath());
 				}
 			}
 		}

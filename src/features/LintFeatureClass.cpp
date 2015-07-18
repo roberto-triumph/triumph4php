@@ -242,17 +242,13 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		// did the user supress unkown class/method/function results?
 		wxFileName wxf(t4p::IcuToWx(identifierResult.File));
 		bool suppressedClass = Suppressions.ShouldIgnore(
-			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS
-		);
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS);
 		bool suppressedMethod = Suppressions.ShouldIgnore(
-			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD
-		);
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD);
 		bool suppressedFunction = Suppressions.ShouldIgnore(
-			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION
-		);
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION);
 		bool suppressedProperty = Suppressions.ShouldIgnore(
-			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY
-		);
+			wxf, identifierResult.Identifier,  t4p::SuppressionRuleClass::SKIP_UNKNOWN_PROPERTY);
 
 		bool isSuppressed = false;
 		pelet::LintResultsClass lintResult;
@@ -304,16 +300,14 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 					"Missing arguments to function `%S`: expected %d but calling with %d arguments",
 					callResult.Identifier.getTerminatedBuffer(),
 					callResult.ExpectedCount,
-					callResult.ActualCount
-				);
+					callResult.ActualCount);
 			}
 			else if (callResult.Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
 				written = u_sprintf(buf,
 					"Too many arguments to function `%S`: expected %d but calling with %d arguments",
 					callResult.Identifier.getTerminatedBuffer(),
 					callResult.ExpectedCount,
-					callResult.ActualCount
-				);
+					callResult.ActualCount);
 			}
 			lintResult.Error.releaseBuffer(written);
 

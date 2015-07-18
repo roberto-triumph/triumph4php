@@ -82,8 +82,7 @@ bool t4p::FileCabinetStoreClass::Store(soci::session& session, t4p::FileCabinetI
 		}
 
 		soci::statement stmt = (session.prepare << sql,
-			soci::use(name), soci::use(fullPath)
-		);
+			soci::use(name), soci::use(fullPath));
 		stmt.execute(true);
 
 		item.Id = t4p::SqliteInsertId(stmt);

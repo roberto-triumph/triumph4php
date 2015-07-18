@@ -172,7 +172,7 @@ typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEve
 #define EVT_FIND_IN_FILES_HITS(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FIND_IN_FILES_FILE_HIT, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( FindInFilesHitEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(FindInFilesHitEventClassFunction, & fn), (wxObject *) NULL),
 
 
 /**

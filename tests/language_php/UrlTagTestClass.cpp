@@ -77,8 +77,7 @@ public:
 		soci::statement stmt = (DetectorTagSession.prepare <<
 			"INSERT INTO url_tags(url, source_id, full_path, class_name, method_name) VALUES (?, ?, ?, ?, ?)",
 			soci::use(url), soci::use(SourceId), soci::use(fileName),
-			soci::use(className), soci::use(methodName)
-		);
+			soci::use(className), soci::use(methodName));
 		stmt.execute(true);
 	}
 

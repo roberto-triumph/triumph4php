@@ -85,8 +85,7 @@ void t4p::LintResultsPanelClass::EnableRunButton(bool doEnable) {
 	RunButton->Enable(doEnable);
 	if (!doEnable) {
 		this->Label->SetLabel(
-			_("Lint check in progress")
-		);
+			_("Lint check in progress"));
 	}
 }
 
@@ -156,24 +155,20 @@ void t4p::LintResultsPanelClass::PrintSummary(int totalFiles, int errorFiles, in
 void t4p::LintResultsPanelClass::UpdateSummary() {
 	if (0 == ErrorFiles) {
 		this->Label->SetLabel(
-			wxString::Format(_("No errors found; checked %d files"), TotalFiles)
-		);
+			wxString::Format(_("No errors found; checked %d files"), TotalFiles));
 	}
 	else if (ErrorFiles > MAX_LINT_ERROR_FILES) {
 		this->Label->SetLabel(
-			wxString::Format(_("Found more than %d files with errors; stopping lint check"), MAX_LINT_ERROR_FILES)
-		);
+			wxString::Format(_("Found more than %d files with errors; stopping lint check"), MAX_LINT_ERROR_FILES));
 	}
 	else if (SkippedFiles > 0) {
 		this->Label->SetLabel(
 			wxString::Format(_("Found %d files with errors; checked %d files; skipped %d files"),
-			ErrorFiles, TotalFiles, SkippedFiles)
-		);
+			ErrorFiles, TotalFiles, SkippedFiles));
 	}
 	else {
 		this->Label->SetLabel(
-			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles)
-		);
+			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles));
 	}
 
 	// now resize the columns so that the errors can be seen
@@ -428,8 +423,7 @@ void t4p::LintViewClass::OnLintMenu(wxCommandEvent& event) {
 void t4p::LintViewClass::StartLint() {
 	if (Feature.App.Globals.HasSources()) {
 		t4p::LintActionClass* reader = new t4p::LintActionClass(
-			Feature.App.RunningThreads, ID_LINT_READER, Feature.Options, t4p::LintSuppressionsFileAsset()
-		);
+			Feature.App.RunningThreads, ID_LINT_READER, Feature.Options, t4p::LintSuppressionsFileAsset());
 		std::vector<t4p::SourceClass> phpSources = Feature.App.Globals.AllEnabledPhpSources();
 
 		// output an error if a source directory no longer exists
@@ -437,8 +431,7 @@ void t4p::LintViewClass::StartLint() {
 		for (source = phpSources.begin(); source != phpSources.end(); ++source) {
 			if (!source->Exists()) {
 				t4p::EditorLogError(t4p::ERR_INVALID_DIRECTORY,
-					source->RootDirectory.GetPath()
-				);
+					source->RootDirectory.GetPath());
 			}
 		}
 		if (reader->InitDirectoryLint(phpSources, Feature.App.Globals)) {
@@ -484,8 +477,7 @@ void t4p::LintViewClass::ShowSuppressionPanel() {
 	else {
 		t4p::LintSuppressionsPanelClass* panel = new t4p::LintSuppressionsPanelClass(
 			GetToolsNotebook(), ID_LINT_SUPPRESSIONS_PANEL, t4p::LintSuppressionsFileAsset(),
-			GetMainWindow()
-		);
+			GetMainWindow());
 		wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check-suppression"));
 		AddToolsWindow(panel, _("Lint Suppressions"), wxEmptyString, lintBitmap);
 	}
@@ -623,8 +615,7 @@ void t4p::LintViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	if (hasErrors || Feature.Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
 		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(
-			Feature.App.RunningThreads, ID_LINT_READER_SAVE, Feature.Options, t4p::LintSuppressionsFileAsset()
-		);
+			Feature.App.RunningThreads, ID_LINT_READER_SAVE, Feature.Options, t4p::LintSuppressionsFileAsset());
 		bool good = thread->Init(fileName, Feature.App.Globals);
 
 		// handle the case where user has saved a file but has not clicked

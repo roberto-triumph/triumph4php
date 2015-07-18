@@ -330,8 +330,7 @@ void t4p::DebuggerViewClass::OnDebuggerOpenPanel(wxCommandEvent& event) {
 	t4p::DebuggerPanelClass* panel = NULL;
 	if (!window) {
 		panel = new t4p::DebuggerPanelClass(
-			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this
-		);
+			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
 	}
 	else {
@@ -468,8 +467,7 @@ void t4p::DebuggerViewClass::OnDebuggerListenError(wxThreadEvent& event) {
 	t4p::EditorLogErrorFix(wxString::Format(_("Debugger Error: Could not start listening on port %d"), Feature.Options.Port),
 		wxString::Format(_("Use netstat to find out the process listening on port %d and stop it\n"), Feature.Options.Port)
 			+ _("OR Go to Edit ... Preferences ... Debugger and choose a different port to listen on.\n")
-			+ _("In this case you will need to change your php.ini setting xdebug.remote_port.")
-		);
+			+ _("In this case you will need to change your php.ini setting xdebug.remote_port."));
 }
 
 void t4p::DebuggerViewClass::OnDbgpEval(t4p::DbgpEvalEventClass& event) {
@@ -493,8 +491,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerVariables(wxCommandEvent& event) {
 	}
 	else {
 		panel = new t4p::DebuggerPanelClass(
-			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this
-		);
+			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
 	}
 	panel->ResetStatus(Feature.IsDebuggerSessionActive);
@@ -509,8 +506,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerLog(wxCommandEvent& event) {
 	}
 	else {
 		panel = new t4p::DebuggerPanelClass(
-			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this
-		);
+			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
 	}
 	panel->ResetStatus(Feature.IsDebuggerSessionActive);
@@ -525,8 +521,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerBreakpoints(wxCommandEvent& event) {
 	}
 	else {
 		panel = new t4p::DebuggerPanelClass(
-			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this
-		);
+			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
 	}
 	panel->ResetStatus(Feature.IsDebuggerSessionActive);
@@ -541,8 +536,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerEval(wxCommandEvent& event) {
 	}
 	else {
 		panel = new t4p::DebuggerPanelClass(
-			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this
-		);
+			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
 	}
 	panel->ResetStatus(Feature.IsDebuggerSessionActive);

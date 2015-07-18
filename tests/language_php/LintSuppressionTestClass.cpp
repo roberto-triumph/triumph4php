@@ -88,8 +88,7 @@ public:
 			"skip_all,,%locationDir%\n"
 			"skip_unknown_method, serializeToCouchbase, %locationFile%\n"
 			"skip_unknown_function, couchbase_init, %locationFile%\n"
-			"skip_uninitialized_var, $connection, %locationFile%\n"
-		);
+			"skip_uninitialized_var, $connection, %locationFile%\n");
 
 		// create 1 code file that will be used as the file
 		// to be suppressed. file can be empty (no contents)

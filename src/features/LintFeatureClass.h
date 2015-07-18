@@ -97,14 +97,14 @@ typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClas
 #define EVT_LINT_ERROR(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_LINT_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(LintResultsEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSummaryEventClass&);
 
 #define EVT_LINT_SUMMARY(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_LINT_SUMMARY, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(LintResultsSummaryEventClassFunction, & fn), (wxObject *) NULL),
 
 /**
  * Stores flags that determine how strict linting will be

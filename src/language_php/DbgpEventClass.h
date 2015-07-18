@@ -824,140 +824,140 @@ typedef void (wxEvtHandler::*DbgpInitEventClassFunction)(t4p::DbgpInitEventClass
 #define EVT_DBGP_INIT(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_INIT, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpInitEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpInitEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpErrorEventClassFunction)(t4p::DbgpErrorEventClass&);
 
 #define EVT_DBGP_ERROR(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_ERROR, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpErrorEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpErrorEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStatusEventClassFunction)(t4p::DbgpStatusEventClass&);
 
 #define EVT_DBGP_STATUS(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STATUS, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpStatusEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpStatusEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpFeatureGetEventClassFunction)(t4p::DbgpFeatureGetEventClass&);
 
 #define EVT_DBGP_FEATUREGET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATUREGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpFeatureGetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpFeatureGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpFeatureSetEventClassFunction)(t4p::DbgpFeatureSetEventClass&);
 
 #define EVT_DBGP_FEATURESET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_FEATURESET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpFeatureSetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpFeatureSetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContinueEventClassFunction)(t4p::DbgpContinueEventClass&);
 
 #define EVT_DBGP_CONTINUE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTINUE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpContinueEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpContinueEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointSetEventClassFunction)(t4p::DbgpBreakpointSetEventClass&);
 
 #define EVT_DBGP_BREAKPOINTSET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTSET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakpointSetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakpointSetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointGetEventClassFunction)(t4p::DbgpBreakpointGetEventClass&);
 
 #define EVT_DBGP_BREAKPOINTGET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakpointGetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakpointGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointUpdateEventClassFunction)(t4p::DbgpBreakpointUpdateEventClass&);
 
 #define EVT_DBGP_BREAKPOINTUPDATE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTUPDATE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakpointUpdateEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakpointUpdateEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointRemoveEventClassFunction)(t4p::DbgpBreakpointRemoveEventClass&);
 
 #define EVT_DBGP_BREAKPOINTREMOVE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTREMOVE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakpointRemoveEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakpointRemoveEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakpointListEventClassFunction)(t4p::DbgpBreakpointListEventClass&);
 
 #define EVT_DBGP_BREAKPOINTLIST(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAKPOINTLIST, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakpointListEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakpointListEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStackDepthEventClassFunction)(t4p::DbgpStackDepthEventClass&);
 
 #define EVT_DBGP_STACKDEPTH(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKDEPTH, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpStackDepthEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpStackDepthEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpStackGetEventClassFunction)(t4p::DbgpStackGetEventClass&);
 
 #define EVT_DBGP_STACKGET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_STACKGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpStackGetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpStackGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContextNamesEventClassFunction)(t4p::DbgpContextNamesEventClass&);
 
 #define EVT_DBGP_CONTEXTNAMES(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTNAMES, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpContextNamesEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpContextNamesEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpContextGetEventClassFunction)(t4p::DbgpContextGetEventClass&);
 
 #define EVT_DBGP_CONTEXTGET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_CONTEXTGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpContextGetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpContextGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertyGetEventClassFunction)(t4p::DbgpPropertyGetEventClass&);
 
 #define EVT_DBGP_PROPERTYGET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYGET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpPropertyGetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpPropertyGetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertyValueEventClassFunction)(t4p::DbgpPropertyValueEventClass&);
 
 #define EVT_DBGP_PROPERTYVALUE(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYVALUE, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpPropertyValueEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpPropertyValueEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpPropertySetEventClassFunction)(t4p::DbgpPropertySetEventClass&);
 
 #define EVT_DBGP_PROPERTYSET(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_PROPERTYSET, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpPropertySetEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpPropertySetEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpBreakEventClassFunction)(t4p::DbgpBreakEventClass&);
 
 #define EVT_DBGP_BREAK(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_BREAK, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpBreakEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpBreakEventClassFunction, & fn), (wxObject *) NULL),
 
 typedef void (wxEvtHandler::*DbgpEvalEventClassFunction)(t4p::DbgpEvalEventClass&);
 
 #define EVT_DBGP_EVAL(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_DBGP_EVAL, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( DbgpEvalEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(DbgpEvalEventClassFunction, & fn), (wxObject *) NULL),
 
 
 }

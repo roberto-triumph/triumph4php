@@ -117,7 +117,7 @@ t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::Run
 
 }
 
-bool t4p::FindInFilesBackgroundReaderClass::InitForFind( t4p::FindInFilesClass findInFiles,
+bool t4p::FindInFilesBackgroundReaderClass::InitForFind(t4p::FindInFilesClass findInFiles,
 															  bool doHiddenFiles,
 															  std::vector<wxString> skipFiles) {
 
@@ -161,8 +161,7 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 					FindInFiles.GetCurrentLineNumber(),
 					FindInFiles.GetLineOffset(),
 					FindInFiles.GetFileOffset(),
-					FindInFiles.GetMatchLength()
-				);
+					FindInFiles.GetMatchLength());
 				hits.push_back(hit);
 
 			}

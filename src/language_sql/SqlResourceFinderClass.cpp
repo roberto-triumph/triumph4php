@@ -207,8 +207,7 @@ bool t4p::SqlResourceFetchClass::StoreTables(const std::string& hash, const std:
 		std::string tableName;
 		soci::transaction txn(Session);
 		soci::statement stmt = (Session.prepare << sql,
-			soci::use(hash), soci::use(tableName)
-		);
+			soci::use(hash), soci::use(tableName));
 		for (size_t i = 0; i < tables.size(); ++i) {
 			tableName = tables[i];
 			stmt.execute(true);
@@ -234,8 +233,7 @@ bool t4p::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std
 		std::string columnName;
 		soci::transaction txn(Session);
 		soci::statement stmt = (Session.prepare << sql,
-			soci::use(columnName), soci::use(hash)
-		);
+			soci::use(columnName), soci::use(hash));
 		for (size_t i = 0; i < columns.size(); ++i) {
 			columnName = columns[i];
 			stmt.execute(true);

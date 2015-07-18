@@ -145,7 +145,7 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 
 		// now we add all bookmarks for the newly opened file
 		AddBookmarks(bookmark.FileName, newlyOpenedCtrl);
-		newlyOpenedCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber );
+		newlyOpenedCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
 	}
 }
 

@@ -87,8 +87,7 @@ std::vector<t4p::PhpTagClass> AllResources(soci::session& session) {
 			soci::into(type), soci::into(namespaceName), soci::into(signature),
 			soci::into(returnType), soci::into(comment), soci::into(fullPath, fullPathIndicator), soci::into(isProtected), soci::into(isPrivate),
 			soci::into(isStatic), soci::into(isDynamic), soci::into(isNative), soci::into(hasVariableArgs),
-			soci::into(fileIsNew, fileIsNewIndicator)
-		);
+			soci::into(fileIsNew, fileIsNewIndicator));
 		if (stmt.execute(true)) {
 			do {
 				t4p::PhpTagClass tag;
@@ -200,16 +199,14 @@ int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
 	try {
 		std::string stdFullPath = t4p::WxToChar(dir.GetPathWithSep());
 		soci::statement stmt = (Session->prepare <<
-		"SELECT source_id FROM sources WHERE directory = ?",
-		soci::into(sourceId), soci::use(stdFullPath)
-		);
+			"SELECT source_id FROM sources WHERE directory = ?",
+			soci::into(sourceId), soci::use(stdFullPath));
 		if (!stmt.execute(true)) {
 
 			// didn't find the source, create a new row
 			soci::statement stmt = (Session->prepare <<
-			"INSERT INTO sources(directory) VALUES(?)",
-			soci::use(stdFullPath)
-			);
+				"INSERT INTO sources(directory) VALUES(?)",
+				soci::use(stdFullPath));
 			stmt.execute(true);
 			sourceId = t4p::SqliteInsertId(stmt);
 		}
@@ -251,8 +248,7 @@ void t4p::TagParserClass::BeginTransaction() {
 			soci::use(FileTagId), soci::use(CurrentSourceId), soci::use(Key), soci::use(Identifier), soci::use(ClassName),
 			soci::use(Type), soci::use(NamespaceName), soci::use(Signature),
 			soci::use(ReturnType), soci::use(Comment), soci::use(IsProtected), soci::use(IsPrivate),
-			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative), soci::use(HasVariableArgs)
-		);
+			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative), soci::use(HasVariableArgs));
 	} catch (std::exception& e) {
 
 		// ATTN: at some point bubble these exceptions up?
@@ -825,8 +821,7 @@ bool t4p::TagParserClass::FindFileTagByFullPathExact(const wxString& fullPath, t
 	std::string sql = "SELECT file_item_id, source_id, last_modified, is_parsed, is_new FROM file_items WHERE full_path = ?";
 	try {
 		soci::statement stmt = (Session->prepare << sql, soci::use(query),
-			soci::into(fileTagId), soci::into(sourceId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew)
-		);
+			soci::into(fileTagId), soci::into(sourceId), soci::into(lastModified), soci::into(isParsed), soci::into(isNew));
 		foundFile = stmt.execute(true);
 		if (foundFile) {
 			fileTag.DateTime.Set(lastModified);
@@ -1007,8 +1002,7 @@ void t4p::TagParserClass::PersistTraits(
 	try {
 		soci::statement stmt = (Session->prepare << sql,
 			soci::use(key), soci::use(fileTagId), soci::use(CurrentSourceId), soci::use(className), soci::use(namespaceName), soci::use(traitClassName),
-			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs)
-		);
+			soci::use(traitNamespaceName), soci::use(aliases), soci::use(insteadOfs));
 		std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
 		for (it = traitMap.begin(); it != traitMap.end(); ++it) {
 			std::vector<t4p::TraitTagClass>::const_iterator trait;
@@ -1071,8 +1065,7 @@ std::vector<t4p::TraitTagClass> t4p::TagParserClass::FindTraitsByClassName(const
 	try {
 		soci::statement stmt = (Session->prepare << sql,
 			soci::into(key), soci::into(className), soci::into(namespaceName), soci::into(traitClassName),
-			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs)
-		);
+			soci::into(traitNamespaceName), soci::into(aliases), soci::into(insteadOfs));
 		if (stmt.execute(true)) {
 			do {
 				t4p::TraitTagClass trait;
@@ -1121,8 +1114,7 @@ void t4p::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFileName
 		std::string stdNewName = t4p::WxToChar(newFile.GetFullName());
 		std::string sql = "UPDATE file_items SET full_path = ?, name = ? WHERE full_path = ?";
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(stdNewPath), soci::use(stdNewName), soci::use(stdOldPath)
-		);
+			soci::use(stdNewPath), soci::use(stdNewName), soci::use(stdOldPath));
 		stmt.execute(true);
 	} catch (std::exception& e) {
 
@@ -1139,8 +1131,7 @@ void t4p::TagParserClass::RenameDir(const wxFileName& oldDir, const wxFileName& 
 		std::string stdNewPath = t4p::WxToChar(newDir.GetPathWithSep());
 		std::string sql = "UPDATE file_items SET full_path = REPLACE(full_path, ?, ?) WHERE full_path LIKE ?";
 		soci::statement stmt = (Session->prepare << sql,
-			soci::use(stdOldPath), soci::use(stdNewPath), soci::use(stdOldPathLike)
-		);
+			soci::use(stdOldPath), soci::use(stdNewPath), soci::use(stdOldPathLike));
 		stmt.execute(true);
 	} catch (std::exception& e) {
 

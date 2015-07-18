@@ -1058,8 +1058,7 @@ void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const
 			newFile.GetFullPath() +
 			_("\nWhat would you like to do?"),
 			_("File Rename"),
-			choices
-		);
+			choices);
 	choiceDialog.SetWindowStyle(wxCENTER | wxOK);
 	choiceDialog.SetSize(choiceDialog.GetSize().GetWidth(), choiceDialog.GetSize().GetHeight() + 40);
 	if (wxID_OK == choiceDialog.ShowModal()) {
@@ -1454,8 +1453,7 @@ void t4p::ExplorerOutlinePanelClass::RenamePrompt(const wxFileName& oldFile, con
 			newFile.GetFullPath() +
 			_("\nWhat would you like to do?"),
 			_("File Rename"),
-			choices
-		);
+			choices);
 	choiceDialog.SetWindowStyle(wxCENTER | wxOK);
 	choiceDialog.SetSize(choiceDialog.GetSize().GetWidth(), choiceDialog.GetSize().GetHeight() + 40);
 	if (wxID_OK == choiceDialog.ShowModal()) {

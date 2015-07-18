@@ -117,8 +117,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 			codeControl->GetIdString(), codeControl->GetSafeText(), endPos,
 			Feature.App.Globals.AllEnabledSourceDirectories(),
 			Feature.App.Globals,
-			matchError
-		);
+			matchError);
 		if (!matchError.empty()) {
 			GetStatusBarWithGauge()->SetColumn0Text(matchError);
 		}

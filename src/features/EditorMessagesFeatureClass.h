@@ -57,7 +57,7 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
 #define EVT_APP_LOG(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_LOG, -1, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( EditorLogEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(EditorLogEventClassFunction, &fn), (wxObject *) NULL),
 
 
 

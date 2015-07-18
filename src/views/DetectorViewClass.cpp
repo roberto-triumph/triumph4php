@@ -486,8 +486,7 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnChooseUrlButton(wxCommandEvent& 
 			t4p::WxToIcu(TestUrl.MethodName),
 
 			// the selection index is the index of the enabled projects
-			Globals.DetectorCacheDbFileName
-		);
+			Globals.DetectorCacheDbFileName);
 		action->Init(Globals);
 		RunningThreads.Queue(action);
 	}

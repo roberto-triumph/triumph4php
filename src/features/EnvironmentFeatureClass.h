@@ -59,7 +59,7 @@ typedef void (wxEvtHandler::*ApacheFileReadCompleteEventClassFunction)(ApacheFil
 #define EVT_APACHE_FILE_READ_COMPLETE(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APACHE_FILE_READ_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ApacheFileReadCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ApacheFileReadCompleteEventClassFunction, &fn), (wxObject *) NULL),
 
 
 /**

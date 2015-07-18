@@ -627,8 +627,7 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 				ctrl->GetIdString(), ctrl->GetSafeText(), currentPos,
 				Globals.AllEnabledSourceDirectories(),
 				Globals,
-				status
-			);
+				status);
 
 			for (size_t i = 0; i < matches.size(); ++i) {
 				t4p::PhpTagClass tag = matches[i];
@@ -647,8 +646,7 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 
 				// search project and native tags
 				t4p::TagResultClass* result = Globals.TagCache.ExactTags(
-					constructorSearch, Globals.AllEnabledSourceDirectories()
-				);
+					constructorSearch, Globals.AllEnabledSourceDirectories());
 				if (result->Empty()) {
 					delete result;
 					result = Globals.TagCache.ExactNativeTags(constructorSearch);

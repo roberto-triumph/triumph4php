@@ -479,12 +479,10 @@ wxFileName t4p::ExplorerModifyEventClass::GetParentDir() const {
 wxEvent* t4p::ExplorerModifyEventClass::Clone() const {
 	if (Action == t4p::ExplorerModifyActionClass::RENAME_FILE) {
 		return new t4p::ExplorerModifyEventClass(
-			GetId(), OldFile, NewName, Success
-		);
+			GetId(), OldFile, NewName, Success);
 	}
 	return new t4p::ExplorerModifyEventClass(
-		GetId(), DirsDeleted, FilesDeleted, DirsNotDeleted, FilesNotDeleted, Success
-	);
+		GetId(), DirsDeleted, FilesDeleted, DirsNotDeleted, FilesNotDeleted, Success);
 }
 
 const wxEventType t4p::EVENT_EXPLORER = wxNewEventType();

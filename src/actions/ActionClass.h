@@ -646,12 +646,12 @@ typedef void (wxEvtHandler::*ActionProgressEventClassFunction)(t4p::ActionProgre
 #define EVT_ACTION_PROGRESS(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_ACTION_PROGRESS, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ActionProgressEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ActionProgressEventClassFunction, & fn), (wxObject *) NULL),
 
 #define EVT_ACTION_COMPLETE(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_ACTION_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ActionEventClassFunction, & fn), (wxObject *) NULL),
 
 
 }

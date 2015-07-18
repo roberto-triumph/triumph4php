@@ -254,7 +254,7 @@ typedef void (wxEvtHandler::*VolumeListEventClassFunction)(VolumeListEventClass&
 #define EVT_ACTION_VOLUME_LIST(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_ACTION_VOLUME_LIST, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( VolumeListEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(VolumeListEventClassFunction, & fn), (wxObject *) NULL),
 
 class VolumeListEventClass : public wxEvent {
 

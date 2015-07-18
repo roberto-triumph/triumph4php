@@ -78,7 +78,7 @@ typedef void (wxEvtHandler::*ActionEventClassFunction)(t4p::ActionEventClass&);
 #define EVT_MY_ACTION(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(EVENT_RUNNING, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( ActionEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(ActionEventClassFunction, & fn), (wxObject *) NULL),
 
 
 const int ID_THREAD = wxNewId();

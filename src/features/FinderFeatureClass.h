@@ -109,7 +109,7 @@ typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventCla
 #define EVT_FINDER(id, fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_FINDER_ACTION, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( FinderHitEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(FinderHitEventClassFunction, & fn), (wxObject *) NULL),
 
 
 class FinderFeatureClass : public FeatureClass {

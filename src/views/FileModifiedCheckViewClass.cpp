@@ -196,8 +196,7 @@ void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p:
 			newFile +
 			_("\nWhat would you like to do?"),
 			_("File Rename"),
-			choices
-		);
+			choices);
 		choiceDialog.SetWindowStyle(wxCENTER | wxOK);
 		choiceDialog.SetSize(choiceDialog.GetSize().GetWidth(), choiceDialog.GetSize().GetHeight() + 40);
 		if (wxID_OK == choiceDialog.ShowModal()) {

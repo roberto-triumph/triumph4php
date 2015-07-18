@@ -428,8 +428,7 @@ void t4p::FileWatcherFeatureClass::HandleWatchError() {
 		wxString msg = wxString::FromAscii(
 			"The following source directories have been detected as deleted from your system. "
 			"If you intend to delete those permanently, you should go to File ... Projects "
-			"and remove the source directories.\n"
-		);
+			"and remove the source directories.\n");
 		msg += dirsDeleted;
 		msg = wxGetTranslation(msg);
 		wxMessageBox(msg, _("Warning"), wxICON_WARNING | wxOK, NULL);

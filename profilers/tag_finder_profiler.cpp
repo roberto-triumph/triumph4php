@@ -442,8 +442,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 						callResults[i].ExpectedCount,
 						callResults[i].ActualCount,
 						callResults[i].File.getTerminatedBuffer(),
-						callResults[i].LineNumber
-					);
+						callResults[i].LineNumber);
 				}
 				else if (callResults[i].Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
 					u_fprintf(out,
@@ -452,8 +451,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 						callResults[i].ExpectedCount,
 						callResults[i].ActualCount,
 						callResults[i].File.getTerminatedBuffer(),
-						callResults[i].LineNumber
-					);
+						callResults[i].LineNumber);
 				}
 			}
 		}

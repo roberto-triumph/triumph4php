@@ -291,8 +291,7 @@ void t4p::DetectorFeatureClass::RunTemplateFileDetectors() {
 			App.Globals.DetectorCacheDbFileName);
 		actions.push_back(callStackAction);
 		actions.push_back(
-			new t4p::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR)
-		);
+			new t4p::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR));
 		App.Sequences.Build(actions);
 	}
 	else {

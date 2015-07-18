@@ -66,7 +66,7 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
 #define EVENT_TAG_CACHE_SEARCH_COMPLETE(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TAG_CACHE_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TagCacheSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(TagCacheSearchCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 
 /**

@@ -86,8 +86,7 @@ static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePrefere
 
 	t4p::StylePreferenceClass pref = options.FindByStcStyle(
         options.PhpStyles,
-        wxSTC_HPHP_DEFAULT
-	 );
+        wxSTC_HPHP_DEFAULT);
 
 	// use the PHP default settings as the catch-all for settings not yet exposed
 	// so the user sees a uniform style.
@@ -109,9 +108,8 @@ static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePrefere
 
 	// the found match indicator style
 	pref = options.FindByStcStyle(
-	           styles,
-	           t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT
-	       );
+	   styles,
+	   t4p::CodeControlOptionsClass::T4P_STYLE_MATCH_HIGHLIGHT);
 	ctrl->IndicatorSetStyle(t4p::CODE_CONTROL_INDICATOR_FIND,  wxSTC_INDIC_ROUNDBOX);
 	ctrl->IndicatorSetForeground(t4p::CODE_CONTROL_INDICATOR_FIND, pref.Color);
 }

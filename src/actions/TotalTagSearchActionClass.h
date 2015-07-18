@@ -113,7 +113,7 @@ typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagS
 #define EVENT_TOTAL_TAG_SEARCH_COMPLETE(id, fn) \
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_TOTAL_TAG_SEARCH_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
-    wxStaticCastEvent( TotalTagSearchCompleteEventClassFunction, & fn ), (wxObject *) NULL ),
+    wxStaticCastEvent(TotalTagSearchCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
 
 class TotalTagSearchActionClass : public t4p::ActionClass {

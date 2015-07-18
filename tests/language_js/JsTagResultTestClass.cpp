@@ -61,8 +61,7 @@ public:
 		File1Tag.MakeNew(
 			file1,
 			wxDateTime::Now(),
-			1
-		);
+			1);
 		File1Tag.SourceId = 12;
 		File1Tag.IsParsed = 1;
 		t4p::FileTagPersist(Session, File1Tag);
@@ -75,8 +74,7 @@ public:
 		File2Tag.MakeNew(
 			file2,
 			wxDateTime::Now(),
-			1
-		);
+			1);
 		t4p::FileTagPersist(Session, File2Tag);
 
 		Tag1.FileTagId = File1Tag.FileId;
