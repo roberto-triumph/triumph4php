@@ -49,7 +49,7 @@ t4p::ActionClass::~ActionClass() {
 }
 
 void t4p::ActionClass::Cancel() {
-	{   // NOLINT we want a lock to only last in this block
+	{   // NOLINT(whitespace/braces) we want a lock to only last in this block
 		wxMutexLocker locker(Mutex);
 		Cancelled = true;
 	}
@@ -370,7 +370,7 @@ void t4p::RunningThreadsClass::StopAll() {
 		return;
 	}
 
-	{  //  NOLINT we want a lock to only last in this block
+	{  //  NOLINT(whitespace/braces) we want a lock to only last in this block
 		// delete all queued actions. we do this first so that when we stop
 		// the running action the thread does not start working on the next action
 		// in the queue
