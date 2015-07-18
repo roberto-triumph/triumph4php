@@ -31,6 +31,7 @@ static void NewStyle(std::vector<t4p::StylePreferenceClass>& styles, int stcId, 
 	styles.push_back(pref); 
 }
 
+// NOLINT (readability/fn_size) these are a bunch of hard-coded values
 void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {	
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {  
