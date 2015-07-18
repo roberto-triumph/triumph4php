@@ -422,7 +422,7 @@ t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	CacheStatusLabel->SetLabel(wxT("Cache Status: ") + cacheStatus);
 	SearchText->SetFocus();
 
-	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
+	ProjectChoice->Append(_("All Enabled Projects"), reinterpret_cast<void*>(NULL));
 	for (size_t i = 0; i < Globals.Projects.size(); ++i) {
 		if (Globals.Projects[i].IsEnabled) {
 

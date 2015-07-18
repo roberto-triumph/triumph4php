@@ -103,7 +103,7 @@ static void GetNodeAttributeInt(wxXmlNode* node, const wxString& attributeName, 
 	if (GetNodeAttributeString(node, attributeName, str, error)) {
 		long lval = 0;
 		if (str.ToLong(&lval) && lval > 0) {
-			value = (int) lval;
+			value = static_cast<int>(lval);
 		}
 	}
 }

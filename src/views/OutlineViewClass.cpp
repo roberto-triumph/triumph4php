@@ -137,7 +137,7 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
-		outlineViewPanel = (OutlineViewPanelClass*)window;
+		outlineViewPanel = reinterpret_cast<OutlineViewPanelClass*>(window);
 		SetFocusToOutlineWindow(outlineViewPanel);
 
 	}
@@ -176,7 +176,7 @@ void t4p::OutlineViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& eve
 void t4p::OutlineViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 	if (window != NULL) {
-		OutlineViewPanelClass* outlineViewPanel = (OutlineViewPanelClass*)window;
+		OutlineViewPanelClass* outlineViewPanel = reinterpret_cast<OutlineViewPanelClass*>(window);
 		CodeControlClass* codeCtrl = event.GetCodeControl();
 		if (codeCtrl) {
 			outlineViewPanel->RemoveFileFromOutline(codeCtrl->GetFileName());
@@ -203,7 +203,7 @@ void t4p::OutlineViewClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventC
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
-		outlineViewPanel = (OutlineViewPanelClass*)window;
+		outlineViewPanel = reinterpret_cast<OutlineViewPanelClass*>(window);
 		outlineViewPanel->AddTagsToOutline(event.Tags);
 	}
 }
@@ -738,7 +738,7 @@ t4p::FileSearchDialogClass::FileSearchDialogClass(wxWindow *parent, t4p::Outline
 }
 
 void t4p::FileSearchDialogClass::Init() {
-	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
+	ProjectChoice->Append(_("All Enabled Projects"), reinterpret_cast<void*>(NULL));
 	for (size_t i = 0; i < Feature.App.Globals.Projects.size(); ++i) {
 		if (Feature.App.Globals.Projects[i].IsEnabled) {
 

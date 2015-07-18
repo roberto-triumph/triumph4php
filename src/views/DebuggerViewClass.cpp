@@ -200,7 +200,7 @@ static void ReplaceTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& item, cons
 
 static wxTreeListItem FindTreeListItemByFullName(wxTreeListCtrl* ctrl, const wxString& fullName) {
 	for (wxTreeListItem item = ctrl->GetFirstItem(); item.IsOk(); item = ctrl->GetNextItem(item)) {
-		wxStringClientData* data = (wxStringClientData*) ctrl->GetItemData(item);
+		wxStringClientData* data = reinterpret_cast<wxStringClientData*>(ctrl->GetItemData(item));
 		if (data && data->GetData() == fullName) {
 			return item;
 		}
@@ -1032,7 +1032,7 @@ void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxTreeListEvent& event
 		// due to hitting the depth limit
 		int contextId = ContextIdFromItem(VariablesList, item, LocalVariablesRoot, GlobalVariablesRoot);
 		if (contextId >= 0) {
-			wxStringClientData* clientData = (wxStringClientData*)VariablesList->GetItemData(item);
+			wxStringClientData* clientData = reinterpret_cast<wxStringClientData*>(VariablesList->GetItemData(item));
 			if (clientData) {
 				t4p::DbgpPropertyClass prop;
 				prop.FullName = clientData->GetData();
@@ -1047,7 +1047,7 @@ void t4p::DebuggerVariablePanelClass::OnVariableActivated(wxTreeListEvent& event
 	if (!item.IsOk()) {
 		return;
 	}
-	wxStringClientData* data = (wxStringClientData*)VariablesList->GetItemData(item);
+	wxStringClientData* data = reinterpret_cast<wxStringClientData*>(VariablesList->GetItemData(item));
 	if (data) {
 		wxString var = data->GetData();
 		wxCommandEvent evt(t4p::EVENT_DEBUGGER_SHOW_FULL, wxID_ANY);

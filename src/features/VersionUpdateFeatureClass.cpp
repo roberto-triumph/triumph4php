@@ -47,7 +47,7 @@ static wxEventType EVENT_VERSION_CHECK = wxNewEventType();
  /* writes to a stream */
 static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* stream) {
     size_t bytes = size * nmemb;
-    wxOutputStream* ostream = (wxOutputStream*)stream;
+    wxOutputStream* ostream = reinterpret_cast<wxOutputStream*>(stream);
     if (ostream) {
         ostream->Write(ptr, bytes);
         return ostream->LastWrite();

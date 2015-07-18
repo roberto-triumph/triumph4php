@@ -149,7 +149,7 @@ t4p::MainFrameClass::~MainFrameClass() {
 }
 
 t4p::StatusBarWithGaugeClass* t4p::MainFrameClass::GetStatusBarWithGauge() {
-	return (StatusBarWithGaugeClass*)GetStatusBar();
+	return reinterpret_cast<StatusBarWithGaugeClass*>(GetStatusBar());
 }
 
 void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {

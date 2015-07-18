@@ -70,7 +70,7 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 			isDestroy = IsCancelled();
 			if (!isDestroy) {
 				singleEvent.SetInt(counter);
-				singleEvent.SetClientData((void*) res);
+				singleEvent.SetClientData(reinterpret_cast<void*>(res));
 				PostEvent(singleEvent);
 			}
 		}

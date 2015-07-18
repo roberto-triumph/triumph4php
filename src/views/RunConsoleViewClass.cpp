@@ -227,7 +227,7 @@ t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
 
 void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	int selected = evt.GetSelection();
-	wxAuiNotebook* ctrl = (wxAuiNotebook*)evt.GetEventObject();
+	wxAuiNotebook* ctrl = reinterpret_cast<wxAuiNotebook*>(evt.GetEventObject());
 	if (ctrl->GetPage(selected) == this) {
 
 		// make sure we kill any running processes

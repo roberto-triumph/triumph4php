@@ -112,7 +112,7 @@ int main() {
 	UFILE* ufout = u_finit(stdout, NULL, NULL);
 	if (t4p::CallStackClass::NONE != error) {
 		u_fprintf(ufout, "Call stack error:%d Match Error:%d Error Lexeme:%S Error Class:%S\n", 
-			(int)error, (int)callStack.MatchError.Type, 
+			static_cast<int>(error), static_cast<int>(callStack.MatchError.Type),
 			callStack.MatchError.ErrorLexeme.getTerminatedBuffer(),
 			callStack.MatchError.ErrorClass.getTerminatedBuffer());
 	}

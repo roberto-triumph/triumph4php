@@ -103,7 +103,7 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 		}
 	}
 	if (window) {
-		FinderPanelClass* panel = (FinderPanelClass*) window;
+		FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(window);
 		wxString selectedText = GetSelectedText();
 		if (selectedText.empty() && transferExpression) {
 			selectedText = t4p::IcuToWx(Feature.FinderReplace.Expression);
@@ -135,14 +135,14 @@ void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 		wxWindow* replaceWindow = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 		wxWindow* findWindow = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 		if (replaceWindow && AuiManager->GetPane(replaceWindow).IsShown()) {
-			ReplacePanelClass* panel = (ReplacePanelClass*) replaceWindow;
+			ReplacePanelClass* panel = reinterpret_cast<ReplacePanelClass*>(replaceWindow);
 			panel->FindNext();
 			
 			// give focus back to code control this is just better user experience
 			codeControl->SetFocus();
 		}
 		else if (findWindow && AuiManager->GetPane(findWindow).IsShown()) {
-			FinderPanelClass* panel = (FinderPanelClass*) findWindow;
+			FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(findWindow);
 			panel->FindNext();
 			
 			// give focus back to code control this is just better user experience
@@ -159,7 +159,7 @@ void t4p::FinderViewClass::OnEditFindPrevious(wxCommandEvent& event) {
 	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
-		FinderPanelClass* panel = (FinderPanelClass*) window;	
+		FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(window);
 		panel->FindPrevious();	
 		// give focus back to code control this is just better user experience
 		codeControl->SetFocus();
@@ -201,7 +201,7 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 		}
 	}
 	if (window) {
-		ReplacePanelClass* panel = (ReplacePanelClass*) window;
+		ReplacePanelClass* panel = reinterpret_cast<ReplacePanelClass*>(window);
 		wxString selectedText = GetSelectedText();
 		if (selectedText.empty() && transferExpression) {
 			selectedText = t4p::IcuToWx(Feature.Finder.Expression);

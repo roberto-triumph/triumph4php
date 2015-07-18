@@ -271,7 +271,7 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 
 	// according to http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153(v=vs.85).aspx
 	// succes is when return value is greater than 32
-	ret = ((int)res) > 32;
+	ret = static_cast<int>(res) > 32;
 	wxASSERT_MSG(ret, wxString::Format("result code=%d", res));
 	codeCtrl->MarkAsSaved();
 
@@ -660,7 +660,7 @@ void t4p::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 		gauge->SetColumn0Text(wxT(""));
 	}
 
-	char ch = (char)event.GetKey();
+	char ch = static_cast<char>(event.GetKey());
 	if (CodeControlOptions.EnableAutomaticLineIndentation) {
 		HandleAutomaticIndentation(ch);
 	}
@@ -874,7 +874,7 @@ UnicodeString t4p::CodeControlClass::GetSafeText() {
 	// copied from the implementation of GetText method in stc.cpp 
 	int len  = GetTextLength();
 	wxMemoryBuffer mbuf(len + 1);   // leave room for the null...
-	char* buf = (char*)mbuf.GetWriteBuf(len + 1);
+	char* buf = reinterpret_cast<char*>(mbuf.GetWriteBuf(len + 1));
 	
 	SendMsg(2182, len + 1, (long)buf);
 	mbuf.UngetWriteBuf(len);
@@ -1194,7 +1194,7 @@ void t4p::CodeControlClass::TrimTrailingSpaces() {
 		int lineStart = PositionFromLine(line);
 		int lineEnd = GetLineEndPosition(line);
 		int i = lineEnd - 1;
-		char ch = (char)GetCharAt(i);
+		char ch = static_cast<char>(GetCharAt(i));
 		while ((i >= lineStart) && ((ch == ' ') || (ch == '\t'))) {
 			i--;
 			ch = GetCharAt(i);

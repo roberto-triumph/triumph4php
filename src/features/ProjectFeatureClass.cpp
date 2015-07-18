@@ -139,7 +139,7 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		wxString keySourceCount = wxString::Format(wxT("/Project_%ld/SourceCount"), i);
 		config->Write(keyLabel, project.Label);
 		config->Write(keyEnabled, project.IsEnabled);
-		config->Write(keySourceCount, (int)project.Sources.size());
+		config->Write(keySourceCount, static_cast<int>(project.Sources.size()));
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
 			t4p::SourceClass source = project.Sources[j];			
 			wxString keyRootPath = wxString::Format(wxT("/Project_%ld/Source_%ld_RootDirectory"), i, j);

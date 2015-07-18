@@ -143,7 +143,7 @@ static int StringToKeyCode(const wxString& str) {
 
 	// it should be an ASCII key...
 	if (!normalized.empty()) {
-		return (int)normalized.GetChar(0);
+		return static_cast<int>(normalized.GetChar(0));
 	}
 	return 0;
 }

@@ -162,7 +162,7 @@ void t4p::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRootDir,
 
 void t4p::DetectorTreeHandlerClass::OnTreeItemActivated(wxTreeEvent& event) {
 	wxTreeItemId id = event.GetItem();
-	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
+	TreeItemDataStringClass* treeItemData = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(id));
 	if (treeItemData) {
 		t4p::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
@@ -240,7 +240,7 @@ void t4p::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 	// make sure that item selected is an actual detector and not a label
 	wxTreeItemId itemId = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
-		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(itemId))
 		: NULL;
 	if (!treeItemData) {
 		wxMessageBox(_("Please choose a detector to test."));
@@ -260,7 +260,7 @@ void t4p::DetectorTreeHandlerClass::OnTestButton(wxCommandEvent& event) {
 
 void t4p::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
-	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
+	TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
 	if (data) {
 		DetectorTree->SelectItem(treeItemId, true);
 
@@ -293,7 +293,7 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemRightClick(wxTreeEvent& event) {
 
 void t4p::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
 	wxTreeItemId treeItemId = event.GetItem();
-	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
+	TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
 	if (data) {
 		wxRemoveFile(data->Str);
 	}
@@ -302,7 +302,7 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemDelete(wxTreeEvent& event) {
 
 void t4p::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
-	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
+	TreeItemDataStringClass* treeItemData = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(id));
 	if (treeItemData) {
 		t4p::OpenFileCommandEventClass openEvent(treeItemData->Str);
 		EventSink.Publish(openEvent);
@@ -311,7 +311,7 @@ void t4p::DetectorTreeHandlerClass::OnMenuOpenDetector(wxCommandEvent& event) {
 
 void t4p::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& event) {
 	wxTreeItemId id = DetectorTree->GetSelection();
-	TreeItemDataStringClass* treeItemData = (TreeItemDataStringClass*)DetectorTree->GetItemData(id);
+	TreeItemDataStringClass* treeItemData = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(id));
 	if (treeItemData) {
 		DetectorTree->EditLabel(id);	
 	}
@@ -319,7 +319,7 @@ void t4p::DetectorTreeHandlerClass::OnMenuRenameDetector(wxCommandEvent& event) 
 
 void t4p::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& event) {
 	wxTreeItemId treeItemId = DetectorTree->GetSelection();
-	TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
+	TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
 	if (data) {
 		int res = wxMessageBox(_("Delete this detector? The operation cannot be undone.\n") + data->Str, _("Delete URL detector"), wxYES_NO);
 		if (wxYES == res) {
@@ -364,7 +364,7 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 
 		// rename the file and set the tree item data; the label itself will be set 
 		// by the next event handler
-		TreeItemDataStringClass* data = (TreeItemDataStringClass*)DetectorTree->GetItemData(treeItemId);
+		TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
 		wxASSERT(data);
 		wxFileName oldFileName(data->Str);
 		wxFileName newFileName(oldFileName.GetPath(), newName);
@@ -519,7 +519,7 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnTestButton(wxCommandEvent& event
 	// make sure that item selected is an actual detector and not a label
 	wxTreeItemId itemId = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
-		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(itemId))
 		: NULL;
 	if (!treeItemData) {
 		wxMessageBox(_("Please choose a detector to test."));
@@ -544,7 +544,7 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnTestButton(wxCommandEvent& event
 void t4p::TemplateFileTagsDetectorPanelClass::OnCallStackComplete(wxCommandEvent& event) {
 	wxTreeItemId itemId = DetectorTree->GetSelection();
 	TreeItemDataStringClass* treeItemData = itemId.IsOk() ? 
-		(TreeItemDataStringClass*)DetectorTree->GetItemData(itemId)
+		reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(itemId))
 		: NULL;
 	if (!treeItemData) {
 		return;

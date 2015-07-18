@@ -387,7 +387,7 @@ void t4p::LintActionClass::IterateDirectory() {
 		// that will barely be noticeable in the gauge.
 		FilesCompleted++;
 		double newProgress = (FilesCompleted * 1.0) / FilesTotal;
-		int newProgressWhole = (int)floor(newProgress * 100);
+		int newProgressWhole = static_cast<int>(floor(newProgress * 100));
 
 		// we dont want to send the progress=0 event more than once
 		if (newProgressWhole < 1) {

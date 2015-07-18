@@ -755,10 +755,10 @@ void t4p::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 
 	// the event object is the control that has focus
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
-		((wxWindow*)event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsBackward);
+		reinterpret_cast<wxWindow*>(event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsBackward);
 	}
 	else if (event.GetKeyCode() == WXK_TAB) {
-		((wxWindow*)event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsForward);
+		reinterpret_cast<wxWindow*>(event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsForward);
 	}
 	else {
 		event.Skip();

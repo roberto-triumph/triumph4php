@@ -94,7 +94,7 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 	
 	// horrible code: must find a way to write many bytes at once
 	for (unsigned int i = 0; i < contents.Length(); ++i) {
-		file.put((int)contents[i]);
+		file.put(static_cast<int>(contents[i]));
 	}
 	file.close();
 }

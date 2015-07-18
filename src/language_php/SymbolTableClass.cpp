@@ -858,7 +858,7 @@ void t4p::SymbolTableClass::Print() const {
 		u_fprintf(out, "Symbol Table For %S\n", s.getTerminatedBuffer());
 		for (size_t j = 0; j < scopedSymbols.size(); ++j) {
 			t4p::SymbolClass symbol = scopedSymbols[j];
-			u_fprintf(out, "%d\t%S\t", (int)j, 
+			u_fprintf(out, "%ld\t%S\t", j, 
 				symbol.Variable.getTerminatedBuffer()); 
 			for (size_t k = 0; k < symbol.ChainList.size(); ++k) {
 				u_fprintf(out, "%S", 

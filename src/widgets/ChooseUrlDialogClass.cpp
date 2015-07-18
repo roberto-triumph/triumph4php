@@ -41,7 +41,7 @@ t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 	FillUrlList(allUrlTags);
 	
 	ProjectChoice->Clear();
-	ProjectChoice->Append(_("All Enabled Projects"), (void*)NULL);
+	ProjectChoice->Append(_("All Enabled Projects"), reinterpret_cast<void*>(NULL));
 	for (size_t i = 0; i < projects.size(); ++i) {
 		if (projects[i].IsEnabled) {
 			Projects.push_back(projects[i]);
