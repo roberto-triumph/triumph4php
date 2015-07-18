@@ -40,7 +40,7 @@ namespace t4p {
  */
 class RegularExpressionValidatorClass : public wxValidator {
 
-public:
+	public:
 
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
@@ -58,7 +58,7 @@ public:
 
 	virtual wxObject* Clone() const;
 
-private:
+	private:
 
 	RegularExpressionValidatorClass();
 

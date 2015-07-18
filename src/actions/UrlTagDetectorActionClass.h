@@ -39,7 +39,7 @@ namespace t4p {
  */
 class UrlTagDetectorParamsClass {
 
-public:
+	public:
 
 	/**
 	 * location to the php executable (php.exe / php)
@@ -104,7 +104,7 @@ public:
  */
 class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	UrlTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -119,7 +119,7 @@ public:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * used to run the external url detector PHP script

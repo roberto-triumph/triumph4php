@@ -34,7 +34,7 @@ namespace t4p {
 
 class DebuggerViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	DebuggerViewClass(t4p::DebuggerFeatureClass& feature);
 
@@ -93,7 +93,7 @@ public:
 	 */
 	void BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
 
-private:
+	private:
 
 	t4p::DebuggerFeatureClass& Feature;
 
@@ -195,13 +195,13 @@ private:
 };
 
 class DebuggerLogPanelClass : public DebuggerLogPanelGeneratedClass {
-public:
+	public:
 
 	DebuggerLogPanelClass(wxWindow* parent);
 
 	void Append(const wxString& text);
 
-private:
+	private:
 
 	void OnClearButton(wxCommandEvent& event);
 };
@@ -212,7 +212,7 @@ private:
  */
 class DebuggerStackPanelClass : public DebuggerStackPanelGeneratedClass {
 
-public:
+	public:
 
 	DebuggerStackPanelClass(wxWindow* parent, int id);
 
@@ -226,13 +226,13 @@ public:
 	 */
 	void ResetStatus(bool active);
 
-private:
+	private:
 
 };
 
 class DebuggerVariablePanelClass : public DebuggerVariablePanelGeneratedClass {
 
-public:
+	public:
 
 	DebuggerVariablePanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
@@ -252,7 +252,7 @@ public:
 	 */
 	void ResetStatus(bool active);
 
-private:
+	private:
 
 	void OnVariableExpanding(wxTreeListEvent& event);
 	void OnVariableActivated(wxTreeListEvent& event);
@@ -277,7 +277,7 @@ private:
  */
 class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClass {
 
-public:
+	public:
 
 	DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature,
 		t4p::DebuggerViewClass& view);
@@ -287,7 +287,7 @@ public:
 	 */
 	void RefreshList();
 
-private:
+	private:
 
 	// button click handlers
 	void OnDeleteBreakpoint(wxCommandEvent& event);
@@ -321,7 +321,7 @@ private:
  */
 class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
 
-public:
+	public:
 
 	DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
@@ -345,7 +345,7 @@ public:
 	 */
 	void ResetStatus(bool active);
 
-private:
+	private:
 
 	void OnEvalClick(wxCommandEvent& event);
 	void OnClearClick(wxCommandEvent& event);
@@ -370,7 +370,7 @@ private:
  */
 class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
 
-public:
+	public:
 
 	// this class will own these 3 panel pointers
 	t4p::DebuggerLogPanelClass* LogPanel;
@@ -393,7 +393,7 @@ public:
 	 */
 	void ResetStatus(bool active);
 
-private:
+	private:
 };
 
 /**
@@ -402,13 +402,13 @@ private:
  */
 class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
 
-public:
+	public:
 
 	DebuggerOptionsPanelClass(wxWindow* parent, t4p::DebuggerOptionsClass& options, bool& wasDebuggerPortChanged);
 
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	// handlers for source code mapping CRUD
 	void OnAddMapping(wxCommandEvent& event);
@@ -446,7 +446,7 @@ private:
  */
 class DebuggerFullViewDialogClass : public DebuggerFullViewDialogGeneratedClass {
 
-public:
+	public:
 
 	DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value);
 };
@@ -457,11 +457,11 @@ public:
  */
 class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
 
-public:
+	public:
 
 	DebuggerMappingDialogClass(wxWindow* parent, wxString& localPath, wxString& remotePath);
 
-private:
+	private:
 
 	void OnCancelButton(wxCommandEvent& event);
 

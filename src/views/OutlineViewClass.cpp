@@ -79,7 +79,7 @@ namespace t4p {
  */
 class IdTreeItemDataClass  : public wxTreeItemData {
 
-public:
+	public:
 
 	int Id;
 

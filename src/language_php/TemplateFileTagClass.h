@@ -39,7 +39,7 @@ namespace t4p {
  */
 class TemplateFileTagClass {
 
-public:
+	public:
 
 	/**
 	 * the full path of the template file
@@ -68,7 +68,7 @@ public:
  */
 class TemplateFileTagFinderClass {
 
-public:
+	public:
 
 	TemplateFileTagFinderClass();
 
@@ -85,7 +85,7 @@ public:
 	 */
 	std::vector<t4p::TemplateFileTagClass> All();
 
-private:
+	private:
 
 	soci::session Session;
 

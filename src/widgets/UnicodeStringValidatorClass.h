@@ -36,7 +36,7 @@ namespace t4p {
  */
 class UnicodeStringValidatorClass : public wxValidator {
 
-public:
+	public:
 
 	UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty);
 
@@ -48,7 +48,7 @@ public:
 
 	virtual wxObject* Clone() const;
 
-private:
+	private:
 
 	/**
 	 * The data

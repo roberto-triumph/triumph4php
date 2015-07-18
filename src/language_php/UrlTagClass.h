@@ -38,7 +38,7 @@ namespace t4p {
  */
 class UrlTagClass {
 
-public:
+	public:
 
 	/**
 	 * These are absolute URLs; may contain a query string.
@@ -102,7 +102,7 @@ public:
  */
 class UrlTagFinderClass : public t4p::SqliteFinderClass {
 
-public:
+	public:
 
 	UrlTagFinderClass(soci::session& session);
 

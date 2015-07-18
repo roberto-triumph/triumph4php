@@ -34,7 +34,7 @@ namespace t4p {
 
 class ProjectViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	/**
 	 * Create a new instance of ProjectViewClass.
@@ -51,7 +51,7 @@ public:
 	 */
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 
 	/**
@@ -77,7 +77,7 @@ private:
 
 class ProjectPreferencesPanelClass : public ProjectPreferencesGeneratedPanelClass {
 
-public:
+	public:
 
 	/**
 	 * Construct a new instance
@@ -91,7 +91,7 @@ public:
  */
 class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClass {
 
-protected:
+	protected:
 
 	void OnAddSource(wxCommandEvent& event);
 	void OnEditSource(wxCommandEvent& event);
@@ -99,11 +99,11 @@ protected:
 	void OnOkButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
 	void OnSourcesListDoubleClick(wxCommandEvent& event);
-public:
+	public:
 
 	ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project);
 
-private:
+	private:
 
 	/**
 	 * Reference that gets updated only when the user clicks OK
@@ -126,16 +126,16 @@ private:
  */
 class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
 
-public:
+	public:
 
 	ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source);
 
-private:
+	private:
 
 	/**
 	 * The source that will get updated when the user clicks OK
@@ -153,7 +153,7 @@ private:
  */
 class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
 
-protected:
+	protected:
 
 	void OnSelectAllButton(wxCommandEvent& event);
 	void OnProjectsListDoubleClick(wxCommandEvent& event);
@@ -166,7 +166,7 @@ protected:
 	void OnAddFromDirectoryButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 
-public:
+	public:
 
 	/**
 	 * @param project the list of projects the user will edit / remove / add to
@@ -183,7 +183,7 @@ public:
 		std::vector<t4p::ProjectClass>& removedProjects,
 		std::vector<t4p::ProjectClass>& touchedProjects);
 
-private:
+	private:
 
 	/**
 	 * The list that will get updated once the user clicks OK
@@ -212,7 +212,7 @@ private:
 	 */
 	void Populate();
 
-private:
+	private:
 
 	/**
 	 * @param project to add to both the edited data structure and the GUI list
@@ -226,7 +226,7 @@ private:
  */
 class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent the parent window
@@ -237,13 +237,13 @@ public:
 	 */
 	MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption, std::vector<wxString>& choices, std::vector<int>& selections);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	std::vector<int>& Selections;
 };

@@ -38,7 +38,7 @@ namespace t4p {
  */
 class FileOperationsViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
     FileOperationsViewClass(t4p::FileOperationsFeatureClass& feature);
 

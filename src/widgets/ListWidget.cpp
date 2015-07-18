@@ -22,7 +22,7 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #include <widgets/ListWidget.h>
+#include <widgets/ListWidget.h>
 
 void t4p::ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
 	int newRowNumber = list->GetItemCount();

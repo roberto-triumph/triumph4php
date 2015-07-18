@@ -42,7 +42,7 @@ namespace t4p {
  */
 class GlobalActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -58,7 +58,7 @@ public:
  */
 class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 

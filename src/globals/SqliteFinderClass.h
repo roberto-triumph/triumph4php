@@ -81,7 +81,7 @@ class SqliteFinderClass {
 	 */
 	bool Exec(t4p::SqliteResultClass* result);
 
-protected:
+	protected:
 
 	/**
 	 * the opened connection to the detector databases.

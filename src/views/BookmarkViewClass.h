@@ -52,7 +52,7 @@ namespace t4p {
  */
 class BookmarkViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 	BookmarkViewClass(t4p::BookmarkFeatureClass& feature);
 
 	/**
@@ -65,7 +65,7 @@ public:
 	 */
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	/**
 	 * this menu handler will toggle the bookmark in the current

@@ -42,7 +42,7 @@ namespace t4p {
  */
 class ProjectTagActionClass : public GlobalActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all
@@ -75,7 +75,7 @@ public:
 
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	/**
 	 * Queue of projects to be indexed.
@@ -127,7 +127,7 @@ private:
  */
 class ProjectTagInitActionClass : public t4p::InitializerGlobalActionClass {
 
-public:
+	public:
 
 	ProjectTagInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -141,7 +141,7 @@ public:
  */
 class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -162,7 +162,7 @@ public:
 	 */
 	bool Init(t4p::GlobalsClass& globals);
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -189,7 +189,7 @@ protected:
  */
 class ProjectTagSingleFileActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -212,7 +212,7 @@ public:
 	bool Init(t4p::GlobalsClass& globals);
 
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -239,7 +239,7 @@ protected:
  */
 class ProjectTagSingleFileRenameActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	ProjectTagSingleFileRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -258,7 +258,7 @@ public:
 	bool Init(t4p::GlobalsClass& globals);
 
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -288,7 +288,7 @@ protected:
  */
 class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	ProjectTagDirectoryRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -307,7 +307,7 @@ public:
 	bool Init(t4p::GlobalsClass& globals);
 
 
-protected:
+	protected:
 
 	void BackgroundWork();
 

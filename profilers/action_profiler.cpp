@@ -42,7 +42,7 @@
  */
 
 class MyApp : public wxApp {
-public:
+	public:
 
 	MyApp();
 	bool OnInit();
@@ -85,12 +85,12 @@ public:
 };
 
 class MyFrame: public wxFrame {
-public:
+	public:
 	MyFrame(MyApp& app);
 
 	void Log(wxString msg);
 
-private:
+	private:
 
 	wxTextCtrl* TextCtrl;
 	MyApp& App;

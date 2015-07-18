@@ -57,7 +57,7 @@ class TagParserClass : public pelet::ClassObserverClass,
 	public pelet::FunctionObserverClass,
 	public t4p::DirectoryWalkerClass {
 
-public:
+	public:
 
 	/**
 	 * The files to be parsed; these are php source code file
@@ -242,7 +242,7 @@ public:
 	 */
 	void RenameDir(const wxFileName& oldDir, const wxFileName& newDir);
 
-private:
+	private:
 
 	/**
 	 * cache of namespaces, used because the same namespace may be declared in multiple

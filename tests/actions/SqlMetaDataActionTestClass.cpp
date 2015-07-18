@@ -39,7 +39,7 @@ static int ID_SQL_METADATA_FETCH = wxNewId();
 class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass,
 	public DatabaseTestFixtureClass, public SqliteTestFixtureClass, public FileTestFixtureClass {
 
-public:
+	public:
 
 	t4p::SqlMetaDataActionClass SqlMetaDataAction;
 	t4p::SqlResourceFinderClass Results;

@@ -32,7 +32,7 @@
 
 class JsTagResultFixtureClass : SqliteTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * The tags that we will insert, then expect to be

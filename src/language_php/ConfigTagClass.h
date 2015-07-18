@@ -41,7 +41,7 @@ namespace t4p {
  */
 class ConfigTagClass {
 
-public:
+	public:
 
 	/**
 	 * The label that will be showns as the menu item.
@@ -76,7 +76,7 @@ public:
  */
 class ConfigTagFinderClass : public t4p::SqliteFinderClass {
 
-public:
+	public:
 
 	ConfigTagFinderClass(soci::session& session);
 

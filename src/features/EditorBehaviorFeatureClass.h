@@ -41,7 +41,7 @@ namespace t4p {
  */
 class EditorKeyboardCommandClass {
 
-public:
+	public:
 
 	/**
 	 * human-friendly name of the command
@@ -97,7 +97,7 @@ public:
  */
 class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * The keyboard commands (shortcuts) assigned to the Scintilla
@@ -122,7 +122,7 @@ public:
 	int SciCommandToMenuId(int cmdId);
 	int MenuIdToSciCommand(int menuId);
 
-private:
+	private:
 
 	/**
 	 * Handler to save the editor feature preferences.

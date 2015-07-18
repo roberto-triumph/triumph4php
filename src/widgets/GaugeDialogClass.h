@@ -39,7 +39,7 @@ namespace t4p {
  */
 class GaugeDialogClass : public GaugeDialogGeneratedClass {
 
-public:
+	public:
 
 	GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label);
 
@@ -48,13 +48,13 @@ public:
 	 */
 	void Start();
 
-protected:
+	protected:
 
 	void OnHideButton(wxCommandEvent& event);
 
 	void OnTimer(wxTimerEvent& event);
 
-private:
+	private:
 
 	wxTimer Timer;
 

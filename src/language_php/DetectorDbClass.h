@@ -37,7 +37,7 @@ namespace t4p {
  */
 class DetectorDbClass {
 
-public:
+	public:
 
 	DetectorDbClass();
 
@@ -57,7 +57,7 @@ public:
 	 */
 	void Wipe();
 
-private:
+	private:
 
 	/**
 	 * This class will not own the pointer.

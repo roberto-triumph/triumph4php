@@ -46,7 +46,7 @@ namespace t4p {
  */
 class TemplateFilesFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	TemplateFilesFeatureClass(t4p::AppClass& app);
 
@@ -61,7 +61,7 @@ public:
 	 */
 	void StartDetection();
 
-private:
+	private:
 
 };
 

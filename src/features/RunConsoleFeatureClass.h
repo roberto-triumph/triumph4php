@@ -41,7 +41,7 @@ class RunConsoleFeatureClass;
  */
 class CliCommandClass {
 
-public:
+	public:
 
 	/**
 	 * Binary to be run. This may be a full path, or just the
@@ -95,7 +95,7 @@ public:
  */
 class FileNameHitClass {
 
-public:
+	public:
 
 	/**
 	 * The 0-based index into output string. This is the start of the file name
@@ -113,7 +113,7 @@ public:
 
 class RunConsoleFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * The list of commands to be persisted.
@@ -144,7 +144,7 @@ public:
 	 */
 	void LoadPage(const wxString& fileName);
 
-private:
+	private:
 
 	/**
 	 * Handles the click of the saved command buttons

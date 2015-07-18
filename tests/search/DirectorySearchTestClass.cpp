@@ -30,7 +30,7 @@
 #include <algorithm>
 
 class DirectorySearchTestClass : public FileTestFixtureClass {
-public:
+	public:
 	DirectorySearchTestClass()
 		: FileTestFixtureClass(wxT("directory_search"))
 		, DirectorySearch() {
@@ -73,7 +73,7 @@ public:
 };
 
 class SourceFixtureClass {
-public:
+	public:
 
 	SourceFixtureClass()
 		: Source() {
@@ -97,7 +97,7 @@ public:
 
 class FileTestDirectoryWalker : public t4p::DirectoryWalkerClass {
 
-public:
+	public:
 
 
 	bool IsBeginCalled;

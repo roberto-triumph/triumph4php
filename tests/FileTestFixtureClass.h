@@ -34,7 +34,7 @@
  */
 class FileTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * Construct a new test fixture that will use subdirectory tempDirectory within the OS temp

@@ -88,7 +88,7 @@ class BookmarkClass {
  */
 class BookmarkFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * all bookmarks added by the user

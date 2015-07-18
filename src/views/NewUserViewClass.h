@@ -39,11 +39,11 @@ namespace t4p {
  */
 class NewUserViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	NewUserViewClass(t4p::NewUserFeatureClass& feature);
 
-private:
+	private:
 
 	void OnAppReady(wxCommandEvent& event);
 
@@ -65,14 +65,14 @@ private:
 - */
 class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
 
-public:
+	public:
 
 	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals,
 		t4p::PreferencesClass& preferences, wxFileName& configFileDir);
 
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	void OnUpdateUi(wxUpdateUIEvent& event);
 
@@ -89,11 +89,11 @@ private:
  */
 class NewUserAssociationsPanelClass : public NewUserAssociationsPanelGeneratedClass {
 
-public:
+	public:
 
 	NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
-private:
+	private:
 
 	t4p::GlobalsClass& Globals;
 
@@ -104,13 +104,13 @@ private:
  */
 class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClass {
 
-public:
+	public:
 
 	NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	void OnUpdateUi(wxUpdateUIEvent& event);
 

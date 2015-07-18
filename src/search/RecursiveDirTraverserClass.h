@@ -37,7 +37,7 @@ namespace t4p {
  * for more info.
  */
 class RecursiveDirTraverserClass : public wxDirTraverser {
-public:
+	public:
 
     RecursiveDirTraverserClass(std::vector<wxString>& fullPaths);
 
@@ -45,7 +45,7 @@ public:
 
     wxDirTraverseResult OnDir(const wxString& dirname);
 
-private:
+	private:
 
     std::vector<wxString>& FullPaths;
 };

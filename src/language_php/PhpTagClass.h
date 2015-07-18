@@ -39,7 +39,7 @@ namespace t4p {
  */
 class PhpTagClass {
 
-public:
+	public:
 
 	/**
 	 * All the resources we collect
@@ -238,7 +238,7 @@ public:
 
 class TraitTagClass {
 
-public:
+	public:
 
 	/**
 	 * the key is used to perform lookups into this table. The key will be either
@@ -296,7 +296,7 @@ public:
  */
 class FileTagClass {
 
-public:
+	public:
 
 	/**
 	 * The full path to the file where this tag was found

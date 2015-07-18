@@ -48,7 +48,7 @@ wxFileName FileNameCopy(const wxFileName& fileName);
  * @param dest vector to insert/delete wxFileNames from
  * @return the cloned filenames
  */
- std::vector<wxFileName> DeepCopyFileNames(const std::vector<wxFileName>& fileNames);
+std::vector<wxFileName> DeepCopyFileNames(const std::vector<wxFileName>& fileNames);
 
 }
 

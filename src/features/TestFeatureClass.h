@@ -35,7 +35,7 @@ namespace t4p {
  * repeating steps just put the code in the Go() method )
  */
 class TestFeatureClass : public FeatureClass {
-public:
+	public:
 
 	TestFeatureClass(t4p::AppClass& app);
 

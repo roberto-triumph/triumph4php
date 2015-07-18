@@ -202,7 +202,7 @@ t4p::TagCacheClass::TagCacheClass()
 
 t4p::TagCacheClass::~TagCacheClass() {
 	Clear();
- }
+}
 
 bool t4p::TagCacheClass::RegisterWorking(const wxString& fileName, t4p::WorkingCacheClass* cache) {
 	bool ret = false;

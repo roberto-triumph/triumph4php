@@ -41,7 +41,7 @@ extern const wxEventType EVENT_APP_LOG;
 
 class EditorLogEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Message;
 	wxLogLevel Level;
@@ -66,11 +66,11 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
  */
 class EditorMessagesFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	EditorMessagesFeatureClass(t4p::AppClass& app);
 
-private:
+	private:
 
 	void OnAppReady(wxCommandEvent& event);
 
@@ -86,13 +86,13 @@ private:
  */
 class EditorMessagesLoggerClass : public wxLog {
 
-public:
+	public:
 
 	EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
 
 	void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info);
 
-private:
+	private:
 
 	EditorMessagesFeatureClass& Feature;
 };

@@ -49,7 +49,7 @@ class NotebookClass;
  */
 class NavigationViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	NavigationViewClass();
 
@@ -74,7 +74,7 @@ public:
  */
 class NavigationChoiceClass {
 
-public:
+	public:
 
 	/**
 	 * The notebook that the user chose to be focused on
@@ -98,7 +98,7 @@ public:
  */
 class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 
-public:
+	public:
 
 	NavigationViewDialogClass(wxWindow* parent,
 		t4p::NavigationViewClass& view,
@@ -108,13 +108,13 @@ public:
 		wxAuiNotebook* toolsNotebook,
 		t4p::NavigationChoiceClass& choice);
 
-protected:
+	protected:
 
 	void OnFilesListKeyDown(wxKeyEvent& event);
 	void OnPanelsListKeyDown(wxKeyEvent& event);
 	void OnFileItemActivated(wxListEvent& event);
 	void OnPanelItemActivated(wxListEvent& event);
-private:
+	private:
 
 	std::vector<t4p::NotebookClass*> CodeNotebooks;
 	wxAuiNotebook* OutlineNotebook;

@@ -42,7 +42,7 @@ namespace t4p {
  */
 class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
 
@@ -50,7 +50,7 @@ public:
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
-private:
+	private:
 
 	/**
 	 * handler for the notebook menu event

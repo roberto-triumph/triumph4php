@@ -34,7 +34,7 @@ namespace t4p {
  * This class allows the status bar to be populated with a gauge (progress bar).
  */
 class StatusBarWithGaugeClass : public wxStatusBar {
-public:
+	public:
     StatusBarWithGaugeClass(wxWindow *parent, int id = wxID_ANY);
 
 	/**
@@ -119,7 +119,7 @@ public:
 		DETERMINATE_MODE = -2
 	};
 
-private:
+	private:
     enum {
         FIELD_TEXT,
         FIELD_GAUGE_TITLE,

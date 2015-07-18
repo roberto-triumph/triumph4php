@@ -37,7 +37,7 @@
  */
 class ActionTestFixtureClass : public wxEvtHandler {
 
-public:
+	public:
 
 	t4p::RunningThreadsClass RunningThreads;
 

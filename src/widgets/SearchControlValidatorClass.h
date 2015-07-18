@@ -34,7 +34,7 @@
  */
 class SearchControlValidatorClass : public wxValidator {
 
-public:
+	public:
 
 	SearchControlValidatorClass(wxString* data);
 
@@ -46,7 +46,7 @@ public:
 
 	virtual wxObject* Clone() const;
 
-private:
+	private:
 
 	SearchControlValidatorClass();
 

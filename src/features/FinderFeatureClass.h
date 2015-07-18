@@ -37,7 +37,7 @@ namespace t4p {
  */
 class FinderActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param utf8buf this class will take ownership of this pointer
@@ -45,7 +45,7 @@ public:
 	FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const UnicodeString& search, char* utf8Buf, int bufLength);
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -83,7 +83,7 @@ protected:
  */
 class FinderHitEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * this is the index into the utf8 buffer, not character pos
@@ -114,7 +114,7 @@ typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventCla
 
 class FinderFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * will perform the searching

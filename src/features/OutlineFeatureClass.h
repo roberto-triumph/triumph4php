@@ -39,7 +39,7 @@ namespace t4p {
  */
 class OutlineSearchCompleteClass {
 
-public:
+	public:
 
 	wxString Label;
 
@@ -60,16 +60,16 @@ public:
  */
 class OutlineSearchCompleteEventClass : public wxEvent {
 
-        public:
+	public:
 
-        /**
-         * Will contain all of the resulting tags.
-         */
-        std::vector<t4p::OutlineSearchCompleteClass> Tags;
+	/**
+	 * Will contain all of the resulting tags.
+	 */
+	std::vector<t4p::OutlineSearchCompleteClass> Tags;
 
-        OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
+	OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
 
-        wxEvent* Clone() const;
+	wxEvent* Clone() const;
 
 };
 
@@ -88,7 +88,7 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
  */
 class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -103,11 +103,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	t4p::TagCacheClass TagCache;
 
@@ -125,7 +125,7 @@ private:
  * in the opened files.
  */
 class OutlineFeatureClass : public FeatureClass {
-public:
+	public:
 
 	/**
 	 * Creates a new OutlineViewFeature.

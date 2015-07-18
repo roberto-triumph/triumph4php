@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,10 +56,9 @@ const static int ID_MENU_ADJUST_6 = wxNewId();
 const static int ID_MENU_ADJUST_7 = wxNewId();
 const static int ID_MENU_MOVE_7 = wxNewId();
 
-class ChangeDialogGeneratedClass : public wxDialog 
-{
+class ChangeDialogGeneratedClass : public wxDialog {
 	private:
-	
+
 	protected:
 		wxStaticText* LayerLabel;
 		wxSpinCtrl* Layer;
@@ -70,96 +69,94 @@ class ChangeDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
-	
+
 	public:
-		
-		ChangeDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
-		~ChangeDialogGeneratedClass();
-	
+
+	ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+	~ChangeDialogGeneratedClass();
+
 };
 
-ChangeDialogGeneratedClass::ChangeDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
+ChangeDialogGeneratedClass::ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style) {
+	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
+
 	wxFlexGridSizer* BodySizer;
-	BodySizer = new wxFlexGridSizer( 2, 1, 0, 0 );
-	BodySizer->SetFlexibleDirection( wxBOTH );
-	BodySizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+	BodySizer = new wxFlexGridSizer(2, 1, 0, 0);
+	BodySizer->SetFlexibleDirection(wxBOTH);
+	BodySizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
 	wxFlexGridSizer* FormSizer;
-	FormSizer = new wxFlexGridSizer( 3, 2, 0, 0 );
-	FormSizer->AddGrowableCol( 1 );
-	FormSizer->AddGrowableRow( 0 );
-	FormSizer->AddGrowableRow( 1 );
-	FormSizer->AddGrowableRow( 2 );
-	FormSizer->SetFlexibleDirection( wxHORIZONTAL );
-	FormSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	LayerLabel = new wxStaticText( this, wxID_ANY, wxT("Layer"), wxDefaultPosition, wxDefaultSize, 0 );
-	LayerLabel->Wrap( -1 );
-	FormSizer->Add( LayerLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
-	
-	Layer = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
-	FormSizer->Add( Layer, 1, wxALL|wxEXPAND, 5 );
-	
-	RowLabel = new wxStaticText( this, wxID_ANY, wxT("Row"), wxDefaultPosition, wxDefaultSize, 0 );
-	RowLabel->Wrap( -1 );
-	FormSizer->Add( RowLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
-	
-	Row = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 2 );
-	FormSizer->Add( Row, 0, wxALL|wxEXPAND, 5 );
-	
-	PositionLabel = new wxStaticText( this, wxID_ANY, wxT("Position"), wxDefaultPosition, wxDefaultSize, 0 );
-	PositionLabel->Wrap( -1 );
-	FormSizer->Add( PositionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5 );
-	
-	Position = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	FormSizer->Add( Position, 0, wxALL|wxEXPAND, 5 );
-	
-	BodySizer->Add( FormSizer, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-	
+	FormSizer = new wxFlexGridSizer(3, 2, 0, 0);
+	FormSizer->AddGrowableCol(1);
+	FormSizer->AddGrowableRow(0);
+	FormSizer->AddGrowableRow(1);
+	FormSizer->AddGrowableRow(2);
+	FormSizer->SetFlexibleDirection(wxHORIZONTAL);
+	FormSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
+	LayerLabel = new wxStaticText(this, wxID_ANY, wxT("Layer"), wxDefaultPosition, wxDefaultSize, 0);
+	LayerLabel->Wrap(-1);
+	FormSizer->Add(LayerLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+
+	Layer = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0);
+	FormSizer->Add(Layer, 1, wxALL|wxEXPAND, 5);
+
+	RowLabel = new wxStaticText(this, wxID_ANY, wxT("Row"), wxDefaultPosition, wxDefaultSize, 0);
+	RowLabel->Wrap(-1);
+	FormSizer->Add(RowLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+
+	Row = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 2);
+	FormSizer->Add(Row, 0, wxALL|wxEXPAND, 5);
+
+	PositionLabel = new wxStaticText(this, wxID_ANY, wxT("Position"), wxDefaultPosition, wxDefaultSize, 0);
+	PositionLabel->Wrap(-1);
+	FormSizer->Add(PositionLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT, 5);
+
+	Position = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0);
+	FormSizer->Add(Position, 0, wxALL|wxEXPAND, 5);
+
+	BodySizer->Add(FormSizer, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5);
+
 	wxBoxSizer* bSizer1;
-	bSizer1 = new wxBoxSizer( wxVERTICAL );
-	
+	bSizer1 = new wxBoxSizer(wxVERTICAL);
+
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
-	m_sdbSizer1OK = new wxButton( this, wxID_OK );
-	m_sdbSizer1->AddButton( m_sdbSizer1OK );
-	m_sdbSizer1Cancel = new wxButton( this, wxID_CANCEL );
-	m_sdbSizer1->AddButton( m_sdbSizer1Cancel );
+	m_sdbSizer1OK = new wxButton(this, wxID_OK);
+	m_sdbSizer1->AddButton(m_sdbSizer1OK);
+	m_sdbSizer1Cancel = new wxButton(this, wxID_CANCEL);
+	m_sdbSizer1->AddButton(m_sdbSizer1Cancel);
 	m_sdbSizer1->Realize();
-	bSizer1->Add( m_sdbSizer1, 1, wxEXPAND, 5 );
-	
-	BodySizer->Add( bSizer1, 1, wxEXPAND, 5 );
-	
-	this->SetSizer( BodySizer );
+	bSizer1->Add(m_sdbSizer1, 1, wxEXPAND, 5);
+
+	BodySizer->Add(bSizer1, 1, wxEXPAND, 5);
+
+	this->SetSizer(BodySizer);
 	this->Layout();
-	
-	this->Centre( wxBOTH );
+
+	this->Centre(wxBOTH);
 }
 
-ChangeDialogGeneratedClass::~ChangeDialogGeneratedClass()
-{
+ChangeDialogGeneratedClass::~ChangeDialogGeneratedClass() {
 }
 
 
 class ChangeDialogClass : public ChangeDialogGeneratedClass {
 
-public:
+	public:
 
-ChangeDialogClass(wxWindow* parent, wxString name, int& dock, int& row, int& position, int& layer) 
-: ChangeDialogGeneratedClass(parent, wxID_ANY,  "Change " + name) {
-	wxGenericValidator valRow(&row);
-	Row->SetValidator(valRow);
-	
-	wxGenericValidator valPosition(&position);
-	Position->SetValidator(valPosition);
-	
-	wxGenericValidator valLayer(&layer);
-	Layer->SetValidator(valLayer);
-	
-	TransferDataToWindow();
-}
+	ChangeDialogClass(wxWindow* parent, wxString name, int& dock, int& row, int& position, int& layer)
+	: ChangeDialogGeneratedClass(parent, wxID_ANY,  "Change " + name) {
+		wxGenericValidator valRow(&row);
+		Row->SetValidator(valRow);
+
+		wxGenericValidator valPosition(&position);
+		Position->SetValidator(valPosition);
+
+		wxGenericValidator valLayer(&layer);
+		Layer->SetValidator(valLayer);
+
+		TransferDataToWindow();
+	}
 
 };
 
@@ -168,23 +165,23 @@ ChangeDialogClass(wxWindow* parent, wxString name, int& dock, int& row, int& pos
  * This is a simple test of the wx AUI system. It will create 2 panels
  */
 class MyApp : public wxApp {
-public:
+	public:
 
 	bool OnInit();
-	
+
 };
 
 class MyFrame: public wxFrame {
-public:
+	public:
 	MyFrame();
 	~MyFrame();
-	
-private:
+
+	private:
 
 	void OnAdjust(wxCommandEvent& event);
 	void OnMovePanel7(wxCommandEvent& event);
 	wxAuiManager AuiManager;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -193,18 +190,18 @@ IMPLEMENT_APP(MyApp)
 bool MyApp::OnInit() {
 	MyFrame* frame = new MyFrame();
 	SetTopWindow(frame);
-	frame->Show(true);	
+	frame->Show(true);
 	return true;
 }
 
 MyFrame::MyFrame() :
-	wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition, 
-			wxSize(640, 480)) 
+	wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition,
+			wxSize(640, 480))
 	, AuiManager() {
-	
-	wxAuiNotebook* book = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+
+	wxAuiNotebook* book = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB);
-		
+
 	wxPanel* panel1 = new wxPanel(this, wxID_ANY, wxDefaultPosition);
 	wxPanel* panel2 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
 	wxPanel* panel3 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(640, 100));
@@ -218,20 +215,20 @@ MyFrame::MyFrame() :
 	panel7->SetSizerAndFit(panel7Sizer);
 	txt->SetText("# this is some code for panel 7\n\n");
 	panel7->Layout();
-		
+
 	txt = new wxStyledTextCtrl(panel1);
 	wxBoxSizer* contentSizer =  new wxBoxSizer(wxVERTICAL);
 	contentSizer->Add(txt, wxSizerFlags().Expand().Proportion(1));
 	panel1->SetSizerAndFit(contentSizer);
 	panel1->Layout();
 	txt->SetText("# this is some code for panel 1\n\n");
-	
+
 	new wxTextCtrl(panel2, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(640, 24), 0);
 	book->AddPage(panel1, wxT("Code"));
-	
-	AuiManager.AddPane(book, wxAuiPaneInfo().CentrePane(
-		).Caption("book").PaneBorder(false).Gripper(false).Floatable(false).Name("panel1"));
-		
+
+	AuiManager.AddPane(book, wxAuiPaneInfo().CentrePane()
+		.Caption("book").PaneBorder(false).Gripper(false).Floatable(false).Name("panel1"));
+
 	AuiManager.AddPane(panel2, wxAuiPaneInfo().Bottom().Caption(
 		_("panel2")).Floatable(false).Name("panel2"));
 	AuiManager.AddPane(panel3, wxAuiPaneInfo().Left().Caption(
@@ -246,7 +243,7 @@ MyFrame::MyFrame() :
 		_("panel7")).Floatable(false).Name("panel7"));
 	AuiManager.SetManagedWindow(this);
 	AuiManager.Update();
-	
+
 	wxMenuBar* bar = new wxMenuBar();
 	wxMenu* menu = new wxMenu();
 	menu->Append(ID_MENU_ADJUST_1, "adjust panel 1", "adjust panel 1", wxITEM_NORMAL);

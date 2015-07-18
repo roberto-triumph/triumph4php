@@ -67,7 +67,7 @@ namespace t4p {
  */
 class EventSinkClass {
 
-public:
+	public:
 
 	EventSinkClass();
 
@@ -106,7 +106,7 @@ public:
 	 */
 	void Post(wxEvent& event);
 
-private:
+	private:
 
 	/**
 	 * the list of handlers to send events to. this class will NOT
@@ -124,7 +124,7 @@ private:
  */
 class EventSinkLockerClass {
 
-public:
+	public:
 
 	EventSinkLockerClass();
 
@@ -154,7 +154,7 @@ public:
 	 */
 	void Post(wxEvent& event);
 
-private:
+	private:
 
 	/**
 	 * holds the list of event handlers
@@ -224,7 +224,7 @@ extern const wxEventType EVENT_APP_FILE_NOTEBOOK_CHANGED;
  */
 class CodeControlEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * @param codeControl caller will still own the pointer
@@ -242,7 +242,7 @@ public:
 	 */
     wxEvent* Clone() const;
 
-private:
+	private:
 
 	CodeControlClass* CodeControl;
 };
@@ -254,7 +254,7 @@ private:
  */
 class RenameEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxFileName OldPath;
 
@@ -272,7 +272,7 @@ public:
  */
 class OpenFileCommandEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * the full path of the file to open
@@ -305,7 +305,7 @@ public:
 
 class OpenDbTableCommandEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * The name of the table to open
@@ -577,7 +577,7 @@ extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
  */
 class ProjectEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * the projects that were removed or updated. If this is a

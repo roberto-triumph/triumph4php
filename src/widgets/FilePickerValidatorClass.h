@@ -36,7 +36,7 @@ namespace t4p {
  */
 class FilePickerValidatorClass : public wxValidator {
 
-public:
+	public:
 
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
@@ -51,7 +51,7 @@ public:
 
 	virtual wxObject* Clone() const;
 
-private:
+	private:
 
 	/**
 	 * The object to validate. This class will not own this pointer.

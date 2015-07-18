@@ -37,7 +37,7 @@ namespace t4p {
  */
 class TreeItemDataStringClass : public wxTreeItemData {
 
-public:
+	public:
 
 	wxString Str;
 

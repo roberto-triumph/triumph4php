@@ -36,7 +36,7 @@ namespace t4p {
  */
 class NewUserFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	NewUserFeatureClass(t4p::AppClass& app);
 };

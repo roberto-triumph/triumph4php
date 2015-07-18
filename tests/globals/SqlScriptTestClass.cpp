@@ -34,7 +34,7 @@
 
 class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * The full path to a file that will contain an SQL script

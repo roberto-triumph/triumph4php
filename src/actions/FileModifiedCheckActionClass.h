@@ -38,7 +38,7 @@ namespace t4p {
  */
 class FileModifiedTimeClass {
 
-public:
+	public:
 
 	wxFileName FileName;
 
@@ -57,7 +57,7 @@ public:
  */
 class FilesModifiedEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * files that have been modified externally (outside the editor)
@@ -100,7 +100,7 @@ extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
  */
 class FileModifiedCheckActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -120,7 +120,7 @@ public:
 	 */
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
 };

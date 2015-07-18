@@ -49,7 +49,7 @@ namespace t4p {
  */
 class VariableSymbolClass {
 
-public:
+	public:
 
 	enum Types {
 
@@ -254,7 +254,7 @@ class CallStackClass :
 	public pelet::ExpressionObserverClass,
 	public pelet::ClassObserverClass {
 
-public:
+	public:
 
 	/**
 	 * reasons why building of the call stack could not be completeed
@@ -372,7 +372,7 @@ public:
 	void ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression);
 
 
-private:
+	private:
 
 	/**
 	 * this is the class that will parse the source code

@@ -35,7 +35,7 @@ namespace t4p {
 
 class EditorBehaviorViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	EditorBehaviorViewClass(t4p::EditorBehaviorFeatureClass& feature);
 
@@ -51,7 +51,7 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	/**
 	 * adds menu items for each of the scintilla keyboard commands
@@ -112,13 +112,13 @@ private:
  */
 class EditorBehaviorPanelClass : public EditorBehaviorPanelGeneratedClass {
 
-public:
+	public:
 
 	EditorBehaviorPanelClass(wxWindow* parent, CodeControlOptionsClass& options);
 	bool TransferDataToWindow();
 	bool TransferDataFromWindow();
 
-protected:
+	protected:
 
 	// Handlers for EditorBehaviorPanelGeneratedClass events.
 	void OnIndentUsingSpaces(wxCommandEvent& event);
@@ -137,7 +137,7 @@ protected:
  */
 class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent the window parent
@@ -151,7 +151,7 @@ public:
 
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	void FillCommands();
 
@@ -180,7 +180,7 @@ private:
  */
 class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent the window parent
@@ -193,7 +193,7 @@ public:
 		std::vector<t4p::EditorKeyboardCommandClass>& commands,
 		wxKeyBinder* keyBinder);
 
-private:
+	private:
 
 	void OnOkButton(wxCommandEvent& event);
 	void OnKey(wxKeyEvent& event);

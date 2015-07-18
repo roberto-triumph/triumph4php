@@ -35,7 +35,7 @@ namespace t4p {
  * configured SQL connections
  */
 class DatabaseTableTagClass {
-public:
+	public:
 
 	/**
 	 * The name of the table.  Note that this is case sensitive

@@ -44,7 +44,7 @@ class TagFinderListClass;
  */
 class SymbolTableMatchErrorClass {
 
-public:
+	public:
 
 	enum ErrorTypes {
 
@@ -200,7 +200,7 @@ public:
  */
 class SymbolClass {
 
-public:
+	public:
 
 	/**
 	 * The variable type
@@ -280,7 +280,7 @@ class SymbolTableClass :
 	public pelet::VariableObserverClass,
 	public pelet::AnyExpressionObserverClass {
 
-public:
+	public:
 	SymbolTableClass();
 
 	/**
@@ -428,7 +428,7 @@ public:
 	 */
 	void SetVersion(pelet::Versions version);
 
-private:
+	private:
 
 	/**
 	 * Get the vector of variables for the given scope. If scope does not exist it will
@@ -513,7 +513,7 @@ class ScopeFinderClass :
 	public pelet::ClassMemberObserverClass,
 	public pelet::FunctionObserverClass {
 
-public:
+	public:
 
 	ScopeFinderClass();
 
@@ -543,7 +543,7 @@ public:
 	 */
 	void SetVersion(pelet::Versions version);
 
-private:
+	private:
 
 	/**
 	 * if the given namespace is different than the current one, it indicates that the file has

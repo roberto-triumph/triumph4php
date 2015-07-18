@@ -57,14 +57,14 @@ class FeatureViewClass;
  */
 class AppEventListenerForFrameClass : public wxEvtHandler {
 
-public:
+	public:
 
 	/**
 	 * @param frame this class will not own the pointer
 	*/
 	AppEventListenerForFrameClass(MainFrameClass* frame);
 
-private:
+	private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 
@@ -96,7 +96,7 @@ private:
  */
 class MainFrameClass : public MainFrameGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @brief
@@ -156,7 +156,7 @@ public:
 	 */
 	void UpdateNotebooks();
 
-protected:
+	protected:
 
 	// Handlers for MainFrameGeneratedClass events.
 	void OnClose(wxCloseEvent& event);
@@ -178,7 +178,7 @@ protected:
 	 */
 	void OnContextMenu(wxContextMenuEvent& event);
 
-private:
+	private:
 
 	/**
 	 * Status bar accessor.  This status bar allows features to easily add gauges to the status bar.

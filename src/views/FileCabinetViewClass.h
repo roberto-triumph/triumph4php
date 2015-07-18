@@ -36,14 +36,14 @@ namespace t4p {
 
 class FileCabinetViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	FileCabinetViewClass(t4p::FileCabinetFeatureClass& feature);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 	void AddViewMenuItems(wxMenu* viewMenu);
 
-private:
+	private:
 
 	void OnViewFileCabinet(wxCommandEvent& event);
 	void OnEditAddCurrentFileToCabinet(wxCommandEvent& event);
@@ -60,7 +60,7 @@ private:
  */
 class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 
-public:
+	public:
 
 	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, wxWindow* mainWindow);
 
@@ -69,7 +69,7 @@ public:
 	 */
 	void AddItemToList(const t4p::FileCabinetItemClass& item);
 
-private:
+	private:
 
 	// event handlers
 	void OnAddFileClick(wxCommandEvent& event);

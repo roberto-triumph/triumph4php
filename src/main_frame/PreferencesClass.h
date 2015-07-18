@@ -66,7 +66,7 @@ wxString KeyCodeToShortcutString(int modifiers, int keyCode);
  */
 class DynamicCmdClass {
 
-public:
+	public:
 
 	/**
 	 *
@@ -114,7 +114,7 @@ public:
 	 */
 	wxString GetIdentifier() const;
 
-private:
+	private:
 
 	/**
 	 * This is the binding; menu item-shortcut(s) combination.
@@ -132,7 +132,7 @@ private:
  */
 class PreferencesClass {
 
-public:
+	public:
 
 	/**
 	 * Construct preferences. Creates on keyboard profile.

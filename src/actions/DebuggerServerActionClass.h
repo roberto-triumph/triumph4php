@@ -131,7 +131,7 @@ extern const wxEventType EVENT_DEBUGGER_CMD;
  */
 class DebuggerServerActionClass : public wxEvtHandler, public t4p::ActionClass {
 
-public:
+	public:
 
 	DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker);
 
@@ -143,7 +143,7 @@ public:
 	 */
 	void Init(int port);
 
-protected:
+	protected:
 
 	/**
 	 * this method contains the "main loop" of the socket service. we will

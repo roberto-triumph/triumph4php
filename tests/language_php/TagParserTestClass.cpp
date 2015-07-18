@@ -32,7 +32,7 @@
 
 class TagParserTestFixtureClass : public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagParserClass TagParser;
 

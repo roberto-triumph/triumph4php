@@ -36,7 +36,7 @@
 
 class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagCacheClass TagCache;
 	t4p::CallStackClass CallStack;

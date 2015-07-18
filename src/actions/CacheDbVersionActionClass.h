@@ -40,7 +40,7 @@ namespace t4p {
  */
 class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -50,7 +50,7 @@ public:
 
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	/**
 	 * files to check.
@@ -73,7 +73,7 @@ private:
  */
 class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -83,7 +83,7 @@ public:
 
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	/**
 	 * files to check.

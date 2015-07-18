@@ -34,7 +34,7 @@
 
 class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	soci::session DetectorTagSession;
 	t4p::DetectorDbClass DetectorDb;

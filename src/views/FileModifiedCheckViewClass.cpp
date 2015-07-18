@@ -69,7 +69,7 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 	if (filesToPrompt.empty()) {
 		return;
 	}
- 	wxArrayString choices;
+	wxArrayString choices;
 	std::map<wxString, t4p::CodeControlClass*>::iterator it;
 	for (it = filesToPrompt.begin(); it != filesToPrompt.end(); ++it) {
 		choices.Add(it->first);

@@ -83,7 +83,7 @@ extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
  */
 class CodeCompletionItemClass {
 
-public:
+	public:
 
 	/**
 	 * the string that will be shown to the user
@@ -115,7 +115,7 @@ public:
  */
 class CodeCompletionProviderClass {
 
-public:
+	public:
 
 	CodeCompletionProviderClass();
 
@@ -196,7 +196,7 @@ class CallTipProviderClass {
  */
 class BraceMatchStylerClass {
 
-public:
+	public:
 
 	BraceMatchStylerClass();
 	virtual ~BraceMatchStylerClass();
@@ -231,7 +231,7 @@ public:
  */
 class CodeControlClass : public wxStyledTextCtrl {
 
-public:
+	public:
 
 	/**
 	 * Constructor.
@@ -669,7 +669,7 @@ public:
 	CodeControlOptionsClass& CodeControlOptions;
 
 
-private:
+	private:
 
 	/**
 	 * Opens the file, loads its contents of the given file, and initializes the

@@ -106,7 +106,7 @@ namespace t4p {
  */
 class FindInFilesClass : public DirectoryWalkerClass {
 
-public:
+	public:
 
 	/**
 	 * Reasons why a file could not be opened.
@@ -273,7 +273,7 @@ public:
 	static OpenErrors FileContents(const wxString& fileName, UnicodeString& content,
 		wxString& charset, bool& hasSignature);
 
-private:
+	private:
 
 	/**
 	 * To find text

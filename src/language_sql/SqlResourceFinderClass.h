@@ -22,13 +22,13 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #ifndef _SQLRESOURCEFINDERCLASS_H
- #define _SQLRESOURCEFINDERCLASS_H
+#ifndef _SQLRESOURCEFINDERCLASS_H
+#define _SQLRESOURCEFINDERCLASS_H
 
- #include <language_sql/DatabaseTagClass.h>
- #include <unicode/unistr.h>
- #include <vector>
- #include <map>
+#include <language_sql/DatabaseTagClass.h>
+#include <unicode/unistr.h>
+#include <vector>
+#include <map>
 
 namespace t4p {
 
@@ -38,7 +38,7 @@ namespace t4p {
  */
 class SqlResourceFetchClass {
 
-public:
+	public:
 
 	/**
 	 *  @param soci::session the session that holds the connection
@@ -60,7 +60,7 @@ public:
 	 */
 	bool Wipe();
 
-private:
+	private:
 
 	/**
 	 * Connects to the given mysql database and queries the table meta data
@@ -94,7 +94,7 @@ private:
  * Performs a prefix lookup on table names
  */
 class SqlResourceTableResultClass : public t4p::SqliteResultClass {
-public:
+	public:
 
 	/**
 	 * The matched table name
@@ -119,7 +119,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query for tables and bind the input
@@ -138,7 +138,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	std::string Lookup;
 
@@ -151,7 +151,7 @@ private:
  * Performs an exact match lookup on table names
  */
 class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
-public:
+	public:
 
 	/**
 	 * The matched table name
@@ -176,7 +176,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query for tables and bind the input
@@ -195,7 +195,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	std::string Lookup;
 
@@ -206,7 +206,7 @@ private:
  * Performs a prefix lookup on column names
  */
 class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
-public:
+	public:
 
 	/**
 	 * The matched column name
@@ -226,7 +226,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * prepares and binds the query
@@ -239,7 +239,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	std::string Lookup;
 
@@ -255,7 +255,7 @@ private:
  */
 class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 
-public:
+	public:
 
 	SqlResourceFinderClass(soci::session& session);
 
@@ -279,5 +279,6 @@ public:
 
 };
 
- }
- #endif
+}
+
+#endif

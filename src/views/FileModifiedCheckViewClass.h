@@ -35,11 +35,11 @@ class FileModifiedCheckFeatureClass;
 
 class FileModifiedCheckViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature);
 
-private:
+	private:
 
 	/**
 	 * when the user puts this app in the foreground, check for

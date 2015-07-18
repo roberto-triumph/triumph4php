@@ -38,7 +38,7 @@ namespace t4p {
 
 class TotalTagResultClass {
 
-public:
+	public:
 
 	enum Types {
 		FILE_TAG,
@@ -82,7 +82,7 @@ public:
  */
 class TotalTagSearchCompleteEventClass : public wxEvent {
 
-    public:
+	public:
 
 	/**
 	 * The string that was searched for.
@@ -118,7 +118,7 @@ typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagS
 
 class TotalTagSearchActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	TotalTagSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -140,11 +140,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * perform a search on all items using exact, case

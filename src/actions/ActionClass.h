@@ -66,7 +66,7 @@ class RunningThreadsClass;
  */
 class ActionClass {
 
-public:
+	public:
 
 	/**
 	 * ProgressMode can be one of two modes: determinate or indeterminate.
@@ -155,7 +155,7 @@ public:
 	 */
 	void PostEvent(wxEvent& event);
 
-protected:
+	protected:
 
 	/**
 	 * Generates a EVENT_ACTION_STATUS event with the given string
@@ -179,7 +179,7 @@ protected:
 	 */
 	void SetPercentComplete(int percentComplete);
 
-private:
+	private:
 
 	/**
 	 * Keeps a reference to this object's running thread; that way
@@ -232,7 +232,7 @@ private:
  */
 class ThreadCleanupClass {
 
-public:
+	public:
 
 	ThreadCleanupClass();
 
@@ -262,7 +262,7 @@ public:
  */
 class ThreadActionClass : public wxThread {
 
-public:
+	public:
 
 	/**
 	 *
@@ -309,7 +309,7 @@ public:
 	 */
 	void PostProgressEvent();
 
-private:
+	private:
 
 	/**
 	 * actions to be run; First In First Out
@@ -358,7 +358,7 @@ private:
 	 * cleanup alls action that are still in the queue
 	 */
 	void CleanupAllActions();
-  };
+};
 
 /**
  * Class to hold all of the actions that are currently running. wxWidgets
@@ -377,7 +377,7 @@ private:
  */
 class RunningThreadsClass : public wxEvtHandler {
 
-  	public:
+	public:
 
 	RunningThreadsClass(bool doPostEvents = true);
 
@@ -552,7 +552,7 @@ class RunningThreadsClass : public wxEvtHandler {
  * start at 20,000 to prevent collison with feature menu IDs
  * ID_MENU_*
  */
- enum {
+enum {
 	ID_EVENT_ACTION_TAG_FINDER_LIST_INIT = wxID_HIGHEST + 20000,
 	ID_EVENT_ACTION_TAG_FINDER_LIST,
 	ID_EVENT_ACTION_SQL_METADATA_INIT,
@@ -568,7 +568,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK,
 	ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK,
 	ID_EVENT_ACTION_DETECTOR_DB_INIT
- };
+};
 
 
 
@@ -601,7 +601,7 @@ extern const wxEventType EVENT_ACTION_PROGRESS;
  */
 class ActionProgressEventClass : public wxEvent {
 
-public:
+	public:
 
 	/** on of  either determinate or indeterminate */
 	t4p::ActionClass::ProgressMode Mode;
@@ -626,7 +626,7 @@ public:
  */
 class ActionEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * a string, copied between threads in a safe way

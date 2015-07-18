@@ -41,24 +41,24 @@ namespace t4p {
 
 class AllMembersTagResultClass : public t4p::ExactMemberTagResultClass {
 
-public:
+	public:
 
 	AllMembersTagResultClass();
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	int ClassCount;
 };
 
 class ExactNonMemberTagResultClass : public t4p::TagResultClass {
 
-public:
+	public:
 
 	ExactNonMemberTagResultClass();
 
@@ -68,7 +68,7 @@ public:
 
 	void SetTagType(t4p::PhpTagClass::Types type);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
@@ -83,7 +83,7 @@ protected:
 
 class NearMatchNonMemberTagResultClass : public t4p::ExactNonMemberTagResultClass {
 
-public:
+	public:
 
 	NearMatchNonMemberTagResultClass();
 
@@ -91,11 +91,11 @@ public:
 
 	void AddTagType(t4p::PhpTagClass::Types type);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	std::string KeyUpper;
 };
@@ -106,7 +106,7 @@ private:
 // make sure to NOT get fully qualified  matches (key=identifier)
 class ExactMemberOnlyTagResultClass : public t4p::TagResultClass {
 
-public:
+	public:
 
 	ExactMemberOnlyTagResultClass();
 
@@ -117,7 +117,7 @@ public:
 
 	void SetPropertyType(bool onlyStatic);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
@@ -132,32 +132,32 @@ protected:
 
 class NearMatchMemberOnlyTagResultClass : public ExactMemberOnlyTagResultClass {
 
-public:
+	public:
 	NearMatchMemberOnlyTagResultClass();
 
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	std::string KeyUpper;
 };
 
 class TopLevelTagInFileResultClass : public TagResultClass {
 
-public:
+	public:
 	TopLevelTagInFileResultClass();
 
 	void Set(const wxString& fullPath);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	std::string FullPath;
 
@@ -166,11 +166,11 @@ private:
 
 class AllTagsResultClass : public TagResultClass {
 
-public:
+	public:
 
 	AllTagsResultClass();
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 };
@@ -180,17 +180,17 @@ protected:
  */
 class TagByIdResultClass : public TagResultClass {
 
-public:
+	public:
 
 	TagByIdResultClass();
 
 	void Set(int id);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	int Id;
 };

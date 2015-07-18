@@ -34,7 +34,7 @@ namespace t4p {
 
 class ExplorerViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	ExplorerViewClass(t4p::ExplorerFeatureClass& feature);
 
@@ -55,7 +55,7 @@ public:
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 	t4p::ExplorerFeatureClass& Feature;
 
@@ -137,7 +137,7 @@ class FileListingWidgetClass : public wxEvtHandler {
 	void OnListMenuShell(wxCommandEvent& event);
 	void OnListMenuFileManager(wxCommandEvent& event);
 
-private:
+	private:
 
 	// events handlers for the files list
 	void OnListItemRightClick(wxListEvent& event);
@@ -198,7 +198,7 @@ class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 
 	void ShowDir();
 
-private:
+	private:
 
 
 	/**
@@ -285,7 +285,7 @@ class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
 
 	void ShowDir();
 
-private:
+	private:
 
 
 	/**
@@ -354,7 +354,7 @@ private:
  */
 class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
 
-public:
+	public:
 
 	ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);
 

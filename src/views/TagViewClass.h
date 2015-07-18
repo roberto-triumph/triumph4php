@@ -38,7 +38,7 @@ namespace t4p {
 
 class TagViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	TagViewClass(t4p::TagFeatureClass& feature);
 
@@ -55,7 +55,7 @@ public:
 	 */
 	void OpenFile(wxString fileName);
 
-private:
+	private:
 
 	/**
 	 * Toggle various widgets on or off based on the application state.
@@ -184,7 +184,7 @@ private:
  * the tag searching will be done in a background thread.
  */
 class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
-public:
+	public:
 
 	/**
 	 * @param parent the parent window
@@ -205,7 +205,7 @@ public:
 	 */
 	void Prepopulate(const wxString& text, const std::vector<t4p::PhpTagClass>& matches);
 
-protected:
+	protected:
 
 	/**
 	 * When user types in text perform searched
@@ -237,7 +237,7 @@ protected:
 
 	void OnProjectChoice(wxCommandEvent& event);
 
-private:
+	private:
 
 	/**
 	 * Handle the results of the tag lookups.

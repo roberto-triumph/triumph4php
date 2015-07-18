@@ -63,7 +63,7 @@ UnicodeString FindCursor(const UnicodeString& code, int32_t& cursorPosition) {
 }
 
 class SymbolTableTestClass : public FileTestFixtureClass {
-public:
+	public:
 	SymbolTableTestClass()
 	 : FileTestFixtureClass(wxT("symbol_table"))
 	 , SymbolTable()
@@ -83,7 +83,7 @@ public:
 
 class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::SymbolTableClass CompletionSymbolTable;
 	pelet::ScopeClass Scope;
@@ -172,7 +172,7 @@ public:
 
 class ScopeFinderTestClass {
 
-public:
+	public:
 
 	t4p::ScopeFinderClass ScopeFinder;
 	pelet::ScopeClass Scope;

@@ -37,7 +37,7 @@ namespace t4p {
  */
 class HtmlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 
-public:
+	public:
 
 	HtmlCodeCompletionProviderClass();
 
@@ -52,7 +52,7 @@ public:
  */
 class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
 
-public:
+	public:
 
 	CssBraceMatchStylerClass();
 
@@ -67,11 +67,11 @@ public:
  */
 class HtmlViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	HtmlViewClass();
 
-private:
+	private:
 
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 

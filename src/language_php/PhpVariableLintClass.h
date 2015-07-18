@@ -43,7 +43,7 @@ class TagCacheClass;
  */
 class PhpVariableLintResultClass {
 
-public:
+	public:
 
 	enum Types {
 		NONE,
@@ -88,7 +88,7 @@ public:
  */
 class PhpVariableLintOptionsClass {
 
-public:
+	public:
 
 	/**
 	 * if true, variables in the global scope will be checked.  if false,
@@ -125,7 +125,7 @@ class PhpVariableLintClass :
 	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass  {
 
-public:
+	public:
 
 	PhpVariableLintClass();
 
@@ -221,7 +221,7 @@ public:
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
-private:
+	private:
 
 	/**
 	 * errors found so far

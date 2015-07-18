@@ -40,11 +40,11 @@ namespace t4p {
  */
 class GlobalsChangeHandlerClass : public wxEvtHandler {
 
-public:
+	public:
 
 	GlobalsChangeHandlerClass(t4p::GlobalsClass& globals);
 
-private:
+	private:
 
 	t4p::GlobalsClass& Globals;
 

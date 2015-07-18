@@ -145,7 +145,7 @@ class SuppressionRuleClass {
  */
 class LintSuppressionClass {
 
-public:
+	public:
 
 	/**
 	 * the items to supress

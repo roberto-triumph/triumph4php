@@ -54,7 +54,7 @@ extern const wxEventType EVENT_SEQUENCE_COMPLETE;
  */
 class SequenceClass : public wxEvtHandler {
 
-public:
+	public:
 
 	/**
 	 * The global data structures; each action will read these as their
@@ -149,7 +149,7 @@ public:
 	 */
 	void Stop();
 
-protected:
+	protected:
 
 	/**
 	 * @param step to be run.  Steps are run in the order they are given. This class
@@ -164,7 +164,7 @@ protected:
 	 */
 	void Run();
 
-private:
+	private:
 
 	void OnActionComplete(t4p::ActionEventClass& event);
 
@@ -208,7 +208,7 @@ private:
 
 class SequenceProgressEventClass : public t4p::ActionProgressEventClass {
 
-public:
+	public:
 
 	SequenceProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
 

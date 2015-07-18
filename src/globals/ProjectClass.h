@@ -39,7 +39,7 @@ namespace t4p {
  */
 class ProjectClass {
 
-public:
+	public:
 
 	/**
 	 * A friendly label for this project. This is usually set by a user.
@@ -142,7 +142,7 @@ public:
 	 */
 	std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
 
-private:
+	private:
 
 };
 

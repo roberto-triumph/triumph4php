@@ -35,7 +35,7 @@ class EditorLogEventClass;
 
 class EditorMessagesViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	EditorMessagesViewClass();
 
@@ -43,7 +43,7 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	/**
 	 * When the user clicks on the editor messages menu
@@ -68,7 +68,7 @@ private:
  */
 class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
 
-public:
+	public:
 
 	EditorMessagesPanelClass(wxWindow* parent, int id);
 
@@ -77,7 +77,7 @@ public:
 	 */
 	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
-protected:
+	protected:
 
 	/**
 	 * Removes all messages from the display grid.

@@ -36,7 +36,7 @@ namespace t4p {
  */
 class ChangelogFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	ChangelogFeatureClass(t4p::AppClass& app);
 
@@ -44,7 +44,7 @@ public:
 
 	void ShowChangeLog();
 
-private:
+	private:
 
 	void OnAppReady(wxCommandEvent& event);
 

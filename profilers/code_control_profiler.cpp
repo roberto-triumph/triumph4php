@@ -41,7 +41,7 @@
  * There will be a menu created where the user can test the code completions and call tips.
  */
 class CodeControlProfilerAppClass : public wxApp {
-public:
+	public:
 
 	CodeControlProfilerAppClass();
 
@@ -60,7 +60,7 @@ public:
  */
 class FileDropTargetClass : public wxFileDropTarget {
 
-public:
+	public:
 
 	/**
 	 * This class will NOT own the codeControl or the globals pointer
@@ -73,15 +73,15 @@ public:
 	 */
 	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
 
-private:
+	private:
 
 	t4p::CodeControlClass* CodeControl;
 	t4p::GlobalsClass* Globals;
 };
 
 FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals)
- : CodeControl(codeControl)
- , Globals(globals) {
+: CodeControl(codeControl)
+, Globals(globals) {
 
 }
 
@@ -134,14 +134,14 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
  * The application frame will contain the code control only
  */
 class CodeControlFrameClass: public wxFrame {
-public:
+	public:
 	CodeControlFrameClass(CodeControlProfilerAppClass& app);
 
-private:
+	private:
 
-/*
- * Build the menu and add the event handlers
- */
+	/*
+	 * Build the menu and add the event handlers
+	 */
 
 	void CreateMenu();
 

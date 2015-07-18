@@ -38,7 +38,7 @@ extern const int MAX_RECENT_FILES;
  */
 class RecentFilesFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * class that encapsulates the logic
@@ -51,7 +51,7 @@ public:
 
 	void SavePreferences();
 
-private:
+	private:
 
 };
 

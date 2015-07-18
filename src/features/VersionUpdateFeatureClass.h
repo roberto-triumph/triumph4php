@@ -37,7 +37,7 @@ namespace t4p {
  * latest version from the response.
  */
 class VersionUpdateFeatureClass : public FeatureClass {
-public:
+	public:
 
 	VersionUpdateFeatureClass(t4p::AppClass& app);
 
@@ -50,7 +50,7 @@ public:
 	 */
 	wxDateTime NextCheckTime;
 
-private:
+	private:
 
 
 	void OnAppReady(wxCommandEvent& event);
@@ -68,12 +68,12 @@ private:
  */
 class VersionUpdateActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads,
 		int eventId, const wxString& currentVersion);
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -81,7 +81,7 @@ protected:
 
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	wxString CurrentVersion;
 

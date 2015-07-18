@@ -109,7 +109,7 @@ static void CountArgs(const UnicodeString& signature, int& required, int& total)
 	required = 0;
 	total = 0;
 
- 	int32_t start = signature.indexOf('(');
+	int32_t start = signature.indexOf('(');
 	int32_t next = VariableEnd(signature, start + 1);
 	if (next > (start + 1)) {
 

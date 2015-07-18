@@ -87,7 +87,7 @@ enum FileType {
  */
 class FileTypeClass {
 
-public:
+	public:
 
 	/**
 	 * Serialized file filters strings from the config

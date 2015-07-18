@@ -34,7 +34,7 @@
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	FileCabinetFixtureClass()
 	: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())

@@ -37,7 +37,7 @@ namespace t4p {
 
 class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 
-public:
+	public:
 
 	PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
@@ -55,7 +55,7 @@ public:
 	 */
 	void OnAutoCompletionSelected(wxStyledTextEvent& evt);
 
-private:
+	private:
 
 	/**
 	 * handles auto completion for PHP.
@@ -158,7 +158,7 @@ private:
  */
 class PhpCallTipProviderClass : public t4p::CallTipProviderClass {
 
-public:
+	public:
 
 	PhpCallTipProviderClass(t4p::GlobalsClass& globals);
 
@@ -183,7 +183,7 @@ public:
 	 */
 	void OnCallTipClick(wxStyledTextEvent& evt);
 
-private:
+	private:
 
 	/**
 	 * To access any global structures: the tag cache, template variables
@@ -208,7 +208,7 @@ private:
  */
 class PhpBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
 
-public:
+	public:
 
 	PhpBraceMatchStylerClass();
 
@@ -228,10 +228,10 @@ public:
  */
 class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 	PhpCodeCompletionViewClass(t4p::PhpCodeCompletionFeatureClass& feature);
 
-private:
+	private:
 
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAutoCompletionSelected(wxStyledTextEvent& event);

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,11 +28,11 @@
 #include <actions/ActionClass.h>
 
 /**
- * This is an app that exercises the RunningThreads class and shows the 
+ * This is an app that exercises the RunningThreads class and shows the
  * proper usage.
  */
 class MyApp : public wxApp {
-public:
+	public:
 	virtual bool OnInit();
 
 	t4p::RunningThreadsClass RunningThreads;
@@ -41,9 +41,9 @@ public:
 static int ActionCount = 0;
 
 class MyFrame: public wxFrame {
-public:
+	public:
 	MyFrame(t4p::RunningThreadsClass& runningThreads);
-private:
+	private:
 	void AddMenu();
 	void OnExit(wxCommandEvent& event);
 	void OnClose(wxCloseEvent& event);
@@ -62,10 +62,10 @@ private:
 
 class MyAction : public t4p::ActionClass {
 
-public:
+	public:
 	MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label);
 	wxString GetLabel() const;
-protected:
+	protected:
 	void BackgroundWork();
 	wxString Label;
 };
@@ -93,18 +93,18 @@ IMPLEMENT_APP(MyApp)
 bool MyApp::OnInit() {
 	MyFrame* frame = new MyFrame(RunningThreads);
 	SetTopWindow(frame);
-	frame->Show(true);	
+	frame->Show(true);
 	return true;
 }
 
 MyFrame::MyFrame(t4p::RunningThreadsClass& runningThreads) :
-	wxFrame(NULL, wxID_ANY, wxT("running threads tutorial"), wxDefaultPosition, 
-			wxSize(640, 480)) 
-	, RunningThreads(runningThreads) 
+	wxFrame(NULL, wxID_ANY, wxT("running threads tutorial"), wxDefaultPosition,
+			wxSize(640, 480))
+	, RunningThreads(runningThreads)
 	, RunningActionId(0) {
 	RunningThreads.AddEventHandler(this);
 
-	SetSizeHints( wxDefaultSize, wxDefaultSize );
+	SetSizeHints(wxDefaultSize, wxDefaultSize);
 	Text = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 	wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(Text, 1, wxALL | wxEXPAND, 5);
@@ -156,14 +156,14 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 }
 
 MyAction::MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label)
-	: t4p::ActionClass(runningThreads, eventId) 
+	: t4p::ActionClass(runningThreads, eventId)
 	, Label(label) {
 
 }
 
 void MyAction::BackgroundWork() {
 	while (!IsCancelled()) {
-		wxString msg = wxString::Format(_("%s is running...\n"), (const char*)Label.c_str()); 
+		wxString msg = wxString::Format(_("%s is running...\n"), (const char*)Label.c_str());
 		t4p::ActionEventClass evt(ID_THREAD, EVENT_RUNNING, msg);
 		PostEvent(evt);
 		wxThread::Sleep(2000);

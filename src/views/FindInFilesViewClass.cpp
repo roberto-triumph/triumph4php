@@ -54,7 +54,7 @@ static const size_t MAX_HITS = 1000;
 
 class FindInFilesPreviewRenderer : public wxDataViewCustomRenderer {
 
-public:
+	public:
 
 	t4p::FindInFilesHitClass Hit;
 

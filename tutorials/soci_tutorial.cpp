@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <stdio.h>
- 
+
 /**
  * This is an example that will query a MySQL and a SQLite3 database using the SOCI library. The example
  * will attempt to connect to MySQL and execute a query to get the list of databases.
@@ -64,7 +64,7 @@ void queryMysql() {
 
 /**
  * This is an example that will query a SQLite3 database using the SOCI library. The example
- * will create an SQLite3 database in memory, create a table, insert 2 rows, and then execute a 
+ * will create an SQLite3 database in memory, create a table, insert 2 rows, and then execute a
  * query to get all of the inserted rows.
  * This example will use dynamic binding (where the number and types of columns is not
  * known at compile time; as in "SELECT * FROM" type query).
@@ -76,7 +76,7 @@ void querySqlite() {
 		session.once << "CREATE TABLE users(id int, name varchar(255));";
 		session.once << "INSERT INTO users(id, name) VALUES(1, 'John');";
 		session.once << "INSERT INTO users(id, name) VALUES(2, 'Ron');";
-		
+
 		std::string query = "SELECT id, name FROM users;";
 		printf("querying SQLite3: %s\n", query.c_str());
 		soci::statement stmt(session);

@@ -40,7 +40,7 @@ namespace t4p {
  */
 class PhpCodeCompletionFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 	PhpCodeCompletionFeatureClass(t4p::AppClass& app);
 
 };

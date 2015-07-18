@@ -49,7 +49,7 @@ class FindInFilesHitClass : public wxObject {
 	DECLARE_DYNAMIC_CLASS(t4p::FindInFilesHitClass)
 
 
-public:
+	public:
 
 	/**
 	 * the full path of the file searched
@@ -137,7 +137,7 @@ DECLARE_VARIANT_OBJECT(t4p::FindInFilesHitClass)
  */
 class FindInFilesHitEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * @param id of the event, used to differentiate between multiple searches if they are happpening
@@ -153,7 +153,7 @@ public:
 	 */
 	std::vector<t4p::FindInFilesHitClass> GetHits() const;
 
-private:
+	private:
 
 	/**
 	 * All of the hits for a single file. Hiding this vector because we want to make sure
@@ -179,7 +179,7 @@ typedef void (wxEvtHandler::*FindInFilesHitEventClassFunction)(FindInFilesHitEve
  * This class is the background thread where all finding and replacing will be done.
  */
 class FindInFilesBackgroundReaderClass: public BackgroundFileReaderClass {
-public:
+	public:
 
 	/**
 	 * @param wxEvtHandler This object will receive the EVENT_FIND_IN_FILES_FILE_HIT events.
@@ -220,7 +220,7 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	/**
 	 * Finds the expression in all files.
@@ -232,7 +232,7 @@ protected:
 	 */
 	bool BackgroundFileMatch(const wxString& file);
 
-private:
+	private:
 
 	/**
 	 * To find matches in files.
@@ -251,7 +251,7 @@ private:
 
 class FindInFilesFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * We will NOT use this object to actually search, we will just use this to keep track of the last
@@ -270,7 +270,7 @@ public:
 	 */
 	FindInFilesFeatureClass(t4p::AppClass& app);
 
-private:
+	private:
 
 };
 

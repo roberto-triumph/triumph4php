@@ -82,7 +82,7 @@ class NotebookLayoutFeatureClass;
 
 class FeatureFactoryClass {
 
-public:
+	public:
 
 	/**
 	 * This class owns these pointers; do not delete them

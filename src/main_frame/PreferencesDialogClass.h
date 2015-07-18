@@ -39,7 +39,7 @@ class GlobalsClass;
 
 class KeyboardShortcutsPanelClass : public wxKeyConfigPanel {
 
-public:
+	public:
 
 	KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position = wxDefaultPosition,
 		wxSize size = wxDefaultSize, long style = 0);
@@ -50,7 +50,7 @@ public:
 /** Implementing PreferencesDialogGeneratedClass */
 class PreferencesDialogClass : public wxPropertySheetDialog {
 
-public:
+	public:
 	/**
 	 * @param parent the parent window
 	 * @param globals the GlobalsClass, to check to see if the user modified any globals settings
@@ -77,7 +77,7 @@ public:
 	 */
 	void OnOkButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	/**
 	 * The dialog to let the user create shortcut keys

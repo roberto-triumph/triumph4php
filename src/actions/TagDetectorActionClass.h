@@ -39,7 +39,7 @@ namespace t4p {
  */
 class TagDetectorParamsClass {
 
-public:
+	public:
 
 	/**
 	 * location to the php executable (php.exe / php)
@@ -97,7 +97,7 @@ public:
  */
 class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -112,7 +112,7 @@ public:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * used to run the external tag detector PHP script

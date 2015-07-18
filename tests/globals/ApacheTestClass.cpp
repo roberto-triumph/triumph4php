@@ -31,7 +31,7 @@
 #include <wx/utils.h>
 
 class ApacheTestClass : public FileTestFixtureClass {
-public:
+	public:
 
 	wxString PhpFile;
 	wxString HttpdFile;

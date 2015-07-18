@@ -47,7 +47,7 @@ class ConnectionIdentifierClass;
  */
 class DatabaseTagClass {
 
-public:
+	public:
 
 	/**
 	 * The RDBMS systems that both the frameworks and Triumph supports.
@@ -143,7 +143,7 @@ public:
  */
 class SqlResultClass {
 
-public:
+	public:
 
 	/**
 	 * results are tied to a session. when reusing result objects you will need to call Init() method
@@ -405,7 +405,7 @@ class SqlQueryClass {
  */
 class ConnectionIdentifierClass {
 
-public:
+	public:
 
 	ConnectionIdentifierClass();
 
@@ -420,7 +420,7 @@ public:
 	 */
 	unsigned long Get();
 
-private:
+	private:
 
 	/**
 	 * for shared access protection
@@ -432,7 +432,7 @@ private:
 
 class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
 
-public:
+	public:
 
 	DatabaseTagFinderClass(soci::session& session);
 

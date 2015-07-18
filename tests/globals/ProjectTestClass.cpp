@@ -29,7 +29,7 @@
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
 
-public:
+	public:
 
 	t4p::ProjectClass Project;
 	t4p::FileTypeClass FileType;

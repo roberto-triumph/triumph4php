@@ -31,7 +31,7 @@ namespace t4p {
 
 class DetectorClass {
 
-public:
+	public:
 
 	DetectorClass();
 
@@ -53,7 +53,7 @@ public:
 };
 
 class UrlTagDetectorClass : public t4p::DetectorClass {
-public:
+	public:
 
 	UrlTagDetectorClass();
 
@@ -72,7 +72,7 @@ public:
 };
 
 class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
-public:
+	public:
 
 	TemplateFileTagsDetectorClass();
 
@@ -91,7 +91,7 @@ public:
 };
 
 class TagDetectorClass : public t4p::DetectorClass {
-public:
+	public:
 
 	TagDetectorClass();
 
@@ -110,7 +110,7 @@ public:
 };
 
 class DatabaseTagDetectorClass : public t4p::DetectorClass {
-public:
+	public:
 
 	DatabaseTagDetectorClass();
 
@@ -129,7 +129,7 @@ public:
 };
 
 class ConfigTagDetectorClass : public t4p::DetectorClass {
-public:
+	public:
 
 	ConfigTagDetectorClass();
 
@@ -149,7 +149,7 @@ public:
 
 class DetectorFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	DetectorFeatureClass(t4p::AppClass& app);
 

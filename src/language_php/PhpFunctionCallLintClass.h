@@ -40,7 +40,7 @@ class TagCacheClass;
  */
 class PhpFunctionCallLintResultClass {
 
-public:
+	public:
 
 	enum Types {
 		NONE,
@@ -108,7 +108,7 @@ public:
  */
 class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 
-public:
+	public:
 
 	PhpFunctionCallLintClass();
 
@@ -161,7 +161,7 @@ public:
 	 */
 	void OnAnyExpression(pelet::ExpressionClass* expr);
 
-private:
+	private:
 
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods

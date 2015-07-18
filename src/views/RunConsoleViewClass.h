@@ -41,11 +41,11 @@ class RunConsoleViewClass;
  */
 class CliCommandEditDialogClass : public CliCommandEditDialogGeneratedClass {
 
-public:
+	public:
 
 	CliCommandEditDialogClass(wxWindow* parent, int id, t4p::CliCommandClass& command);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
@@ -59,12 +59,12 @@ protected:
  */
 class CliCommandListDialogClass : public CliCommandListDialogGeneratedClass {
 
-public:
+	public:
 
 	CliCommandListDialogClass(wxWindow* parent, int id, std::vector<t4p::CliCommandClass>& commands);
 
 
-protected:
+	protected:
 
 	// to manage the list of commands
 	// UP & DOWN control the order of the commands
@@ -78,7 +78,7 @@ protected:
 	void OnListDoubleClick(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	/**
 	 * List of commands that are bound to this dialog. They will only be
@@ -100,14 +100,14 @@ private:
 };
 
 class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
-protected:
+	protected:
 
 	/**
 	 * Handle the clear button.
 	 */
 	void OnClear(wxCommandEvent& event);
 
-public:
+	public:
 
 	/*
 	 * @param parent the parent of this pane
@@ -151,7 +151,7 @@ public:
 	 */
 	wxString GetCommand() const;
 
-private:
+	private:
 
 	/**
 	 * The command to run
@@ -255,7 +255,7 @@ private:
 
 class RunConsoleViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	/**
 	 * Constructor
@@ -291,7 +291,7 @@ public:
 	 */
 	void LoadPage(const wxString& fileName);
 
-private:
+	private:
 
 	/**
 	 * handler for the menu

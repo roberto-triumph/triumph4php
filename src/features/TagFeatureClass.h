@@ -56,7 +56,7 @@ namespace t4p {
  */
 class TagFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * when a 'jump to tag' is done and we need to index a project, we
@@ -72,7 +72,7 @@ public:
 	 */
 	wxString CacheStatus();
 
-private:
+	private:
 
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 

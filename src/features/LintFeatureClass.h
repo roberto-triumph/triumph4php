@@ -53,7 +53,7 @@ extern const wxEventType EVENT_LINT_SUMMARY;
  */
 class LintResultsEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * The results for a single file. there could be multiple errors, undefined
@@ -68,7 +68,7 @@ public:
 
 class LintResultsSummaryEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * the number of files that were parsed
@@ -111,7 +111,7 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
  */
 class LintFeatureOptionsClass {
 
-public:
+	public:
 
 	/**
 	 * If TRUE, then when a file is saved; a lint check on that file
@@ -159,7 +159,7 @@ public:
  * to DirectorySearch and easily parse many files.
  */
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
-public:
+	public:
 
 	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options,
 		const wxFileName& suppressionFile);
@@ -226,7 +226,7 @@ public:
 	 */
 	int WithSkip;
 
-private:
+	private:
 
 	// flags that control which checks to perform
 	t4p::LintFeatureOptionsClass Options;
@@ -257,7 +257,7 @@ private:
  */
 class LintActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
@@ -283,14 +283,14 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	/**
 	 * Will iterate through each source and parse it for errors
 	 */
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * Will iterate the entire set of files in DirectorySearch.
@@ -331,7 +331,7 @@ private:
  */
 class LintBackgroundSingleFileClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
@@ -356,14 +356,14 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	/**
 	 * Will parse the current file.
 	 */
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * the file to parse
@@ -383,7 +383,7 @@ private:
  */
 class LintFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	t4p::LintFeatureOptionsClass Options;
 
@@ -400,7 +400,7 @@ public:
 
 	void LoadPreferences(wxConfigBase* config);
 
-private:
+	private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 

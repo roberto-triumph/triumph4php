@@ -44,15 +44,15 @@ static int ID_EVENT_VERSION_UPDATES_ON_DIALOG = wxNewId();
 static wxEventType EVENT_VERSION_CHECK = wxNewEventType();
 
 
- /* writes to a stream */
+/* writes to a stream */
 static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* stream) {
-    size_t bytes = size * nmemb;
-    wxOutputStream* ostream = reinterpret_cast<wxOutputStream*>(stream);
-    if (ostream) {
-        ostream->Write(ptr, bytes);
-        return ostream->LastWrite();
-    }
-    return 0;
+	size_t bytes = size * nmemb;
+	wxOutputStream* ostream = reinterpret_cast<wxOutputStream*>(stream);
+	if (ostream) {
+		ostream->Write(ptr, bytes);
+		return ostream->LastWrite();
+	}
+	return 0;
 }
 
 t4p::VersionUpdateFeatureClass::VersionUpdateFeatureClass(t4p::AppClass& app)

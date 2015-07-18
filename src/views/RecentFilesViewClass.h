@@ -34,7 +34,7 @@ namespace t4p {
 
 class RecentFilesViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
 
@@ -44,7 +44,7 @@ public:
 
 	void SavePreferences();
 
-private:
+	private:
 
 	/**
 	 * sub-menu to hold the recent files

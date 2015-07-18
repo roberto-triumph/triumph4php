@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,12 +37,12 @@
 #ifdef _WIN32
 	#pragma warning(disable : 4996)
 #endif
-int main(int argc, char **argv)
-{
+
+int main(int argc, char **argv) {
 	// THIS THE FILE THAT WILL BE OPENED
 #ifdef _WIN32
 	char* fileName = "C:\\Users\\Roberto\\Documents\\triumph4php\\php_samples\\sample_unicode.php";
-#else 
+#else
 	const char* fileName = "/home/roberto/workspace/triumph4php/php_samples/sample_unicode.php";
 #endif
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 		// obtain file size and read the raw data
 		fseek(rawFile , 0 , SEEK_END);
 		int32_t size = ftell(rawFile);
-		rewind(rawFile);		
+		rewind(rawFile);
 		char* tmp = new char[size];
 		fread(tmp, 1, size, rawFile);
 		fclose(rawFile);
@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 		UErrorCode status = U_ZERO_ERROR;
 		const char* name = 0;
 		UCharsetDetector* csd = ucsdet_open(&status);
-		const UCharsetMatch *ucm;		
+		const UCharsetMatch *ucm;
 		ucsdet_setText(csd, tmp, size, &status);
 		if(U_SUCCESS(status)) {
 			ucm = ucsdet_detect(csd, &status);
@@ -76,16 +76,16 @@ int main(int argc, char **argv)
 				}
 			}
 			else {
-				puts("could not detect charset\n");	
+				puts("could not detect charset\n");
 			}
 			ucsdet_close(csd);
-		} 
+		}
 		else {
 			puts("could init detector\n");
 		}
-		
+
 		delete[] tmp;
-		
+
 		// encode to string
 		UFILE* file = u_fopen(fileName, "r", NULL, NULL);
 		if (name != 0) {
@@ -96,11 +96,11 @@ int main(int argc, char **argv)
 			}
 		}
 		u_fclose(file);
-		
+
 		UFILE *out = u_finit(stdout, NULL, NULL);
 		u_fprintf(out, "***********\nFILE\n***************\n%S\n", fileContents.getTerminatedBuffer());
 		u_fclose(out);
-		
+
 		// print UTF-8 encoded String
 		int32_t utf8Length = 0;
 		status = U_ZERO_ERROR;

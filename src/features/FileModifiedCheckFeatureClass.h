@@ -50,7 +50,7 @@ extern const int ID_FILE_MODIFIED_ACTION;
  */
 class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	FileModifiedCheckFeatureClass(t4p::AppClass& app);
 

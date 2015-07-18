@@ -43,7 +43,7 @@ class SyntaxHighlightFeatureClass;
 
 /** Implementing EditColorsPanelGeneratedClass */
 class EditColorsPanelClass : public SyntaxHighlightPanelGeneratedClass {
-protected:
+	protected:
 	// Handlers for EditColorsPanelGeneratedClass events.
 	void OnListBox(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
@@ -51,14 +51,14 @@ protected:
 	void OnFontChanged(wxFontPickerEvent& event);
 	void OnThemeChoice(wxCommandEvent& event);
 
-public:
+	public:
 	/** Constructor */
 	EditColorsPanelClass(wxWindow* parent,
 	                     t4p::SyntaxHighlightFeatureClass& feature,
 	                     t4p::SyntaxHighlightViewClass& view);
 
 	bool TransferDataFromWindow();
-private:
+	private:
 
 	t4p::CodeControlOptionsClass& CodeControlOptions;
 
@@ -89,7 +89,7 @@ private:
  */
 class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 	SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature);
 
 	/**
@@ -100,7 +100,7 @@ public:
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 	/*
 	 * when a file is opened or created, we will

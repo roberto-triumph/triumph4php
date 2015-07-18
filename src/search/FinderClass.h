@@ -57,7 +57,7 @@ namespace t4p {
  */
 class FinderClass {
 
-public:
+	public:
 
 	/**
 	 * All possible search modes
@@ -194,7 +194,7 @@ public:
 	 */
 	bool Wrap;
 
-private:
+	private:
 
 	/**
 	 * The compiled regular expression

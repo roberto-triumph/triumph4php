@@ -40,10 +40,10 @@ namespace t4p {
  */
 class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 	SyntaxHighlightFeatureClass(t4p::AppClass& app);
 
-private:
+	private:
 
 };
 

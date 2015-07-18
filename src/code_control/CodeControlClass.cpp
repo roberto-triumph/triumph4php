@@ -79,7 +79,7 @@ namespace t4p {
  */
 class ElevatedSaveProcessClass : public wxProcess {
 
-public:
+	public:
 
 	// the temp file and script temp are used to copy the
 	// contents that the user has edited into the original

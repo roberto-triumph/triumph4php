@@ -40,7 +40,7 @@ namespace t4p {
  */
 class TotalSearchFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	TotalSearchFeatureClass(t4p::AppClass& app);
 

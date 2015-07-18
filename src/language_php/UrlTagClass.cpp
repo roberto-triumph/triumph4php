@@ -30,27 +30,27 @@
 #include <wx/ffile.h>
 
 t4p::UrlTagClass::UrlTagClass()
- : Url()
- , FileName()
- , ClassName()
- , MethodName() {
+: Url()
+, FileName()
+, ClassName()
+, MethodName() {
 
- }
+}
 
 t4p::UrlTagClass::UrlTagClass(wxString uri)
-	: Url(uri)
-	, FileName()
-	, ClassName()
-	, MethodName() {
+: Url(uri)
+, FileName()
+, ClassName()
+, MethodName() {
 }
 
 t4p::UrlTagClass::UrlTagClass(const t4p::UrlTagClass& src)
-	: Url()
-	, FileName()
-	, ClassName()
-	, MethodName() {
+: Url()
+, FileName()
+, ClassName()
+, MethodName() {
 	Copy(src);
- }
+}
 
 void t4p::UrlTagClass::Reset() {
 	Url.Create(wxT(""));

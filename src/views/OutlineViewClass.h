@@ -38,7 +38,7 @@ namespace t4p {
  * in the opened files.
  */
 class OutlineViewClass : public FeatureViewClass {
-public:
+	public:
 
 	/**
 	 * Creates a new OutlineView.
@@ -74,7 +74,7 @@ public:
 	 */
 	void StartTagSearch(const std::vector<UnicodeString>& searchStrings);
 
-private:
+	private:
 
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
@@ -133,7 +133,7 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	  */
 	 void RemoveFileFromOutline(const wxString& fullPath);
 
-protected:
+	protected:
 
 	/**
 	 * Shows the help
@@ -155,7 +155,7 @@ protected:
 	 */
 	void OnTreeItemRightClick(wxTreeEvent& event);
 
-private:
+	private:
 
 	// image IDs used by the Tree ImageList
 	enum {
@@ -348,7 +348,7 @@ private:
 
 class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent the parent window
@@ -358,7 +358,7 @@ public:
 	FileSearchDialogClass(wxWindow* parent, t4p::OutlineFeatureClass& feature,
 		std::vector<t4p::PhpTagClass>& chosenTags);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 	void OnSearchText(wxCommandEvent& event);
@@ -369,7 +369,7 @@ protected:
 	void OnMatchesListKeyDown(wxKeyEvent& event);
 
 
-private:
+	private:
 
 	/**
 	 * populate the project choice

@@ -38,7 +38,7 @@ class ExplorerModifyEventClass;
 
 class FileListingClass : public wxEvtHandler {
 
-public:
+	public:
 
 	wxFileName WorkingDir;
 	std::vector<wxFileName> Files;
@@ -101,7 +101,7 @@ public:
  */
 class ExplorerFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * executable of the operating system file manager
@@ -127,7 +127,7 @@ public:
 	 */
 	std::vector<wxFileName> EnabledSourceDirectories() const;
 
-private:
+	private:
 
 	/**
 	 * when projects list is updated, we need to update our sources list
@@ -152,7 +152,7 @@ typedef void (wxEvtHandler::*ExplorerEventClassFunction)(t4p::ExplorerEventClass
  */
 class ExplorerEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 *  the dir that was searched
@@ -198,7 +198,7 @@ public:
  */
 class ExplorerFileSystemActionClass : public t4p::ActionClass {
 
-public:
+	public:
 	ExplorerFileSystemActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -211,10 +211,10 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
-private:
+	private:
 
 	wxFileName Dir;
 
@@ -239,7 +239,7 @@ private:
  */
 class ExplorerModifyActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	enum Actions {
 		NONE,
@@ -261,7 +261,7 @@ public:
 	 */
 	void SetFileToRename(const wxFileName& file, const wxString& newName);
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -310,7 +310,7 @@ typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(t4p::ExplorerModi
  */
 class ExplorerModifyEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * name of the item renamed

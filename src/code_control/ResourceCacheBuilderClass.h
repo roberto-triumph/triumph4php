@@ -46,7 +46,7 @@ class GlobalsClass;
  */
 class WorkingCacheBuilderClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads the object will get notified to EVENT_WORK* events with the given ID
@@ -73,14 +73,14 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	/**
 	 * In the background thread we will parse the code for resources
 	 */
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * the location of the tag cache; the sqlite file where the tags are stored

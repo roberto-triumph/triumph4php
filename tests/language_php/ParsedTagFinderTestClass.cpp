@@ -47,7 +47,7 @@
  * Using the file fixture less often means that tests run faster.
  */
 class ParsedTagFinderFileTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-public:
+	public:
 	ParsedTagFinderFileTestClass()
 		: FileTestFixtureClass(wxT("tag_finder"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
@@ -122,7 +122,7 @@ public:
  * create and delete actual files.
  */
 class ParsedTagFinderMemoryTestClass : public SqliteTestFixtureClass {
-public:
+	public:
 	ParsedTagFinderMemoryTestClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
@@ -179,7 +179,7 @@ public:
 
 class TagSearchTestClass {
 
-public:
+	public:
 
 	t4p::TagSearchClass* TagSearch;
 

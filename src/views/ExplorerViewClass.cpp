@@ -374,7 +374,7 @@ void t4p::FileListingWidgetClass::ShowDir() {
 		List->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	}
 	List->SetFocus();
- }
+}
 
 void t4p::FileListingWidgetClass::OnListItemRightClick(wxListEvent& event) {
 	long index = event.GetIndex();

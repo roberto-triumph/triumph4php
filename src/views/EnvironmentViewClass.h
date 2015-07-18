@@ -38,7 +38,7 @@ class EnvironmentFeatureClass;
 
 class EnvironmentViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature);
 
@@ -47,7 +47,7 @@ public:
 	 */
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 	t4p::EnvironmentFeatureClass& Feature;
 };
@@ -57,19 +57,19 @@ private:
  */
 class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClass {
 
-public:
+	public:
 
 	VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
 			wxString& hostname, wxFileName& rootDirectory);
 
-protected:
+	protected:
 
 	/**
 	 * here we will do duplicate checks; the same directory may not be entered twice
 	 */
 	void OnOkButton(wxCommandEvent& event);
 
-private:
+	private:
 
 
 	/**
@@ -90,14 +90,14 @@ private:
  */
 class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass {
 
-protected:
+	protected:
 
 	void OnScanButton(wxCommandEvent& event);
 	void OnAddButton(wxCommandEvent& event);
 	void OnEditButton(wxCommandEvent& event);
 	void OnRemoveButton(wxCommandEvent& event);
 
-public:
+	public:
 	/** Constructor */
 	ApacheEnvironmentPanelClass(wxWindow* parent, t4p::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
 
@@ -108,7 +108,7 @@ public:
 	 */
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	/**
 	 * The configuration class
@@ -176,7 +176,7 @@ private:
  */
 class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
 
-public:
+	public:
 
 	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
@@ -186,7 +186,7 @@ public:
 	 */
 	bool TransferDataFromWindow();
 
-protected:
+	protected:
 
 	/**
 	 * When this panel is resized automatically re-adjust the wrapping the label
@@ -203,7 +203,7 @@ protected:
 
 	void OnMoveDown(wxCommandEvent& event);
 
-private:
+	private:
 
 	/**
 	 * The configuration class
@@ -225,13 +225,13 @@ private:
  */
 class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
 
-public:
+	public:
 
 	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
 	bool TransferDataFromWindow();
 
-protected:
+	protected:
 
 	/**
 	 * Handle the file picker changed event.
@@ -248,7 +248,7 @@ protected:
 	 */
 	void OnResize(wxSizeEvent& event);
 
-private:
+	private:
 
 	/**
 	 * The configuration class
@@ -265,12 +265,12 @@ private:
  */
 class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass {
 
-public:
+	public:
 
 	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers,
 		WebBrowserClass& newBrowser);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 

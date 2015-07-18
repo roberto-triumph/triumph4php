@@ -44,7 +44,7 @@ class EventSinkClass;
  */
 class NotebookClass : public wxAuiNotebook {
 
-public:
+	public:
 
 	/**
 	 * Fonts, colors, and other code control settings
@@ -292,7 +292,7 @@ public:
 	 */
 	void SplitVertically();
 
-protected:
+	protected:
 
 	/**
 	 * Handle the Close Page event.  Will save the contents of the
@@ -329,7 +329,7 @@ protected:
 	 */
 	void OnPageChanged(wxAuiNotebookEvent& event);
 
-private:
+	private:
 
 	/**
 	 * Find out all the open files that have changes that have not been saved.
@@ -397,7 +397,7 @@ private:
  */
 class FileDropTargetClass : public wxFileDropTarget {
 
-public:
+	public:
 
 	/**
 	 * constructor
@@ -411,7 +411,7 @@ public:
 	 */
 	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
 
-private:
+	private:
 
 	NotebookClass* Notebook;
 };

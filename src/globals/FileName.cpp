@@ -29,7 +29,7 @@ wxFileName t4p::FileNameCopy(const wxFileName& fileName) {
 	return cpy;
 }
 
- std::vector<wxFileName> t4p::DeepCopyFileNames(const std::vector<wxFileName>& fileNames) {
+std::vector<wxFileName> t4p::DeepCopyFileNames(const std::vector<wxFileName>& fileNames) {
 	std::vector<wxFileName> cpy;
 	std::vector<wxFileName>::const_iterator filename;
 	for (filename = fileNames.begin(); filename != fileNames.end(); ++filename) {

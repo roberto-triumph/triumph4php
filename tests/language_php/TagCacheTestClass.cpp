@@ -41,7 +41,7 @@
  */
 class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagCacheClass TagCache;
 	t4p::DirectorySearchClass Search;
@@ -111,7 +111,7 @@ public:
  */
 class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass, SqliteTestFixtureClass  {
 
-public:
+	public:
 
 	t4p::TagCacheClass TagCache;
 	wxString GlobalFile;
@@ -200,7 +200,7 @@ public:
 
 class TagCacheSearchFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagCacheClass TagCache;
 	t4p::DirectorySearchClass Search;

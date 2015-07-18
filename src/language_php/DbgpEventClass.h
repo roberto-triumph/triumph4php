@@ -67,7 +67,7 @@ enum DbgpXmlErrors {
  */
 class DbgpInitEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString AppId;
 	wxString IdeKey;
@@ -92,7 +92,7 @@ public:
  */
 class DbgpErrorEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -130,7 +130,7 @@ enum DbgpReason {
 
 class DbgpStatusEventClass : public wxEvent {
 
-public:
+	public:
 
 	/** starting|stopping|stopped|running|break */
 	t4p::DbgpStatus Status;
@@ -169,7 +169,7 @@ enum DbgpFeatures {
 
 class DbgpFeatureGetEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	t4p::DbgpFeatures Feature;
@@ -197,7 +197,7 @@ public:
  */
 class DbgpFeatureSetEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	t4p::DbgpFeatures Feature;
@@ -226,7 +226,7 @@ enum DbgpContinuations {
 
 class DbgpContinueEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	t4p::DbgpStatus Status;
@@ -246,7 +246,7 @@ public:
  */
 class DbgpBreakpointSetEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -262,7 +262,7 @@ public:
 
 class DbgpBreakpointClass {
 
-public:
+	public:
 
 	wxString BreakpointId;
 	wxString BreakpointType;
@@ -295,7 +295,7 @@ public:
  */
 class DbgpBreakpointGetEventClass : public wxEvent {
 
-public:
+	public:
 
 	t4p::DbgpBreakpointClass Breakpoint;
 
@@ -312,7 +312,7 @@ public:
  */
 class DbgpBreakpointUpdateEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -330,7 +330,7 @@ public:
  */
 class DbgpBreakpointRemoveEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -348,7 +348,7 @@ public:
  */
 class DbgpBreakpointListEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -367,7 +367,7 @@ public:
  */
 class DbgpStackDepthEventClass : public wxEvent {
 
-public:
+	public:
 
 	int Depth;
 
@@ -380,7 +380,7 @@ public:
 
 class DbgpStackClass {
 
-public:
+	public:
 
 	int Level;
 	wxString Type;
@@ -410,7 +410,7 @@ public:
  */
 class DbgpStackGetEventClass : public wxEvent {
 
-public:
+	public:
 
 	std::vector<t4p::DbgpStackClass> Stack;
 
@@ -428,7 +428,7 @@ public:
  */
 class DbgpContextNamesEventClass : public wxEvent {
 
-public:
+	public:
 
 	std::vector<wxString> Names;
 	std::vector<int> Ids;
@@ -446,7 +446,7 @@ public:
  */
 class DbgpPropertyClass {
 
-public:
+	public:
 
 	wxString Name;
 	wxString FullName;
@@ -489,7 +489,7 @@ public:
  */
 class DbgpContextGetEventClass : public wxEvent {
 
-public:
+	public:
 
 	std::vector<t4p::DbgpPropertyClass> Properties;
 
@@ -512,7 +512,7 @@ public:
  */
 class DbgpPropertyGetEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -535,7 +535,7 @@ public:
  */
 class DbgpPropertyValueEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -555,7 +555,7 @@ public:
  */
 class DbgpPropertySetEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -574,7 +574,7 @@ public:
  */
 class DbgpBreakEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -593,7 +593,7 @@ public:
  */
 class DbgpEvalEventClass : public wxEvent {
 
-public:
+	public:
 
 	wxString Command;
 	wxString TransactionId;
@@ -616,7 +616,7 @@ public:
  */
 class DbgpCommandClass {
 
-public:
+	public:
 
 	DbgpCommandClass();
 
@@ -780,7 +780,7 @@ public:
 	 */
 	std::string CurrentTransactionId() const;
 
-private:
+	private:
 
 	// all three are used to produce a unique transaction id
 	int TransactionId;

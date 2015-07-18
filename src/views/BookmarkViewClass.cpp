@@ -22,11 +22,11 @@
  * @copyright  2015 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #include <views/BookmarkViewClass.h>
- #include <features/BookmarkFeatureClass.h>
- #include <code_control/CodeControlClass.h>
+#include <views/BookmarkViewClass.h>
+#include <features/BookmarkFeatureClass.h>
+#include <code_control/CodeControlClass.h>
 
- t4p::BookmarkViewClass::BookmarkViewClass(t4p::BookmarkFeatureClass& feature)
+t4p::BookmarkViewClass::BookmarkViewClass(t4p::BookmarkFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
 }

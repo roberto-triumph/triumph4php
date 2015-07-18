@@ -41,7 +41,7 @@ class CodeControlClass;
  */
 class DocCommentFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	DocCommentFeatureClass(t4p::AppClass& app);
 

@@ -34,13 +34,13 @@ namespace t4p {
 
 class FileWatcherViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 	t4p::FileWatcherFeatureClass& Feature;
 
@@ -54,11 +54,11 @@ private:
 
 class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
 
-public:
+	public:
 
 	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
 
-private:
+	private:
 
 	t4p::FileWatcherFeatureClass& Feature;
 };

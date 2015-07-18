@@ -37,7 +37,7 @@ namespace t4p {
  */
 class JsTagResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	t4p::JsTagClass JsTag;
 
@@ -45,11 +45,11 @@ public:
 
 	void Next();
 
-protected:
+	protected:
 
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	// the variables bound to the sqlite result set
 	int Id;
@@ -72,7 +72,7 @@ private:
  */
 class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
 
-public:
+	public:
 
 	ExactMatchJsTagResultClass();
 
@@ -82,11 +82,11 @@ public:
 	 */
 	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	std::string Search;
 	std::vector<std::string> SourceDirs;
@@ -99,7 +99,7 @@ private:
  */
 class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
 
-public:
+	public:
 
 	NearMatchJsTagResultClass();
 
@@ -109,11 +109,11 @@ public:
 	 */
 	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	std::string Search;
 	std::string SearchUpper;

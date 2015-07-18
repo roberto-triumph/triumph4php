@@ -38,7 +38,7 @@ namespace t4p {
 
 class RunBrowserViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	RunBrowserViewClass(t4p::RunBrowserFeatureClass& feature);
 
@@ -46,7 +46,7 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	/**
 	 * when a file is saved and that file is from an enabled project

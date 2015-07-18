@@ -40,7 +40,7 @@ namespace t4p {
  */
 class SqlLexicalAnalyzerClass {
 
-public:
+	public:
 
 	SqlLexicalAnalyzerClass();
 

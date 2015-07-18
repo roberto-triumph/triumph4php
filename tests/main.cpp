@@ -94,7 +94,7 @@
 
 class SingleTestsPredicateClass {
 
-public:
+	public:
 
 	std::vector<std::string> TestCases;
 

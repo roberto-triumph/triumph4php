@@ -77,7 +77,7 @@ void ProfileTagSearch();
  * This class will help in parsing the large project
  */
 class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
-public:
+	public:
 
 	ParserDirectoryWalkerClass();
 
@@ -87,7 +87,7 @@ public:
 
 	int WithNoErrors;
 
-private:
+	private:
 
 	pelet::ParserClass Parser;
 };
@@ -97,7 +97,7 @@ private:
  * This class will help in linting a large project
  */
 class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
-public:
+	public:
 
 	VariableLinterWalkerClass(t4p::TagCacheClass& tagCache);
 
@@ -107,7 +107,7 @@ public:
 
 	int WithNoErrors;
 
-private:
+	private:
 
 	t4p::PhpVariableLintOptionsClass Options;
 	t4p::PhpVariableLintClass Linter;

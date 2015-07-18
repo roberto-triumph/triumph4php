@@ -37,7 +37,7 @@ namespace t4p {
  */
 class PhpEnvironmentClass {
 
-public:
+	public:
 
 	/**
 	 * Full path to the PHP executable
@@ -106,7 +106,7 @@ public:
  */
 class WebBrowserClass {
 
-public:
+	public:
 
 	/**
 	 * should be unique, but that is not enforced here
@@ -145,7 +145,7 @@ public:
  */
 class EnvironmentClass {
 
-public:
+	public:
 	EnvironmentClass();
 	~EnvironmentClass();
 
@@ -203,7 +203,7 @@ public:
 	 */
 	bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
 
-private:
+	private:
 
 	void AddDefaults();
 };

@@ -35,7 +35,7 @@
  */
 class SqliteTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * @param sqlScriptFile the file that contains the CREATE table statements
@@ -64,7 +64,7 @@ public:
 	 */
 	bool Exec(const std::string& query);
 
-protected:
+	protected:
 
 	/**
 	 * The active connection
@@ -75,6 +75,6 @@ protected:
 	 * The connection info
 	 */
 	std::string ConnectionString;
- };
+};
 
- #endif
+#endif

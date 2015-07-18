@@ -32,7 +32,7 @@ namespace t4p {
 
 class ProjectFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * the location of the "file explorer" binary.  This is dependent per OS.
@@ -70,7 +70,7 @@ public:
 	 */
 	void CreateProject(const wxString& dir, bool doTag);
 
-private:
+	private:
 
 	/**
 	 * Save the preferences to persistent storage

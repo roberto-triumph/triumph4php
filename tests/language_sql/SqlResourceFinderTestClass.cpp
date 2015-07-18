@@ -38,7 +38,7 @@
 class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 	public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	MysqlResourceFinderFixtureClass()
 		: DatabaseTestFixtureClass("sql_resource_finder")
@@ -64,7 +64,7 @@ public:
 
 class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	SqliteResourceFinderFixtureClass()
 		: FileTestFixtureClass("sql_resource_finder")

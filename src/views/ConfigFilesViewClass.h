@@ -39,7 +39,7 @@ class ConfigFilesFeatureClass;
  */
 class ConfigFilesViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature);
 

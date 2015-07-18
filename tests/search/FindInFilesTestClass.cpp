@@ -50,7 +50,7 @@ wxString FILE_2 = wxString::FromAscii(
 );
 
 class FindInFilesTestFixtureClass : public FileTestFixtureClass {
-public:
+	public:
 	FindInFilesTestFixtureClass()
 		: FileTestFixtureClass(wxT("find_in_files"))
 		, FindInFiles() {

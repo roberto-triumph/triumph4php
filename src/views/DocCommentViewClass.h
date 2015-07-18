@@ -37,13 +37,13 @@ class CodeControlClass;
 
 class DocCommentViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	DocCommentViewClass(t4p::DocCommentFeatureClass& feature);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 
-private:
+	private:
 
 	void OnShowDocComment(wxCommandEvent& event);
 
@@ -63,7 +63,7 @@ private:
  */
 class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
 
-public:
+	public:
 
 	DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView);
 
@@ -71,7 +71,7 @@ public:
 
 	void EnablePhpSiteLink(const wxString& functionName);
 
-protected:
+	protected:
 
 	void OnClose(wxHyperlinkEvent& event);
 	void OnKeyDown(wxKeyEvent& event);

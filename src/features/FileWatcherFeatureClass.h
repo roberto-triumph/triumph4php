@@ -61,7 +61,7 @@ class VolumeListEventClass;
  */
 class FileWatcherFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * Flag to turn this feature on or off, we want this so that in case
@@ -91,7 +91,7 @@ public:
 	 */
 	void UntrackOpenedFile(wxString fullPath);
 
-private:
+	private:
 
 	/**
 	 * when the app starts then start the watches
@@ -234,11 +234,11 @@ private:
  */
 class VolumeListActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -258,7 +258,7 @@ typedef void (wxEvtHandler::*VolumeListEventClassFunction)(VolumeListEventClass&
 
 class VolumeListEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * List of the LOCAL volumes that are mounted. this will

@@ -39,7 +39,7 @@ namespace t4p {
  */
 class FileCabinetItemClass {
 
-public:
+	public:
 
 	/**
 	 * a unique identifier (database primary key)
@@ -86,7 +86,7 @@ public:
  */
 class FileCabinetStoreClass {
 
-public:
+	public:
 
 	FileCabinetStoreClass();
 
@@ -117,7 +117,7 @@ public:
  */
 class FileCabinetBaseResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	/**
 	 * the current item of the result set. This is populated
@@ -133,7 +133,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * binds the sql result columns to this item
@@ -153,7 +153,7 @@ protected:
 	 */
 	bool BindAndExecute(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * the variable that is bound to the file_cabinet_item_id column of the result set
@@ -180,7 +180,7 @@ class AllFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
 
 	AllFileCabinetResultClass();
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query the file_cabinet table and prepares it.
@@ -208,7 +208,7 @@ class SingleFileCabinetResultClass : public t4p::FileCabinetBaseResultClass {
 	 */
 	void SetId(int id);
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query the file_cabinet table and prepares it.
@@ -220,7 +220,7 @@ protected:
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 
-private:
+	private:
 
 	/**
 	 * the ID to query for
@@ -246,7 +246,7 @@ class FileCabinetExactSearchResultClass : public t4p::FileCabinetBaseResultClass
 	 */
 	void SetName(const std::string& name);
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query the file_cabinet table and prepares it.
@@ -258,7 +258,7 @@ protected:
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 
-private:
+	private:
 
 	/**
 	 * the name to query for
@@ -283,7 +283,7 @@ class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
 	 */
 	void SetName(const std::string& name);
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL to query the file_cabinet table and prepares it.
@@ -295,7 +295,7 @@ protected:
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 
-private:
+	private:
 
 	/**
 	 * the name to query for

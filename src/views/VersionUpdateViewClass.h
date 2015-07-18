@@ -39,7 +39,7 @@ namespace t4p {
  * latest version from the response.
  */
 class VersionUpdateViewClass : public FeatureViewClass {
-public:
+	public:
 
 	VersionUpdateViewClass(t4p::VersionUpdateFeatureClass& feature);
 
@@ -47,7 +47,7 @@ public:
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
-private:
+	private:
 
 	/**
 	 * when the app starts, start the update check timer
@@ -97,7 +97,7 @@ private:
 
 class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
 
-public:
+	public:
 
 	VersionUpdateDialogClass(wxWindow* parent, int id,
 		t4p::RunningThreadsClass& runningThreads,
@@ -105,11 +105,11 @@ public:
 		bool showNewVersion,
 		wxString newVersion);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	void OnTimer(wxTimerEvent& event);
 
@@ -129,7 +129,7 @@ private:
 
 class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGeneratedPanelClass {
 
-public:
+	public:
 
 	VersionUpdatePreferencesPanelClass(wxWindow* parent, t4p::PreferencesClass& preferences);
 

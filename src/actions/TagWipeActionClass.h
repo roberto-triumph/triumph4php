@@ -35,7 +35,7 @@ namespace t4p {
  */
 class TagWipeActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -43,11 +43,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * The db files that need to be wiped.
@@ -63,7 +63,7 @@ private:
  */
 class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagDeleteSourceActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& sourceDirsToDelete);
 
@@ -71,11 +71,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * The db files that need to be wiped.
@@ -96,7 +96,7 @@ private:
  */
 class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagDeleteDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
 
@@ -104,11 +104,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * The db files that need to be wiped.
@@ -129,7 +129,7 @@ private:
  */
 class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	TagDeleteFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& filesToDelete);
 
@@ -137,11 +137,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * The db files that need to be wiped.

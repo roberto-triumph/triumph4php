@@ -37,7 +37,7 @@ namespace t4p {
 
 class RunBrowserFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * The most recent URLs that have been run. New URLs are added after the
@@ -52,7 +52,7 @@ public:
 
 	void ExternalBrowser(const wxString& browserName, const wxURI& url);
 
-private:
+	private:
 
 };
 

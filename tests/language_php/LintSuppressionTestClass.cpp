@@ -30,7 +30,7 @@
 
 class LintSuppressionFixtureClass : public FileTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * the object under test

@@ -43,7 +43,7 @@ namespace t4p {
  */
 class GlobalsClass {
 
-public:
+	public:
 
 	/**
 	 * The environment stack.

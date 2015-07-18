@@ -39,7 +39,7 @@ namespace t4p {
  */
 class CallStackActionClass : public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
@@ -64,7 +64,7 @@ public:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * This is used by the call stack class to find out the file name (full paths) of the

@@ -40,7 +40,7 @@ namespace t4p {
  */
 class TotalSearchViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature);
 
@@ -48,7 +48,7 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	void OnTotalSearch(wxCommandEvent& event);
 
@@ -65,12 +65,12 @@ private:
  */
 class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 
-public:
+	public:
 
 	TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
 		std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
 
-private:
+	private:
 
 	void OnCancelButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);

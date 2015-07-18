@@ -49,7 +49,7 @@ class SqlBrowserViewClass;
  */
 class SqliteConnectionDialogClass : public SqliteConnectionDialogGeneratedClass {
 
-public:
+	public:
 
 	SqliteConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag);
 
@@ -60,7 +60,7 @@ public:
  */
 class MysqlConnectionDialogClass : public MysqlConnectionDialogGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param wxWindow* the parent window
@@ -72,7 +72,7 @@ public:
 
 	~MysqlConnectionDialogClass();
 
-private:
+	private:
 
 	void OnTestButton(wxCommandEvent& event);
 
@@ -112,13 +112,13 @@ private:
  */
 class SqlConnectionListDialogClass : public SqlConnectionListDialogGeneratedClass {
 
-public:
+	public:
 
 	SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags, t4p::RunningThreadsClass& runningThreads);
 
 	~SqlConnectionListDialogClass();
 
-private:
+	private:
 
 	void OnOkButton(wxCommandEvent& event);
 
@@ -187,7 +187,7 @@ private:
  */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * Creates a new SQL browser panel. After creation, the panel needs to be linked to a CodeControl
@@ -268,7 +268,7 @@ public:
 	 */
 	int SelectedConnectionIndex();
 
-private:
+	private:
 
 	/**
 	 * Transfers all of the variables from the controls to the Query data structure
@@ -408,7 +408,7 @@ private:
  */
 class DefinitionIndicesPanelClass : public DefinitionIndicesPanelGeneratedClass {
 
-public:
+	public:
 
 	DefinitionIndicesPanelClass(wxWindow* parent);
 
@@ -420,7 +420,7 @@ public:
  */
 class DefinitionColumnsPanelClass : public DefinitionColumnsPanelGeneratedClass {
 
-public:
+	public:
 
 	DefinitionColumnsPanelClass(wxWindow* parent);
 
@@ -430,7 +430,7 @@ public:
 
 class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
 
-public:
+	public:
 
 	TableDefinitionPanelClass(wxWindow* parent, int id, t4p::SqlBrowserFeatureClass& feature,
 		t4p::SqlBrowserViewClass& view);
@@ -443,7 +443,7 @@ public:
 
 	void FillConnectionList();
 
-private:
+	private:
 
 	void OnColumnSqlComplete(t4p::QueryCompleteEventClass& event);
 
@@ -498,7 +498,7 @@ private:
  */
 class SqlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 
-public:
+	public:
 
 	SqlCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
@@ -508,7 +508,7 @@ public:
 
 	void SetDbTag(const t4p::DatabaseTagClass& dbTag);
 
-private:
+	private:
 
 	std::vector<wxString> HandleAutoCompletionMySql(const UnicodeString& word);
 
@@ -525,7 +525,7 @@ private:
 
 class SqlBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
 
-public:
+	public:
 
 	SqlBraceMatchStylerClass();
 
@@ -538,7 +538,7 @@ public:
  * This is a view to manage SQL connections and make queries to the database.
  */
 class SqlBrowserViewClass : public FeatureViewClass {
-public:
+	public:
 	SqlBrowserViewClass(t4p::SqlBrowserFeatureClass& feature);
 
 	~SqlBrowserViewClass();
@@ -567,7 +567,7 @@ public:
 	 */
 	void SetCurrentInfo(const DatabaseTagClass& info);
 
-private:
+	private:
 
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 
@@ -631,17 +631,17 @@ private:
  */
 class SqlCopyDialogClass : public SqlCopyDialogGeneratedClass {
 
-public:
+	public:
 
 	SqlCopyDialogClass(wxWindow* parent, int id, t4p::SqlCopyOptionsClass& options);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	t4p::SqlCopyOptionsClass EditedOptions;
 
@@ -655,12 +655,12 @@ private:
  */
 class SqlCopyAsInsertDialogClass : public SqlCopyAsInsertDialogGeneratedClass {
 
-public:
+	public:
 
 	SqlCopyAsInsertDialogClass(wxWindow* parent, int id,
 		t4p::RowToSqlInsertClass& rowToSql);
 
-private:
+	private:
 
 	void OnOkButton(wxCommandEvent& event);
 
@@ -684,11 +684,11 @@ private:
 
 class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
 
-public:
+	public:
 
 	SqlCopyAsPhpDialogClass(wxWindow* parent, int id, t4p::RowToPhpClass& rowToPhp);
 
-private:
+	private:
 
 	void OnOkButton(wxCommandEvent& event);
 

@@ -55,7 +55,7 @@ class FileTagResultClass;
  */
 class TagSearchClass {
 
-public:
+	public:
 
 	/**
 	 * These are the different near match scenarios that can occur.
@@ -247,7 +247,7 @@ public:
 	 */
 	TagSearchClass::ResourceTypes GetResourceType() const;
 
-private:
+	private:
 
 	/**
 	 * the file name parsed from tag string
@@ -323,7 +323,7 @@ private:
  */
 class TagResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	t4p::PhpTagClass Tag;
 
@@ -338,7 +338,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * bind the sql columns to the instance variables
@@ -372,7 +372,7 @@ protected:
 
 class FileTagResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	t4p::FileTagClass FileTag;
 
@@ -393,7 +393,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * this method builds the SQL and prepares it.
@@ -408,7 +408,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * Get the line count from the given file.
@@ -447,7 +447,7 @@ private:
 
 class TraitTagResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	t4p::TraitTagClass TraitTag;
 
@@ -468,7 +468,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * build the SQL and prepare it.
@@ -483,7 +483,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * only tags that were found in files located in the given directories will match.
@@ -519,13 +519,13 @@ private:
 
 class ExactMemberTagResultClass : public t4p::TagResultClass {
 
-public:
+	public:
 
 	ExactMemberTagResultClass();
 
 	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
@@ -538,17 +538,17 @@ protected:
 
 class NearMatchMemberTagResultClass : public t4p::ExactMemberTagResultClass {
 
-public:
+	public:
 
 	NearMatchMemberTagResultClass();
 
 	void SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
-private:
+	private:
 
 	// number of classes we want to search for
 	int ClassCount;
@@ -567,7 +567,7 @@ private:
  */
 class FunctionLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	FunctionLookupClass();
 
@@ -578,7 +578,7 @@ public:
 
 	bool Found();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -599,7 +599,7 @@ protected:
 	 */
 	void Next();
 
-private:
+	private:
 
 	/**
 	 *  bound to the prepared statement as an input
@@ -623,7 +623,7 @@ private:
  */
 class ClassLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	ClassLookupClass();
 
@@ -647,7 +647,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -662,7 +662,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 *  bound to the prepared statement as an input
@@ -686,7 +686,7 @@ private:
  */
 class NamespaceLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	NamespaceLookupClass();
 
@@ -709,7 +709,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -724,7 +724,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 *  bound to the prepared statement as an input
@@ -748,7 +748,7 @@ private:
  */
 class MethodLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	MethodLookupClass();
 
@@ -773,7 +773,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -788,7 +788,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * bound to the prepared statement as an input
@@ -816,7 +816,7 @@ private:
  */
 class PropertyLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	PropertyLookupClass();
 
@@ -841,7 +841,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -856,7 +856,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * bound to the prepared statement as an input
@@ -884,7 +884,7 @@ private:
  */
 class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	/**
 	 * the function's signature that was found in the db
@@ -917,7 +917,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -932,7 +932,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 *  bound to the prepared statement as an input
@@ -968,7 +968,7 @@ private:
  */
 class MethodSignatureLookupClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	/**
 	 * the method's signature that was found in the db
@@ -1003,7 +1003,7 @@ public:
 	 */
 	void Next();
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
@@ -1018,7 +1018,7 @@ protected:
 	 */
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	/**
 	 * bound to the prepared statement as an input
@@ -1071,7 +1071,7 @@ private:
  */
 class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 
-public:
+	public:
 
 	ParsedTagFinderClass(soci::session& session);
 
@@ -1275,7 +1275,7 @@ public:
 	 */
 	bool HasDir(const wxString& dir);
 
-protected:
+	protected:
 
 	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
@@ -1288,7 +1288,7 @@ protected:
 	 */
 	bool FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag);
 
-private:
+	private:
 
 	/**
 	 * Collects all resources that are classes / functions / defines and match the the given Resource search.

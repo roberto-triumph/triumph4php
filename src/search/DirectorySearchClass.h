@@ -40,7 +40,7 @@ namespace t4p {
  */
 class DirectoryWalkerClass {
 
-public:
+	public:
 
 	/**
 	 * This method will be called right before the first file is iterated through. Walkers will
@@ -90,7 +90,7 @@ public:
  */
 class SourceClass {
 
-public:
+	public:
 
 	/**
 	 * The location where to start looking files from.
@@ -236,7 +236,7 @@ bool CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::vecto
  */
 class DirectorySearchClass {
 
-public:
+	public:
 
 	enum Modes {
 
@@ -313,7 +313,7 @@ public:
 	 */
 	const std::vector<wxString>& GetMatchedFiles();
 
-private:
+	private:
 
 	/**
 	 * Populate CurrentFiles with all files in the given path (will recurse through sub-directories as well.)

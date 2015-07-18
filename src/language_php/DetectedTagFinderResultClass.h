@@ -34,7 +34,7 @@ namespace t4p {
 
 class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	DetectedTagTotalCountResultClass();
 
@@ -42,20 +42,20 @@ public:
 
 	void Next();
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	void DoBind(soci::statement& stmt);
 
-private:
+	private:
 
 	int TotalCount;
 };
 
 class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
 
-public:
+	public:
 
 	/**
 	 * this object is the current row of the result.
@@ -69,7 +69,7 @@ public:
 
 	void Next();
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
@@ -98,17 +98,17 @@ protected:
 
 class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMemberResultClass {
 
-public:
+	public:
 
 	DetectedTagNearMatchMemberResultClass();
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 		const std::vector<wxFileName>& sourceDirectories);
 
-protected:
+	protected:
 
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
-private:
+	private:
 
 	std::string KeyUpper;
 

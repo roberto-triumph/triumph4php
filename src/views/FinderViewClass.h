@@ -35,7 +35,7 @@ namespace t4p {
 
 class FinderViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	FinderViewClass(t4p::FinderFeatureClass& feature);
 
@@ -108,7 +108,7 @@ public:
  */
 class FinderPanelClass : public FinderPanelGeneratedClass {
 
-protected:
+	protected:
 	// Handlers for FindDialogGeneratedClass events.
 	void OnHelpButton(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
@@ -127,7 +127,7 @@ protected:
 	 */
 	void OnFindKillFocus(wxFocusEvent& event);
 
-public:
+	public:
 
 	/**
 	 * Construct a new finder dialog
@@ -166,7 +166,7 @@ public:
 	 */
 	void FindPrevious();
 
-private:
+	private:
 
 	/**
 	 * Execute a find on the currently active notebook page
@@ -231,7 +231,7 @@ private:
 
 class ReplacePanelClass : public ReplacePanelGeneratedClass {
 
-protected:
+	protected:
 	void OnHelpButton(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
 	void OnPreviousButton(wxCommandEvent& event);
@@ -261,7 +261,7 @@ protected:
 	void OnFindKillFocus(wxFocusEvent& event);
 	void OnReplaceKillFocus(wxFocusEvent& event);
 
-public:
+	public:
 
 	/**
 	 * Construct a new finder dialog
@@ -306,7 +306,7 @@ public:
 	 */
 	void FindPrevious();
 
-private:
+	private:
 
 	/**
 	 * Execute a find on the currently active notebook page

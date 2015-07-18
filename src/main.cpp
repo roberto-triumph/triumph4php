@@ -60,7 +60,7 @@ namespace t4p {
  */
 class AppTimerClass : public wxTimer {
 
-public:
+	public:
 
 	/**
 	 * create AND begin the timer
@@ -72,7 +72,7 @@ public:
 	 */
 	void Notify();
 
-private:
+	private:
 
 	GuiAppClass& GuiApp;
 
@@ -95,7 +95,7 @@ private:
  */
 class GuiAppClass : public wxApp {
 
-public:
+	public:
 
 	/**
 	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
@@ -132,7 +132,7 @@ public:
 	 */
 	void FeatureWindows(t4p::MainFrameClass* mainFrame);
 
-private:
+	private:
 
 	void LoadPreferences(t4p::MainFrameClass* mainFrame);
 
@@ -195,7 +195,7 @@ namespace t4p {
 
 class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 
-public:
+	public:
 
 	MysqlThreadCleanupClass()
 	: ThreadCleanupClass() {

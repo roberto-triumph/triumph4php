@@ -39,7 +39,7 @@ extern const wxEventType EVENT_SQL_META_DATA_COMPLETE;
 
 class SqlMetaDataEventClass : public wxEvent {
 
-public:
+	public:
 
 	/**
 	 * Get any connection errors that occurred in the background thread.
@@ -60,7 +60,7 @@ public:
  */
 class SqlMetaDataActionClass : public GlobalActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads will get notified with EVENT_WORK_* events
@@ -82,7 +82,7 @@ public:
 
 	wxString GetLabel() const;
 
-private:
+	private:
 
 	/**
 	 * The connections to query; where the tables / columns will be fetched from
@@ -97,13 +97,13 @@ private:
 
 class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
 
-public:
+	public:
 
 	SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(t4p::GlobalsClass& globals);
 
-protected:
+	protected:
 
 	wxString GetLabel() const;
 };

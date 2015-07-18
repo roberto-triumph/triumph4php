@@ -43,7 +43,7 @@ class TagCacheClass;
  */
 class PhpIdentifierLintResultClass {
 
-public:
+	public:
 
 	enum Types {
 		NONE,
@@ -98,7 +98,7 @@ class PhpIdentifierLintClass :
 	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass  {
 
-public:
+	public:
 
 	PhpIdentifierLintClass();
 
@@ -200,7 +200,7 @@ public:
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
-private:
+	private:
 
 	/**
 	 * errors found so far

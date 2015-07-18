@@ -38,7 +38,7 @@
  */
 class DatabaseTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * Connects to the database and creates a test database
@@ -84,7 +84,7 @@ public:
 	 */
 	std::string Password() const;
 
-private:
+	private:
 
 	/**
 	 * The active connection
@@ -95,6 +95,6 @@ private:
 	 * The connection info
 	 */
 	std::string ConnectionString;
- };
+};
 
- #endif
+#endif

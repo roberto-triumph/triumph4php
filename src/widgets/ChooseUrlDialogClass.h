@@ -38,13 +38,13 @@ namespace t4p {
  */
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 
-public:
+	public:
 	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls,
 		const std::vector<t4p::ProjectClass>& projects,
 		const t4p::FileTypeClass& fileType,
 		UrlTagClass& chosenUrl);
 
-protected:
+	protected:
 
 	void OnOkButton(wxCommandEvent& event);
 
@@ -80,7 +80,7 @@ protected:
 	 */
 	void OnProjectChoice(wxCommandEvent& event);
 
-private:
+	private:
 
 	/**
 	 * Get the matching urls. a matching url is one that starts with the

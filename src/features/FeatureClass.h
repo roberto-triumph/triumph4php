@@ -146,7 +146,7 @@ enum MenuIds {
  */
 class FeatureClass : public wxEvtHandler {
 
-public:
+	public:
 
 
 	/**
@@ -174,7 +174,7 @@ public:
 	 */
 	virtual void LoadPreferences(wxConfigBase* config);
 
-private:
+	private:
 
 };
 

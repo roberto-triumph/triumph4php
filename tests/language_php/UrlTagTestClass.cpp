@@ -35,7 +35,7 @@
 
 class UrlTagFixtureClass : public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::UrlTagFinderClass Finder;
 	soci::session DetectorTagSession;

@@ -54,7 +54,7 @@ class GlobalsClass;
  */
 class WorkingCacheClass {
 
-public:
+	public:
 
 	/**
 	 * The object that keeps track of variable types; we only need
@@ -116,7 +116,7 @@ public:
 	 */
 	bool Update(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable);
 
-private:
+	private:
 
 };
 
@@ -140,7 +140,7 @@ private:
  */
 class TagCacheClass {
 
-public:
+	public:
 
 	TagCacheClass();
 
@@ -515,7 +515,7 @@ public:
 	 */
 	bool HasDir(const wxString& dir);
 
-private:
+	private:
 
 	/**
 	 * Returns a list that contains all of the tag finders for the registered files plus
@@ -552,7 +552,7 @@ extern const wxEventType EVENT_TAG_FINDER_LIST_COMPLETE;
 
 
 class WorkingCacheCompleteEventClass : public wxEvent {
-public:
+	public:
 
 	/**
 	 * This will be owned by the event handler
@@ -583,7 +583,7 @@ public:
 	 */
 	wxString GetFileName() const;
 
-private:
+	private:
 
 	wxString FileName;
 
@@ -591,7 +591,7 @@ private:
 };
 
 class TagFinderListCompleteEventClass : public wxEvent {
-public:
+	public:
 
 	TagFinderListCompleteEventClass(int id);
 

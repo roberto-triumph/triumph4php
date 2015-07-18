@@ -39,7 +39,7 @@ namespace t4p {
  */
 class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
 
-public:
+	public:
 
 	DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 

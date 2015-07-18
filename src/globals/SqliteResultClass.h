@@ -62,7 +62,7 @@ namespace t4p {
  */
 class SqliteResultClass {
 
-public:
+	public:
 
 	SqliteResultClass();
 	virtual ~SqliteResultClass();
@@ -121,7 +121,7 @@ public:
 	 */
 	bool ReExec(wxString& error);
 
-protected:
+	protected:
 
 	/**
 	 * in this method subclasses will build the SQL and bind the input
@@ -148,7 +148,7 @@ protected:
 	 */
 	bool Fetch();
 
-private:
+	private:
 
 	/**
 	 * the statement to iterate through

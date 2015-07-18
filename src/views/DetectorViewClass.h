@@ -37,7 +37,7 @@ namespace t4p {
 
 class DetectorViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	DetectorViewClass(t4p::DetectorFeatureClass& feature);
 
@@ -68,7 +68,7 @@ public:
 
 class DetectorTreeHandlerClass : public wxEvtHandler {
 
-public:
+	public:
 
 	/**
 	 * @param detectorTree the wxTreeCtrl that renders the files. pointer will NOT be
@@ -99,7 +99,7 @@ public:
 	void OnMenuRenameDetector(wxCommandEvent& event);
 	void OnMenuDeleteDetector(wxCommandEvent& event);
 
-private:
+	private:
 	void FillSubTree(const wxString& detectorRootDir, wxTreeItemId treeItemDir);
 
 	// tree control event handlers
@@ -149,7 +149,7 @@ private:
 
 class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent window parent
@@ -174,7 +174,7 @@ public:
 	 */
 	void UpdateProjects();
 
-private:
+	private:
 
 	t4p::UrlTagDetectorClass Detector;
 
@@ -185,7 +185,7 @@ private:
 
 class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent window parent
@@ -211,7 +211,7 @@ public:
 	 */
 	void UpdateProjects();
 
-private:
+	private:
 
 	t4p::TemplateFileTagsDetectorClass Detector;
 
@@ -242,7 +242,7 @@ private:
 
 class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent window parent
@@ -267,11 +267,11 @@ public:
 	 */
 	void UpdateProjects();
 
-protected:
+	protected:
 
 	void OnChooseUrlButton(wxCommandEvent& event);
 
-private:
+	private:
 
 	t4p::TagDetectorClass Detector;
 
@@ -282,7 +282,7 @@ private:
 
 class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent window parent
@@ -307,7 +307,7 @@ public:
 	 */
 	void UpdateProjects();
 
-private:
+	private:
 
 	t4p::DatabaseTagDetectorClass Detector;
 
@@ -318,7 +318,7 @@ private:
 
 class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
 
-public:
+	public:
 
 	/**
 	 * @param parent window parent
@@ -343,7 +343,7 @@ public:
 	 */
 	void UpdateProjects();
 
-private:
+	private:
 
 	t4p::ConfigTagDetectorClass Detector;
 

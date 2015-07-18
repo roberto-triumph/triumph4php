@@ -40,7 +40,7 @@ namespace t4p {
  */
 class TagCacheSearchCompleteEventClass : public wxEvent {
 
-    public:
+	public:
 
 	/**
 	 * The string that was searched for.
@@ -75,7 +75,7 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
  */
 class TagCacheSearchActionClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -97,11 +97,11 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * the thing to search in

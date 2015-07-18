@@ -39,7 +39,7 @@ namespace t4p {
  */
 class ComboBoxHistoryClass : public wxEvtHandler {
 
-public:
+	public:
 
 	/**
 	 * Construct a new history
@@ -73,7 +73,7 @@ public:
 	 */
 	void Detach();
 
-private:
+	private:
 
 	/**
 	 * We will use this only for modal dialogs; in order to persist items accross many instances of the same dialog.

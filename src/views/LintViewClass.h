@@ -41,7 +41,7 @@ class LintViewClass;
  */
 class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 
-public:
+	public:
 
 	LintResultsPanelClass(wxWindow *parent, int id, t4p::LintFeatureClass& feature,
 		t4p::LintViewClass& lintView, wxWindow* topWindow);
@@ -130,7 +130,7 @@ public:
 
 	void OnAddSuppression(wxCommandEvent& event);
 
-private:
+	private:
 
 	t4p::LintFeatureClass& Feature;
 
@@ -157,11 +157,11 @@ private:
  */
 class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
 
-public:
+	public:
 
 	LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results);
 
-private:
+	private:
 
 	void OnKeyDown(wxKeyEvent& event);
 	void OnGoToLink(wxHyperlinkEvent& event);
@@ -187,7 +187,7 @@ private:
  */
 class LintViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	t4p::LintFeatureClass& Feature;
 
@@ -209,7 +209,7 @@ public:
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
-private:
+	private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 
@@ -251,7 +251,7 @@ private:
  */
 class LintPreferencesPanelClass : public LintPreferencesGeneratedPanelClass {
 
-public:
+	public:
 
 	t4p::LintFeatureClass& Feature;
 
@@ -265,12 +265,12 @@ public:
  */
 class LintSuppressionsPanelClass : public LintSuppressionsGeneratedPanelClass {
 
-public:
+	public:
 
 	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
 		wxWindow* topWindow);
 
-private:
+	private:
 
 	// event handlers
 	void OnAddButton(wxCommandEvent& event);
@@ -326,11 +326,11 @@ private:
  */
 class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialogClass {
 
-public:
+	public:
 
 	LintSuppressionRuleDialogClass(wxWindow* parent, int id, t4p::SuppressionRuleClass& rule);
 
-private:
+	private:
 
 	// events to prevent invalid inputs
 	void OnTypeChoice(wxCommandEvent& event);

@@ -43,7 +43,7 @@ namespace t4p {
  */
 class FileCabinetFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	FileCabinetFeatureClass(t4p::AppClass& app);
 
@@ -62,7 +62,7 @@ public:
 	 */
 	void DeleteCabinetItem(int id);
 
-private:
+	private:
 
 	/**
 	 * to modify the file cabinet

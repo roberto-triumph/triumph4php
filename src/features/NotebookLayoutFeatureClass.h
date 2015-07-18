@@ -35,7 +35,7 @@ namespace t4p {
  */
 class NotebookLayoutFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
     NotebookLayoutFeatureClass(t4p::AppClass& app);
 };

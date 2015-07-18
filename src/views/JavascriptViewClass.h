@@ -60,7 +60,7 @@ class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProvider
 
 	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 
-private:
+	private:
 
 	/**
 	 * The globals; used to get connection handle
@@ -85,7 +85,7 @@ private:
  */
 class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
 
-public:
+	public:
 
 	JavascriptBraceMatchStylerClass();
 
@@ -101,11 +101,11 @@ public:
  */
 class JavascriptViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	JavascriptViewClass(t4p::AppClass& app);
 
-private:
+	private:
 
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 

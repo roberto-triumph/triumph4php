@@ -38,7 +38,7 @@ namespace t4p {
  */
 class StylePreferenceClass {
 
-public:
+	public:
 
 	wxFont Font;
 	wxColor Color;
@@ -93,7 +93,7 @@ public:
  */
 class CodeControlOptionsClass {
 
-public:
+	public:
 
 	/**
 	 * Stores the preferences for each style; for syntax highlighting

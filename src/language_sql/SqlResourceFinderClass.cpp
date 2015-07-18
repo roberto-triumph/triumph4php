@@ -247,14 +247,14 @@ bool t4p::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std
 }
 
 t4p::SqlResourceTableResultClass::SqlResourceTableResultClass()
- : SqliteResultClass()
- , TableName()
- , Connection()
- , Lookup()
- , LookupEnd()
- , ConnectionHash() {
+: SqliteResultClass()
+, TableName()
+, Connection()
+, Lookup()
+, LookupEnd()
+, ConnectionHash() {
 
- }
+}
 
 void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
 	Lookup = t4p::WxToChar(lookup);
@@ -301,13 +301,13 @@ void t4p::SqlResourceTableResultClass::Next() {
 }
 
 t4p::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
- : SqliteResultClass()
- , TableName()
- , Connection()
- , Lookup()
- , ConnectionHash() {
+: SqliteResultClass()
+, TableName()
+, Connection()
+, Lookup()
+, ConnectionHash() {
 
- }
+}
 
 void t4p::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
 	Lookup = t4p::WxToChar(lookup);

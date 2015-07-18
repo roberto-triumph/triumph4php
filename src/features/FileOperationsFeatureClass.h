@@ -35,7 +35,7 @@ namespace t4p {
  */
 class FileOperationsFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
     FileOperationsFeatureClass(t4p::AppClass& app);
 };

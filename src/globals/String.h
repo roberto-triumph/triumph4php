@@ -37,7 +37,7 @@ namespace t4p {
  */
 class UnicodeStringComparatorClass {
 
-public:
+	public:
 	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const;
 
 };

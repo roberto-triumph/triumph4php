@@ -68,7 +68,7 @@ extern const wxEventType EVENT_FILE_READ;
  */
 class BackgroundFileReaderClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * flags to determine whether to iterate through all files
@@ -125,7 +125,7 @@ public:
 	 */
 	bool InitMatched(const std::vector<wxString>& matchedFiles);
 
-protected:
+	protected:
 
 	/**
 	 * This method will be executed in it's own thread. Most of the time
@@ -145,7 +145,7 @@ protected:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * The object that will be used to traverse the file system.

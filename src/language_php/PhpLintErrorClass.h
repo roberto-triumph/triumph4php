@@ -32,10 +32,10 @@ namespace t4p {
  */
 class PhpLintErrorClass {
 
-public:
+	public:
 	PhpLintErrorClass();
 
-private:
+	private:
 
 };
 

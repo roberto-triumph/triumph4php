@@ -58,7 +58,7 @@ extern const wxEventType EVENT_DEBUGGER_OPEN_PANEL;
  */
 class BreakpointWithHandleClass {
 
-public:
+	public:
 
 	/**
 	 * the line number where the breakpoint is located.
@@ -98,7 +98,7 @@ public:
  */
 class DebuggerOptionsClass {
 
-public:
+	public:
 
 	/**
 	 * the port that triumph will listen on for incoming xdebug
@@ -156,7 +156,7 @@ public:
  */
 class DebuggerFeatureClass : public t4p::FeatureClass {
 
-public:
+	public:
 
 	/**
 	 * the breakpoints that the user has set.
@@ -348,7 +348,7 @@ public:
 	 */
 	void StopDebugger(int port);
 
-private:
+	private:
 
 	// handlers to begin/stop listening on server
 	void OnAppReady(wxCommandEvent& event);

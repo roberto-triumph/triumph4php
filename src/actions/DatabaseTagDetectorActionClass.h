@@ -39,7 +39,7 @@ namespace t4p {
  */
 class DatabaseTagDetectorParamsClass {
 
-public:
+	public:
 
 	/**
 	 * location to the php executable (php.exe / php)
@@ -90,7 +90,7 @@ public:
  */
 class DatabaseTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
 
-public:
+	public:
 
 	DatabaseTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -105,7 +105,7 @@ public:
 
 	void BackgroundWork();
 
-private:
+	private:
 
 	/**
 	 * used to run the external tag detector PHP script

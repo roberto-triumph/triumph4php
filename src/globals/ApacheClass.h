@@ -67,7 +67,7 @@ namespace t4p {
  */
 class ApacheClass : public DirectoryWalkerClass {
 
-public:
+	public:
 
 	/**
 	 * if this is TRUE, then apache files will not be parsed; the virtual hosts
@@ -179,7 +179,7 @@ public:
 	 */
 	wxString GetUri(const wxString& fileSystemPath, const wxString& uriPath) const;
 
-private:
+	private:
 
 	/**
 	 * Open an apache config file extract virtual host information.  This method will correctly handle

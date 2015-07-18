@@ -36,7 +36,7 @@
  */
 class NonEmptyTextValidatorClass : public wxValidator {
 
-public:
+	public:
 
 	/**
 	 * Constructor takes in a static text so that the error message will sound proper.
@@ -54,7 +54,7 @@ public:
 
 	virtual wxObject* Clone() const;
 
-private:
+	private:
 
 	NonEmptyTextValidatorClass();
 

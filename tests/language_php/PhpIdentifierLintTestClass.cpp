@@ -42,7 +42,7 @@
  */
 class PhpIdentifierLintTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagCacheClass TagCache;
 	std::vector<wxString> PhpFileExtensions;

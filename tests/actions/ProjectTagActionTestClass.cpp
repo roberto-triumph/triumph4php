@@ -43,7 +43,7 @@ static int ID_EVENT = wxNewId();
 
 class ProjectTagActionTestClass : public ActionTestFixtureClass, public FileTestFixtureClass {
 
-public:
+	public:
 
 	/**
 	 * the object under test. we will assert that the object generates

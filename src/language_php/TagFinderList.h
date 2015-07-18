@@ -91,7 +91,7 @@ class TagFinderListClass {
 	 */
 	bool IsDetectedTagFinderInit;
 
-public:
+	public:
 
 	TagFinderListClass();
 
@@ -214,7 +214,7 @@ public:
 	 */
 	void NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches);
 
-private:
+	private:
 
 };
 

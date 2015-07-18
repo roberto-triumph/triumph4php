@@ -34,7 +34,7 @@
 
 class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public FileTestFixtureClass {
 
-public:
+	public:
 
 	t4p::TagCacheDbVersionActionClass Action;
 	t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;

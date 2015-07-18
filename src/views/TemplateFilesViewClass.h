@@ -48,7 +48,7 @@ namespace t4p {
  */
 class TemplateFilesViewClass : public t4p::FeatureViewClass {
 
-public:
+	public:
 
 	TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature);
 
@@ -68,7 +68,7 @@ public:
 	 */
 	void OpenFile(wxString file);
 
-private:
+	private:
 
 	/**
 	 * show (or create) the view files window and start the calculations if needed
@@ -89,7 +89,7 @@ private:
 
 class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 
-public:
+	public:
 
 	TemplateFilesFeatureClass& Feature;
 
@@ -105,7 +105,7 @@ public:
 
 	void UpdateControllers();
 
-protected:
+	protected:
 
 	void OnHelpButton(wxCommandEvent& event);
 
@@ -117,7 +117,7 @@ protected:
 
 	void OnTreeItemActivated(wxTreeEvent& event);
 
-private:
+	private:
 
 	enum {
 		IMAGE_TEMPLATE_FOLDER = 0,

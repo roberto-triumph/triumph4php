@@ -31,13 +31,13 @@ namespace t4p {
 
 class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass {
 
-public:
+	public:
 
 	SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir);
 
 	bool TransferDataFromWindow();
 
-private:
+	private:
 
 	void OnUserDataDir(wxCommandEvent& event);
 	void OnAppDir(wxCommandEvent& event);

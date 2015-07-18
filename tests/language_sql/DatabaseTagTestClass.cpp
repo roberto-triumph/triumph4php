@@ -30,7 +30,7 @@
 #include <soci.h>
 
 class DatabaseTagTestFixtureClass : public DatabaseTestFixtureClass {
-public:
+	public:
 	DatabaseTagTestFixtureClass()
 		: DatabaseTestFixtureClass("database_tag")
 		, DatabaseTag() {

@@ -155,5 +155,5 @@ int AuiRowCount(wxAuiManager& auiManager, int dock);
 
 }
 
- #endif
+#endif
 

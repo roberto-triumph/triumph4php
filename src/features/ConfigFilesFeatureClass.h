@@ -39,7 +39,7 @@ namespace t4p {
 */
 class ConfigFilesFeaturePairClass {
 
-public:
+	public:
 
 	/**
 	 * the label of the project that the config files were
@@ -95,7 +95,7 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 	 */
 	void OpenConfigItem(size_t index);
 
-private:
+	private:
 
 	/**
 	 * Read all of the detected config tags into memory; that way we can

@@ -77,7 +77,7 @@ class CodeControlEventClass;
  */
 class FeatureViewClass : public wxEvtHandler {
 
-public:
+	public:
 
 	FeatureViewClass();
 
@@ -267,7 +267,7 @@ public:
 	 */
 	void CloseCodeControl(t4p::CodeControlClass* codeCtrl);
 
-protected:
+	protected:
 
 	/**
 	 * This is a helper method that will add each of the given menu items as a
@@ -443,7 +443,7 @@ protected:
 	 */
 	wxAuiToolBar* ToolBar;
 
-private:
+	private:
 
 	/**
 	 * The widget that feature uses to display status to the user.

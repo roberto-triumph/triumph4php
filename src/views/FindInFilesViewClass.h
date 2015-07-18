@@ -38,7 +38,7 @@ class FindInFilesViewClass;
 
 /** Implementing FindInFilesPanelGeneratedClass */
 class FindInFilesResultsPanelClass : public FindInFilesResultsPanelGeneratedClass {
-protected:
+	protected:
 	// Handlers for FindInFilesResultsPanelClass events.
 	void OnReplaceButton(wxCommandEvent& event);
 	void OnReplaceAllInFileButton(wxCommandEvent& event);
@@ -55,7 +55,7 @@ protected:
 	void OnReplaceTextEnter(wxCommandEvent& event);
 
 
-public:
+	public:
 
 	/**
 	 * Construct a new FindInFilesResultsPanelClass
@@ -101,7 +101,7 @@ public:
 	 */
 	void ShowPreviousMatch();
 
-private:
+	private:
 
 	/**
 	 * To find matches in files.
@@ -230,7 +230,7 @@ private:
 
 class FindInFilesViewClass : public FeatureViewClass {
 
-public:
+	public:
 
 	/**
 	 * Holds previously entered searches. We need these to persist longer than the dialog so that
@@ -270,7 +270,7 @@ public:
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
-private:
+	private:
 
 	/**
 	 * show the find dialog
@@ -304,12 +304,12 @@ private:
 
 class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 
-public:
+	public:
 
 	FindInFilesDialogClass(wxWindow* parent, FindInFilesFeatureClass& feature,
 		FindInFilesViewClass& view);
 
-protected:
+	protected:
 
 	virtual void OnOkButton(wxCommandEvent& event);
 	virtual void OnCancelButton(wxCommandEvent& event);
@@ -317,7 +317,7 @@ protected:
 	void OnRegExReplaceHelpButton(wxCommandEvent& event);
 	void OnDirChanged(wxFileDirPickerEvent& event);
 
-private:
+	private:
 
 	FindInFilesFeatureClass& Feature;
 	FindInFilesViewClass& View;

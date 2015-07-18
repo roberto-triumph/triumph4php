@@ -55,7 +55,7 @@ namespace t4p {
  */
 class MacCommonMenuBarClass {
 
-public:
+	public:
 
 	enum {
 		ID_COMMON_MENU_NEW = wxID_HIGHEST + 1,

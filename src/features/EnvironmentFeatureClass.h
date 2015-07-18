@@ -44,7 +44,7 @@ extern const wxEventType EVENT_APACHE_FILE_READ_COMPLETE;
  */
 class ApacheFileReadCompleteEventClass : public wxEvent {
 
-public:
+	public:
 
 	t4p::ApacheClass Apache;
 
@@ -69,7 +69,7 @@ typedef void (wxEvtHandler::*ApacheFileReadCompleteEventClassFunction)(ApacheFil
  */
 class ApacheFileReaderClass : public BackgroundFileReaderClass {
 
-public:
+	public:
 
 	/**
 	 * @param handler the event handler for the EVENT_APACHE_FILE_READ_COMPLETE and EVENT_WORK_* events
@@ -84,13 +84,13 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	bool BackgroundFileMatch(const wxString& file);
 
 	bool BackgroundFileRead(DirectorySearchClass& search);
 
-private:
+	private:
 
 	ApacheClass ApacheResults;
 
@@ -102,7 +102,7 @@ private:
  */
 class EnvironmentFeatureClass : public FeatureClass {
 
-public:
+	public:
 
 	EnvironmentFeatureClass(t4p::AppClass& app);
 
@@ -111,7 +111,7 @@ public:
 	 */
 	void OnMenuEnvironment(wxCommandEvent& event);
 
-private:
+	private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 

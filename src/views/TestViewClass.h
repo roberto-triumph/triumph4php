@@ -35,7 +35,7 @@ namespace t4p {
  * This is also useful for prototyping of a feature or debugging.
  */
 class TestViewClass : public FeatureViewClass {
-public:
+	public:
 
 	TestViewClass(t4p::TestFeatureClass& feature);
 
@@ -59,7 +59,7 @@ public:
 	 */
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 
-private:
+	private:
 
 	/**
 	 * the actual code that will get executed when the "GO" button is clicked

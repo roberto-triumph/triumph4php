@@ -67,7 +67,7 @@ namespace t4p {
  */
 class ProcessWithHeartbeatClass : public wxEvtHandler {
 
-public:
+	public:
 
 	/**
 	 * @param handler will receive the EVENT_PROCESS_* events
@@ -110,7 +110,7 @@ public:
 	 */
 	wxString GetProcessOutput(long pid) const;
 
-private:
+	private:
 
 	/**
 	 * On process termination clean up any process data structures.

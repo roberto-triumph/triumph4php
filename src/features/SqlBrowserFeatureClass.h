@@ -50,7 +50,7 @@ extern const wxEventType QUERY_COMPLETE_EVENT;
 
 class QueryCompleteEventClass : public wxEvent {
 
-public:
+	public:
 	/**
 	 * this class will not delete the pointer; the
 	 * event handler should
@@ -81,7 +81,7 @@ class SqlBrowserFeatureClass;
  */
 class MultipleSqlExecuteClass : public t4p::ActionClass {
 
-public:
+	public:
 
 	/**
 	 * @param runningThreads the object that will receive the EVENT_WORK_* events when queries are
@@ -103,7 +103,7 @@ public:
 
 	wxString GetLabel() const;
 
-protected:
+	protected:
 
 	void BackgroundWork();
 
@@ -113,7 +113,7 @@ protected:
 	 */
 	void DoCancel();
 
-private:
+	private:
 
 	/**
 	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
@@ -168,7 +168,7 @@ private:
  */
 class SqlCopyOptionsClass {
 
-public:
+	public:
 
 	/**
 	 * string to put before / after each cell
@@ -280,7 +280,7 @@ class RowToSqlInsertClass {
  */
 class RowToPhpClass {
 
-public:
+	public:
 
 	/**
 	 * All of the available columns of the table
@@ -345,7 +345,7 @@ public:
  * This is a feature to manage SQL connections and make queries to the database.
  */
 class SqlBrowserFeatureClass : public FeatureClass {
-public:
+	public:
 	SqlBrowserFeatureClass(t4p::AppClass& app);
 
 	~SqlBrowserFeatureClass();
@@ -362,7 +362,7 @@ public:
 	 */
 	void SavePreferences();
 
-private:
+	private:
 
 };
 
