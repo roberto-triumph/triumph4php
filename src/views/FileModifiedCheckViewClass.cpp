@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,18 +31,18 @@
 #include <wx/choicdlg.h>
 #include <algorithm>
 #include <vector>
-#include <algorithm>
 #include <map>
+
 t4p::FileModifiedCheckViewClass::FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature)
-: FeatureViewClass() 
-, Feature(feature) 
+: FeatureViewClass()
+, Feature(feature)
 , JustReactivated(false) {
 
 }
 
 
 void t4p::FileModifiedCheckViewClass::OpenedCodeControlCheck() {
-	
+
 	// loop through all of the opened files to get the files to
 	// be checked
 	// be careful to skip new buffers since they are not yet
@@ -52,7 +52,7 @@ void t4p::FileModifiedCheckViewClass::OpenedCodeControlCheck() {
 	for (size_t i = 0; i < ctrls.size(); ++i) {
 		t4p::CodeControlClass* ctrl = ctrls[i];
 		if (!ctrl->IsNew()) {
-			wxString ctrlFileName = ctrl->GetFileName();		
+			wxString ctrlFileName = ctrl->GetFileName();
 			t4p::FileModifiedTimeClass modTime;
 			modTime.FileName.Assign(ctrlFileName);
 			modTime.ModifiedTime = ctrl->GetFileOpenedDateTime();
@@ -83,7 +83,7 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 		msg = _("Files have been modified externally. Reload files and lose any changes?\n");
 		msg += _("The checked files will be reloaded. Unchecked files will not be reloaded, allowing you to overwrite the files.");
 	}
-	wxMultiChoiceDialog dialog(GetMainWindow(), msg, _("Files Externally Modified"), 
+	wxMultiChoiceDialog dialog(GetMainWindow(), msg, _("Files Externally Modified"),
 		choices, wxOK | wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxCENTRE);
 	dialog.ShowModal();
 	wxArrayInt selections = dialog.GetSelections();
@@ -95,15 +95,15 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 
 		// find the control for the file and revert the contents
 		if (filesToPrompt.find(fileName) != filesToPrompt.end()) {
-			
+
 			t4p::CodeControlClass* code = filesToPrompt[fileName];
-			
+
 			int currentLine = code->GetCurrentLine();
 			code->Freeze();
 			code->Revert();
-			
+
 			if (currentLine <= code->GetLineCount()) {
-				
+
 				// stc uses zero-based line numbers, this method
 				// accepts 1-based line numbers
 				code->GotoLineAndEnsureVisible(currentLine + 1);
@@ -128,7 +128,7 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 	}
 }
 
-void t4p::FileModifiedCheckViewClass::FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, 
+void t4p::FileModifiedCheckViewClass::FilesDeletedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles,
 																  std::map<wxString, int>& deletedFiles) {
 	std::map<wxString, int>::const_iterator file;
 	wxString files;
@@ -161,7 +161,7 @@ void t4p::FileModifiedCheckViewClass::FilesDeletedPrompt(std::map<wxString, t4p:
 }
 
 void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
-	
+
 	std::map<wxString, wxString>::iterator renamed;
 	std::map<wxString, t4p::CodeControlClass*> openedFilesRenamed;
 	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {
@@ -169,7 +169,7 @@ void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p:
 		if (openedFiles.find(renamedFrom) != openedFiles.end()) {
 			openedFilesRenamed[renamedFrom] = openedFiles[renamedFrom];
 		}
-		
+
 		// check for renames, but check the new paths
 		// if a file was renamed and the new name is an opened file, treat it as modified
 		/*wxString renamedTo = renamed->second;
@@ -181,21 +181,21 @@ void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p:
 	// ask the user whether they want to
 	// 1. open the new file and close the old one
 	// 2. open the new file and keep the old one open
-	// 3. don't open the new one and close the old one 
+	// 3. don't open the new one and close the old one
 	std::map<wxString, t4p::CodeControlClass*>::iterator renamedCtrl;
 	for (renamedCtrl = openedFilesRenamed.begin(); renamedCtrl != openedFilesRenamed.end(); ++renamedCtrl) {
 		wxArrayString choices;
 		choices.Add(_("Open the new file and close the old one"));
 		choices.Add(_("Open the new file and keep the old one open"));
 		choices.Add(_("Don't open the new one and close the old file"));
-		
+
 		wxString newFile = pathsRenamed[renamedCtrl->first];
-		wxSingleChoiceDialog choiceDialog(GetMainWindow(), 
-			renamedCtrl->first + 
+		wxSingleChoiceDialog choiceDialog(GetMainWindow(),
+			renamedCtrl->first +
 			_("\nhas been renamed to \n") +
 			newFile +
 			_("\nWhat would you like to do?"),
-			_("File Rename"), 
+			_("File Rename"),
 			choices
 		);
 		choiceDialog.SetWindowStyle(wxCENTER | wxOK);
@@ -239,7 +239,7 @@ void t4p::FileModifiedCheckViewClass::OnFileModifiedPollComplete(t4p::FilesModif
 			filesDeletedToPrompt[ctrl->GetFileName()] = ctrl;
 			filesDeleted[ctrl->GetFileName()] = 1;
 		}
-	}	
+	}
 	if (!filesModifiedToPrompt.empty()) {
 		FilesModifiedPrompt(filesModifiedToPrompt);
 	}
