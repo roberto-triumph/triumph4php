@@ -295,7 +295,7 @@ bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int3
 		if (U_SUCCESS(error) && matcher) {
 			if (matcher->find()) {
 				foundPos = matcher->start(error);
-				endPos = matcher->end(error) ;
+				endPos = matcher->end(error);
 				if (U_SUCCESS(error) && U_SUCCESS(error)) {
 					IsFound = true;
 

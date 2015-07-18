@@ -99,8 +99,7 @@ public:
 			<< "INSERT INTO template_file_tags "
 			<< "(source_id, full_path, variables) "
 			<< "VALUES(?, 'full_path', 'variables')"
-			, soci::use(sourceId)
-		;
+			, soci::use(sourceId);
 	}
 	
 	void AddConfigTag(int sourceId) {
@@ -108,8 +107,7 @@ public:
 			<< "INSERT INTO config_tags "
 			<< "(source_id, label, full_path) "
 			<< "VALUES(?, 'label', 'full_path')"
-			, soci::use(sourceId)
-		;
+			, soci::use(sourceId);
 	}
 	
 	void AddUrlTag(int sourceId) {
@@ -120,8 +118,7 @@ public:
 			<< "INSERT INTO url_tags"
 			<< "(source_id, url, full_path, class_name, method_name) "
 			<< "VALUES(?, ?, 'full_path', 'class_name', 'method_name')"
-			, soci::use(sourceId), soci::use(url)
-		;
+			, soci::use(sourceId), soci::use(url);
 	}
 	
 	int AddSource(const wxFileName& fileName) {

@@ -124,7 +124,7 @@ void t4p::SqlMetaDataActionClass::BackgroundWork() {
 	for (std::vector<t4p::DatabaseTagClass>::iterator it = DatabaseTags.begin(); it != DatabaseTags.end(); ++it) {
 		if (!IsCancelled()) {
 			if (it->IsEnabled) {
-				wxString wxLabel = _("SQL Meta / ") ; //t4p::IcuToWx(it->Label);
+				wxString wxLabel = _("SQL Meta / "); //t4p::IcuToWx(it->Label);
 				SetStatus(wxLabel);
 				UnicodeString error;
 				if (!fetcher.Fetch(*it, error)) {
