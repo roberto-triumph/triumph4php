@@ -726,7 +726,7 @@ void t4p::RunConsoleViewClass::FillCommandPanel() {
 	if (CommandToolbar == NULL) {
 		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
-		CommandToolbar->SetToolBitmapSize(wxSize(16,16));
+		CommandToolbar->SetToolBitmapSize(wxSize(16, 16));
 		CommandToolbar->SetOverflowVisible(false);
 	}
 	else {

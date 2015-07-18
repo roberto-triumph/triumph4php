@@ -215,7 +215,7 @@ static void ConfigStore(wxConfigBase* config,
 	const t4p::DebuggerOptionsClass& options, 
 	const std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
 	
-	config->Write(wxT("Debugger/Port"),options.Port);
+	config->Write(wxT("Debugger/Port"), options.Port);
 	config->Write(wxT("Debugger/MaxChildren"), options.MaxChildren);
 	config->Write(wxT("Debugger/MaxDepth"), options.MaxDepth);
 	config->Write(wxT("Debugger/DoListenOnAppReady"), options.DoListenOnAppReady);

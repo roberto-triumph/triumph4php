@@ -82,7 +82,7 @@ void t4p::ExplorerViewClass::AddWindows() {
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
 	ExplorerToolBar->SetFont(Feature.App.Preferences.ApplicationFont);
-	ExplorerToolBar->SetToolBitmapSize(wxSize(16,16));
+	ExplorerToolBar->SetToolBitmapSize(wxSize(16, 16));
 
 	wxBitmap bmp = t4p::BitmapImageAsset(wxT("explore"));
 	wxBitmap bmpOpen = t4p::BitmapImageAsset(wxT("explore-open-document"));

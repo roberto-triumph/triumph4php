@@ -140,7 +140,7 @@ void t4p::RunBrowserViewClass::AddWindows() {
                                          wxAUI_TB_TEXT |
                                          wxAUI_TB_HORZ_TEXT);
 	BrowserToolbar->SetFont(Feature.App.Preferences.ApplicationFont);
-	BrowserToolbar->SetToolBitmapSize(wxSize(16,16));
+	BrowserToolbar->SetToolBitmapSize(wxSize(16, 16));
 	wxBitmap browserBitmap = t4p::BitmapImageAsset(wxT("browser-generic"));
 	wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run-browser"));
 	wxBitmap searchUrlBitmap = t4p::BitmapImageAsset(wxT("search-url-tags"));

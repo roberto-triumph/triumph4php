@@ -138,7 +138,7 @@ wxString FileTestFixtureClass::GetFileContents(const wxString& fileName) {
 	char* buf = new char[filesize];
 	file.read(buf, filesize);
 	file.close();
-	wxString fileContents(buf, wxConvUTF8,filesize);
+	wxString fileContents(buf, wxConvUTF8, filesize);
 	delete[] buf;
 	return fileContents;
 }

@@ -286,7 +286,7 @@ protected:
 	 * the second command.
 	 * If a menu item is not found, and assertion is triggered.
 	 */
-	void AddDynamicCmd(std::map<int, wxString> menuItemIds,std::vector<DynamicCmdClass>& shortcuts);
+	void AddDynamicCmd(std::map<int, wxString> menuItemIds, std::vector<DynamicCmdClass>& shortcuts);
 	
 	/**
 	 * Finds the tools window with the given window ID and returns it.

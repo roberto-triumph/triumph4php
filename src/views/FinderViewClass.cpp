@@ -726,7 +726,7 @@ void t4p::ReplacePanelClass::OnReplaceRegExFindHelpButton(wxCommandEvent& event)
 void t4p::ReplacePanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
 	wxString symbols;
 	int id = event.GetId() - ID_REGEX_REPLACE_MENU_START;
-	t4p::AddSymbolToReplaceRegularExpression(ReplaceWithText, id,CurrentInsertionPointReplace);
+	t4p::AddSymbolToReplaceRegularExpression(ReplaceWithText, id, CurrentInsertionPointReplace);
 	FinderMode->SetSelection(FinderClass::REGULAR_EXPRESSION);
 }
 
