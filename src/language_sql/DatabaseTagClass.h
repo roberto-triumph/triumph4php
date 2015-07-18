@@ -22,24 +22,24 @@
  * @copyright  2009-2011 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- #ifndef T4P_DATABASETAGCLASS_H
- #define T4P_DATABASETAGCLASS_H
+#ifndef T4P_DATABASETAGCLASS_H
+#define T4P_DATABASETAGCLASS_H
  
- #include <unicode/unistr.h>
- #include <globals/Sqlite.h>
- #include <globals/SqliteFinderClass.h>
- #include <vector>
- #include <wx/longlong.h>
- #include <wx/thread.h>
- #include <wx/filename.h>
+#include <unicode/unistr.h>
+#include <globals/Sqlite.h>
+#include <globals/SqliteFinderClass.h>
+#include <vector>
+#include <wx/longlong.h>
+#include <wx/thread.h>
+#include <wx/filename.h>
  
- namespace t4p {
+namespace t4p {
 
- //defined below
- class SqlQueryClass;
- class ConnectionIdentifierClass;
+//defined below
+class SqlQueryClass;
+class ConnectionIdentifierClass;
 
- /**
+/**
  * This is the database connection information used by the framework.
  * The information will actually be located via a PHP script
  * (MvcEditorFrameworkApp.php) and not the C++ code. this way we
