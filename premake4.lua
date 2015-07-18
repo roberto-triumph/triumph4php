@@ -463,6 +463,7 @@ solution "triumph4php"
 			"src/globals/**.cpp",
 			"src/language_php/**.cpp",
 			"src/language_sql/**.cpp",
+			"src/language_js/**.cpp",
 			"src/main_frame/**.cpp",
 			"src/search/**.cpp",
 			"src/views/**.cpp",
