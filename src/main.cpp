@@ -328,7 +328,7 @@ GuiAppClass::~GuiAppClass() {
 
 	// calling cleanup here so that we can run this binary through a memory leak detector 
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
-	// TODO: only use this during debug mode
+	// TODO(roberto): only use this during debug mode
 	u_cleanup();
 	mysql_library_end();
 	sqlite_api::sqlite3_shutdown();

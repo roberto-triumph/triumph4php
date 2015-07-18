@@ -329,7 +329,7 @@ public:
 
 	TagResultClass();
 
-	// TODO: remove this method
+	// TODO(roberto): remove this method
 	std::vector<t4p::PhpTagClass> Matches();
 
 	/**
@@ -383,7 +383,7 @@ public:
 	 */
 	void Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
-	// TODO: remove this method
+	// TODO(roberto): remove this method
 	std::vector<t4p::FileTagClass> Matches();
 	std::vector<t4p::PhpTagClass> MatchesAsTags();
 
@@ -459,7 +459,7 @@ public:
 	 */
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs);
 
-	// TODO: remove this method
+	// TODO(roberto): remove this method
 	std::vector<t4p::PhpTagClass> MatchesAsTags();
 
 	/**

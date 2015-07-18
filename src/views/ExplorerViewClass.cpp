@@ -861,7 +861,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
 			
-			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
 			if (index != wxNOT_FOUND) {
@@ -870,7 +870,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
 			
-			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
 			if (index != wxNOT_FOUND) {
@@ -1296,7 +1296,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
 			
-			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
 			if (index != wxNOT_FOUND) {
@@ -1305,7 +1305,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
 			
-			// TODO FindItem is case insensitive but the file system may be case sensitive
+			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
 			if (index != wxNOT_FOUND) {

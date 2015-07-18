@@ -133,7 +133,7 @@ static wxXmlNode* GetNodeChild(wxXmlNode* node, const wxString& childName, t4p::
 static void GetNodeText(wxXmlNode* node, wxString& contents, bool doBase64Decode = true) {
 
 	// dbgp base64 encodes the contents, we must decode it
-	// TODO what about when there are NULLs we would like to 
+	// TODO(roberto): what about when there are NULLs we would like to 
 	// show them
 	contents = node->GetNodeContent();
 	if (doBase64Decode) {

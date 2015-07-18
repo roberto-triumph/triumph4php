@@ -673,7 +673,7 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		return;
 	}
 
-	// TODO:
+	// TODO(roberto):
 	// more checks that would be great to implement
 	//  1. variable inside interporlated strings  "this is your name: {$name}"
 	//

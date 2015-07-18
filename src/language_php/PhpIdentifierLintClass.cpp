@@ -469,7 +469,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 		return;
 	}
 
-	// TODO:
+	// TODO(roberto):
 	// checks to implement
 	// 1. type hints with classes that are not defined
 	if (var->ChainList[0].IsFunction) {

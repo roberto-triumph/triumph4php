@@ -126,7 +126,7 @@ void t4p::VersionUpdateViewClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	// since the version check is triggered during the app ready
 	// event, during the very first run the user has not yet
 	// chosen a settings dir, and the config is not usable
-	// TODO: we should prevent config from being read
+	// TODO(roberto): we should prevent config from being read
 	// before the user has chosen a settings dir, or
 	// provide a default settings dir
 	wxFileName settingsDir = t4p::SettingsDirAsset();

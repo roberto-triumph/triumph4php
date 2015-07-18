@@ -239,7 +239,7 @@ TEST_FIXTURE(CallStackFixtureTestClass, ResolutionError) {
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnStackLimit) {
-	// TODO: not sure how to test this
+	// TODO(roberto): not sure how to test this
 }	
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnEmptyCache) {

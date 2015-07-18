@@ -362,7 +362,7 @@ void t4p::DirectorySearchClass::EnumerateNextDir(t4p::DirectoryWalkerClass& walk
 	}
 }
 
-// TODO there is a bug in here when using recursive mode and 
+// TODO(roberto): there is a bug in here when using recursive mode and 
 // there is this structure
 // |
 // ==> apache_config

@@ -176,7 +176,7 @@ void t4p::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
 bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
 
 	// get the project that the directory is in
-	// TODO: what if the directory is in more than 1 project?
+	// TODO(roberto): what if the directory is in more than 1 project?
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator src;
 	bool isDirFromProject = false;
@@ -249,7 +249,7 @@ void t4p::ProjectTagSingleFileActionClass::SetFileToParse(const wxString& fullPa
 bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 
 	// get the project that the file is in
-	// TODO: what if the file is in more than 1 project?
+	// TODO(roberto): what if the file is in more than 1 project?
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	bool isFileFromProject = false;
 	for (project = globals.Projects.begin(); project != globals.Projects.end(); ++project) {

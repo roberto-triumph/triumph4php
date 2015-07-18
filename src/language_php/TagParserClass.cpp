@@ -731,7 +731,7 @@ void t4p::TagParserClass::RemovePersistedResources(const std::vector<int>& fileT
 		std::string deleteResourceSql = "DELETE FROM resources " + stream.str();
 		std::string deleteFileItemSql = "DELETE FROM file_items " + stream.str();
 
-		// TODO remove trait_resources
+		// TODO(roberto): remove trait_resources
 		Session->once << deleteResourceSql;
 		if (removeFileTag) {
 			Session->once << deleteFileItemSql;
