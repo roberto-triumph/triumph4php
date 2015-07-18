@@ -60,7 +60,7 @@ void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName,
 	// in a background thread
 	t4p::DeepCopy(TagParser.PhpFileExtensions, phpFileExtensions);
 	t4p::DeepCopy(TagParser.MiscFileExtensions, miscFileExtensions);
-	IsTagFinderInit = Open(TagDbSession, tagDbFileName.GetFullPath());
+	IsTagFinderInit = t4p::SqliteOpen(TagDbSession, tagDbFileName.GetFullPath());
 	if (IsTagFinderInit) {
 		TagParser.SetVersion(version);
 		TagParser.Init(&TagDbSession);
@@ -89,7 +89,7 @@ void t4p::TagFinderListClass::CreateGlobalTag(const std::vector<wxString>& phpFi
 
 void t4p::TagFinderListClass::InitDetectorTag(const wxFileName& detectorDbFileName) {
 	wxASSERT_MSG(!IsDetectedTagFinderInit, wxT("tag finder can only be initialized once"));
-	IsDetectedTagFinderInit = Open(DetectedTagDbSession, detectorDbFileName.GetFullPath());
+	IsDetectedTagFinderInit = t4p::SqliteOpen(DetectedTagDbSession, detectorDbFileName.GetFullPath());
 }
 
 void t4p::TagFinderListClass::CreateDetectorTag() {
@@ -103,34 +103,12 @@ void t4p::TagFinderListClass::CreateDetectorTag() {
 
 void t4p::TagFinderListClass::InitNativeTag(const wxFileName& nativeDbFileName) {
 	wxASSERT_MSG(!IsNativeTagFinderInit, wxT("native tag finder can only be initialized once"));
-	IsNativeTagFinderInit = Open(NativeDbSession, nativeDbFileName.GetFullPath());
-}
-
-bool t4p::TagFinderListClass::Open(soci::session& session, const wxString& dbName) {
-	bool ret = false;
-	try {
-		std::string stdDbName = t4p::WxToChar(dbName);
-		
-		// we should be able to open this since it has been created by
-		// the TagCacheDbVersionActionClass
-		session.open(*soci::factory_sqlite3(), stdDbName);
-
-		// set a busy handler so that if we attempt to query while the file is locked, we 
-		// sleep for a bit then try again
-		t4p::SqliteSetBusyTimeout(session, 200);
-		ret = true;
-	} catch(std::exception const& e) {
-		session.close();
-		wxString msg = t4p::CharToWx(e.what());
-		wxASSERT_MSG(false, msg);
-	}
-	return ret;
+	IsNativeTagFinderInit = t4p::SqliteOpen(NativeDbSession, nativeDbFileName.GetFullPath());
 }
 
 void t4p::TagFinderListClass::Walk(t4p::DirectorySearchClass& search) {
 	search.Walk(TagParser);
 }
-
 
 std::vector<UnicodeString> t4p::TagFinderListClass::ClassParents(UnicodeString className, UnicodeString methodName) {
 	std::vector<UnicodeString> parents;

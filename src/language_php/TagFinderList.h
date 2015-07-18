@@ -216,14 +216,6 @@ public:
 
 private:
 
-	/**
-	 * create the database connection to the given db
-	 *
-	 * @param session the db connection to open.
-	 * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
-	 *        file neeeds to exist and have been initialized with the schema
-	 */
-	bool Open(soci::session& session, const wxString& dbName);
 };
 
 }

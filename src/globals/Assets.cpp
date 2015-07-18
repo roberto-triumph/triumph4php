@@ -389,6 +389,12 @@ wxFileName t4p::DetectorCacheAsset() {
 	return tagCacheFileName;
 }
 
+wxFileName t4p::JsTagCacheAsset() {
+	wxFileName configDir = t4p::ConfigDirAsset();
+	wxFileName tagCacheFileName(configDir.GetFullPath(), wxT("js_tags.db"));
+	return tagCacheFileName;
+}
+
 wxFileName t4p::VersionFileAsset() {
 	wxFileName asset = AssetRootDir();
 	wxFileName versionFile(asset.GetPath(), wxT("version.txt"));

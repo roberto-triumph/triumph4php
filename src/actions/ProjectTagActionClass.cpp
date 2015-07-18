@@ -153,6 +153,12 @@ void t4p::ProjectTagInitActionClass::Work(t4p::GlobalsClass &globals) {
 		tagFinderList->InitDetectorTag(globals.DetectorCacheDbFileName);
 	}
 	globals.TagCache.RegisterGlobal(tagFinderList);
+
+	// the JS tags db is created by the triumph-js-tools project
+	// we don't want to create the tables here
+	if (globals.JsCacheDbFileName.FileExists()) {
+		t4p::SqliteOpen(globals.JsCacheSession, globals.JsCacheDbFileName.GetFullPath());
+	}
 }
 
 t4p::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)

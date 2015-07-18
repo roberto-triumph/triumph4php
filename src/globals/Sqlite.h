@@ -108,6 +108,17 @@ void SqliteSetBusyTimeout(soci::session& session, int timeoutMs = 100);
  */
 int SqliteInsertId(soci::statement& stmt);
 
+/**
+ * create the database connection to the given db in an exception-safe
+ * way. Additionally, we set a query timeout so that we cancel long-running
+ * queries.
+ *
+ * @param session the db connection to open.
+ * @param wxString dbName, given to SQLite.  db can be a full path to a file  The
+ *        file neeeds to exist and have been initialized with the schema
+ * @return bool TRUE if db connection was opened.
+ */
+bool SqliteOpen(soci::session& session, const wxString& dbName);
 }
 
 #endif

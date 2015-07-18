@@ -23,6 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 #include <views/JavascriptViewClass.h>
+#include <globals/GlobalsClass.h>
+#include <Triumph.h>
 
 static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);
@@ -32,19 +34,61 @@ static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 }
 
 
-t4p::JavascriptCodeCompletionProviderClass::JavascriptCodeCompletionProviderClass()
-: CodeCompletionProviderClass() {
-	
+t4p::JavascriptCodeCompletionProviderClass::JavascriptCodeCompletionProviderClass(t4p::GlobalsClass& globals)
+: CodeCompletionProviderClass()
+, Globals(globals)
+, Results()
+, HasInit(false) {
+}
+
+void t4p::JavascriptCodeCompletionProviderClass::Init() {
+	if (HasInit) {
+		return;
+	}
+	if (Globals.JsCacheDbFileName.FileExists()) {
+		Globals.JsResourceFinder.Prepare(&Results, true);
+		HasInit = true;
+	}
 }
 
 bool t4p::JavascriptCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
-	
-	// not yet implemented
-	return false;
+	return t4p::FILE_TYPE_JS == type;
 }
 
 void t4p::JavascriptCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
-	
+	if (!HasInit) {
+		return;
+	}
+
+	int currentPos = ctrl->GetCurrentPos();
+	int startPos = ctrl->WordStartPosition(currentPos, true);
+	int endPos = ctrl->WordEndPosition(currentPos, true);
+	UnicodeString word = ctrl->GetSafeSubstring(startPos, endPos);
+
+	Results.SetSearch(word, Globals.AllEnabledSourceDirectories());
+	wxString error;
+	bool good = Results.ReExec(error);
+	if (good) {
+		wxString list;
+		int cnt = 0;
+		while (Results.More()) {
+			Results.Next();
+			list += t4p::IcuToWx(Results.JsTag.Identifier);
+			list += (wxChar)ctrl->AutoCompGetSeparator();
+			cnt++;
+		}
+		completeStatus = wxString::Format("found %d matches", cnt);
+		ctrl->AutoCompSetMaxWidth(0);
+		int currentPos = ctrl->GetCurrentPos();
+		int startPos = ctrl->WordStartPosition(currentPos, true);
+		int wordLength = currentPos - startPos;
+		ctrl->AutoCompShow(wordLength, list);
+	}
+	else {
+		completeStatus = "Error: ";
+		completeStatus += error;
+	}
+
 }
 
 t4p::JavascriptBraceMatchStylerClass::JavascriptBraceMatchStylerClass()
@@ -83,9 +127,9 @@ void t4p::JavascriptBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, in
 	}
 }
 
-t4p::JavascriptViewClass::JavascriptViewClass()
+t4p::JavascriptViewClass::JavascriptViewClass(t4p::AppClass& app)
 : FeatureViewClass()
-, JavascriptCompletionProvider() 
+, JavascriptCompletionProvider(app.Globals)
 , BraceStyler() {
 	
 }
@@ -93,6 +137,10 @@ t4p::JavascriptViewClass::JavascriptViewClass()
 void t4p::JavascriptViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 	event.GetCodeControl()->RegisterCompletionProvider(&JavascriptCompletionProvider);
 	event.GetCodeControl()->RegisterBraceMatchStyler(&BraceStyler);
+
+	if (event.GetCodeControl()->GetFileType() == t4p::FILE_TYPE_JS) {
+		JavascriptCompletionProvider.Init();
+	}
 }
 
 BEGIN_EVENT_TABLE(t4p::JavascriptViewClass, t4p::FeatureViewClass)

@@ -267,6 +267,17 @@ wxFileName TagCacheWorkingAsset();
 wxFileName DetectorCacheAsset();
 
 /**
+ * The location of the js tag cache db. The tag DB file contains all of
+ * the parsed resources for all of defined projects' javascript resources.
+ *
+ * The SQL schema for this cache can be found in resources/sql/js_tags.sql
+ * The database file is created by the triumph-js-tools project.
+ *
+ * @return the full path to the tag database that stores JavaScript tags for all defined projects
+ */
+wxFileName JsTagCacheAsset();
+
+/**
  * @return wxFileName the full path to the file that stores the application's version
  *         number
  */

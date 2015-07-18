@@ -60,7 +60,12 @@ class SqliteFinderClass {
 	virtual ~SqliteFinderClass();
 	
 	/**
-	 * prepares  a query against this sqlite db.
+	 * prepares  a query against this sqlite db. There is no need to
+	 * call this call this for one-time queries; as Exec() will prepare
+	 * the query if its not prepared.  The advantage of calling Prepare()
+	 * is that it can be called once, then SqliteResultClass::ReExec
+	 * can be called as many times as needed in order to make queries
+	 * performant.
 	 *
 	 * @param result contains the query to run and the parameters to bind
 	 * @param doLimit if true then a limit will be added to the query

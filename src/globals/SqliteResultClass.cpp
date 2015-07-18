@@ -112,6 +112,7 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 	IsEmpty = true;
 	IsFetched = false;
 	if (!Stmt) {
+		error = wxT("Result has not been prepared");
 		return false;
 	}
 	try {
@@ -121,6 +122,7 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 		}
 		else {
 			IsEmpty = true;
+			error = wxT("No results");
 		}
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());

@@ -70,6 +70,12 @@ public:
 	soci::session DetectorCacheSession;
 
 	/**
+	 * the opened connection to the js tags db
+	 * @var session
+	 */
+	soci::session JsCacheSession;
+
+	/**
 	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
 	 * "current" URL.
 	 */
@@ -79,6 +85,11 @@ public:
 	 * To grab SQL table meta data
 	 */
 	SqlResourceFinderClass SqlResourceFinder;
+
+	/**
+	 * To grab javascript functions
+	 */
+	SqliteFinderClass JsResourceFinder;
 	
 	/**
 	 * The datatabase connections. These are all of the connections, there may be a 
@@ -138,6 +149,16 @@ public:
 	 * @return the full path to the tag database that stores detected tags for all defined projects
 	 */
 	wxFileName DetectorCacheDbFileName;
+
+	/**
+	 * The location of the js tags cache for all defined projects.
+	 *
+	 * The SQL schema for this cache can be found in resources/sql/js_tags.sql
+	 * The database file is created by the triumph-js-tools project.
+	 *
+	 * @return the full path to the tag database that stores detected tags for all defined projects
+	 */
+	wxFileName JsCacheDbFileName;
 	
 	/**
 	 * List of the local volumes that are mounted and writable.

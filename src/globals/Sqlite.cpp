@@ -140,3 +140,23 @@ int t4p::SqliteInsertId(soci::statement& stmt) {
 	return sqlite3_last_insert_rowid(backend->session_.conn_);
 }
 
+bool t4p::SqliteOpen(soci::session& session, const wxString& dbName) {
+	bool ret = false;
+	try {
+		std::string stdDbName = t4p::WxToChar(dbName);
+
+		// we should be able to open this since it has been created by
+		// the TagCacheDbVersionActionClass
+		session.open(*soci::factory_sqlite3(), stdDbName);
+
+		// set a busy handler so that if we attempt to query while the file is locked, we
+		// sleep for a bit then try again
+		t4p::SqliteSetBusyTimeout(session, 200);
+		ret = true;
+	} catch(std::exception const& e) {
+		session.close();
+		wxString msg = t4p::CharToWx(e.what());
+		wxASSERT_MSG(false, msg);
+	}
+	return ret;
+}

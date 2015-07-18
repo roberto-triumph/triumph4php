@@ -179,7 +179,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionString(const Unico
 
 			}
 		}
-			ctrl->AutoCompSetMaxWidth(0);
+		ctrl->AutoCompSetMaxWidth(0);
 		int currentPos = ctrl->GetCurrentPos();
 		int startPos = ctrl->WordStartPosition(currentPos, true);
 		int wordLength = currentPos - startPos;
