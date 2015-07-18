@@ -733,8 +733,7 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 , SuppressionFile(suppressionFile)
 , Suppressions()
 , Errors()
-, TopWindow(topWindow)
-{
+, TopWindow(topWindow) {
 	AddButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-add")));
 	EditButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-edit")));
 	DeleteButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-delete")));
@@ -929,8 +928,7 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 	t4p::SuppressionRuleClass& rule)
 : LintSuppressionRuleGeneratedDialogClass(parent, id)
 , Rule(rule)
-, EditRule(rule)
-{
+, EditRule(rule) {
 	t4p::UnicodeStringValidatorClass targetValidator(&EditRule.Target, true);
 	Target->SetValidator(targetValidator);
 	

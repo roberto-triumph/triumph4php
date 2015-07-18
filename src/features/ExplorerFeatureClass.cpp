@@ -426,8 +426,7 @@ t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFil
 , DirsNotDeleted()
 , FilesNotDeleted()
 , Action(t4p::ExplorerModifyActionClass::RENAME_FILE)
-, Success(success)
-{
+, Success(success) {
 
 }
 
@@ -443,8 +442,7 @@ t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId,
 , DirsNotDeleted()
 , FilesNotDeleted()
 , Action(t4p::ExplorerModifyActionClass::DELETE_FILES_DIRS)
-, Success(success)
-{
+, Success(success) {
 	DirsDeleted = t4p::DeepCopyFileNames(dirsDeleted);
 	DirsNotDeleted = t4p::DeepCopyFileNames(dirsNotDeleted);
 	FilesDeleted = t4p::DeepCopyFileNames(filesDeleted);

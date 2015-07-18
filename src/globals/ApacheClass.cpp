@@ -72,7 +72,7 @@ t4p::ApacheClass::ApacheClass(const t4p::ApacheClass& src)
 	, VirtualHostMappings()
 	, HttpdPath()
 	, ServerRoot()
-	, Port(){
+	, Port() {
 	Copy(src);
 }
 

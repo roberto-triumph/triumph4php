@@ -27,8 +27,7 @@
 
 t4p::ConfigFilesViewClass::ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature)
 : Feature(feature)
-, ConfigMenu(NULL)
-{
+, ConfigMenu(NULL) {
 }
 
 void t4p::ConfigFilesViewClass::AddNewMenu(wxMenuBar* menuBar) {

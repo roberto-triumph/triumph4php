@@ -60,8 +60,7 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 , EnableVirtualSpace(false)
 , EnableRectangularSelection(false)
 , ShowWhitespace(false)
-, Zoom(0)
-{
+, Zoom(0) {
 	
 }
 

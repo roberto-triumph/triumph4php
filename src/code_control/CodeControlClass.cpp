@@ -125,8 +125,7 @@ t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* c
 , TempFile()
 , ScriptTempFile()
 , CodeCtrl(ctrl)
-, EventSink(eventSink)
-{
+, EventSink(eventSink) {
 	
 }
 

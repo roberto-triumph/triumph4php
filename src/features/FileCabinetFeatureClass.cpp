@@ -28,8 +28,7 @@
 
 t4p::FileCabinetFeatureClass::FileCabinetFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
-, Store()
-{
+, Store() {
 }
 
 t4p::FileCabinetItemClass t4p::FileCabinetFeatureClass::AddDirectoryToCabinet(const wxString& dir) {

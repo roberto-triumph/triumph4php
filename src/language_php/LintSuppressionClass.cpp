@@ -175,8 +175,7 @@ void t4p::SuppressionRuleClass::Copy(const t4p::SuppressionRuleClass& src) {
 }
 
 t4p::LintSuppressionClass::LintSuppressionClass()
-: Rules()
-{
+: Rules() {
 }
 
 bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vector<UnicodeString>& errors) {

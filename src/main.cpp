@@ -286,8 +286,7 @@ t4p::MainFrameClass* GuiAppClass::CreateFrame() {
 	return frame;
 }
 
-void GuiAppClass::OnCommonMenuFileNew(wxCommandEvent& event)
-{
+void GuiAppClass::OnCommonMenuFileNew(wxCommandEvent& event) {
 	t4p::MainFrameClass* frame = CreateFrame();
 	
 	wxCommandEvent appReady(t4p::EVENT_APP_READY);

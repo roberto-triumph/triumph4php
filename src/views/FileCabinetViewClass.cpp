@@ -35,8 +35,7 @@ static int ID_FILE_CABINET_MENU_OPEN = wxNewId();
 
 t4p::FileCabinetViewClass::FileCabinetViewClass(t4p::FileCabinetFeatureClass& feature)
 : FeatureViewClass()
-, Feature(feature)
-{
+, Feature(feature) {
 }
 
 void t4p::FileCabinetViewClass::AddEditMenuItems(wxMenu* editMenu) {

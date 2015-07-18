@@ -38,10 +38,10 @@ t4p::TagFinderListClass::TagFinderListClass()
 	, DetectedTagFinder(DetectedTagDbSession)
 	, IsNativeTagFinderInit(false)
 	, IsTagFinderInit(false)
-	, IsDetectedTagFinderInit(false)
-{
+	, IsDetectedTagFinderInit(false) {
 
 }
+
 t4p::TagFinderListClass::~TagFinderListClass() {
 	TagParser.Close();
 	TagDbSession.close();

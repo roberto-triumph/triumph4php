@@ -331,8 +331,7 @@ t4p::RowToSqlInsertClass::RowToSqlInsertClass()
 , TableName()
 , CheckedColumns()
 , CheckedValues()
-, LineMode(MULTI_LINE)
-{
+, LineMode(MULTI_LINE) {
 }
 
 t4p::RowToSqlInsertClass::RowToSqlInsertClass(const t4p::RowToSqlInsertClass& src)
@@ -341,8 +340,7 @@ t4p::RowToSqlInsertClass::RowToSqlInsertClass(const t4p::RowToSqlInsertClass& sr
 , TableName()
 , CheckedColumns()
 , CheckedValues()
-, LineMode(MULTI_LINE)
-{
+, LineMode(MULTI_LINE) {
 	Copy(src);
 }
 

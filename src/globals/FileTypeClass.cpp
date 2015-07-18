@@ -75,8 +75,7 @@ t4p::FileTypeClass::FileTypeClass()
 , MarkdownFileExtensionsString(wxT("*.md"))
 , BashFileExtensionsString(wxT("*.sh"))
 , DiffFileExtensionsString(wxT("*.diff;*.patch"))
-, MiscFileExtensionsString(wxT("*.json;*.twig;*.txt"))
-{
+, MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
 }
 
 t4p::FileTypeClass::FileTypeClass(const t4p::FileTypeClass& src) 

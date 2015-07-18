@@ -27,8 +27,7 @@
 
 t4p::ChangelogViewClass::ChangelogViewClass(t4p::ChangelogFeatureClass& feature)
 : FeatureViewClass()
-, Feature(feature)
-{
+, Feature(feature) {
 
 }
 

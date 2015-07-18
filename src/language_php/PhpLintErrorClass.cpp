@@ -25,7 +25,6 @@
 #include <language_php/PhpLintErrorClass.h>
 
 
-t4p::PhpLintErrorClass::PhpLintErrorClass ()
-{
+t4p::PhpLintErrorClass::PhpLintErrorClass() {
 }
 

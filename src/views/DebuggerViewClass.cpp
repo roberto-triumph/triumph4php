@@ -1364,8 +1364,7 @@ void t4p::DebuggerMappingDialogClass::OnOkButton(wxCommandEvent& event) {
 
 t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature)
 : DebuggerEvalPanelGeneratedClass(parent, id)
-, Feature(feature)
-{
+, Feature(feature) {
 	CodeCtrl = new t4p::CodeControlClass(
 		ExprCodePanel, 
 		Feature.App.Preferences.CodeControlOptions, 

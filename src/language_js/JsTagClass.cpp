@@ -35,8 +35,7 @@ t4p::JsTagClass::JsTagClass()
 , FullPath()
 , FileIsNew(false)
 , LineNumber(0)
-, ColumnPosition(0)
-{
+, ColumnPosition(0) {
 }
 
 t4p::JsTagClass::JsTagClass(const t4p::JsTagClass& src)

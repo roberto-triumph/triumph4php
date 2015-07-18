@@ -258,7 +258,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 		typeToLookup = ResolveVariableType(variableScope, sourceDirs, tagFinderList, doDuckTyping, error, 
 				start, scopeSymbols, symbolTable);
 	}
-	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0){
+	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0) {
 		
 		// self is the static version of $this, need to look at the pseudo variable $this
 		// that is put into the symbol table during parsing

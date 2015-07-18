@@ -150,8 +150,7 @@ void t4p::FileCabinetBaseResultClass::Next() {
 }
 
 t4p::AllFileCabinetResultClass::AllFileCabinetResultClass() 
-: FileCabinetBaseResultClass()
-{
+: FileCabinetBaseResultClass() {
 	
 }
 

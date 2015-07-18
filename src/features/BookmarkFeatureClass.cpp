@@ -28,15 +28,13 @@
 t4p::BookmarkClass::BookmarkClass()
 : FileName()
 , LineNumber(0)
-, Handle(-1)
-{
+, Handle(-1) {
 }
 
 t4p::BookmarkClass::BookmarkClass(const wxFileName& fileName, int lineNumber, int handle)
 : FileName(fileName)
 , LineNumber(lineNumber)
-, Handle(handle)
-{
+, Handle(handle) {
 }
 
 t4p::BookmarkClass::BookmarkClass(const t4p::BookmarkClass& src) 
@@ -64,7 +62,6 @@ void t4p::BookmarkClass::Copy(const t4p::BookmarkClass& src) {
 t4p::BookmarkFeatureClass::BookmarkFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , Bookmarks()
-, CurrentBookmarkIndex(-1)
-{
+, CurrentBookmarkIndex(-1) {
 }
 

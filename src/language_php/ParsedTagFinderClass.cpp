@@ -1801,8 +1801,7 @@ t4p::TagResultClass::TagResultClass()
 	, FileIsNew(false)
 	, FileTagIdIndicator()
 	, FullPathIndicator()
-	, FileIsNewIndicator()
-{
+	, FileIsNewIndicator() {
 }
 
 void t4p::TagResultClass::DoBind(soci::statement& stmt) {

@@ -133,8 +133,7 @@ static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 }
 
 t4p::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag)
-: SqliteConnectionDialogGeneratedClass(parent, wxID_ANY)
-{
+: SqliteConnectionDialogGeneratedClass(parent, wxID_ANY) {
 	t4p::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
 	Label->SetValidator(labelValidator);
 	Label->SetName(wxT("label"));

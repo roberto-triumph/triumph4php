@@ -108,8 +108,7 @@ t4p::ParserDirectoryWalkerClass::ParserDirectoryWalkerClass(const t4p::LintFeatu
 , LastResults()
 , VariableResults()
 , IdentifierResults()
-, CallResults()
-{
+, CallResults() {
 	VariableLinterOptions.CheckGlobalScope = Options.CheckGlobalScopeVariables;
 }
 

@@ -104,9 +104,7 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 }
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
-: FeatureViewClass()
-///, Feature(feature) 
-{
+: FeatureViewClass() {
 
 }
 
