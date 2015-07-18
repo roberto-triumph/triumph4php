@@ -1,16 +1,16 @@
 /*
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,12 +25,12 @@
 #include <globals/FileCabinetItemClass.h>
 #include <globals/String.h>
 
-t4p::FileCabinetItemClass::FileCabinetItemClass() 
+t4p::FileCabinetItemClass::FileCabinetItemClass()
 : Id(0)
 , FileName() {
 }
 
-t4p::FileCabinetItemClass::FileCabinetItemClass(const t4p::FileCabinetItemClass& src) 
+t4p::FileCabinetItemClass::FileCabinetItemClass(const t4p::FileCabinetItemClass& src)
 : Id(0)
 , FileName() {
 	Copy(src);
@@ -69,7 +69,7 @@ bool t4p::FileCabinetStoreClass::Store(soci::session& session, t4p::FileCabinetI
 		std::string sql = "INSERT INTO file_cabinet_items(file_cabinet_item_id, name, full_path) VALUES(NULL, ?, ?)";
 		std::string name;
 		std::string fullPath;
-		
+
 		// not using IsDir() because during tests we insert
 		// directories that don't exist
 		if (item.FileName.GetFullName().empty()) {
@@ -80,20 +80,20 @@ bool t4p::FileCabinetStoreClass::Store(soci::session& session, t4p::FileCabinetI
 			name = t4p::WxToChar(item.FileName.GetFullName());
 			fullPath = t4p::WxToChar(item.FileName.GetFullPath());
 		}
-		
-		soci::statement stmt = (session.prepare << sql, 
+
+		soci::statement stmt = (session.prepare << sql,
 			soci::use(name), soci::use(fullPath)
 		);
 		stmt.execute(true);
-		
+
 		item.Id = t4p::SqliteInsertId(stmt);
-		
+
 		ret = true;
 	} catch (std::exception& e) {
 		error = e.what();
 		wxASSERT_MSG(false, error);
 	}
-	
+
 	return ret;
 }
 
@@ -104,18 +104,18 @@ bool t4p::FileCabinetStoreClass::Delete(soci::session& session, int fileCabinetI
 	 try {
 		std::string sql = "DELETE FROM file_cabinet_items WHERE file_cabinet_item_id = ?";
 		session.once << sql, soci::use(fileCabinetItemId);
-		ret = true; 
+		ret = true;
 	 } catch (std::exception& e) {
 		 error = e.what();
 		 wxASSERT_MSG(false, error);
 	 }
-	
+
 	return ret;
 }
 
 t4p::FileCabinetBaseResultClass::FileCabinetBaseResultClass()
 : SqliteResultClass()
-, Item() 
+, Item()
 , Id(0)
 , FullPath() {
 
@@ -138,7 +138,7 @@ void t4p::FileCabinetBaseResultClass::Next() {
 		// check the string ending instead of actually hitting the
 		// disk, don't want to do 100+ disk accesses when
 		// looping through results
-	
+
 		Item.Id = Id;
 		Item.FileName.AssignDir(FullPath);
 	}
@@ -149,9 +149,9 @@ void t4p::FileCabinetBaseResultClass::Next() {
 	Fetch();
 }
 
-t4p::AllFileCabinetResultClass::AllFileCabinetResultClass() 
+t4p::AllFileCabinetResultClass::AllFileCabinetResultClass()
 : FileCabinetBaseResultClass() {
-	
+
 }
 
 bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
@@ -159,7 +159,7 @@ bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLim
 	if (doLimit) {
 		sql += " LIMIT 100";
 	}
-	
+
 	wxString error;
 	bool good = false;
 	try {
@@ -172,10 +172,10 @@ bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLim
 	return good;
 }
 
-t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass() 
+t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass()
 : FileCabinetBaseResultClass()
 , QueryId(0) {
-	
+
 }
 
 void t4p::SingleFileCabinetResultClass::SetId(int id) {
@@ -198,10 +198,10 @@ bool t4p::SingleFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool do
 	return good;
 }
 
-t4p::FileCabinetExactSearchResultClass::FileCabinetExactSearchResultClass() 
+t4p::FileCabinetExactSearchResultClass::FileCabinetExactSearchResultClass()
 : FileCabinetBaseResultClass()
 , Name() {
-	
+
 }
 
 void t4p::FileCabinetExactSearchResultClass::SetName(const std::string& name) {
@@ -213,7 +213,7 @@ bool t4p::FileCabinetExactSearchResultClass::DoPrepare(soci::statement& stmt, bo
 	if (doLimit) {
 		sql += " LIMIT 100";
 	}
-	
+
 	wxString error;
 	bool good = false;
 	try {
@@ -227,10 +227,10 @@ bool t4p::FileCabinetExactSearchResultClass::DoPrepare(soci::statement& stmt, bo
 	return good;
 }
 
-t4p::FileCabinetNearMatchResultClass::FileCabinetNearMatchResultClass() 
+t4p::FileCabinetNearMatchResultClass::FileCabinetNearMatchResultClass()
 : FileCabinetBaseResultClass()
 , Name() {
-	
+
 }
 
 void t4p::FileCabinetNearMatchResultClass::SetName(const std::string& name) {
@@ -240,7 +240,7 @@ void t4p::FileCabinetNearMatchResultClass::SetName(const std::string& name) {
 bool t4p::FileCabinetNearMatchResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string escaped = t4p::SqliteSqlLikeEscape(Name, '^');
 	escaped = "'%" + escaped + "%'";
-	
+
 	std::string sql = "SELECT file_cabinet_item_id, full_path FROM file_cabinet_items ";
 	sql += "WHERE name LIKE " + escaped + " ESCAPE '^' ";
 	if (doLimit) {

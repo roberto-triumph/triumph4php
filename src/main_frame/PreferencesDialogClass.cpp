@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,12 +33,12 @@
 #include <map>
 #include <vector>
 
-t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent, 
+t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 														  t4p::GlobalsClass& globals,
 														  t4p::PreferencesClass& preferences,
 														  wxFileName& settingsDir,
 														  bool& changedSettingsDir, bool& needsRetag)
-		: Preferences(preferences) 
+		: Preferences(preferences)
 		, Globals(globals)
 		, OldSettingsDir(settingsDir)
 		, SettingsDir(settingsDir)
@@ -47,12 +47,12 @@ t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 	SetSheetStyle(wxPROPSHEET_TREEBOOK);
 	Create(parent, wxID_ANY, _("Preferences"));
 	CreateButtons(wxOK | wxCANCEL);
-	
+
 	wxBookCtrlBase* notebook = GetBookCtrl();
-	
+
 	// make it so that no other preference dialogs have to explictly call Transfer methods
 	notebook->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
-	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+	KeyboardShortcutsPanel =  new KeyboardShortcutsPanelClass(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxKEYBINDER_USE_TREECTRL | wxKEYBINDER_SHOW_ADDREMOVE_PROFILE | wxKEYBINDER_ENABLE_PROFILE_EDITING);
 
 	KeyboardShortcutsPanel->AddProfiles(Preferences.KeyProfiles);
@@ -129,7 +129,7 @@ void t4p::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<t4p::Dyn
 	}
 	wxTreeItemId root = m_pCommandsTree->AddRoot(_("Keyboard Shortcuts"));
 
-	// now we build the 'leaf' nodes 
+	// now we build the 'leaf' nodes
 	for (std::map<wxString, std::vector<wxString> >::iterator it = items.begin(); it != items.end(); ++it) {
 		wxString groupName = it->first;
 		wxTreeItemId group = m_pCommandsTree->AppendItem(root, groupName);
@@ -151,6 +151,6 @@ void t4p::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<t4p::Dyn
 	m_pCommandsTree->Expand(root);
 }
 
-BEGIN_EVENT_TABLE(t4p::PreferencesDialogClass, wxDialog) 
-	EVT_BUTTON(wxID_OK, t4p::PreferencesDialogClass::OnOkButton) 	
+BEGIN_EVENT_TABLE(t4p::PreferencesDialogClass, wxDialog)
+	EVT_BUTTON(wxID_OK, t4p::PreferencesDialogClass::OnOkButton)
 END_EVENT_TABLE()

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,18 +37,18 @@
  * [NULL]
  *
  * where data_length is the numeric string of the size of the xml response
- * 
+ *
  * @param socket the socket to read
  * @param streamBuffer buffer to use
  * @param [out] error any error code will be set here if there is an error
- * @return wxString the XML response only 
+ * @return wxString the XML response only
  */
 static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asio::streambuf& streamBuffer, boost::system::error_code& error) {
 	std::string contents;
 	int read = boost::asio::read_until(socket, streamBuffer, '\0', error);
 	if (read <= 0) {
 		return contents;
-	}	
+	}
 
 	// extract the xml size
 	std::istream is(&streamBuffer);
@@ -65,7 +65,7 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 	read = boost::asio::read_until(socket, streamBuffer, '\0', error);
 	if (read <= 0) {
 		return contents;
-	}	
+	}
 	std::getline(is, contents, '\0');
 	return contents;
 }
@@ -73,7 +73,7 @@ static std::string ReadResponse(boost::asio::ip::tcp::socket& socket, boost::asi
 t4p::DebuggerServerActionClass::DebuggerServerActionClass(
 	t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker)
 : wxEvtHandler()
-, ActionClass(runningThreads, eventId) 
+, ActionClass(runningThreads, eventId)
 , Commands()
 , CommandMutex()
 , IoService()
@@ -115,7 +115,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 		boost::asio::ip::tcp::acceptor::reuse_address option(true);
 		acceptor.set_option(option);
 		acceptor.listen();
-	} 
+	}
 	catch (std::exception& e) {
 		wxThreadEvent errEvt(t4p::EVENT_DEBUGGER_LISTEN_ERROR, GetEventId());
 		errEvt.SetString(e.what());
@@ -128,7 +128,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 		EventSinkLocker.RemoveHandler(this);
 		return;
 	}
-	
+
 	wxThreadEvent startEvt(t4p::EVENT_DEBUGGER_LISTEN, GetEventId());
 	startEvt.SetInt(Port);
 	PostEvent(startEvt);
@@ -155,7 +155,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 				socket.close();
 				break;
 			}
-			
+
 			// xdebug responses
 			bool isDebuggerStopped = false;
 			ParseAndPost(response, "init ", isDebuggerStopped);
@@ -170,7 +170,7 @@ void t4p::DebuggerServerActionClass::BackgroundWork() {
 			PostEvent(errEvt);
 		}
 	}
-	
+
 	// no longer need to listen for commands
 	EventSinkLocker.RemoveHandler(this);
 }
@@ -206,7 +206,7 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 				socket.close();
 				break;
 			}
-			
+
 			// xdebug xml
 			Log("response", response);
 			ParseAndPost(response, next, isDebuggerStopped);
@@ -215,7 +215,7 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 			wxThread::Sleep(150);
 		}
 		if (isDebuggerStopped) {
-			
+
 			// remove all commands as they will no longer be run
 			// so that commands don't carry over script runs
 			next = NextCommand();
@@ -255,7 +255,7 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 			PostEvent(featureSetResponse);
 		}
 	}
-	else if ("run" == cmdOnly || "step_into" == cmdOnly || 
+	else if ("run" == cmdOnly || "step_into" == cmdOnly ||
 			"step_over" == cmdOnly || "step_out" == cmdOnly || "stop" == cmdOnly) {
 		t4p::DbgpContinueEventClass continueResponse;
 		if (continueResponse.FromXml(xml, xmlError)) {
@@ -343,20 +343,20 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 	}
 	else if ("eval" == cmdOnly) {
 		t4p::DbgpEvalEventClass evalResponse;
-		if (evalResponse.FromXml(xml, xmlError) 
+		if (evalResponse.FromXml(xml, xmlError)
 
 			// determine if we actually had an error
 			// we look for properties that either
 			// dont have a name, value, data type, or children
-			// added the children test for windows 
+			// added the children test for windows
 			// xdebug version 2.1.0
-			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty() 
-				|| !evalResponse.Property.DataType.empty() 
+			&& (!evalResponse.Property.Name.empty() || !evalResponse.Property.Value.empty()
+				|| !evalResponse.Property.DataType.empty()
 				|| evalResponse.Property.NumChildren)) {
 			PostEvent(evalResponse);
 		}
 		else {
-			
+
 			// most likely an error response
 			t4p::DbgpErrorEventClass errorResponse;
 			if (errorResponse.FromXml(xml, xmlError)) {
@@ -385,7 +385,7 @@ wxString t4p::DebuggerServerActionClass::GetLabel() const {
 }
 
 void t4p::DebuggerServerActionClass::Log(const wxString& title, const wxString& msg) {
-	wxString toLog;  
+	wxString toLog;
 	toLog += title;
 	toLog += wxT(" - ");
 	toLog += msg;

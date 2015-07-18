@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vecto
 	}
 	std::string sql = "";
 	for (size_t i = 0; i < dirs.size(); i++) {
-		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" + 
+		sql += "SELECT file_item_id FROM file_items WHERE full_path LIKE '" +
 			t4p::WxToChar(dirs[i].GetPathWithSep()) + "%' ESCAPE '^'";
 		if (i < (dirs.size() - 1)) {
 			sql += " UNION ";
@@ -42,7 +42,7 @@ std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vecto
 	}
 	int fileItemId = 0;
 	try {
-		soci::statement stmt = (session.prepare << sql, 
+		soci::statement stmt = (session.prepare << sql,
 			soci::into(fileItemId)
 		);
 		bool foundFile = stmt.execute(true);

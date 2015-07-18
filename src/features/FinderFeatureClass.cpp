@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,16 +28,16 @@
 #include <widgets/RegularExpressionValidatorClass.h>
 #include <Triumph.h>
 
-static const int ID_FIND_PANEL = wxNewId(); 
-static const int ID_REPLACE_PANEL = wxNewId(); 
+static const int ID_FIND_PANEL = wxNewId();
+static const int ID_REPLACE_PANEL = wxNewId();
 const int t4p::ID_FINDER_ACTION = wxNewId();
 
 t4p::FinderFeatureClass::FinderFeatureClass(t4p::AppClass& app)
-	: FeatureClass(app) 
+	: FeatureClass(app)
 	, Finder()
 	, FinderReplace() {
 }
-	
+
 void t4p::FinderFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Finder/Wrap"), &Finder.Wrap);
 	config->Read(wxT("/Finder/Mode"), &Finder.Mode);
@@ -50,13 +50,13 @@ void t4p::FinderFeatureClass::StartFinderAction(UnicodeString word, char* buf, i
 		buf, documentLength);
 	App.RunningThreads.Queue(action);
 }
-	
+
 t4p::FinderActionClass::FinderActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const UnicodeString& search, char* utf8Buf, int bufLength)
 : ActionClass(runningThreads, eventId)
 , Finder()
 , Code()
-, Utf8Buf(utf8Buf) 
+, Utf8Buf(utf8Buf)
 , BufferLength(bufLength) {
 	Finder.Expression = search;
 	Finder.Mode = t4p::FinderClass::EXACT;
@@ -87,7 +87,7 @@ void t4p::FinderActionClass::BackgroundWork() {
 		found = Finder.FindNext(Code, nextIndex);
 	}
 	delete[] Utf8Buf;
-	
+
 }
 
 wxString t4p::FinderActionClass::GetLabel() const {
@@ -98,7 +98,7 @@ t4p::FinderHitEventClass::FinderHitEventClass(int id, int start, int length)
 : wxEvent(id, t4p::EVENT_FINDER_ACTION)
 , Start(start)
 , Length(length) {
-	
+
 }
 
 wxEvent* t4p::FinderHitEventClass::Clone() const {

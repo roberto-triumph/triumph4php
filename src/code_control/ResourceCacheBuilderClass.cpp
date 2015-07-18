@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,21 +32,21 @@ t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	: ActionClass(runningThreads, eventId)
 	, TagCacheDbFileName()
 	, Code()
-	, FileName() 
+	, FileName()
 	, SourceDir()
 	, FileIdentifier()
 	, PreviousSymbolTable()
 	, Version(pelet::PHP_53)
-	, FileIsNew(true) 
+	, FileIsNew(true)
 	, DoParseTags(true) {
 }
-	
+
 void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
-												 const wxString& fileName, 
+												 const wxString& fileName,
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version,
 												 bool doParseTags) {
-	
+
 	// make sure these is are deep copies since we access the variables in a separate thread
 	TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	Code = code;
@@ -56,7 +56,7 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 	FileIsNew = isNew;
 	DoParseTags = doParseTags;
 	SourceDir = wxT("");
-	
+
 	t4p::WorkingCacheClass* workingCache = globals.TagCache.GetWorking(fileIdentifier);
 	if (workingCache) {
 		PreviousSymbolTable.Copy(workingCache->SymbolTable);
@@ -96,7 +96,7 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 
 		// make sure to use the local variables and not the class ones
 		// since this code is outside the mutex
-		// even if code is empty, lets create a working cache so that the 
+		// even if code is empty, lets create a working cache so that the
 		// file is registered and code completion works
 		t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();
 		std::vector<wxString> phpFileExtensions;

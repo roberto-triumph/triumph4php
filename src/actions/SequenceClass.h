@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,7 +38,7 @@ namespace t4p {
 extern const wxEventType EVENT_SEQUENCE_START;
 
 /**
- * this event will be generated while a sequence is running; it is 
+ * this event will be generated while a sequence is running; it is
  * generated consitantly every 200-300 ms.
  */
 extern const wxEventType EVENT_SEQUENCE_PROGRESS;
@@ -80,8 +80,8 @@ public:
 	 * - Detect the SQL table metadata for the project's database connections
 	 *
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
-	 *         sequence running then we will not start another sequence as sequences deal with 
-	 *         GlobalsClass and running many sequences may cause problems 
+	 *         sequence running then we will not start another sequence as sequences deal with
+	 *         GlobalsClass and running many sequences may cause problems
 	 */
 	bool AppStart();
 
@@ -97,13 +97,13 @@ public:
 	 * - Load the project's database connections
 	 * - Detect the SQL table metadata for the project's database connections
 	 *
-	 * @param updateProjects the list of projects that were updated ie. new/removed/edited 
+	 * @param updateProjects the list of projects that were updated ie. new/removed/edited
 	 *       source directories, wildcards, etc...
 	 * @param removedProjects the list of projects that were deleted we will delete the tags
 	 *        from these projects
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
-	 *         sequence running then we will not start another sequence as sequences deal with 
-	 *         GlobalsClass and running many sequences may cause problems 
+	 *         sequence running then we will not start another sequence as sequences deal with
+	 *         GlobalsClass and running many sequences may cause problems
 	 */
 	bool ProjectDefinitionsUpdated(const std::vector<t4p::ProjectClass>& touchedProjects,
 		const std::vector<t4p::ProjectClass>& removedProjects);
@@ -113,8 +113,8 @@ public:
 	 * - wiping all existing global caches from the given projects
 	 * - indexing the given projects
 	 * @return bool FALSE if there is a sequence already running. if there is an existing
-	 *         sequence running then we will not start another sequence as sequences deal with 
-	 *         GlobalsClass and running many sequences may cause problems 
+	 *         sequence running then we will not start another sequence as sequences deal with
+	 *         GlobalsClass and running many sequences may cause problems
 	 */
 	bool TagCacheWipeAndIndex(const std::vector<t4p::ProjectClass>& enabledProjects);
 
@@ -129,8 +129,8 @@ public:
 	bool DatabaseDetection();
 
 	/**
-	 * start running a sequence of arbritrary actions. actions will run 
-	 * in the order that they are given. 
+	 * start running a sequence of arbritrary actions. actions will run
+	 * in the order that they are given.
 	 *
 	 * @param actions the list of actions to run. action pointers will be owned by
 	 *        this class.
@@ -154,7 +154,7 @@ protected:
 	/**
 	 * @param step to be run.  Steps are run in the order they are given. This class
 	 *        will own the pointer and will be deleted when the action completes.
-	 *        This means that the action must have been allocated in the 
+	 *        This means that the action must have been allocated in the
 	 *        heap.
 	 */
 	void AddStep(t4p::GlobalActionClass* action);
@@ -182,9 +182,9 @@ private:
 	 * missing source, and not 1 error for each missing source and each action.
 	 */
 	void SourceCheck();
-	
+
 	/**
-	 * The steps in the current sequence.  
+	 * The steps in the current sequence.
 	 *
 	 * These pointers are owned by this class, although that if an action
 	 * is run as a background thread the pointer will delete itself.

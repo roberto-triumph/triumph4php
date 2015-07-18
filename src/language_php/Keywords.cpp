@@ -78,7 +78,7 @@ const wxString t4p::KEYWORDS_PHP_54 = wxString::FromAscii(
 const wxString t4p::KEYWORDS_HTML_TAG_NAMES = wxString::FromAscii(
 
 	// HTML4 tag names, found at http://www.w3.org/TR/html4/index/elements.html
-	"a abbr acronym address applet area b base basefont bdo big blockquote body br button caption center cite code col colgroup " 
+	"a abbr acronym address applet area b base basefont bdo big blockquote body br button caption center cite code col colgroup "
 	"dd del dfn dir div dl dt em fieldset font form frame frameset h1 h2 h3 h4 h5 h6 head hr html i iframe img input ins isindex kbd "
 	"label legend li link map menu meta noframes noscript object ol optgroup option p param pre q s samp script select small span strike "
 	"strong style sub sup table tbody td textarea tfoot th thead title tr tt u ul var"
@@ -91,7 +91,7 @@ const wxString t4p::KEYWORDS_HTML_TAG_NAMES = wxString::FromAscii(
 	"meter nav output progress rp rt ruby section "
 	"source summary time track video wbr"
 );
-	
+
 /**
  * HTML tag attributes
  * want to support both HTML4 and HTML5, using both sets of keywords.
@@ -161,7 +161,7 @@ const wxString t4p::KEYWORDS_MYSQL = wxString::FromAscii(
 const wxString t4p::KEYWORDS_CSS = wxString::FromAscii(
 	"ascent azimuth background background-attachment background-color background-image background-position "
 	"background-repeat background-size baseline bbox border border-bottom border-bottom-color "
-	"border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width border-collapse " 
+	"border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width border-collapse "
 	"border-color border-color border-left border-left-color border-left-style border-left-width border-radius "
 	"border-right border-right-color border-right-style border-right-width border-spacing border-style "
 	"border-style border-top border-top-left-radius border-top-right-radius border-top-style border-top-width "

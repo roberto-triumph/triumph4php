@@ -32,39 +32,39 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class RunConsolePanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class RunConsolePanelGeneratedClass : public wxPanel 
+class RunConsolePanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxTextCtrl* Command;
 		wxButton* RunButton;
 		wxButton* ClearButton;
 		wxButton* StoreButton;
 		wxTextCtrl* OutputWindow;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void RunCommand( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStoreButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnMouseMotion( wxMouseEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		RunConsolePanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 696,210 ), long style = wxTAB_TRAVERSAL );
 		~RunConsolePanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CliCommandEditDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class CliCommandEditDialogGeneratedClass : public wxDialog 
+class CliCommandEditDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ExecutableLabel;
 		wxTextCtrl* Executable;
@@ -81,44 +81,44 @@ class CliCommandEditDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
 		wxButton* ButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnFileChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnDescriptionText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Add/Edit Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 422,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~CliCommandEditDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MyFrame1
 ///////////////////////////////////////////////////////////////////////////////
-class MyFrame1 : public wxFrame 
+class MyFrame1 : public wxFrame
 {
 	private:
-	
+
 	protected:
-	
+
 	public:
-		
+
 		MyFrame1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~MyFrame1();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CliCommandListDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class CliCommandListDialogGeneratedClass : public wxDialog 
+class CliCommandListDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* SavedLabel;
 		wxListBox* CommandsList;
@@ -131,7 +131,7 @@ class CliCommandListDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
 		wxButton* ButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpButton( wxCommandEvent& event ) { event.Skip(); }
@@ -141,13 +141,13 @@ class CliCommandListDialogGeneratedClass : public wxDialog
 		virtual void OnEditButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		CliCommandListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Console Commands"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 511,484 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~CliCommandListDialogGeneratedClass();
-	
+
 };
 
 #endif //__RunConsoleFeatureForms__

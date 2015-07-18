@@ -1,16 +1,16 @@
 /*
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,7 @@
 
 #define SQL_LEXICAL_ANALYZER_SET_CONDITION(c) CurrentCondition = c
 
-t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass() 
+t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass()
 	: Buffer()
 	, QueryStartLineNumber(0)
 	, CurrentCondition(SQL_ANY) {
@@ -55,7 +55,7 @@ bool t4p::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	const UChar *start = Buffer.TokenStart;
 	const UChar *end =  Buffer.Current;
 	if ((end - start) > 0 && Buffer.Current <= Buffer.Limit) {
-	
+
 		// if passed by the EOF need to step back otherwise we insert
 		// a null character
 		if (Buffer.Current >= Buffer.Limit) {
@@ -80,7 +80,7 @@ int t4p::SqlLexicalAnalyzerClass::NextToken() {
 sql_lexical_analyzer_next:
 
 /*!re2c
- 
+
 re2c:define:YYCTYPE = UChar;
 re2c:define:YYCURSOR = Buffer.Current;
 re2c:define:YYLIMIT = Buffer.Limit;
@@ -130,3 +130,4 @@ WHITESPACE = [ \t\v\f];
 <BLOCK_COMMENT> ANY { goto sql_lexical_analyzer_next; }
 */
 }
+

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,27 +43,27 @@ FileTestFixtureClass::FileTestFixtureClass(const wxString& tempTestDirectory) {
 	if (!tempDir.DirExists()) {
 		wxMkdir(tempDir.GetPath(), 0777);
 	}
-	
+
 	tempDir.AppendDir(tempTestDirectory);
 	TestProjectDir = tempDir.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 	if (wxFileName::DirExists(TestProjectDir)) {
 		RecursiveRmDir(TestProjectDir);
-	}	
+	}
 }
-	
+
 FileTestFixtureClass::~FileTestFixtureClass() {
 }
-	
+
 void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 	wxDir dir(path);
 	wxString filename;
 	bool next = dir.GetFirst(&filename, wxEmptyString, wxDIR_FILES | wxDIR_DIRS | wxDIR_HIDDEN);
-	
+
 	// this way so that gcc does not think that good is an unused variable
 	bool good;
 	wxUnusedVar(good);
 	while (next) {
-		
+
 		// wxRmDir does not handle symlinks
 		if (wxT("sfPropelPlugin") == filename) {
 			wxExecute(wxT("rm ") + path + wxT("sfPropelPlugin"));
@@ -91,7 +91,7 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 	std::ofstream file;
 	file.open(fileToWrite.fn_str(), std::ios::out | std::ios::binary | std::ios::trunc);
 	wxASSERT_MSG(file.good(), _("Could not open file for writing: ") + fileToWrite);
-	
+
 	// horrible code: must find a way to write many bytes at once
 	for (unsigned int i = 0; i < contents.Length(); ++i) {
 		file.put(static_cast<int>(contents[i]));
@@ -99,11 +99,11 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 	file.close();
 }
 
-wxString FileTestFixtureClass::HideFile(const wxString& fileName) {	
+wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 
 	// since tests are not wxApps we cannot use wxExecute
 	// must do it the hard way
-	
+
 	// start with the windows way
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
@@ -116,7 +116,7 @@ wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 		system(cmd);
 	}
 	else if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX || info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
-		
+
 		//hide the file when running tests on a linux / unix box by renaming to a dot file
 		wxString hiddenName;
 		wxFileName wxf(fileName);
@@ -159,7 +159,7 @@ void FileTestFixtureClass::CreateSubDirectory(const wxString& subDirectory) {
 void FileTestFixtureClass::TouchTestDir() {
 	if (!wxDirExists(TestProjectDir)) {
 		bool good = wxMkdir(TestProjectDir, 0777);
-		
+
 		// this way so that gcc does not think that good is an unused variable
 		// in release mode
 		wxUnusedVar(good);

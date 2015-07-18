@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,18 +37,18 @@
 
 /**
  * This profiler can be used to test the speediness of the code editing control.
- * Interface: Files can be opened by dragging them from the operating system file explorer 
+ * Interface: Files can be opened by dragging them from the operating system file explorer
  * There will be a menu created where the user can test the code completions and call tips.
  */
 class CodeControlProfilerAppClass : public wxApp {
 public:
 
 	CodeControlProfilerAppClass();
-	
+
 	virtual bool OnInit();
-	
+
 	virtual int OnExit();
-	
+
 	t4p::CodeControlOptionsClass Options;
 	t4p::GlobalsClass Globals;
 	t4p::EventSinkClass EventSink;
@@ -67,7 +67,7 @@ public:
 	 */
 	FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals);
 
-	/** 
+	/**
 	 * Called by wxWidgets when user drags a file to this application frame. All files dragged in will be opened
 	 * into the notebook.
 	 */
@@ -113,7 +113,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 		Globals->FileTypes.GetMiscFileExtensions(),
 		Globals->Environment.Php.Version
 	);
-	
+
 	t4p::SymbolTableClass emptyTable;
 	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
 	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true, emptyTable);
@@ -125,7 +125,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	else {
 		delete workingCache;
 	}
-	
+
 	delete tagFinderlist;
 	return true;
 }
@@ -138,27 +138,27 @@ public:
 	CodeControlFrameClass(CodeControlProfilerAppClass& app);
 
 private:
-	
+
 /*
  * Build the menu and add the event handlers
  */
 
 	void CreateMenu();
-	
+
 	void OnContentAssist(wxCommandEvent& event);
-	
+
 	void OnCallTip(wxCommandEvent& event);
-	
+
 	void OnHelp(wxCommandEvent& event);
-	
+
 	void OnClose(wxCloseEvent& event);
-	
+
 	enum {
 		ID_CONTENT_ASSIST,
 		ID_CALL_TIP,
 		ID_HELP
 	};
-	
+
 	t4p::CodeControlClass* Ctrl;
 
 	DECLARE_EVENT_TABLE()
@@ -166,12 +166,12 @@ private:
 
 IMPLEMENT_APP(CodeControlProfilerAppClass)
 
-CodeControlProfilerAppClass::CodeControlProfilerAppClass() 
+CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 	: wxApp()
 	, Options()
 	, Globals()
 	, EventSink() {
-		
+
 }
 
 bool CodeControlProfilerAppClass::OnInit() {
@@ -181,8 +181,8 @@ bool CodeControlProfilerAppClass::OnInit() {
 	Globals.Environment.Php.Version = pelet::PHP_54;
 	Options.EnableAutomaticLineIndentation = true;
 	Options.EnableAutoCompletion = true;
-	
-	
+
+
 	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass;
 	tagFinderlist->InitGlobalTag(
 		Globals.TagCacheDbFileName,
@@ -193,7 +193,7 @@ bool CodeControlProfilerAppClass::OnInit() {
 	tagFinderlist->InitDetectorTag(Globals.DetectorCacheDbFileName);
 	tagFinderlist->InitNativeTag(t4p::NativeFunctionsAsset());
 	Globals.TagCache.RegisterGlobal(tagFinderlist);
-	
+
 	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
 	SetTopWindow(frame);
 	frame->Show(true);
@@ -205,8 +205,8 @@ int CodeControlProfilerAppClass::OnExit() {
 	return 0;
 }
 
-CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app) 
-	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition, 
+CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
+	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition,
 			wxSize(1024, 768)) {
 	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
 	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
@@ -215,11 +215,11 @@ CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
 }
 
 void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {
-	Ctrl->HandleCallTip(0, true);	
+	Ctrl->HandleCallTip(0, true);
 }
 
 void CodeControlFrameClass::OnContentAssist(wxCommandEvent& event) {
-	Ctrl->HandleAutoCompletion();	
+	Ctrl->HandleAutoCompletion();
 }
 
 void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
@@ -243,7 +243,7 @@ void CodeControlFrameClass::CreateMenu() {
 	SetMenuBar(menuBar);
 }
 
-BEGIN_EVENT_TABLE(CodeControlFrameClass, wxFrame) 
+BEGIN_EVENT_TABLE(CodeControlFrameClass, wxFrame)
 	EVT_MENU(CodeControlFrameClass::ID_CONTENT_ASSIST, CodeControlFrameClass::OnContentAssist)
 	EVT_MENU(CodeControlFrameClass::ID_CALL_TIP, CodeControlFrameClass::OnCallTip)
 	EVT_MENU(CodeControlFrameClass::ID_HELP, CodeControlFrameClass::OnHelp)

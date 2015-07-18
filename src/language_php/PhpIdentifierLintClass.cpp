@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,14 +32,14 @@
 
 /**
  * we will stop tracking errors after we have reached this
- * many.  The user cannot possibly go through all 
+ * many.  The user cannot possibly go through all
  * of them
  */
 const static size_t MAX_ERRORS = 100;
 
 static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
 
-	// magic methods, never unknown 
+	// magic methods, never unknown
 	methods[UNICODE_STRING_SIMPLE("__construct")] = 1;
 	methods[UNICODE_STRING_SIMPLE("__destruct")] = 1;
 	methods[UNICODE_STRING_SIMPLE("__call()")] = 1;
@@ -60,7 +60,7 @@ t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 : Identifier()
 , File()
 , LineNumber(0)
-, Pos(0) 
+, Pos(0)
 , Type(NONE) {
 
 }
@@ -69,12 +69,12 @@ t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const t4p::PhpId
 : Identifier()
 , File()
 , LineNumber(0)
-, Pos(0) 
+, Pos(0)
 , Type(NONE) {
 	Copy(src);
 }
 
-t4p::PhpIdentifierLintResultClass& 
+t4p::PhpIdentifierLintResultClass&
 t4p::PhpIdentifierLintResultClass::operator=(const t4p::PhpIdentifierLintResultClass& src) {
 	Copy(src);
 	return *this;
@@ -92,7 +92,7 @@ void t4p::PhpIdentifierLintResultClass::Copy(const t4p::PhpIdentifierLintResultC
 t4p::PhpIdentifierLintClass::PhpIdentifierLintClass()
 : ExpressionObserverClass()
 , Errors()
-, Parser() 
+, Parser()
 , File()
 , ClassLookup()
 , MethodLookup()
@@ -141,7 +141,7 @@ void t4p::PhpIdentifierLintClass::SetVersion(pelet::Versions version) {
 	Parser.SetVersion(version);
 }
 
-bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName, 
+bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 															std::vector<t4p::PhpIdentifierLintResultClass>& errors) {
 	Errors.clear();
 	FoundClasses.clear();
@@ -173,9 +173,9 @@ bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 	return !errors.empty();
 }
 
-bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code, 
+bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 															  std::vector<t4p::PhpIdentifierLintResultClass>& errors) {
-	
+
 	Errors.clear();
 	FoundClasses.clear();
 	FoundMethods.clear();
@@ -191,7 +191,7 @@ bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 	NotFoundStaticProperties.clear();
 	CurrentClassName = UNICODE_STRING_SIMPLE("");
 
-	// magic methods, never unknown 
+	// magic methods, never unknown
 	AddMagicMethods(FoundMethods);
 	AddMagicMethods(FoundStaticMethods);
 
@@ -203,60 +203,60 @@ bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 	return !errors.empty();
 }
 
-void t4p::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& namespaceName, 
-													 const UnicodeString& variableName, 
-													 const UnicodeString& variableValue, 
-													 const UnicodeString& comment, 
+void t4p::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& namespaceName,
+													 const UnicodeString& variableName,
+													 const UnicodeString& variableValue,
+													 const UnicodeString& comment,
 													 const int lineNumber) {
 
 }
 
-void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-		const UnicodeString& signature, 
+void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className,
+		const UnicodeString& signature,
 		const UnicodeString& baseClassName,
 		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber) {
 	CheckClassNameAndLog(baseClassName, lineNumber, 0);
-	
+
 	if (implementsList.isEmpty()) {
 		return;
 	}
-	
+
 	UChar* state = NULL;
 	UChar* buf = new UChar[implementsList.length() + 1];
 	u_memmove(buf, implementsList.getBuffer(), implementsList.length());
 	buf[implementsList.length()] = '\0';
-	
+
 	UChar delims[3] = { ',', ' ', '\0' };
 	UChar* next = u_strtok_r(buf, delims, &state);
 	while (next) {
 		UnicodeString nextInterface(next);
 		CheckClassNameAndLog(nextInterface, lineNumber, 0);
-		
+
 		next = u_strtok_r(NULL, delims, &state);
 	}
-	
+
 	delete[] buf;
 }
 
 
-void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-										  const UnicodeString& methodName, const UnicodeString& signature, 
+void t4p::PhpIdentifierLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className,
+										  const UnicodeString& methodName, const UnicodeString& signature,
 										  const UnicodeString& returnType, const UnicodeString& comment,
-										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, 
+										  pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber,
 										  bool hasVariableArguments) {
 	HasMethodExistsCalled = false;
 	CurrentClassName = className;
 }
 
-void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
-											const UnicodeString& signature, const UnicodeString& returnType, 
+void t4p::PhpIdentifierLintClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName,
+											const UnicodeString& signature, const UnicodeString& returnType,
 											const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	HasMethodExistsCalled = false;
 	CurrentClassName = UNICODE_STRING_SIMPLE("");
 }
 
-void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, 
+void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber,
 		int startingPos) {
 	if (Errors.size() > MAX_ERRORS) {
 		return;
@@ -272,7 +272,7 @@ void t4p::PhpIdentifierLintClass::NamespaceUseFound(const UnicodeString& namespa
 		lintResult.Pos = startingPos;
 		lintResult.Type = t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS;
 		lintResult.Identifier = namespaceName;
-		Errors.push_back(lintResult);	
+		Errors.push_back(lintResult);
 	}
 }
 
@@ -316,11 +316,11 @@ void t4p::PhpIdentifierLintClass::ExpressionTernaryOperationFound(pelet::Ternary
 
 void t4p::PhpIdentifierLintClass::ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression) {
 	CheckExpression(expression->Expression1);
-	CheckClassNameAndLog(expression->ClassName, expression->LineNumber, expression->Pos);	
+	CheckClassNameAndLog(expression->ClassName, expression->LineNumber, expression->Pos);
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
-	
+
 	// nothing as scalars cannot be undefined
 }
 
@@ -339,10 +339,10 @@ void t4p::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceE
 			CheckExpression(*chainArg);
 		}
 	}
-} 
+}
 
 void t4p::PhpIdentifierLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
-	
+
 	// global statement only contain "simple" variables, ie no function/method calls
 }
 
@@ -356,7 +356,7 @@ void t4p::PhpIdentifierLintClass::ExpressionIncludeFound(pelet::IncludeExpressio
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
-	
+
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
 	// scope for the closure.
@@ -385,7 +385,7 @@ void t4p::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::Assignmen
 		pelet::VariableClass var = expression->Destinations[i];
 		CheckExpression(&var);
 	}
-	
+
 	CheckExpression(expression->Expression);
 }
 
@@ -453,12 +453,12 @@ void t4p::PhpIdentifierLintClass::CheckExpression(pelet::ExpressionClass* expr) 
 		ExpressionEvalFound((pelet::EvalExpressionClass*)expr);
 		break;
 	case pelet::ExpressionClass::ARRAY_PAIR:
-	
-		// we dont event get array pairs by themselves, they come in 
+
+		// we dont event get array pairs by themselves, they come in
 		// with the array
 		break;
 	case pelet::ExpressionClass::UNKNOWN:
-	
+
 		// cannot check unknown expressions
 		break;
 	}
@@ -474,7 +474,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 	// 1. type hints with classes that are not defined
 	if (var->ChainList[0].IsFunction) {
 		CheckFunctionName(var->ChainList[0], var);
-		
+
 		// check the function parameters
 		std::vector<pelet::ExpressionClass*>::const_iterator it;
 		for (it = var->ChainList[0].CallArguments.begin(); it != var->ChainList[0].CallArguments.end(); ++it) {
@@ -505,15 +505,15 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			CheckExpression(var->ChainList[i].ArrayAccess);
 		}
 		else if (!prop.IsArrayAccess && prop.IsStatic) {
-				
+
 			// only check for static properties (and constants)
 			// for now
-			// testing for instance properties results in many false 
+			// testing for instance properties results in many false
 			// positives when the analyzed code deals with serializing
 			// and unserializing data from strings (json_encode)
 			CheckPropertyName(prop, var);
 		}
-		
+
 	}
 }
 
@@ -532,7 +532,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	if (Errors.size() > MAX_ERRORS) {
 		return;
 	}
-	
+
 	// we check to see if the function is a native function first
 	// native functions never have a namespace
 	// but the parser always returns a fully qualified name because
@@ -541,7 +541,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	if (functionName == UNICODE_STRING_SIMPLE("\\method_exists") || functionName == UNICODE_STRING_SIMPLE("method_exists")) {
 		HasMethodExistsCalled = true;
 	}
-	
+
 	UnicodeString unqualifiedName;
 	int32_t pos = functionName.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 	bool isUnknown = false;
@@ -550,7 +550,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	if (pos >= 0) {
 		functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
 	}
-	
+
 	// first see if we have looked up this function before
 	if (!unqualifiedName.isEmpty() && FoundFunctions.find(unqualifiedName) != FoundFunctions.end()) {
 		isUnknown = false;
@@ -568,8 +568,8 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		isUnknown = true;
 		foundInMap = true;
 	}
-	
-	// if we have not found the answer in the maps, then perform 
+
+	// if we have not found the answer in the maps, then perform
 	// a tag cache lookup, lookup the unqualified name in the native
 	// function tag cache
 	bool foundInTagCache = false;
@@ -586,7 +586,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			isUnknown = true;
 		}
 	}
-	
+
 	// lookup the qualified name in the global tag cache
 	if (!foundInMap && !foundInTagCache && NativeFunctionLookup.IsOk()) {
 		NativeFunctionLookup.Set(functionName);
@@ -601,7 +601,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			isUnknown = true;
 		}
 	}
-	
+
 	// lookup the unqualified name in the global tag cache
 	if (!foundInMap && !foundInTagCache && FunctionLookup.IsOk()) {
 		FunctionLookup.Set(unqualifiedName);
@@ -616,13 +616,13 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			isUnknown = true;
 		}
 	}
-	
+
 	// lookup the qualified name in the global tag cache
 	if (!foundInMap && !foundInTagCache && FunctionLookup.IsOk()) {
 		FunctionLookup.Set(functionName);
 		FunctionLookup.ReExec(error);
 		wxASSERT_MSG(error.empty(), error);
-		bool isFound = FunctionLookup.Found();		
+		bool isFound = FunctionLookup.Found();
 		if (isFound) {
 			FoundFunctions[functionName] = 1;
 			isUnknown = false;
@@ -647,7 +647,7 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 	if (Errors.size() > MAX_ERRORS) {
 		return;
 	}
-	
+
 	// skip empty methods or "variable methods names
 	// it $this->$methodName()
 	// also skip if we have seen a call to method_exists just exit; as the code
@@ -657,21 +657,21 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 		HasMethodExistsCalled) {
 		return;
 	}
-	
+
 	// magic methods, constructors are always put in the cache automatically above
 	// this same code will work for those also
 	bool isStaticCall = methodProp.IsStatic;
 	if (isStaticCall && var->ChainList.size() == 2) {
-		
+
 		// check for calls to the base class
 		// these calls are NOT static
 		//
 		// parent::baseMethod()
 		// self::method()
-		// class MyClass {  
-		//    function mm() { MyClass::mm(); } 
+		// class MyClass {
+		//    function mm() { MyClass::mm(); }
 		// }
-		
+
 		UnicodeString unqualifiedClassName;
 		int32_t pos = var->ChainList[0].Name.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 		if (pos >= 0) {
@@ -680,7 +680,7 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 		else {
 			unqualifiedClassName = var->ChainList[0].Name;
 		}
-	
+
 		isStaticCall = var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) != 0
 			&& var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) != 0
 			&& unqualifiedClassName.caseCompare(CurrentClassName, 0) != 0;
@@ -746,10 +746,10 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 	if (Errors.size() > MAX_ERRORS) {
 		return;
 	}
-	
+
 	// only check for static properties (and constants)
 	// for now
-	// testing for instance properties results in many false 
+	// testing for instance properties results in many false
 	// positives when the analyzed code deals with serializing
 	// and unserializing data from strings (json_encode)
 	if (!propertyProp.IsStatic) {
@@ -758,10 +758,10 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 	if (propertyProp.Name.isEmpty()) {
 		return;
 	}
-			
+
 	bool isUnknown = false;
 	wxString error;
-	
+
 	// check our internal class cache, if not found
 	// then query the tags db and cache the value
 	if (propertyProp.IsStatic && FoundStaticProperties.find(propertyProp.Name) != FoundStaticProperties.end()) {
@@ -821,7 +821,7 @@ void t4p::PhpIdentifierLintClass::CheckClassNameAndLog(const UnicodeString& clas
 }
 
 bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className) {
-	
+
 	// some class names are never unknown
 	if (className.isEmpty() ||
 		className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||

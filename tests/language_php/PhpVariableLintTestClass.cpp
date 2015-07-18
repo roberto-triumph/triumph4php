@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -51,14 +51,14 @@ public:
 	std::vector<t4p::PhpVariableLintResultClass> Results;
 	bool HasError;
 
-	PhpVariableLintTestFixtureClass() 
-	: FileTestFixtureClass(wxT("variable_lint")) 
+	PhpVariableLintTestFixtureClass()
+	: FileTestFixtureClass(wxT("variable_lint"))
 	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()
 	, Options()
-	, Lint() 
+	, Lint()
 	, Results()
 	, HasError(false) {
 		Options.Version = pelet::PHP_53;
@@ -67,23 +67,23 @@ public:
 
 	void Parse(const UnicodeString& code) {
 		Lint.SetOptions(Options);
-		
-		// create the file, so that we can index it 
+
+		// create the file, so that we can index it
 		// and the tags get parsed from it
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 		BuildCache(true);
 		Lint.Init(TagCache);
-	
+
 		HasError = Lint.ParseString(code, Results);
 	}
-	
+
 	void SetupFile(const wxString& fileName, const wxString& contents) {
 		CreateSubDirectory(wxT("src"));
 		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-		
+
 		// make the cache consume the source code file; to prime it with the resources because the
 		// variable linter uses the tag cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -205,7 +205,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
-	
+
 	// no errors on exception blocks as exceptions
 	// caught are already initialized
 	UnicodeString code = t4p::CharToIcu(
@@ -271,9 +271,9 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
-	
+
 	// when the extract() function is used, we can't really
-	// detect wich variables have been initialized, as 
+	// detect wich variables have been initialized, as
 	// extract defines variables based on the array keys.
 	// in this case, we disable variable linting on
 	// the scope
@@ -293,9 +293,9 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
-	
+
 	// when the extract() function is used, we can't really
-	// detect wich variables have been initialized, as 
+	// detect wich variables have been initialized, as
 	// extract defines variables based on the array keys.
 	// in this case, we disable variable linting on
 	// the scope
@@ -320,9 +320,9 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
 
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
-	
+
 	// when the eval() function is used, we can't really
-	// detect wich variables have been initialized, as 
+	// detect wich variables have been initialized, as
 	// eval can create new variables.
 	// in this case, we disable variable linting on
 	// the scope
@@ -341,9 +341,9 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
-	
+
 	// when include() is used, we can't really
-	// detect wich variables have been initialized, as 
+	// detect wich variables have been initialized, as
 	// include brings in new variables to the current scope
 	// in this case, we disable variable linting on
 	// the scope
@@ -393,7 +393,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInSwitch) {
 	Options.Version = pelet::PHP_54;
-	
+
 	// assignment in switch still counts as initialized
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -517,7 +517,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 
 	// test that arguments to calling function are checked
 	UnicodeString code = t4p::CharToIcu(
-		"<?php\n" 
+		"<?php\n"
 		"function myFunc($a, $b) {\n"
 		"  $a = $a + 99;\n"
 		"  $b->work();\n"
@@ -598,7 +598,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 		"  myFunc(myFunc($a), myFunc2(myFunc3($x)));\n"
 		"}"
 	);
-	SetupFile(wxT("test.php"), t4p::IcuToWx(code));	
+	SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
 	CHECK_VECTOR_SIZE(1, Results);
@@ -610,7 +610,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
 
 	// test that arguments to a constructor are checked
-	// must recurse down constructor call and any method chaining 
+	// must recurse down constructor call and any method chaining
 	// in case an argument
 	// is the result of another function call
 	Options.Version = pelet::PHP_54;
@@ -666,7 +666,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	Options.CheckGlobalScope = true;
 	Parse(code);
 	CHECK_EQUAL(true, HasError);
-	
+
 	// only the first $file variable should be
 	// labeled as uninitialized, when we encounter an
 	// include/require there could be variables imported
@@ -674,7 +674,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$file", Results[0].VariableName);
 	CHECK_EQUAL(2, Results[0].LineNumber);
-	
+
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
@@ -684,7 +684,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 		"  $a = $c[$d];\n"
 		"  $zz = function($i, $j) use ($d) {\n"
 		"      $a[$c] = array($i => $d, 2 => $j, 3 => $k); \n"
-		"   };\n"  
+		"   };\n"
 		"}"
 	);
 	Parse(code);
@@ -697,7 +697,7 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionDefinedInClosure) {
-	
+
 	// define a function inside of a closure, make sure
 	// that the function arguments are correctly captured
 	// as being initialized
@@ -717,8 +717,8 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionDefinedInClosure) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
-	
-	// test that when a closure uses variables that are passed by 
+
+	// test that when a closure uses variables that are passed by
 	// reference, the linter does NOT label them as un-initialized
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -752,11 +752,11 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
-	
+
 	// when we see a variable variable ie. '$$clazz' in the assignment
 	// we should turn off uninitialized variable checks, since the
-	// code is making variables assignments that we cannot know 
-	
+	// code is making variables assignments that we cannot know
+
 		UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
 		"  function work() {\n"

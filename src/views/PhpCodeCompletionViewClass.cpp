@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -87,9 +87,9 @@ static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 }
 
 t4p::PhpCodeCompletionViewClass::PhpCodeCompletionViewClass(t4p::PhpCodeCompletionFeatureClass& feature)
-: FeatureViewClass() 
-, CodeCompletionProvider(feature.App.Globals) 
-, CallTipProvider(feature.App.Globals) 
+: FeatureViewClass()
+, CodeCompletionProvider(feature.App.Globals)
+, CallTipProvider(feature.App.Globals)
 , BraceStyler() {
 }
 
@@ -109,7 +109,7 @@ void t4p::PhpCodeCompletionViewClass::OnCallTipClick(wxStyledTextEvent& event) {
 	CallTipProvider.OnCallTipClick(event);
 }
 
-t4p::PhpCodeCompletionProviderClass::PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals) 
+t4p::PhpCodeCompletionProviderClass::PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals)
 : LanguageDiscovery()
 , Parser()
 , Lexer()
@@ -121,7 +121,7 @@ t4p::PhpCodeCompletionProviderClass::PhpCodeCompletionProviderClass(t4p::Globals
 bool t4p::PhpCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
 	return t4p::FILE_TYPE_PHP == type;
 }
-	
+
 
 void t4p::PhpCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 	AutoCompletionResourceMatches.clear();
@@ -168,7 +168,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionString(const Unico
 	std::vector<wxString> autoCompleteList;
 	AppendSqlTableNames(word, autoCompleteList);
 	if (!autoCompleteList.empty()) {
-		
+
 		// scintilla needs the keywords sorted.
 		std::sort(autoCompleteList.begin(), autoCompleteList.end());
 		wxString list;
@@ -206,7 +206,7 @@ void t4p::PhpCodeCompletionProviderClass::AppendSqlTableNames(const UnicodeStrin
 	}
 }
 
-void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const UnicodeString& word, 
+void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const UnicodeString& word,
 														   pelet::LanguageDiscoveryClass::Syntax syntax,
 														   wxStyledTextCtrl* ctrl,
 														   wxString& completeStatus) {
@@ -222,7 +222,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const Unicode
 		t4p::KeywordsTokenizeMatch(t4p::KEYWORDS_HTML_TAG_NAMES, symbol, autoCompleteList);
 	}
 	if (!autoCompleteList.empty()) {
-			
+
 		// scintilla needs the keywords sorted.
 		std::sort(autoCompleteList.begin(), autoCompleteList.end());
 		wxString list;
@@ -249,14 +249,14 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const Unicode
 	}
 }
 
-void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word, 
+void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeString& code, const UnicodeString& word,
 	pelet::LanguageDiscoveryClass::Syntax syntax, t4p::CodeControlClass* ctrl,
 	wxString& completeStatus) {
-	
+
 	Lexer.SetVersion(Globals.Environment.Php.Version);
 	Parser.SetVersion(Globals.Environment.Php.Version);
 	ScopeFinder.SetVersion(Globals.Environment.Php.Version);
-	
+
 	std::vector<wxFileName> sourceDirs = Globals.AllEnabledSourceDirectories();
 	std::vector<wxString> autoCompleteList;
 	std::vector<UnicodeString> variableMatches;
@@ -266,7 +266,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 	pelet::VariableClass parsedVariable(scope);
 	pelet::ScopeClass variableScope;
 	t4p::SymbolTableMatchErrorClass error;
-	
+
 	bool doDuckTyping = ctrl->CodeControlOptions.EnableDynamicAutoCompletion;
 	if (!lastExpression.isEmpty()) {
 		Parser.ParseExpression(lastExpression, parsedVariable);
@@ -280,7 +280,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 			}
 		}
 		else if (parsedVariable.ChainList.size() == 1) {
-			
+
 			// a bunch of function, define, or class names
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
@@ -305,7 +305,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 			}
 		}
 		else if (!AutoCompletionResourceMatches.empty()) {
-			
+
 			// an object / function "chain"
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
@@ -352,7 +352,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 				}
 			}
 		}
-		
+
 		// in case of a double quoted string, complete SQL table names too
 		// this is in addition to auto completing any variable names inside the string too
 		if (pelet::LanguageDiscoveryClass::SYNTAX_PHP_DOUBLE_QUOTE_STRING == syntax) {
@@ -361,7 +361,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 	}
 
 	if (!autoCompleteList.empty()) {
-			
+
 		// scintilla needs the keywords sorted.
 		sort(autoCompleteList.begin(), autoCompleteList.end());
 		wxString list;
@@ -384,7 +384,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 }
 
 void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhpStatus(
-		const t4p::SymbolTableMatchErrorClass& error, 
+		const t4p::SymbolTableMatchErrorClass& error,
 		const UnicodeString& lastExpression,
 		const pelet::VariableClass& parsedVariable,
 		const pelet::ScopeClass& variableScope,
@@ -472,7 +472,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhpStatus(
 
 std::vector<wxString> t4p::PhpCodeCompletionProviderClass::CollectNearMatchKeywords(wxString tag) {
 	tag = tag.Lower();
-	std::vector<wxString> matchedKeywords;	
+	std::vector<wxString> matchedKeywords;
 	t4p::KeywordsTokenizeMatch(
 		t4p::KeywordsPhpAll(Globals.Environment.Php.Version),
 		tag,
@@ -502,21 +502,21 @@ void t4p::PhpCodeCompletionProviderClass::RegisterAutoCompletionImages(wxStyledT
 }
 
 void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextEvent& event) {
-	wxStyledTextCtrl* txtCtrl = wxDynamicCast(event.GetEventObject(), wxStyledTextCtrl);	
+	wxStyledTextCtrl* txtCtrl = wxDynamicCast(event.GetEventObject(), wxStyledTextCtrl);
 	if (!txtCtrl) {
 		return;
 	}
 	t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)txtCtrl;
-	
+
 	if (!AutoCompletionResourceMatches.empty()) {
 		UnicodeString selected = t4p::WxToIcu(event.GetText());
-		
+
 		bool handled = false;
 		for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 			t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
 			if (res.Identifier == selected) {
 
-				// user had selected  a function /method name; let's add the 
+				// user had selected  a function /method name; let's add the
 				// parenthesis and show the call tip
 				ctrl->AutoCompCancel();
 				wxString selected = event.GetText();
@@ -548,8 +548,8 @@ void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextE
 				selected.caseCompare(UNICODE_STRING_SIMPLE("endfor"), 0) == 0 ||
 				selected.caseCompare(UNICODE_STRING_SIMPLE("endforeach"), 0) == 0 ||
 				selected.caseCompare(UNICODE_STRING_SIMPLE("endswitch"), 0) == 0) {
-				
-				ctrl->AutoCompCancel();	
+
+				ctrl->AutoCompCancel();
 				wxString selected = event.GetText();
 				int startPos = ctrl->WordStartPosition(ctrl->GetCurrentPos(), true);
 				ctrl->SetSelection(startPos, ctrl->GetCurrentPos());
@@ -560,11 +560,11 @@ void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextE
 }
 
 t4p::PhpCallTipProviderClass::PhpCallTipProviderClass(t4p::GlobalsClass& globals)
-: CallTipProviderClass() 
-, Globals(globals) 
-, CurrentCallTipResources() 
+: CallTipProviderClass()
+, Globals(globals)
+, CurrentCallTipResources()
 , CurrentCallTipIndex(0) {
-	
+
 }
 
 bool t4p::PhpCallTipProviderClass::DoesSupport(t4p::FileType type) {
@@ -572,28 +572,28 @@ bool t4p::PhpCallTipProviderClass::DoesSupport(t4p::FileType type) {
 }
 
 void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxChar ch, bool force, wxString& status) {
-	
-	// this function deliberately uses scintilla positions (bytes) instead of 
+
+	// this function deliberately uses scintilla positions (bytes) instead of
 	// converting over to unicode text. be careful.
 	int currentPos = ctrl->GetCurrentPos();
 	if (InCommentOrStringStyle(ctrl, currentPos) && wxT(')') == ch) {
 		ctrl->CallTipCancel();
 	}
 	if (force || wxT('(') == ch) {
-		
+
 		// back up to the last function call "(" then get the function name, do not get the open parenthesis
 		// we are always going to do the call tip for the nearest function ie. when
-		// a line is  
+		// a line is
 		// Func1('hello', Func2('bye'
 		// we are always going to show the call tip for Func2 (if the cursor is after 'bye')
 		// make sure we don't go past the last statement
-		// - But - 
-		// in this case 
+		// - But -
+		// in this case
 		// Func1('hello, Func2('bye')
-		// we are going to show the call tip for Func1 since Func2 has been 
+		// we are going to show the call tip for Func1 since Func2 has been
 		// closed. we need to ignore matching parenthesis
 		bool hasMethodCall = false;
-		
+
 		// seed matching parens in case the cursor is at a close parens
 		// we show the call tip
 		int matchingParens = 0;
@@ -618,18 +618,18 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 			}
 			currentPos--;
 		}
-		
+
 		if (currentPos >= 0) {
 			CurrentCallTipResources.clear();
 			CurrentCallTipIndex = 0;
 
 			std::vector<t4p::PhpTagClass> matches = Globals.TagCache.GetTagsAtPosition(
-				ctrl->GetIdString(), ctrl->GetSafeText(), currentPos, 
+				ctrl->GetIdString(), ctrl->GetSafeText(), currentPos,
 				Globals.AllEnabledSourceDirectories(),
 				Globals,
 				status
 			);
-			
+
 			for (size_t i = 0; i < matches.size(); ++i) {
 				t4p::PhpTagClass tag = matches[i];
 				if (t4p::PhpTagClass::FUNCTION == tag.Type || t4p::PhpTagClass::METHOD == tag.Type) {
@@ -645,7 +645,7 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 				UnicodeString constructorSearch = matches[0].FullyQualifiedClassName();
 				constructorSearch += UNICODE_STRING_SIMPLE("::__construct");
 
-				// search project and native tags 
+				// search project and native tags
 				t4p::TagResultClass* result = Globals.TagCache.ExactTags(
 					constructorSearch, Globals.AllEnabledSourceDirectories()
 				);
@@ -663,14 +663,14 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 				delete result;
 			}
 			size_t matchCount = CurrentCallTipResources.size();
-			if (matchCount > 0) {	
+			if (matchCount > 0) {
 				wxString callTip = PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
 				ctrl->CallTipShow(ctrl->GetCurrentPos(), callTip);
 			}
 		}
 	}
 	if (ctrl->CallTipActive()) {
-		
+
 		// highlight the 1st, 2nd, 3rd or 4th parameter of the call tip depending on where the cursors currently is.
 		// If the cursor is in the 2nd argument, then highlight the 2nd parameter and so on...
 		int startOfArguments = ctrl->GetCurrentPos();
@@ -694,14 +694,14 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 		if (startOfArguments >= 0 && !CurrentCallTipResources.empty() && CurrentCallTipIndex < CurrentCallTipResources.size()) {
 			wxString currentSignature = t4p::IcuToWx(CurrentCallTipResources[CurrentCallTipIndex].Signature);
 			int startHighlightPos = currentSignature.find(wxT('('));
-			
+
 			// sometimes the previous call tip is active, as in for example this line
 			//   $m->getB()->work(
 			// in this case we need to be careful
 			if(startHighlightPos >= 0) {
 				int endHighlightPos = currentSignature.find(wxT(','), startHighlightPos);
-				
-				// no comma =  highlight the only param, if signature has no params, then 
+
+				// no comma =  highlight the only param, if signature has no params, then
 				// nothing will get highlighted since its all whitespace
 				if (endHighlightPos < 0) {
 					endHighlightPos = currentSignature.length() - 1;
@@ -730,11 +730,11 @@ void t4p::PhpCallTipProviderClass::OnCallTipClick(wxStyledTextEvent& evt) {
 		int position = evt.GetPosition();
 		wxString callTip;
 
-		// up arrow. if already at the first choice, then loop around 
-		// looping around looks better than hiding arrows; because hiding arrows changes the 
+		// up arrow. if already at the first choice, then loop around
+		// looping around looks better than hiding arrows; because hiding arrows changes the
 		// rendering position and make the call tip jump around when clicking up/down
 		if (1 == position) {
-			CurrentCallTipIndex = ((CurrentCallTipIndex >= 1) && (CurrentCallTipIndex - 1) < resourcesSize) ? CurrentCallTipIndex - 1 : resourcesSize - 1;				
+			CurrentCallTipIndex = ((CurrentCallTipIndex >= 1) && (CurrentCallTipIndex - 1) < resourcesSize) ? CurrentCallTipIndex - 1 : resourcesSize - 1;
 			callTip =  PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
 		}
 		else if (2 == position) {
@@ -745,7 +745,7 @@ void t4p::PhpCallTipProviderClass::OnCallTipClick(wxStyledTextEvent& evt) {
 		}
 		if (!callTip.IsEmpty()) {
 			ctrl->CallTipCancel();
-			ctrl->CallTipShow(ctrl->GetCurrentPos(), callTip);					
+			ctrl->CallTipShow(ctrl->GetCurrentPos(), callTip);
 		}
 	}
 	evt.Skip();
@@ -753,7 +753,7 @@ void t4p::PhpCallTipProviderClass::OnCallTipClick(wxStyledTextEvent& evt) {
 
 t4p::PhpBraceMatchStylerClass::PhpBraceMatchStylerClass()
 : BraceMatchStylerClass() {
-	
+
 }
 
 bool t4p::PhpBraceMatchStylerClass::DoesSupport(t4p::FileType type) {

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,18 +49,18 @@ static void AssignKeyCommands(wxStyledTextCtrl* ctrl, const std::vector<t4p::Edi
 t4p::EditorBehaviorViewClass::EditorBehaviorViewClass(t4p::EditorBehaviorFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-	
+
 }
 
 void t4p::EditorBehaviorViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
 	toolBar->AddSeparator();
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 1, _("Word Wrap"), 
+	toolBar->AddTool(t4p::MENU_BEHAVIOR + 1, _("Word Wrap"),
 		t4p::BitmapImageAsset(wxT("wrap")), _("Enable / disable word wrap"), wxITEM_NORMAL
 	);
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 2, _("Indentation"), 
+	toolBar->AddTool(t4p::MENU_BEHAVIOR + 2, _("Indentation"),
 		t4p::BitmapImageAsset(wxT("indentation")), _("Enable / disable identation guides"), wxITEM_NORMAL
 	);
-	toolBar->AddTool(t4p::MENU_BEHAVIOR + 3, _("Whitespace"), 
+	toolBar->AddTool(t4p::MENU_BEHAVIOR + 3, _("Whitespace"),
 		t4p::BitmapImageAsset(wxT("whitespace")), _("Enable / disable showing whitespace"), wxITEM_NORMAL
 	);
 }
@@ -81,7 +81,7 @@ void t4p::EditorBehaviorViewClass::AddEditMenuItems(wxMenu* editMenu) {
 	subMenu->Append(t4p::MENU_BEHAVIOR + 7, _("Unix (LF)"), _("Convert Line ending to UNIX"));
 	subMenu->Append(t4p::MENU_BEHAVIOR + 8, _("Windows (CRLF)"), _("Convert Line ending to Windows"));
 	subMenu->Append(t4p::MENU_BEHAVIOR + 9, _("Max (CR)"), _("Convert Line ending to MAC"));
-	
+
 	editMenu->Append(wxID_ANY, _("Convert Line Endings To"), subMenu);
 }
 
@@ -106,7 +106,7 @@ void t4p::EditorBehaviorViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdCl
 }
 
 void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-	
+
 	// no need to delete moreMenu pointer, the contextMenu will delete it for us
 	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	bool isTextSelected = false;
@@ -137,7 +137,7 @@ void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* m
 	menu->Enable(wxID_REDO, canRedo);
 
 	AddKeyboardCommands(menu, isTextSelected);
-	
+
 	// update the menu accelerators to be the ones configured by the
 	// user
 	for (size_t i = 0; i < Feature.KeyboardCommands.size(); ++i) {
@@ -145,9 +145,9 @@ void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* m
 		int menuId = Feature.SciCommandToMenuId(cmdId);
 		wxMenuItem* menuItem = menu->FindItem(menuId);
 		if (menuItem) {
-			wxString label = 
+			wxString label =
 				menuItem->GetItemLabelText()
-				+ wxT("\t") 
+				+ wxT("\t")
 				+ Feature.KeyboardCommands[i].ToString();
 			menuItem->SetItemLabel(label);
 		}
@@ -155,7 +155,7 @@ void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* m
 }
 
 void t4p::EditorBehaviorViewClass::OnToggleWordWrap(wxCommandEvent& event) {
-	Feature.ToggleWordWrap();	
+	Feature.ToggleWordWrap();
 	SetFeaturesOnNotebook();
 }
 
@@ -203,7 +203,7 @@ void t4p::EditorBehaviorViewClass::OnEditConvertEols(wxCommandEvent& event) {
 void t4p::EditorBehaviorViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 	wxKeyBinder* keyBinder = Feature.App.Preferences.KeyProfiles.GetSelProfile();
 
-	t4p::EditorBehaviorPanelClass* panel = new t4p::EditorBehaviorPanelClass(parent, 
+	t4p::EditorBehaviorPanelClass* panel = new t4p::EditorBehaviorPanelClass(parent,
 		Feature.App.Preferences.CodeControlOptions);
 	t4p::EditorCommandPanelClass* cmdPanel = new t4p::EditorCommandPanelClass(parent,
 		wxID_ANY, Feature.KeyboardCommands, keyBinder);
@@ -212,22 +212,22 @@ void t4p::EditorBehaviorViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
-	
+
 	/*
 	 the transform menu exposes the following scintilla commands
-	 
+
 	SCI_LINECUT
 	SCI_LINEDUPLICATE
 	SCI_LINEDELETE
 	SCI_LINETRANSPOSE
-	SCI_LINECOPY 
-	SCI_LOWERCASE 
+	SCI_LINECOPY
+	SCI_LOWERCASE
 	SCI_UPPERCASE
 	SCI_DELWORDLEFT
 	SCI_DELWORDRIGHT
 	SCI_DELLINELEFT
-	SCI_DELLINERIGHT 
-	SCI_SELECTIONDUPLICATE 
+	SCI_DELLINERIGHT
+	SCI_SELECTIONDUPLICATE
 	SCI_MOVESELECTEDLINESUP
 	SCI_MOVESELECTEDLINESDOWN
 	*/
@@ -263,8 +263,8 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	SCI_WORDPARTRIGHTEXTEND
 	*/
 	wxMenu* selectionMenu = new wxMenu();
-	
-	
+
+
 	/*
 	the caret menu exposes the following scintilla commands
 	SCI_PARADOWN
@@ -272,7 +272,7 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	SCI_WORDLEFT
 	SCI_WORDRIGHT
 	SCI_WORDPARTLEFT
-	SCI_WORDPARTRIGHT 
+	SCI_WORDPARTRIGHT
 	*/
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARADOWNEXTEND), _("Expand selection to the end of paragraph")); //\tCTRL+SHIFT+]
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARAUPEXTEND), _("Expand selection to the beginning of paragraph")); // \tCTRL+SHIFT+[
@@ -282,7 +282,7 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHTENDEXTEND), _("Expand selection to the end of next word"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment")); // \tCTRL+SHIFT+/
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment")); // \tCTRL+SHIFT+backslash
-	
+
 	//?? not sure what these do
 	//SCI_WORDLEFTEND
 	//SCI_WORDRIGHTEND
@@ -293,11 +293,11 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHT), _("Move to next word\tCTRL+RIGHT"));
 	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFT), _("Move to previous word segment")); // \tCTRL+/
 	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHT), _("Move to next word segment")); // \tCTRL+backslash
-	
+
 	menu->Append(ID_SUBMENU_TRANSFORM, _("Transform text"), transformMenu);
 	menu->Append(ID_SUBMENU_SELECTION, _("Selection"), selectionMenu);
 	menu->Append(ID_SUBMENU_CARET, _("Move caret"), caretMenu);
-	
+
 	transformMenu->Enable(Feature.SciCommandToMenuId(wxSTC_CMD_LOWERCASE), isTextSelected);
 	transformMenu->Enable(Feature.SciCommandToMenuId(wxSTC_CMD_UPPERCASE), isTextSelected);
 }
@@ -336,7 +336,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	codeCtrl->SetIndentationGuides(options.EnableIndentationGuides);
 	codeCtrl->SetEOLMode(options.LineEndingMode);
 	codeCtrl->SetViewEOL(options.EnableLineEndings);
-	
+
 	if (options.EnableWordWrap) {
 		codeCtrl->SetWrapMode(wxSTC_WRAP_WORD);
 		codeCtrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
@@ -344,17 +344,17 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	else {
 		codeCtrl->SetWrapMode(wxSTC_WRAP_NONE);
 	}
-	
+
 	codeCtrl->SetMultipleSelection(options.EnableMultipleSelection);
 	codeCtrl->SetAdditionalSelectionTyping(options.EnableMultipleSelection);
 	if (options.EnableMultipleSelection) {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_EACH);
-		
+
 	}
 	else {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_ONCE);
 	}
-	
+
 	int virtualSpaceOpts = wxSTC_SCVS_NONE;
 	if (options.EnableVirtualSpace) {
 		virtualSpaceOpts |= wxSTC_SCVS_USERACCESSIBLE;
@@ -363,7 +363,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 		virtualSpaceOpts |= wxSTC_SCVS_RECTANGULARSELECTION;
 	}
 	codeCtrl->SetVirtualSpaceOptions(virtualSpaceOpts);
-	
+
 	int selectionMode = wxSTC_SEL_STREAM;
 	if (options.EnableRectangularSelection) {
 		selectionMode = wxSTC_SEL_RECTANGLE;
@@ -375,7 +375,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	}
 	codeCtrl->SetViewWhiteSpace(whitespaceMode);
 	codeCtrl->SetZoom(options.Zoom);
-	
+
 	AssignKeyCommands(codeCtrl, Feature.KeyboardCommands);
 }
 
@@ -390,7 +390,7 @@ void t4p::EditorBehaviorViewClass::OnAppFileNew(t4p::CodeControlEventClass& even
 }
 
 void t4p::EditorBehaviorViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-	
+
 	// since this gets called when the code control is ABOUT to be closed
 	// the count of code controls is 1 but it wil soon be zero
 	bool hasEditors = AllCodeControls().size() > 1;
@@ -555,7 +555,7 @@ void t4p::EditorBehaviorViewClass::OnPreferencesSaved(wxCommandEvent& event) {
 		t4p::NotebookClass* notebook = notebooks[i];
 		notebook->RefreshCodeControlOptions();
 	}
-	
+
 	SetFeaturesOnNotebook();
 }
 
@@ -579,7 +579,7 @@ t4p::EditorBehaviorPanelClass::EditorBehaviorPanelClass(wxWindow* parent, t4p::C
 	EnableIndentationGuides->SetValidator(enableIndentationGuidesValidator);
 	wxGenericValidator rightMarginValidator(&options.RightMargin);
 	RightMargin->SetValidator(rightMarginValidator);
-	wxGenericValidator enableLineEndingsValidator(&options.EnableLineEndings);	
+	wxGenericValidator enableLineEndingsValidator(&options.EnableLineEndings);
 	EnableLineEndings->SetValidator(enableLineEndingsValidator);
 	wxGenericValidator lineEndingModeValidator(&options.LineEndingMode);
 	LineEndingMode->SetValidator(lineEndingModeValidator);
@@ -614,7 +614,7 @@ void t4p::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {
 
 bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
 	if (wxWindow::TransferDataToWindow()) {
-		
+
 		// CodeControlOptionsClass disables right margin when RightMargin = 0
 		EnableRightMargin->SetValue(RightMargin->GetValue() > 0);
 		RightMargin->Enable(RightMargin->GetValue() > 0);
@@ -624,11 +624,11 @@ bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
 }
 
 bool t4p::EditorBehaviorPanelClass::TransferDataFromWindow() {
-	
+
 	// CodeControlOptionsClass disables right margin when RightMargin = 0
 	if (!EnableRightMargin->IsChecked()) {
 		RightMargin->SetValue(0);
-	}	
+	}
 	return wxWindow::TransferDataFromWindow();
 }
 
@@ -641,7 +641,7 @@ t4p::EditorCommandPanelClass::EditorCommandPanelClass(wxWindow* parent, int id,
 													  wxKeyBinder* keyBinder)
 : EditorCommandPanelGeneratedClass(parent, id)
 , Commands(commands)
-, EditedCommands(commands) 
+, EditedCommands(commands)
 , KeyBinder(keyBinder) {
 	List->ClearAll();
 	List->InsertColumn(0, _("Command"));
@@ -677,7 +677,7 @@ void t4p::EditorCommandPanelClass::FillCommands() {
 
 void t4p::EditorCommandPanelClass::OnItemActivated(wxListEvent& event) {
 	int row = event.GetIndex();
-	
+
 	wxString name = List->GetItemText(row, 0);
 	wxString shortcut = List->GetItemText(row, 1);
 
@@ -692,9 +692,9 @@ t4p::KeyboardCommandEditDialogClass::KeyboardCommandEditDialogClass(wxWindow* pa
 																	wxString& shortcut,
 																	std::vector<t4p::EditorKeyboardCommandClass>& commands,
 																	wxKeyBinder* keyBinder)
-: KeyboardCommandEditDialogGeneratedClass(parent, wxID_ANY) 
-, Commands(commands) 
-, KeyBinder(keyBinder) 
+: KeyboardCommandEditDialogGeneratedClass(parent, wxID_ANY)
+, Commands(commands)
+, KeyBinder(keyBinder)
 , OriginalShortcut(shortcut) {
 	Help->SetLabel(Help->GetLabel() + wxT(" ") + commandName);
 
@@ -708,7 +708,7 @@ void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (newShortcut == OriginalShortcut || newShortcut.empty()) {
 
 		// allow the user to "save" the same shortcut
-		// also, allow the user to remove shortcuts (empty 
+		// also, allow the user to remove shortcuts (empty
 		// string == no shortcut)
 		TransferDataFromWindow();
 		EndModal(wxOK);
@@ -735,8 +735,8 @@ void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 	if (alreadyExists) {
 		wxMessageBox(
-			wxString::Format(_("shortcut %s is already defined to %s"), newShortcut.c_str(), existingCmd), 
-			_("Edit Keyboard Command"), 
+			wxString::Format(_("shortcut %s is already defined to %s"), newShortcut.c_str(), existingCmd),
+			_("Edit Keyboard Command"),
 			wxCENTRE, this
 		);
 		return;
@@ -752,7 +752,7 @@ void t4p::KeyboardCommandEditDialogClass::OnEnter(wxCommandEvent& event) {
 void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	bool hasModifiers = event.HasAnyModifiers();
-	if (hasModifiers && keyCode > 0) {	
+	if (hasModifiers && keyCode > 0) {
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
 	}
@@ -762,12 +762,12 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	}
 	else if (hasModifiers && (
 		WXK_BACK == keyCode ||
-		WXK_TAB == keyCode ||	
+		WXK_TAB == keyCode ||
 		WXK_RETURN == keyCode ||
-		WXK_ESCAPE == keyCode || 	
-		WXK_SPACE == keyCode ||	
+		WXK_ESCAPE == keyCode ||
+		WXK_SPACE == keyCode ||
 		WXK_DELETE  == keyCode)) {
-		
+
 		// shortcuts with special chars ie CTRL+TAB
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
@@ -775,7 +775,7 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	else {
 		Edit->Clear();
 		event.Skip();
-		
+
 	}
 }
 
@@ -800,7 +800,7 @@ BEGIN_EVENT_TABLE(t4p::EditorBehaviorViewClass, t4p::FeatureViewClass)
 	EVT_MENU(wxID_UNDO, t4p::EditorBehaviorViewClass::OnUndo)
 	EVT_MENU(wxID_REDO, t4p::EditorBehaviorViewClass::OnRedo)
 	EVT_MENU(t4p::MENU_BEHAVIOR + 10, t4p::EditorBehaviorViewClass::OnEditContentAssist)
-	EVT_MENU(t4p::MENU_BEHAVIOR + 11, t4p::EditorBehaviorViewClass::OnEditCallTip)	
+	EVT_MENU(t4p::MENU_BEHAVIOR + 11, t4p::EditorBehaviorViewClass::OnEditCallTip)
 	EVT_MENU_RANGE(t4p::MENU_BEHAVIOR + 20, t4p::MENU_BEHAVIOR + 99, t4p::EditorBehaviorViewClass::OnEditorCommand)
 
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EditorBehaviorViewClass::OnPreferencesSaved)

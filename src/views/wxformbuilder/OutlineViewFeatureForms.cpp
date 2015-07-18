@@ -13,70 +13,70 @@ OutlineViewGeneratedPanelClass::OutlineViewGeneratedPanelClass( wxWindow* parent
 {
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	wxFlexGridSizer* GridSizer;
 	GridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	GridSizer->AddGrowableCol( 0 );
 	GridSizer->AddGrowableRow( 1 );
 	GridSizer->SetFlexibleDirection( wxBOTH );
 	GridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	wxFlexGridSizer* NavigationSizer;
 	NavigationSizer = new wxFlexGridSizer( 1, 10, 0, 0 );
 	NavigationSizer->AddGrowableCol( 0 );
 	NavigationSizer->AddGrowableRow( 0 );
 	NavigationSizer->SetFlexibleDirection( wxBOTH );
 	NavigationSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	StatusLabel = new wxStaticText( this, ID_STATUSLABEL, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
 	StatusLabel->Wrap( -1 );
 	NavigationSizer->Add( StatusLabel, 1, wxALL|wxALIGN_BOTTOM, 5 );
-	
+
 	AddButton = new wxBitmapButton( this, ID_ADDBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	AddButton->SetToolTip( _("Add a class to the outline tree") );
-	
+
 	AddButton->SetToolTip( _("Add a class to the outline tree") );
-	
+
 	NavigationSizer->Add( AddButton, 0, wxALL, 5 );
-	
+
 	SortButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	SortButton->SetToolTip( _("Sort Outline") );
-	
+
 	SortButton->SetToolTip( _("Sort Outline") );
-	
+
 	NavigationSizer->Add( SortButton, 0, wxALL, 5 );
-	
+
 	FilterButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	FilterButton->SetToolTip( _("Show filter menu") );
-	
+
 	FilterButton->SetToolTip( _("Show filter menu") );
-	
+
 	NavigationSizer->Add( FilterButton, 0, wxALL, 5 );
-	
+
 	SyncButton = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	SyncButton->SetToolTip( _("Sync Outline With Opened Files") );
-	
+
 	SyncButton->SetToolTip( _("Sync Outline With Opened Files") );
-	
+
 	NavigationSizer->Add( SyncButton, 0, wxALL, 5 );
-	
+
 	HelpButton = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxSize( -1,-1 ), wxBU_AUTODRAW );
 	HelpButton->SetToolTip( _("Help") );
-	
+
 	HelpButton->SetToolTip( _("Help") );
-	
+
 	NavigationSizer->Add( HelpButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
+
 	GridSizer->Add( NavigationSizer, 1, wxEXPAND, 5 );
-	
+
 	Tree = new wxTreeCtrl( this, ID_TREE, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
 	GridSizer->Add( Tree, 1, wxALL|wxEXPAND, 5 );
-	
+
 	BoxSizer->Add( GridSizer, 1, wxEXPAND, 5 );
-	
+
 	this->SetSizer( BoxSizer );
 	this->Layout();
-	
+
 	// Connect Events
 	AddButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnAddButton ), NULL, this );
 	SortButton->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( OutlineViewGeneratedPanelClass::OnSortLeftDown ), NULL, this );
@@ -97,23 +97,23 @@ OutlineViewGeneratedPanelClass::~OutlineViewGeneratedPanelClass()
 	HelpButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( OutlineViewGeneratedPanelClass::OnHelpButton ), NULL, this );
 	Tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemActivated ), NULL, this );
 	Tree->Disconnect( wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK, wxTreeEventHandler( OutlineViewGeneratedPanelClass::OnTreeItemRightClick ), NULL, this );
-	
+
 }
 
 FileSearchDialogGeneratedClass::FileSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
+
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	wxFlexGridSizer* FlexSizer;
 	FlexSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	FlexSizer->AddGrowableCol( 0 );
 	FlexSizer->AddGrowableRow( 2 );
 	FlexSizer->SetFlexibleDirection( wxBOTH );
 	FlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	wxFlexGridSizer* InputsSizer;
 	InputsSizer = new wxFlexGridSizer( 2, 2, 0, 0 );
 	InputsSizer->AddGrowableCol( 1 );
@@ -121,33 +121,33 @@ FileSearchDialogGeneratedClass::FileSearchDialogGeneratedClass( wxWindow* parent
 	InputsSizer->AddGrowableRow( 1 );
 	InputsSizer->SetFlexibleDirection( wxBOTH );
 	InputsSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	SearchLabel = new wxStaticText( this, ID_SEARCHLABEL, _("Search"), wxDefaultPosition, wxDefaultSize, 0 );
 	SearchLabel->Wrap( -1 );
 	InputsSizer->Add( SearchLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	SearchText = new wxTextCtrl( this, ID_SEARCHTEXT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	InputsSizer->Add( SearchText, 1, wxALL|wxEXPAND, 5 );
-	
+
 	ProjectLabel = new wxStaticText( this, ID_PROJECTLABEL, _("Project"), wxDefaultPosition, wxDefaultSize, 0 );
 	ProjectLabel->Wrap( -1 );
 	InputsSizer->Add( ProjectLabel, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	wxArrayString ProjectChoiceChoices;
 	ProjectChoice = new wxChoice( this, ID_PROJECTCHOICE, wxDefaultPosition, wxDefaultSize, ProjectChoiceChoices, 0 );
 	ProjectChoice->SetSelection( 0 );
 	InputsSizer->Add( ProjectChoice, 0, wxEXPAND|wxALL, 5 );
-	
+
 	FlexSizer->Add( InputsSizer, 1, wxEXPAND, 5 );
-	
+
 	MatchesLabel = new wxStaticText( this, ID_MATCHESLABEL, _("Matches"), wxDefaultPosition, wxDefaultSize, 0 );
 	MatchesLabel->Wrap( -1 );
 	FlexSizer->Add( MatchesLabel, 1, wxALL|wxEXPAND, 5 );
-	
+
 	wxArrayString MatchesListChoices;
 	MatchesList = new wxCheckListBox( this, ID_MATCHESLIST, wxDefaultPosition, wxDefaultSize, MatchesListChoices, 0 );
 	FlexSizer->Add( MatchesList, 1, wxALL|wxEXPAND, 5 );
-	
+
 	ButtonsSizer = new wxStdDialogButtonSizer();
 	ButtonsSizerOK = new wxButton( this, wxID_OK );
 	ButtonsSizer->AddButton( ButtonsSizerOK );
@@ -155,14 +155,14 @@ FileSearchDialogGeneratedClass::FileSearchDialogGeneratedClass( wxWindow* parent
 	ButtonsSizer->AddButton( ButtonsSizerCancel );
 	ButtonsSizer->Realize();
 	FlexSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
-	
+
 	BoxSizer->Add( FlexSizer, 1, wxEXPAND, 5 );
-	
+
 	this->SetSizer( BoxSizer );
 	this->Layout();
-	
+
 	this->Centre( wxBOTH );
-	
+
 	// Connect Events
 	SearchText->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler( FileSearchDialogGeneratedClass::OnSearchKeyDown ), NULL, this );
 	SearchText->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( FileSearchDialogGeneratedClass::OnSearchText ), NULL, this );
@@ -183,5 +183,5 @@ FileSearchDialogGeneratedClass::~FileSearchDialogGeneratedClass()
 	MatchesList->Disconnect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( FileSearchDialogGeneratedClass::OnMatchesListDoubleClick ), NULL, this );
 	MatchesList->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler( FileSearchDialogGeneratedClass::OnMatchesListKeyDown ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FileSearchDialogGeneratedClass::OnOkButton ), NULL, this );
-	
+
 }

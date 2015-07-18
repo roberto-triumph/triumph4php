@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,8 +40,8 @@ class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 
 public:
 
-	MysqlResourceFinderFixtureClass() 
-		: DatabaseTestFixtureClass("sql_resource_finder") 
+	MysqlResourceFinderFixtureClass()
+		: DatabaseTestFixtureClass("sql_resource_finder")
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(SqliteTestFixtureClass::Session)
@@ -54,11 +54,11 @@ public:
 		DatabaseTag.User = t4p::CharToIcu(UserName().c_str());
 		DatabaseTag.Password = t4p::CharToIcu(Password().c_str());
 	}
-	
+
 	t4p::DatabaseTagClass DatabaseTag;
-	
+
 	t4p::SqlResourceFetchClass Fetcher;
-	
+
 	t4p::SqlResourceFinderClass Finder;
 };
 
@@ -66,26 +66,26 @@ class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public Sql
 
 public:
 
-	SqliteResourceFinderFixtureClass() 
-		: FileTestFixtureClass("sql_resource_finder") 
+	SqliteResourceFinderFixtureClass()
+		: FileTestFixtureClass("sql_resource_finder")
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, DatabaseTag()
 		, Fetcher(Session)
 		, Finder(Session)
-		, SqliteFile() 
+		, SqliteFile()
 		, TestSession() {
-		
+
 		// create a sqlite db file
 		TouchTestDir();
 		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
-		TestSession.open(*soci::factory_sqlite3(), 
+		TestSession.open(*soci::factory_sqlite3(),
 			t4p::WxToChar(SqliteFile.GetFullPath())
 		);
-					
+
 		DatabaseTag.Driver = t4p::DatabaseTagClass::SQLITE;
 		DatabaseTag.FileName = SqliteFile;
 	}
-	
+
 	bool ExecIntoTest(const std::string& sql) {
 		try {
 			TestSession.once << sql;
@@ -95,22 +95,22 @@ public:
 		}
 		return false;
 	}
-	
+
 	t4p::DatabaseTagClass DatabaseTag;
-	
+
 	t4p::SqlResourceFetchClass Fetcher;
-	
+
 	t4p::SqlResourceFinderClass Finder;
-	
+
 	wxFileName SqliteFile;
-	
-	// the db file we will inspect 
+
+	// the db file we will inspect
 	soci::session TestSession;
 };
- 
+
 SUITE(SqlResourceFinderTestClass) {
-	 
-TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {	
+
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
 	std::string query = "CREATE TABLE web_users(idUser int);";
 	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_names(idServiceName int);";
@@ -163,7 +163,7 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableShouldLocateInformationSc
 	CHECK_UNISTR_EQUALS_NO_CASE("columns", tables[1]);
 }
 
-TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {	
+TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {
 	std::string query = "CREATE TABLE web_users(idIUser int);";
 	CHECK(DatabaseTestFixtureClass::Exec(query));
 	query = "CREATE TABLE service_names(idIServiceName int);";
@@ -174,14 +174,14 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumns) {
 	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
 	CHECK(Fetcher.Fetch(DatabaseTag, error));
-	
+
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idIServiceL"));
 	CHECK_VECTOR_SIZE(1, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[0]);
-	
+
 
 	columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idI"));
-	
+
 	CHECK_VECTOR_SIZE(4, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIDeletedBy", columns[0]);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[1]);
@@ -200,7 +200,7 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
 	CHECK(DatabaseTestFixtureClass::Exec(query));
 	UnicodeString error;
 	CHECK(Fetcher.Fetch(DatabaseTag, error));
-	
+
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idiservice"));
 	CHECK_VECTOR_SIZE(2, columns);
 	CHECK_UNISTR_EQUALS("idIServiceLocation", columns[0]);
@@ -244,13 +244,13 @@ TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindColumns) {
 	CHECK(ExecIntoTest(query));
 	UnicodeString error;
 	CHECK(Fetcher.Fetch(DatabaseTag, error));
-	
+
 	std::vector<UnicodeString> columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idIServiceL"));
 	CHECK_VECTOR_SIZE(1, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[0]);
-	
+
 	columns = Finder.FindColumns(DatabaseTag, UNICODE_STRING_SIMPLE("idI"));
-	
+
 	CHECK_VECTOR_SIZE(4, columns);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIDeletedBy", columns[0]);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceLocation", columns[1]);

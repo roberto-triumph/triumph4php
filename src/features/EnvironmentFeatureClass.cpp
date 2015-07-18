@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -65,10 +65,10 @@ bool t4p::ApacheFileReaderClass::BackgroundFileRead(t4p::DirectorySearchClass& s
 		ret = true;
 	}
 	if (!search.More() && !IsCancelled()) {
-		
+
 		// when we are done recursing, parse the matched files
 		std::vector<wxString> possibleConfigFiles = search.GetMatchedFiles();
-		
+
 		// there may be multiple files, at this point just exist as soon as we find one file
 		// that we can recognize as a config file
 		bool found = false;
@@ -104,6 +104,6 @@ void t4p::EnvironmentFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	App.UpdateConfigModifiedTime();
 }
 
-BEGIN_EVENT_TABLE(t4p::EnvironmentFeatureClass, wxEvtHandler) 
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EnvironmentFeatureClass::OnPreferencesSaved) 	
+BEGIN_EVENT_TABLE(t4p::EnvironmentFeatureClass, wxEvtHandler)
+	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_PREFERENCES_SAVED, t4p::EnvironmentFeatureClass::OnPreferencesSaved)
 END_EVENT_TABLE()

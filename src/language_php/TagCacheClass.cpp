@@ -36,9 +36,9 @@
 /**
  * Fills completeStatus with a human-friendly version of the symbol table error
  */
-static void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error, 
+static void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass& error,
 	const UnicodeString& lastExpression, const pelet::VariableClass& parsedVariable,
-	const pelet::ScopeClass& variableScope, 
+	const pelet::ScopeClass& variableScope,
 	const std::vector<t4p::PhpTagClass>& autoCompletionResourceMatches,
 	wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
@@ -122,11 +122,11 @@ static void HandleAutoCompletionPhpStatus(const t4p::SymbolTableMatchErrorClass&
 	}
 }
 
-t4p::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId, 
+t4p::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId,
 																		  const wxString& fileName,
 																		  const wxString& fileIdentifier, t4p::WorkingCacheClass* cache)
 	: wxEvent(eventId, t4p::EVENT_WORKING_CACHE_COMPLETE)
-	, WorkingCache(cache) 
+	, WorkingCache(cache)
 	, FileName(fileName.c_str())
 	, FileIdentifier(fileIdentifier.c_str()) {
 
@@ -161,7 +161,7 @@ const wxEventType t4p::EVENT_TAG_FINDER_LIST_COMPLETE = wxNewEventType();
 
 t4p::WorkingCacheClass::WorkingCacheClass()
 	: SymbolTable()
-	, FileName() 
+	, FileName()
 	, IsNew(true) {
 
 }
@@ -181,8 +181,8 @@ bool t4p::WorkingCacheClass::Update(const UnicodeString& code, const t4p::Symbol
 	return ret;
 }
 
-void t4p::WorkingCacheClass::Init(const wxString& fileName, 
-										const wxString& fileIdentifier, bool isNew, pelet::Versions version, 
+void t4p::WorkingCacheClass::Init(const wxString& fileName,
+										const wxString& fileIdentifier, bool isNew, pelet::Versions version,
 										bool createSymbols,
 										const t4p::SymbolTableClass& previousSymbolTable) {
 	FileName = fileName;
@@ -197,7 +197,7 @@ void t4p::WorkingCacheClass::Init(const wxString& fileName,
 t4p::TagCacheClass::TagCacheClass()
 	: TagFinderList(NULL)
 	, WorkingCaches() {
-	
+
 }
 
 t4p::TagCacheClass::~TagCacheClass() {
@@ -422,7 +422,7 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::NearMatchClassesOrFiles(const 
 	t4p::TagSearchClass tagSearch(search);
 
 	// return all of the matches from all finders that were found by the Collect* call.
-	// This is a bit tricky because we want to prioritize matches in opened files 
+	// This is a bit tricky because we want to prioritize matches in opened files
 	// instead of the global finder, since the global finder will be outdated.
 	std::vector<t4p::ParsedTagFinderClass*> finders = AllFinders();
 	for (size_t i = 0; i < finders.size(); ++i) {
@@ -471,9 +471,9 @@ std::vector<t4p::ParsedTagFinderClass*> t4p::TagCacheClass::AllFinders() {
 	return allTagFinders;
 }
 
-void t4p::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName, 
-													const pelet::VariableClass& parsedVariable, 
-													const pelet::ScopeClass& variableScope, 
+void t4p::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName,
+													const pelet::VariableClass& parsedVariable,
+													const pelet::ScopeClass& variableScope,
 													const std::vector<wxFileName>& sourceDirs,
 													 std::vector<UnicodeString>& autoCompleteList,
 													 std::vector<t4p::PhpTagClass>& resourceMatches,
@@ -484,18 +484,18 @@ void t4p::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName,
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		t4p::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ExpressionCompletionMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList, 
+		cache->SymbolTable.ExpressionCompletionMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList,
 			autoCompleteList, resourceMatches, doDuckTyping, error);
-	
+
 	}
 	if (!foundSymbolTable) {
 		error.Type = t4p::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
 	}
 }
 
-void t4p::TagCacheClass::ResourceMatches(const wxString& fileName, 
+void t4p::TagCacheClass::ResourceMatches(const wxString& fileName,
 												const pelet::VariableClass& parsedVariable,
-												const pelet::ScopeClass& variableScope, 
+												const pelet::ScopeClass& variableScope,
 												const std::vector<wxFileName>& sourceDirs,
 												std::vector<t4p::PhpTagClass>& matches,
 												bool doDuckTyping, bool doFullyQualifiedMatchOnly,
@@ -505,8 +505,8 @@ void t4p::TagCacheClass::ResourceMatches(const wxString& fileName,
 	if (itWorkingCache != WorkingCaches.end()) {
 		foundSymbolTable = true;
 		t4p::WorkingCacheClass* cache = itWorkingCache->second;
-		cache->SymbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList, 
-			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);	
+		cache->SymbolTable.ResourceMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList,
+			matches, doDuckTyping, doFullyQualifiedMatchOnly, error);
 	}
 	if (!foundSymbolTable) {
 		error.Type = t4p::SymbolTableMatchErrorClass::UNREGISTERED_FILE;
@@ -575,23 +575,23 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeStr
 	// first search for all members of the given class that is also in the given file
 	t4p::TagSearchClass tagSearch(fullyQualifiedClassName + UNICODE_STRING_SIMPLE("::"));
 	tagSearch.SetFileItemId(fileTagId);
-	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(), 
+	tagSearch.SetTraits(TagFinderList->ClassUsedTraits(fullyQualifiedClassName, tagSearch.GetParentClasses(),
 			tagSearch.GetMethodName(), sourceDirs));
-	
+
 	TagFinderList->NearMatchesFromAll(tagSearch, allMatches, sourceDirs);
-	
+
 	// now get all parent class  (look in all files) also look for inherited members and traits
 	UnicodeString parentClassName  = TagFinderList->ParentClassName(fullyQualifiedClassName, fileTagId);
 	if (!parentClassName.isEmpty()) {
 		t4p::TagSearchClass hierarchySearch(parentClassName + UNICODE_STRING_SIMPLE("::"));
-		
+
 		hierarchySearch.SetParentClasses(TagFinderList->ClassParents(parentClassName, hierarchySearch.GetMethodName()));
-		hierarchySearch.SetTraits(TagFinderList->ClassUsedTraits(parentClassName, hierarchySearch.GetParentClasses(), 
+		hierarchySearch.SetTraits(TagFinderList->ClassUsedTraits(parentClassName, hierarchySearch.GetParentClasses(),
 			hierarchySearch.GetMethodName(), sourceDirs));
-		
+
 		// search classes from the enabled source directories only
 		hierarchySearch.SetSourceDirs(sourceDirs);
-		
+
 		TagFinderList->NearMatchesFromAll(hierarchySearch, allMatches, sourceDirs);
 		TagFinderList->NearMatchTraitAliasesFromAll(hierarchySearch, allMatches);
 	}
@@ -607,9 +607,9 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllClassesFunctionsDefines(con
 		allMatches = finder->ClassesFunctionsDefines(fullPath);
 		if (!allMatches.empty()) {
 
-			// even if the file tag is is multiple finders, they should both be the 
+			// even if the file tag is is multiple finders, they should both be the
 			// same. stop when we find anything
-			break;	
+			break;
 		}
 	}
 	return allMatches;
@@ -618,7 +618,7 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllClassesFunctionsDefines(con
 std::vector<UnicodeString> t4p::TagCacheClass::ParentClassesAndTraits(const UnicodeString& className, const std::vector<wxFileName>& sourceDirs) {
 	std::vector<UnicodeString> classParents = TagFinderList->ClassParents(className, UNICODE_STRING_SIMPLE(""));
 	std::vector<UnicodeString> classTraits = TagFinderList->ClassUsedTraits(className, classParents, UNICODE_STRING_SIMPLE(""), sourceDirs);
-	
+
 	std::vector<UnicodeString> all;
 	all.insert(all.end(), classParents.begin(), classParents.end());
 	all.insert(all.end(), classTraits.begin(), classTraits.end());
@@ -647,7 +647,7 @@ bool t4p::TagCacheClass::HasFullPath(const wxString& fullPath) {
 	bool found  = false;
 	if (TagFinderList->IsTagFinderInit) {
 		found = TagFinderList->TagFinder.HasFullPath(fullPath);
-	}	
+	}
 	return found;
 }
 
@@ -655,13 +655,13 @@ bool t4p::TagCacheClass::HasDir(const wxString& dir) {
 	bool found  = false;
 	if (TagFinderList->IsTagFinderInit) {
 		found = TagFinderList->TagFinder.HasDir(dir);
-	}	
+	}
 	return found;
 }
 
 std::vector<t4p::PhpTagClass> t4p::TagCacheClass::GetTagsAtPosition(
-		const wxString& fileName, 
-		const UnicodeString& code, int posToCheck, 
+		const wxString& fileName,
+		const UnicodeString& code, int posToCheck,
 		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
 		wxString& status) {
 	std::vector<t4p::PhpTagClass> matches;
@@ -674,19 +674,19 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::GetTagsAtPosition(
 	lexer.SetVersion(globals.Environment.Php.Version);
 	parser.SetVersion(globals.Environment.Php.Version);
 	scopeFinder.SetVersion(globals.Environment.Php.Version);
-	
+
 	UnicodeString codeUntilPos(code, 0, posToCheck);
-	
+
 	UnicodeString lastExpression = lexer.LastExpression(codeUntilPos);
 	UnicodeString resourceName;
 	bool doDuckTyping = true;
 	if (!lastExpression.isEmpty()) {
 		scopeFinder.GetScopeString(codeUntilPos, posToCheck, variableScope);
-		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 && 
+		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 &&
 			variableScope.ClassName.isEmpty() &&
 			variableScope.MethodName.isEmpty()) {
 
-			// the expression is a namespace name outside a class or method.  this is 
+			// the expression is a namespace name outside a class or method.  this is
 			// most likely a namespace in the "use" statement
 			// namespace in a use statement is always fully qualified, even if it does
 			// not begin with a backslash
@@ -694,10 +694,10 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::GetTagsAtPosition(
 		}
 		parser.ParseExpression(lastExpression, parsedVariable);
 		t4p::SymbolTableMatchErrorClass error;
-		ResourceMatches(fileName, parsedVariable, variableScope, sourceDirs, matches, 
+		ResourceMatches(fileName, parsedVariable, variableScope, sourceDirs, matches,
 			doDuckTyping, true, error);
 		if (matches.empty()) {
-			HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable, 
+			HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable,
 				variableScope, matches, status);
 		}
 	}

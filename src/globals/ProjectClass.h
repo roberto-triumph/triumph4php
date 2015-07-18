@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,7 +38,7 @@ namespace t4p {
  * This project can hold files from multiple, separate directories.
  */
 class ProjectClass {
-	
+
 public:
 
 	/**
@@ -47,18 +47,18 @@ public:
 	wxString Label;
 
 	/**
-	 * The directories where source files are located in. 
+	 * The directories where source files are located in.
 	 */
 	std::vector<t4p::SourceClass> Sources;
-	
+
 	/**
 	 * If TRUE, this project is enabled and is used by Triumph.
 	 */
 	bool IsEnabled;
-	
+
 	/**
 	 * Construct a ProjectClass object from the given options
-	 * 
+	 *
 	 * @param ProjectOptionsClass options the new project's options
 	 */
 	ProjectClass();
@@ -76,7 +76,7 @@ public:
 	 * Removes all of the sources from this project.
 	 */
 	void ClearSources();
-	
+
 	/**
 	 * This method will return a list of sources suitable
 	 * for recursing into this project to find all of the PHP Source
@@ -95,7 +95,7 @@ public:
 	 *
 	 * @param fileTypes the configured file type extensions
 	 * @return all of this project's sources with all of the wildcards (PHP, CSS, SQL, JS,
-	 * and misc file extensions) added to each sources. 
+	 * and misc file extensions) added to each sources.
 	 */
 	std::vector<t4p::SourceClass> AllSources(const t4p::FileTypeClass& fileType) const;
 
@@ -108,10 +108,10 @@ public:
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
 
-	
+
 	/**
-	 * @return TRUE if given full path is a "source" file; TRUE if 
-	 *         the given file's extension is any of the fileType's 
+	 * @return TRUE if given full path is a "source" file; TRUE if
+	 *         the given file's extension is any of the fileType's
 	 *         extensions
 	 */
 	bool IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const;
@@ -127,7 +127,7 @@ public:
 	 * source directory = /home/roberto/
 	 * fullPath = /home/roberto/workspace/now.php
 	 * Then this method returns "workspace/now.php"
-	 * 
+	 *
 	 * @param full path to a file
 	 * @return the part of the file without the source prefix
 	 * In the case that fullPath is not contained in any of this
@@ -143,7 +143,7 @@ public:
 	std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
 
 private:
-	
+
 };
 
 }

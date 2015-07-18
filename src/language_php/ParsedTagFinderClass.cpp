@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -63,7 +63,7 @@ public:
 	ExactNonMemberTagResultClass();
 
 	virtual void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
-	
+
 	void SetFileTagId(int fileTagId);
 
 	void SetTagType(t4p::PhpTagClass::Types type);
@@ -77,7 +77,7 @@ protected:
 	std::vector<int> TagTypes;
 
 	std::vector<std::string> SourceDirs;
-	
+
 	int FileTagIdSearch;
 };
 
@@ -101,7 +101,7 @@ private:
 };
 
 // special case, query across all classes for a method (::getName)
-// if ClassName is empty, then just check method names This ensures 
+// if ClassName is empty, then just check method names This ensures
 // queries like '::getName' will work as well.
 // make sure to NOT get fully qualified  matches (key=identifier)
 class ExactMemberOnlyTagResultClass : public t4p::TagResultClass {
@@ -110,7 +110,7 @@ public:
 
 	ExactMemberOnlyTagResultClass();
 
-	
+
 	void Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs);
 
 	void SetMethodType(bool onlyStatic);
@@ -171,7 +171,7 @@ public:
 	AllTagsResultClass();
 
 protected:
-	
+
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 };
 
@@ -221,7 +221,7 @@ t4p::ExactMemberTagResultClass::ExactMemberTagResultClass()
 	TagTypes.push_back(t4p::PhpTagClass::METHOD);
 }
 
-void t4p::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+void t4p::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
@@ -229,7 +229,7 @@ void t4p::ExactMemberTagResultClass::Set(const std::vector<UnicodeString>& class
 		Keys.push_back(t4p::IcuToChar(key));
 	}
 
-	// add trailing separator to lookup exact matches that include the last directory 
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -243,7 +243,7 @@ bool t4p::ExactMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool doLi
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON (s.source_id = r.source_id) WHERE ";
-	
+
 	sql += "key IN (?";
 	for (size_t i = 1; i < Keys.size(); ++i) {
 		sql += ",?";
@@ -253,7 +253,7 @@ bool t4p::ExactMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool doLi
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -261,7 +261,7 @@ bool t4p::ExactMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool doLi
 	if (doLimit) {
 		sql += " LIMIT 100";
 	}
-	
+
 	stmt.prepare(sql);
 
 	for (size_t i = 0; i < Keys.size(); i++) {
@@ -281,7 +281,7 @@ t4p::AllMembersTagResultClass::AllMembersTagResultClass()
 	, ClassCount(0) {
 }
 
-void t4p::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, 
+void t4p::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 											   const std::vector<wxFileName>& sourceDirs) {
 	wxASSERT_MSG(!classNames.empty(), wxT("classNames must not be empty"));
 	for (size_t i = 0; i < classNames.size(); i++) {
@@ -291,7 +291,7 @@ void t4p::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classN
 		Keys.push_back(t4p::IcuToChar(key));
 		Keys.push_back(t4p::IcuToChar(key) + "zzzzzzzzzz");
 	}
-	// add trailing separator to lookup exact matches that include the last directory 
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -300,7 +300,7 @@ void t4p::AllMembersTagResultClass::Set(const std::vector<UnicodeString>& classN
 }
 
 bool t4p::AllMembersTagResultClass::DoPrepare(soci::statement& stmt,  bool doLimit) {
-	
+
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
@@ -321,7 +321,7 @@ bool t4p::AllMembersTagResultClass::DoPrepare(soci::statement& stmt,  bool doLim
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -344,8 +344,8 @@ bool t4p::AllMembersTagResultClass::DoPrepare(soci::statement& stmt,  bool doLim
 
 
 t4p::NearMatchMemberTagResultClass::NearMatchMemberTagResultClass()
-	: ExactMemberTagResultClass() 
-	, ClassCount(0) 
+	: ExactMemberTagResultClass()
+	, ClassCount(0)
 	, FileItemId(0) {
 }
 
@@ -361,7 +361,7 @@ void t4p::NearMatchMemberTagResultClass::SetNearMatchArgs(const std::vector<Unic
 		Keys.push_back(t4p::IcuToChar(key) + "zzzzzzzzzz");
 	}
 
-	// add trailing separator to lookup exact matches that include the last directory 
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -394,7 +394,7 @@ bool t4p::NearMatchMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -423,9 +423,9 @@ bool t4p::NearMatchMemberTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 
 t4p::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 	: TagResultClass()
-	, Key() 
+	, Key()
 	, TagTypes()
-	, SourceDirs() 
+	, SourceDirs()
 	, FileTagIdSearch(0) {
 	TagTypes.push_back(t4p::PhpTagClass::DEFINE);
 	TagTypes.push_back(t4p::PhpTagClass::CLASS);
@@ -434,8 +434,8 @@ t4p::ExactNonMemberTagResultClass::ExactNonMemberTagResultClass()
 
 void t4p::ExactNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
 	Key = t4p::IcuToChar(key);
-	
-	// add trailing separator to lookup exact matches that include the last directory 
+
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -466,7 +466,7 @@ bool t4p::ExactNonMemberTagResultClass::DoPrepare(soci::statement& stmt, bool do
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i < SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -492,7 +492,7 @@ bool t4p::ExactNonMemberTagResultClass::DoPrepare(soci::statement& stmt, bool do
 }
 
 t4p::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
-	: ExactNonMemberTagResultClass() 
+	: ExactNonMemberTagResultClass()
 	, KeyUpper() {
 
 }
@@ -500,8 +500,8 @@ t4p::NearMatchNonMemberTagResultClass::NearMatchNonMemberTagResultClass()
 void t4p::NearMatchNonMemberTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
 	Key = t4p::IcuToChar(key);
 	KeyUpper = t4p::IcuToChar(key) + "zzzzzzzzzz";
-	
-	// add trailing separator to lookup exact matches that include the last directory 
+
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -528,14 +528,14 @@ bool t4p::NearMatchNonMemberTagResultClass::DoPrepare(soci::statement& stmt, boo
 	sql += " key BETWEEN ? AND ? ";
 	sql += " AND r.type IN(?";
 	for (size_t i = 1; i < TagTypes.size(); ++i) {
-		sql += ",?"; 
+		sql += ",?";
 	}
 	sql += ")";
 
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i < SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -559,18 +559,18 @@ t4p::ExactMemberOnlyTagResultClass::ExactMemberOnlyTagResultClass()
 	: TagResultClass()
 	, Key()
 	, TagTypes()
-	, SourceDirs() 
+	, SourceDirs()
 	, OnlyStatic(false) {
 	TagTypes.push_back(t4p::PhpTagClass::CLASS_CONSTANT);
 	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
 	TagTypes.push_back(t4p::PhpTagClass::METHOD);
 }
 
-void t4p::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName, 
+void t4p::ExactMemberOnlyTagResultClass::Set(const UnicodeString& memberName,
 											   const std::vector<wxFileName>& sourceDirs) {
 	Key = t4p::IcuToChar(memberName);
-	
-	// add trailing separator to lookup exact matches that include the last directory 
+
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -597,23 +597,23 @@ bool t4p::ExactMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
-	
+
 	// make sure to use the key because it is indexed
 	sql += "key = ? AND identifier = key";
 	sql += " AND type IN(?";
 	for (size_t i = 1; i <  TagTypes.size(); ++i) {
-		sql += ",?"; 
+		sql += ",?";
 	}
 	sql += ")";
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
 	if (OnlyStatic) {
-		sql += " AND is_static = 1"; 
+		sql += " AND is_static = 1";
 	}
 	sql += " ORDER BY key";
 	if (doLimit) {
@@ -632,7 +632,7 @@ bool t4p::ExactMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt,  bool 
 }
 
 t4p::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
-: ExactMemberOnlyTagResultClass() 
+: ExactMemberOnlyTagResultClass()
 , KeyUpper() {
 
 }
@@ -640,8 +640,8 @@ t4p::NearMatchMemberOnlyTagResultClass::NearMatchMemberOnlyTagResultClass()
 void t4p::NearMatchMemberOnlyTagResultClass::Set(const UnicodeString& key, const std::vector<wxFileName>& sourceDirs) {
 	Key = t4p::IcuToChar(key);
 	KeyUpper = t4p::IcuToChar(key) + "zzzzzzzzzz";
-	
-	// add trailing separator to lookup exact matches that include the last directory 
+
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -655,7 +655,7 @@ bool t4p::NearMatchMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt, bo
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) LEFT JOIN sources s ON(s.source_id = r.source_id) WHERE ";
-	
+
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
 	// see http://sqlite.org/optoverview.html (LIKE optimization)
@@ -666,7 +666,7 @@ bool t4p::NearMatchMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt, bo
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i <  SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -688,7 +688,7 @@ bool t4p::NearMatchMemberOnlyTagResultClass::DoPrepare(soci::statement& stmt, bo
 
 t4p::TopLevelTagInFileResultClass::TopLevelTagInFileResultClass()
 	: TagResultClass()
-	, FullPath() 
+	, FullPath()
 	, TagTypes() {
 	TagTypes.push_back(t4p::PhpTagClass::CLASS);
 	TagTypes.push_back(t4p::PhpTagClass::FUNCTION);
@@ -700,7 +700,7 @@ void t4p::TopLevelTagInFileResultClass::Set(const wxString& fullPath) {
 }
 
 bool t4p::TopLevelTagInFileResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	// remove the duplicates from fully qualified namespaces
 	// fully qualified classes / functions will start with backslash; but we want the
@@ -710,7 +710,7 @@ bool t4p::TopLevelTagInFileResultClass::DoPrepare(soci::statement& stmt, bool do
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON(r.file_item_id = f.file_item_id) WHERE ";
 	sql += "f.full_path = ? AND Type IN(?, ?, ?) AND key NOT LIKE '\\%' ORDER BY key ";
-	
+
 	stmt.prepare(sql);
 	stmt.exchange(soci::use(FullPath));
 	for (size_t i = 0; i < TagTypes.size(); i++) {
@@ -729,7 +729,7 @@ bool t4p::AllTagsResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	sql += "SELECT r.id, r.file_item_id, r.source_id, key, identifier, class_name, type, namespace_name, signature, return_type, comment, f.full_path, ";
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id)";
-	
+
 	stmt.prepare(sql);
 	return true;
 }
@@ -750,7 +750,7 @@ bool t4p::TagByIdResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	sql += "is_protected, is_private, is_static, is_dynamic, is_native, has_variable_args, is_new ";
 	sql += "FROM resources r LEFT JOIN file_items f ON (f.file_item_id = r.file_item_id) ";
 	sql += "WHERE r.id = ?";
-	
+
 	stmt.prepare(sql);
 	stmt.exchange(soci::use(Id));
 	return true;
@@ -761,7 +761,7 @@ t4p::FileTagResultClass::FileTagResultClass()
 	: SqliteResultClass()
 	, FileTag()
 	, SourceDirs()
-	, FilePart() 
+	, FilePart()
 	, LineNumber(0)
 	, ExactMatch(false)
 	, FileTagId(0)
@@ -779,8 +779,8 @@ void t4p::FileTagResultClass::Next() {
 void t4p::FileTagResultClass::Set(const UnicodeString& filePart, int lineNumber, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
 	FilePart = t4p::IcuToChar(filePart);
 	LineNumber = lineNumber;
-	
-	// add trailing separator to lookup exact matches that include the last directory 
+
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -808,7 +808,7 @@ bool t4p::FileTagResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	if (!SourceDirs.empty()) {
 		sql += " AND s.directory IN(?";
 		for (size_t i = 1; i < SourceDirs.size(); ++i) {
-			sql += ",?"; 
+			sql += ",?";
 		}
 		sql += ")";
 	}
@@ -820,7 +820,7 @@ bool t4p::FileTagResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	try {
 		stmt.prepare(sql);
 		if (ExactMatch) {
-			
+
 			// yes this is correct; there are 2 input params
 			// that use the file name
 			stmt.exchange(soci::use(FilePart));
@@ -934,7 +934,7 @@ void t4p::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames,
 		Keys.push_back(t4p::IcuToChar(classNames[i]));
 	}
 
-	// add trailing separator to lookup exact matches that include the last directory 
+	// add trailing separator to lookup exact matches that include the last directory
 	// we dont want to get directories that start with a prefix
 	for (size_t i = 0; i < sourceDirs.size(); i++) {
 		SourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
@@ -1002,11 +1002,11 @@ void t4p::TraitTagResultClass::Next() {
 	TraitTag.NamespaceName = t4p::CharToIcu(NamespaceName.c_str());
 	TraitTag.TraitClassName = t4p::CharToIcu(TraitClassName.c_str());
 	TraitTag.TraitNamespaceName = t4p::CharToIcu(TraitNamespaceName.c_str());
-	
+
 	size_t start = 0;
 	size_t found = Aliases.find_first_of(",");
 	while (found != std::string::npos) {
-		TraitTag.Aliased.push_back(t4p::CharToIcu(Aliases.substr(start, found).c_str()));	
+		TraitTag.Aliased.push_back(t4p::CharToIcu(Aliases.substr(start, found).c_str()));
 		start = found++;
 	}
 	if (!Aliases.empty()) {
@@ -1016,7 +1016,7 @@ void t4p::TraitTagResultClass::Next() {
 	start = 0;
 	found = InsteadOfs.find_first_of(",");
 	while (found != std::string::npos) {
-		TraitTag.InsteadOfs.push_back(t4p::CharToIcu(InsteadOfs.substr(start, found).c_str()));	
+		TraitTag.InsteadOfs.push_back(t4p::CharToIcu(InsteadOfs.substr(start, found).c_str()));
 		start = found++;
 	}
 	if (!InsteadOfs.empty()) {
@@ -1056,7 +1056,7 @@ std::vector<t4p::PhpTagClass> t4p::TraitTagResultClass::MatchesAsTags() {
 }
 
 t4p::FunctionLookupClass::FunctionLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , FunctionName()
 , TagType(0)
 , Id(0) {
@@ -1066,12 +1066,12 @@ t4p::FunctionLookupClass::FunctionLookupClass()
 void t4p::FunctionLookupClass::Set(const UnicodeString& functionName) {
 	FunctionName = t4p::IcuToChar(functionName);
 }
-	
+
 bool t4p::FunctionLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT id FROM resources WHERE key = ? AND type = ?";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(FunctionName));
 		stmt.exchange(soci::use(TagType));
@@ -1088,7 +1088,7 @@ void t4p::FunctionLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::FunctionLookupClass::Next() {
-	
+
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
@@ -1099,7 +1099,7 @@ bool t4p::FunctionLookupClass::Found() {
 }
 
 t4p::ClassLookupClass::ClassLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , ClassName()
 , TagType(0)
 , Id(0) {
@@ -1109,12 +1109,12 @@ t4p::ClassLookupClass::ClassLookupClass()
 void t4p::ClassLookupClass::Set(const UnicodeString& className) {
 	ClassName = t4p::IcuToChar(className);
 }
-	
+
 bool t4p::ClassLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT id FROM resources WHERE key = ? AND type = ?";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(ClassName));
 		stmt.exchange(soci::use(TagType));
@@ -1131,7 +1131,7 @@ void t4p::ClassLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::ClassLookupClass::Next() {
-	
+
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
@@ -1143,7 +1143,7 @@ bool t4p::ClassLookupClass::Found() {
 
 
 t4p::NamespaceLookupClass::NamespaceLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , NamespaceName()
 , TagType(0)
 , Id(0) {
@@ -1153,12 +1153,12 @@ t4p::NamespaceLookupClass::NamespaceLookupClass()
 void t4p::NamespaceLookupClass::Set(const UnicodeString& namespaceName) {
 	NamespaceName = t4p::IcuToChar(namespaceName);
 }
-	
+
 bool t4p::NamespaceLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT id FROM resources WHERE key = ? AND type = ?";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(NamespaceName));
 		stmt.exchange(soci::use(TagType));
@@ -1175,7 +1175,7 @@ void t4p::NamespaceLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::NamespaceLookupClass::Next() {
-	
+
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
@@ -1186,7 +1186,7 @@ bool t4p::NamespaceLookupClass::Found() {
 }
 
 t4p::MethodLookupClass::MethodLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , MethodName()
 , TagType(0)
 , IsStaticTrue(0)
@@ -1206,20 +1206,20 @@ void t4p::MethodLookupClass::Set(const UnicodeString& methodName, bool isStatic)
 		IsStaticFalse = 0;
 	}
 }
-	
+
 bool t4p::MethodLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// we use two conditions for is_static
 	// because the semantics of the query are that
 	// if we don't want static methods, then we want to query
-	// for both static and instance methods.  Further, we 
+	// for both static and instance methods.  Further, we
 	// don't want the query to change when the isStatic flag changes
 	// otherwise we would need to re-prepare the statement (and negate
 	// any performance improvement)
 	std::string sql = "SELECT id FROM resources WHERE key = ? AND type = ? AND is_static IN(?, ?)";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(MethodName));
 		stmt.exchange(soci::use(TagType));
@@ -1238,7 +1238,7 @@ void t4p::MethodLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::MethodLookupClass::Next() {
-	
+
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
@@ -1250,7 +1250,7 @@ bool t4p::MethodLookupClass::Found() {
 
 
 t4p::PropertyLookupClass::PropertyLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , PropertyName()
 , TagTypeMember(0)
 , TagTypeConstant(0)
@@ -1272,20 +1272,20 @@ void t4p::PropertyLookupClass::Set(const UnicodeString& propertyName, bool isSta
 		IsStaticFalse = 0;
 	}
 }
-	
+
 bool t4p::PropertyLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// we use two conditions for is_static
 	// because the semantics of the query are that
 	// if we don't want static methods, then we want to query
-	// for both static and instance methods.  Further, we 
+	// for both static and instance methods.  Further, we
 	// don't want the query to change when the isStatic flag changes
 	// otherwise we would need to re-prepare the statement (and negate
 	// any performance improvement)
 	std::string sql = "SELECT id FROM resources WHERE key = ? AND type IN(?, ?) AND is_static IN(?, ?)";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(PropertyName));
 		stmt.exchange(soci::use(TagTypeMember));
@@ -1305,7 +1305,7 @@ void t4p::PropertyLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::PropertyLookupClass::Next() {
-	
+
 	// nothing else as variable is already bound
 	// fetch gets the next row
 	Fetch();
@@ -1316,12 +1316,12 @@ bool t4p::PropertyLookupClass::Found() {
 }
 
 t4p::FunctionSignatureLookupClass::FunctionSignatureLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , Signature()
 , HasVariableArgs(false)
 , FunctionName()
 , TagType(0)
-, Id(0) 
+, Id(0)
 , RowHasVariableArgs(0)
 , StdSignature() {
 	TagType = t4p::PhpTagClass::FUNCTION;
@@ -1330,12 +1330,12 @@ t4p::FunctionSignatureLookupClass::FunctionSignatureLookupClass()
 void t4p::FunctionSignatureLookupClass::Set(const UnicodeString& functionName) {
 	FunctionName = t4p::IcuToChar(functionName);
 }
-	
+
 bool t4p::FunctionSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 	std::string sql = "SELECT id, has_variable_args, signature FROM resources WHERE key = ? AND type = ?";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(FunctionName));
 		stmt.exchange(soci::use(TagType));
@@ -1354,7 +1354,7 @@ void t4p::FunctionSignatureLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::FunctionSignatureLookupClass::Next() {
-	
+
 	// very important to assign to instance variables
 	// AND THEN fetch the next row, what way
 	// we can do this when looping
@@ -1369,7 +1369,7 @@ void t4p::FunctionSignatureLookupClass::Next() {
 	// }
 	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
-	
+
 	Fetch();
 }
 
@@ -1378,14 +1378,14 @@ bool t4p::FunctionSignatureLookupClass::Found() {
 }
 
 t4p::MethodSignatureLookupClass::MethodSignatureLookupClass()
-: t4p::SqliteResultClass() 
+: t4p::SqliteResultClass()
 , Signature()
 , HasVariableArgs(false)
 , MethodName()
 , IsStaticTrue(0)
 , IsStaticFalse(0)
 , TagType(0)
-, Id(0) 
+, Id(0)
 , StdSignature() {
 	TagType = t4p::PhpTagClass::METHOD;
 }
@@ -1401,13 +1401,13 @@ void t4p::MethodSignatureLookupClass::Set(const UnicodeString& methodName, bool 
 		IsStaticFalse = 0;
 	}
 }
-	
+
 bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// we use two conditions for is_static
 	// because the semantics of the query are that
 	// if we don't want static methods, then we want to query
-	// for both static and instance methods.  Further, we 
+	// for both static and instance methods.  Further, we
 	// don't want the query to change when the isStatic flag changes
 	// otherwise we would need to re-prepare the statement (and negate
 	// any performance improvement)
@@ -1416,7 +1416,7 @@ bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLi
 	sql += "WHERE key = ? AND type = ? AND is_static IN(?, ?)";
 	bool good = false;
 	wxString error;
-	try {	
+	try {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(MethodName));
 		stmt.exchange(soci::use(TagType));
@@ -1437,7 +1437,7 @@ void t4p::MethodSignatureLookupClass::DoBind(soci::statement& stmt) {
 }
 
 void t4p::MethodSignatureLookupClass::Next() {
-	
+
 	// very important to assign to instance variables
 	// AND THEN fetch the next row, what way
 	// we can do this when looping
@@ -1452,7 +1452,7 @@ void t4p::MethodSignatureLookupClass::Next() {
 	// }
 	HasVariableArgs = RowHasVariableArgs > 0;
 	Signature = t4p::CharToIcu(StdSignature.c_str());
-	
+
 	Fetch();
 }
 
@@ -1494,7 +1494,7 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		ResourceType = CLASS_NAME_METHOD_NAME;
 	}
 	else if (namespacePos >= 0) {
-		
+
 		// query has a namespace, parse it out
 		// note that the last identifier after the final backslash is the class name
 		// make sure to account for the root namespace ie '\Exception'
@@ -1516,7 +1516,7 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		ResourceType = CLASS_NAME_METHOD_NAME;
 	}
 	else if (colonPos >= 0) {
-		
+
 		// : => filename : line number
 		UnicodeString after(resourceQuery, colonPos + 1);
 		Formattable fmtable((int32_t)0);
@@ -1536,12 +1536,12 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 
 		// class names can only have alphanumerics or underscores
 		UnicodeString symbols = UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?");
-		
+
 		// not using getTerminatedBuffer() because that method triggers valgrind warnings
 		UChar* queryBuf = new UChar[resourceQuery.length() + 1];
 		u_memmove(queryBuf, resourceQuery.getBuffer(), resourceQuery.length());
 		queryBuf[resourceQuery.length()] = '\0';
-	
+
 		UChar* symbolBuf = new UChar[symbols.length() + 1];
 		u_memmove(symbolBuf, symbols.getBuffer(), symbols.length());
 		symbolBuf[symbols.length()] = '\0';
@@ -1585,7 +1585,7 @@ int t4p::TagSearchClass::GetFileItemId() const {
 
 std::vector<UnicodeString> t4p::TagSearchClass::GetClassHierarchy() const {
 	std::vector<UnicodeString> allClassNames;
-	if (!ClassName.isEmpty()) { 
+	if (!ClassName.isEmpty()) {
 		allClassNames.push_back(ClassName);
 	}
 	allClassNames.insert(allClassNames.end(), ParentClasses.begin(), ParentClasses.end());
@@ -1627,7 +1627,7 @@ UnicodeString t4p::TagSearchClass::GetNamespaceName() const {
 }
 
 t4p::TagResultClass* t4p::TagSearchClass::CreateExactResults() const {
-	t4p::TagResultClass* results = NULL; 
+	t4p::TagResultClass* results = NULL;
 	if (GetResourceType() == t4p::TagSearchClass::CLASS_NAME_METHOD_NAME) {
 		t4p::ExactMemberTagResultClass* memberResults = new t4p::ExactMemberTagResultClass();
 
@@ -1636,7 +1636,7 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateExactResults() const {
 		std::vector<UnicodeString> classHierarchy = GetParentClasses();
 		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 		classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
-		
+
 		memberResults->Set(classHierarchy, GetMethodName(), GetSourceDirs());
 		results = memberResults;
 	}
@@ -1662,7 +1662,7 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateExactResults() const {
 }
 
 t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
-	t4p::TagResultClass* results = NULL; 
+	t4p::TagResultClass* results = NULL;
 	if (t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType() && !GetClassName().isEmpty()) {
 		t4p::NearMatchMemberTagResultClass* nearMatchMembersResult = new t4p::NearMatchMemberTagResultClass();
 
@@ -1696,7 +1696,7 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
 		nearMatchNonMemberNamespaced->Set(namespaceKey, GetSourceDirs());
 		nearMatchNonMemberNamespaced->AddTagType(t4p::PhpTagClass::NAMESPACE);
 		results = nearMatchNonMemberNamespaced;
-	} 
+	}
 	else if (!ClassName.isEmpty()) {
 		UnicodeString key;
 		// if query does not have a namespace then get the non-namespaced tags
@@ -1777,7 +1777,7 @@ t4p::FileTagResultClass* t4p::TagSearchClass::CreateNearMatchFileResults() const
 	return result;
 }
 
-t4p::TagResultClass::TagResultClass() 
+t4p::TagResultClass::TagResultClass()
 	: SqliteResultClass()
 	, Tag()
 	, Id(0)
@@ -1826,7 +1826,7 @@ void t4p::TagResultClass::DoBind(soci::statement& stmt) {
 		stmt.exchange(soci::into(IsNative));
 		stmt.exchange(soci::into(HasVariableArgs));
 		stmt.exchange(soci::into(FileIsNew, FileIsNewIndicator));
-		
+
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1874,7 +1874,7 @@ std::vector<t4p::PhpTagClass> t4p::TagResultClass::Matches() {
 	return matches;
 }
 
-bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass& tag, const UnicodeString& text, int32_t& pos, 
+bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass& tag, const UnicodeString& text, int32_t& pos,
 		int32_t& length) {
 	size_t start = 0;
 	t4p::FinderClass finder;
@@ -1900,7 +1900,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 		case t4p::PhpTagClass::METHOD:
 			//advance past the class header so that if  a function with the same name exists we will skip it
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-			if (finder.Prepare() && finder.FindNext(text, start)) {			
+			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
 			}
 			start = pos + length;
@@ -1916,7 +1916,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 		case t4p::PhpTagClass::MEMBER:
 			//advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-			if (finder.Prepare() && finder.FindNext(text, start)) {			
+			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
 			}
 			start = pos + length;
@@ -1928,7 +1928,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 		case t4p::PhpTagClass::CLASS_CONSTANT:
 			//advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
-			if (finder.Prepare() && finder.FindNext(text, start)) {			
+			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
 			}
 			start = pos + length;
@@ -1989,7 +1989,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchClassesOrFiles
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const t4p::TagSearchClass& tagSearch) {
 	std::vector<t4p::PhpTagClass> matches;
-	
+
 	// when looking for members we need to look
 	// 1. in the class itself
 	// 2. in any parent classes
@@ -2008,11 +2008,11 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 	std::vector<UnicodeString> traits = tagSearch.GetTraits();
 	classesToSearch.insert(classesToSearch.end(), traits.begin(), traits.end());
 	if (tagSearch.GetMethodName().isEmpty()) {
-		
+
 		// special case; query for all methods for a class (UserClass::)
 		t4p::AllMembersTagResultClass allMembersResult;
 		allMembersResult.Set(classesToSearch, UNICODE_STRING_SIMPLE(""), tagSearch.GetSourceDirs());
-		
+
 		// do not limit, a class may have more than 100 members
 		allMembersResult.Exec(Session, false);
 		std::vector<t4p::PhpTagClass> memberMatches = allMembersResult.Matches();
@@ -2020,9 +2020,9 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
 	}
 	else if (tagSearch.GetClassName().isEmpty()) {
-		
+
 		// special case, query across all classes for a method (::getName)
-		// if ClassName is empty, then just check method names This ensures 
+		// if ClassName is empty, then just check method names This ensures
 		// queries like '::getName' will work as well.
 		// make sure to NOT get fully qualified  matches (key=identifier)
 		t4p::ExactMemberOnlyTagResultClass exactResult;
@@ -2047,14 +2047,14 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		t4p::NearMatchMemberTagResultClass nearMatchMemberResult;
 		nearMatchMemberResult.SetNearMatchArgs(classesToSearch, tagSearch.GetMethodName(), tagSearch.GetFileItemId(), tagSearch.GetSourceDirs());
 		nearMatchMemberResult.Exec(Session, true);
-		matches = nearMatchMemberResult.Matches();			
+		matches = nearMatchMemberResult.Matches();
 	}
 	return matches;
 }
 
 UnicodeString t4p::ParsedTagFinderClass::ParentClassName(const UnicodeString& fullyQualifiedClassName, int fileTagId) {
 	UnicodeString parentClassName;
-	
+
 	// empty file items == search on all files
 	std::vector<wxFileName> sourceDirs;
 	t4p::ExactNonMemberTagResultClass exactResult;
@@ -2070,11 +2070,11 @@ UnicodeString t4p::ParsedTagFinderClass::ParentClassName(const UnicodeString& fu
 	return parentClassName;
 }
 
-std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const UnicodeString& className, 
+std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const UnicodeString& className,
 																		const UnicodeString& methodName,
 																		const std::vector<wxFileName>& sourceDirs) {
 	std::vector<UnicodeString> inheritedTraits;
-	
+
 	std::vector<UnicodeString> classNames;
 	classNames.push_back(className);
 
@@ -2085,8 +2085,8 @@ std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const Un
 			traitResult.Next();
 			t4p::TraitTagClass trait = traitResult.TraitTag;
 			UnicodeString fullyQualifiedTrait = QualifyName(trait.TraitNamespaceName, trait.TraitClassName);
-			
-			// trait is used unless there is an explicit insteadof 
+
+			// trait is used unless there is an explicit insteadof
 			bool match = true;
 			for (size_t j = 0; j < trait.InsteadOfs.size(); ++j) {
 				if (trait.InsteadOfs[j].caseCompare(fullyQualifiedTrait, 0) == 0) {
@@ -2099,7 +2099,7 @@ std::vector<UnicodeString> t4p::ParsedTagFinderClass::GetResourceTraits(const Un
 			}
 		}
 	}
-	
+
 	// we will get duplicate traits, since we looped over get the trait methods
 	// not just the traits
 	// lets remove all dups
@@ -2144,7 +2144,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const 
 	// is called while the user is typing text.
 	// take care when coding; make sure that any code called by this method does not touch the file system
 	std::vector<t4p::PhpTagClass> allMatches;
-	if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() || 
+	if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType() ||
 		t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
 		t4p::FileTagResultClass fileTagResult;
 		fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), true, tagSearch.GetSourceDirs());
@@ -2162,48 +2162,48 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const 
 }
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClass(const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::PhpTagClass> allMatches;	
+	std::vector<t4p::PhpTagClass> allMatches;
 	t4p::ExactNonMemberTagResultClass exactResult;
 	exactResult.SetTagType(t4p::PhpTagClass::CLASS);
-	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName()); 
+	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
-	
+
 	return allMatches;
 }
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactFunction(const t4p::TagSearchClass& tagSearch) {
-	std::vector<t4p::PhpTagClass> allMatches;	
+	std::vector<t4p::PhpTagClass> allMatches;
 	t4p::ExactNonMemberTagResultClass exactResult;
 	exactResult.SetTagType(t4p::PhpTagClass::FUNCTION);
 	UnicodeString fullName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
 	exactResult.Set(fullName, tagSearch.GetSourceDirs());
 	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
-	
+
 	return allMatches;
 }
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactMethod(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<t4p::PhpTagClass> allMatches;	
+	std::vector<t4p::PhpTagClass> allMatches;
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetMethodType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
-	
+
 	return allMatches;
 }
 
 std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactProperty(const t4p::TagSearchClass& tagSearch, bool onlyStatic) {
-	std::vector<t4p::PhpTagClass> allMatches;	
+	std::vector<t4p::PhpTagClass> allMatches;
 	t4p::ExactMemberOnlyTagResultClass exactResult;
 	exactResult.SetPropertyType(onlyStatic);
 	exactResult.Set(tagSearch.GetMethodName(), tagSearch.GetSourceDirs());
 	exactResult.Exec(Session, true);
 	allMatches = exactResult.Matches();
-	
+
 	return allMatches;
 }
 
@@ -2333,7 +2333,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::All() {
 			// fully qualified methods
 		}
 		else if (result.Tag.Type != t4p::PhpTagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
-			
+
 			// fully qualified classes / functions (with namespace)
 		}
 		else {

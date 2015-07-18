@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@ t4p::EditorMessagesPanelClass::EditorMessagesPanelClass(wxWindow* parent, int id
 	Grid->DeleteRows(0, rowCount);
 	int colCount = Grid->GetNumberCols();
 	Grid->DeleteCols(0, colCount);
-	
+
 	Grid->AppendCols(4);
 	Grid->SetColLabelValue(0, _("Message"));
 	Grid->SetColLabelValue(1, _("Fix"));
@@ -51,13 +51,13 @@ void t4p::EditorMessagesPanelClass::OnClearButton(wxCommandEvent& event) {
 }
 
 void t4p::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
-	
+
 	// put a bound on the number of messages to display
 	int maxRows = 1000;
 	if (Grid->GetNumberRows() > maxRows) {
 		Grid->DeleteRows(0, 1);
 	}
-	wxString error, 
+	wxString error,
 		fix,
 		levelString,
 		dateString;
@@ -106,7 +106,7 @@ t4p::EditorMessagesViewClass::EditorMessagesViewClass()
 }
 
 void t4p::EditorMessagesViewClass::AddViewMenuItems(wxMenu *viewMenu) {
-	viewMenu->Append(t4p::MENU_EDITOR_MESSAGES, _("Editor Messages"), 
+	viewMenu->Append(t4p::MENU_EDITOR_MESSAGES, _("Editor Messages"),
 		_("Editor Messages"));
 }
 
@@ -128,15 +128,15 @@ void t4p::EditorMessagesViewClass::OnAppLog(t4p::EditorLogEventClass& evt) {
 
 void t4p::EditorMessagesViewClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
 
-	// in MSW ignore log messages dealting with SetFocus() 
-	// If we don't ignore this, the app will stack overflow when the app is minized 
+	// in MSW ignore log messages dealting with SetFocus()
+	// If we don't ignore this, the app will stack overflow when the app is minized
 	// and later restored.
 	// Best guess at explaining why this is happening:
 	// When the app is restored after being minized, the app is given focus but this
 	// results in a debug message ("SetFocus failed"....) When the debug message
 	// is triggered, this method (AddMessage) is called. Now, we try
 	// to add the warning to the panel and set the focus to the messages panel. This
-	// new call to focus on the panel in turn triggers another ("SetFocus failed"....) 
+	// new call to focus on the panel in turn triggers another ("SetFocus failed"....)
 	// debug message; which in turn calls this method again. And the cycle never
 	// stops.
 	//

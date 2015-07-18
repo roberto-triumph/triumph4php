@@ -35,10 +35,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FindInFilesDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FindInFilesDialogGeneratedClass : public wxDialog 
+class FindInFilesDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -47,7 +47,7 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 			ID_REPLACEWITHTEXT,
 			ID_FILESFILTER,
 		};
-		
+
 		wxStaticText* FindLabel;
 		wxButton* RegExFindHelpButton;
 		wxComboBox* FindText;
@@ -62,7 +62,7 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
@@ -72,43 +72,43 @@ class FindInFilesDialogGeneratedClass : public wxDialog
 		virtual void OnKillFocusReplaceText( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnDirChanged( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		FindInFilesDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find In Files"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~FindInFilesDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FindInFilesHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FindInFilesHelpDialogGeneratedClass : public wxDialog 
+class FindInFilesHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-	
+
 	public:
-		
+
 		FindInFilesHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Find In Files Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~FindInFilesHelpDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FindInFilesResultsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FindInFilesResultsPanelGeneratedClass : public wxPanel 
+class FindInFilesResultsPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -122,7 +122,7 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 			ID_REPLACETEXT,
 			ID_RESULTS_LIST,
 		};
-		
+
 		wxBitmapButton* ReplaceButton;
 		wxBitmapButton* ReplaceAllInFileButton;
 		wxBitmapButton* ReplaceInAllFilesButton;
@@ -137,7 +137,7 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 		wxStaticText* FindLabel;
 		wxStaticText* ResultText;
 		wxDataViewListCtrl* ResultsList;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnReplaceButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReplaceAllInFileButton( wxCommandEvent& event ) { event.Skip(); }
@@ -149,13 +149,13 @@ class FindInFilesResultsPanelGeneratedClass : public wxPanel
 		virtual void OnStopButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRegExReplaceHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnKillFocusReplaceText( wxFocusEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		FindInFilesResultsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 810,255 ), long style = wxTAB_TRAVERSAL );
 		~FindInFilesResultsPanelGeneratedClass();
-	
+
 };
 
 #endif //__FindInFilesFeatureForms__

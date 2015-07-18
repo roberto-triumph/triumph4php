@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ namespace t4p {
  * use our own function to convert string to key codes
  * because the wxKeyBinder function does not handle
  * converting  LEFT, RIGHT arrow keys to the correct key code
- * 
+ *
  * See http://sourceforge.net/p/wxcode/patches/39/
  *
  * @param string the string representation of a shortcut ie. "CTRL+SHIFT+A"
@@ -54,9 +54,9 @@ void ShortcutStringToKeyCode(const wxString& str, int& modifiers, int& keyCode);
 wxString KeyCodeToShortcutString(int modifiers, int keyCode);
 
 /**
- * This is a class that will Triumph will use to manage keyboard shortcuts.  
+ * This is a class that will Triumph will use to manage keyboard shortcuts.
  * Default functionality of the Keybinder classes is not sufficient because
- * (1) Triumph menus are dynamic; they can be updated or removed when new 
+ * (1) Triumph menus are dynamic; they can be updated or removed when new
  *     features
  * (2) Triumph menus can even change for different projects; we would like
  *     shortcuts to tolerant of menu items is not being attached to the menu bar.
@@ -70,7 +70,7 @@ public:
 
 	/**
 	 *
-	 * @param item the menu item. This class will NOT own the pointer 
+	 * @param item the menu item. This class will NOT own the pointer
 	 *        the menu item's ID need not be consistent across application
 	 *        runs, but it must be unique (use wxNewId() function)
 	 * @param identifier this is a string that is unique across the application.
@@ -84,7 +84,7 @@ public:
 	/**
 	 * Add a key mapping to this command.  More than one can be added by calling this function
 	 * multiple times.
-	 * @param key the shortcut string to add (ie. CTRL+4, SHIFT+CTRL+P). See wxKeyBind for 
+	 * @param key the shortcut string to add (ie. CTRL+4, SHIFT+CTRL+P). See wxKeyBind for
 	 *  details on this string.
 	 */
 	void AddShortcut(const wxString& key);
@@ -138,7 +138,7 @@ public:
 	 * Construct preferences. Creates on keyboard profile.
 	 */
 	PreferencesClass();
-	
+
 	/**
 	 * Cleanup (delete) the keyboard profile pointers
 	 */
@@ -148,10 +148,10 @@ public:
 	 * initalizes the preferences
 	 */
 	void Init();
-	
+
 	/**
 	 * Load the preferences from persistent storage.
-	 * 
+	 *
 	 * @param wxConfigBase* config the config object to load info from
 	 * @param wxFrame* we need a frame so we can attach keyboard listeners to it.
 	 */
@@ -162,7 +162,7 @@ public:
 	 * file that was changed externally.
 	 */
 	void ClearAllShortcuts();
-	
+
 	/**
 	 * Save the preferences to persistent storage.
 	 */
@@ -185,11 +185,11 @@ public:
 	 * 2. config file already exists: in this case the config object is initialized
 	 *    with the settings from the file.
 	 * 3. config file does not exist and the config directory is set to a non-existing
-	 *    directory: in this case, the config object is initialized to the 
+	 *    directory: in this case, the config object is initialized to the
 	 *    default settings, and this method return false. The config object
 	 *    is initialized to a temporary config file that is only used in this case.
 	 *
-	 * @return bool false if the settings DIRECTORY does not exist, this means that 
+	 * @return bool false if the settings DIRECTORY does not exist, this means that
 	 *         the config file cannot be written.
 	 *
 	 */
@@ -199,16 +199,16 @@ public:
 	 * Set the settings directory.  This will
 	 * - write the settingsDir to the bootstrap config file
 	 * - delete the old wxConfig global pointer (in-memory config)
-	 * - create a new wxFileConfig object 
+	 * - create a new wxFileConfig object
 	 * - set the global wxConfig  pointer
 	 *
 	 * @param settingsDir the new directory where settings will be stored
 	 */
 	void SetSettingsDir(const wxFileName& settingsDir);
-		
+
 	/**
 	 * The options for the source code editor
-	 * 
+	 *
 	 * @var CodeControlOptionsClass
 	 */
 	CodeControlOptionsClass CodeControlOptions;
@@ -217,26 +217,26 @@ public:
 	 * The default keyboard shortcuts. These will never change; they will be used
 	 * as a 'template' of sorts to create the multiple wxKeyProfile objects
 	 * in the KeyProfiles array
-	 * 
+	 *
 	 * @var std::vector<DynamicCmdClass>
 	 */
 	std::vector<DynamicCmdClass> DefaultKeyboardShortcutCmds;
-	
+
 	/**
-	 * The keyboard shortcuts. Each 'set' consists of the default 
-	 * shortcuts; but each set will have the same commands but may have 
+	 * The keyboard shortcuts. Each 'set' consists of the default
+	 * shortcuts; but each set will have the same commands but may have
 	 * different key bindings for each command.  For example, "File-Open"
 	 * command may be bound to "CTRL+O" on one set but it may be bound to
 	 * "CTRL+SHIFT+O" on another set.
-	 * 
+	 *
 	 * @var wxKeyProfileArray
 	 */
 	wxKeyProfileArray KeyProfiles;
-	
+
 	/**
 	 * this font is used for application windows and dialogs OTHER THAN the source code
 	 * window (source code window font is controlled by CodeControlOptionsClass).
-	 * 
+	 *
 	 * ATTN: at this time we won't let the user change this; I have not found a way to have the font
 	 * changes apply to all windows /panels that are already
 	 * drawn on the screen

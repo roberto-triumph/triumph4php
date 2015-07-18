@@ -34,10 +34,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class OutlineViewGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class OutlineViewGeneratedPanelClass : public wxPanel 
+class OutlineViewGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -46,7 +46,7 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 			ID_ADDBUTTON,
 			ID_TREE,
 		};
-		
+
 		wxStaticText* StatusLabel;
 		wxBitmapButton* AddButton;
 		wxBitmapButton* SortButton;
@@ -54,7 +54,7 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 		wxBitmapButton* SyncButton;
 		wxBitmapButton* HelpButton;
 		wxTreeCtrl* Tree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSortLeftDown( wxMouseEvent& event ) { event.Skip(); }
@@ -63,22 +63,22 @@ class OutlineViewGeneratedPanelClass : public wxPanel
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemRightClick( wxTreeEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		OutlineViewGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_OUTLINEVIEWGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 502,657 ), long style = wxTAB_TRAVERSAL );
 		~OutlineViewGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FileSearchDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FileSearchDialogGeneratedClass : public wxDialog 
+class FileSearchDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -90,7 +90,7 @@ class FileSearchDialogGeneratedClass : public wxDialog
 			ID_MATCHESLABEL,
 			ID_MATCHESLIST,
 		};
-		
+
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
 		wxStaticText* ProjectLabel;
@@ -100,7 +100,7 @@ class FileSearchDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchText( wxCommandEvent& event ) { event.Skip(); }
@@ -109,13 +109,13 @@ class FileSearchDialogGeneratedClass : public wxDialog
 		virtual void OnMatchesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMatchesListKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		FileSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = ID_FILESEARCHDIALOGGENERATEDCLASS, const wxString& title = _("File Search"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 559,295 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~FileSearchDialogGeneratedClass();
-	
+
 };
 
 #endif //__OutlineViewFeatureForms__

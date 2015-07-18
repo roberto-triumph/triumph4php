@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -81,7 +81,7 @@ protected:
 private:
 
 	/**
-	 * List of commands that are bound to this dialog. They will only be 
+	 * List of commands that are bound to this dialog. They will only be
 	 * modified when the user clicks OK
 	 */
 	std::vector<t4p::CliCommandClass>& Commands;
@@ -90,25 +90,25 @@ private:
 	 * List of commands that the user modifies.
 	 */
 	std::vector<t4p::CliCommandClass> EditedCommands;
-	
+
 	/**
-	 * populates the Commands listbox using the data 
+	 * populates the Commands listbox using the data
 	 * from Commands
 	 */
 	void FillList();
-	
+
 };
-	
+
 class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
 protected:
-	
+
 	/**
 	 * Handle the clear button.
 	 */
 	void OnClear(wxCommandEvent& event);
 
 public:
-	
+
 	/*
 	 * @param parent the parent of this pane
 	 * @param id window ID
@@ -122,18 +122,18 @@ public:
 
 	/**
 	 * Set to run the given command
-	 * 
+	 *
 	 * @param cmdLine entire command line to run
 	 * @param workingDirectory the startng directory where the command line runs
 	 * @aparam waitForArgument if TRUE then
 	 */
 	void SetToRunCommand(const wxString& cmdLine, const wxFileName& workingDirectory, bool waitForArguments);
-	
+
 	/**
 	 * Handle the 'Run' button
 	 */
 	void RunCommand(wxCommandEvent& event);
-	
+
 	/**
 	 * when the page is closed perform cleanup. This means
 	 * clean up the child process and any open gauges
@@ -152,17 +152,17 @@ public:
 	wxString GetCommand() const;
 
 private:
-		
+
 	/**
 	 * The command to run
 	 */
 	wxString CommandString;
-	
+
 	/**
 	 * The command's CWD / PWD
 	 */
 	wxFileName  WorkingDirectory;
-	
+
 	/**
 	 * Used to run the process asynchronously
 	 */
@@ -172,12 +172,12 @@ private:
 	 * To show progress to the user.
 	 */
 	StatusBarWithGaugeClass* Gauge;
-	
+
 	/**
 	 * To save the current command to be persisted.
 	 */
 	RunConsoleFeatureClass& Feature;
-	
+
 	/**
 	 * To update the cli command toolbar after the commands
 	 * are persisted
@@ -188,19 +188,19 @@ private:
 	 * Save the hits so that we can traverse through them
 	 */
 	std::vector<t4p::FileNameHitClass> FileNameHits;
-	
+
 	/**
 	 * the current PID of the async process.
 	 */
 	long int CurrentPid;
-	
+
 	/**
 	 * Gauge id for this instance of RunConsole. Each run console will have its own gauge to update
-	 * 
+	 *
 	 * @var int
 	 */
 	int IdProcessGauge;
-	
+
 	/**
 	 * called when the process ends.
 	 */
@@ -210,10 +210,10 @@ private:
 	 * called when the process ends.
 	 */
 	void OnProcessFailed(wxCommandEvent& event);
-	
+
 	/**
 	 * Check running process output. Will poll process output and display it.
-	 * 
+	 *
 	 * @param wwCommandEvent& event
 	 */
 	void OnProcessInProgress(wxCommandEvent& event);
@@ -223,9 +223,9 @@ private:
 	 * so that they are distinguishable from other text.
 	 */
 	void AppendText(const wxString& text);
-	
+
 	/**
-	 * @return the regular expression that will match a file name. The 
+	 * @return the regular expression that will match a file name. The
 	 * matche files will have PHP, CSS, or SQL extensions as allowed
 	 * by the current project's file name wildcards.
 	 */
@@ -236,7 +236,7 @@ private:
 	 * if so, then change the cursor
 	 */
 	void OnMouseMotion(wxMouseEvent& event);
-	
+
 	/**
 	 * Opens the file that was clicked on
 	 */
@@ -249,7 +249,7 @@ private:
 	 * @return the filename hit that is located at the mouse position
 	 */
 	t4p::FileNameHitClass HitAt(wxMouseEvent& evt);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -261,43 +261,43 @@ public:
 	 * Constructor
  	 */
 	RunConsoleViewClass(t4p::RunConsoleFeatureClass& feature);
-	
+
 	/**
 	 * Add menu items
 	 */
 	void AddNewMenu(wxMenuBar* menuBar);
-	
+
 	/**
 	 * Add items to the toolbar
 	 */
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
+
 	/**
 	 * add the bottom toolbar panel
 	 */
 	void AddWindows();
-	
+
 	/**
 	 * synchronized the command panel buttons with those
-	 * from the Commands list. Any buttons for the removed 
+	 * from the Commands list. Any buttons for the removed
 	 * commands are removed and buttons for new commands are added.
 	 */
 	void FillCommandPanel();
-	
+
 	/**
 	 * Open a file.
 	 */
 	void LoadPage(const wxString& fileName);
-	
+
 private:
-				
+
 	/**
 	 * handler for the menu
 	 */
 	void OnRunFileAsCli(wxCommandEvent& event);
-	
+
 	/**
 	 * Always run in a new console window
 	 */
@@ -314,12 +314,12 @@ private:
 	 * be created. Otherwise, the current output window may be used.
 	 */
 	void RunCommand(const wxString& cmdLine, const wxFileName& workingDirectory, bool waitForArguments, bool inNewWindow);
-	
+
 	// update the menu when files are loaded / closed
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAppFileNew(t4p::CodeControlEventClass& event);
-	
+
 	/**
 	 * disable menus when source code notebook is empty
 	 */
@@ -332,7 +332,7 @@ private:
 
 	/**
 	 * When another feature wants to run a process; it will send a command
-	 * event of type EVENT_CMD_RUN_COMMAND. This method will handle 
+	 * event of type EVENT_CMD_RUN_COMMAND. This method will handle
 	 * these events from other features and start the process.
 	 */
 	void OnAppCommandRun(wxCommandEvent& event);
@@ -346,7 +346,7 @@ private:
 	 * The list of commands to be persisted.
 	 */
 	t4p::RunConsoleFeatureClass& Feature;
-			
+
 	/**
 	 * Our menu items
 	 */

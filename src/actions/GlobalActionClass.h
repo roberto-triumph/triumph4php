@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,9 +32,9 @@ namespace t4p {
 
 /**
  * An action is any short or long-lived process that reads Global data structures
- * and performs an action. 
+ * and performs an action.
  * An action is an asynchronous operation. Take care when designing the class
- * so that any data structures are copied instead of referenced. 
+ * so that any data structures are copied instead of referenced.
  *
  * Pay special attention to wxString variables, as the default wxString
  * assignment operator and copy constructors are NOT thread-safe (produce
@@ -53,8 +53,8 @@ public:
 
 /**
  * A specialization of ActionClass; these kinds of actions are
- * small, quick actions that modify GlobalsClass in a specific 
- * manner. 
+ * small, quick actions that modify GlobalsClass in a specific
+ * manner.
  */
 class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 

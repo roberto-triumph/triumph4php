@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,8 +28,8 @@
 #include <wx/icon.h>
 #include <wx/fileconf.h>
 
-// these macros will expand a macro into its 
-// these are needed to expand the asset root location 
+// these macros will expand a macro into its
+// these are needed to expand the asset root location
 // which is given as a macro by the premake script
 #define T4P_STR_EXPAND(s) #s
 #define T4P_STR(s) T4P_STR_EXPAND(s)
@@ -41,19 +41,19 @@
  *         the asset directory is relative or absolute.
  */
 static wxFileName AssetRootDir() {
-	
+
 	std::string stdRoot;
 	#ifdef T4P_ASSET_DIR
 		stdRoot = T4P_STR(T4P_ASSET_DIR);
 	#endif
-	
+
     wxFileName assetRoot;
     wxString assetDir = wxString::FromAscii(stdRoot.c_str());
     if (assetDir.StartsWith(wxT("/"))) {
         assetRoot.AssignDir(assetDir);
     }
     else {
-        
+
         // assume that the path is relative to the executable
 		wxStandardPaths paths = wxStandardPaths::Get();
 		wxFileName pathExecutableFileName(paths.GetExecutablePath());
@@ -73,7 +73,7 @@ wxFileName t4p::NativeFunctionsAsset() {
 wxFileName t4p::ResourceSqlSchemaAsset() {
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("sql"));
-	
+
 	wxFileName sqlFile(asset.GetPath(), wxT("resources.sql"));
 	return sqlFile;
 }
@@ -88,12 +88,12 @@ wxFileName t4p::JsTagsSqlSchemaAsset() {
 
 wxBitmap t4p::AutoCompleteImageAsset(wxString imageName) {
 	if (!wxImage::FindHandler(wxBITMAP_TYPE_XPM)) {
-		wxImage::AddHandler(new wxXPMHandler);	
+		wxImage::AddHandler(new wxXPMHandler);
 	}
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("auto_complete"));
 	wxFileName iconFile(asset.GetPath(), imageName + wxT(".xpm"));
-	
+
 	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_XPM);
@@ -109,7 +109,7 @@ wxBitmap t4p::BitmapImageAsset(wxString imageName) {
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
-    
+
 	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
@@ -125,13 +125,13 @@ wxBitmap t4p::BitmapImageButtonPrepAsset(wxString imageName) {
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".png"));
-    
+
 	wxASSERT(iconFile.IsOk());
 	wxBitmap bitmap;
 	bool loaded = bitmap.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_PNG);
 	wxUnusedVar(loaded);
 	wxASSERT_MSG(loaded, wxT("failed to load: ") + iconFile.GetFullPath());
-	
+
 #ifdef __WXMAC__
 
 	// make images bigger, that way buttons have extra padding
@@ -149,7 +149,7 @@ wxIcon t4p::IconImageAsset(wxString imageName) {
 	wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("icons"));
     wxFileName iconFile(asset.GetPath(), imageName + wxT(".ico"));
-    
+
 	wxASSERT(iconFile.IsOk());
 	wxIcon icon;
 	bool loaded = icon.LoadFile(iconFile.GetFullPath(), wxBITMAP_TYPE_ICO);
@@ -161,7 +161,7 @@ wxIcon t4p::IconImageAsset(wxString imageName) {
 wxFileName t4p::PhpDetectorsBaseAsset() {
     wxFileName asset = AssetRootDir();
     asset.AppendDir(wxT("php_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -171,7 +171,7 @@ wxFileName t4p::UrlTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("url_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -191,7 +191,7 @@ wxFileName t4p::TemplateFilesDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("template_files_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -221,7 +221,7 @@ wxFileName t4p::TagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("tag_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -241,7 +241,7 @@ wxFileName t4p::DatabaseTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("database_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -261,7 +261,7 @@ wxFileName t4p::ConfigTagDetectorsGlobalAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("php_detectors"));
 	asset.AppendDir(wxT("config_detectors"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;
@@ -284,7 +284,7 @@ wxFileName t4p::ConfigDirAsset() {
 	// the bootstrap file could be located in the same dir as the executable
 	// or in the user data directory
 	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
-	wxFileConfig config(wxT("bootstrap"), wxEmptyString, 
+	wxFileConfig config(wxT("bootstrap"), wxEmptyString,
 		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString configDirString;
 	if (!config.Read("SettingsDirectory", &configDirString)) {
@@ -306,7 +306,7 @@ wxFileName t4p::BootstrapConfigFileAsset() {
 	bootstrapConfigFile.Assign(paths.GetExecutablePath());
 	bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	if (!bootstrapConfigFile.FileExists()) {
-		
+
 		// look at the global config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
@@ -316,11 +316,11 @@ wxFileName t4p::BootstrapConfigFileAsset() {
 
 
 wxFileName t4p::SettingsDirAsset() {
-	
+
 	// get the location of the settings dir from the bootstrap file
 	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
 	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
+	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
 		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString settingsDirString;
 	bootstrapConfig.Read(wxT("SettingsDirectory"), &settingsDirString);
@@ -347,7 +347,7 @@ void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	}
 	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
-	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString, 
+	wxFileConfig bootstrapConfig(wxT("bootstrap"), wxEmptyString,
 		bootstrapFullPath, wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString s = settingsDir.GetPath();
 	bootstrapConfig.Write(wxT("SettingsDirectory"), s);
@@ -357,7 +357,7 @@ void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
 wxFileName t4p::DetectorSqlSchemaAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("sql"));
-	
+
 	wxFileName sqlFile(asset.GetPath(), wxT("detectors.sql"));
 	return sqlFile;
 }
@@ -365,7 +365,7 @@ wxFileName t4p::DetectorSqlSchemaAsset() {
 wxFileName t4p::SkeletonsBaseAsset() {
 	wxFileName asset = AssetRootDir();
 	asset.AppendDir(wxT("skeletons"));
-	
+
 	wxFileName scriptsFileName;
 	scriptsFileName.AssignDir(asset.GetPath());
 	return scriptsFileName;

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -51,13 +51,13 @@ public:
 	std::vector<t4p::PhpIdentifierLintResultClass> Results;
 	bool HasError;
 
-	PhpIdentifierLintTestFixtureClass() 
-	: FileTestFixtureClass(wxT("identifier_lint")) 
+	PhpIdentifierLintTestFixtureClass()
+	: FileTestFixtureClass(wxT("identifier_lint"))
 	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, TagCache()
 	, PhpFileExtensions()
 	, MiscFileExtensions()
-	, Lint() 
+	, Lint()
 	, Results()
 	, HasError(false) {
 		Lint.SetVersion(pelet::PHP_53);
@@ -68,7 +68,7 @@ public:
 	void Parse(const UnicodeString& code) {
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 		BuildCache(true);
-		
+
 		Lint.Init(TagCache);
 		HasError = Lint.ParseString(code, Results);
 	}
@@ -78,7 +78,7 @@ public:
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-		
+
 		// make the cache consume the source code file; to prime it with the resources because the
 		// identifier linter won't work without the cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -103,7 +103,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassAndFunction) {
 	// calling defined classes and defined functions should
 	// not generate any errors
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass {} \n"
 		"function doPrint($a) {} \n"
 	);
@@ -122,7 +122,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
 	// test that we resolve the "use" statement when
 	// looking up class names
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {} \n"
 		"function doPrint($a) {} \n"
@@ -141,7 +141,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassSelfReference) {
 
 	// test that the "self" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  const MAX = 1000; \n"
@@ -164,7 +164,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassParentReference) {
 
 	// test that the "parent" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  const MAX = 1000; \n"
@@ -187,7 +187,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
 
 	// test that the "static" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  public static $iMax = 1000; \n"
@@ -212,7 +212,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
 	// test that the "parent" keyword is never seen as an unknown class
 	// and that the method is not treated as a static method call
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  public function work($d) { \n"
@@ -239,7 +239,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, SameClassReference) {
 	// test that the static calls to the same class are treated as
 	// instance calls
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  public function work($d) { \n"
@@ -262,7 +262,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
 
 	// test that the "__constructor" method is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  public static $iMax = 1000; \n"
@@ -285,7 +285,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
 
 	// test that the "magic" method is never seen as an unknown method
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"class MyClass {\n"
 		"  public static $iMax = 1000; \n"
@@ -310,7 +310,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 	// as unknown, we should always look them up in the global
 	// namespace even when the code is inside a namespace
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"function doPrint($a) {} \n"
 	);
@@ -331,7 +331,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
 	// as unknown, we should always look them up in the global
 	// namespace even when the code is inside a namespace
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"function doPrint($a) {} \n"
 	);
 
@@ -346,12 +346,12 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeProperty) {
-	
-	// test that we don't flag native properties 
+
+	// test that we don't flag native properties
 	// as unkown, we should always find them if we are guaranteed
 	// to know the type involved
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace Util; \n"
 		"function doPrint($a) {} \n"
 	);
@@ -370,7 +370,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 	// instantiating an unknown class should generate
 	// an error
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass {} \n"
 	);
 
@@ -390,7 +390,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 	// calling a static method on an unknown class should generate
 	// an error
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass {\n"
 		"  static function work() {} \n"
 		"} \n"
@@ -412,7 +412,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownBaseClass) {
 	// make sure that the class being extended from actually
 	// exists
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass {\n"
 		"  function work() {} \n"
 		"} \n"
@@ -434,7 +434,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
 	// make sure that the class being extended from actually
 	// exists
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass {\n"
 		"  function work() {} \n"
 		"} \n"
@@ -455,11 +455,11 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCode) {
 
 	// class name resolution should look properly
-	// look at namespaces; when a piece of code does 
-	// not declare a namespace then it should 
+	// look at namespaces; when a piece of code does
+	// not declare a namespace then it should
 	// treat relative namespaces as absolute namespaces
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace util {\n "
 		"\n"
 		"class MyClass {} \n"
@@ -484,7 +484,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
 	// but its from a different namespace then we should
 	// generate an error
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace util {\n "
 		"\n"
 		"class MyClass {} \n"
@@ -508,7 +508,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
 	// calling undefined functions should generate an
 	// error
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"function MyFirstFunction{} \n"
 	);
 
@@ -530,7 +530,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
 	// function that is being called as an argument to another
 	// function
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"function MyFirstFunction() {} \n"
 		"function MySecondFunction() {} \n"
 	);
@@ -551,7 +551,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
 	// we should also lookup functions used in
 	// the left hand of the assignment
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"function MyFirstFunction() {} \n"
 		"function MySecondFunction() {} \n"
 		"class MyClass {\n"
@@ -572,7 +572,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownMethod) {
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass { \n"
 		"  function work() {} \n"
 		"} \n"
@@ -598,7 +598,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticMethod) {
 	// if we have the same method name, the method must
 	// be static if the call is a static call
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass { \n"
 		"  function work() {} \n"
 		"} \n"
@@ -617,7 +617,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticMethod) {
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class MyClass { \n"
 		"  var $name; \n"
 		"} \n"
@@ -637,13 +637,13 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
-	
+
 	// if a piece of code calls method_exists, it means that the code
 	// accounts for methods not being available, therefore we should
 	// stop checking methods as when the code runs it will never generate
 	// an 'unknown method' error.
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"class Route { \n"
 		"  var $name; \n"
 		"} \n"
@@ -668,7 +668,7 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
 	// test that when a unknown namespace is "used" with a use statement
 	// that we generate an error
 	wxString cacheCode = t4p::CharToWx(
-		"<?php \n"  
+		"<?php \n"
 		"namespace util {\n "
 		"\n"
 		"class MyClass {} \n"

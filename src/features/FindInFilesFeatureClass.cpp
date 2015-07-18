@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,33 +36,33 @@ t4p::FindInFilesHitClass::FindInFilesHitClass()
 	: wxObject()
 	, FileName()
 	, Preview()
-	, LineNumber() 
+	, LineNumber()
 	, LineOffset(0)
-	, FileOffset(0) 
+	, FileOffset(0)
 	, MatchLength(0) {
 
 }
 
-t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview, 
+t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview,
 	int lineNumber, int lineOffset, int fileOffset, int matchLength)
 	: wxObject()
 	// use c_str() to deep copy
 	, FileName(fileName.c_str())
 	, Preview(preview.c_str())
-	, LineNumber(lineNumber) 
-	, LineOffset(lineOffset) 
-	, FileOffset(fileOffset) 
+	, LineNumber(lineNumber)
+	, LineOffset(lineOffset)
+	, FileOffset(fileOffset)
 	, MatchLength(matchLength) {
 
 }
 
-t4p::FindInFilesHitClass::FindInFilesHitClass(const t4p::FindInFilesHitClass& hit) 
+t4p::FindInFilesHitClass::FindInFilesHitClass(const t4p::FindInFilesHitClass& hit)
 	: wxObject()
 	, FileName()
-	, Preview() 
-	, LineNumber(1) 
+	, Preview()
+	, LineNumber(1)
 	, LineOffset(0)
-	, FileOffset(0) 
+	, FileOffset(0)
 	, MatchLength(0) {
 	Copy(hit);
 }
@@ -73,7 +73,7 @@ t4p::FindInFilesHitClass& t4p::FindInFilesHitClass::operator=(const t4p::FindInF
 }
 
 bool t4p::FindInFilesHitClass::operator==(const t4p::FindInFilesHitClass& hit) {
-	return FileName == hit.FileName 
+	return FileName == hit.FileName
 		&& LineNumber == hit.LineNumber
 		&& LineOffset == hit.LineOffset
 		&& FileOffset == hit.FileOffset;
@@ -110,14 +110,14 @@ std::vector<t4p::FindInFilesHitClass> t4p::FindInFilesHitEventClass::GetHits() c
 	return Hits;
 }
 
-t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId) 
-	: BackgroundFileReaderClass(runningThreads, eventId) 
+t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
+	: BackgroundFileReaderClass(runningThreads, eventId)
 	, FindInFiles()
 	, SkipFiles() {
 
 }
 
-bool t4p::FindInFilesBackgroundReaderClass::InitForFind( t4p::FindInFilesClass findInFiles, 
+bool t4p::FindInFilesBackgroundReaderClass::InitForFind( t4p::FindInFilesClass findInFiles,
 															  bool doHiddenFiles,
 															  std::vector<wxString> skipFiles) {
 
@@ -144,7 +144,7 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 	found = search.Walk(FindInFiles);
 	if (found) {
 		wxString fileName = search.GetMatchedFiles().back();
-		
+
 		// if this match is for one of the skip files then we want to ignore it
 		// DirectorySearch doesn't have a GetCurrentFile() so the one way to know the
 		// file that was searched is to do the search
@@ -156,8 +156,8 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 				if (destroy) {
 					break;
 				}
-				t4p::FindInFilesHitClass hit(fileName, 
-					t4p::IcuToWx(FindInFiles.GetCurrentLine()), 
+				t4p::FindInFilesHitClass hit(fileName,
+					t4p::IcuToWx(FindInFiles.GetCurrentLine()),
 					FindInFiles.GetCurrentLineNumber(),
 					FindInFiles.GetLineOffset(),
 					FindInFiles.GetFileOffset(),

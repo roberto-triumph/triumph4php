@@ -82,34 +82,34 @@ void t4p::FileCabinetViewClass::OnEditAddCurrentFileToCabinet(wxCommandEvent& ev
 	panel->AddItemToList(fileItem);
 }
 
-t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, 
+t4p::FileCabinetPanelClass::FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature,
 												  wxWindow* mainWindow)
 : FileCabinetPanelGeneratedClass(parent, id)
 , SqliteFinder(feature.App.Globals.ResourceCacheSession)
 , FileCabinet()
-, Feature(feature) 
+, Feature(feature)
 , MainWindow(mainWindow) {
 	AddFileButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("document-plus")));
 	AddDirectoryButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("directory-plus")));
 	HelpButtonIcon(HelpButton);
 	ImageList = new wxImageList(16, 16);
-	
+
 	t4p::FileTypeImageList(*ImageList);
 	ImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
-	
+
 	List->AssignImageList(ImageList, wxIMAGE_LIST_NORMAL);
 	FillList();
-	
+
 	wxAcceleratorEntry entries[1];
 	entries[0].Set(wxACCEL_NORMAL, WXK_DELETE, ID_FILE_CABINET_MENU_DELETE);
-	
+
 	wxAcceleratorTable accel(1, entries);
 	List->SetAcceleratorTable(accel);
 }
 
 void t4p::FileCabinetPanelClass::FillList() {
 	List->DeleteAllItems();
-	
+
 	bool found = SqliteFinder.Exec(&FileCabinet);
 	if (found) {
 		do {
@@ -120,7 +120,7 @@ void t4p::FileCabinetPanelClass::FillList() {
 }
 
 void t4p::FileCabinetPanelClass::AddItemToList(const t4p::FileCabinetItemClass& fileItem) {
-	if (fileItem.FileName.GetFullName().empty() && 
+	if (fileItem.FileName.GetFullName().empty() &&
 		!fileItem.FileName.GetDirs().empty()) {
 		wxListItem listItem;
 		listItem.SetText(fileItem.FileName.GetDirs().back());
@@ -154,7 +154,7 @@ void t4p::FileCabinetPanelClass::OnAddFileClick(wxCommandEvent& event) {
 	wxFileDialog dialog(this, _("Choose a file to add to the File Cabinet"), wxEmptyString,
 		wxEmptyString, wxFileSelectorDefaultWildcardStr, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (dialog.ShowModal() == wxID_OK) {
-		t4p::FileCabinetItemClass fileItem = Feature.AddFileToCabinet(dialog.GetPath());		
+		t4p::FileCabinetItemClass fileItem = Feature.AddFileToCabinet(dialog.GetPath());
 		AddItemToList(fileItem);
 	}
 }
@@ -168,7 +168,7 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 	result.SetId(fileCabinetItemId);
 	bool found = SqliteFinder.Exec(&result);
 	if (found) {
-		
+
 		// we create the proper event to tell the app to
 		// open the file/dir
 		result.Next();
@@ -203,7 +203,7 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 }
 
 void t4p::FileCabinetPanelClass::DeleteItemAt(int index) {
-	
+
 	// delete from the database AND the list control
 	long dbId = List->GetItemData(index);
 	if (dbId <= 0) {
@@ -211,13 +211,13 @@ void t4p::FileCabinetPanelClass::DeleteItemAt(int index) {
 	}
 	Feature.DeleteCabinetItem(dbId);
 
-	// redraw the list entirely so that there are no gaps 
+	// redraw the list entirely so that there are no gaps
 	// in the list items
 	FillList();
 }
 
 void t4p::FileCabinetPanelClass::OnListItemActivated(wxListEvent& event) {
-	
+
 	// need to get the file/dir to open. to get the filename, we get
 	// the file_cabinet_item_id from the list, then query the
 	// db
@@ -244,7 +244,7 @@ void t4p::FileCabinetPanelClass::OnListItemOpen(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (index >= 0) {
-		OpenItemAt(index);		
+		OpenItemAt(index);
 	}
 }
 
@@ -252,7 +252,7 @@ void t4p::FileCabinetPanelClass::OnListItemDelete(wxCommandEvent& event) {
 	long index = -1;
 	index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (index >= 0) {
-		DeleteItemAt(index);		
+		DeleteItemAt(index);
 	}
 }
 

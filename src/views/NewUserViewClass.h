@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,8 +34,8 @@ namespace t4p {
 
 /**
  * The New User feature is a feature that will show the
- * user the welcome wizard the very first time that 
- * the user runs the program.  
+ * user the welcome wizard the very first time that
+ * the user runs the program.
  */
 class NewUserViewClass : public t4p::FeatureViewClass {
 
@@ -52,7 +52,7 @@ private:
 	void OnWizardCancel(wxWizardEvent& event);
 
 	wxTimer Timer;
-	
+
 	t4p::NewUserFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
@@ -67,7 +67,7 @@ class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
 
 public:
 
-	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals, 
+	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals,
 		t4p::PreferencesClass& preferences, wxFileName& configFileDir);
 
 	bool TransferDataFromWindow();
@@ -85,7 +85,7 @@ private:
 
 /**
  * The dialog that shows the user the file extensions to associate to
- * a type (language) 
+ * a type (language)
  */
 class NewUserAssociationsPanelClass : public NewUserAssociationsPanelGeneratedClass {
 

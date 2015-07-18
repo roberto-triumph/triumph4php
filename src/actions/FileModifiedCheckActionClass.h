@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,13 +37,13 @@ namespace t4p {
  * is saved in a variable so that we can tell when it changes.
  */
 class FileModifiedTimeClass {
-	
+
 public:
 
 	wxFileName FileName;
 
 	wxDateTime ModifiedTime;
-	
+
 	FileModifiedTimeClass();
 
 	FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src);
@@ -58,7 +58,7 @@ public:
 class FilesModifiedEventClass : public wxEvent {
 
 public:
-	
+
 	/**
 	 * files that have been modified externally (outside the editor)
 	 */
@@ -76,7 +76,7 @@ public:
 	 */
 	std::vector<wxFileName> Deleted;
 
-	FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified, 
+	FilesModifiedEventClass(int eventId, const std::vector<wxFileName>& modified,
 		const std::vector<wxDateTime>& modifiedTimes,
 		const std::vector<wxFileName>& deleted);
 
@@ -108,7 +108,7 @@ public:
 	 * set the files to be checked, along with the times that we know
 	 * the files were last modified.
 	 */
-	void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files); 
+	void SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files);
 
 	/**
 	 * performs the file checks in a background thread and POSTs the results

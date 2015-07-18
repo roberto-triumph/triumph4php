@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,7 +43,7 @@ enum DbgpXmlErrors {
 	 * no error when parsing the response
 	 */
 	DBGP_XML_ERROR_NONE,
-	
+
 	/**
 	 * could not parse XML (no well-formed)
 	 */
@@ -60,7 +60,7 @@ enum DbgpXmlErrors {
 	DBGP_XML_ERROR_ATTRIBUTE
 };
 
-/* 
+/*
  * The init response is sent by the debug engine (xdebug) when
  * the script starts in debug mode.
  * See section 5.2
@@ -86,9 +86,9 @@ public:
 };
 
 /**
- * debugger engine error; an error with the 
+ * debugger engine error; an error with the
  * engine itself and not the running script
- * See Section 6.5 
+ * See Section 6.5
  */
 class DbgpErrorEventClass : public wxEvent {
 
@@ -99,7 +99,7 @@ public:
 	int ErrorCode;
 	wxString AppErrorCode;
 	wxString Message;
-	
+
 	DbgpErrorEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -131,7 +131,7 @@ enum DbgpReason {
 class DbgpStatusEventClass : public wxEvent {
 
 public:
-	
+
 	/** starting|stopping|stopped|running|break */
 	t4p::DbgpStatus Status;
 
@@ -139,7 +139,7 @@ public:
 	t4p::DbgpReason Reason;
 	wxString TransactionId;
 	wxString MessageData;
-	
+
 	DbgpStatusEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -149,7 +149,7 @@ public:
 
 /**
  * Response to query for the value of a feature
- * See Section 7.2.2 
+ * See Section 7.2.2
  */
 enum DbgpFeatures {
 	DBGP_FEATURE_UNKNOWN,
@@ -175,10 +175,10 @@ public:
 	t4p::DbgpFeatures Feature;
 
 	/*
-	 * supported means that the feature_name given was a 
+	 * supported means that the feature_name given was a
 	 * a valid feature name, not that the feature itself is
 	 * available. whether or not the feature is available ca
-	 * be seen by looking at the data 
+	 * be seen by looking at the data
      */
 	bool Supported;
 	wxString TransactionId;
@@ -203,7 +203,7 @@ public:
 	t4p::DbgpFeatures Feature;
 	bool Success;
 	wxString TransactionId;
-	
+
 	DbgpFeatureSetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -232,7 +232,7 @@ public:
 	t4p::DbgpStatus Status;
 	t4p::DbgpReason Reason;
 	wxString TransactionId;
-	
+
 	DbgpContinueEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -252,7 +252,7 @@ public:
 	wxString TransactionId;
 	bool Enabled;
 	wxString BreakpointId;
-	
+
 	DbgpBreakpointSetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -298,7 +298,7 @@ class DbgpBreakpointGetEventClass : public wxEvent {
 public:
 
 	t4p::DbgpBreakpointClass Breakpoint;
-	
+
 	DbgpBreakpointGetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -308,12 +308,12 @@ public:
 
 /**
  * Response to a breakpoint being updated
- * See Section 7.6.3 
+ * See Section 7.6.3
  */
 class DbgpBreakpointUpdateEventClass : public wxEvent {
 
 public:
-	
+
 	wxString Command;
 	wxString TransactionId;
 
@@ -331,7 +331,7 @@ public:
 class DbgpBreakpointRemoveEventClass : public wxEvent {
 
 public:
-	
+
 	wxString Command;
 	wxString TransactionId;
 
@@ -343,13 +343,13 @@ public:
 };
 
 /**
- * Response to a breakpoint list 
- * See Section 7.6.5 
+ * Response to a breakpoint list
+ * See Section 7.6.5
  */
 class DbgpBreakpointListEventClass : public wxEvent {
 
 public:
-	
+
 	wxString Command;
 	wxString TransactionId;
 	std::vector<t4p::DbgpBreakpointClass> Breakpoints;
@@ -370,7 +370,7 @@ class DbgpStackDepthEventClass : public wxEvent {
 public:
 
 	int Depth;
-	
+
 	DbgpStackDepthEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -385,7 +385,7 @@ public:
 	int Level;
 	wxString Type;
 	wxString Filename;
-	
+
 	/**
 	 * 1-based
 	 */
@@ -432,7 +432,7 @@ public:
 
 	std::vector<wxString> Names;
 	std::vector<int> Ids;
-	
+
 	DbgpContextNamesEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -492,9 +492,9 @@ class DbgpContextGetEventClass : public wxEvent {
 public:
 
 	std::vector<t4p::DbgpPropertyClass> Properties;
-	
+
 	int ContextId;
-	
+
 	DbgpContextGetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -503,8 +503,8 @@ public:
 };
 
 /**
- * Response to the property_get command, gets a single 
- * variable and its value. Note that this event 
+ * Response to the property_get command, gets a single
+ * variable and its value. Note that this event
  * will return only up to the max data length (it may not
  * return the entire variable value)
  *
@@ -517,7 +517,7 @@ public:
 	wxString Command;
 	wxString TransactionId;
 	t4p::DbgpPropertyClass Property;
-	
+
 	DbgpPropertyGetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -527,8 +527,8 @@ public:
 
 
 /**
- * Response to the property_value command, gets a single 
- * variable and its value. Note that this event 
+ * Response to the property_value command, gets a single
+ * variable and its value. Note that this event
  * WILL return THE ENTIRE variable value
  *
  * See Section  7.13
@@ -540,7 +540,7 @@ public:
 	wxString Command;
 	wxString TransactionId;
 	wxString Value;
-	
+
 	DbgpPropertyValueEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -560,7 +560,7 @@ public:
 	wxString Command;
 	wxString TransactionId;
 	bool Success;
-	
+
 	DbgpPropertySetEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -570,7 +570,7 @@ public:
 
 /**
  * Response to a break command;
- * See Section 8.3 
+ * See Section 8.3
  */
 class DbgpBreakEventClass : public wxEvent {
 
@@ -579,7 +579,7 @@ public:
 	wxString Command;
 	wxString TransactionId;
 	bool Success;
-	
+
 	DbgpBreakEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -589,7 +589,7 @@ public:
 
 /**
  * Response to a eval command
- * See Section 8.3.1 
+ * See Section 8.3.1
  */
 class DbgpEvalEventClass : public wxEvent {
 
@@ -599,7 +599,7 @@ public:
 	wxString TransactionId;
 	t4p::DbgpPropertyClass Property;
 	bool Success;
-	
+
 	DbgpEvalEventClass();
 
 	bool FromXml(const wxString& xml, t4p::DbgpXmlErrors& error);
@@ -709,7 +709,7 @@ public:
 	std::string BreakpointEnable(const wxString& breakpointId);
 
 	/**
-	 * removes a breakpoint 
+	 * removes a breakpoint
 	 * See section 7.6.4
 	 */
 	std::string BreakpointRemove(const wxString& breakpointId);
@@ -763,7 +763,7 @@ public:
 	std::string PropertyValue(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey);
 
 	/**
-	 * interrupt the debugger while the engine is running  
+	 * interrupt the debugger while the engine is running
 	 * See section 8.2
 	 */
 	std::string Break();
@@ -772,7 +772,7 @@ public:
 	 * evaluates the given expression in the current context.
 	 * See section 8.3
 	 */
-	std::string Eval(const wxString& expression);	
+	std::string Eval(const wxString& expression);
 
 	/**
 	 * @return the transaction Id that will be used for the
@@ -795,7 +795,7 @@ private:
 /**
  * the code below is needed to make use of the wxWidgets event
  * propagation system (event tables)
- */ 
+ */
 
 extern const wxEventType EVENT_DBGP_INIT;
 extern const wxEventType EVENT_DBGP_ERROR;

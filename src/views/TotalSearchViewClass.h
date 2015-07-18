@@ -45,22 +45,22 @@ public:
 	TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
-	
+
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 private:
 
 	void OnTotalSearch(wxCommandEvent& event);
-	
+
 	t4p::TotalSearchFeatureClass& Feature;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
 
 /**
  * Class that allows the user to search for tags. It
- * will search as the user types in the query, providing 
+ * will search as the user types in the query, providing
  * instant feedback
  */
 class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
@@ -71,7 +71,7 @@ public:
 		std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
 
 private:
-	
+
 	void OnCancelButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnMatchesListKeyDown(wxKeyEvent& event);
@@ -87,41 +87,41 @@ private:
 	void UpdateCacheStatus();
 
 	void OnTimer(wxTimerEvent& event);
-	
+
 	void ChooseSelectedAndEnd(size_t selected);
-	
+
 	t4p::TotalSearchFeatureClass& Feature;
-	
+
 	/**
 	 * The item last searched; we wont attempt to search
 	 * the same thing twice consecutively since it will produce
 	 * the same result
 	 */
 	wxString LastSearch;
-	
+
 	/**
 	 * we will perform  a search every time the timer goes
 	 * off.
 	 */
 	wxTimer Timer;
-	
+
 	/**
 	 * we will perform the search in a background thread
 	 * that way the user does not feel a slowdown while
 	 * typing in thq query
 	 */
 	t4p::RunningThreadsClass RunningThreads;
-	
+
 	/**
-	 * results from the last compeleted search 
+	 * results from the last compeleted search
 	 */
 	std::vector<t4p::TotalTagResultClass> Results;
-	
+
 	/**
 	 * The tags that were selected by the user
 	 */
 	std::vector<t4p::TotalTagResultClass>& SelectedTags;
-	
+
 	/**
 	 * the line number to jump to (given by the user)
 	 */
@@ -140,7 +140,7 @@ private:
 	 * shown
 	 */
 	bool IsCacheEmpty;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

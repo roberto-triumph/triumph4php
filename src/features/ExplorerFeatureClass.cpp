@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -59,7 +59,7 @@ static bool DirNameCmp(const wxFileName& a, const wxFileName& b) {
 	return aName.compare(bName) < 0;
 }
 
-t4p::FileListingClass::FileListingClass(wxEvtHandler& handler) 
+t4p::FileListingClass::FileListingClass(wxEvtHandler& handler)
 : wxEvtHandler()
 , WorkingDir()
 , Files()
@@ -69,7 +69,7 @@ t4p::FileListingClass::FileListingClass(wxEvtHandler& handler)
 , RunningThreads()
 , Handler(handler)
 , Watcher(NULL) {
-	
+
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 }
@@ -90,7 +90,7 @@ void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 		return;
 	}
 	if (event.GetChangeType() == wxFSW_EVENT_WARNING && event.GetWarningType() == wxFSW_WARNING_OVERFLOW) {
-		
+
 		// restart the watch
 		delete Watcher;
 		Watcher = new wxFileSystemWatcher();
@@ -98,7 +98,7 @@ void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 		Watcher->Add(WorkingDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 	}
 	else if (event.GetChangeType() == wxFSW_EVENT_ERROR) {
-		
+
 		// restart the watch
 		delete Watcher;
 		Watcher = new wxFileSystemWatcher();
@@ -107,7 +107,7 @@ void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 	}
 
 	// naive implementation for now, just refresh the entire dir
-	// this is because we have labels to update, and the 
+	// this is because we have labels to update, and the
 	// items must be kept sorted (first dirs, then files)
 	// each sorted, AND taking the filters into account
 	else if (event.GetChangeType() == wxFSW_EVENT_CREATE
@@ -144,8 +144,8 @@ void t4p::FileListingClass::OnExplorerListComplete(t4p::ExplorerEventClass& even
 	// only recreate the watch when the explorer shows a new dir
 	// this method will be called as a result of an external file
 	// watcher event (new/delete file), if there are many events in
-	// quick succession a crash would happen. in reality we 
-	// only need to recreate the watch when the explorer is being 
+	// quick succession a crash would happen. in reality we
+	// only need to recreate the watch when the explorer is being
 	// pointed into a different directory than previous
 	bool changedDir = WorkingDir != event.Dir;
 	if (changedDir && Watcher) {
@@ -168,7 +168,7 @@ void t4p::FileListingClass::OnExplorerModifyComplete(t4p::ExplorerModifyEventCla
 	wxPostEvent(&Handler, event);
 }
 
-t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app) 
+t4p::ExplorerFeatureClass::ExplorerFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 	wxPlatformInfo info;
 	switch (info.GetOperatingSystemId()) {
@@ -196,7 +196,7 @@ void t4p::ExplorerFeatureClass::LoadPreferences(wxConfigBase *config) {
 	config->Read(wxT("/Explorer/FileManagerExecutable"), &s);
 
 	// when setting, make sure to have the defaults in case there is nothing
-	// in the config yet 
+	// in the config yet
 	if (!s.IsEmpty()) {
 		FileManagerExecutable.Assign(s);
 	}
@@ -221,17 +221,17 @@ std::vector<t4p::SourceClass> t4p::ExplorerFeatureClass::EnabledSources() const 
 	return App.Globals.AllEnabledSources();
 }
 
-t4p::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
+t4p::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files,
 												  const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles,
 												  int totalSubDirs)
 : wxEvent(eventId, t4p::EVENT_EXPLORER)
 , Dir()
 , Files()
 , SubDirs()
-, Error() 
-, TotalFiles(totalFiles) 
+, Error()
+, TotalFiles(totalFiles)
 , TotalSubDirs(totalSubDirs) {
-	
+
 	// clone filenames they contain wxStrings; no thread-safe
 	Dir = t4p::FileNameCopy(dir);
 	Files = t4p::DeepCopyFileNames(files);
@@ -245,7 +245,7 @@ wxEvent* t4p::ExplorerEventClass::Clone() const {
 }
 
 t4p::ExplorerFileSystemActionClass::ExplorerFileSystemActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-: ActionClass(runningThreads, eventId) 
+: ActionClass(runningThreads, eventId)
 , Dir()
 , Extensions()
 , DoHidden(false) {
@@ -258,7 +258,7 @@ wxString t4p::ExplorerFileSystemActionClass::GetLabel() const {
 
 void t4p::ExplorerFileSystemActionClass::Directory(const wxFileName& dir, const std::vector<wxString>& extensions, bool doHidden) {
 	Dir = t4p::FileNameCopy(dir);
-	Extensions.clear(); 
+	Extensions.clear();
 	t4p::DeepCopy(Extensions, extensions);
 	DoHidden = doHidden;
 }
@@ -338,7 +338,7 @@ bool t4p::ExplorerFileSystemActionClass::MatchesWildcards(const wxString& fileNa
 
 t4p::ExplorerModifyActionClass::ExplorerModifyActionClass(t4p::RunningThreadsClass& runningThreads,
 																int eventId)
-: ActionClass(runningThreads, eventId) 
+: ActionClass(runningThreads, eventId)
 , Action(NONE)
 , Dirs()
 , Files()
@@ -399,7 +399,7 @@ void t4p::ExplorerModifyActionClass::BackgroundWork() {
 			}
 			totalSuccess &= success;
 		}
-		t4p::ExplorerModifyEventClass modEvent(GetEventId(), 
+		t4p::ExplorerModifyEventClass modEvent(GetEventId(),
 			dirsDeleted, filesDeleted, dirsNotDeleted, filesNotDeleted, totalSuccess);
 		PostEvent(modEvent);
 	}
@@ -407,7 +407,7 @@ void t4p::ExplorerModifyActionClass::BackgroundWork() {
 		wxFileName destFile(OldFile.GetPath(), NewName);
 		bool success = wxRenameFile(OldFile.GetFullPath(), destFile.GetFullPath(), false);
 
-		t4p::ExplorerModifyEventClass modEvent(GetEventId(), 
+		t4p::ExplorerModifyEventClass modEvent(GetEventId(),
 			OldFile, NewName, success);
 		PostEvent(modEvent);
 	}
@@ -416,8 +416,8 @@ wxString t4p::ExplorerModifyActionClass::GetLabel() const {
 	return wxT("File System Modification");
 }
 
-t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &oldFile, 
-															  const wxString &newName, bool success) 
+t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFileName &oldFile,
+															  const wxString &newName, bool success)
 : wxEvent(eventId, t4p::EVENT_EXPLORER_MODIFY)
 , OldFile(oldFile.GetFullPath())
 , NewName(newName.c_str())
@@ -430,7 +430,7 @@ t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFil
 
 }
 
-t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, 
+t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId,
 															  const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted,
 															  const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted,
 															  bool success)

@@ -27,7 +27,7 @@
 #include <wx/msgdlg.h>
 
 t4p::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
-: wxValidator() 
+: wxValidator()
 , Data(data) {
 
 }

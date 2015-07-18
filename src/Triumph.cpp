@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,7 +53,7 @@ t4p::AppClass::AppClass(wxTimer& configModifiedTimer)
 	, Sequences(Globals, SqliteRunningThreads)
 	, Preferences()
 	, ConfigLastModified()
-	, FeatureFactory(*this) 
+	, FeatureFactory(*this)
 	, Timer(configModifiedTimer) {
 }
 
@@ -61,7 +61,7 @@ t4p::AppClass::AppClass(wxTimer& configModifiedTimer)
  * when app starts, create the new app frame
  */
 void t4p::AppClass::Init() {
-	
+
 	// 1 ==> to make sure any queued items are done one at a time
 	SqliteRunningThreads.SetMaxThreads(1);
 	Globals.Environment.Init();
@@ -80,7 +80,7 @@ t4p::AppClass::~AppClass() {
 
 void t4p::AppClass::CreateFeatures() {
 
-	
+
 	// connect the features to the event sink so that they can
 	// receive app events
 	FeatureFactory.CreateFeatures();
@@ -104,7 +104,7 @@ void t4p::AppClass::DeleteFeatures() {
 	for (size_t i = 0; i < FeatureFactory.Features.size(); ++i) {
 		RunningThreads.RemoveEventHandler(FeatureFactory.Features[i]);
 		SqliteRunningThreads.RemoveEventHandler(FeatureFactory.Features[i]);
-	
+
 		// disconnect from events so that events dont get sent after
 		// features are destroyed
 		EventSink.RemoveHandler(FeatureFactory.Features[i]);
@@ -138,7 +138,7 @@ void t4p::AppClass::LoadPreferences() {
 	}
 	for (size_t i = 0; i < FeatureFactory.FeatureViews.size(); ++i) {
 		FeatureFactory.FeatureViews[i]->AddKeyboardShortcuts(Preferences.DefaultKeyboardShortcutCmds);
-	}	
+	}
 }
 
 void t4p::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedDirectory) {
@@ -160,7 +160,7 @@ void t4p::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedD
 	// save global preferences; keyboard shortcuts / syntax colors
 	Preferences.Save();
 
-	// tell each feature to save their own config 
+	// tell each feature to save their own config
 	wxCommandEvent evt(t4p::EVENT_APP_PREFERENCES_SAVED);
 	EventSink.Publish(evt);
 

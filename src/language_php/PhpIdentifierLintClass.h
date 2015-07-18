@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,7 +42,7 @@ class TagCacheClass;
  * found in a PHP file.
  */
 class PhpIdentifierLintResultClass {
-	
+
 public:
 
 	enum Types {
@@ -68,7 +68,7 @@ public:
 	 * the line number (1- based) the unknown identifier was found in
 	 */
 	int LineNumber;
-	
+
 	/**
 	 * the character offset (0-based) in the file where the unknown identifier was
 	 * found at
@@ -93,15 +93,15 @@ public:
  * not be found.
  */
 class PhpIdentifierLintClass :
-	public pelet::ClassObserverClass, 
-	public pelet::ClassMemberObserverClass, 
-	public pelet::FunctionObserverClass, 
+	public pelet::ClassObserverClass,
+	public pelet::ClassMemberObserverClass,
+	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass  {
 
 public:
 
 	PhpIdentifierLintClass();
-	
+
 	/**
 	 * prepares the internal cache used for function lookups. This needs
 	 * to be called before any file is checked.
@@ -119,11 +119,11 @@ public:
 
 	/**
 	 * Init() method should be called before a file is parsed. Note that
-	 * if a file has many errors, this class will stop adding	
+	 * if a file has many errors, this class will stop adding
 	 * errors after a certain amount.
-	 * 
+	 *
 	 * @param fileName the file to parse and report errors on.
-	 * @param errors any unknown identifier errors will be 
+	 * @param errors any unknown identifier errors will be
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one unknown identifier
 	 */
@@ -131,39 +131,39 @@ public:
 
 	/**
 	 * Init() method should be called before a string is parsed. Note that
-	 * if a string has many errors, this class will stop adding	
+	 * if a string has many errors, this class will stop adding
 	 * errors after a certain amount.
-	 * 
+	 *
 	 * @param code the string to parse and report errors on
-	 * @param errors any unknown identifier errors will be 
+	 * @param errors any unknown identifier errors will be
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
 	bool ParseString(const UnicodeString& code, std::vector<t4p::PhpIdentifierLintResultClass>& errors);
 
 	// these methods are callbacks from the parser
-	// whenever we see an expression or statement, we 
+	// whenever we see an expression or statement, we
 	// will check it to see if it contains undefined
 	// variables
-	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
+	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue,
 			const UnicodeString& comment, const int lineNumber);
 
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-		const UnicodeString& signature, 
+	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className,
+		const UnicodeString& signature,
 		const UnicodeString& baseClassName,
 		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber);
-		
-	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
+
+	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments);
-	
-	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, 
+
+	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		const int lineNumber, bool hasVariableArguments);
 
 	void NamespaceUseFound(const UnicodeString& namespaceName, const UnicodeString& alias, int lineNumber, int startingPos);
-		
+
 	void ExpressionVariableFound(pelet::VariableClass* expression);
 
 	void ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression);
@@ -177,7 +177,7 @@ public:
 	void ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression);
 
 	void ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression);
-	
+
 	void ExpressionInstanceOfOperationFound(pelet::InstanceOfOperationClass* expression);
 
 	void ExpressionScalarFound(pelet::ScalarExpressionClass* expression);
@@ -193,9 +193,9 @@ public:
 	void ExpressionIncludeFound(pelet::IncludeExpressionClass* expr);
 
 	void ExpressionClosureFound(pelet::ClosureExpressionClass* expr);
-	
+
 	void ExpressionIssetFound(pelet::IssetExpressionClass* expression);
-	
+
 	void ExpressionEvalFound(pelet::EvalExpressionClass* expression);
 
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
@@ -224,7 +224,7 @@ private:
 	 * use this to lookup into the tag cache
 	 * we keep an instance stored as a class
 	 * variable so that we prepare the statement once
-	 * during the time we parse the ENTIRE set 
+	 * during the time we parse the ENTIRE set
 	 * of files
 	 */
 	t4p::ClassLookupClass ClassLookup;
@@ -238,10 +238,10 @@ private:
 	t4p::FunctionLookupClass NativeFunctionLookup;
 
 	/**
-	 * caching results of methods and function lookups, will 
+	 * caching results of methods and function lookups, will
 	 * only hit the tag cache once per file per method/function
 	 */
-	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass> 
+	std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>
 		FoundClasses,
 		FoundMethods,
 		FoundProperties,
@@ -254,7 +254,7 @@ private:
 		NotFoundFunctions,
 		NotFoundStaticMethods,
 		NotFoundStaticProperties;
-	
+
 	/**
 	 * keep track of calls to method_exists() function; if a call
 	 * is being made then disable method name checks as the code
@@ -267,7 +267,7 @@ private:
      *   }
 	 */
 	bool HasMethodExistsCalled;
-	
+
 	/**
 	 * the name of the class that is being parsed.
 	 * we keep this around to test when checking static
@@ -278,9 +278,9 @@ private:
 
 	/**
 	 * @param var the expression to check. A Check  will be
-	 *       done to see if any of the identifiers used in the 
+	 *       done to see if any of the identifiers used in the
 	 *       given expression are not found in the cache
-	 *       if not, then a new error is 
+	 *       if not, then a new error is
 	 *       created and appended to the Errors vector.
 	 */
 	void CheckExpression(pelet::ExpressionClass* expr);
@@ -288,8 +288,8 @@ private:
 	/**
 	 * @param var the variable to check. A Check  will be
 	 *       done to see if the any of the identifiers
-	 *       in the given variable are not found in the cache. if 
-	 *       not, then a new error is 
+	 *       in the given variable are not found in the cache. if
+	 *       not, then a new error is
 	 *       created and appended to the Errors vector.
 	 */
 	void CheckVariable(pelet::VariableClass* var);
@@ -298,41 +298,41 @@ private:
 	 * @param expr array definition to check. check array($key => $value)
 	 *        A Check  will be
 	 *        done to see if the any of the identifiers
-	 *        in the given array key-value pairs are not found in the cache. if 
-	 *        not, then a new error is 
+	 *        in the given array key-value pairs are not found in the cache. if
+	 *        not, then a new error is
 	 *        created and appended to the Errors vector.
 	 */
 	void CheckArrayDefinition(pelet::ArrayExpressionClass* expr);
-	
+
 	/**
 	 * lookup the class name in the tag cache; if it is not found
 	 * then add an error
 	 * @param className the name of the class to look up,
 	 * @param lineNumber line where the class name is in the file,
 	 *        to populate the error string
-	 * @param pos position where the class name is in the file; used to 
+	 * @param pos position where the class name is in the file; used to
 	 *        populate the error string
 	 */
 	void CheckClassNameAndLog(const UnicodeString& className, int lineNumber, int pos);
-	
+
 	/**
 	 * lookup the class name in the tag cache; if it is not found
 	 * then returns false (no error is logged)
-	 * 
+	 *
 	 * @param className the name of the class to look up
 	 * @return bool TRUE if class name exists in the tag cache
 	 */
 	bool CheckClassName(const UnicodeString& className);
-	
+
 	/**
 	 * lookup the namespace name in the tag cache; if it is not found
 	 * then returns false (no error is logged)
-	 * 
+	 *
 	 * @param namespaceName the name of the namespace to look up
 	 * @return bool TRUE if class name exists in the tag cache
 	 */
 	bool CheckNamespace(const UnicodeString& namespaceName);
-	
+
 	/**
 	 * lookup the method in the tag cache; if it is not found
 	 * then add an error

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,7 +39,7 @@ namespace t4p {
  * contains the results of the search.
  */
 class TagCacheSearchCompleteEventClass : public wxEvent {
-        
+
     public:
 
 	/**
@@ -52,9 +52,9 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
      */
 	std::vector<t4p::PhpTagClass> Tags;
 
-    TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
+    TagCacheSearchCompleteEventClass(int eventId, const UnicodeString& searchString,
 		const std::vector<t4p::PhpTagClass>& tags);
-    
+
     wxEvent* Clone() const;
 
 };
@@ -74,7 +74,7 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
  * the results will be posted in an event of type EVENT_TAG_CACHE_SEARCH_COMPLETE.
  */
 class TagCacheSearchActionClass : public t4p::ActionClass {
-	
+
 public:
 
 	TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
@@ -85,7 +85,7 @@ public:
 	 * This won't be a straight equals search; it will be a "near match"
 	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
 	 * when the given search string is more than 2 characters long, and will
-	 * be an exact search as defined by CollectFullyQualifiedResources when the 
+	 * be an exact search as defined by CollectFullyQualifiedResources when the
 	 * search string is 2 characters long
 	 * This method assumes that index is up-to-date, if not matches may be stale.
 	 *

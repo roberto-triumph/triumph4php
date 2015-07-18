@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -91,7 +91,7 @@ t4p::SuppressionRuleClass::SuppressionRuleClass()
 : Type(SKIP_ALL)
 , Target()
 , Location() {
-	
+
 }
 
 t4p::SuppressionRuleClass::SuppressionRuleClass(const t4p::SuppressionRuleClass& src)
@@ -104,7 +104,7 @@ t4p::SuppressionRuleClass::SuppressionRuleClass(const t4p::SuppressionRuleClass&
 void t4p::SuppressionRuleClass::SkipAllRule(const wxFileName& location) {
 	Type = SKIP_ALL;
 	Target = UNICODE_STRING_SIMPLE("");
-	
+
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
@@ -114,11 +114,11 @@ void t4p::SuppressionRuleClass::SkipAllRule(const wxFileName& location) {
 	}
 }
 
-void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location, 
+void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location,
 	const UnicodeString& className) {
 	Type = SKIP_UNKNOWN_CLASS;
 	Target = className;
-	
+
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
@@ -128,11 +128,11 @@ void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location,
 	}
 }
 
-void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location, 
+void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location,
 	const UnicodeString& methodName) {
 	Type = SKIP_UNKNOWN_METHOD;
 	Target = methodName;
-	
+
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
@@ -142,11 +142,11 @@ void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location
 	}
 }
 
-void t4p::SuppressionRuleClass::SkipUnknownFunctionRule(const wxFileName& location, 
+void t4p::SuppressionRuleClass::SkipUnknownFunctionRule(const wxFileName& location,
 		const UnicodeString& functionName) {
 	Type = SKIP_UNKNOWN_FUNCTION;
 	Target = functionName;
-	
+
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
@@ -164,7 +164,7 @@ t4p::SuppressionRuleClass& t4p::SuppressionRuleClass::operator=(const t4p::Suppr
 void t4p::SuppressionRuleClass::Copy(const t4p::SuppressionRuleClass& src) {
 	Type = src.Type;
 	Target = src.Target;
-	
+
 	// make thread safe
 	if (src.Location.IsDir()) {
 		Location.AssignDir(src.Location.GetPath());
@@ -191,14 +191,14 @@ bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vec
 	wxTextInputStream txt(fstream);
 	wxStringTokenizer tok;
 	while (!fstream.Eof()) {
-		
+
 		// each supression is in its own line, in comma-separated form
-		// 
+		//
 		// type,target, location
 		//
 		// lines starting with # are ignored (treated as comments)
 		// examples:
-		// 
+		//
 		// SKIP_UNKNOWN_CLASS,Couchbase,/home/user/www/project
 		// SKIP_ALL,,/home/user/www/project/vendor
 		//
@@ -211,11 +211,11 @@ bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vec
 			wxString targetStr = tok.GetNextToken();
 			wxString locationStr = tok.GetNextToken();
 			bool goodType = false;
-			
+
 			typeStr.Trim(false).Trim(true);
 			targetStr.Trim(false).Trim(true);
 			locationStr.Trim(false).Trim(true);
-			
+
 			t4p::SuppressionRuleClass::Types type = RuleTypeFromName(typeStr, goodType);
 			if (!typeStr.IsEmpty() && !locationStr.IsEmpty() && goodType) {
 				t4p::SuppressionRuleClass rule;
@@ -256,7 +256,7 @@ bool t4p::LintSuppressionClass::Save(const wxFileName& suppressionFile) {
 		return false;
 	}
 	wxTextOutputStream txt(fstream);
-	
+
 	txt.WriteString("# each supression is in its own line, in comma-separated form\n");
 	txt.WriteString("# \n");
 	txt.WriteString("# type, target, location\n");
@@ -282,7 +282,7 @@ bool t4p::LintSuppressionClass::Save(const wxFileName& suppressionFile) {
 		else if (rule->Location.DirExists()) {
 			locationStr = rule->Location.GetPathWithSep();
 		}
-		
+
 		txt.WriteString(typeStr);
 		txt.WriteString(",");
 		txt.WriteString(targetStr);
@@ -297,22 +297,22 @@ void t4p::LintSuppressionClass::Add(const t4p::SuppressionRuleClass& rule) {
 	Rules.push_back(rule);
 }
 
-bool t4p::LintSuppressionClass::ShouldIgnore(const wxFileName& file, const UnicodeString& target, 
+bool t4p::LintSuppressionClass::ShouldIgnore(const wxFileName& file, const UnicodeString& target,
 		t4p::SuppressionRuleClass::Types type) const {
 	bool ignore = false;
 	std::vector<t4p::SuppressionRuleClass>::const_iterator rule;
 	wxString fullPathToCheck = file.GetFullPath();
-	
+
 	for (rule = Rules.begin(); rule != Rules.end(); ++rule) {
 		bool matchesType = false;
 		bool matchesLocation = false;
 		bool matchesTarget  = false;
-		
+
 		// account for the skip_all rule
 		if (rule->Type == type || rule->Type == t4p::SuppressionRuleClass::SKIP_ALL) {
 			matchesType = true;
 		}
-			
+
 		if (matchesType) {
 			// does the rule match the given file?
 			// if the rule location is a dir, then is the file in the dir?
@@ -325,16 +325,16 @@ bool t4p::LintSuppressionClass::ShouldIgnore(const wxFileName& file, const Unico
 			}
 			matchesLocation = fullPathToCheck.Find(rulePath) == 0;
 		}
-		
+
 		// for the skip_all rule, we don't need to look at target
 		if (matchesType && matchesLocation && rule->Type == t4p::SuppressionRuleClass::SKIP_ALL) {
 			matchesTarget = true;
 		}
-		
+
 		if (matchesType && matchesLocation && rule->Target.caseCompare(target, 0) == 0) {
 			matchesTarget = true;
 		}
-		
+
 		if (matchesType && matchesLocation && matchesTarget) {
 			ignore = true;
 			break;
@@ -353,10 +353,10 @@ bool t4p::LintSuppressionClass::AddSkipAllRuleForDirectory(const wxFileName& dir
 			if (location == dirStr) {
 				isFound = true;
 			}
-		}		
+		}
 		++rule;
 	}
-	
+
 	if (!isFound) {
 		t4p::SuppressionRuleClass newRule;
 		newRule.SkipAllRule(dir);
@@ -372,7 +372,7 @@ bool t4p::LintSuppressionClass::RemoveRulesForDirectory(const wxFileName& dir) {
 	while (rule != Rules.end()) {
 		bool isRemoved = false;
 		if (rule->Location.IsDir()) {
-			
+
 			// what should happen to rules that the user manually created
 			// that are in sub-drectories of the given dir? should we
 			// remove those too? for now, we are not
@@ -383,7 +383,7 @@ bool t4p::LintSuppressionClass::RemoveRulesForDirectory(const wxFileName& dir) {
 				removeCount++;
 			}
 		}
-		
+
 		if (!isRemoved) {
 			++rule;
 		}

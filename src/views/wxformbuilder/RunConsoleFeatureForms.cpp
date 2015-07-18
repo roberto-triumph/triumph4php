@@ -13,44 +13,44 @@ RunConsolePanelGeneratedClass::RunConsolePanelGeneratedClass( wxWindow* parent, 
 {
 	wxBoxSizer* MainSizer;
 	MainSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	wxFlexGridSizer* FlexGridSizer;
 	FlexGridSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FlexGridSizer->AddGrowableCol( 0 );
 	FlexGridSizer->AddGrowableRow( 1 );
 	FlexGridSizer->SetFlexibleDirection( wxBOTH );
 	FlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	wxBoxSizer* TopSizer;
 	TopSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	Command = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER );
 	TopSizer->Add( Command, 1, wxALL, 5 );
-	
+
 	RunButton = new wxButton( this, wxID_ANY, _("Run"), wxDefaultPosition, wxDefaultSize, 0 );
 	TopSizer->Add( RunButton, 0, wxALL, 5 );
-	
+
 	ClearButton = new wxButton( this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDefaultSize, 0 );
 	TopSizer->Add( ClearButton, 0, wxALL, 5 );
-	
+
 	StoreButton = new wxButton( this, wxID_ANY, _("Store Command"), wxDefaultPosition, wxDefaultSize, 0 );
 	TopSizer->Add( StoreButton, 0, wxALL, 5 );
-	
+
 	FlexGridSizer->Add( TopSizer, 0, wxEXPAND, 5 );
-	
+
 	wxBoxSizer* BottomSizer;
 	BottomSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	OutputWindow = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH );
 	BottomSizer->Add( OutputWindow, 1, wxEXPAND|wxRIGHT|wxLEFT, 5 );
-	
+
 	FlexGridSizer->Add( BottomSizer, 0, wxEXPAND, 5 );
-	
+
 	MainSizer->Add( FlexGridSizer, 1, wxEXPAND, 5 );
-	
+
 	this->SetSizer( MainSizer );
 	this->Layout();
-	
+
 	// Connect Events
 	Command->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( RunConsolePanelGeneratedClass::RunCommand ), NULL, this );
 	RunButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::RunCommand ), NULL, this );
@@ -69,23 +69,23 @@ RunConsolePanelGeneratedClass::~RunConsolePanelGeneratedClass()
 	StoreButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( RunConsolePanelGeneratedClass::OnStoreButton ), NULL, this );
 	OutputWindow->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnLeftDown ), NULL, this );
 	OutputWindow->Disconnect( wxEVT_MOTION, wxMouseEventHandler( RunConsolePanelGeneratedClass::OnMouseMotion ), NULL, this );
-	
+
 }
 
 CliCommandEditDialogGeneratedClass::CliCommandEditDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
+
 	wxFlexGridSizer* RightSizer;
 	RightSizer = new wxFlexGridSizer( 5, 1, 0, 0 );
 	RightSizer->AddGrowableCol( 0 );
 	RightSizer->AddGrowableRow( 1 );
 	RightSizer->SetFlexibleDirection( wxBOTH );
 	RightSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	wxBoxSizer* FormSizer;
 	FormSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	wxFlexGridSizer* FormFlexSizer;
 	FormFlexSizer = new wxFlexGridSizer( 2, 1, 0, 0 );
 	FormFlexSizer->AddGrowableCol( 0 );
@@ -93,78 +93,78 @@ CliCommandEditDialogGeneratedClass::CliCommandEditDialogGeneratedClass( wxWindow
 	FormFlexSizer->AddGrowableRow( 1 );
 	FormFlexSizer->SetFlexibleDirection( wxBOTH );
 	FormFlexSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	wxBoxSizer* FormColumn1Sizer;
 	FormColumn1Sizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	ExecutableLabel = new wxStaticText( this, wxID_ANY, _("Executable"), wxDefaultPosition, wxDefaultSize, 0 );
 	ExecutableLabel->Wrap( -1 );
 	FormColumn1Sizer->Add( ExecutableLabel, 0, wxALL, 5 );
-	
+
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	Executable = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer12->Add( Executable, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	ExecutableFilePicker = new wxFilePickerCtrl( this, wxID_ANY, wxEmptyString, _("Select an executable"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_FILE_MUST_EXIST|wxFLP_OPEN );
 	bSizer12->Add( ExecutableFilePicker, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
-	
+
 	FormColumn1Sizer->Add( bSizer12, 1, wxEXPAND, 5 );
-	
+
 	FormFlexSizer->Add( FormColumn1Sizer, 1, wxEXPAND, 5 );
-	
+
 	wxBoxSizer* WorkingDirectorySizer;
 	WorkingDirectorySizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	WorkingDirectoryLabel = new wxStaticText( this, wxID_ANY, _("Working Directory"), wxDefaultPosition, wxDefaultSize, 0 );
 	WorkingDirectoryLabel->Wrap( -1 );
 	WorkingDirectorySizer->Add( WorkingDirectoryLabel, 0, wxALL, 5 );
-	
+
 	WorkingDirectory = new wxDirPickerCtrl( this, wxID_ANY, wxEmptyString, _("Select a working directory"), wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_USE_TEXTCTRL );
 	WorkingDirectorySizer->Add( WorkingDirectory, 0, wxALL|wxEXPAND, 5 );
-	
+
 	FormFlexSizer->Add( WorkingDirectorySizer, 1, wxEXPAND, 5 );
-	
+
 	FormSizer->Add( FormFlexSizer, 1, wxEXPAND, 5 );
-	
+
 	RightSizer->Add( FormSizer, 1, wxEXPAND, 5 );
-	
+
 	wxBoxSizer* ArgumentsSizer;
 	ArgumentsSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	ArgumentsLabel = new wxStaticText( this, wxID_ANY, _("Arguments"), wxDefaultPosition, wxDefaultSize, 0 );
 	ArgumentsLabel->Wrap( -1 );
 	ArgumentsSizer->Add( ArgumentsLabel, 0, wxALL, 5 );
-	
+
 	Arguments = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE );
 	ArgumentsSizer->Add( Arguments, 1, wxALL|wxEXPAND, 5 );
-	
+
 	RightSizer->Add( ArgumentsSizer, 1, wxEXPAND, 5 );
-	
+
 	wxBoxSizer* FormColumn2Sizer;
 	FormColumn2Sizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	DescriptionLabel = new wxStaticText( this, wxID_ANY, _("Description"), wxDefaultPosition, wxDefaultSize, 0 );
 	DescriptionLabel->Wrap( -1 );
 	FormColumn2Sizer->Add( DescriptionLabel, 0, wxALL, 5 );
-	
+
 	Description = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	FormColumn2Sizer->Add( Description, 0, wxALL|wxEXPAND, 5 );
-	
+
 	RightSizer->Add( FormColumn2Sizer, 1, wxEXPAND, 5 );
-	
+
 	wxBoxSizer* CheckSizer;
 	CheckSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	WaitForArguments = new wxCheckBox( this, wxID_ANY, _("Wait For Arguments"), wxDefaultPosition, wxDefaultSize, 0 );
 	CheckSizer->Add( WaitForArguments, 0, wxALL, 5 );
-	
+
 	ShowInToolbar = new wxCheckBox( this, wxID_ANY, _("Show In Toolbar"), wxDefaultPosition, wxDefaultSize, 0 );
 	CheckSizer->Add( ShowInToolbar, 0, wxALL, 5 );
-	
+
 	RightSizer->Add( CheckSizer, 1, wxEXPAND, 5 );
-	
+
 	ButtonsSizer = new wxStdDialogButtonSizer();
 	ButtonsSizerOK = new wxButton( this, wxID_OK );
 	ButtonsSizer->AddButton( ButtonsSizerOK );
@@ -174,12 +174,12 @@ CliCommandEditDialogGeneratedClass::CliCommandEditDialogGeneratedClass( wxWindow
 	ButtonsSizer->AddButton( ButtonsSizerHelp );
 	ButtonsSizer->Realize();
 	RightSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
-	
+
 	this->SetSizer( RightSizer );
 	this->Layout();
-	
+
 	this->Centre( wxBOTH );
-	
+
 	// Connect Events
 	ExecutableFilePicker->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( CliCommandEditDialogGeneratedClass::OnFileChanged ), NULL, this );
 	Description->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CliCommandEditDialogGeneratedClass::OnDescriptionText ), NULL, this );
@@ -194,14 +194,14 @@ CliCommandEditDialogGeneratedClass::~CliCommandEditDialogGeneratedClass()
 	Description->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( CliCommandEditDialogGeneratedClass::OnDescriptionText ), NULL, this );
 	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandEditDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandEditDialogGeneratedClass::OnOkButton ), NULL, this );
-	
+
 }
 
 MyFrame1::MyFrame1( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	
+
+
 	this->Centre( wxBOTH );
 }
 
@@ -212,44 +212,44 @@ MyFrame1::~MyFrame1()
 CliCommandListDialogGeneratedClass::CliCommandListDialogGeneratedClass( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
+
 	wxBoxSizer* BoxSizer;
 	BoxSizer = new wxBoxSizer( wxVERTICAL );
-	
+
 	wxFlexGridSizer* ColumnSizer;
 	ColumnSizer = new wxFlexGridSizer( 4, 1, 0, 0 );
 	ColumnSizer->AddGrowableCol( 0 );
 	ColumnSizer->AddGrowableRow( 1 );
 	ColumnSizer->SetFlexibleDirection( wxBOTH );
 	ColumnSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
+
 	SavedLabel = new wxStaticText( this, wxID_ANY, _("Saved Console Commands"), wxDefaultPosition, wxDefaultSize, 0 );
 	SavedLabel->Wrap( -1 );
 	ColumnSizer->Add( SavedLabel, 0, wxALL, 5 );
-	
-	CommandsList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+
+	CommandsList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE );
 	ColumnSizer->Add( CommandsList, 1, wxALL|wxEXPAND, 5 );
-	
+
 	wxBoxSizer* ListButtonsSizer;
 	ListButtonsSizer = new wxBoxSizer( wxHORIZONTAL );
-	
+
 	MoveUpButton = new wxButton( this, wxID_ANY, _("Up"), wxDefaultPosition, wxDefaultSize, 0 );
 	ListButtonsSizer->Add( MoveUpButton, 0, wxALL, 5 );
-	
+
 	MoveDownButton = new wxButton( this, wxID_ANY, _("Down"), wxDefaultPosition, wxDefaultSize, 0 );
 	ListButtonsSizer->Add( MoveDownButton, 0, wxALL, 5 );
-	
+
 	AddButton = new wxButton( this, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
 	ListButtonsSizer->Add( AddButton, 0, wxALL, 5 );
-	
+
 	DeleteButton = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	ListButtonsSizer->Add( DeleteButton, 0, wxALL, 5 );
-	
+
 	EditButton = new wxButton( this, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
 	ListButtonsSizer->Add( EditButton, 0, wxALL, 5 );
-	
+
 	ColumnSizer->Add( ListButtonsSizer, 1, wxEXPAND, 5 );
-	
+
 	ButtonsSizer = new wxStdDialogButtonSizer();
 	ButtonsSizerOK = new wxButton( this, wxID_OK );
 	ButtonsSizer->AddButton( ButtonsSizerOK );
@@ -259,14 +259,14 @@ CliCommandListDialogGeneratedClass::CliCommandListDialogGeneratedClass( wxWindow
 	ButtonsSizer->AddButton( ButtonsSizerHelp );
 	ButtonsSizer->Realize();
 	ColumnSizer->Add( ButtonsSizer, 1, wxEXPAND, 5 );
-	
+
 	BoxSizer->Add( ColumnSizer, 1, wxEXPAND, 5 );
-	
+
 	this->SetSizer( BoxSizer );
 	this->Layout();
-	
+
 	this->Centre( wxBOTH );
-	
+
 	// Connect Events
 	CommandsList->Connect( wxEVT_COMMAND_LISTBOX_DOUBLECLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnListDoubleClick ), NULL, this );
 	MoveUpButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnUpButton ), NULL, this );
@@ -289,5 +289,5 @@ CliCommandListDialogGeneratedClass::~CliCommandListDialogGeneratedClass()
 	EditButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnEditButton ), NULL, this );
 	ButtonsSizerHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnHelpButton ), NULL, this );
 	ButtonsSizerOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CliCommandListDialogGeneratedClass::OnOkButton ), NULL, this );
-	
+
 }

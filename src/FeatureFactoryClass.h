@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,17 +32,17 @@ namespace t4p {
 /**
  * The feature factory class will take care of instantiating
  * and deleting features along with corresponding views.
- * 
+ *
  * The main reason for this class existing is to allow
  * for forward declarations of features so that we prevent
  * compilation as much as possible; because feature views
  * need features, we need to keep each feature in a separate
- * variable; if we included the feature then every time 
+ * variable; if we included the feature then every time
  * a new feature is created we would need to edit the triumph
  * header, which is required by many features; this would result
  * in all features being recompiled.
  */
- 
+
 class FeatureClass;
 class FeatureViewClass;
 class AppClass;
@@ -91,12 +91,12 @@ public:
 	std::vector<t4p::FeatureViewClass*> FeatureViews;
 
 	FeatureFactoryClass(t4p::AppClass& app);
-	
+
 	~FeatureFactoryClass();
-	
+
 	bool CreateFeatures();
 	void DeleteFeatures();
-	
+
 	/**
 	 * Feature views are view specific functionality; a view
 	 * is the class that makes updates to the GUI of the editor
@@ -106,7 +106,7 @@ public:
 	 * on Mac OS X, an application may run without a main frame,
 	 * so during a run feature views may be created more than once
 	 * (but there will be at most 1 instance to each view).
-	 * 
+	 *
 	 * @return bool TRUE if views were created; false f views
 	 *         were not created. View will not be created if
 	 *         at least 1 view is instantiated. This is an all-or
@@ -114,11 +114,11 @@ public:
 	 *         or none are created.
 	 */
 	bool CreateViews();
-	
+
 	void DeleteViews();
-	
+
 	private:
-	
+
 	t4p::AppClass& App;
 
 	t4p::FileOperationsFeatureClass*       FileOperations;

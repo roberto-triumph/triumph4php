@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -70,7 +70,7 @@ bool t4p::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 		// get the 'raw' connection because it can handle multiple statements at once
 		char *errorMessage = NULL;
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
-		
+
 		wxASSERT_MSG(backend->conn_, "session is not connected, cannot execute sql script file");
 		sqlite_api::sqlite3_exec(backend->conn_, stdSql.c_str(), NULL, NULL, &errorMessage);
 		if (errorMessage) {
@@ -89,10 +89,10 @@ bool t4p::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 
 bool t4p::SqliteTables(soci::session& session, std::vector<std::string>& tableNames, wxString& error) {
 	bool ret = false;
-	try {	
+	try {
 		std::string tableName;
-		soci::statement stmt = (session.prepare << 
-			"SELECT tbl_name from sqlite_master WHERE type='table' AND NOT name = 'sqlite_sequence'", 
+		soci::statement stmt = (session.prepare <<
+			"SELECT tbl_name from sqlite_master WHERE type='table' AND NOT name = 'sqlite_sequence'",
 			soci::into(tableName)
 		);
 		if (stmt.execute(true)) {
@@ -113,7 +113,7 @@ int t4p::SqliteSchemaVersion(soci::session& session) {
 	int versionNumber = 0;
 	try {
 
-		// check to see if table exists, on first the very first program run 
+		// check to see if table exists, on first the very first program run
 		// there won't be any tables
 		std::string table;
 		session.once << "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'",
@@ -123,7 +123,7 @@ int t4p::SqliteSchemaVersion(soci::session& session) {
 		}
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
-		versionNumber = -1;	
+		versionNumber = -1;
 	}
 	return versionNumber;
 }

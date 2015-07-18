@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -55,31 +55,31 @@ public:
 	 * the full path of the file searched
 	 */
 	wxString FileName;
-	
+
 	/**
 	 * preview is the entire line where the hit occurred.
 	 */
 	wxString Preview;
-	
+
 	/**
 	 * line where the hit was found (1- based)
 	 */
 	int LineNumber;
-	
+
 	/**
 	 * character position where the hit was found (0- based),
 	 * relative to the start of the line.
-	 * 
+	 *
 	 * 0 <= LineOffset < Preview.Length()
 	 */
 	int LineOffset;
-	
+
 	/**
 	 * character position where the hit was found (0- based)
 	 * relative to the beginning of the file.
 	 */
 	int FileOffset;
-	
+
 	/**
 	 * Character length of the matching hit
 	 */
@@ -100,13 +100,13 @@ public:
 
 	 * @param fileName the full path to the file
 	 * @param preview the contents of the line where the hit ocurred
-	 * @param lineNumber line (1 based) where the hit 
+	 * @param lineNumber line (1 based) where the hit
 	 * @param lineOffset character position (0 based) where the hit ocurred. relative to the line
 	 * @param fileOffset character position (0 based) where the hit ocurred, relative to the beginning
 	 *        of the file
 	 * @param matchLength length of the matching text
 	 */
-	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber, int lineOffset, 
+	FindInFilesHitClass(const wxString& fileName, const wxString& preview, int lineNumber, int lineOffset,
 		int fileOffset, int matchLength);
 
 	/**
@@ -115,7 +115,7 @@ public:
 	 * @param hit to deep copy
 	 */
 	FindInFilesHitClass& operator=(const t4p::FindInFilesHitClass& hit);
-	
+
 	/**
 	 * Equality operator, needed to implment wxVariant stuff
 	 * @param bool return if hits are the same
@@ -189,10 +189,10 @@ public:
 
 	/**
 	 * Prepare to iterate through all files in the given directory.
-	 * 
+	 *
 	 * @param FindInFilesClass findInFiles the expression to search for
 	 * @param doHiddenFiles if TRUE then hidden files are searched
-	 * @param skipFiles full paths of files to not search. We want to NOT perform searches 
+	 * @param skipFiles full paths of files to not search. We want to NOT perform searches
 	 *        in files that are already opened; those would result in incorrect hits.
 	 * @return True if directory is valid and the find expression is valid.
 	 */
@@ -201,7 +201,7 @@ public:
 	/**
 	 * When replacing, the thread will replace the files in the given hits. In case files are opened, we don't want to
 	 * replace them in the background since the user may have modified them but not saved them yet.
-	 * 
+	 *
 	 * @param FindInFilesClass findInFiles the expression to search and replace with
 	 * @param allHits the files to perform replacements in.
 	 * @param skipFiles full paths of files to not replace. We want to NOT perform replacements
@@ -231,16 +231,16 @@ protected:
 	 * Replaces this expression in all files.
 	 */
 	bool BackgroundFileMatch(const wxString& file);
-	
+
 private:
 
 	/**
 	 * To find matches in files.
-	 * 
+	 *
 	 * @var FindInFilesClass
 	 */
 	FindInFilesClass FindInFiles;
-	
+
 	/**
 	 * Matched files that will NOT be replaced / searched
 	 * The feature will make the background thread skip the files that are currently opened; this way the result do not
@@ -252,7 +252,7 @@ private:
 class FindInFilesFeatureClass : public FeatureClass {
 
 public:
-	
+
 	/**
 	 * We will NOT use this object to actually search, we will just use this to keep track of the last
 	 * inputs by the user so we can show them
@@ -269,9 +269,9 @@ public:
 	 * Constructor
 	 */
 	FindInFilesFeatureClass(t4p::AppClass& app);
-	
+
 private:
-	
+
 };
 
 }

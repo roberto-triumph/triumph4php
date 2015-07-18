@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ namespace t4p {
  * This class will take care of iterating through all files in a project
  * and parsing the resources so that queries to ParsedTagFinderClass
  * will work.
- * The ProjectTagActionClass will generate a TagFinderListCompleteEventClass 
+ * The ProjectTagActionClass will generate a TagFinderListCompleteEventClass
  * event once each project  has been parsed.
  */
 class ProjectTagActionClass : public GlobalActionClass {
@@ -45,7 +45,7 @@ class ProjectTagActionClass : public GlobalActionClass {
 public:
 
 	/**
-	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all 
+	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all
 	 * files have been iterated through.
 	 */
 	ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
@@ -81,7 +81,7 @@ private:
 	 * Queue of projects to be indexed.
 	 */
 	std::vector<t4p::ProjectClass> Projects;
-	
+
 	/**
 	 * the relevant file extensions that we want to look at
 	 */
@@ -111,7 +111,7 @@ private:
 	 * recurse though all of the queued projects
 	 */
 	void IterateProjects();
-	
+
 	/** the number of files that have been parsed in the current project */
 	int FilesCompleted;
 
@@ -123,7 +123,7 @@ private:
  * This class will prime the tag cache with all of the
  * enabled projects. The tag cache will be primed; although
  * it will be primed with the existing cache file which may be
- * stale. 
+ * stale.
  */
 class ProjectTagInitActionClass : public t4p::InitializerGlobalActionClass {
 
@@ -137,7 +137,7 @@ public:
 };
 
 /**
- * this action will re-tag a single directory (and its subdirs) 
+ * this action will re-tag a single directory (and its subdirs)
  */
 class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
 
@@ -152,7 +152,7 @@ public:
 	void SetDirToParse(const wxString& path);
 
 	/**
-	 * prepare to iterate through the file given in SetDirToParse. 
+	 * prepare to iterate through the file given in SetDirToParse.
 	 * This method can be used to update the resources once a die has been created on disk.
 	 * Note that directory must be inside an enabled project
 	 *
@@ -194,7 +194,7 @@ public:
 	ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * 
+	 *
 	 * Set the file to be parsed
 	 * @param fullPath file to be scanned (full path, including name).
 	 */
@@ -244,7 +244,7 @@ public:
 	ProjectTagSingleFileRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * 
+	 *
 	 * Set the file to be parsed
 	 * @param fullPath file to be scanned (full path, including name).
 	 */
@@ -265,7 +265,7 @@ protected:
 	wxString GetLabel() const;
 
 	/**
-	 * the files 
+	 * the files
 	 */
 	wxFileName OldFileName;
 	wxFileName NewFileName;
@@ -293,7 +293,7 @@ public:
 	ProjectTagDirectoryRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
-	 * 
+	 *
 	 * Set the file to be parsed
 	 * @param fullPath file to be scanned (full path, including name).
 	 */

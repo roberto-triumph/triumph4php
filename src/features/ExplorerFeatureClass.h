@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ class ExplorerEventClass;
 class ExplorerModifyEventClass;
 
 class FileListingClass : public wxEvtHandler {
-	
+
 public:
 
 	wxFileName WorkingDir;
@@ -45,21 +45,21 @@ public:
 	std::vector<wxFileName> Dirs;
 	int TotalFiles;
 	int TotalSubDirs;
-	
+
 	FileListingClass(wxEvtHandler& handler);
 	~FileListingClass();
-	
+
 	void StartRefresh(const wxFileName& dir, const std::vector<wxString>& filterExtensions, bool doHidden);
-	
+
 	void StartRename(const wxFileName& oldFile, const wxString& newName);
-	
+
 	void StartDelete(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files);
-		
+
 	private:
-	
+
 	// when a file is added/remove update the panel
 	void OnFsWatcher(wxFileSystemWatcherEvent& event);
-	
+
 	/**
 	 * when the explorer action has finished fetching the files,
 	 * tells the handler that the file listing is up-to-date
@@ -82,7 +82,7 @@ public:
 	 * directories has changed
 	 */
 	wxEvtHandler& Handler;
-	
+
 	/**
 	 * we will watch for new/deleted files and update the panel automatically
 	 * using a pointer because wxFileSystemWatcher::Remove() is buggy on MSW
@@ -90,7 +90,7 @@ public:
 	 * this class will own the pointer
 	 */
 	wxFileSystemWatcher* Watcher;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -102,7 +102,7 @@ public:
 class ExplorerFeatureClass : public t4p::FeatureClass {
 
 public:
-	
+
 	/**
 	 * executable of the operating system file manager
 	 */
@@ -116,24 +116,24 @@ public:
 	ExplorerFeatureClass(t4p::AppClass& app);
 
 	void LoadPreferences(wxConfigBase* config);
-	
+
 	/**
 	 * @return all of the enabled sources
 	 */
 	std::vector<t4p::SourceClass> EnabledSources() const;
-	
+
 	/**
 	 * @return all of the enabled source directories
 	 */
 	std::vector<wxFileName> EnabledSourceDirectories() const;
-	
+
 private:
 
 	/**
 	 * when projects list is updated, we need to update our sources list
 	 */
 	void OnAppPreferencesSaved(wxCommandEvent& event);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -185,7 +185,7 @@ public:
 	 */
 	int TotalSubDirs;
 
-	ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files, 
+	ExplorerEventClass(int eventId, const wxFileName& dir, const std::vector<wxFileName>& files,
 		const std::vector<wxFileName>& subDirs, const wxString& error, int totalFiles, int totalSubDirs);
 
 	wxEvent* Clone() const;
@@ -218,7 +218,7 @@ private:
 
 	wxFileName Dir;
 
-	/** 
+	/**
 	 * extensions to show.  if empty, we show all files
 	 */
 	std::vector<wxString> Extensions;
@@ -355,15 +355,15 @@ public:
 	/**
 	 * create a rename event
 	 */
-	ExplorerModifyEventClass(int eventId, const wxFileName& oldFile, 
+	ExplorerModifyEventClass(int eventId, const wxFileName& oldFile,
 		const wxString& newName, bool success);
 
 	/**
 	 * create a delete event
 	 */
-	ExplorerModifyEventClass(int eventId, 
-		const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted, 
-		const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted, 
+	ExplorerModifyEventClass(int eventId,
+		const std::vector<wxFileName>& dirsDeleted, const std::vector<wxFileName>& filesDeleted,
+		const std::vector<wxFileName>& dirsNotDeleted, const std::vector<wxFileName>& filesNotDeleted,
 		bool success);
 
 	/**

@@ -44,10 +44,10 @@ void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::PhpTagClass& tag) {
 	bool hasSignature = false;
 	wxString charset;
 	t4p::FindInFilesClass::FileContents(tag.FullPath, content, charset, hasSignature);
-	int32_t position, 
+	int32_t position,
 			length;
 	bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, content, position, length);
-	
+
 	if (found) {
 		t4p::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
 		App.EventSink.Publish(cmd);

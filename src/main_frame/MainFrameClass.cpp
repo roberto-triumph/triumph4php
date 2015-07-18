@@ -133,7 +133,7 @@ t4p::MainFrameClass::MainFrameClass(const std::vector<t4p::FeatureViewClass*>& f
 
 	// setup the bottom "tools" pane, the main content pane, and the toolbar on top
 	// tools notebook will be placed at row = 0 because we want it at the bottom
-	// of the frame even if there are split notebooks or the finder panel is 
+	// of the frame even if there are split notebooks or the finder panel is
 	// visible.
 	int row = 0;
 	AuiManager.AddPane(ToolsNotebook, wxAuiPaneInfo().Name(wxT("tools")).Bottom().Caption(
@@ -294,7 +294,7 @@ void t4p::MainFrameClass::PreferencesSaved() {
 }
 
 void t4p::MainFrameClass::SetApplicationFont() {
-	
+
 	// ATTN: this method will only work on startup (before the
 	// main frame is drawn. have not found a way to have the font
 	// changes apply to all windows /panels that are already
@@ -443,7 +443,7 @@ void t4p::MainFrameClass::RealizeToolbar() {
 
 void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	CodeControlClass* codeWindow = FindFocusedCodeControl(AuiManager);
-	
+
 	// only show the user if and only if
 	// user clicked inside of the code control
 	if (codeWindow != NULL && event.GetEventObject() == codeWindow) {
@@ -522,7 +522,7 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 }
 
 void t4p::MainFrameClass::UpdateNotebooks() {
-	
+
 	// this is a code notebook
 	// for code notebooks; we want to keep 1, but if the user
 	// removes pages from the 2-N notebook, then we kill the
@@ -541,14 +541,14 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 			}
 		}
 	}
-	
+
 	if (finalVisible <= 2) {
 		// if we have 2 or less notebooks, hide the captions as they are not useful
 		for (size_t i = 0; i < notebooks.size(); i++) {
 			AuiManager.GetPane(notebooks[i]).CaptionVisible(false);
 		}
 	}
-	
+
 	// if the center notebook no longer has pages, then transfer
 	// the pages from another notebook into the center notebook
 	// we do this because the notebook layout and split notebooks
@@ -559,7 +559,7 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 		if (notebook->GetPageCount() == 0 && notebooks.size() > 1) {
 			wxAuiPaneInfo& info = AuiManager.GetPane(notebook);
 			if (info.IsOk() && info.dock_direction == wxAUI_DOCK_CENTER) {
-				
+
 				// get another notebook
 				t4p::NotebookClass* src = i > 0 ? notebooks[i - 1] : notebooks[i + 1];
 				while (src->GetPageCount() > 0) {
@@ -742,7 +742,7 @@ BEGIN_EVENT_TABLE(t4p::MainFrameClass,  MainFrameGeneratedClass)
 	// make sure some STC events are propagated
 	EVT_STC_SAVEPOINTREACHED(wxID_ANY, t4p::MainFrameClass::OnStcSavePointReached)
 	EVT_STC_SAVEPOINTLEFT(wxID_ANY, t4p::MainFrameClass::OnStcSavedPointLeft)
-	
+
 	// make sure to show status of running sequences
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_START, t4p::MainFrameClass::OnSequenceStart)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::MainFrameClass::OnSequenceComplete)

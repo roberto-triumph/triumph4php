@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -80,24 +80,24 @@ static wxString NiceDocText(const UnicodeString& comment) {
 		// <ul> -- unordered list
 		// <var> -- denote a variable name
 		//
-		// will ignore all of the tags except '<br>', '<code>', <p>', '<pre>' 
+		// will ignore all of the tags except '<br>', '<code>', <p>', '<pre>'
 		// since we cannot format the Scintilla call tip window.
 		// For the tags we don handle; just translate them to newlies for now.
-		wxString remove[] = { 
-			wxT("<b>"), wxT("</b>"), wxT("<i>"), wxT("</i>"), 
-			wxT("<kbd>"), wxT("</kbd>"), wxT("<samp>"), wxT("</samp>"), 
-			wxT("<var>"), wxT("</var>"), 
-			wxT("") 
+		wxString remove[] = {
+			wxT("<b>"), wxT("</b>"), wxT("<i>"), wxT("</i>"),
+			wxT("<kbd>"), wxT("</kbd>"), wxT("<samp>"), wxT("</samp>"),
+			wxT("<var>"), wxT("</var>"),
+			wxT("")
 		};
 		for (int i = 0; !remove[i].IsEmpty(); ++i) {
-			line.Replace(remove[i], wxT(""));	
+			line.Replace(remove[i], wxT(""));
 		}
 
-		wxString toNewline[] =  { 
-			wxT("<code>"), wxT("</code>"),	wxT("<br>"), wxT("<br />"), 
-			wxT("<li>"), wxT("</li>"), wxT("<ol>"), wxT("</ol>"), 
-			wxT("<p>"), wxT("</p>"), wxT("<ul>"), wxT("</ul>"), 
-			wxT("") 
+		wxString toNewline[] =  {
+			wxT("<code>"), wxT("</code>"),	wxT("<br>"), wxT("<br />"),
+			wxT("<li>"), wxT("</li>"), wxT("<ol>"), wxT("</ol>"),
+			wxT("<p>"), wxT("</p>"), wxT("<ul>"), wxT("</ul>"),
+			wxT("")
 		};
 		for (int i = 0; !toNewline[i].IsEmpty(); ++i) {
 			line.Replace(toNewline[i], wxT("\n"));
@@ -131,14 +131,14 @@ static bool CodeControlHasDocComment(wxWindow* parent) {
 }
 
 t4p::DocCommentViewClass::DocCommentViewClass(t4p::DocCommentFeatureClass& feature)
-: FeatureViewClass() 
+: FeatureViewClass()
 , Feature(feature) {
 
 }
 
 
 void t4p::DocCommentViewClass::AddEditMenuItems(wxMenu* editMenu) {
-	editMenu->Append(t4p::MENU_DOC_COMMENT + 0, _("Show Doc Comment"), 
+	editMenu->Append(t4p::MENU_DOC_COMMENT + 0, _("Show Doc Comment"),
 		_("Show PHP Doc comment of the symbol located at the current position"), wxITEM_NORMAL);
 }
 
@@ -149,7 +149,7 @@ void t4p::DocCommentViewClass::OnShowDocComment(wxCommandEvent& event) {
 		// only show a DocComment if there isn't another DocComment shown on this code control
 		if (!CodeControlHasDocComment(ctrl)) {
 			ShowDocComment(ctrl, ctrl->GetCurrentPos());
-		}		
+		}
 	}
 }
 
@@ -175,7 +175,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	if (type != t4p::FILE_TYPE_PHP) {
 		return;
 	}
-	
+
 	// if the cursor is in the middle of an identifier, find the end of the
 	// current identifier; that way we can know the full name of the tag we want
 	// to get
@@ -183,7 +183,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	pos = ctrl->WordStartPosition(pos, true);
 	wxString matchError;
 	std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
-		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
+		ctrl->GetIdString(), ctrl->GetSafeText(), endPos,
 		Feature.App.Globals.AllEnabledSourceDirectories(),
 		Feature.App.Globals,
 		matchError
@@ -222,7 +222,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 			if (!tag.ReturnType.isEmpty()) {
 				msg += wxT(" [ ");
 				msg += t4p::IcuToWx(tag.ReturnType);
-				msg += wxT(" ]");	
+				msg += wxT(" ]");
 			}
 			hasContent = !tag.ReturnType.isEmpty();
 		}
@@ -247,10 +247,10 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	}
 	else {
 
-		// freeze thaw the code control so that the call tip popup is 
+		// freeze thaw the code control so that the call tip popup is
 		// not drawn while its being moved into place
 		// in linux, freezing already happens internally so we don't
-		// want to do it here 
+		// want to do it here
 		wxPlatformInfo info;
 		if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 			ctrl->Freeze();
@@ -273,8 +273,8 @@ void t4p::DocCommentViewClass::OnPhpSiteLinkClick(wxHyperlinkEvent& event) {
 	wxLaunchDefaultBrowser(event.GetURL());
 }
 
-t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView) 
-: DocCommentPanelGeneratedClass(parent) 
+t4p::DocCommentPanelClass::DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView)
+: DocCommentPanelGeneratedClass(parent)
 , FeatureView(featureView) {
 	SetName(wxT("DocComment"));
 	PhpSiteDocs->Hide();
@@ -297,8 +297,8 @@ void t4p::DocCommentPanelClass::OnClose(wxHyperlinkEvent& event) {
 
 void t4p::DocCommentPanelClass::OnPhpSiteDocs(wxHyperlinkEvent& event) {
 	CallAfter(&t4p::DocCommentPanelClass::DoDestroy);
-	
-	// post an event instead of handling letting the defauly handling take 
+
+	// post an event instead of handling letting the defauly handling take
 	// place
 	// this is because in MSW, DoDestroy gets called before the
 	// default handling finishes; and this causes a crash

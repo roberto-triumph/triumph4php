@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,10 +58,10 @@ SUITE(SqliteTestClass) {
 
 TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithNewFile) {
 	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
-		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
-		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
+		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"
+		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"
 	));
-	
+
 	wxString error;
 	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
@@ -74,17 +74,17 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithNewFile) {
 
 TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
-		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"	
-		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"	
+		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"
+		"CREATE TABLE your_table ( id INT, your_name VARCHAR(255));"
 	));
 	wxString error;
 	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
 	CHECK(ret);
 
 	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
-		"CREATE TABLE others_table ( id INT, othername VARCHAR(255));"	
-		"CREATE TABLE another_table ( id INT, another_name VARCHAR(255));"	
-		"CREATE TABLE yet_another_table ( id INT, yet_another_name VARCHAR(255));"	
+		"CREATE TABLE others_table ( id INT, othername VARCHAR(255));"
+		"CREATE TABLE another_table ( id INT, another_name VARCHAR(255));"
+		"CREATE TABLE yet_another_table ( id INT, yet_another_name VARCHAR(255));"
 	));
 
 	ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);
@@ -100,8 +100,8 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 
 TEST_FIXTURE(SqliteFixtureClass, SchemaVersion) {
 	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
-		"CREATE TABLE schema_version ( version_number INT);"	
-		"INSERT INTO schema_version VALUES(2);"	
+		"CREATE TABLE schema_version ( version_number INT);"
+		"INSERT INTO schema_version VALUES(2);"
 	));
 	wxString error;
 	bool ret = t4p::SqliteSqlScript(ScriptFileName, EmptySession, error);

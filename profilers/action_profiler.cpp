@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@
 /**
  * This is a program that tests a single sequence or action in isolation.  This was
  * done instead of unit tests because wxWidgets event mechanism does not work in
- * console apps (as of wxWidgets 2.8.12). 
+ * console apps (as of wxWidgets 2.8.12).
  *
  * To test an action or sequence, modify the BuildSequence method to add, remove
  * to modify the actions that will be run.  You may also need to initialize the
@@ -47,9 +47,9 @@ public:
 	MyApp();
 	bool OnInit();
 	int OnExit();
-	
+
 	/**
-	 * build the sequence to be tested. 
+	 * build the sequence to be tested.
 	 */
 	void BuildSequence();
 
@@ -76,7 +76,7 @@ public:
 	 * used to keep track of running threads
 	 */
 	t4p::GlobalsClass Globals;
-	
+
 	/**
 	 * the sequence being tested
 	 */
@@ -118,7 +118,7 @@ MyApp::MyApp()
 bool MyApp::OnInit() {
 	MyFrame* frame = new MyFrame(*this);
 	SetTopWindow(frame);
-	frame->Show(true);	
+	frame->Show(true);
 
 	BuildGlobals();
 	BuildSequence();
@@ -171,10 +171,10 @@ void MyApp::BuildGlobals() {
 
 	Globals.Environment.Apache.ManualConfiguration = true;
 	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
-	
+
 	Globals.TagCacheDbFileName = tagDbFileName;
 	Globals.DetectorCacheDbFileName = detectorTagDbFileName;
-	
+
 	// create a project
 	CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
 	CreateProject(wxT("symfony"), wxT("C:\\Users\\roberto\\Documents\\php_projects\\symfony"));
@@ -202,8 +202,8 @@ int MyApp::OnExit() {
     return 0;
 }
 
-MyFrame::MyFrame(MyApp& app) 
-	: wxFrame(NULL, wxID_ANY, _("action profiler"), wxDefaultPosition, 
+MyFrame::MyFrame(MyApp& app)
+	: wxFrame(NULL, wxID_ANY, _("action profiler"), wxDefaultPosition,
 			wxSize(640, 480))
 	, App(app) {
 	TextCtrl = new  wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(640, 480), wxTE_MULTILINE | wxTE_READONLY);
@@ -219,15 +219,15 @@ void MyFrame::Log(wxString msg) {
 	}
 	TextCtrl->AppendText(msg);
 	TextCtrl->AppendText(wxT("\n"));
-	
+
 }
 
 void MyFrame::OnActionComplete(wxCommandEvent& event) {
-	
+
 }
 
 void MyFrame::OnActionInProgress(wxCommandEvent& event) {
-	
+
 }
 
 void MyFrame::OnClose(wxCloseEvent& event) {
@@ -248,7 +248,7 @@ void MyFrame::OnSequenceComplete(wxCommandEvent& event) {
 	App.BuildSequence();
 }
 
-BEGIN_EVENT_TABLE(MyFrame, wxFrame) 
+BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_CLOSE(MyFrame::OnClose)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
 	EVT_TAG_FINDER_LIST_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)

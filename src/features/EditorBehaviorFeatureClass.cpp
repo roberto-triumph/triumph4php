@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -142,7 +142,7 @@ static int SciModifiersToWxModifiers(int sciModifiers) {
 	int wxMods = 0;
 	if (sciModifiers & wxSTC_SCMOD_SHIFT) {
 		wxMods |= wxACCEL_SHIFT;
-	}	
+	}
 	if (sciModifiers & wxSTC_SCMOD_CTRL) {
 		wxMods |= wxACCEL_CTRL;
 	}
@@ -187,7 +187,7 @@ static void SetupCommands(std::vector<t4p::EditorKeyboardCommandClass>& cmds) {
 	PC(cmds, _("Move to next word segment"), wxSTC_CMD_WORDPARTRIGHT, wxSTC_SCMOD_CTRL, '\\');
 }
 
-t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass() 
+t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass()
 : Name()
 , CmdId(0)
 , Modifiers(0)
@@ -196,7 +196,7 @@ t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass()
 
 t4p::EditorKeyboardCommandClass::EditorKeyboardCommandClass(const wxString& name,
 															int cmdId, int modifiers,
-															int keyCode) 
+															int keyCode)
 : Name(name)
 , CmdId(cmdId)
 , Modifiers(modifiers)
@@ -232,7 +232,7 @@ void t4p::EditorKeyboardCommandClass::InitFromString(const wxString& shortcut) {
 	int wxModifiers = 0;
 	if (!shortcut.empty()) {
 		t4p::ShortcutStringToKeyCode(shortcut, wxModifiers, wxKeyCode);
-	
+
 		// turn wx keys, modifiers into stc counterparts
 		KeyCode = WxKeyCodeToSciKeyCode(wxKeyCode);
 		Modifiers = WxModifiersToSciModifiers(wxModifiers);
@@ -259,7 +259,7 @@ wxString t4p::EditorKeyboardCommandClass::ToString() const {
 t4p::EditorBehaviorFeatureClass::EditorBehaviorFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , KeyboardCommands() {
-	
+
 }
 
 void t4p::EditorBehaviorFeatureClass::LoadPreferences(wxConfigBase* config) {
@@ -277,7 +277,7 @@ void t4p::EditorBehaviorFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void t4p::EditorBehaviorFeatureClass::ToggleWordWrap() {
 	App.Preferences.CodeControlOptions.EnableWordWrap = !App.Preferences.CodeControlOptions.EnableWordWrap;
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
@@ -285,7 +285,7 @@ void t4p::EditorBehaviorFeatureClass::ToggleWordWrap() {
 
 void t4p::EditorBehaviorFeatureClass::ToggleIndentationGuides() {
 	App.Preferences.CodeControlOptions.EnableIndentationGuides = !App.Preferences.CodeControlOptions.EnableIndentationGuides;
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
@@ -293,7 +293,7 @@ void t4p::EditorBehaviorFeatureClass::ToggleIndentationGuides() {
 
 void t4p::EditorBehaviorFeatureClass::ToggleWhitespace() {
 	App.Preferences.CodeControlOptions.ShowWhitespace = !App.Preferences.CodeControlOptions.ShowWhitespace;
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
@@ -304,7 +304,7 @@ void t4p::EditorBehaviorFeatureClass::ZoomIn() {
 	if (App.Preferences.CodeControlOptions.Zoom > 50) {
 		App.Preferences.CodeControlOptions.Zoom = 50;
 	}
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
@@ -315,7 +315,7 @@ void t4p::EditorBehaviorFeatureClass::ZoomOut() {
 	if (App.Preferences.CodeControlOptions.Zoom < -35) {
 		App.Preferences.CodeControlOptions.Zoom = -35;
 	}
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();
@@ -323,7 +323,7 @@ void t4p::EditorBehaviorFeatureClass::ZoomOut() {
 
 void t4p::EditorBehaviorFeatureClass::ZoomReset() {
 	App.Preferences.CodeControlOptions.Zoom = 0;
-	
+
 	wxConfigBase* config = wxConfigBase::Get(false);
 	App.Preferences.CodeControlOptions.Save(config);
 	config->Flush();

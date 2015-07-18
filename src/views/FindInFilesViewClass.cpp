@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,7 +46,7 @@ static const int ID_REGEX_MENU_START = 9000;
 static const int ID_REGEX_REPLACE_MENU_START = 10000;
 
 // maximuum number of find in files hits to be found; if there are more hits
-// than this the search will stop.  This is done because the user cannot 
+// than this the search will stop.  This is done because the user cannot
 // possibly go through all hits; plus this program will allocate too much
 // memory
 static const size_t MAX_HITS = 1000;
@@ -55,39 +55,39 @@ static const size_t MAX_HITS = 1000;
 class FindInFilesPreviewRenderer : public wxDataViewCustomRenderer {
 
 public:
-	
+
 	t4p::FindInFilesHitClass Hit;
-	
+
 	FindInFilesPreviewRenderer()
 	: wxDataViewCustomRenderer(wxT("t4p::FindInFilesHitClass")) {
-		
+
 	}
-	
+
 	bool SetValue(const wxVariant& value) {
 		bool ret = true;
 		wxAny any = value.GetAny();
 		ret = any.GetAs(&Hit);
 		return ret;
 	}
-	
+
 	bool GetValue(wxVariant& value) const {
 		bool ret = true;
 		wxAny any = value.GetAny();
 		any = Hit;
 		return ret;
 	}
-	
+
 	wxSize GetSize() const {
 		wxString preview = Hit.Preview;
 		preview.Trim(true);
 		preview.Trim(false);
 		return GetTextExtent(preview);
 	}
-	
+
 	bool Render(wxRect rect, wxDC* dc, int state) {
 		bool ret = true;
 		wxString preview = Hit.Preview;
-		
+
 		// we want to trim the leading whitespace so that the
 		// preview text is aligned left; however trimming the
 		// leading spaces means that we need to account for the
@@ -95,39 +95,39 @@ public:
 		// the before/after hit string correctly
 		size_t spaceCount = 0;
 		for (; spaceCount < preview.length(); ++spaceCount) {
-			if (preview[spaceCount] != ' ' && preview[spaceCount] != '\t' 
+			if (preview[spaceCount] != ' ' && preview[spaceCount] != '\t'
 				&& preview[spaceCount] != '\v'
 				&& preview[spaceCount] != '\r' && preview[spaceCount] != '\n') {
 				break;
 			}
 		}
-		
+
 		preview.Trim(false);
-		
+
 		// break the preview into before/during/after hit.
-		// taking into account the spaces that were trimmed 
+		// taking into account the spaces that were trimmed
 		// from the beginning of the string
 		wxString beforeHit = preview.Mid(0, Hit.LineOffset - spaceCount);
 		wxString hit = preview.Mid(Hit.LineOffset - spaceCount, Hit.MatchLength);
 		wxString afterHit = preview.Mid(Hit.LineOffset + Hit.MatchLength - spaceCount);
-		
+
 		wxSize sizeBeforeHit = GetTextExtent(beforeHit);
 		wxSize sizeHit = GetTextExtent(hit);
-		
+
 		wxPoint posBeforeHit = rect.GetTopLeft();
 		wxPoint posHit = rect.GetTopLeft();
 		posHit.x += sizeBeforeHit.GetWidth();
 		wxPoint posAfterHit = rect.GetTopLeft();
 		posAfterHit.x += sizeBeforeHit.GetWidth() + sizeHit.GetWidth();
-		
-		
+
+
 		dc->DrawText(beforeHit, posBeforeHit);
 		dc->SetBackgroundMode(wxSOLID);
 		dc->SetTextBackground(*wxYELLOW);
 		dc->DrawText(hit, posHit);
 		dc->SetBackgroundMode(wxTRANSPARENT);
 		dc->DrawText(afterHit, posAfterHit);
-		
+
 		return ret;
 	}
 };
@@ -145,14 +145,14 @@ static std::vector<wxString> FilesFromHits(const std::vector<t4p::FindInFilesHit
 	return files;
 }
 
-t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, t4p::FindInFilesViewClass& view, 
+t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent, t4p::FindInFilesViewClass& view,
 		StatusBarWithGaugeClass* gauge, t4p::RunningThreadsClass& runningThreads)
 	: FindInFilesResultsPanelGeneratedClass(parent)
 	, FindInFiles()
 	, RunningThreads(runningThreads)
 	, View(view)
 	, Gauge(gauge)
-	, MatchedFiles(0) 
+	, MatchedFiles(0)
 	, RunningActionId(0) {
 	FindInFilesGaugeId = wxNewId();
 	RunningThreads.AddEventHandler(this);
@@ -165,12 +165,12 @@ t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent
 	StopButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("stop")));
 	CopySelectedButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("copy")));
 	CopyAllButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("copy-all")));
-	
-	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT, 
+
+	ResultsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
-	ResultsList->AppendTextColumn(_("Line Number"), wxDATAVIEW_CELL_INERT, 
+	ResultsList->AppendTextColumn(_("Line Number"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
-	
+
 	FindInFilesPreviewRenderer* previewRenderer = new FindInFilesPreviewRenderer();
 	wxDataViewColumn* previewColumn = new wxDataViewColumn(_("Preview"),
 		previewRenderer, 2, wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
@@ -182,7 +182,7 @@ t4p::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
 	// make sure we kill any running searches
 	if (RunningActionId > 0) {
 		RunningThreads.CancelAction(RunningActionId);
-		
+
 		// dont try to kill the gauge as the gauge window may not valid anymore
 		// if the program is closed while the find is running
 	}
@@ -201,12 +201,12 @@ void t4p::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles
 		return;
 	}
 	std::vector<wxString> skipFiles = View.AllOpenedFiles();
-	t4p::FindInFilesBackgroundReaderClass* reader = 
+	t4p::FindInFilesBackgroundReaderClass* reader =
 		new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 	if (reader->InitForFind(FindInFiles, doHiddenFiles, skipFiles)) {
 		RunningActionId = RunningThreads.Queue(reader);
 		EnableButtons(true, false, false);
-		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
+		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE,
 			wxGA_HORIZONTAL);
 		SetStatus(_("Searching"));
 
@@ -240,7 +240,7 @@ void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 				while (finder.FindNext(text, next)) {
 					if (finder.GetLastMatch(charPos, length)) {
 						int lineNumber = codeControl->LineFromCharacter(charPos);
-						
+
 						int start = codeControl->PositionFromLine(lineNumber);
 						int end = codeControl->GetLineEndPosition(lineNumber);
 						wxString lineText = codeControl->GetTextRange(start, end);
@@ -286,7 +286,7 @@ void t4p::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 		next = selected - 1;
 	}
 	else {
-		
+
 		// loop back to the end
 		next = ResultsList->GetItemCount() - 1;
 	}
@@ -295,15 +295,15 @@ void t4p::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 
 void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
-		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());
 	}
 	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
-	
+
 	// if user changed tab, GetLastReplacementText would return false and nothing will be replaced
 	UnicodeString text = codeControl->GetSafeText();
-	if (codeControl) {		
+	if (codeControl) {
 		int32_t position = codeControl->GetCurrentPos(),
 			length = 0;
 		FinderClass finder;
@@ -311,10 +311,10 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 		wxString replaceWithText = t4p::IcuToWx(FindInFiles.ReplaceExpression);
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
-			
+
 			// only replace when the cursor is at the hit (which would be the case when and only when the use
 			// double clicked on the result list (and focused on the hit).
-			if (finder.FindNext(text, position) && finder.GetLastMatch(position, length) && 
+			if (finder.FindNext(text, position) && finder.GetLastMatch(position, length) &&
 				position == codeControl->GetCurrentPos() &&
 				finder.GetLastReplacementText(text, matchedText)) {
 				codeControl->SetSelectionAndEnsureVisible(position, position + length);
@@ -329,12 +329,12 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 
 void t4p::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
-		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());
 	}
 	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	FindInFiles.Prepare();
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
-			
+
 	// if user changed tab, the new tab would be modified; this is clear to the user
 	 if (codeControl) {
 		UnicodeString text = codeControl->GetSafeText();
@@ -343,7 +343,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent&
 		if (finder.Prepare()) {
 			int matches = finder.ReplaceAllMatches(text);
 			codeControl->SetUnicodeText(text);
-			SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));	
+			SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));
 		}
 	 }
 }
@@ -356,7 +356,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 		return;
 	}
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
-		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());
 	}
 	FindInFiles.ReplaceExpression = t4p::WxToIcu(ReplaceWithText->GetValue());
 	if (FindInFiles.Prepare()) {
@@ -369,21 +369,21 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 			for (size_t i = 0; i < codeCtrls.size(); ++i) {
 				CodeControlClass* codeControl = codeCtrls[i];
 				UnicodeString text = codeControl->GetSafeText();
-			
+
 				// only update code control when there are replacements made
 				if(finder.ReplaceAllMatches(text) > 0) {
 					codeControl->SetUnicodeText(text);
 				}
 			}
 		}
-		
+
 		// we've already searched, when replacing we should iterate through matched files hence we don't call DirectorySearch,.Init().
-		t4p::FindInFilesBackgroundReaderClass* reader = 
+		t4p::FindInFilesBackgroundReaderClass* reader =
 			new t4p::FindInFilesBackgroundReaderClass(RunningThreads, FindInFilesGaugeId);
 		reader->InitForReplace(FindInFiles, FilesFromHits(AllHits), View.AllOpenedFiles());
 		RunningActionId = RunningThreads.Queue(reader);
 		SetStatus(_("Find In Files In Progress"));
-		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE, 
+		Gauge->AddGauge(_("Find In Files"), FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE,
 			wxGA_HORIZONTAL);
 		EnableButtons(true, false, false);
 		SetStatus(_("Replacing"));
@@ -406,7 +406,7 @@ void t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& ev
 		else {
 			SetStatus(_("Did not Find any Matches"));
 		}
-		
+
 		// now resize the columns so that the hits can be seen
 		t4p::DataViewGridAutoSizeAllColumns(ResultsList);
 	}
@@ -459,7 +459,7 @@ void t4p::FindInFilesResultsPanelClass::OnFileHit(t4p::FindInFilesHitEventClass&
 			data.push_back(wxString::Format(wxT("%d"), hit->LineNumber));
 			wxAny any(*hit);
 			data.push_back(any);
-			
+
 			ResultsList->AppendItem(data);
 		}
 		AllHits.insert(AllHits.end(), hits.begin(), hits.end());
@@ -500,7 +500,7 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	View.LoadCodeControl(fileName);
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-			
+
 		// search for the expression and highlight it. search from the start of the line.
 		int32_t startPos = AllHits[i].FileOffset;
 		int32_t length = 0;
@@ -512,7 +512,7 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 				codeControl->SetFocus();
 			}
 			else {
-				
+
 				// hit is no longer there, still go to the
 				// line
 				// it seems pretty weird for the editor to open the file
@@ -534,13 +534,13 @@ void t4p::FindInFilesResultsPanelClass::ShowMatchAndEnsureVisible(int i) {
 void t4p::FindInFilesResultsPanelClass::OnCopySelectedButton(wxCommandEvent& event) {
 	int selected = ResultsList->GetSelectedRow();
 	if (selected != wxNOT_FOUND) {
-		wxString selectedItems = ResultsList->GetTextValue(selected, 0) 
+		wxString selectedItems = ResultsList->GetTextValue(selected, 0)
 			+ wxT(",")
 			+ ResultsList->GetTextValue(selected, 1)
 			+ wxT(",")
 			+ ResultsList->GetTextValue(selected, 2);
 		selectedItems += wxTextFile::GetEOL();
-		
+
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(selectedItems));
 			wxTheClipboard->Close();
@@ -554,14 +554,14 @@ void t4p::FindInFilesResultsPanelClass::OnCopyAllButton(wxCommandEvent& event) {
 	}
 	wxString selectedItems;
 	for (int i = 0; i < ResultsList->GetItemCount(); ++i) {
-		selectedItems += ResultsList->GetTextValue(i, 0) 
+		selectedItems += ResultsList->GetTextValue(i, 0)
 			+ wxT(",")
 			+ ResultsList->GetTextValue(i, 1)
 			+ wxT(",")
 			+ ResultsList->GetTextValue(i, 2);
 		selectedItems += wxTextFile::GetEOL();
 	}
-		
+
 	if (wxTheClipboard->Open()) {
 		wxTheClipboard->SetData(new wxTextDataObject(selectedItems));
 		wxTheClipboard->Close();
@@ -579,7 +579,7 @@ void t4p::FindInFilesResultsPanelClass::OnNextHitButton(wxCommandEvent& event) {
 void t4p::FindInFilesResultsPanelClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
 	t4p::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
-	PopupMenu(&regExMenu);	
+	PopupMenu(&regExMenu);
 }
 
 void t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol(wxCommandEvent& event) {
@@ -594,7 +594,7 @@ void t4p::FindInFilesResultsPanelClass::OnKillFocusReplaceText(wxFocusEvent& eve
 
 void t4p::FindInFilesResultsPanelClass::OnReplaceTextEnter(wxCommandEvent& event) {
 	if (ReplaceWithText->FindString(ReplaceWithText->GetValue()) == wxNOT_FOUND) {
-		ReplaceWithText->AppendString(ReplaceWithText->GetValue());	
+		ReplaceWithText->AppendString(ReplaceWithText->GetValue());
 	}
 }
 
@@ -608,7 +608,7 @@ void t4p::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, boo
 }
 
 void t4p::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
-	
+
 	// label might grow/shrink according to new text, must
 	// tell the sizer to re-position the label correctly
 	// we need this for the label to be right-aligned after
@@ -645,7 +645,7 @@ void t4p::FindInFilesResultsPanelClass::OnActionProgress(t4p::ActionProgressEven
 		event.Skip();
 		return;
 	}
-	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);	
+	Gauge->IncrementGauge(FindInFilesGaugeId, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
 t4p::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, t4p::FindInFilesFeatureClass& feature,
@@ -659,7 +659,7 @@ t4p::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, t4p::FindI
 	View.ReplaceHistory.Attach(ReplaceWithText);
 	View.DirectoriesHistory.Attach(Directory);
 	View.FilesHistory.Attach(FilesFilter);
-	
+
 	// the first time showing this dialog populate the filter to have only PHP file extensions
 	if (FilesFilter->GetCount() <= 0) {
 		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(feature.App.Globals.FileTypes.PhpFileExtensionsString);
@@ -786,9 +786,9 @@ t4p::FindInFilesViewClass::FindInFilesViewClass(t4p::FindInFilesFeatureClass& fe
 }
 
 void t4p::FindInFilesViewClass::AddSearchMenuItems(wxMenu* searchMenu) {
-	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"), 
+	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 0, _("Find In Files\tCTRL+SHIFT+F"),
 		_("Find an expression by searching entire directory contents"));
-	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"), 
+	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 1, _("Next Find In Files Match\tALT+F3"),
 		_("Move the cursor to the next Find In Files Match"));
 	searchMenu->Append(t4p::MENU_FIND_IN_FILES + 2, _("Previous Find In Files Match\tALT+SHIFT+F3"),
 		_("Move the cursor to the previous Find In Files Match"));
@@ -811,7 +811,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFiles(wxCommandEvent& event) {
 	}
 	FindInFilesDialogClass dialog(GetMainWindow(), Feature, *this);
 	if (dialog.ShowModal() == wxID_OK) {
-		t4p::FindInFilesResultsPanelClass* panel = new t4p::FindInFilesResultsPanelClass(GetToolsNotebook(), 
+		t4p::FindInFilesResultsPanelClass* panel = new t4p::FindInFilesResultsPanelClass(GetToolsNotebook(),
 			*this, GetStatusBarWithGauge(), Feature.App.RunningThreads);
 		wxBitmap findBitmap = wxNullBitmap;
 		if (Feature.PreviousFindInFiles.ReplaceExpression.isEmpty()) {
@@ -820,7 +820,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFiles(wxCommandEvent& event) {
 		else {
 			findBitmap = t4p::BitmapImageAsset(wxT("replace-in-files"));
 		}
-		
+
 		if(AddToolsWindow(panel, _("Find In Files Results"), wxEmptyString, findBitmap)) {
 			panel->Find(Feature.PreviousFindInFiles, Feature.DoHiddenFiles);
 			ResultsPanels.push_back(panel);
@@ -879,13 +879,13 @@ void t4p::FindInFilesViewClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& ev
 void t4p::FindInFilesDialogClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
 	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
-	PopupMenu(&regExMenu);	
+	PopupMenu(&regExMenu);
 }
 
 void t4p::FindInFilesDialogClass::OnRegExReplaceHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
 	t4p::PopulateRegExReplaceMenu(regExMenu, ID_REGEX_REPLACE_MENU_START);
-	PopupMenu(&regExMenu);	
+	PopupMenu(&regExMenu);
 }
 
 void t4p::FindInFilesDialogClass::InsertRegExSymbol(wxCommandEvent& event) {
@@ -902,7 +902,7 @@ void t4p::FindInFilesDialogClass::InsertReplaceRegExSymbol(wxCommandEvent& event
 }
 
 BEGIN_EVENT_TABLE(t4p::FindInFilesResultsPanelClass, FindInFilesResultsPanelGeneratedClass)
-	
+
 	// remove this handler; when searching many files the GUI is redrawn constantly and doesn't
 	// look smooth
 	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, t4p::FindInFilesResultsPanelClass::OnFileSearched)
@@ -916,7 +916,7 @@ BEGIN_EVENT_TABLE(t4p::FindInFilesResultsPanelClass, FindInFilesResultsPanelGene
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_THREE, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FOUR, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
 	EVT_MENU(ID_REGEX_REPLACE_MENU_START + ID_MENU_REG_EX_REPLACE_MATCH_FIVE, t4p::FindInFilesResultsPanelClass::InsertReplaceRegExSymbol)
-	
+
 	EVT_DATAVIEW_ITEM_ACTIVATED(FindInFilesResultsPanelGeneratedClass::ID_RESULTS_LIST, t4p::FindInFilesResultsPanelClass::OnRowActivated)
 END_EVENT_TABLE()
 

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@
 namespace t4p {
 
 /**
- * These event will be dispatched to the handler. Note that the 
+ * These event will be dispatched to the handler. Note that the
  * event won't have a consitent ID; use wxID_ANY when connecting
  * to these events.
  *
@@ -57,11 +57,11 @@ extern const wxEventType EVENT_FILE_READ;
 
 /**
  * This is a class that will glue together any background task with any "results" type panel.  Since
- * wxThreads cannot access GUI elements we need a way to separate any time-consuming tasks (such as 
+ * wxThreads cannot access GUI elements we need a way to separate any time-consuming tasks (such as
  * searching through a project's files) with the updating of a GUI element (such as displaying the
  * found hits).  This class is the "glue" between a background task and GUI element: It will start
  * up a wxThread. Note: Objects of this class will handle at most 1 concurrently running thread at a time.
- * 
+ *
  * ATTN: make it so that multiple logic can be added to this class; as we ideally do not want
  * to iterate through entire projects twice. It is better to open a file once and hand it to
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
@@ -79,12 +79,12 @@ public:
 		WALK,
 		MATCHED
 	};
-	
+
 	/**
 	 * @param wxEvtHandler& handler this event handler will receive
 	 *        a EVENT_FILE_READ_COMPLETE event when the
 	 *        background thread has completed. Will also receive
-	 * 		  t4p::WORK_* events 
+	 * 		  t4p::WORK_* events
 	 * @see t4p::ThreadWithHeartbeatClass
 	 */
 	BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId);
@@ -94,7 +94,7 @@ public:
 	 * files in the given directory.
 	 *
 	 * @param const wxString& path the path to recurse
-	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the 
+	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
 	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
 	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
 	 *        memory intensive.  Note that both modes will result in walking of all files.
@@ -107,7 +107,7 @@ public:
 	 * Prepare the background thread to iterate through the given sources.
 	 *
 	 * @param sources the list of directories to recurse
-	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the 
+	 * @param one of RECURSIVE or PRECISE.  in PRECISE mode, all files for all sub-directories are enumerated at once, making the
 	 *        total files count available.  In RECURSIVE mode, sub-directories are recursed one at a time.  PRECISE mode
 	 *        is useful when the caller needs to know how many total files will be walked over, but it is also more
 	 *        memory intensive.  Note that both modes will result in walking of all files.
@@ -125,7 +125,7 @@ public:
 	 */
 	bool InitMatched(const std::vector<wxString>& matchedFiles);
 
-protected: 
+protected:
 
 	/**
 	 * This method will be executed in it's own thread. Most of the time
@@ -151,7 +151,7 @@ private:
 	 * The object that will be used to traverse the file system.
 	 */
 	DirectorySearchClass DirectorySearch;
-	
+
 	/**
 	 * The files to traverse through if the caller gave us a set of files
 	 */

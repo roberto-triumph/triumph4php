@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@ t4p::ProcessWithHeartbeatClass::ProcessWithHeartbeatClass(wxEvtHandler& handler)
 	: wxEvtHandler()
 	, RunningProcesses()
 	, Timer()
-	, Handler(handler) 
+	, Handler(handler)
 	, EventId(0) {
 	Timer.SetOwner(this);
 }
@@ -52,7 +52,7 @@ t4p::ProcessWithHeartbeatClass::~ProcessWithHeartbeatClass() {
 	}
 }
 
-bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& workingDir, 
+bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& workingDir,
 		int eventId, long& pid) {
 	wxProcess* newProcess = new wxProcess(this, eventId);
 	EventId = eventId;
@@ -61,14 +61,14 @@ bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& wo
 	if (workingDir.IsOk()) {
 		env->cwd = workingDir.GetPath();
 	}
-	
+
 	// dont use newProcess::GetPid(), it seems to always return zero.
 	// http://forums.wxwidgets.org/viewtopic.php?t=13559
 	pid = wxExecute(command, wxEXEC_ASYNC, newProcess, env);
 	if (pid != 0) {
 		std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 		if (it != RunningProcesses.end()) {
-			
+
 			// not sure the new process will get the same PID if another one is running
 			// let's cleanup just to be sure
 			Stop(pid);
@@ -84,16 +84,16 @@ bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& wo
 
 bool t4p::ProcessWithHeartbeatClass::Stop(long pid) {
 	Timer.Stop();
-	bool stopped = false;	
+	bool stopped = false;
 	std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 	if (it != RunningProcesses.end()) {
 		it->second->Detach();
 
 		// in Windows, wxSIGTERM is too nice and the process does not die
-		wxKillError killError = wxProcess::Kill(pid, wxSIGKILL); 
+		wxKillError killError = wxProcess::Kill(pid, wxSIGKILL);
 		stopped = wxKILL_OK == killError;
-		
-		/* 
+
+		/*
 		 * do not delete the process pointer, as the wxWidgets docs for wxProcess states:
 		 *
 		 *  the object will delete itself upon reception of the process termination notification
@@ -145,7 +145,7 @@ wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid) const {
 }
 
 wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const {
-	wxString allOutput;		
+	wxString allOutput;
 	while (proc->IsInputAvailable()) {
 		wxInputStream* stream = proc->GetInputStream();
 		wxTextInputStream tis(*stream);
@@ -158,7 +158,7 @@ wxString t4p::ProcessWithHeartbeatClass::GetProcessOutput(wxProcess* proc) const
 		allOutput << tis.ReadLine();
 		allOutput << wxT("\n");
 	}
-	
+
 	return allOutput;
 }
 
@@ -168,6 +168,6 @@ void t4p::ProcessWithHeartbeatClass::OnTimer(wxTimerEvent& event) {
 }
 
 BEGIN_EVENT_TABLE(t4p::ProcessWithHeartbeatClass, wxEvtHandler)
-	EVT_END_PROCESS(wxID_ANY, t4p::ProcessWithHeartbeatClass::OnProcessEnded)	
+	EVT_END_PROCESS(wxID_ANY, t4p::ProcessWithHeartbeatClass::OnProcessEnded)
 	EVT_TIMER(wxID_ANY, t4p::ProcessWithHeartbeatClass::OnTimer)
 END_EVENT_TABLE()

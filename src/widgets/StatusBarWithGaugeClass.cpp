@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,7 +66,7 @@ void t4p::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int r
 			gauge->Pulse();
 		}
 		else {
-			
+
 			// must set range first, otherwise value could be "invalid" (outside the
 			// previous range)
 			gauge->SetRange(range);
@@ -115,7 +115,7 @@ void t4p::StatusBarWithGaugeClass::StopGauge(int id) {
 		RemoveChild(gauge);
 		gauge->Destroy();
 		Gauges.erase(id);
-		GaugeTitles.erase(id);		
+		GaugeTitles.erase(id);
 		SetStatusText(wxT(""), FIELD_GAUGE_TITLE);
 		RedrawGauges();
 	}
@@ -128,7 +128,7 @@ void t4p::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
 
 void t4p::StatusBarWithGaugeClass::RedrawGauges() {
 
-	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself), 
+	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself),
 	// plus the leftmost default status bar columns (for the menu help and other messages)
 	const int DEFAULT_COLUMNS = 2;
 	int newColumnCount = (Gauges.size() * 2) + DEFAULT_COLUMNS;
@@ -136,7 +136,7 @@ void t4p::StatusBarWithGaugeClass::RedrawGauges() {
 	for (int i = 0; i < DEFAULT_COLUMNS; ++i) {
 		widths[i] = -1;
 	}
-	for (int i = DEFAULT_COLUMNS; i < newColumnCount; i += 2) {		
+	for (int i = DEFAULT_COLUMNS; i < newColumnCount; i += 2) {
 		widths[i] = 150;
 		widths[i + 1] = 300;
 	}
@@ -159,7 +159,7 @@ void t4p::StatusBarWithGaugeClass::RedrawGauges() {
 }
 
 void t4p::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
-	
+
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(0);
 	if (oldText == text) {
@@ -171,7 +171,7 @@ void t4p::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 }
 
 void t4p::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
-	
+
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(1);
 	if (oldText == text) {

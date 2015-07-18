@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,7 +29,7 @@
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
 
-// these macros will expand a macro into its 
+// these macros will expand a macro into its
 // these are needed to expand the update host which
 // are given as macros by the premake script
 #define T4P_STR_EXPAND(s) #s
@@ -90,7 +90,7 @@ void t4p::VersionUpdateViewClass::OnPreferencesExternallyUpdated(wxCommandEvent&
 }
 
 void t4p::VersionUpdateViewClass::OnTimer(wxTimerEvent& event) {
-	
+
 	// is it time to check for a new version
 	wxDateTime now = wxDateTime::Now();
 	if (Feature.NextCheckTime.IsEarlierThan(now)) {
@@ -105,7 +105,7 @@ void t4p::VersionUpdateViewClass::OnTimer(wxTimerEvent& event) {
 
 void t4p::VersionUpdateViewClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	wxString nextVersion = event.GetString();
-	
+
 	wxString currentVersion = Feature.GetCurrentVersion();
 	if (!nextVersion.empty()) {
 		VersionUpdateDialogClass dialog(GetMainWindow(), wxID_ANY,
@@ -121,7 +121,7 @@ void t4p::VersionUpdateViewClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 
 	// write the check time to the config
 	// NOTE: we check if settings dir has been set, if it has not
-	// been set, then we cannot write the config to a file 
+	// been set, then we cannot write the config to a file
 	// because the user has not chosen a settings directory
 	// since the version check is triggered during the app ready
 	// event, during the very first run the user has not yet
@@ -132,7 +132,7 @@ void t4p::VersionUpdateViewClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 	wxFileName settingsDir = t4p::SettingsDirAsset();
 	if (settingsDir.IsOk()) {
 		wxConfigBase* config = wxConfig::Get();
-	
+
 		config->Write(wxT("VersionUpdates/NextCheckTime"), Feature.NextCheckTime.FormatISOCombined(' '));
 		config->Flush();
 	}
@@ -142,7 +142,7 @@ void t4p::VersionUpdateViewClass::OnUpdateCheckComplete(wxCommandEvent& event) {
 
 void t4p::VersionUpdateViewClass::OnHelpCheckForUpdates(wxCommandEvent& event) {
 	wxString currentVersion  = Feature.GetCurrentVersion();
-	t4p::VersionUpdateDialogClass dialog(GetMainWindow(), 
+	t4p::VersionUpdateDialogClass dialog(GetMainWindow(),
 			wxID_ANY, Feature.App.RunningThreads, currentVersion, false,
 			wxEmptyString);
 	dialog.ShowModal();
@@ -156,11 +156,11 @@ t4p::VersionUpdatePreferencesPanelClass::VersionUpdatePreferencesPanelClass(wxWi
 	TransferDataToWindow();
 }
 
-t4p::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id, 
+t4p::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id,
 															  t4p::RunningThreadsClass& runningThreads,
 															  const wxString& currentVersion,
 															  bool showNewVersion,
-															  wxString newVersion) 
+															  wxString newVersion)
 : VersionUpdateGeneratedDialogClass(parent, id)
 , Timer(this, ID_VERSION_DIALOG_TIMER)
 , RunningThreads(runningThreads)
@@ -207,7 +207,7 @@ void t4p::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& event)
 	Timer.Stop();
 }
 
-void t4p::VersionUpdateDialogClass::ConnectToUpdateServer() {	
+void t4p::VersionUpdateDialogClass::ConnectToUpdateServer() {
 	t4p::VersionUpdateActionClass* action = new t4p::VersionUpdateActionClass(
 		RunningThreads, ID_EVENT_VERSION_UPDATES_ON_DIALOG, CurrentVersion->GetLabel()
 	);

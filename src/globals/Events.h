@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -91,7 +91,7 @@ public:
 	void RemoveHandler(wxEvtHandler *handler);
 
 	/**
-	 * Note that the event is processed IMMEDIATELY ie. within the same 
+	 * Note that the event is processed IMMEDIATELY ie. within the same
 	 * event loop. This method will not return control until all of the
 	 * handlers have processed the event.
 	 *
@@ -100,7 +100,7 @@ public:
 	void Publish(wxEvent& event);
 
 	/**
-	 * Note that the event is processed IN THE NEXT EVENT LOOP. 
+	 * Note that the event is processed IN THE NEXT EVENT LOOP.
 	 *
 	 * @param event send the event to all registered handlers
 	 */
@@ -148,7 +148,7 @@ public:
 	void RemoveHandler(wxEvtHandler *handler);
 
 	/**
-	 * Note that the event is processed IN THE NEXT EVENT LOOP. 
+	 * Note that the event is processed IN THE NEXT EVENT LOOP.
 	 *
 	 * @param event send the event to all registered handlers
 	 */
@@ -190,8 +190,8 @@ extern const wxEventType EVENT_APP_FILE_CLOSED;
 extern const wxEventType EVENT_APP_FILE_OPENED;
 
 /**
- * Notification that a new code control tab has been created.  Since this is a 
- * file not yet on the file system, there is no filename associated with the new 
+ * Notification that a new code control tab has been created.  Since this is a
+ * file not yet on the file system, there is no filename associated with the new
  * tab. The event will be of type CodeControlEventClass
  */
 extern const wxEventType EVENT_APP_FILE_NEW;
@@ -237,7 +237,7 @@ public:
 	 */
 	CodeControlClass* GetCodeControl() const;
 
-	/** 
+	/**
 	 * required for sending with wxPostEvent()
 	 */
     wxEvent* Clone() const;
@@ -271,36 +271,36 @@ public:
  * open a file. A file can be opened to a specific line number.
  */
 class OpenFileCommandEventClass : public wxEvent {
-	
+
 public:
-	
+
 	/**
 	 * the full path of the file to open
 	 */
 	wxString FullPath;
-	
+
 	/**
 	 * position to focus on and start highlighting, -1 to not highlight anything
 	 * * This number is 0-based
 	 */
 	int StartingPos;
-	
+
 	/**
 	 * number of characters to highlight, -1 to not highlight anything
 	 */
 	int Length;
-	
+
 	/**
 	 * line number to seek to after the file is opened, -1 to not jump to a file
 	 * This number is 1-based
 	 */
 	int LineNumber;
-	
-	
+
+
 	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1, int lineNumber = -1);
-	
+
 	wxEvent* Clone() const;
-	
+
 };
 
 class OpenDbTableCommandEventClass : public wxEvent {
@@ -308,17 +308,17 @@ class OpenDbTableCommandEventClass : public wxEvent {
 public:
 
 	/**
-	 * The name of the table to open 
+	 * The name of the table to open
 	 */
 	wxString DbTableName;
-	
+
 	/**
 	 * The hash of the db connection to connect to
 	 */
 	wxString ConnectionHash;
-	
+
 	OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, const wxString& connectionHash);
-	
+
 	wxEvent* Clone() const;
 };
 
@@ -328,7 +328,7 @@ typedef void (wxEvtHandler::*CodeControlEventClassFunction)(CodeControlEventClas
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_NEW, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( CodeControlEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
 #define EVT_APP_FILE_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_FILE_OPENED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
@@ -370,16 +370,16 @@ typedef void (wxEvtHandler::*RenameEventClassFunction)(RenameEventClass&);
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_APP_DIR_RENAMED, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( RenameEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
 typedef void (wxEvtHandler::*OpenFileCommandEventClassFunction)(OpenFileCommandEventClass&);
-	
+
 #define EVT_CMD_FILE_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_FILE_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenFileCommandEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
 typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCommandEventClass&);
-	
+
 #define EVT_APP_DB_TABLE_DATA_OPEN(fn) \
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DATA_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
@@ -389,10 +389,10 @@ typedef void (wxEvtHandler::*OpenDbTableCommandEventClassFunction)(OpenDbTableCo
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_CMD_DB_TABLE_DEFINITION_OPEN, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( OpenDbTableCommandEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
 /**
  * This is a one-time event that gets generated after the application main
- * window is first shown to the user. When this event is generated, all 
+ * window is first shown to the user. When this event is generated, all
  * settings have been loaded from the config files. Features should not
  * do heavy work in any of the menu or config related methods; they should
  * do their heavy work in this event handler.
@@ -424,7 +424,7 @@ typedef void (wxEvtHandler::*NotifyEventFunction)(wxNotifyEvent&);
 
 /**
  * This is a one-time event that gets generated after the user has clicked the
- * Exit or Close button on the main frame AND the user has chosen to 
+ * Exit or Close button on the main frame AND the user has chosen to
  * not save the open files (or has already saved them).  Features can
  * do any final cleanup in this event handler. Note that in OS X, the
  * application will stay running even after this event is generated.
@@ -434,12 +434,12 @@ extern const wxEventType EVENT_APP_EXIT;
 /**
  * Notification that a new file has been created on the file system.  A file is created when
  * the user opens a new buffer and then saves it. The event will contain
- * the full path of the file that was opened in the GetString() method; 
+ * the full path of the file that was opened in the GetString() method;
  */
 extern const wxEventType EVENT_APP_FILE_CREATED;
 
 /**
- * Notification that a file has been reverted (all changed in memory undone). The event 
+ * Notification that a file has been reverted (all changed in memory undone). The event
  * is of type CodeControlEventClass
  */
 extern const wxEventType EVENT_APP_FILE_REVERTED;
@@ -449,24 +449,24 @@ extern const wxEventType EVENT_APP_FILE_REVERTED;
  * the full path of the file that was opened in the GetString() method.
  * This event gets generated if the user deletes a files from the internal explorer or from
  * an external process (command prompt or OS shell)
- * NOTE: this event will only be generated when single files are deleted. if an entire directory is deleted, 
+ * NOTE: this event will only be generated when single files are deleted. if an entire directory is deleted,
  * then only 1 event will be generated: an EVENT_APP_DIR_DELETED, no EVENT_APP_FILE_DELETED events will be
  * generated.
  */
 extern const wxEventType EVENT_APP_FILE_DELETED;
 
 /**
- * Notification that the one of the files in any of the enabled projects has been updated by an 
- * external process. 
+ * Notification that the one of the files in any of the enabled projects has been updated by an
+ * external process.
  * An example is when a user performs a SVN update / GIT pull to get the latest version of their
- * code; the editor will generated events of this type for each file that was updated by the source control 
+ * code; the editor will generated events of this type for each file that was updated by the source control
  * program.
  *
  * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
  * GetString() will return the full path to the file.
  *
  * NOTE: This event will only be generated if the file is NOT created in Triumph.
- * NOTE: This event will only be generated when single files are created. if an entire directory is created, 
+ * NOTE: This event will only be generated when single files are created. if an entire directory is created,
  * then only 1 event will be generated: an EVENT_APP_DIR_CREATED, no EVENT_APP_FILE_EXTERNALLY_CREATED events will be
  * generated.
  */
@@ -474,16 +474,16 @@ extern const wxEventType EVENT_APP_FILE_EXTERNALLY_CREATED;
 
 /**
  * Notification that a file was renamed. The event will contain the old and new
- * paths. This event gets generated if the user creates a directory from 
+ * paths. This event gets generated if the user creates a directory from
  * an external process (command prompt or OS shell).
  */
 extern const wxEventType EVENT_APP_FILE_RENAMED;
 
 /**
- * Notification that the one of the files in any of the enabled projects has been updated by an 
- * external process. 
+ * Notification that the one of the files in any of the enabled projects has been updated by an
+ * external process.
  * An example is when a user performs a SVN update / GIT pull to get the latest version of their
- * code; the editor will generated events of this type for each file that was updated by the source control 
+ * code; the editor will generated events of this type for each file that was updated by the source control
  * program.
  *
  * The event generated will be of type wxCommandEvent, the file that was modified will be available via GetString() method
@@ -499,7 +499,7 @@ extern const wxEventType EVENT_APP_FILE_EXTERNALLY_MODIFIED;
 /**
  * Notification that a single directory has been created. The event will contain
  * the full path of the directory that was created in the GetString() method.
- * This event gets generated if the user creates a directory from 
+ * This event gets generated if the user creates a directory from
  * an external process (command prompt or OS shell). Note: if an entire directory structure
  * is copied from one place to another, then only one EVENT_APP_DIR_CREATED is created for the
  * base directory that was created, no events will be generated for the sub directories.
@@ -511,33 +511,33 @@ extern const wxEventType EVENT_APP_DIR_CREATED;
  * the full path of the file that was opened in the GetString() method.
  * This event gets generated if the user deletes a files from the internal explorer or from
  * an external process (command prompt or OS shell)
- * NOTE: If an entire directory structure is deleted, then only 1 event will be generated: 
+ * NOTE: If an entire directory structure is deleted, then only 1 event will be generated:
  * an EVENT_APP_DIR_DELETED for the base directory. No events will be generated for the sub directories.
  */
 extern const wxEventType EVENT_APP_DIR_DELETED;
 
 /**
  * Notification that a directory was renamed. The event will contain the old and new
- * paths. This event gets generated if the user creates a directory from 
+ * paths. This event gets generated if the user creates a directory from
  * an external process (command prompt or OS shell).
  */
 extern const wxEventType EVENT_APP_DIR_RENAMED;
 
 /**
- * Notification that the user preferences have been saved by the user. 
+ * Notification that the user preferences have been saved by the user.
  * This event will be genreated after the user changes the settings via Edit ... Preferences.
  * Listeners of this event will  need to repaint any windows that are affected by the changes. Listeners
  * can access the new preferences via the App Preferences global. Listeners also
  * need to save the preferences to persistent storage (config) that were updated
  * in the preferences forms (windows added in the AddPreferenceWindow() method).
  * The global config (wxConfig::Get()) should be used.
- * Note that the app will flush the changes after all handlers have been called, so there 
+ * Note that the app will flush the changes after all handlers have been called, so there
  * is no need for each handler to call wxConfig::Flush()
  */
 extern const wxEventType EVENT_APP_PREFERENCES_SAVED;
 
 /**
- * Notification that the user preferences (the config INI file) has been updated by an 
+ * Notification that the user preferences (the config INI file) has been updated by an
  * external process. An example of this is the user having 2 instances of Triumph open
  * and the user changed preferences in one of the instances.
  *
@@ -557,14 +557,14 @@ extern const wxEventType EVENT_APP_PROJECT_CREATED;
 
 /**
  * Notification that a one or more projects were removed via the "Defined Projects"
- * menu. The generated event will be a ProjectEventClass, it 
+ * menu. The generated event will be a ProjectEventClass, it
  * will contain the projects that were removed.
  */
 extern const wxEventType EVENT_APP_PROJECTS_REMOVED;
 
 /**
  * Notification that a one or more projects were updated via the "Defined Projects"
- * menu. The generated event will be a ProjectEventClass, it 
+ * menu. The generated event will be a ProjectEventClass, it
  * will contain ONLY the projects that were actually updated.
  * Note that a project update could just have a label change and not
  * have any new source directories.
@@ -576,20 +576,20 @@ extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
  * added, removed, or updated
  */
 class ProjectEventClass : public wxEvent {
-	
-public: 
-	
+
+public:
+
 	/**
 	 * the projects that were removed or updated. If this is a
 	 * remove event, the these are the projects that were removed
 	 * if this is a update event, then these projects were
-	 * actually updated. Note that a project update could just 
+	 * actually updated. Note that a project update could just
 	 * have a label change and not have any new source directories.
 	 */
 	const std::vector<t4p::ProjectClass>& Projects;
-	
+
 	ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects);
-	
+
 	wxEvent* Clone() const;
 
 };
@@ -643,7 +643,7 @@ extern const wxEventType EVENT_CMD_DB_TABLE_DEFINITION_OPEN;
 
 /**
  * Tell the app to request attention from the user. The app's title
- * bar in the task bar will blink 
+ * bar in the task bar will blink
  */
 extern const wxEventType EVENT_CMD_APP_USER_ATTENTION;
 

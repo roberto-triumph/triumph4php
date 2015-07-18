@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,7 @@
 #include <globals/FileName.h>
 
 t4p::TagWipeActionClass::TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, ResourceDbFileName()
 	, DetectorDbFileName() {
 }
@@ -42,7 +42,7 @@ bool t4p::TagWipeActionClass::Init(t4p::GlobalsClass& globals) {
 	// since we will access the filenames from multiple threads
 	ResourceDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	DetectorDbFileName.Assign(globals.DetectorCacheDbFileName.GetFullPath());
-	
+
 	return ResourceDbFileName.FileExists() && DetectorDbFileName.FileExists();
 }
 
@@ -57,7 +57,7 @@ void t4p::TagWipeActionClass::BackgroundWork() {
 		t4p::TagParserClass tagParser;
 		tagParser.Init(&session);
 		tagParser.WipeAll();
-		
+
 		detectorSession.open(*soci::factory_sqlite3(), t4p::WxToChar(DetectorDbFileName.GetFullPath()));
 		t4p::DetectorDbClass detectorDb;
 		detectorDb.Init(&detectorSession);
@@ -75,7 +75,7 @@ wxString t4p::TagWipeActionClass::GetLabel() const {
 
 t4p::TagDeleteSourceActionClass::TagDeleteSourceActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& sourceDirsToDelete)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, ResourceDbFileName()
 	, DetectorDbFileName()
 	, SourceDirsToDelete() {
@@ -91,7 +91,7 @@ bool t4p::TagDeleteSourceActionClass::Init(t4p::GlobalsClass& globals) {
 	// since we will access the filenames from multiple threads
 	ResourceDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	DetectorDbFileName.Assign(globals.DetectorCacheDbFileName.GetFullPath());
-	
+
 	return ResourceDbFileName.FileExists() && DetectorDbFileName.FileExists();
 }
 
@@ -105,11 +105,11 @@ void t4p::TagDeleteSourceActionClass::BackgroundWork() {
 		session.open(*soci::factory_sqlite3(), t4p::WxToChar(ResourceDbFileName.GetFullPath()));
 		t4p::TagParserClass tagParser;
 		tagParser.Init(&session);
-		
+
 		detectorSession.open(*soci::factory_sqlite3(), t4p::WxToChar(DetectorDbFileName.GetFullPath()));
 		t4p::DetectorDbClass detectorDb;
 		detectorDb.Init(&detectorSession);
-		
+
 		for (size_t i = 0; i < SourceDirsToDelete.size(); ++i) {
 			tagParser.DeleteSource(SourceDirsToDelete[i]);
 			detectorDb.DeleteSource(SourceDirsToDelete[i]);
@@ -127,7 +127,7 @@ wxString t4p::TagDeleteSourceActionClass::GetLabel() const {
 
 t4p::TagDeleteDirectoryActionClass::TagDeleteDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& dirsToDelete)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, DirsToDelete() {
 	DirsToDelete = t4p::DeepCopyFileNames(dirsToDelete);
 }
@@ -166,7 +166,7 @@ wxString t4p::TagDeleteDirectoryActionClass::GetLabel() const {
 
 t4p::TagDeleteFileActionClass::TagDeleteFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 													  const std::vector<wxFileName>& filesToDelete)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, FilesToDelete() {
 	FilesToDelete = t4p::DeepCopyFileNames(filesToDelete);
 }

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
 
-// these macros will expand a macro into its 
+// these macros will expand a macro into its
 // these are needed to expand the update host which
 // are given as macros by the premake script
 #define T4P_STR_EXPAND(s) #s
@@ -93,7 +93,7 @@ wxString t4p::VersionUpdateFeatureClass::GetCurrentVersion() const {
 	return currentVersion;
 }
 
-t4p::VersionUpdateActionClass::VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, 
+t4p::VersionUpdateActionClass::VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 															  const wxString& currentVersion)
 : ActionClass(runningThreads, eventId)
 , CurrentVersion(currentVersion.c_str()) {
@@ -102,7 +102,7 @@ t4p::VersionUpdateActionClass::VersionUpdateActionClass(t4p::RunningThreadsClass
 void t4p::VersionUpdateActionClass::BackgroundWork() {
 	long statusCode = 0;
 	wxString newVersion = GetNewVersion(CurrentVersion, statusCode);
-	
+
 	wxCommandEvent evt(EVENT_VERSION_CHECK);
 	evt.SetString(newVersion);
 	evt.SetInt(statusCode);
@@ -117,22 +117,22 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 	std::string fullUrl = "http://";
 	fullUrl += host;
 	fullUrl += "/updates.php";
-	
+
 	std::string data = "v=";
 	data += t4p::WxToChar(currentVersion);
 	const char* buf = data.c_str();
 	const char* urlBuf = fullUrl.c_str();
-	
+
 	wxStringOutputStream ostream;
 	CURL* curl = curl_easy_init();
-	
+
 	curl_easy_setopt(curl, CURLOPT_URL, urlBuf);
 	curl_easy_setopt(curl, CURLOPT_POST, 1);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, buf);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_ostream_write);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ostream);
-	
+
 	CURLcode ret = curl_easy_perform(curl);
 	wxString newVersion;
 	if (0 == ret) {
@@ -143,7 +143,7 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 
 				// the update query can return
 				// 1. A single line: "UP_TO_DATE"
-				// or 
+				// or
 				// 2. 3 lines seperated by newlines:
 				// "NEW_VERSION"
 				// new version string
@@ -157,7 +157,7 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 		}
 		else {
 			newVersion = t4p::CharToWx(curl_easy_strerror(ret));
-			
+
 		}
 	}
 	curl_easy_cleanup(curl);

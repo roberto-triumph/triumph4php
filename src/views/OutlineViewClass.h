@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,13 +33,13 @@
 namespace t4p {
 
 /**
- * This is a feature that is designed to let the user see the classes / methods of 
+ * This is a feature that is designed to let the user see the classes / methods of
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
  */
 class OutlineViewClass : public FeatureViewClass {
 public:
-	
+
 	/**
 	 * Creates a new OutlineView.
 	 */
@@ -51,16 +51,16 @@ public:
 	void AddViewMenuItems(wxMenu* viewMenu);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
+
 	/**
 	 * When the right click context menu is chosen on some selected text, open that tag into the outline control.
 	 * @param wxCommandEvent& event
 	 */
 	void OnOutlineMenu(wxCommandEvent& event);
-	
+
 	/**
 	 * Opens the file where the given tag is located.
-	 * 
+	 *
 	 * @param int the tag ID to jump to
 	 */
 	void JumpToResource(int tagId);
@@ -73,14 +73,14 @@ public:
 	 * @param searchStrings tags to look for
 	 */
 	void StartTagSearch(const std::vector<UnicodeString>& searchStrings);
-	
+
 private:
-		
+
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
 	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
-	
+
 	/**
 	 * when a file is closed, remove it from the outline tree
 	 */
@@ -96,9 +96,9 @@ private:
 	 * once tag searching finishes, update the tree control
 	 */
 	void OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event);
-	
+
 	t4p::OutlineFeatureClass& Feature;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -108,14 +108,14 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 
 	/**
 	 * Create a new outline view panel.
-	 * 
+	 *
 	 * @param wxWindow* parent the parent window
 	 * @param int windowId the window ID
-	 * @param OutlineFeatureClass& feature the object that will execute the business logic. 
-	 * @param OutlineViewClass& view another object that will execute the business logic. 
+	 * @param OutlineFeatureClass& feature the object that will execute the business logic.
+	 * @param OutlineViewClass& view another object that will execute the business logic.
 	 */
 	OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, OutlineViewClass& view);
-	
+
 	/**
 	 * update the status label
 	 */
@@ -132,14 +132,14 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	  * @param fullPath file to remove from the outline tre
 	  */
 	 void RemoveFileFromOutline(const wxString& fullPath);
-	
+
 protected:
 
 	/**
 	 * Shows the help
 	 */
 	void OnHelpButton(wxCommandEvent& event);
-	
+
 	/**
 	 * make the user pick a tag, then outline the tag
 	 */
@@ -147,7 +147,7 @@ protected:
 
 	/**
 	 * sync the outline with the currently opened file
-	 */	
+	 */
 	void OnSyncButton(wxCommandEvent& event);
 
 	/**
@@ -189,17 +189,17 @@ private:
 	wxImageList* ImageList;
 
 	/**
-	 * The feature class that will execute all logic. 
+	 * The feature class that will execute all logic.
 	 * @var OutlineFeatureClass&
 	 */
 	OutlineFeatureClass& Feature;
-	
+
 	/**
-	 * The feature class that will execute all logic. 
+	 * The feature class that will execute all logic.
 	 * @var OutlineViewClass&
 	 */
 	OutlineViewClass& View;
-	
+
 	/**
 	 * if TRUE outline will show class methods
 	 */
@@ -247,7 +247,7 @@ private:
 	 * @param tags that the user chose
 	 */
 	void SearchTagsToOutline(const std::vector<t4p::PhpTagClass>& tags);
-	
+
 	/**
 	 * double clicking on a  tag name in the tree will make the editor open up that tag
 	 */
@@ -262,7 +262,7 @@ private:
 	void TagToNode(const t4p::PhpTagClass& tag, wxTreeItemId& tagRoot, UnicodeString classNameNode);
 
 	/**
-	 * @return the tree node for the given full path. search is done 
+	 * @return the tree node for the given full path. search is done
 	 *         by comparing tree item data and NOT the tree item name
 	 */
 	wxTreeItemId FindFileNode(const wxString& fullPath);
@@ -355,7 +355,7 @@ public:
 	 * @param feature to get the project list and to search for files
 	 * @param chosenTags the tags that the user chose will be filled in here
 	 */
-	FileSearchDialogClass(wxWindow* parent, t4p::OutlineFeatureClass& feature, 
+	FileSearchDialogClass(wxWindow* parent, t4p::OutlineFeatureClass& feature,
 		std::vector<t4p::PhpTagClass>& chosenTags);
 
 protected:
@@ -372,12 +372,12 @@ protected:
 private:
 
 	/**
-	 * populate the project choice 
+	 * populate the project choice
 	 */
 	void Init();
 
 	/**
-	 * perform the file search based on the selected project and 
+	 * perform the file search based on the selected project and
 	 * the entered text
 	 */
 	void Search();
@@ -396,7 +396,7 @@ private:
 	 * the tags that the were the result of the preivous search
 	 */
 	std::vector<t4p::PhpTagClass> MatchingTags;
-	
+
 	/**
 	 * the tags that the user chose
 	 */

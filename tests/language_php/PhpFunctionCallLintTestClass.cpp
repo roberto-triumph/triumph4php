@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,18 +33,18 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-class PhpFunctionCallLintTestFixtureClass : 
+class PhpFunctionCallLintTestFixtureClass :
 	public FileTestFixtureClass, public SqliteTestFixtureClass {
-	
+
 public:
-	
+
 	t4p::TagCacheClass TagCache;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	t4p::PhpFunctionCallLintClass Lint;
 	std::vector<t4p::PhpFunctionCallLintResultClass> Results;
 	bool HasError;
-	
+
 	PhpFunctionCallLintTestFixtureClass()
 	: FileTestFixtureClass(wxT("php-function-call-lint"))
 	, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
@@ -60,13 +60,13 @@ public:
 	}
 
 	void Parse(const UnicodeString& code) {
-		
-		// create the file, so that we can index it 
+
+		// create the file, so that we can index it
 		// and the tags get parsed from it
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
 		BuildCache(true);
 		Lint.Init(TagCache);
-		
+
 		HasError = Lint.ParseString(code, Results);
 	}
 
@@ -75,7 +75,7 @@ public:
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-		
+
 		// make the cache consume the source code file; to prime it with the resources because the
 		// function call linter won't work without the cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -191,7 +191,7 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMatchMul
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariableArgs) {
-	
+
 	// since printf has variable args
 	// and date have default args
 	// then the linter should recognize that
@@ -204,7 +204,7 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariable
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionOptionalArgumentsArgs) {
-	
+
 	// since gmdate has the timestamp arg is optional
 	// then the linter should recognize that
 	// and not label it as an error
@@ -264,7 +264,7 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodArgumentMissing) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
-	
+
 	// test that when there is a method name clash
 	// between that we do not attempt to check the arguments
 	// here we will make a method with the same name as a
@@ -290,7 +290,7 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionJoin) {
-	
+
 	// the join function is special as it can have
 	// either 1 or 2 args
 	UnicodeString code = t4p::CharToIcu(
@@ -303,7 +303,7 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionJoin) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionRand) {
-	
+
 	// the rand / mt_rand functions are special as they can have
 	// either 0 or 2 args
 	UnicodeString code = t4p::CharToIcu(
@@ -316,8 +316,8 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionRand) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionStripos) {
-	
-	// the stripos functions is special as the last 
+
+	// the stripos functions is special as the last
 	// argument is optional
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"

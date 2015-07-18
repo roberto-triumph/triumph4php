@@ -41,29 +41,29 @@ namespace t4p {
 class RegularExpressionValidatorClass : public wxValidator {
 
 public:
-	
+
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
-	 * @param the mode radio button. this needs to be 
+	 * @param the mode radio button. this needs to be
 	 *        checked so that we skip reg ex validation
 	 *        when the expression is not a reg ex
 	 */
 	RegularExpressionValidatorClass(UnicodeString* data, wxRadioBox* modeRadio);
 
 	virtual bool TransferToWindow();
-	
+
 	virtual bool TransferFromWindow();
-	
+
 	virtual bool Validate(wxWindow* parent);
-	
+
 	virtual wxObject* Clone() const;
 
 private:
 
 	RegularExpressionValidatorClass();
-	
+
 	/**
-	 * The mode radio button; this needs to be 
+	 * The mode radio button; this needs to be
 	 * checked so that we skip reg ex validation
 	 * when the expression is not a reg ex
 	 */
@@ -90,9 +90,9 @@ void PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart);
 void PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart);
 
 /**
- * Alter the given textbox (that contains a regular expression) depending on the user choice. 
+ * Alter the given textbox (that contains a regular expression) depending on the user choice.
  * Note that the caret will be left at currentInsertionPoint
- * 
+ *
  * @param wxComboBox* the combobox containing the regular expression (will be modified in place)
  * @param int menuId the ID that the user chose (one of the ID_MENU_REG_EX_ constants)
  * @param int currentInsertionPoint the position of the cursor
@@ -102,11 +102,11 @@ void PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart);
 void AddSymbolToRegularExpression(wxComboBox* text, const int id, int currentInsertionPoint);
 
 /**
- * Alter the given textbox (that contains a regular expression replacement) depending on 
+ * Alter the given textbox (that contains a regular expression replacement) depending on
  * the user choice. Note that the caret will be left at currentInsertionPoint
  *
  * @param wxComboBox* the combobox containing the regular expression (will be modified in place)
- * @param int menuId the ID that the user chose (one of the ID_MENU_REG_EX_ constants) 
+ * @param int menuId the ID that the user chose (one of the ID_MENU_REG_EX_ constants)
  * @param int currentInsertionPoint the position of the cursor
  *        on Win32 GetInsertionPoint() returns 0 when the combo box is no
  *	      in focus; we must receive the position via an outside mechanism

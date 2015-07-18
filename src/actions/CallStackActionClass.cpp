@@ -6,15 +6,15 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 t4p::CallStackActionClass::CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, TagCache()
 	, CallStack(TagCache)
 	, DetectorDbFileName()
-	, StartFileName() 
-	, StartClassName() 
-	, StartMethodName() 
+	, StartFileName()
+	, StartClassName()
+	, StartMethodName()
 	, Version(pelet::PHP_53) {
-		
+
 }
 
 wxString t4p::CallStackActionClass::GetLabel() const {
@@ -36,12 +36,12 @@ bool t4p::CallStackActionClass::Init(t4p::GlobalsClass& globals) {
 	projectCache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(projectCache);
 	ret = true;
-	SetStatus(_("Call Stack Gen ") + t4p::IcuToWx(StartClassName) + wxT("::") + 
+	SetStatus(_("Call Stack Gen ") + t4p::IcuToWx(StartClassName) + wxT("::") +
 		t4p::IcuToWx(StartMethodName));
 	return ret;
 }
 
-bool t4p::CallStackActionClass::SetCallStackStart(const wxFileName& startFileName, const UnicodeString& className, 
+bool t4p::CallStackActionClass::SetCallStackStart(const wxFileName& startFileName, const UnicodeString& className,
 														const UnicodeString& methodName, const wxFileName& detectorDbFileName) {
 
 	// make sure to set these BEFORE calling CreateSingleInstance
@@ -55,7 +55,7 @@ bool t4p::CallStackActionClass::SetCallStackStart(const wxFileName& startFileNam
 
 void t4p::CallStackActionClass::BackgroundWork() {
 	t4p::CallStackClass::Errors lastError = t4p::CallStackClass::NONE;
-	
+
 	// build the call stack then save it to a temp file
 	if (CallStack.Build(StartFileName, StartClassName, StartMethodName, Version, lastError)) {
 		if (!DetectorDbFileName.IsOk()) {

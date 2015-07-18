@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,10 +49,10 @@
 //  {
 //  }
 //
-// The TEST macro contains enough machinery to turn this slightly odd-looking syntax into legal C++, and automatically register the test in a global list. 
+// The TEST macro contains enough machinery to turn this slightly odd-looking syntax into legal C++, and automatically register the test in a global list.
 // This test list forms the basis of what is executed by RunAllTests().
 //
-// If you want to re-use a set of test data for more than one test, or provide setup/teardown for tests, 
+// If you want to re-use a set of test data for more than one test, or provide setup/teardown for tests,
 // you can use the TEST_FIXTURE macro instead. The macro requires that you pass it a class name that it will instantiate, so any setup and teardown code should be in its constructor and destructor.
 //
 //  struct SomeFixture
@@ -62,7 +62,7 @@
 //
 //    int testData;
 //  };
-// 
+//
 //  TEST_FIXTURE(SomeFixture, YourTestName)
 //  {
 //    int temp = testData;
@@ -71,7 +71,7 @@
 // =================================
 // Test Suites
 // =================================
-// 
+//
 // Tests can be grouped into suites, using the SUITE macro. A suite serves as a namespace for test names, so that the same test name can be used in two difference contexts.
 //
 //  SUITE(YourSuiteName)
@@ -85,7 +85,7 @@
 //    }
 //  }
 //
-// This will place the tests into a C++ namespace called YourSuiteName, and make the suite name available to UnitTest++. 
+// This will place the tests into a C++ namespace called YourSuiteName, and make the suite name available to UnitTest++.
 // RunAllTests() can be called for a specific suite name, so you can use this to build named groups of tests to be run together.
 // Note how members of the fixture are used as if they are a part of the test, since the macro-generated test class derives from the provided fixture class.
 //
@@ -98,9 +98,9 @@ public:
 
 	std::vector<std::string> TestCases;
 
-	SingleTestsPredicateClass(const std::vector<std::string>& testCases) 
+	SingleTestsPredicateClass(const std::vector<std::string>& testCases)
 		: TestCases(testCases) {
-	
+
 	}
 
 	bool operator()(const UnitTest::Test* test) const {
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
 		puts("Could not initialize wxWidgets\n");
 		return -1;
 	}
-	
+
 	int ret = 0;
 	if (argc > 1 && strcmp("--all", argv[1]) == 0) {
 		ret = UnitTest::RunAllTests();
@@ -258,11 +258,11 @@ int main(int argc, char **argv) {
 	else {
 		ret = chooseTests();
 	}
-	
-	// calling cleanup here so that we can run this binary through a memory leak detector 
+
+	// calling cleanup here so that we can run this binary through a memory leak detector
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
 	u_cleanup();
-	
+
 	// clean up the MySQL library. Same reason as the ICU cleanup.
 	mysql_library_end();
 	sqlite_api::sqlite3_shutdown();

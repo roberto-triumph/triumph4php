@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,17 +37,17 @@ class DebuggerViewClass : public t4p::FeatureViewClass {
 public:
 
 	DebuggerViewClass(t4p::DebuggerFeatureClass& feature);
-	
+
 	~DebuggerViewClass();
-	
+
 	void AddNewMenu(wxMenuBar* menuBar);
-	
+
 	void AddViewMenuItems(wxMenu* menu);
-	
+
 	void AddToolBarItems(wxAuiToolBar* bar);
-	
+
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
-	
+
 	/**
 	 * Performs all necessary actions to disable the breakpoint.
 	 * disables it in the breakpoints list
@@ -56,7 +56,7 @@ public:
 	 *
 	 * Issues a debugger command to disable the given breakpoint.
 	 * The command is asynchronous; this method exits
-	 * immediately, and the command is queued to be sent to 
+	 * immediately, and the command is queued to be sent to
 	 * the debugger over a socket on a background thread.
 	 *
 	 * See section 7.6.3 of the xdbgp protocol docs.
@@ -71,22 +71,22 @@ public:
 	 *
 	 * Issues a debugger command to enable the given breakpoint.
 	 * The command is asynchronous; this method exits
-	 * immediately, and the command is queued to be sent to 
+	 * immediately, and the command is queued to be sent to
 	 * the debugger over a socket on a background thread.
 	 *
 	 * See section 7.6.3 of the xdbgp protocol docs.
 	*/
 	void BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
-	
+
 	/**
 	 * Performs all necessary actions to remove the breakpoint.
 	 * Removes it from the breakpoints list
 	 * Removes its marker (in the code control margin)
 	 * Sends the breakpoint_remove command to the debug engine
-	 *  
-	 * issues a debugger command to remove the given breakpoint. 
-	 * The command is asynchronous; this method exits 
-	 * immediately, and the command is queued to be sent to 
+	 *
+	 * issues a debugger command to remove the given breakpoint.
+	 * The command is asynchronous; this method exits
+	 * immediately, and the command is queued to be sent to
 	 * the debugger over a socket on a background thread.
 	 *
 	 * See section 7.6.4 of the xdbgp protocol docs.
@@ -96,38 +96,38 @@ public:
 private:
 
 	t4p::DebuggerFeatureClass& Feature;
-	
+
 	/**
 	 * TRUE if the user modified the port number in the preferences
 	 * window. We need to know this so that we can restart the
 	 * debugger server on the new port.
 	 */
 	bool WasDebuggerPortChanged;
-	
+
 	/**
 	 * The value of the debugger port before it was modified. Used in
 	 * conjunction with WasDebuggerPortChanged to stop the debugger
 	 * server socket when the user changes ports.
 	 */
 	int WasDebuggerPort;
-	
+
 	/**
 	 * checks to see if debugger options / port was modified
 	 * if so, restart the debugger
 	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
-	
+
 	/**
 	 * in this handler we will update the breakpoints list
 	 */
 	void OnBreakpointRefresh(wxCommandEvent& event);
-	
+
 	/**
 	 * in this handler we will open the debugger panel
 	 * and update the status.
 	 */
 	void OnDebuggerOpenPanel(wxCommandEvent& event);
-	
+
 	// menu handlers
 	void OnStartDebugger(wxCommandEvent& event);
 	void OnStopDebugger(wxCommandEvent& event);
@@ -144,7 +144,7 @@ private:
 	void OnViewDebuggerBreakpoints(wxCommandEvent& event);
 	void OnViewDebuggerEval(wxCommandEvent& event);
 
-	
+
 	// debugger event handlers; update the debugger panels
 	void OnDbgpError(t4p::DbgpErrorEventClass& event);
 	void OnDbgpStackGet(t4p::DbgpStackGetEventClass& event);
@@ -152,45 +152,45 @@ private:
 	void OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event);
 	void OnDbgpEval(t4p::DbgpEvalEventClass& event);
 	void OnDbgpPropertyValue(t4p::DbgpPropertyValueEventClass& event);
-	
+
 	/**
 	 * this is an additional debug engine handler, we log a listen
 	 * error
 	 */
 	void OnDebuggerListenError(wxThreadEvent& event);
-	
+
 	/**
 	 * this is an additional debug engine handler, we log the exact
-	 * response we get back from the debug engine 
+	 * response we get back from the debug engine
 	 */
 	void OnDebuggerLog(wxThreadEvent& event);
-	
+
 	/**
 	 * this is an additional debug engine handler, we log a socket
 	 * error
 	 */
 	void OnDebuggerSocketError(wxThreadEvent& event);
-	
+
 	/**
 	 * this is an additional debug engine handler, we log a success
 	 * message when Triumph successfully start listening on
 	 * the port.
 	 */
 	void OnDebuggerListenStart(wxThreadEvent& event);
-	
+
 	/**
 	 * when the user clicks on the margin of a code control, toggle
 	 * a debugger breakpoint at the line that was clicked on
 	 */
 	void OnMarginClick(wxStyledTextEvent& event);
-	
+
 	/**
 	 * we want to get notified of code changes so that
 	 * if a breakpoint is now located at a new line
 	 * we update the breakpoints properly
 	 */
 	void OnStyledTextModified(wxStyledTextEvent& event);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -207,7 +207,7 @@ private:
 };
 
 /**
- * shows the current run-time stack (the function/method that is being 
+ * shows the current run-time stack (the function/method that is being
  * run along with all of the functions/methods that called it).
  */
 class DebuggerStackPanelClass : public DebuggerStackPanelGeneratedClass {
@@ -219,7 +219,7 @@ public:
 	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
 
 	void ClearStack();
-	
+
 	/**
 	 * update the label to say the the debugger is / is no longer running
 	 * @param active bool if TRUE status will be set as active
@@ -239,13 +239,13 @@ public:
 	void SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
 	void UpdateLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
 	void ClearLocalVariables();
-	
+
 	void SetGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
 	void UpdateGlobalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
 	void ClearGlobalVariables();
 
 	void VariableAddChildren(const t4p::DbgpPropertyClass& variable);
-	
+
 	/**
 	 * update the label to say the the debugger is / is no longer running
 	 * @param active bool if TRUE status will be set as active
@@ -262,9 +262,9 @@ private:
 	 * a variable is being expanded.
 	 */
 	t4p::DebuggerFeatureClass& Feature;
-	
+
 	wxTreeListItem LocalVariablesRoot;
-	
+
 	wxTreeListItem GlobalVariablesRoot;
 
 	DECLARE_EVENT_TABLE()
@@ -272,7 +272,7 @@ private:
 
 
 /**
- * shows the user the breakpoints that the user has added; the user can bulk delete / 
+ * shows the user the breakpoints that the user has added; the user can bulk delete /
  * bulk disable the breakpoints by using this panel.
  */
 class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClass {
@@ -317,34 +317,34 @@ private:
  * The eval panel allows the user to enter any arbritary expression and
  * it will get sent to xdebug to be evaluated. User can only enter
  * 1 expression at a time.
- * 
+ *
  */
 class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
 
 public:
-	
+
 	DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
-	
+
 	~DebuggerEvalPanelClass();
-	
+
 	/**
 	 * append the results of an eval'ed expression into the results
 	 * text area
 	 */
 	void AppendResults(const t4p::DbgpPropertyClass& prop);
-	
+
 	/**
 	 * appends an error string into the results.  This will usually
 	 * happen when the user enters an invalid expression
 	 */
 	void AppendError(const wxString& error);
-	
+
 	/**
 	 * update the label to say the the debugger is / is no longer running
 	 * @param active bool if TRUE status will be set as active
 	 */
 	void ResetStatus(bool active);
-	
+
 private:
 
 	void OnEvalClick(wxCommandEvent& event);
@@ -352,17 +352,17 @@ private:
 	void OnCode(wxStyledTextEvent& event);
 	void OnCmdRun(wxCommandEvent& event);
 	void OnCmdComplete(wxCommandEvent& event);
-	
+
 	void PrettyPrint(const t4p::DbgpPropertyClass& prop);
 
 	t4p::DebuggerFeatureClass& Feature;
-	
+
 	t4p::CodeControlClass* CodeCtrl;
-	
+
 	wxString InitialCode;
-	
+
 	DECLARE_EVENT_TABLE()
-	
+
 };
 
 /**
@@ -380,13 +380,13 @@ public:
 
 	DebuggerPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature,
 		t4p::DebuggerViewClass& view);
-	
+
 	// bring the various panels to the forefront
 	void SelectLoggerPanel();
 	void SelectVariablePanel();
 	void SelectBreakpointPanel();
 	void SelectEvalPanel();
-	
+
 	/**
 	 * update the label to say the the debugger is / is no longer running
 	 * @param active bool if TRUE status will be set as active
@@ -401,13 +401,13 @@ private:
  * debugger settings
  */
 class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
-	
+
 public:
-	
+
 	DebuggerOptionsPanelClass(wxWindow* parent, t4p::DebuggerOptionsClass& options, bool& wasDebuggerPortChanged);
-	
+
 	bool TransferDataFromWindow();
-	
+
 private:
 
 	// handlers for source code mapping CRUD
@@ -420,20 +420,20 @@ private:
 	 * fill the mappings list according to the options
 	 */
 	void FillMappings();
-	
-	
+
+
 	/**
-	 * the final set of options that will be 
+	 * the final set of options that will be
 	 * edited only when the user hits the OK
 	 * button
 	 */
 	t4p::DebuggerOptionsClass& Options;
-	
+
 	/**
 	 * the options being edited by the user
 	 */
 	t4p::DebuggerOptionsClass EditedOptions;
-	
+
 	/**
 	 * will be set to TRUE if the user changed port
 	 */
@@ -445,7 +445,7 @@ private:
  * It is big to accomodate variables with lots of content
  */
 class DebuggerFullViewDialogClass : public DebuggerFullViewDialogGeneratedClass {
-	
+
 public:
 
 	DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value);
@@ -456,19 +456,19 @@ public:
  * mapping.
  */
 class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
-	
+
 public:
 
 	DebuggerMappingDialogClass(wxWindow* parent, wxString& localPath, wxString& remotePath);
-	
+
 private:
-	
+
 	void OnCancelButton(wxCommandEvent& event);
-	
+
 	void OnOkButton(wxCommandEvent& event);
-	
+
 	wxFileName LocalDir;
-	
+
 	wxString& LocalPathString;
 };
 

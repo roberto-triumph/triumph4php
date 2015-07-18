@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,9 +41,9 @@ class RunBrowserViewClass : public FeatureViewClass {
 public:
 
 	RunBrowserViewClass(t4p::RunBrowserFeatureClass& feature);
-	
+
 	void AddWindows();
-	
+
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 private:
@@ -56,18 +56,18 @@ private:
 	void OnFileSaved(t4p::CodeControlEventClass& event);
 
 	/**
-	 * run the chosen URL in (an external) web browser 
+	 * run the chosen URL in (an external) web browser
 	 */
 	void OnRunInWebBrowser(wxCommandEvent& event);
-	
+
 	void OnBrowserToolDropDown(wxAuiToolBarEvent& event);
-	
+
 	void OnBrowserToolMenuItem(wxCommandEvent& event);
-	
+
 	void OnUrlToolDropDown(wxAuiToolBarEvent& event);
-	
+
 	void OnUrlToolMenuItem(wxCommandEvent& event);
-	
+
 	void OnUrlSearchTool(wxCommandEvent& event);
 
 	/**
@@ -79,7 +79,7 @@ private:
 	 * show the user the URL dialog and open the chosen url
 	 */
 	void ShowUrlDialog();
-	
+
 	void SetCurrentBrowser();
 
 	/**
@@ -88,14 +88,14 @@ private:
 	 * the user the ChooseUrlDialog
 	 */
 	void OnUrlDetectionComplete(t4p::ActionEventClass& event);
-	
+
 	void OnPreferencesSaved(wxCommandEvent& event);
-	
+
 	/**
 	 * contains the application logic
 	 */
 	t4p::RunBrowserFeatureClass& Feature;
-		
+
 	/**
 	 * A popup menu to show the currently configured browsers. The same popup menu will be
 	 * reused multiple times. This class will own it,  that's why we use auto_ptr here
@@ -110,18 +110,18 @@ private:
 
 	/**
 	 * a bigger progress bar to show the user while url detection is running. this
-	 * dialog is shown so that the user has more feedback that just the bottom 
+	 * dialog is shown so that the user has more feedback that just the bottom
 	 * progress bar in the status bar.
 	 */
 	t4p::GaugeDialogClass* GaugeDialog;
 
 	wxMenuItem* RunInBrowser;
-	
+
 	wxAuiToolBar* BrowserToolbar;
 
 	/**
 	 * A 'dirty' flag so that we can re-run url detection
-	 * when the user clicks on the Search For Urls button when we know that 
+	 * when the user clicks on the Search For Urls button when we know that
 	 * the URL cache needs to be updated.
 	 */
 	bool IsUrlCacheStale;
@@ -132,7 +132,7 @@ private:
 	 * ChooseUrlDialog
 	 */
 	bool IsWaitingForUrlDetection;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

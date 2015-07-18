@@ -37,18 +37,18 @@ namespace t4p {
 class FilePickerValidatorClass : public wxValidator {
 
 public:
-	
+
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
 	 */
 	FilePickerValidatorClass(wxFileName* data);
 
 	virtual bool TransferToWindow();
-	
+
 	virtual bool TransferFromWindow();
-	
+
 	virtual bool Validate(wxWindow* parent);
-	
+
 	virtual wxObject* Clone() const;
 
 private:

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,13 +42,13 @@
 /**
  * This is a fixture to test that the tag finder works with-
  * files.  We will use this sparingly since the parser (really the
- * LexicalAnalyzerClass) is the one responsible for tokenizing 
+ * LexicalAnalyzerClass) is the one responsible for tokenizing
  * the input.
  * Using the file fixture less often means that tests run faster.
  */
 class ParsedTagFinderFileTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-public:	
-	ParsedTagFinderFileTestClass() 
+public:
+	ParsedTagFinderFileTestClass()
 		: FileTestFixtureClass(wxT("tag_finder"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
@@ -60,7 +60,7 @@ public:
 			RecursiveRmDir(TestProjectDir);
 		}
 	}
-	
+
 	/**
 	 * creates a file that will contain the given contents.
 	 * Then the tag finder is run on the new file
@@ -122,8 +122,8 @@ public:
  * create and delete actual files.
  */
 class ParsedTagFinderMemoryTestClass : public SqliteTestFixtureClass {
-public:	
-	ParsedTagFinderMemoryTestClass() 
+public:
+	ParsedTagFinderMemoryTestClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser()
 		, ParsedTagFinder(Session)
@@ -132,9 +132,9 @@ public:
 		TagParser.PhpFileExtensions.push_back(wxT("*.php"));
 		TagParser.Init(&Session);
 	}
-	
+
 	/**
-	 * will call the object under test (will make the tag finder 
+	 * will call the object under test (will make the tag finder
 	 * parse the given source code. this is a bit different than the
 	 * ParsedTagFinderFileTestClass::Prep method
 	 */
@@ -185,7 +185,7 @@ public:
 
 	TagSearchTestClass()
 		: TagSearch(NULL) {
-	
+
 	}
 
 	~TagSearchTestClass() {
@@ -243,7 +243,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindFileWhenFileNa
 	Parse(TestProjectDir + TestFile);
 	Parse(TestProjectDir + miscFile);
 	NearMatchFileTags(t4p::WxToIcu(miscFile));
-	
+
 	CHECK_VECTOR_SIZE(1, FileMatches);
 	CHECK_EQUAL(TestProjectDir + miscFile, FileMatches[0].FullPath);
 }
@@ -276,7 +276,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenFil
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchFileTagsShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
-	
+
 	// should count unix, windows & mac line endings
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -335,7 +335,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
@@ -404,7 +404,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
@@ -430,7 +430,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFileWhenClas
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestFile, Matches[0].GetFullPath());
@@ -446,7 +446,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldNotFindFileWhenC
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::getAddress"));
 	CHECK_VECTOR_SIZE(0, Matches);
 }
@@ -481,7 +481,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindTwoFilesWhen
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	TestFile = testFile2;
 	Prep(t4p::CharToIcu(
 		"<?php\n"
@@ -492,7 +492,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindTwoFilesWhen
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_EQUAL(testFile, Matches[0].GetFullPath());
@@ -509,7 +509,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenItH
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
@@ -545,7 +545,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWhen
 		"\t echo $user->getName() . \"\\n\";"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
@@ -564,7 +564,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindFunctionWith
 		"\t  $args = func_get_args(); \n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
@@ -593,9 +593,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 		"}\n"
 		"function userClassPrint($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"
-		"}\n"		
+		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("userClas"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
@@ -613,7 +613,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
@@ -636,7 +636,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCl
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::MAX"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
@@ -653,7 +653,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDe
 		"/** the max constant @var int */\n"
 		"define('MAX_ITEMS', 1);\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("MAX_ITEMS"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
@@ -665,7 +665,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDe
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCorrectClassMethod) {
-	
+
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -683,14 +683,14 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCo
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatchesForCorrectClassMethod) {
-	
+
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -708,7 +708,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
@@ -730,7 +730,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatch
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	NearMatchTags(UNICODE_STRING_SIMPLE("::getNa"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "getName", Matches[0]);
@@ -765,7 +765,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNa
 	// test a built-in object query for all methods
 	NearMatchTags(UNICODE_STRING_SIMPLE("PDO::"));
 	CHECK_VECTOR_SIZE(100, Matches);
-	
+
 	// a fully qualified search
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\Exception"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -774,7 +774,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNa
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
-	
+
 	// write a file, "modify" the file in memory by adding a method, we should find the new method
 	wxString code  = wxString::FromAscii(
 		"<?php\n"
@@ -817,7 +817,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsi
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFileAndUsingNewFile) {
 	Prep(t4p::CharToIcu(
-		
+
 		// this simulates the user writing a completely new file that has yet to be saved.
 		"<?php\n"
 		"class UserClass {\n"
@@ -834,9 +834,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesWhenU
 		"}\n"
 		"function userClassPrint($user) {\n"
 		"\t echo $user->getName() . \"\\n\";"
-		"}\n"		
+		"}\n"
 		"?>\n"
-	));	
+	));
 	UnicodeString uniCode  = t4p::CharToIcu(
 		"<?php\n"
 		"function printUser($user) {\n"
@@ -887,7 +887,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpe
 	CreateSubDirectory(wxT("model"));
 
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
-	
+
 	Prep(t4p::CharToWx(
 		"<?php\n"
 		"class UserClass {\n"
@@ -1019,7 +1019,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedF
 	));
 	Parse(TestProjectDir + TestFile);
 	t4p::TagSearchClass search(UNICODE_STRING_SIMPLE("user"));
-	
+
 	std::vector<wxFileName> dirs;
 	wxFileName adminDir;
 	adminDir.AssignDir(TestProjectDir);
@@ -1043,7 +1043,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNam
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
-	));	
+	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1052,7 +1052,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNam
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAndPropertyNameAreTheSame) {
-		
+
 	// the name of the class and the name of the property are the same
 	// the method under test should know the difference and only return the class tag
 	Prep(t4p::CharToIcu(
@@ -1071,9 +1071,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("SetClass"));
-	
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].Identifier);
 	CHECK_UNISTR_EQUALS("SetClass", Matches[0].ClassName);
@@ -1081,7 +1081,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrectClassMethod) {
-	
+
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -1099,9 +1099,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrec
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::get"));
-	
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("UserClass", "get", Matches[0]);
 }
@@ -1121,7 +1121,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldNotFindFileWhenClass
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenModified) {
-	
+
 	// this method is testing the scenario where the tag cache is modified and when the ExactTags
 	// method is checked that the cache is re-sorted and searched correctly
 	Prep(wxString::FromAscii(
@@ -1133,7 +1133,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1169,7 +1169,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenDeleted) {
-	
+
 	// this method is testing the scenario where the tag cache invalidates matches when files have been deleted
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1180,19 +1180,19 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(TestProjectDir + TestFile, Matches[0].GetFullPath());
 	CHECK(wxRemoveFile(TestProjectDir + TestFile));
-	
+
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 
 
 	// before this was expected to be zero, but the code that ensures matched files
 	// exist is gone from the NearMatchTags method because of performance
-	// issues and we want the method to be fast because it is performed during 
+	// issues and we want the method to be fast because it is performed during
 	// user clicks
 	CHECK_VECTOR_SIZE(1, Matches);
 }
@@ -1220,7 +1220,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnSignatureForCon
 		"?>\n"
 	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("UserClass::__construct"));
-	 
+
 	t4p::PhpTagClass tag = Matches[0];
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("public function __construct($name)"), tag.Signature);
 }
@@ -1248,7 +1248,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 	parents.push_back(UNICODE_STRING_SIMPLE("UserClass"));
 	tagSearch.SetParentClasses(parents);
 	ExactMatchTags(tagSearch);
-	
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	t4p::PhpTagClass tag = Matches[0];
 	CHECK_UNISTR_EQUALS("UserClass", tag.ClassName);
@@ -1260,7 +1260,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifi
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("model"));
-	
+
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
 	Prep(t4p::CharToWx(
 		"<?php\n"
@@ -1315,7 +1315,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
-	));	
+	));
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
 	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1325,13 +1325,13 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(wxT("test.php"), Matches[0].GetFullPath());
 }
-	
+
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
-	
+
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("admin"));
-	
+
 	TestFile = wxT("user") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
 	Prep(t4p::CharToWx(
 		"<?php\n"
@@ -1341,7 +1341,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 
 	TestFile = wxT("admin") + wxString(wxFileName::GetPathSeparator()) + wxT("user.php");
@@ -1353,7 +1353,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 		"\t\treturn $this->name;\n"
 		"\t}\n"
 		"}\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("UserClass"));
@@ -1366,7 +1366,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
 	Matches = ParsedTagFinder.ExactClassOrFile(tagSearch);
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("UserClass", Matches[0].Identifier);
-	CHECK_EQUAL(adminDir.GetPathWithSep() + wxT("user.php"), Matches[0].GetFullPath());	
+	CHECK_EQUAL(adminDir.GetPathWithSep() + wxT("user.php"), Matches[0].GetFullPath());
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceParentClassShouldReturnParentClass) {
@@ -1444,7 +1444,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 		"?>\n"
 	);
 	Prep(icuCode);
-	int32_t pos, 
+	int32_t pos,
 		length;
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1452,7 +1452,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(6, pos);
 	CHECK_EQUAL(16, length);
-	
+
 	// checking methods
 	NearMatchTags(UNICODE_STRING_SIMPLE("::getName"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1460,7 +1460,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("function getName()")), (int32_t)pos);
 	CHECK_EQUAL(17, length);
-	
+
 	// checking properties
 	NearMatchTags(UNICODE_STRING_SIMPLE("UserClass::name"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1468,7 +1468,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceMatchPositionShouldRetur
 	CHECK(t4p::ParsedTagFinderClass::GetResourceMatchPosition(Matches[0], icuCode, pos, length));
 	CHECK_EQUAL(icuCode.indexOf(UNICODE_STRING_SIMPLE("private $name")), (int32_t)pos);
 	CHECK_EQUAL(14, length);
-	
+
 	// checking functions
 	NearMatchTags(UNICODE_STRING_SIMPLE("printUser"));
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1490,7 +1490,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespaces)
 		"?>\n"
 	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
-	
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
 }
@@ -1515,7 +1515,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 		"}\n"
 		"\n"
 		"?>\n"
-	));	
+	));
 	ExactMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"));
 
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1524,7 +1524,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectQualifiedResourceNamespacesS
 	std::vector<t4p::PhpTagClass> all = ParsedTagFinder.All();
 
 	//  6 tags total
-	// namespace First\\Child 
+	// namespace First\\Child
 	// class MyClass
 	// function MyClass::work
 	// function singleWork
@@ -1543,11 +1543,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectResourceInGlobalNamespaces) 
 		"function singleWork() { } \n"
 		"?>\n"
 	));
-	ExactMatchTags(UNICODE_STRING_SIMPLE("\\MyClass"));	
-	
+	ExactMatchTags(UNICODE_STRING_SIMPLE("\\MyClass"));
+
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_UNISTR_EQUALS("\\MyClass", Matches[0].Identifier);
-	
+
 	ExactMatchTags(UNICODE_STRING_SIMPLE("\\singleWork"));
 
 	CHECK_VECTOR_SIZE(1, Matches);
@@ -1570,7 +1570,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaces) {
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[1].Identifier);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[2].Identifier);
-	
+
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Ch"));
 	CHECK_VECTOR_SIZE(3, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child"), Matches[0].Identifier);
@@ -1592,11 +1592,11 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchNamespaceQualifiedC
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\si"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\singleWork"), Matches[0].Identifier);
-	
+
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\M"));
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
-	
+
 	NearMatchTags(UNICODE_STRING_SIMPLE("\\First\\Child\\"));
 	CHECK_VECTOR_SIZE(2, Matches);
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE("\\First\\Child\\MyClass"), Matches[0].Identifier);
@@ -1631,9 +1631,9 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 		"    /* ... */ "
 		"}"
 	));
-	
+
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("ezcReflectionMethod::getReturn"));
-	
+
 	// tell the tag finder to look for traits
 	std::vector<UnicodeString> traits;
 	traits.push_back(UNICODE_STRING_SIMPLE("ezcReflectionReturnInfo"));
@@ -1650,7 +1650,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, CollectNearMatchesShouldFindTraitMe
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
-	TagParser.SetVersion(pelet::PHP_54); 
+	TagParser.SetVersion(pelet::PHP_54);
 	Prep(t4p::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
@@ -1674,7 +1674,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 	result.Set(classNames, UNICODE_STRING_SIMPLE(""), false, sourceDirs);
 	ParsedTagFinder.Exec(&result);
 	Matches = result.MatchesAsTags();
-	
+
 	// for now just show only the aliased methods
 	CHECK_VECTOR_SIZE(1, Matches);
 	CHECK_MEMBER_RESOURCE("ezcReflectionReturnInfo", "getFunctionReturnType", Matches[0]);
@@ -1682,7 +1682,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, TraitTagResultShouldFindAliases) {
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, GetResourceTraitsShouldReturnAllTraits) {
-	TagParser.SetVersion(pelet::PHP_54); 
+	TagParser.SetVersion(pelet::PHP_54);
 	Prep(t4p::CharToIcu(
 		"trait ezcReflectionReturnInfo { "
 		"    function getReturnType() { } "
@@ -1714,7 +1714,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(t4p::NativeFunctionsAsset().GetFullPath()));;
 	t4p::ParsedTagFinderClass finder(session);
-	
+
 	// still empty
 	CHECK(finder.IsFileCacheEmpty());
 	CHECK(finder.IsResourceCacheEmpty());
@@ -1737,8 +1737,8 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturn
 		"function printUsers($user) {}\n"
 		"\n"
 		"?>\n"
-	));	
-	
+	));
+
 	TestFile = wxT("tan.php");
 		Prep(t4p::CharToIcu(
 		"<?php\n"
@@ -1752,7 +1752,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturn
 		"function printScore($tan) {}\n"
 		"\n"
 		"?>\n"
-	));	
+	));
 
 	// this method only returns top-level tags for now
 	Matches = ParsedTagFinder.ClassesFunctionsDefines(wxT("test.php"));
@@ -1775,7 +1775,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	Parse(TestProjectDir + TestFile);
 
 	CHECK_EQUAL(false, ParsedTagFinder.IsFileCacheEmpty());
@@ -1796,7 +1796,7 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWild
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	wxString badFile = wxT("bad.php");
 	CreateFixtureFile(badFile, wxString::FromAscii(
 		"<?php\n"
@@ -1807,10 +1807,10 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWild
 		"\t}\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 	TagParser.PhpFileExtensions.clear();
 	TagParser.PhpFileExtensions.push_back(wxT("good.php"));
-	
+
 	Parse(TestProjectDir + goodFile);
 	Parse(TestProjectDir + badFile);
 
@@ -1832,7 +1832,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDir) {
 		"class UserClass {\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 
 	bool hasDir = ParsedTagFinder.HasDir(paths.GetUserDataDir());
 	CHECK(hasDir);
@@ -1849,7 +1849,7 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, HasDirShouldNotBeFound) {
 		"class UserClass {\n"
 		"}\n"
 		"?>\n"
-	));	
+	));
 
 	bool hasDir = ParsedTagFinder.HasDir(paths.GetTempDir());
 	CHECK_EQUAL(false, hasDir);

@@ -75,7 +75,7 @@ private:
 	t4p::EventSinkClass EventSink;
 
 	t4p::SyntaxHighlightViewClass& View;
-	
+
 	void AddPreviews();
 };
 
@@ -91,7 +91,7 @@ class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 
 public:
 	SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature);
-	
+
 	/**
 	 * Change the styles to use based on the
 	 * code control's document mode and the given options
@@ -114,21 +114,21 @@ private:
 	 * control because the styles might have changed.
 	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
-	
+
 	/**
 	 * on app start we load the bitmaps we use
 	 * on the margin markers
 	 */
 	void OnAppReady(wxCommandEvent& event);
-	
+
 	/**
 	 * loads the bitmaps that are used as STC markers
 	 * from disk.
 	 */
 	void LoadMarkerBitmaps();
-	
+
 	t4p::SyntaxHighlightFeatureClass& Feature;
-	
+
 	// bitmaps to show in the margin for search hits
 	// and bookmarks
 	// we load from disk once per feature

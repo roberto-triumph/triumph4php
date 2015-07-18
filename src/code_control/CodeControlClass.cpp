@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -80,53 +80,53 @@ namespace t4p {
 class ElevatedSaveProcessClass : public wxProcess {
 
 public:
-	
+
 	// the temp file and script temp are used to copy the
 	// contents that the user has edited into the original
 	// file.
 	wxString TempFile;
 	wxString ScriptTempFile;
-	
+
 	/**
 	 * the code control that the user saved.  after the save is completed,
 	 * we mark the file as having been saved (file is no longer dirty)
-	 * and update the last modified timestamp 
+	 * and update the last modified timestamp
 	 * This class will not own the pointer.
 	 * This pointer may be NULL if the user closes the file right after
 	 * the save.
 	 */
 	t4p::CodeControlClass* CodeCtrl;
-	
+
 	/**
 	 * After the file is saved, we tell the rest of the Triumph app
 	 * that the file was saved.
 	 */
 	t4p::EventSinkClass& EventSink;
-	
+
 	ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink);
-	
+
 	/**
 	 * this method will get called when the save process completes
 	 */
 	void OnTerminate(int pid, int status);
-	
+
 	/**
 	 * in case of an error, we can get the error from the input and error
 	 * streams to show the user
 	 */
 	wxString GetProcessOutput() const;
-	
+
 };
 
 }
 
-t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink) 
+t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink)
 : wxProcess(wxPROCESS_REDIRECT)
 , TempFile()
 , ScriptTempFile()
 , CodeCtrl(ctrl)
 , EventSink(eventSink) {
-	
+
 }
 
 void t4p::ElevatedSaveProcessClass::OnTerminate(int pid, int status) {
@@ -138,7 +138,7 @@ void t4p::ElevatedSaveProcessClass::OnTerminate(int pid, int status) {
 	}
 	if (CodeCtrl) {
 		CodeCtrl->MarkAsSaved();
-		
+
 		// hmm will never tell the app of file saves in this case
 		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, CodeCtrl);
 		EventSink.Publish(codeControlEvent);
@@ -167,10 +167,10 @@ wxString t4p::ElevatedSaveProcessClass::GetProcessOutput() const {
 }
 
 /**
- * saves the given contents into the given file path; 
+ * saves the given contents into the given file path;
  * taking into account UTF-8 BOM signature if desired. The full path
  * must be writable, else an error will occur.
- * 
+ *
  * @param fullPath the path to save the file to. If file already exists it will
  *        be overwritten
  * @param contents the contents to put in the file
@@ -178,10 +178,10 @@ wxString t4p::ElevatedSaveProcessClass::GetProcessOutput() const {
  * @param hasSignature if TRUE, then the UTF-8 BOM will be written to the file
  * @return bool TRUE if file was successfully saved
  */
-static bool SaveFileWithCharset(const wxString& fullPath, const wxString& contents, 
+static bool SaveFileWithCharset(const wxString& fullPath, const wxString& contents,
 	const wxString& charset, bool hasSignature) {
 	bool ret = false;
-	
+
 	wxFFile file(fullPath, wxT("wb"));
 	wxCSConv conv(charset);
     if (file.IsOpened() && conv.IsOk()) {
@@ -189,28 +189,28 @@ static bool SaveFileWithCharset(const wxString& fullPath, const wxString& conten
 			wxString sig = wxT("\xfeff");
 			file.Write(sig, conv);
 		}
-		
+
 		ret = file.Write(contents, conv);
 	}
 	return ret;
-		
+
 }
 
-static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const wxString& contents, 
+static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const wxString& contents,
 	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
 	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
 	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
 	bool ret = savedTemp;
-	
+
 	// now copy the contents the temp file to the desired location
-	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
+	// dont use mv or copy as that copies file attributes (owner, permissions) as well,
 	// and we want the original file's attributes to not be changed.
 	// dumping the echo into its own script because I could not figure out
 	// how to properly escape
 	// i tried this
-	// 
+	//
 	//  gksudo  "sh -c \"echo 'file1' > 'file2' \" "
-	// 
+	//
 	// but it did not work
 	// also I tried making this a synchronous process, but the GUI
 	// badly affected
@@ -220,7 +220,7 @@ static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const w
 	);
 	wxString scriptTempFile = wxFileName::CreateTempFileName("triumph_script");
 	SaveFileWithCharset(scriptTempFile, scriptContents, "", false);
-	
+
 	// wanted to use mv, but mv will overwrite permissions and ownership
 	// we want to keep the file's original ownership
 	// ie. if a file owned by root is being saved, it should stay
@@ -230,10 +230,10 @@ static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const w
 		wxT("Triumph4PHP privilege save"),
 		scriptTempFile
 	);
-	
+
 	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
 	eventSink.Publish(codeControlEvent);
-	
+
 	t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
 	proc->TempFile = tempFile;
 	proc->ScriptTempFile = scriptTempFile;
@@ -242,13 +242,13 @@ static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const w
 	return ret;
 }
 
-static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const wxString& contents, 
+static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const wxString& contents,
 	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
 #if defined(__WXMSW__)
 	wxString tempFile = wxFileName::CreateTempFileName("triumph_file");
 	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
 	bool ret = savedTemp;
-	
+
 	// now copy the contents the temp file to the desired location
 	// dont use mv or copy so that file attributes (owner, permissions) are not
 	// copied over.
@@ -260,11 +260,11 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 	SaveFileWithCharset(scriptTempFile.GetFullPath(), scriptContents, "", false);
 
 	// now create the command to be run
-	// ATTN: not sure if this runs the script synchronously or async, 
+	// ATTN: not sure if this runs the script synchronously or async,
 	// it seems that it is asynchronous at this time.
 	// however, ShellExecute does not provide a callback mechanism
 	// this code could be greatly improved, perhaps by usiing ShellExecuteEx
-	// we mark the file as saved here since there is no callback when the 
+	// we mark the file as saved here since there is no callback when the
 	// temp script has completed.
 	HINSTANCE res = ::ShellExecute(NULL, wxT("runas"), scriptTempFile.GetFullPath().fn_str(), NULL, NULL, 0);
 
@@ -276,7 +276,7 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 
 	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
 	eventSink.Publish(codeControlEvent);
-	
+
 	wxRemoveFile(tempFile);
 	wxRemoveFile(scriptTempFile.GetFullPath());
 
@@ -286,18 +286,18 @@ static bool SavePrivilegedFileWithCharsetWindows(const wxString& fullPath, const
 #endif
 }
 
-static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxString& contents, 
+static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxString& contents,
 	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
 	wxString tempFile = wxFileName::CreateTempFileName("triumph_temp");
 	bool savedTemp = SaveFileWithCharset(tempFile, contents, charset, hasSignature);
 	bool ret = savedTemp;
-	
+
 	// now copy the contents the temp file to the desired location
-	// dont use mv or copy as that copies file attributes (owner, permissions) as well, 
+	// dont use mv or copy as that copies file attributes (owner, permissions) as well,
 	// and we want the original file's attributes to not be changed.
 	// ie. if a file owned by root is being saved, it should stay
 	// as owned by root and not the current user (that is saving the file).
-	// 
+	//
 	// note that the filenames given to CAT are enclosed in quotes but the
 	// resulting scriupt needs to escape them
 	wxString scriptContents = wxString::Format(
@@ -310,10 +310,10 @@ static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxS
 		"osascript '%s' ",
 		scriptTempFile
 	);
-	
+
 	t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, codeCtrl);
 	eventSink.Publish(codeControlEvent);
-	
+
 	t4p::ElevatedSaveProcessClass* proc = new t4p::ElevatedSaveProcessClass(codeCtrl, eventSink);
 	proc->TempFile = tempFile;
 	proc->ScriptTempFile = scriptTempFile;
@@ -323,18 +323,18 @@ static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxS
 }
 
 /**
- * saves the given contents into the given file path; 
- * taking into account UTF-8 BOM signature if desired. This 
+ * saves the given contents into the given file path;
+ * taking into account UTF-8 BOM signature if desired. This
  * function uses a different save algorithm, it will save the
  * contents to a temp file and them perform a overwrite the original
  * file that was opened using elevated privileges (root / administrator)
- * The move will is done with escalated privileges so files that are read-only 
+ * The move will is done with escalated privileges so files that are read-only
  * may be saved; a good example of this is the system hosts file.
- * 
+ *
  * The mechanics of saving are as follows:
  * 1. the contents of the code control are saved to a temp file
  * 2. a temp script is created that echos the contents of the temp file
- *    into the original file that was opened.  This script is needed 
+ *    into the original file that was opened.  This script is needed
  *    because if we use copy / mv the permissions attributes of the
  *    original file are changed and we want to
  *    retain the original file permissions.
@@ -342,11 +342,11 @@ static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxS
  *    step (1) with escalated privileges; in linux
  *    gksu or ksudo are used. Note that at no time does the Triumph process
  *    attain escalated privileges.
- * 4. The privilege escalation method will ask the user for their 
- *    password if needed; note that Triumph never receives the user's 
- *    password. 
+ * 4. The privilege escalation method will ask the user for their
+ *    password if needed; note that Triumph never receives the user's
+ *    password.
  * 5. After the script runs, we delete the temp script and the temp file.
- * 
+ *
  * @param fullPath the path to save the file to. If file already exists it will
  *        be overwritten.
  * @param contents the contents to put in the file
@@ -356,15 +356,15 @@ static bool SavePrivilegedFileWithCharsetMac(const wxString& fullPath, const wxS
  * @param eventSink to notify the rest of the app when the file is saved
  * @return bool TRUE if external process was started.
  */
-static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxString& contents, 
+static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxString& contents,
 	const wxString& charset, bool hasSignature, t4p::CodeControlClass* codeCtrl, t4p::EventSinkClass& eventSink) {
 	wxPlatformInfo platform;
 	if (wxOS_UNIX_LINUX == platform.GetOperatingSystemId()) {
-		return SavePrivilegedFileWithCharsetLinux(fullPath, contents, 
+		return SavePrivilegedFileWithCharsetLinux(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
 	}
 	else if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
-		return SavePrivilegedFileWithCharsetWindows(fullPath, contents, 
+		return SavePrivilegedFileWithCharsetWindows(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
 	}
 	else if (wxOS_MAC_OSX_DARWIN == platform.GetOperatingSystemId()) {
@@ -377,7 +377,7 @@ static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxStri
 t4p::CodeCompletionItemClass::CodeCompletionItemClass()
 : Label()
 , Code() {
-	
+
 }
 
 t4p::CodeCompletionItemClass::CodeCompletionItemClass(const t4p::CodeCompletionItemClass& src)
@@ -397,27 +397,27 @@ void t4p::CodeCompletionItemClass::Copy(const t4p::CodeCompletionItemClass& src)
 }
 
 t4p::CodeCompletionProviderClass::CodeCompletionProviderClass() {
-	
+
 }
 
 t4p::CodeCompletionProviderClass::~CodeCompletionProviderClass() {
-	
+
 }
 
 t4p::CallTipProviderClass::CallTipProviderClass() {
-	
+
 }
 
 t4p::CallTipProviderClass::~CallTipProviderClass() {
-	
+
 }
 
 t4p::BraceMatchStylerClass::BraceMatchStylerClass() {
-	
+
 }
 
 t4p::BraceMatchStylerClass::~BraceMatchStylerClass() {
-	
+
 }
 
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
@@ -434,13 +434,13 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 		, Globals(globals)
 		, EventSink(eventSink)
 		, WordHighlightIsWordHighlighted(false)
-		, Type(t4p::FILE_TYPE_TEXT) 
-		, IsHidden(false) 
-		, IsTouched(false) 
-		, HasSearchMarkers(false) 
-		, HasFileSignature(false) 
+		, Type(t4p::FILE_TYPE_TEXT)
+		, IsHidden(false)
+		, IsTouched(false)
+		, HasSearchMarkers(false)
+		, HasFileSignature(false)
 		, Charset() {
-	
+
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
@@ -449,7 +449,7 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 
 t4p::CodeControlClass::~CodeControlClass() {
 }
-void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents, 
+void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& contents,
 		const wxString& charset, bool hasSignature) {
 	SetUnicodeText(contents);
 	HasFileSignature = hasSignature;
@@ -466,7 +466,7 @@ void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& c
 
 void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 
-	// lets avoid the IcuToWx to prevent going from 
+	// lets avoid the IcuToWx to prevent going from
 	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
 	// cost of translation (computation and memoory) could be big for big sized files
 	// because of the double encoding due to all three libraries using
@@ -483,7 +483,7 @@ void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 	int32_t written;
 	u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
 	if(U_SUCCESS(status)) {
-	
+
 		// SetText message
 		SendMsg(2181, 0, (long)(const char*)dest);
 	}
@@ -502,7 +502,7 @@ void t4p::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 	// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 	bool hasSignature = false;
 	wxString charset;
-	t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents, 
+	t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(fileName, contents,
 		charset, hasSignature);
 	if (error == t4p::FindInFilesClass::NONE) {
 		TrackFile(fileName, contents, charset, hasSignature);
@@ -539,22 +539,22 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 
 	bool isAsyncSave = false;
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
-		
+
 		// if file is not changing name then its not changing extension
 		// no need to auto detect the file type
 		bool isWritable = wxFileName::IsFileWritable(CurrentFilename);
 		bool doesExist = wxFileName::FileExists(CurrentFilename);
-		
+
 		if (!doesExist || isWritable) {
 			saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
 		}
 		else {
 			t4p::CodeControlClass* ctrl = willDestroy ? NULL : this;
-			saved = SavePrivilegedFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature, 
+			saved = SavePrivilegedFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature,
 				ctrl, EventSink);
 			isAsyncSave = true;
 		}
-	}	
+	}
 	else {
 		bool isWritable = wxFileName::IsFileWritable(newFilename);
 		bool doesExist = wxFileName::FileExists(newFilename);
@@ -576,9 +576,9 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 	}
 	if (saved && !isAsyncSave) {
 		MarkAsSaved();
-		
+
 		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_SAVED, this);
-		EventSink.Publish(codeControlEvent);		
+		EventSink.Publish(codeControlEvent);
 	}
 	return saved;
 }
@@ -609,7 +609,7 @@ wxDateTime t4p::CodeControlClass::GetFileOpenedDateTime() const {
 }
 
 void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
-	
+
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
 	SetSelectionByCharacterPosition(start, end, true);
@@ -618,10 +618,10 @@ void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
 }
 
 void t4p::CodeControlClass::GotoLineAndEnsureVisible(int lineNumber) {
-	
+
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
-	
+
 	// stc lines are zero-based
 	GotoLine(lineNumber - 1);
 	EnsureCaretVisible();
@@ -631,10 +631,10 @@ void t4p::CodeControlClass::GotoLineAndEnsureVisible(int lineNumber) {
 void t4p::CodeControlClass::SetSelectionByCharacterPosition(int start, int end, bool setPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
-	
+
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
-	
+
 	int byteStart = t4p::CharToUtf8Pos(buf, documentLength, start);
 	int byteEnd = t4p::CharToUtf8Pos(buf, documentLength, end);
 	SetSelection(byteStart, byteEnd);
@@ -670,8 +670,8 @@ void t4p::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 		// current char is now at currentPos - 1, so previous char is at currentPos - 2
 		char prevChar = GetCharAt(GetCurrentPos() - 2);
 		if (('-' == prevChar && '>' == ch) || (':' == prevChar && ':' == ch)) {
-			HandleAutoCompletion();	
-		}	
+			HandleAutoCompletion();
+		}
 		HandleCallTip(ch);
 	}
 
@@ -679,13 +679,13 @@ void t4p::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 	// the folded line is expanded
 	int currentLine = GetCurrentLine();
 	EnsureVisible(currentLine + 1);
-	
+
 	event.Skip();
 }
 
 void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 	int currentLine = GetCurrentLine();
-	
+
 	// ATTN: Change this if support for mac files with \r is needed
 	if ('\n' == chr) {
 		int lineIndentation = 0;
@@ -707,7 +707,7 @@ void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 void t4p::CodeControlClass::HandleAutoCompletion() {
 	wxString completeStatus;
 	std::vector<t4p::CodeCompletionItemClass> suggestions;
-	
+
 	std::vector<t4p::CodeCompletionProviderClass*>::const_iterator completionProvider;
 	completionProvider = CompletionProviders.begin();
 	for (; completionProvider != CompletionProviders.end(); ++completionProvider) {
@@ -715,7 +715,7 @@ void t4p::CodeControlClass::HandleAutoCompletion() {
 			(*completionProvider)->Provide(this, suggestions, completeStatus);
 		}
 	}
-	
+
 	if (!completeStatus.IsEmpty()) {
 		wxWindow* window = GetGrandParent();
 
@@ -730,7 +730,7 @@ void t4p::CodeControlClass::HandleAutoCompletion() {
 
 void t4p::CodeControlClass::HandleCallTip(wxChar ch, bool force) {
 	wxString completeStatus;
-	std::vector<t4p::CallTipProviderClass*>::const_iterator tipProvider; 
+	std::vector<t4p::CallTipProviderClass*>::const_iterator tipProvider;
 	tipProvider = CallTipProviders.begin();
 	for (; tipProvider != CallTipProviders.end(); ++tipProvider) {
 		if ((*tipProvider)->DoesSupport(Type)) {
@@ -754,7 +754,7 @@ void t4p::CodeControlClass::OnUpdateUi(wxStyledTextEvent &event) {
 		event.Skip();
 		return;
 	}
-	
+
 	std::vector<t4p::BraceMatchStylerClass*>::const_iterator styler;
 	styler = BraceMatchStylers.begin();
 	for (; styler != BraceMatchStylers.end(); ++styler) {
@@ -838,7 +838,7 @@ void t4p::CodeControlClass::ApplyPreferences() {
 UnicodeString t4p::CodeControlClass::WordAtCurrentPos() {
 	int pos = WordStartPosition(GetCurrentPos(), true);
 	int endPos = WordEndPosition(GetCurrentPos(), true);
-	
+
 	UnicodeString word = GetSafeSubstring(pos, endPos);
 	return word;
 }
@@ -853,7 +853,7 @@ void  t4p::CodeControlClass::OnDoubleClick(wxStyledTextEvent& event) {
 	SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
 	SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
 	IndicatorClearRange(0, GetTextLength());
-		
+
 	EventSink.Publish(event);
 }
 
@@ -870,11 +870,11 @@ void t4p::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 }
 
 UnicodeString t4p::CodeControlClass::GetSafeText() {
-	// copied from the implementation of GetText method in stc.cpp 
+	// copied from the implementation of GetText method in stc.cpp
 	int len  = GetTextLength();
 	wxMemoryBuffer mbuf(len + 1);   // leave room for the null...
 	char* buf = reinterpret_cast<char*>(mbuf.GetWriteBuf(len + 1));
-	
+
 	SendMsg(2182, len + 1, (long)buf);
 	mbuf.UngetWriteBuf(len);
 	mbuf.AppendByte(0);
@@ -915,7 +915,7 @@ void t4p::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 		IsTouched = true;
 		hasChanged = true;
 	}
-	
+
 	// if there was a search marker, delete it
 	if (hasChanged && HasSearchMarkers) {
 		ClearSearchMarkers();
@@ -934,12 +934,12 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 		event.Skip();
 		return;
 	}
-	
+
 	int style = wxSTC_HPHP_DEFAULT;
-	
+
 	// enable doc text when user holds down **only** ALT
 	// since CTRL+ALT enables multiple selection
-	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT) 
+	if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_ALT)
 		&& !(event.GetModifiers() & wxMOD_CONTROL)) {
 		wxCommandEvent altEvt(t4p::EVT_MOTION_ALT);
 		altEvt.SetInt(pos);
@@ -948,7 +948,7 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	}
 
 	// enable clickable links on identifiers
-	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD) 
+	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)
 		&& !(event.GetModifiers() & wxMOD_ALT)) {
 		StyleSetHotSpot(style, true);
 		SetHotspotActiveForeground(true, *wxBLUE);
@@ -957,13 +957,13 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 	else {
 		StyleSetHotSpot(style, false);
 	}
-	
+
 	event.Skip();
 }
 
 void t4p::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
-	
+
 		// kill any current highlight searches
 		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
 		SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
@@ -981,7 +981,7 @@ void t4p::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
 }
 
 void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
-	
+
 	// positions in scintilla are byte offsets. convert chars to bytes so we can mark
 	// the squigglies properly
 	int byteNumber = 0;
@@ -992,11 +992,11 @@ void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result)
 
 		int documentLength = GetTextLength();
 		char* buf = new char[documentLength];
-		
+
 		// GET_TEXT  message
 		SendMsg(2182, documentLength, (long)buf);
 		byteNumber = t4p::CharToUtf8Pos(buf, documentLength, charNumber);
-		
+
 		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_PHP_LINT);
 		SetIndicatorValue(CODE_CONTROL_INDICATOR_PHP_LINT);
 
@@ -1016,7 +1016,7 @@ void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result)
 }
 
 void t4p::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
-	
+
 	// positions in scintilla are byte offsets. convert chars to bytes so we can jump properly
 	int byteNumber = 0;
 	if (result.CharacterPosition >= 0) {
@@ -1032,9 +1032,9 @@ void t4p::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& 
 
 		// make sure that selection ends up in the middle of the screen, hence the new caret policy
 		SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
-	
+
 		GotoPos(byteNumber);
-		
+
 		EnsureCaretVisible();
 		SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
 
@@ -1051,7 +1051,7 @@ void t4p::CodeControlClass::ClearLintErrors() {
 }
 
 void t4p::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
-	
+
 	// line is 1-based but wxSTC lines start at zero
 	if (goodHit) {
 		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
@@ -1077,7 +1077,7 @@ bool t4p::CodeControlClass::BookmarkMarkCurrent(int& lineNumber, int& handle) {
 	int currentLine = GetCurrentLine();
 	int newHandle = MarkerAdd(currentLine, CODE_CONTROL_BOOKMARK_MARKER);
 	if (newHandle != -1) {
-		
+
 		// we want to return 1-based line numbers, easier for the end user
 		lineNumber = currentLine + 1;
 		handle = newHandle;
@@ -1086,7 +1086,7 @@ bool t4p::CodeControlClass::BookmarkMarkCurrent(int& lineNumber, int& handle) {
 }
 
 bool t4p::CodeControlClass::BookmarkMarkAt(int lineNumber, int& handle) {
-	
+
 	// given line is 1-based, scintilla lines are 0-based
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
 	if (newHandle != -1) {
@@ -1108,13 +1108,13 @@ void t4p::CodeControlClass::BookmarkClearAll() {
 }
 
 void t4p::CodeControlClass::BookmarkClearAt(int lineNumber) {
-	
+
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDelete(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
 }
 
 bool t4p::CodeControlClass::ExecutionMarkAt(int lineNumber) {
-	
+
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDeleteAll(CODE_CONTROL_EXECUTION_MARKER);
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_EXECUTION_MARKER);
@@ -1128,7 +1128,7 @@ void t4p::CodeControlClass::ExecutionMarkRemove() {
 }
 
 bool t4p::CodeControlClass::BreakpointMarkAt(int lineNumber, int& handle) {
-	
+
 	// given line is 1-based, scintilla lines are 0-based
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BREAKPOINT_MARKER);
 	if (newHandle != -1) {
@@ -1167,7 +1167,7 @@ t4p::FileType t4p::CodeControlClass::GetFileType() {
 int t4p::CodeControlClass::LineFromCharacter(int charPos) {
 	int documentLength = GetTextLength();
 	char* buf = new char[documentLength];
-	
+
 	// GET_TEXT  message
 	SendMsg(2182, documentLength, (long)buf);
 	int pos = t4p::CharToUtf8Pos(buf, documentLength, charPos);
@@ -1239,7 +1239,7 @@ void t4p::CodeControlClass::RemoveTrailingBlankLines() {
 		// "?>
 		// \n
 		// \n>"
-		
+
 		if ('>' == c && seenAngleBracket) {
 			done = true;
 		}
@@ -1297,7 +1297,7 @@ void t4p::CodeControlClass::OnHotspotClick(wxStyledTextEvent& event) {
 	}
 
 	// process the event at some point later, otherwise scintilla will expand selection
-	// when the tag is in the currently opened file.  
+	// when the tag is in the currently opened file.
 	// for example, when clicking on "$this->method()"
 	HotspotTimer.Start(100, wxTIMER_ONE_SHOT);
 }
@@ -1344,7 +1344,7 @@ BEGIN_EVENT_TABLE(t4p::CodeControlClass, wxStyledTextCtrl)
 	EVT_CONTEXT_MENU(t4p::CodeControlClass::OnContextMenu)
 
 	EVT_STC_CHARADDED(wxID_ANY, t4p::CodeControlClass::OnCharAdded)
-	EVT_STC_UPDATEUI(wxID_ANY, t4p::CodeControlClass::OnUpdateUi) 
+	EVT_STC_UPDATEUI(wxID_ANY, t4p::CodeControlClass::OnUpdateUi)
 	EVT_STC_MODIFIED(wxID_ANY, t4p::CodeControlClass::OnModified)
 
 	EVT_LEFT_DOWN(t4p::CodeControlClass::OnLeftDown)

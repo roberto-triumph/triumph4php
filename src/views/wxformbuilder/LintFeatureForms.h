@@ -36,48 +36,48 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintResultsGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintResultsGeneratedPanelClass : public wxPanel 
+class LintResultsGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_ERRORS_LIST = 1000,
 		};
-		
+
 		wxBitmapButton* RunButton;
 		wxBitmapButton* HelpButton;
 		wxBitmapButton* SuppressionButton;
 		wxStaticText* Label;
 		wxDataViewListCtrl* ErrorsList;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRunButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSuppressionButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		LintResultsGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 774,371 ), long style = wxTAB_TRAVERSAL );
 		~LintResultsGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintSuppressionsGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintSuppressionsGeneratedPanelClass : public wxPanel 
+class LintSuppressionsGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_SUPPRESSIONS_LIST = 1000,
 		};
-		
+
 		wxBitmapButton* HelpButton;
 		wxBitmapButton* AddButton;
 		wxBitmapButton* EditButton;
@@ -85,7 +85,7 @@ class LintSuppressionsGeneratedPanelClass : public wxPanel
 		wxBitmapButton* DeleteAllButton;
 		wxStaticText* Label;
 		wxDataViewListCtrl* SuppressionsList;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
@@ -93,22 +93,22 @@ class LintSuppressionsGeneratedPanelClass : public wxPanel
 		virtual void OnDeleteButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAllButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		LintSuppressionsGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 774,371 ), long style = wxTAB_TRAVERSAL );
 		~LintSuppressionsGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintSuppressionRuleGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintSuppressionRuleGeneratedDialogClass : public wxDialog 
+class LintSuppressionRuleGeneratedDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxStaticText* TypeLabel;
@@ -125,28 +125,28 @@ class LintSuppressionRuleGeneratedDialogClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnTypeChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDirectoryRadio( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFileRadio( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		LintSuppressionRuleGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Lint Suppression Rule"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~LintSuppressionRuleGeneratedDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintPreferencesGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintPreferencesGeneratedPanelClass : public wxPanel 
+class LintPreferencesGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxBitmapButton* HelpButton;
@@ -155,102 +155,102 @@ class LintPreferencesGeneratedPanelClass : public wxPanel
 		wxCheckBox* CheckUnitializedGlobalVariables;
 		wxCheckBox* CheckUnknownIdentifiers;
 		wxCheckBox* CheckFunctionArgumentCount;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpClick( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		LintPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 560,560 ), long style = wxTAB_TRAVERSAL );
 		~LintPreferencesGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintErrorGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintErrorGeneratedPanelClass : public wxPanel 
+class LintErrorGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ErrorLabel;
 		wxStaticText* HelpLabel;
 		wxHyperlinkCtrl* GoToLink;
 		wxHyperlinkCtrl* DismissLink;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnGoToLink( wxHyperlinkEvent& event ) { event.Skip(); }
 		virtual void OnDismissLink( wxHyperlinkEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		LintErrorGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 488,77 ), long style = wxSIMPLE_BORDER|wxTAB_TRAVERSAL|wxWANTS_CHARS );
 		~LintErrorGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintHelpDialogGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintHelpDialogGeneratedDialogClass : public wxDialog 
+class LintHelpDialogGeneratedDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		LintHelpDialogGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("PHP Lint Check Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~LintHelpDialogGeneratedDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintSuppressionsHelpGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintSuppressionsHelpGeneratedDialogClass : public wxDialog 
+class LintSuppressionsHelpGeneratedDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-	
+
 	public:
-		
+
 		LintSuppressionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("PHP Lint Suppressions Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~LintSuppressionsHelpGeneratedDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LintOptionsHelpGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class LintOptionsHelpGeneratedDialogClass : public wxDialog 
+class LintOptionsHelpGeneratedDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* Help;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerCancel;
-	
+
 	public:
-		
+
 		LintOptionsHelpGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Lint Preferences Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~LintOptionsHelpGeneratedDialogClass();
-	
+
 };
 
 #endif //__LintFeatureForms__

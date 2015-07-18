@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -44,7 +44,7 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	globals.DetectorCacheSession.open(*soci::factory_sqlite3(), sqliteFile);
 
 	// reload the detected database tags
-	
+
 	// first remove all detected connections that were previously detected
 	std::vector<t4p::DatabaseTagClass>::iterator info;
 	info = globals.DatabaseTags.begin();
@@ -61,7 +61,7 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 
 	// initialize the detected tag cache only the enabled projects
 	t4p::DatabaseTagFinderClass finder(globals.DetectorCacheSession);
-	
+
 	std::vector<t4p::DatabaseTagClass> detected = finder.All(sourceDirectories);
 	std::vector<t4p::DatabaseTagClass>::const_iterator tag;
 	for (tag = detected.begin(); tag != detected.end(); ++tag) {

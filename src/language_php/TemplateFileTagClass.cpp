@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,7 +42,7 @@ t4p::TemplateFileTagClass::TemplateFileTagClass(const t4p::TemplateFileTagClass&
 }
 
 void t4p::TemplateFileTagClass::Copy(const t4p::TemplateFileTagClass& src) {
-	
+
 	// copy is thread-safe, wxString needs to be cloned
 	FullPath = src.FullPath.c_str();
 	Variables.clear();
@@ -62,7 +62,7 @@ void t4p::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector
 }
 
 t4p::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
-	: Session() 
+	: Session()
 	, IsInitialized(false) {
 
 }
@@ -89,8 +89,8 @@ std::vector<t4p::TemplateFileTagClass> t4p::TemplateFileTagFinderClass::All() {
 	if (!IsInitialized) {
 		return templates;
 	}
-	
-	std::string fullPath, 
+
+	std::string fullPath,
 				variables;
 	soci::statement stmt = (Session.prepare <<
 		"SELECT full_path, variables FROM template_file_tags;",

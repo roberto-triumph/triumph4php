@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,7 @@
 
 static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 
-t4p::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass() 
+t4p::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass()
 	: PhpExecutablePath()
 	, PhpIncludePath()
 	, ScriptName()
@@ -41,10 +41,10 @@ t4p::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass()
 
 wxString t4p::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
 	wxString cmdLine;
-	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") + 
-		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") + 
-		wxT(" ") + wxT("\"") + ScriptName.GetFullPath() + wxT("\"") + 
-		wxT(" --sourceDir=") + wxT("\"") + SourceDir.GetPath() + wxT("\"") + 
+	cmdLine = wxT("\"") + PhpExecutablePath + wxT("\"") +
+		wxT(" -d include_path=") + wxT("\"") + PhpIncludePath.GetPath() + wxT("\"") +
+		wxT(" ") + wxT("\"") + ScriptName.GetFullPath() + wxT("\"") +
+		wxT(" --sourceDir=") + wxT("\"") + SourceDir.GetPath() + wxT("\"") +
 		wxT(" --outputDbFileName=") + wxT("\"") + OutputDbFileName + wxT("\"");
 	return cmdLine;
 }
@@ -92,7 +92,7 @@ bool t4p::DatabaseTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-		
+
 		// start the first external process
 		started = NextDetection();
 	}
@@ -118,7 +118,7 @@ bool t4p::DatabaseTagDetectorActionClass::NextDetection() {
 	}
 	t4p::DatabaseTagDetectorParamsClass params = ParamsQueue.front();
 	ParamsQueue.pop();
-	
+
 	wxArrayString dirs = params.SourceDir.GetDirs();
 	if (!dirs.IsEmpty()) {
 		SetStatus(_("DB Detect / ") + dirs.back());
@@ -169,7 +169,7 @@ void t4p::DatabaseTagDetectorActionClass::OnProcessFailed(wxCommandEvent &event)
 	}
 }
 
-BEGIN_EVENT_TABLE(t4p::DatabaseTagDetectorActionClass, wxEvtHandler) 
+BEGIN_EVENT_TABLE(t4p::DatabaseTagDetectorActionClass, wxEvtHandler)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_COMPLETE, t4p::DatabaseTagDetectorActionClass::OnProcessComplete)
 	EVT_COMMAND(ID_DATABASE_TAG_DETECTOR_PROCESS, t4p::EVENT_PROCESS_FAILED, t4p::DatabaseTagDetectorActionClass::OnProcessFailed)
 END_EVENT_TABLE()

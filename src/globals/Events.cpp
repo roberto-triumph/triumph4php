@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,7 @@
 #include <globals/Events.h>
 #include <algorithm>
 
-t4p::EventSinkClass::EventSinkClass() 
+t4p::EventSinkClass::EventSinkClass()
 	: Handlers() {
 }
 
@@ -37,7 +37,7 @@ void t4p::EventSinkClass::RemoveAllHandlers() {
 	Handlers.clear();
 }
 
-void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {	
+void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {
 	std::vector<wxEvtHandler*>::iterator it = std::find(Handlers.begin(), Handlers.end(), handler);
 	if (it != Handlers.end()) {
 		Handlers.erase(it);
@@ -46,9 +46,9 @@ void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {
 
 void t4p::EventSinkClass::Publish(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
-		
+
 		// wont use wxPostEvent for now
-		// using wxPostEvent would cause any Popup menus triggered in the 
+		// using wxPostEvent would cause any Popup menus triggered in the
 		// handlers to not work correctly in linux
 		Handlers[i]->ProcessEvent(event);
 	}
@@ -60,8 +60,8 @@ void t4p::EventSinkClass::Post(wxEvent& event) {
 	}
 }
 
-t4p::EventSinkLockerClass::EventSinkLockerClass() 
-: EventSink() 
+t4p::EventSinkLockerClass::EventSinkLockerClass()
+: EventSink()
 , Mutex() {
 }
 
@@ -125,14 +125,14 @@ wxEvent* t4p::RenameEventClass::Clone() const {
 	return new t4p::RenameEventClass(GetEventType(), OldPath.GetFullPath(), OldPath.GetFullPath());
 }
 
-t4p::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos, 
+t4p::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPath, int startingPos,
 	int length, int lineNumber)
-: wxEvent(wxID_ANY, t4p::EVENT_CMD_FILE_OPEN) 
+: wxEvent(wxID_ANY, t4p::EVENT_CMD_FILE_OPEN)
 , FullPath(fullPath.c_str())
 , StartingPos(startingPos)
-, Length(length) 
+, Length(length)
 , LineNumber(lineNumber) {
-	
+
 }
 
 wxEvent* t4p::OpenFileCommandEventClass::Clone() const {
@@ -140,7 +140,7 @@ wxEvent* t4p::OpenFileCommandEventClass::Clone() const {
 }
 
 
-t4p::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable, 
+t4p::OpenDbTableCommandEventClass::OpenDbTableCommandEventClass(wxEventType type, const wxString& dbTable,
 	const wxString& connectionHash)
 : wxEvent(wxID_ANY, type)
 , DbTableName(dbTable.c_str())
@@ -156,7 +156,7 @@ wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
 t4p::ProjectEventClass::ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects)
 : wxEvent(wxID_ANY, type)
 , Projects(projects) {
-	
+
 }
 
 wxEvent* t4p::ProjectEventClass::Clone() const {

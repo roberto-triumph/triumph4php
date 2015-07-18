@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,21 +25,21 @@
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Number.h>
 
-t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent, 
+t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 													  t4p::UrlTagFinderClass& urls,
 													  const std::vector<t4p::ProjectClass>& projects,
 													  const t4p::FileTypeClass& fileType,
 													  t4p::UrlTagClass& chosenUrl)
 	: ChooseUrlDialogGeneratedClass(parent, wxID_ANY)
 	, UrlTagFinder(urls)
-	, ChosenUrl(chosenUrl) 
-	, Projects() 
+	, ChosenUrl(chosenUrl)
+	, Projects()
 	, FileType(fileType) {
 
 	// get some urls to prepopulate the list
 	std::vector<t4p::UrlTagClass> allUrlTags = GetFilteredUrls(wxT("http://"));
 	FillUrlList(allUrlTags);
-	
+
 	ProjectChoice->Clear();
 	ProjectChoice->Append(_("All Enabled Projects"), reinterpret_cast<void*>(NULL));
 	for (size_t i = 0; i < projects.size(); ++i) {
@@ -50,8 +50,8 @@ t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 
 	// now put the enabled projects in the choice
 	for (size_t i = 0; i < Projects.size(); ++i) {
-		
-		// should be ok to reference this vector since it wont change because this is a 
+
+		// should be ok to reference this vector since it wont change because this is a
 		// modal dialog
 		ProjectChoice->Append(Projects[i].Label, &Projects[i]);
 	}
@@ -78,7 +78,7 @@ void t4p::ChooseUrlDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void t4p::ChooseUrlDialogClass::OnListItemDoubleClicked(wxCommandEvent& event) {
-	OnOkButton(event);	
+	OnOkButton(event);
 }
 
 void t4p::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
@@ -97,7 +97,7 @@ void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	}
 
 	std::vector<t4p::UrlTagClass> filteredUrls;
-	
+
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
 	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
@@ -114,7 +114,7 @@ void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 }
 
 void t4p::ChooseUrlDialogClass::OnFilterTextEnter(wxCommandEvent& event) {
-	OnOkButton(event);	
+	OnOkButton(event);
 }
 
 void t4p::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
@@ -184,7 +184,7 @@ std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProjec
 	for (src = project.Sources.begin(); src != project.Sources.end(); ++src) {
 		dirs.push_back(src->RootDirectory);
 	}
-	
+
 	std::vector<t4p::UrlTagClass> filteredUrls;
 	UrlTagFinder.FilterUrls(filter, dirs, filteredUrls);
 
@@ -219,7 +219,7 @@ std::vector<wxFileName> t4p::ChooseUrlDialogClass::ActiveSourceDirectories() {
 	std::vector<wxFileName> dirs;
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator src;
-	
+
 	// project 0 is the "all enabled projects"
 	int sel = ProjectChoice->GetSelection();
 	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {

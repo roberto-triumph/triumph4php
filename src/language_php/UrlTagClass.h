@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ namespace t4p {
  * code entry point so that we can easily jump to it.
  */
 class UrlTagClass {
-	
+
 public:
 
 	/**
@@ -48,27 +48,27 @@ public:
 	 * don't need that extra functionality.
 	 */
 	wxURI Url;
-	
+
 	/**
 	 * The file where the source code of the URL is located in.  This is the entry point
 	 * to the URL; for a framework $fileName will be the location of the controller.
 	 * fileName is full path (os-dependent).
 	 */
 	wxFileName FileName;
-	
+
 	/**
 	 * The name of the controller class that handles this URL.  If a project does not
 	 * use a framework, this will be empty.
 	 */
 	wxString ClassName;
-	
+
 	/**
 	 * The name of the controller method that handles this URL.  If a project does not
 	 * use a framework, this will be empty.
 	 *
 	 */
 	wxString MethodName;
-	
+
 	UrlTagClass();
 
 	UrlTagClass(wxString uri);
@@ -92,7 +92,7 @@ public:
 
 	void Reset();
 };
- 
+
 /**
  * Class that holds all of the URLs that Triumph has encountered.
  * We remember them because they are a relatively expensive to determine (have to
@@ -103,7 +103,7 @@ public:
 class UrlTagFinderClass : public t4p::SqliteFinderClass {
 
 public:
-		
+
 	UrlTagFinderClass(soci::session& session);
 
 	/**
@@ -167,12 +167,12 @@ public:
 	std::vector<wxString> AllControllerNames(const std::vector<wxFileName>& sourceDirs);
 
 	/**
-	 * returns all of the method names that were detected. These are just the 
+	 * returns all of the method names that were detected. These are just the
 	 * methods from the detected URLs.
 	 */
 	std::vector<wxString> AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs);
 
 };
-	
+
 }
 #endif

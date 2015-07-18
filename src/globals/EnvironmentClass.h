@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,17 +38,17 @@ namespace t4p {
 class PhpEnvironmentClass {
 
 public:
-	
+
 	/**
 	 * Full path to the PHP executable
 	 */
 	wxString PhpExecutablePath;
-	
+
 	/**
 	 * The version to use in Source code parsing.
 	 */
 	pelet::Versions Version;
-	
+
 	/**
 	 * If TRUE, we will get the version of use from the PHP executable
 	 * itself by reading the output of "php -v"
@@ -61,7 +61,7 @@ public:
 	 * errors.
 	 */
 	bool Installed;
-	
+
 	PhpEnvironmentClass();
 
 	/**
@@ -81,18 +81,18 @@ public:
 	 * @param src item to copy from
 	 */
 	void Copy(const t4p::PhpEnvironmentClass& src);
-	
+
 	/**
 	 * assign defaults based on the current operating system
 	 */
 	void Init();
-	
+
 	/**
 	 * Use the PHP executable to determine the PHP verion and
 	 * then fills in the  Version property
 	 */
 	void AutoDetermine();
-	
+
 	/**
 	 * @return bool TRUE is php is not installed or binary location
 	 *         is invalid
@@ -141,7 +141,7 @@ public:
 /**
  * The Environment class is a simple container to the configured options of the currently running development stack
  * (LAMP / WAMP / MAMP enviroment). Each composite class will perform all of the underlying logic.
- * 
+ *
  */
 class EnvironmentClass {
 
@@ -160,7 +160,7 @@ public:
 	 * @param src item to copy from
 	 */
 	t4p::EnvironmentClass& operator=(const t4p::EnvironmentClass& src);
-	
+
 	/**
 	 *  assigns default values based on the current operating system
 	 */
@@ -171,18 +171,18 @@ public:
 	 * @param src item to copy from
 	 */
 	void Copy(const t4p::EnvironmentClass& src);
-	
+
 	ApacheClass Apache;
-	
+
 	PhpEnvironmentClass Php;
-	
+
 	/**
 	 * The list of web browsers used to launch when the user click Run On Web Browser
 	 */
 	std::vector<WebBrowserClass> WebBrowsers;
-	
+
 	/**
-	 * Save the environment settings to the given config 
+	 * Save the environment settings to the given config
 	 */
 	void SaveToConfig(wxConfigBase* config) const;
 

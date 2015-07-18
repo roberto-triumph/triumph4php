@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,7 +43,7 @@ namespace t4p {
 
 	/**
 	 * This event will be generated when the external process was submitted (started)
-	 * **successfully** but failed while executing (returned a non-zero exit code). A 
+	 * **successfully** but failed while executing (returned a non-zero exit code). A
 	 * process that has been killed will NOT generate this event.
 	 * event.GetString() will contain the entire process STDOUT and STDERR output; with
 	 * some caveats. see  t4p::ProcessWithHeartbeatClass::GetProcessOutput(long pid)
@@ -60,7 +60,7 @@ namespace t4p {
 	extern const wxEventType EVENT_PROCESS_IN_PROGRESS;
 
 /**
- * This class helps with running one external process 
+ * This class helps with running one external process
  * asynchronously.  It will take care to delete process
  * data structures when it completes. It will signal proces
  * completion by generating an EVENT_PROCESS_COMPLETE event.
@@ -88,14 +88,14 @@ public:
 	 * @param int eventId event ID will be used when an EVENT_PROCESS_* is genereated
 	 *        this way the caller can correlate a command to an event.
 	 * @param pid the PID of the new process will be set here
-	 * @return bool TRUE if the command was started successfully. if FALSE then 
+	 * @return bool TRUE if the command was started successfully. if FALSE then
 	 *         command is invalid or command is not found.
 	 */
 	bool Init(wxString command, const wxFileName& workingDirectory, int eventId, long& pid);
 
 	/**
 	 * stop a running process.
-	 * 
+	 *
 	 * @param pid the PID to stop.
 	 */
 	bool Stop(long pid);
@@ -121,7 +121,7 @@ private:
 	 * Get the output from the process' STDOUT and STDERR output.
 	 */
 	wxString GetProcessOutput(wxProcess* proc) const;
-	
+
 	/**
 	 * Timer callback. In this method, we will get the process output and append it to the textbox.
 	 */
@@ -137,7 +137,7 @@ private:
 	 * used to give out constant feedback.
 	 */
 	wxTimer Timer;
-	
+
 	/**
 	 * Any EVENT_PROCESS_* events are sent to this handler.
 	 */

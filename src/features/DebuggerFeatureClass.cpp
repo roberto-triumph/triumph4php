@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@
 #include <algorithm>
 
 // TODO(roberto): not sure how breakpoints react when
-//       file is edited (and breakpoints moves lines) 
+//       file is edited (and breakpoints moves lines)
 //       but file is then reloaded/discarded
 static int ID_ACTION_DEBUGGER = wxNewId();
 
@@ -41,25 +41,25 @@ static int ID_ACTION_DEBUGGER = wxNewId();
  * xdebug returns files in form
  * file://{system name}/c:/wamp/www/index.php
  *
- * we remove the file:/// from the name. 
- * 
+ * we remove the file:/// from the name.
+ *
  * Also, we want to map the name that xdebug returns to a local
  * path.  this is in case the program being debugged remotely,
  * for instance the user is using a virtual machine for their
- * LAMP setup and Triumph is running on a windows machine; 
+ * LAMP setup and Triumph is running on a windows machine;
  * in this case xdebug will return unix paths (/var/www/index.php)
  * but we want to translate that to a local path (C:\users\user\projects\index.php)
- * 
+ *
  */
 static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxString, wxString>& localToRemoteMappings) {
 	wxString remoteFile = xdebugFile.Mid(8); // 8  = size of "file:///"
 	if (!remoteFile.Contains(":")) {
-		
+
 		// in linux, filename comes back as "file:///"
 		// we want to keep the last slash
-		remoteFile = xdebugFile.Mid(7); 
+		remoteFile = xdebugFile.Mid(7);
 	}
-	
+
 	// check to see if the remote path is inside one of the mappings
 	std::map<wxString, wxString>::const_iterator mapping;
 	wxString localFile;
@@ -67,26 +67,26 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
 	remoteLower.MakeLower();
 	bool foundMapping = false;
 	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
-		
+
 		// lets make comparison case-insensitive
 		wxString remoteMappingLower(mapping->second);
 		remoteMappingLower.MakeLower();
-		
+
 		// convert windows backslashes to forward slashes as xdebug does as
 		// well
 		remoteMappingLower.Replace(wxT("\\"), wxT("/"));
 		if (remoteLower.Find(remoteMappingLower) == 0) {
-			
-			// lets perform the mapping. replace the remote 
+
+			// lets perform the mapping. replace the remote
 			// path with the local path
 			localFile = remoteFile;
 			localFile.Replace(mapping->second, mapping->first);
 			foundMapping = true;
 			break;
 		}
-		
+
 	}
-	
+
 	if (!foundMapping) {
 		localFile = remoteFile;
 	}
@@ -100,16 +100,16 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
  *
  * when we send file breakpoints to xdebug, we want the paths
  * to be paths on the remote system.
- * 
+ *
  * for instance the user is using a virtual machine for their
- * LAMP setup and Triumph is running on a windows machine; 
+ * LAMP setup and Triumph is running on a windows machine;
  * the user add a breakpoint to C:\users\user\projects\index.php
- * then we want to add a file breakpoint as a 
+ * then we want to add a file breakpoint as a
  * unix path (/var/www/index.php)
- * 
+ *
  */
 static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxString, wxString>& localToRemoteMappings) {
-		
+
 	// check to see if the local path is inside one of the mappings
 	std::map<wxString, wxString>::const_iterator mapping;
 	wxString remoteFile;
@@ -117,12 +117,12 @@ static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxStr
 	localLower.MakeLower();
 	bool foundMapping = false;
 	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
-		
+
 		// lets make comparison case-insensitive
 		wxString localMappingLower(mapping->first);
-		localMappingLower.MakeLower();		
+		localMappingLower.MakeLower();
 		if (localLower.Find(localMappingLower) == 0) {
-			
+
 			// lets perform the mapping. replace the local
 			// path with the remote path
 			remoteFile = localFile;
@@ -134,7 +134,7 @@ static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxStr
 			foundMapping = true;
 			break;
 		}
-		
+
 	}
 	return foundMapping ? remoteFile : localFile;
 }
@@ -164,21 +164,21 @@ static void ConfigDeleteGroups(wxConfigBase* config, const wxString& groupNameSt
  * reads debugger options from the given config.
  */
 static void ConfigLoad(wxConfigBase* config,
-	t4p::DebuggerOptionsClass& options, 
+	t4p::DebuggerOptionsClass& options,
 	std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
 	config->Read(wxT("Debugger/Port"), &options.Port, options.Port);
 	config->Read(wxT("Debugger/MaxChildren"), &options.MaxChildren, options.MaxChildren);
 	config->Read(wxT("Debugger/MaxDepth"), &options.MaxDepth, options.MaxDepth);
 	config->Read(wxT("Debugger/DoListenOnAppReady"), &options.DoListenOnAppReady, options.DoListenOnAppReady);
 	config->Read(wxT("Debugger/DoBreakOnStart"), &options.DoBreakOnStart, options.DoBreakOnStart);
-	
+
 	wxString groupName;
 	long index;
 	if (config->GetFirstGroup(groupName, index)) {
 		do {
 			if (groupName.Find(wxT("DebuggerBreakpoint_")) == 0) {
 				t4p::BreakpointWithHandleClass breakpoint;
-				
+
 				config->Read(groupName + wxT("/Filename"), &breakpoint.Breakpoint.Filename);
 				config->Read(groupName + wxT("/LineNumber"), &breakpoint.Breakpoint.LineNumber);
 				config->Read(groupName + wxT("/IsEnabled"), &breakpoint.Breakpoint.IsEnabled );
@@ -188,16 +188,16 @@ static void ConfigLoad(wxConfigBase* config,
 				config->Read(groupName + wxT("/Function"), &breakpoint.Breakpoint.Function);
 				config->Read(groupName + wxT("/HitCondition"), &breakpoint.Breakpoint.HitCondition);
 				config->Read(groupName + wxT("/HitValue"), &breakpoint.Breakpoint.HitValue);
-				
+
 				breakpoints.push_back(breakpoint);
 			}
 			if (groupName.Find(wxT("DebuggerMapping_")) == 0) {
 				wxString localPath;
 				wxString remotePath;
-				
+
 				config->Read(groupName + wxT("/LocalPath"), &localPath);
 				config->Read(groupName + wxT("/RemotePath"), &remotePath);
-				
+
 				if (!localPath.IsEmpty() && !remotePath.IsEmpty()) {
 					options.SourceCodeMappings[localPath] = remotePath;
 				}
@@ -212,19 +212,19 @@ static void ConfigLoad(wxConfigBase* config,
  * disk immediately.
  */
 static void ConfigStore(wxConfigBase* config,
-	const t4p::DebuggerOptionsClass& options, 
+	const t4p::DebuggerOptionsClass& options,
 	const std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
-	
+
 	config->Write(wxT("Debugger/Port"), options.Port);
 	config->Write(wxT("Debugger/MaxChildren"), options.MaxChildren);
 	config->Write(wxT("Debugger/MaxDepth"), options.MaxDepth);
 	config->Write(wxT("Debugger/DoListenOnAppReady"), options.DoListenOnAppReady);
 	config->Write(wxT("Debugger/DoBreakOnStart"), options.DoBreakOnStart);
-	
+
 	// delete all previous breakpoints and mappings
 	ConfigDeleteGroups(config, wxT("DebuggerBreakpoint_"));
 	ConfigDeleteGroups(config, wxT("DebuggerMapping_"));
-	
+
 	std::vector<t4p::BreakpointWithHandleClass>::const_iterator it;
 	int i = 0;
 	for (it = breakpoints.begin(); it != breakpoints.end(); ++it) {
@@ -237,16 +237,16 @@ static void ConfigStore(wxConfigBase* config,
 		config->Write(wxString::Format("DebuggerBreakpoint_%d/Function", i), it->Breakpoint.Function);
 		config->Write(wxString::Format("DebuggerBreakpoint_%d/HitCondition", i), it->Breakpoint.HitCondition);
 		config->Write(wxString::Format("DebuggerBreakpoint_%d/HitValue", i), it->Breakpoint.HitValue);
-		
+
 		++i;
 	}
-	
+
 	i = 0;
 	std::map<wxString, wxString>::const_iterator mapping;
 	for (mapping = options.SourceCodeMappings.begin(); mapping != options.SourceCodeMappings.end(); ++mapping) {
 		config->Write(wxString::Format("DebuggerMapping_%d/LocalPath", i), mapping->first);
 		config->Write(wxString::Format("DebuggerMapping_%d/RemotePath", i), mapping->second);
-		
+
 		i++;
 	}
 	config->Flush();
@@ -254,14 +254,14 @@ static void ConfigStore(wxConfigBase* config,
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
 : Breakpoint()
-, Handle(0) 
+, Handle(0)
 , DbgpTransactionId() {
 
 }
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass(const t4p::BreakpointWithHandleClass& src)
 : Breakpoint()
-, Handle(0) 
+, Handle(0)
 , DbgpTransactionId() {
 	Copy(src);
 }
@@ -280,17 +280,17 @@ void t4p::BreakpointWithHandleClass::Copy(const t4p::BreakpointWithHandleClass& 
 t4p::DebuggerOptionsClass::DebuggerOptionsClass()
 : Port(9000)
 , MaxChildren(100)
-, MaxDepth(1) 
+, MaxDepth(1)
 , DoListenOnAppReady(false)
 , DoBreakOnStart(false)
 , SourceCodeMappings() {
-	
+
 }
 
 t4p::DebuggerOptionsClass::DebuggerOptionsClass(const t4p::DebuggerOptionsClass& src)
 : Port(9000)
 , MaxChildren(100)
-, MaxDepth(1) 
+, MaxDepth(1)
 , DoListenOnAppReady(false)
 , DoBreakOnStart(false)
 , SourceCodeMappings() {
@@ -308,18 +308,18 @@ void t4p::DebuggerOptionsClass::Copy(const t4p::DebuggerOptionsClass& src) {
 	MaxDepth = src.MaxDepth;
 	DoListenOnAppReady = src.DoListenOnAppReady;
 	DoBreakOnStart = src.DoBreakOnStart;
-	
+
 	t4p::DeepCopy(SourceCodeMappings, src.SourceCodeMappings);
 }
 
 t4p::DebuggerFeatureClass::DebuggerFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) 
-, Breakpoints() 
-, RunningThreads() 
+: FeatureClass(app)
+, Breakpoints()
+, RunningThreads()
 , Options()
 , IsDebuggerSessionActive(false)
 , Cmd()
-, EventSinkLocker() 
+, EventSinkLocker()
 , CurrentStackFunction()
 , LastStackFunction()
 , IsDebuggerServerActive(false) {
@@ -352,19 +352,19 @@ void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::DebuggerFeatureClass::RestartDebugger(int oldPort) {
-		
+
 	// need to shutdown the server and listen on the new port
 	StopDebugger(oldPort);
 	if (Options.DoListenOnAppReady) {
 		StartDebugger(false);
 	}
 }
-void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlFileName, int handle, 
+void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlFileName, int handle,
 	int newLineNumber) {
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it;
 	for (it = Breakpoints.begin(); it != Breakpoints.end(); ++it) {
 		if (it->Breakpoint.Filename == ctrlFileName && it->Handle) {
-			
+
 			// only update when line >= 1.  if line == 0 then it means
 			// that the entire text has been deleted. this is most likely
 			// scenario when the user reloads the file.
@@ -374,16 +374,16 @@ void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlF
 }
 
 void t4p::DebuggerFeatureClass::StopDebugger(int port) {
-	
+
 	// this is our (triumph's) message telling the listener that we should no longer accept
 	// connections. we do it this way because we use synchronous sockets
 	// which we cannot stop from another thread.
 	boost::asio::io_service service;
 	boost::asio::ip::tcp::resolver resolver(service);
-	
+
 	wxString wxsPort = wxString::Format("%d", port);
 	std::string strPort = t4p::WxToChar(wxsPort);
-	
+
 	boost::asio::ip::tcp::resolver::query query("localhost", strPort);
 	boost::asio::ip::tcp::resolver::iterator endpointIterator = resolver.resolve(query);
 
@@ -446,19 +446,19 @@ bool t4p::DebuggerFeatureClass::AddBreakpointAtLine(const wxString& fileName, in
 	}
 	if (!found) {
 		t4p::BreakpointWithHandleClass breakpointWithHandle;
-		breakpointWithHandle.Breakpoint.Filename = fileName;	
+		breakpointWithHandle.Breakpoint.Filename = fileName;
 		breakpointWithHandle.Breakpoint.LineNumber = lineNumber;
 		breakpointWithHandle.Breakpoint.IsEnabled = true;
 		breakpointWithHandle.Handle = handle;
-			
+
 		// now if the debugger session is active, we want to tell the
 		// debugger of the new breakpoint immediately.
 		if (IsDebuggerSessionActive) {
 			breakpointWithHandle.DbgpTransactionId = Cmd.CurrentTransactionId();
 			PostCmd(
 				Cmd.BreakpointFile(
-					ToRemoteFilename(breakpointWithHandle.Breakpoint.Filename, Options.SourceCodeMappings), 
-					breakpointWithHandle.Breakpoint.LineNumber, 
+					ToRemoteFilename(breakpointWithHandle.Breakpoint.Filename, Options.SourceCodeMappings),
+					breakpointWithHandle.Breakpoint.LineNumber,
 					breakpointWithHandle.Breakpoint.IsEnabled
 				)
 			);
@@ -469,11 +469,11 @@ bool t4p::DebuggerFeatureClass::AddBreakpointAtLine(const wxString& fileName, in
 		// tell the view that the breakpoints have updated
 		wxCommandEvent refreshEvt(t4p::EVENT_DEBUGGER_BREAKPOINT_REFRESH);
 		App.EventSink.Post(refreshEvt);
-		
+
 		// store the breakpoints to disk
 		wxConfigBase* base = wxConfig::Get();
 		ConfigStore(base, Options, Breakpoints);
-	}	
+	}
 	return !found;
 }
 
@@ -484,7 +484,7 @@ void t4p::DebuggerFeatureClass::StartDebugger(bool doOpenDebuggerPanel) {
 	if (IsDebuggerServerActive) {
 		return;
 	}
-	
+
 	if (doOpenDebuggerPanel) {
 		wxCommandEvent refreshEvt(t4p::EVENT_DEBUGGER_OPEN_PANEL);
 		App.EventSink.Publish(refreshEvt);
@@ -545,7 +545,7 @@ void t4p::DebuggerFeatureClass::Continue() {
 }
 
 void t4p::DebuggerFeatureClass::Finish() {
-	
+
 	// finish is a special command
 	// 1. disable all breakpoints
 	// 2. run to completion
@@ -577,7 +577,7 @@ void t4p::DebuggerFeatureClass::GoToExecutingLine() {
 	// line is being executed next
 	PostCmd(
 		Cmd.StackGet(0)
-	);	
+	);
 }
 
 void t4p::DebuggerFeatureClass::CmdPropertyGetChildren(const t4p::DbgpPropertyClass& prop, int contextId) {
@@ -601,7 +601,7 @@ void t4p::DebuggerFeatureClass::BreakpointGoToSource(const t4p::BreakpointWithHa
 }
 
 void t4p::DebuggerFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-	
+
 	// here we want to add the breakpoint marker if there is a breakpoint
 	// in the opened file
 	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
@@ -615,7 +615,7 @@ void t4p::DebuggerFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& even
 }
 
 void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-	
+
 	// here we want to remove the handles to the breakpoints that
 	// belong to the file being closed.
 	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
@@ -626,7 +626,7 @@ void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& even
 			br->Handle = -1;
 		}
 	}
-	
+
 	// we want to save the breakpoints because the user may  have
 	// added or removed code and now they are located in a different
 	// line number
@@ -642,15 +642,15 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	t4p::DbgpBreakpointClass breakpoint;
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
 	for (; it != Breakpoints.end(); ++it) {
-		
+
 		// save the transaction Id, we will need it so that we can match up
 		// the breakpoint to the breakpoint Id that xdebug returns in the
 		// breakpoint_set response
 		it->DbgpTransactionId = Cmd.CurrentTransactionId();
 		PostCmd(
 			Cmd.BreakpointFile(
-				ToRemoteFilename(it->Breakpoint.Filename, Options.SourceCodeMappings), 
-				it->Breakpoint.LineNumber, 
+				ToRemoteFilename(it->Breakpoint.Filename, Options.SourceCodeMappings),
+				it->Breakpoint.LineNumber,
 				it->Breakpoint.IsEnabled
 			)
 		);
@@ -658,7 +658,7 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 
 	// mark the session as having been started
 	IsDebuggerSessionActive = true;
-	
+
 	// open the debugger panel if its not yet open
 	wxCommandEvent openEvt(t4p::EVENT_DEBUGGER_OPEN_PANEL);
 	App.EventSink.Post(openEvt);
@@ -667,28 +667,28 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	// we can handle more than the default
 	PostCmd(Cmd.FeatureSet("max_depth", wxString::Format("%d", Options.MaxDepth)));
 	PostCmd(Cmd.FeatureSet("max_children", wxString::Format("%d", Options.MaxChildren)));
-	
+
 	// now we send commands to the debug engine
 	// if the user wants to break at the first line, we
 	// want to step into the first line.
 	if (Options.DoBreakOnStart) {
 
-		// run stack command first, ContextGet handler needs 
+		// run stack command first, ContextGet handler needs
 		// to differentiate when scope function has changed
 		PostCmd(Cmd.StepInto());
 		PostCmd(Cmd.StackGet(0));
 		PostCmd(Cmd.ContextNames(0));
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-		
+
 	}
 	else {
-		
+
 		// we want the script to run until a breakpoint is
 		// hit
 		PostCmd(Cmd.Run());
-		
-		// run stack command first, ContextGet handler needs 
+
+		// run stack command first, ContextGet handler needs
 		// to differentiate when scope function has changed
 		PostCmd(Cmd.StackGet(0));
 		PostCmd(Cmd.ContextNames(0));
@@ -702,7 +702,7 @@ void t4p::DebuggerFeatureClass::OnDbgpStatus(t4p::DbgpStatusEventClass& event) {
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureGet(t4p::DbgpFeatureGetEventClass& event) {
-	
+
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& event) {
@@ -710,7 +710,7 @@ void t4p::DebuggerFeatureClass::OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& 
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& event) {
-	IsDebuggerSessionActive = t4p::DBGP_STATUS_STARTING == event.Status 
+	IsDebuggerSessionActive = t4p::DBGP_STATUS_STARTING == event.Status
 		|| t4p::DBGP_STATUS_RUNNING == event.Status
 		|| t4p::DBGP_STATUS_BREAK == event.Status;
 	if (!IsDebuggerSessionActive) {
@@ -719,7 +719,7 @@ void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& even
 	else {
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-		
+
 		// the script has paused execution, alert the user that the debugger windows
 		// are being updated with new script stack trace, variables.
 		if (!App.IsActive()) {
@@ -730,7 +730,7 @@ void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& even
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventClass& event) {
-	
+
 	// when the debug engine signals that a breakpoint was set, we need to store
 	// the debug engine's breakpoint ID because the ID is needed in case the user
 	// wants to remove the breakpoint.
@@ -742,7 +742,7 @@ void t4p::DebuggerFeatureClass::OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventC
 }
 
 void t4p::DebuggerFeatureClass::LocalizeStackFilePaths(std::vector<t4p::DbgpStackClass>& stack) {
-	
+
 	// turn the filename that Xdebug returns into a local filesystem filename
 	// lets convert remote paths to local paths
 	for (size_t i = 0; i < stack.size(); ++i) {
@@ -776,13 +776,13 @@ void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
 }
 
 void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
-	
-	// the command string contains the property full name 
+
+	// the command string contains the property full name
 	// the int contains the context ID
 	wxString fullName = event.GetString();
 	int contextId = event.GetInt();
 	PostCmd(
-		Cmd.PropertyValue(0, contextId, fullName, wxT("")) // xdebug does not return key property 
+		Cmd.PropertyValue(0, contextId, fullName, wxT("")) // xdebug does not return key property
 	);
 }
 

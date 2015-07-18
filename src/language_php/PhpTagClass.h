@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@
 namespace t4p {
 
 /**
- * This class represents each tag we have found in the user's source code.  
+ * This class represents each tag we have found in the user's source code.
  */
 class PhpTagClass {
 
@@ -53,38 +53,38 @@ public:
 		CLASS_CONSTANT,
 		NAMESPACE
 	};
-	
+
 	/**
 	 * The identifer name of this tag. Members will not have a class name with it; ie. a Name method's Identifier will be Name
 	 * @var UnicodeString
 	 */
 	UnicodeString Identifier;
-	
+
 	/**
 	 * The name of the class that this tag belongs to; only members will have a class name with it: ie. User::Name
 	 * The class name will NOT have the namespace
 	 * @var UnicodeString
 	 */
 	UnicodeString ClassName;
-	
+
 	/**
 	 * The namespace that this function / class is in.
 	 */
 	UnicodeString NamespaceName;
-	
+
 	/**
 	 * The tag signature. For methods / functions; it is the entire argument list
 	 * For classes; it is the class declaration ("class User extends Object implements ISerializable")
 	 * @var UnicodeString
 	 */
 	UnicodeString Signature;
-	
+
 	/**
 	 * If this tag item is a method / function / member, ReturnType is the function's return type
 	 * @var UnicodeString
 	 */
 	UnicodeString ReturnType;
-	
+
 	/**
 	 * The PHPDoc comment attached to the tag.
 	 * @var UnicodeString
@@ -103,7 +103,7 @@ public:
 	 * @see FileTagClass::IsNew
 	 */
 	bool FileIsNew;
-	
+
 	/**
 	 * The tag item type
 	 * @var t4p::PhpTagClass::Type
@@ -138,7 +138,7 @@ public:
 	 * that is documented in php.net.
 	 */
 	bool IsNative;
-	
+
 	/**
 	 * TRUE if this is a function / method that has variable arguments. variable argument
 	 * detection works based off whether the body of the function / method
@@ -163,44 +163,44 @@ public:
 	wxString FullPath;
 
 	/**
-	 * The index to the file where this tag was found. 
+	 * The index to the file where this tag was found.
 	 */
 	int FileTagId;
 
 	/**
-	 * The index to the source directory where this tag was found. 
+	 * The index to the source directory where this tag was found.
 	 */
 	int SourceId;
-	
+
 	PhpTagClass();
 	PhpTagClass(const t4p::PhpTagClass& src);
 
 	static t4p::PhpTagClass MakeNamespace(const UnicodeString& namespaceName);
-	
+
 	/**
 	 * Clones a t4p::PhpTagClass
 	 */
 	void operator=(const t4p::PhpTagClass& src);
 	void Copy(const t4p::PhpTagClass& src);
-	
+
 	/**
 	 * Defined a comparison function so that sorting algorithms work for tag containers. A tag is "less"
-	 * than  another if Resource property is less than the other. (essentially containers are sorted by 
+	 * than  another if Resource property is less than the other. (essentially containers are sorted by
 	 * Resource).
 	 */
 	bool operator<(const t4p::PhpTagClass& a) const;
 
 	/**
-	 * Defined a comparison function so for find function. This will compare tag names in an 
+	 * Defined a comparison function so for find function. This will compare tag names in an
 	 * exact, case sensitive manner.
-	 */	
+	 */
 	bool operator==(const t4p::PhpTagClass& a) const;
 
 	/**
 	 * set all properties to empty string
 	 */
 	void Clear();
-	
+
 	/**
 	 * @return TRUE if given key is the same as this tag's key (case insensitive)
 	 */
@@ -237,7 +237,7 @@ public:
 };
 
 class TraitTagClass {
-	
+
 public:
 
 	/**
@@ -253,13 +253,13 @@ public:
 	 */
 	UnicodeString ClassName;
 
-	/** 
+	/**
 	 * the namespace of the class that uses the trait. This will be "\" if the class is
 	 * in the root namespace
 	 */
 	UnicodeString NamespaceName;
 
-	/** 
+	/**
 	 * the name of the class of the trait that is being used. This is the name of the class only
 	 * (no namespace)
 	 */
@@ -270,12 +270,12 @@ public:
 	 * in the root namespace
 	 */
 	UnicodeString TraitNamespaceName;
-	
+
 	/**
 	 * The names of any aliases
 	 */
 	std::vector<UnicodeString> Aliased;
-	
+
 	/**
 	 * the names of any class names excluded from being used by the
 	 * 'insteadof' operator
@@ -283,10 +283,10 @@ public:
 	std::vector<UnicodeString> InsteadOfs;
 
 	/**
-	 * The index to the file where this tag was found. 
+	 * The index to the file where this tag was found.
 	 */
 	int FileTagId;
-	
+
 	TraitTagClass();
 };
 
@@ -297,12 +297,12 @@ public:
 class FileTagClass {
 
 public:
-	
+
 	/**
 	 * The full path to the file where this tag was found
 	 */
 	wxString FullPath;
-	
+
 	/**
 	 * The time that this tag was looked at.
 	 */
@@ -317,9 +317,9 @@ public:
 	/**
 	 * the source directory that this file is located in.  this is the database key
 	 * into the sources table
-	 */ 
+	 */
 	int SourceId;
-	
+
 	/**
 	 * whether or not file has been parsed, could be false if we only looked for files
 	 */
@@ -328,7 +328,7 @@ public:
 	/**
 	 * If TRUE, then this file is not yet written to disk (ie the tag only exists in memory
 	 * ( but not yet in the filesystem). This is needed because the finder will do
-	 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted 
+	 * a sanity check to ensure that the file that contained a match still exists. Iif a file is deleted
 	 * after a file was cached then we want to eliminate that match. But, this sanity checks would kill
 	 * matches that were a result of a manual call to BuildResourceCacheForFile. This flag ensures
 	 * proper operation (resources that were parsed from code that the user has typed in but no yet

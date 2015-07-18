@@ -83,7 +83,7 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 					break;
 				}
 				else if (visible[i] == ctrlNotebook) {
-					
+
 					// the code control is already at a visible notebook.
 					// move on to the next code control
 					moved = true;
@@ -156,7 +156,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event) {
-	
+
 	//
 	// Implementation notes:
 	// see src/widgets/AuiManager.h for more info about how panes
@@ -198,7 +198,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false).Show().BestSize(newNotebookSize);
-		
+
 		// when there are more than 2 notebooks, given them names so
 		// that the user can tell them apart (for "moving tabs" purposes)
 		if (columnCount > 2) {
@@ -220,7 +220,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
-	
+
 	//
 	// Implementation notes:
 	// see src/widgets/AuiManager.h for more info about how panes
@@ -259,14 +259,14 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
 		notebook->SetSize(newNotebookSize);
 
 		wxAuiPaneInfo& info = AuiManager->GetPane(notebook);
-		
+
 		// i+2 because we want the tools notebook and the find/replace
 		// panels below these notebook splits
 		info.Bottom().Row(i + 2).Position(0)
 			.Gripper(false).Resizable(true).Floatable(false)
 			.Resizable(true).PaneBorder(false).CaptionVisible(false)
 			.CloseButton(false).Show().BestSize(newNotebookSize);
-		
+
 		// when there are more than 2 notebooks, given them names so
 		// that the user can tell them apart (for "moving tabs" purposes)
 		if (rowCount > 2) {

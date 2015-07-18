@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@
 const int t4p::AUI_MAX_CODE_NOTEBOOKS = 5;
 
 void t4p::AuiAddCodeNotebook(wxAuiManager& auiManager, t4p::NotebookClass* notebook, int notebookNumber) {
-	
+
 	// very important that the name be given, this is how we find the
 	// notebooks when iterating through the frame's children
 	notebook->SetName("NotebookClass");
@@ -43,7 +43,7 @@ void t4p::AuiAddCodeNotebook(wxAuiManager& auiManager, t4p::NotebookClass* noteb
 	if (notebookNumber > 1) {
 		info.Hide().Right().CaptionVisible(false);
 	}
-	auiManager.AddPane(notebook, info);	
+	auiManager.AddPane(notebook, info);
 }
 
 std::vector<t4p::NotebookClass*> t4p::AuiVisibleCodeNotebooks(wxAuiManager& auiManager) {
@@ -88,7 +88,7 @@ void t4p::AuiResetCodeNotebooks(wxAuiManager& auiManager) {
 			t4p::NotebookClass* notebook = notebooks[i];
 			wxAuiPaneInfo& info = auiManager.GetPane(notebook);
 			if (info.dock_direction != wxAUI_DOCK_CENTER) {
-				
+
 				// move the code controls for this notebook to the
 				// first notebook
 				info.Hide();
@@ -96,7 +96,7 @@ void t4p::AuiResetCodeNotebooks(wxAuiManager& auiManager) {
 			}
 		}
 	}
-	
+
 	// in case the caption was visible due to > 2 notebooks
 	wxAuiPaneInfo& info = auiManager.GetPane(centerNotebook);
 	info.CaptionVisible(false);

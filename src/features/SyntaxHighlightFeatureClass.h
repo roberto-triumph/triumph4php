@@ -42,7 +42,7 @@ class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
 
 public:
 	SyntaxHighlightFeatureClass(t4p::AppClass& app);
-	
+
 private:
 
 };

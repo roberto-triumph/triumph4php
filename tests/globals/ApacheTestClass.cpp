@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@
 #include <wx/utils.h>
 
 class ApacheTestClass : public FileTestFixtureClass {
-public:	
+public:
 
 	wxString PhpFile;
 	wxString HttpdFile;
@@ -40,21 +40,21 @@ public:
 	t4p::DirectorySearchClass Search;
 	t4p::ApacheClass Apache;
 
-	ApacheTestClass() 
-		: FileTestFixtureClass(wxT("apache_test")) 
+	ApacheTestClass()
+		: FileTestFixtureClass(wxT("apache_test"))
 		, PhpFile(wxT("test.php"))
 		, HttpdFile(wxT("httpd.conf"))
-		, ConfigSubDirectory(wxT("apache_config")) 
+		, ConfigSubDirectory(wxT("apache_config"))
 		, VirtualHostFile(wxT("host.conf"))
 		, Search()
 		, Apache() {
-		
+
 		// all tests will need a file to resolve
 		CreateFixtureFile(PhpFile, wxString::FromAscii(
 			"<?php"
 		));
 	}
-	
+
 	/**
 	 * the method that executes the method being tested; reads the TestProjectDir and parses any
 	 * apache config files in that directory (and recurses sub-directories too).
@@ -69,7 +69,7 @@ public:
 			Apache.SetHttpdPath(matchedFiles[0]);
 		}
 	}
-	
+
 	/**
 	 * creates a 'plain' httpd.conf file (no virtual hosts)
 	 * @param subDirectory sub-directory to put file in (relative to TestProjectDir)
@@ -82,14 +82,14 @@ public:
 			"Listen 8080 \n"
 		));
 	}
-	
+
 	/**
 	 * Creates a httpd.conf file with 1 virtual host entry
 	 */
 	void CreateHttpdFileWithVirtualHost(const wxString& subDirectory, const wxString& documentRoot, int serverPort = 80, int virtualHostPort = 80) {
 		wxString serverPortString = wxString::Format(wxT("%d"), serverPort);
 		wxString virtualHostPortString = wxString::Format(wxT("%d"), virtualHostPort);
-		
+
 		CreateSubDirectoryFile(subDirectory, HttpdFile, wxString::FromAscii(
 			"Listen ") + serverPortString + wxString::FromAscii(" \n"
 			"<IfModule mod_ssl.c>\n"
@@ -104,7 +104,7 @@ public:
 			"</VirtualHost>\n"
 		));
 	}
-	
+
 	/**
 	 * Creates a httpd.conf file  with an "include" directive to the given file
 	 * @param includeFile the name of the file to include
@@ -119,7 +119,7 @@ public:
 			"Include ") + includeFile + wxString::FromAscii("\n"
 		));
 	}
-	
+
 	/**
 	 * Creates a file that contains only virtual host config
 	 */
@@ -133,7 +133,7 @@ public:
 		));
 	}
 
-	
+
 	/**
 	 * Creates a file that contains only virtual host config with the
 	 * ServerName directive After the DocumentRoot directive.
@@ -143,29 +143,29 @@ public:
 			"<VirtualHost *:80>\n"
 			"  ServerAdmin webmaster@localhost\n"
 			"  DocumentRoot ") + TestProjectDir + wxString::FromAscii("\n"
-			"  ServerName localhost.testing.com\n"			
+			"  ServerName localhost.testing.com\n"
 			"</VirtualHost>\n"
 		));
 	}
-	
+
 	wxFileName TestProjectDirFileName() {
 		wxFileName fileName(TestProjectDir);
 		return fileName;
 	}
-	
+
 	wxFileName FileName(wxString file) {
 		wxFileName fileName = TestProjectDirFileName();
 		fileName.SetFullName(file);
 		return fileName;
 	}
-	
+
 	wxFileName FileName(wxString subDirectory, wxString file) {
 		wxFileName fileName = TestProjectDirFileName();
 		fileName.AppendDir(subDirectory);
 		fileName.SetFullName(file);
 		return fileName;
 	}
-	
+
 	void CreateSubDirectoryFile(const wxString& subDirectory, const wxString& fileName, const wxString& fileContents) {
 		CreateSubDirectory(subDirectory);
 		wxString path = subDirectory;
@@ -219,8 +219,8 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkHostRoot) {
 	Walk();
 	CHECK_EQUAL(wxT("http://localhost/"), Apache.GetVirtualHostMappings()[TestProjectDir]);
 	CHECK_EQUAL(8080, Apache.GetListenPort());
-	
-	
+
+
 	//remove the trailing slash, make sure it still works
 	wxString test = TestProjectDir;
 	test = test.Mid(0, test.Len() - 1);
@@ -231,7 +231,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkHostRoot) {
 
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
-	int major, 
+	int major,
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
@@ -243,7 +243,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
 		wxString trueDir = TestProjectDir;
 		TestProjectDir.Replace(wxT("\\"), wxT("/"));
 		TestProjectDir.Replace(wxT("a"), wxT("A"));
-		
+
 
 		CreateHttpdFile(ConfigSubDirectory);
 		Walk();
@@ -255,13 +255,13 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
-	
+
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this
 	ConfigSubDirectory = wxT("apache_CONFIG");
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
@@ -272,13 +272,13 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenListeningOnANonStandardPortAndIsVirtualHost) {
-	
+
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this.
 	ConfigSubDirectory = wxT("apache_CONFIG");
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir, 8080, 8080);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
@@ -289,13 +289,13 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenListeningOnANonStandardPortAnd
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsOnDifferentPort) {
-	
+
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this.
 	ConfigSubDirectory = wxT("apache_CONFIG");
 	CreateHttpdFileWithVirtualHost(ConfigSubDirectory, TestProjectDir, 8000, 9000);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
@@ -307,7 +307,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsOnDifferentPort) 
 
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostHasAWindowsPath) {
-	int major, 
+	int major,
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
@@ -323,7 +323,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostHasAWindowsPath) {
 		ConfigSubDirectory = wxT("apache_CONFIG");
 		CreateHttpdFileWithVirtualHost(ConfigSubDirectory, documentRoot);
 		Walk();
-		
+
 		CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 		wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 		CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
@@ -341,13 +341,13 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedFile) {
 	CreateHttpdFileWithIncludeFile(hostsFilePath, ConfigSubDirectory);
 	CreateVirtualHostFileInSubDirectory(ConfigSubDirectory);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	CHECK_EQUAL(FileName(ConfigSubDirectory, HttpdFile).GetFullPath(), actualHttpdPath);
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
 	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
-	CHECK_EQUAL(expectedUrl, url);	
+	CHECK_EQUAL(expectedUrl, url);
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsDefinedInDifferentOrder) {
@@ -359,7 +359,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsDefinedInDifferen
 	CHECK_VECTOR_SIZE(1, Apache.GetVirtualHostMappings());
 	wxString url = Apache.GetUrl(TestProjectDir + PhpFile);
 	wxString expectedUrl = wxT("http://localhost.testing.com/test.php");
-	CHECK_EQUAL(expectedUrl, url);	
+	CHECK_EQUAL(expectedUrl, url);
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedDirectory) {
@@ -371,14 +371,14 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedDirecto
 	CreateHttpdFileWithIncludeFile(TestProjectDir + hostsSubDirectory, ConfigSubDirectory);
 	CreateVirtualHostFileInSubDirectory(hostsSubDirectory);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
 	CHECK_EQUAL(expectedPath, actualHttpdPath);
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);	
+	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedRelativeDirectory) {
@@ -391,7 +391,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedRelativ
 	));
 	CreateVirtualHostFileInSubDirectory(hostsSubDirectory);
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
@@ -399,13 +399,13 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedRelativ
 	CHECK_EQUAL(expectedPath, actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);	
+	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedWildcard) {
 	wxString hostsWildCard = wxT("hosts");
 	hostsWildCard.Append(wxFileName::GetPathSeparator()).Append(wxT("*.conf"));
-	
+
 	wxString hostsSubDirectory;
 	hostsSubDirectory.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(wxT("hosts")).Append(
 		wxFileName::GetPathSeparator());
@@ -423,26 +423,26 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsAnIncludedWildcar
 	CHECK_EQUAL(expectedPath, actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);	
+	CHECK_EQUAL(wxT("http://localhost.testing.com/test.php"), url);
 }
 
 TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRoot) {
 	CreateHttpdFile(ConfigSubDirectory);
-	
+
 	// no Walk(); just use SetHttpPath() when we already know the location of the config
 	// this will happen most of the time; once the user scans for the config directory
 	// on subsequent app runs we wont have to scan for the config directory.
 	wxString actualHttpdPath = FileName(ConfigSubDirectory, HttpdFile).GetFullPath();
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
-	
+
 	wxString expectedPath = TestProjectDir;
 	expectedPath.Append(ConfigSubDirectory).Append(wxFileName::GetPathSeparator()).Append(HttpdFile);
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-	CHECK_EQUAL(wxT("http://localhost:8080/test.php"), url);	
+	CHECK_EQUAL(wxT("http://localhost:8080/test.php"), url);
 }
 
 TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissingEndingSeparator) {
-	
+
 	// document root without ending separator
 	wxString documentRoot(TestProjectDir);
 	documentRoot.RemoveLast();
@@ -451,7 +451,7 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissi
 		"\n"
 	));
 	Walk();
-	
+
 	CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 	wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 	wxString expectedPath = TestProjectDir;
@@ -459,11 +459,11 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissi
 	CHECK_EQUAL(expectedPath, actualHttpdPath);
 	CHECK(Apache.SetHttpdPath(actualHttpdPath));
 	wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-	CHECK_EQUAL(wxT("http://localhost/test.php"), url);	
+	CHECK_EQUAL(wxT("http://localhost/test.php"), url);
 }
 
 TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
-	int major, 
+	int major,
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
@@ -473,14 +473,14 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		// they are  c:/dir1/dir2
 		wxString documentRoot = TestProjectDir;
 		documentRoot.Replace(wxT("\\"), wxT("/"));
-		
+
 		CreateSubDirectoryFile(ConfigSubDirectory, HttpdFile, wxString::FromAscii(
 			"DocumentRoot \"") + documentRoot + wxString::FromAscii("\"\n"
 			"Listen 80 \n"
 			"\n"
 		));
 		Walk();
-		
+
 		CHECK_VECTOR_SIZE(1, Search.GetMatchedFiles());
 		wxString actualHttpdPath = Search.GetMatchedFiles()[0];
 		wxString expectedPath = TestProjectDir;
@@ -488,7 +488,7 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		CHECK_EQUAL(expectedPath, actualHttpdPath);
 		CHECK(Apache.SetHttpdPath(actualHttpdPath));
 		wxString url = Apache.GetUrl(TestProjectDir + wxT("test.php"));
-		CHECK_EQUAL(wxT("http://localhost/test.php"), url);	
+		CHECK_EQUAL(wxT("http://localhost/test.php"), url);
 	}
 }
 

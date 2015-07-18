@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,11 +53,11 @@ bool t4p::FinderClass::Prepare() {
 	delete Pattern;
 	Pattern = NULL;
 	PatternErrorCode = U_ZERO_ERROR;
-	
+
 	if (t4p::FinderClass::REGULAR_EXPRESSION == Mode) {
 		PrepareForRegularExpressionMode();
 	}
-	IsPrepared = !Expression.isEmpty() && 
+	IsPrepared = !Expression.isEmpty() &&
 		(t4p::FinderClass::EXACT == Mode || t4p::FinderClass::CASE_INSENSITIVE == Mode || U_SUCCESS(PatternErrorCode));
 	return IsPrepared;
 }
@@ -109,7 +109,7 @@ bool t4p::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
 			nextLength = 0;
 		while (FindNext(text, nextPosition + nextLength)) {
 			if (GetLastMatch(nextPosition, nextLength)) {
-				if ((nextPosition + nextLength) >= start && start > 0) {					
+				if ((nextPosition + nextLength) >= start && start > 0) {
 					break;
 				}
 				found  = true;
@@ -142,7 +142,7 @@ void t4p::FinderClass::ResetLastHit() {
 
 bool t4p::FinderClass::GetLastReplacementText(const UnicodeString& text, UnicodeString& replacementText) const {
 	UBool matchFound = FALSE;
-	if (IsFound && (LastPosition + LastLength) <= text.length()) {		
+	if (IsFound && (LastPosition + LastLength) <= text.length()) {
 		UnicodeString matchedText(text, LastPosition, LastLength);
 		UnicodeString replaceWith = ReplaceExpression;
 		UErrorCode error = U_ZERO_ERROR;
@@ -171,7 +171,7 @@ bool t4p::FinderClass::GetLastReplacementText(const UnicodeString& text, Unicode
 
 int t4p::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 	int matches = 0;
-	
+
 	// no check for ReplaceExpression.isEmpty() allow for empty replacements
 	// this allows the user to 'delete' parts of a strin
 	if (IsPrepared) {
@@ -212,7 +212,7 @@ int t4p::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 
 void t4p::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	UnicodeString symbols = UNICODE_STRING_SIMPLE("!@#$%^&*()[]{}\\-+?.,\"|");
-	
+
 	// there's got to be a batter way of escaping all regex symbols
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("\\"), UNICODE_STRING_SIMPLE("\\\\"));
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("!"), UNICODE_STRING_SIMPLE("\\!"));
@@ -235,7 +235,7 @@ void t4p::FinderClass::EscapeRegEx(UnicodeString& regEx) {
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("."), UNICODE_STRING_SIMPLE("\\."));
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE(","), UNICODE_STRING_SIMPLE("\\,"));
 	regEx.findAndReplace(UNICODE_STRING_SIMPLE("\""), UNICODE_STRING_SIMPLE("\\\""));
-	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));	
+	regEx.findAndReplace(UNICODE_STRING_SIMPLE("|"), UNICODE_STRING_SIMPLE("\\|"));
 }
 
 bool t4p::FinderClass::FindNextExact(const UnicodeString& text, int32_t start, bool caseSensitive) {
@@ -287,7 +287,7 @@ bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int3
 		else if (start > 0) {
 			findText = UNICODE_STRING_SIMPLE("");
 		}
-		int32_t foundPos = 0, 
+		int32_t foundPos = 0,
 			length = 0,
 			endPos = 0;
 		UErrorCode error = U_ZERO_ERROR;
@@ -299,7 +299,7 @@ bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int3
 				if (U_SUCCESS(error) && U_SUCCESS(error)) {
 					IsFound = true;
 
-					length = endPos - foundPos; // end is the index after the match 
+					length = endPos - foundPos; // end is the index after the match
 
 					// if search was started from the middle of a string,
 					// need to correct the found position

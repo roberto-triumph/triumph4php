@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,7 +24,7 @@
  */
 #ifndef T4P_FEATURECLASS_H
 #define T4P_FEATURECLASS_H
- 
+
 #include <globals/EnvironmentClass.h>
 #include <globals/ProjectClass.h>
 #include <widgets/StatusBarWithGaugeClass.h>
@@ -35,7 +35,7 @@
 #include <vector>
 
 namespace t4p {
-	
+
 // forward declaration to prevent #include of the AppClass
 class AppClass;
 
@@ -47,7 +47,7 @@ class TagCacheClass;
  * Since wxKeyBinder uses menu IDs to serialize the shortcuts, the menu IDs
  * cannot change (else KeyBinder will not bind the shortcut; or worse it may
  * crash.  For now we will use this enum to make sure the IDs are consistent
- * across app versions; and to prevent ID collisions. 
+ * across app versions; and to prevent ID collisions.
  * Be sure to NOT modify the enum values; enum items may be added
  * but make sure to not change the previous values, items may be deleted but if they are
  * do NOT change the values of the remanining items; else menu shortcuts
@@ -99,33 +99,33 @@ enum MenuIds {
  * Find
  * Find In Files
  * Project Errors (PHP lint)
- * TODOs 
+ * TODOs
  * 'Outline' view
  * Log viewer (mysql, apache, php error, other?)
  * Test (PHPUnit, Simple test)
  * PECL installer
- * 
- * 
+ *
+ *
  * Window locations: Left (skinny window), Bottom (wide window), Main (Center). Features can create as many windows
  * as they see fit (maybe in any location??).
- * 
- * Actions: Feature can define actions, menu items for those actions, 
+ *
+ * Actions: Feature can define actions, menu items for those actions,
  *          Also, context menu items for those actions, feature will be given the selected text
- * 
+ *
  * Toolbars: Features will be given the ability to define toolbar buttons or other controls, either left-justified or right-justified.
- * 
- * 
+ *
+ *
  * Features will be given:
- * 1) The GlobalsClass that holds all application-wide data structures. 
+ * 1) The GlobalsClass that holds all application-wide data structures.
  * 2) StatusBarWithGaugeClass to show progress to the user
  * 3) The tools window notebook.  features can add their windows
  * 4) The code notebook.  Features can query which is the currently opened file, any selected text, etc...
- * 5) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the 
+ * 5) An instance of Environment class; contains the apache configuration that is installed in the system. Note that the
  *    Apache class may not be initialized to point at a proper config file.
- * 6) Note that unless specified, all pointers that a feature is given (Notebook, status bar, etc.. )will be taken care of by the 
+ * 6) Note that unless specified, all pointers that a feature is given (Notebook, status bar, etc.. )will be taken care of by the
  *    application and the feature SHOULD NOT delete them.  However, any pointers created by the feature will need to be deleted
  *    by the feature itself.  wxWindow pointers usually do not need to be deleted because the wxWidgets framework manages them.
- *  
+ *
  * Lifecycle:
  *  + One instance of feature per application.  features are created during program startup and deleted during application exit.
  *  + During startup, AddMenuItems method is called. The feature can override this method to create menu items.
@@ -137,18 +137,18 @@ enum MenuIds {
  * ** some ** window events are put in the event sink; all menu events, toolbar events and some AUI events.
  * All features are automatically added as handles for the event sink; what this all means is that a feature
  * can implement menu items and toolbar buttons by adding event table entries as if it were the main
- * frame. 
+ * frame.
  * The event sink is a two-way communication, features can send commands to the event sink or they can
  * handle commands from other features as well.
  *
  * See EventSinkClass for more info.
- * 
+ *
  */
 class FeatureClass : public wxEvtHandler {
 
 public:
 
-	
+
 	/**
 	 * The application event dispatcher. Also holds all 'global' structures and settings.
 	 */
@@ -160,22 +160,22 @@ public:
 	 * Note that at the start, any window pointers are not yet initialized
  	 */
 	FeatureClass(AppClass& app);
-	
+
 	/**
 	 * Destructor.  May be overidden by sub classes.
 	 */
 	virtual ~FeatureClass();
-	
+
 	/**
-	 * This method will be called during application startup; the feature should load the preferences from persistent 
+	 * This method will be called during application startup; the feature should load the preferences from persistent
 	 * storage (confg) here
-	 * 
+	 *
 	 * @param wxConfigBase* the config where settings are stored.
 	 */
 	virtual void LoadPreferences(wxConfigBase* config);
 
 private:
-	
+
 };
 
 }

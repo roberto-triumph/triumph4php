@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -52,7 +52,7 @@ public:
 	 * URLs, templates.
 	 */
 	t4p::GlobalsClass Globals;
-	
+
 	/**
 	 * To keep track of background threads
 	 */
@@ -71,7 +71,7 @@ public:
 	 * Any features should post any useful events to this event handler
 	 * then all other features will get notified.  This is how
 	 * inter-feature communication is done in a way to reduce coupling
-	 * Features need not push themselves onto this sink, the application will do 
+	 * Features need not push themselves onto this sink, the application will do
 	 * so at app start.
 	 */
 	EventSinkClass EventSink;
@@ -86,9 +86,9 @@ public:
 	 * To run multiple steps.
 	 */
 	t4p::SequenceClass Sequences;
-	
+
 	/**
-	 * The user preferences.  
+	 * The user preferences.
 	 * @var PreferencesClass;
 	 */
 	PreferencesClass Preferences;
@@ -99,13 +99,13 @@ public:
 	 * by another instance of this application
 	 */
 	wxDateTime ConfigLastModified;
-	
+
 	AppClass(wxTimer& configModifiedTimer);
 
 	~AppClass();
 
-	/** 
-	 * Initialize the application 
+	/**
+	 * Initialize the application
 	 */
 	void Init();
 
@@ -123,21 +123,21 @@ public:
 	 * delete features from memory in a safe way
 	 */
 	void DeleteFeatures();
-	
+
 	/**
 	 * Deletes all views. This is done when the main frame is closed, because
 	 * frames could have pointers to windows.Feature views are deleted when]
 	 * the main frame is closed.
 	 */
 	void DeleteFeatureViews();
-	
+
 	/**
 	 * Adds all features' preferences panels into the given parent.
-	 * 
+	 *
 	 * @param parent the parent book control
 	 */
 	void AddPreferencesWindows(wxBookCtrlBase* parent);
-	
+
 	/**
 	 * @return TRUE if this app is active (in the foreground)
 	 */
@@ -148,7 +148,7 @@ public:
 private:
 
 	/**
-	 * Parses any command line arguments.  
+	 * Parses any command line arguments.
 	 * @param [out] filenames the files given as arguments
 	 *        to the app.
 	 * @return false if arguments are invalid.
@@ -159,17 +159,17 @@ private:
 	 * create features. only instantiates and nothing else
 	 */
 	void CreateFeatures();
-	
+
 public: // temp public, should be private
 	/**
 	 * asks features for any windows they want to create
 	 */
 	void FeatureWindows();
-	
+
 public: // temp public, should be private
 	/**
-	 * Almost all functionality is encapsulated in features; the 
-	 * app just creates them and hangs on to them until the end. 
+	 * Almost all functionality is encapsulated in features; the
+	 * app just creates them and hangs on to them until the end.
 	 * Each feature is created only once at app start and is
 	 * deleted at app end.
 	 */

@@ -34,10 +34,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FinderPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FinderPanelGeneratedClass : public wxPanel 
+class FinderPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -45,7 +45,7 @@ class FinderPanelGeneratedClass : public wxPanel
 			ID_FINDTEXT,
 			ID_WRAP,
 		};
-		
+
 		wxBitmapButton* CloseButton;
 		wxBitmapButton* PreviousButton;
 		wxBitmapButton* NextButton;
@@ -56,7 +56,7 @@ class FinderPanelGeneratedClass : public wxPanel
 		wxCheckBox* Wrap;
 		wxRadioBox* FinderMode;
 		wxStaticText* ResultText;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCloseButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPreviousButton( wxCommandEvent& event ) { event.Skip(); }
@@ -66,22 +66,22 @@ class FinderPanelGeneratedClass : public wxPanel
 		virtual void OnFindKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnFindKillFocus( wxFocusEvent& event ) { event.Skip(); }
 		virtual void OnFindEnter( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		FinderPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 995,58 ), long style = wxTAB_TRAVERSAL );
 		~FinderPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ReplacePanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ReplacePanelGeneratedClass : public wxPanel 
+class ReplacePanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -90,7 +90,7 @@ class ReplacePanelGeneratedClass : public wxPanel
 			ID_REPLACE_CLOSE,
 			ID_WRAP,
 		};
-		
+
 		wxStaticText* FindLabel;
 		wxButton* RegExFindHelpButton;
 		wxComboBox* FindText;
@@ -107,7 +107,7 @@ class ReplacePanelGeneratedClass : public wxPanel
 		wxCheckBox* Wrap;
 		wxStaticText* ResultText;
 		wxRadioBox* FinderMode;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRegExFindHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFindKeyDown( wxKeyEvent& event ) { event.Skip(); }
@@ -124,34 +124,34 @@ class ReplacePanelGeneratedClass : public wxPanel
 		virtual void OnReplaceButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReplaceAllButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUndoButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ReplacePanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 1003,105 ), long style = wxTAB_TRAVERSAL );
 		~ReplacePanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FindHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FindHelpDialogGeneratedClass : public wxDialog 
+class FindHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* RegexHelpLink;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		FindHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Help On Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~FindHelpDialogGeneratedClass();
-	
+
 };
 
 #endif //__FinderFeatureForms__

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -60,7 +60,7 @@ UnicodeString t4p::WxToIcu(wxString wx) {
 	UnicodeString uni;
 	int actualCount = 0;
 
-	
+
 	wxScopedCharBuffer buf = wx.utf8_str();
 	size_t rawLength = buf.length();
 
@@ -68,7 +68,7 @@ UnicodeString t4p::WxToIcu(wxString wx) {
 	// +1 = make room for the NULL terminator
 	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, buf.data(), rawLength, &status);
 	if (U_SUCCESS(status)) {
-		uni.releaseBuffer(actualCount);	
+		uni.releaseBuffer(actualCount);
 	}
 	else {
 		uni.releaseBuffer(0);
@@ -81,7 +81,7 @@ UnicodeString t4p::CharToIcu(const char* source) {
 	UErrorCode status = U_ZERO_ERROR;
 	UnicodeString uni;
 	int actualCount = 0;
-	
+
 	// 5th param is meant to be in bytes
 	// need to account for the null character, hence the +1
 	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, source, charCount, &status);

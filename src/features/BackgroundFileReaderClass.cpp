@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,7 +54,7 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 	bool isDestroy = IsCancelled();
 	int counter = 0;
 	if (Mode == WALK) {
-		
+
 		// careful to test for destroy first
 		while (!isDestroy && DirectorySearch.More()) {
 			bool res = BackgroundFileRead(DirectorySearch);
@@ -62,7 +62,7 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 			// signal that the background thread has finished one file
 			counter++;
 			wxCommandEvent singleEvent(EVENT_FILE_READ, wxNewId());
-			
+
 			// when isDestroy returns TRUE, must exit as soon as possible
 			// for example, when app exists the ThreadWithHeartbeat class kills the
 			// thread, many things are no longer valid
@@ -90,7 +90,7 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 			}
 		}
 	}
-	
+
 	// signal that the background thread has finished
 	// when isDestroy returns TRUE, must exit as soon as possible
 	// for example, when app exists the ThreadWithHeartbeat class kills the

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -71,11 +71,11 @@ private:
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
 
 	void OnAppReady(wxCommandEvent& event);
-	
+
 	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
-	
+
 	void OnAppFileNotebookChanged(t4p::CodeControlEventClass& event);
-	
+
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);
 
 	void OnAppFileCreated(wxCommandEvent& event);
@@ -97,9 +97,9 @@ private:
 class MainFrameClass : public MainFrameGeneratedClass {
 
 public:
-	
+
 	/**
-	 * @brief 
+	 * @brief
 	 * @param featureViews the views (to get menu bars, toolbars). This class
 	 *        will not own the pointers, although the main fram will tell the
 	 *        app to delete them when the user closes the main frame
@@ -107,13 +107,13 @@ public:
 	 * @param guiApp to change the "exit on frame close" option
 	 * @param configModifiedTimer to stop checking for updates to the
 	 *        config file while the user is making changes to the app preferences
-	 * 
+	 *
 	 */
-	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews, 
+	MainFrameClass(const std::vector<FeatureViewClass*>& featureViews,
 		AppClass&  app, wxApp& guiApp, wxTimer& configModifiedTimer);
-	
+
 	~MainFrameClass();
-	
+
 	/**
 	 * get all of the feature view's extra windows and menus and attach them to the main frame.
 	 */
@@ -133,12 +133,12 @@ public:
 	 * For a re-draw of all dialogs and windows based on new updated preferences
 	 */
 	void PreferencesExternallyUpdated();
-	
+
 	/**
 	 * Updates the title bar with the name of the file being edited.
 	 */
 	void UpdateTitleBar();
-	
+
 	/**
 	 * need to call this once all items have been added to the toolbar
 	 */
@@ -149,10 +149,10 @@ public:
 	 * notebook
 	 */
 	void CreateNewCodeCtrl();
-	
+
 	/**
 	 * Checks code notebooks to see if they have any more pages;if a notebook
-	 * does not have any pages it is scheduled for deletion 
+	 * does not have any pages it is scheduled for deletion
 	 */
 	void UpdateNotebooks();
 
@@ -160,7 +160,7 @@ protected:
 
 	// Handlers for MainFrameGeneratedClass events.
 	void OnClose(wxCloseEvent& event);
-	
+
 	/**
 	 * Top Menu Bar handlers
 	 */
@@ -172,12 +172,12 @@ protected:
 	void OnHelpCredits(wxCommandEvent& event);
 	void OnHelpLicense(wxCommandEvent& event);
 	void OnHelpManual(wxCommandEvent& event);
-	
+
 	/**
 	 * Context menu handler
 	 */
-	void OnContextMenu(wxContextMenuEvent& event);	
-	
+	void OnContextMenu(wxContextMenuEvent& event);
+
 private:
 
 	/**
@@ -240,16 +240,16 @@ private:
 	 * has percentage complete numbers so we want to show a determinate gauge
 	 */
 	void OnDeterminateProgress(t4p::SequenceProgressEventClass& event);
-	
+
 	/**
-	 * set the application-wide font.  this is non-trivial because we 
+	 * set the application-wide font.  this is non-trivial because we
 	 * want to change the tab fonts on all notebooks also
 	 */
 	void SetApplicationFont();
 
 	/**
 	 * GUI framework object, used to programatically position the different windows
-	 * 
+	 *
 	 * @var wxAuiManager
 	 */
 	wxAuiManager AuiManager;
@@ -274,28 +274,28 @@ private:
 	 * @var wxAuiToolBar*
 	 */
 	wxAuiToolBar* ToolBar;
-	
+
 	/**
 	 * To hold the various feature
 	 * panels in place.
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* ToolsNotebook;
-	
+
 	/**
 	 * To hold the various outline
 	 * panels in place.
 	 * @var wxAuiNotebook*
 	 */
 	wxAuiNotebook* OutlineNotebook;
-	
+
 	/**
 	 * The running wxApp
 	 */
 	wxApp& GuiApp;
 
 	/**
-	 * to stop checking for config changes when the 
+	 * to stop checking for config changes when the
 	 * user is actually editing the preferences
 	 */
 	wxTimer& ConfigModifiedTimer;

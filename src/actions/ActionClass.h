@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,26 +41,26 @@ class RunningThreadsClass;
  * call the BackgroundWork() method in a background thread and will the delete
  * the action.  Actions should always be created on the heap because RunningThreadsClass
  * will take ownership of them.
- * 
+ *
  * Actions can be cancelled by another process, like for example in response to a
  * user click button.  Actions should periodically check the IsCancelled() method and
  * should return as soon as IsCancelled returns TRUE.
  *
  * When subclassing an ActionClass, make sure that any data passed from the main thread
- * and used by the background thread are copied properly. Pay special attention to 
+ * and used by the background thread are copied properly. Pay special attention to
  * wxString variables, as the default wxString
  * assignment operator and copy constructors are NOT thread-safe (produce
  * shallow copies)
  *
  * An action will communicate with the rest of the program by posting events
  * to RunningThreadsClass, the rest of the program will attach themselves as
- * event handlers of RunningThreadsClass.  For example, an action that 
- * executes a SQL query in the background would 
+ * event handlers of RunningThreadsClass.  For example, an action that
+ * executes a SQL query in the background would
  *
  * 1.) copy the connection info into member variables via the constructor
  *     or an Init() method.  the variables would be cloned.
  * 2.) in the implementation of BackgroundWork() the query would be executed,
- *     read into object. a wxEvent would be passed to the rest of the 
+ *     read into object. a wxEvent would be passed to the rest of the
  *     program by calling PostEvent()
  *
  */
@@ -81,7 +81,7 @@ public:
 	};
 
 	/**
-	 * @param runningThreads used to post events. This reference must be 
+	 * @param runningThreads used to post events. This reference must be
 	 *        alive for as long as this class is alive.
 	 * @param eventId the posted events will have this ID as the EventID
 	 */
@@ -204,7 +204,7 @@ private:
 	wxMutex Mutex;
 
 	/**
-	 * flag to signal that the action should return immediately even if it has 
+	 * flag to signal that the action should return immediately even if it has
 	 * not completed its work.
 	 */
 	bool Cancelled;
@@ -214,20 +214,20 @@ private:
 	 */
 	t4p::ActionClass::ProgressMode Mode;
 
-	/** 
+	/**
 	 * The progress in the current action. This is only valid if the action is in determinate progress mode
 	 */
 	int PercentComplete;
 };
 
 /**
- * A small class that is used to contain code that will be run when a thread 
+ * A small class that is used to contain code that will be run when a thread
  * is end.  The class will be used in the context of the background thread, not
  * the main thread!
  *
- * The main reason for this class is to cleanup MySQL connections; as 
- * the MySQL driver creates some data in each thread (mysql_thread_init()) 
- * and we need to clean it up by calling mysql_thread_end() in the 
+ * The main reason for this class is to cleanup MySQL connections; as
+ * the MySQL driver creates some data in each thread (mysql_thread_init())
+ * and we need to clean it up by calling mysql_thread_end() in the
  * context of the background thread.
  */
 class ThreadCleanupClass {
@@ -254,7 +254,7 @@ public:
 
 /**
  * A small class that will run in a background thread, look at a queue
- * of ActionClass instances and Run each action (call BackgroundWork()) in the 
+ * of ActionClass instances and Run each action (call BackgroundWork()) in the
  * background thread.
  * This class will continually poll the queue, pop actions off the
  * queue, call BackgroundWork() on them, and delete them once
@@ -294,13 +294,13 @@ public:
 	void CancelRunningActionIf(int actionId);
 
 	/**
-	 * cancel the current action that is running.  this method is used when 
+	 * cancel the current action that is running.  this method is used when
 	 * this thread needs to exit; we need the running action to return out of its
 	 * BackgroundWork() method so that the thread can gracefully end.
 	 *
 	 * Do not confuse this from wxThread::Delete, this is the cancel mechanism for
 	 * the action class; so that actions themselves can terminate early when signaled
-	 * to do so.  
+	 * to do so.
 	 */
 	void CancelRunningAction();
 
@@ -359,7 +359,7 @@ private:
 	 */
 	void CleanupAllActions();
   };
-  
+
 /**
  * Class to hold all of the actions that are currently running. wxWidgets
  * threads are detached by default, we cannot call the IsRunning or IsAlive
@@ -368,21 +368,21 @@ private:
  * button or closes a panel).
  *
  * Code that needs to run an action in the background will create an action
- * in the heap, initialize it as need it, then call the Add() method.  Once 
+ * in the heap, initialize it as need it, then call the Add() method.  Once
  * the Add() method is called, the action will be run in the background at
  * some point in the future.  Add() can be called many times if needed, actions
  * are queued up and run one after another in the background.
- * 
+ *
  * This class will own all given actions, and will delete them need.
  */
 class RunningThreadsClass : public wxEvtHandler {
-  
+
   	public:
-  	
+
 	RunningThreadsClass(bool doPostEvents = true);
-	
+
 	~RunningThreadsClass();
-	
+
 	/**
 	 * Only call this method BEFORE any items are queued up
 	 * @param int maxThreads number threads to start. This can be zero, if so
@@ -391,16 +391,16 @@ class RunningThreadsClass : public wxEvtHandler {
 	void SetMaxThreads(int maxThreads);
 
 	/**
-	 * Queues the given action to be run at some point in the near future. 
-	 * This method will return an identifier that can be used to stop the 
+	 * Queues the given action to be run at some point in the near future.
+	 * This method will return an identifier that can be used to stop the
 	 * action if needed.
 	 *
-	 * It is very important to note that once an action is queued, it may 
+	 * It is very important to note that once an action is queued, it may
 	 * deleted at any time after that so the action pointer should not be accessed
 	 * at all.
 	 *
 	 * @param action this class will own the pointer and delete it
-	 * @return an action ID, which can be used to cancel the action at at 
+	 * @return an action ID, which can be used to cancel the action at at
 	 * later time.
 	 */
 	int Queue(t4p::ActionClass* action);
@@ -416,12 +416,12 @@ class RunningThreadsClass : public wxEvtHandler {
 
 	/**
 	 * stop all of the running threads. This method is guaranteed to block
-	 * until all threads have terminated. If this method is hanging 
+	 * until all threads have terminated. If this method is hanging
 	 * indefinitely, it means that one of the running threads has not
 	 * been calling Cancel() correctly.
 	 */
 	void StopAll();
-	
+
 	/**
 	 * stops all running threads, and additionally will no longer queue up any
 	 * actions given to be queued.  This method is usually called before this item
@@ -430,8 +430,8 @@ class RunningThreadsClass : public wxEvtHandler {
 	void Shutdown();
 
 	/**
-	 * This method should called before any actions are added. 
-	 * 
+	 * This method should called before any actions are added.
+	 *
 	 * @param threadCleanup object to be called when a thread ends.
 	 *        this class will own the pointer
 	 *        this class will clone the object.
@@ -457,18 +457,18 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * this means that the event will be received in the next event loop.
 	 */
 	void PostEvent(wxEvent& event);
-  
+
 	private:
-  
+
 	/**
-	 * holds all actions that need to be run. This class will add 
+	 * holds all actions that need to be run. This class will add
 	 * actions to the queue. An action will be removed as soon as it
 	 * is actually worked on. The background threads will check to
 	 * see if this queue is non-empty and then pop items from it and
 	 * "work" on them (call BackgroundWork() method)
 	 */
 	std::queue<t4p::ActionClass*> Actions;
-  
+
 	/**
 	 * Prevent simultaneous access to Actions
 	 */
@@ -479,18 +479,18 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * and actually runs the actions
 	 */
 	std::vector<t4p::ThreadActionClass*> ThreadActions;
-	
+
 	/**
 	 * holds all event handlers to post events to. This object
 	 * will not own these pointers.
 	 */
 	std::vector<wxEvtHandler*> Handlers;
-	
+
 	/**
 	 * prevent concurrent access to the handlers
 	 */
 	wxMutex HandlerMutex;
-	
+
 	/**
 	 * to implement blocking wait when stopping the background
 	 * threads
@@ -501,7 +501,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	 *  To generate the heartbeats (EVENT_WORK_IN_PROGRESS)
 	 */
 	wxTimer Timer;
- 
+
 	/**
 	 * logic to be called when a thread ends
 	 */
@@ -524,30 +524,30 @@ class RunningThreadsClass : public wxEvtHandler {
 	 * the max number of threads to create
 	 */
 	int MaxThreads;
-	
+
 	/**
 	 * if TRUE no items will be queued.
 	 */
 	bool IsShutdown;
-	
+
 	/**
 	 * Will generate a EVENT_ACTION_IN_PROGRESS event
 	 */
 	void OnTimer(wxTimerEvent& event);
-	
+
 	/**
-	 * Will prepare to send events at regular intervals. After a call to this method, a 
+	 * Will prepare to send events at regular intervals. After a call to this method, a
 	 * EVENT_WORK_IN_PROGRESS will be generated at regular intervals until SignalEnd()
 	 * is called.
 	 */
 	void SignalStart();
 
-	DECLARE_EVENT_TABLE() 
+	DECLARE_EVENT_TABLE()
 };
 
 /**
  * event identifiers for all actions. These should be used
- * as the eventIDs for the corresponding actions unless 
+ * as the eventIDs for the corresponding actions unless
  * it is not possible.
  * start at 20,000 to prevent collison with feature menu IDs
  * ID_MENU_*
@@ -570,7 +570,7 @@ class RunningThreadsClass : public wxEvtHandler {
 	ID_EVENT_ACTION_DETECTOR_DB_INIT
  };
 
- 
+
 
 /**
  * This event will be generated when the thread has completed its job
@@ -595,7 +595,7 @@ extern const wxEventType EVENT_ACTION_PROGRESS;
  * how much it has completed at any given time.
  * Indeterminate mode is means that an action cannot accurately estimate how
  * much it has completed at any given time.
- * When an action uses determinated mode, it assigns a percentage completed 
+ * When an action uses determinated mode, it assigns a percentage completed
  * that is a number between 0 and 100, with 0 being the start of
  * the task and 100 being the end of the task.
  */
@@ -605,7 +605,7 @@ public:
 
 	/** on of  either determinate or indeterminate */
 	t4p::ActionClass::ProgressMode Mode;
-	
+
 	/** a number between 0 and 100 */
 	int PercentComplete;
 
@@ -625,7 +625,7 @@ public:
  * copy any strings that we pass from one thread to another.
  */
 class ActionEventClass : public wxEvent {
-	
+
 public:
 
 	/**
@@ -634,9 +634,9 @@ public:
 	wxString Message;
 
 	ActionEventClass(int id, wxEventType type, const wxString& msg);
-		
+
 	wxEvent* Clone() const;
-	
+
 };
 
 typedef void (wxEvtHandler::*ActionEventClassFunction)(t4p::ActionEventClass&);

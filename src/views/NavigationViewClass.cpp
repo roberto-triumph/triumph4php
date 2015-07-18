@@ -30,7 +30,7 @@
 #include <widgets/FileTypeImageList.h>
 #include <globals/Number.h>
 
-t4p::NavigationViewClass::NavigationViewClass() 
+t4p::NavigationViewClass::NavigationViewClass()
 : FeatureViewClass() {
 }
 
@@ -49,10 +49,10 @@ void t4p::NavigationViewClass::OnEditNavigatePane(wxCommandEvent& event) {
 	std::vector<t4p::CodeControlClass*>codeCtrls = AllCodeControls();
 	wxAuiNotebook* tools = GetToolsNotebook();
 	wxAuiNotebook* outline = GetOutlineNotebook();
-	if (!codeCtrls.empty() ||( tools && tools->GetPageCount() > 0) 
+	if (!codeCtrls.empty() ||( tools && tools->GetPageCount() > 0)
 			|| (outline && outline->GetPageCount() > 0)) {
 		t4p::NavigationChoiceClass choice;
-		t4p::NavigationViewDialogClass dialog(GetMainWindow(), 
+		t4p::NavigationViewDialogClass dialog(GetMainWindow(),
 			*this, *AuiManager,
 			t4p::AuiVisibleCodeNotebooks(*AuiManager), outline,
 			tools, choice
@@ -73,25 +73,25 @@ void t4p::NavigationViewClass::OnEditNavigatePane(wxCommandEvent& event) {
 t4p::NavigationChoiceClass::NavigationChoiceClass()
 : Notebook(NULL)
 , PageIndex(wxNOT_FOUND) {
-	
+
 }
 
-t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent, 
+t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 	t4p::NavigationViewClass& view,
 	wxAuiManager& auiManager,
 	std::vector<t4p::NotebookClass*> codeNotebooks,
-	wxAuiNotebook* outlineNotebook, 
+	wxAuiNotebook* outlineNotebook,
 	wxAuiNotebook* toolsNotebook,
 	t4p::NavigationChoiceClass& choice)
 : NavigationViewDialogGeneratedClass(parent)
 , CodeNotebooks(codeNotebooks)
 , OutlineNotebook(outlineNotebook)
-, ToolsNotebook(toolsNotebook) 
+, ToolsNotebook(toolsNotebook)
 , Choice(choice) {
 	wxImageList* fileImageList = new wxImageList(16, 16);
 	t4p::FileTypeImageList(*fileImageList);
 	FilesList->AssignImageList(fileImageList, wxIMAGE_LIST_SMALL);
-	
+
 	wxArrayString files;
 	int newRowNumber = 0;
 	bool doShowNotebookName =  CodeNotebooks.size() > 1;
@@ -109,11 +109,11 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 				CodeNotebooks[i]->GetCodeControl(p)->GetFileType()
 			));
 			FilesList->InsertItem(column1);
-			
+
 			newRowNumber++;
 		}
 	}
-	
+
 	newRowNumber = 0;
 	for (size_t i = 0; i < OutlineNotebook->GetPageCount(); i++) {
 		wxString value = OutlineNotebook->GetPageText(i);
@@ -122,7 +122,7 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 			column1.SetId(newRowNumber);
 			column1.SetText(value);
 			PanelsList->InsertItem(column1);
-			
+
 			newRowNumber++;
 	}
 	for (size_t i = 0; i < ToolsNotebook->GetPageCount(); i++) {
@@ -132,10 +132,10 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 			column1.SetId(newRowNumber);
 			column1.SetText(value);
 			PanelsList->InsertItem(column1);
-			
+
 			newRowNumber++;
 	}
-	
+
 	if (PanelsList->GetItemCount() == 0) {
 		BodySizer->Remove(PanelsSizer);
 		BodySizer->SetCols(1);
@@ -144,7 +144,7 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 		BodySizer->Remove(FilesSizer);
 		BodySizer->SetCols(1);
 	}
-	
+
 	if (FilesList->GetItemCount() > 0) {
 		FilesList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		FilesList->SetFocus();
@@ -153,7 +153,7 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 		PanelsList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		PanelsList->SetFocus();
 	}
-	
+
 	BodySizer->Layout();
 }
 

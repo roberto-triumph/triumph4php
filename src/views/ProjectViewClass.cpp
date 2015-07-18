@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,7 +38,7 @@
 #include <wx/choicdlg.h>
 #include <algorithm>
 
-t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature) 
+t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 	: FeatureViewClass()
 	, Feature(feature) {
 }
@@ -46,7 +46,7 @@ t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 void t4p::ProjectViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(t4p::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
-	
+
 }
 
 void t4p::ProjectViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -55,7 +55,7 @@ void t4p::ProjectViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
-	
+
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
 	// the project sources
@@ -87,22 +87,22 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 		Feature.App.EventSink.Publish(evt);
 		wxConfigBase* config = wxConfig::Get();
 		config->Flush();
-		
+
 		// order here is important for
-		// suppression to work properly .. not the best 
+		// suppression to work properly .. not the best
 		// but it'll do for now
-		// what happens when the user removes a project and 
+		// what happens when the user removes a project and
 		// adds the same project back at the same time?
 		if (!removedProjects.empty()) {
 			t4p::ProjectEventClass removedEvt(t4p::EVENT_APP_PROJECTS_REMOVED, removedProjects);
 			Feature.App.EventSink.Publish(removedEvt);
 		}
-		
+
 		if (!touchedProjects.empty()) {
 			t4p::ProjectEventClass updateEvt(t4p::EVENT_APP_PROJECTS_UPDATED, touchedProjects);
 			Feature.App.EventSink.Publish(updateEvt);
 		}
-		
+
 
 		// signal that this app has modified the config file, that way the external
 		// modification check fails and the user will not be prompted to reload the config
@@ -129,12 +129,12 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 			}
 		}
 		Feature.App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
-				
+
 	}
 }
 
 void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
-	
+
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
 	// the project sources
@@ -160,7 +160,7 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 	wxDirDialog dirDialog(GetMainWindow(), _("Choose Project Root Directory"));
 	if (dirDialog.ShowModal() == wxID_OK) {
 		wxString dir = dirDialog.GetPath();
-		
+
 		// start the sequence that will update all global data structures
 		// delete the cache files for the projects the user has removed
 		// remove tags from deleted projects
@@ -181,7 +181,7 @@ void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
 	}
 }
 
-t4p::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, t4p::ProjectFeatureClass &projectFeature) 
+t4p::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent, t4p::ProjectFeatureClass &projectFeature)
 : ProjectPreferencesGeneratedPanelClass(parent) {
 	NonEmptyTextValidatorClass phpFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.PhpFileExtensionsString, PhpLabel);
 	PhpFileExtensions->SetValidator(phpFileExtensionsValidator);
@@ -191,41 +191,41 @@ t4p::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent
 
 	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass jsFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.JsFileExtensionsString, JsLabel);
 	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
 
 	NonEmptyTextValidatorClass configFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.ConfigFileExtensionsString, ConfigLabel);
 	ConfigFileExtensions->SetValidator(configFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass crontabFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.CrontabFileExtensionsString, CrontabLabel);
 	CrontabFileExtensions->SetValidator(crontabFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass yamlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.YamlFileExtensionsString, YamlLabel);
 	YamlFileExtensions->SetValidator(yamlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass xmlFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.XmlFileExtensionsString, XmlLabel);
 	XmlFileExtensions->SetValidator(xmlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass rubyFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.RubyFileExtensionsString, RubyLabel);
 	RubyFileExtensions->SetValidator(rubyFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass luaFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.LuaFileExtensionsString, LuaLabel);
 	LuaFileExtensions->SetValidator(luaFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass markdownFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MarkdownFileExtensionsString, MarkdownLabel);
 	MarkdownFileExtensions->SetValidator(markdownFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass bashFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.BashFileExtensionsString, BashLabel);
 	BashFileExtensions->SetValidator(bashFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass diffFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.DiffFileExtensionsString, DiffLabel);
 	DiffFileExtensions->SetValidator(diffFileExtensionsValidator);
-	
-	
+
+
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
-	
+
 }
 
 t4p::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project)
@@ -270,7 +270,7 @@ void t4p::ProjectDefinitionDialogClass::OnRemoveSource(wxCommandEvent& event) {
 		wxString msg = _("Are you sure you wish to remove the source? ");
 		msg += src.RootDirectory.GetFullPath();
 		msg += wxT("\n");
-		msg += 
+		msg +=
 			_("Triumph will no longer open or index files in the directory. Note that the directory is not actually deleted from the file system");
 		wxString caption = _("Remove Project Source");
 		int response = wxMessageBox(msg, caption, wxYES_NO, this);
@@ -354,7 +354,7 @@ t4p::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vecto
 	: ProjectListDialogGeneratedClass(parent)
 	, Projects(projects)
 	, EditedProjects(projects)
-	, RemovedProjects(removedProjects) 
+	, RemovedProjects(removedProjects)
 	, TouchedProjects(touchedProjects) {
 	Populate();
 	if (!ProjectsList->IsEmpty()) {
@@ -395,7 +395,7 @@ void t4p::ProjectListDialogClass::OnProjectsListDoubleClick(wxCommandEvent& even
 				label.Replace(wxT("&"), wxT("&&"));
 			}
 			ProjectsList->SetString(selection, label);
-			
+
 			// on linux, setting the string causes the checkbox to not
 			// be drawn and it makes it look like the project is
 			// disabled
@@ -450,7 +450,7 @@ void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 				projectLabels += wxT("\n");
 			}
 		}
-		
+
 		wxString msg = _("Are you sure you wish to remove the projects\n\n");
 		msg += projectLabels;
 		msg += wxT("\n");
@@ -465,14 +465,14 @@ void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 
 			for (size_t i = 0; i < EditedProjects.size(); ++i) {
 
-				// we dont find the index in the selected list means that the 
+				// we dont find the index in the selected list means that the
 				// user does NOT want to remove it
 				if (selections.Index(i) == wxNOT_FOUND) {
 					remainingProjects.push_back(EditedProjects[i]);
 					remainingLabels.Add(EditedProjects[i].Label);
 				}
 				else {
-					RemovedProjects.push_back(EditedProjects[i]);	
+					RemovedProjects.push_back(EditedProjects[i]);
 				}
 			}
 			EditedProjects = remainingProjects;
@@ -498,7 +498,7 @@ void t4p::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 		if (wxOK == dialog.ShowModal()) {
 			EditedProjects[selection] = project;
 			wxString label = project.Label;
-			
+
 			// escape any ampersands in the label, list box needs them escaped
 			// only happens in win32
 			wxPlatformInfo info = wxPlatformInfo::Get();
@@ -506,7 +506,7 @@ void t4p::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 				label.Replace(wxT("&"), wxT("&&"));
 			}
 			ProjectsList->SetString(selection, label);
-			
+
 			// on linux, setting the string causes the checkbox to not
 			// be drawn and it makes it look like the project is
 			// disabled
@@ -525,7 +525,7 @@ void t4p::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
 
 		// if a project is disabled then we wont need to update the cache so we can
-		// leave it as not touched. 
+		// leave it as not touched.
 		// short circuiting the loop since comparing source lists was shown to be expensive
 		// under a profiler.
 		if (!editedProject->IsEnabled) {
@@ -533,7 +533,7 @@ void t4p::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 		}
 
 		// if we dont find the edited project in the original project, then it has been changed
-		// by the reverse, if we find the edited project in the original projects list then it has 
+		// by the reverse, if we find the edited project in the original projects list then it has
 		/// NOT changed
 		bool touched = true;
 		for (project = Projects.begin(); project != Projects.end(); ++project) {
@@ -551,7 +551,7 @@ void t4p::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
 			TouchedProjects.push_back(*editedProject);
 		}
 	}
-	
+
 	Projects = EditedProjects;
 	EndModal(wxOK);
 }
@@ -595,7 +595,7 @@ void t4p::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event
 			cont = !subDirs.IsEmpty();
 			if (!subDirs.IsEmpty()) {
 				int choice = wxGetSelectedChoices(
-					selections, 
+					selections,
 					wxString::Format(_("There are %ld projects. Please choose directories to create projects for"), subDirs.size()),
 					_("Add Multiple"),
 					subDirs,
@@ -618,12 +618,12 @@ void t4p::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event
 					project.AddSource(newSrc);
 					project.IsEnabled = true;
 					project.Label = chosenSubDir;
-				
+
 					AddProject(project);
 				}
 			}
 			else if (subDirs.empty()) {
-				wxMessageBox(_("Directory does not contain any sub-directories"), 
+				wxMessageBox(_("Directory does not contain any sub-directories"),
 					_("Add Projects From Directory"), wxCENTRE, this);
 			}
 		}

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,7 +58,7 @@ bool t4p::UrlTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t
 	return true;
 }
 
-wxString t4p::UrlTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+wxString t4p::UrlTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals,
 													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	t4p::SourceClass source = project.Sources[0];
@@ -92,7 +92,7 @@ wxString t4p::UrlTagDetectorClass::Label() {
 	return _("URL Detectors");
 }
 
-t4p::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass() 
+t4p::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass()
 	: DetectorClass() {
 
 }
@@ -141,7 +141,7 @@ bool t4p::TagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p:
 	return true;
 }
 
-wxString t4p::TagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+wxString t4p::TagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals,
 													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	t4p::SourceClass source = project.Sources[0];
@@ -182,7 +182,7 @@ bool t4p::DatabaseTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, co
 	return true;
 }
 
-wxString t4p::DatabaseTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+wxString t4p::DatabaseTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals,
 													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
 	t4p::SourceClass source = project.Sources[0];
@@ -221,12 +221,12 @@ bool t4p::ConfigTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, cons
 	return true;
 }
 
-wxString t4p::ConfigTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals, 
+wxString t4p::ConfigTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals,
 													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
-	
-	t4p::SourceClass source = project.Sources[0];														  
-	
+
+	t4p::SourceClass source = project.Sources[0];
+
 	t4p::ConfigTagDetectorParamsClass params;
 	params.PhpExecutablePath = globals.Environment.Php.PhpExecutablePath;
 	params.PhpIncludePath = t4p::PhpDetectorsBaseAsset();
@@ -267,7 +267,7 @@ void t4p::DetectorFeatureClass::RunUrlDetectors() {
 
 	// the sequence class will own this pointer
 	actions.push_back(
-		new t4p::UrlTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR)	
+		new t4p::UrlTagDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR)
 	);
 	App.Sequences.Build(actions);
 }
@@ -282,7 +282,7 @@ void t4p::DetectorFeatureClass::RunTemplateFileDetectors() {
 	// the sequence class will own this pointer
 	t4p::CallStackActionClass* callStackAction =  new t4p::CallStackActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
 	t4p::UrlTagClass urlTag = App.Globals.CurrentUrl;
-	
+
 	if (!urlTag.Url.GetServer().IsEmpty() && urlTag.FileName.IsOk()
 		&& !urlTag.ClassName.IsEmpty() && !urlTag.MethodName.IsEmpty()) {
 		callStackAction->SetCallStackStart(urlTag.FileName,
@@ -296,7 +296,7 @@ void t4p::DetectorFeatureClass::RunTemplateFileDetectors() {
 		App.Sequences.Build(actions);
 	}
 	else {
-		t4p::EditorLogWarningFix("Template Error", 
+		t4p::EditorLogWarningFix("Template Error",
 			_("Need to choose a URL to detect templates for. Template files feature depends on the URL detectors feature."));
 	}
 }

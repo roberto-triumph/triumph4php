@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -83,17 +83,17 @@ public:
 
 	int Id;
 
-	IdTreeItemDataClass(int id) 
+	IdTreeItemDataClass(int id)
 		: wxTreeItemData()
 		, Id(id) {
-		
+
 	}
 
 };
 }
 
 t4p::OutlineViewClass::OutlineViewClass(t4p::OutlineFeatureClass& feature)
-	: FeatureViewClass() 
+	: FeatureViewClass()
 	, Feature(feature) {
 }
 
@@ -114,7 +114,7 @@ void t4p::OutlineViewClass::JumpToResource(int tagId) {
 		LoadCodeControl(tag.GetFullPath());
 		CodeControlClass* codeControl = GetCurrentCodeControl();
 		if (codeControl) {
-			int32_t position, 
+			int32_t position,
 				length;
 			bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
 			if (found) {
@@ -132,7 +132,7 @@ void t4p::OutlineViewClass::StartTagSearch(const std::vector<UnicodeString>& sea
 }
 
 void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
-	
+
 	// create / open the outline window
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	OutlineViewPanelClass* outlineViewPanel = NULL;
@@ -144,7 +144,7 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 	else {
 		outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, Feature, *this);
 		wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
-		AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap); 
+		AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap);
 	}
 
 	// get all classes / functions for the active file
@@ -159,7 +159,7 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 void t4p::OutlineViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& event) {
 	wxWindow* window = wxWindow::FindWindowById(ID_WINDOW_OUTLINE, GetOutlineNotebook());
 
-	// only change the outline if the user is looking at the outline.  otherwise, it gets 
+	// only change the outline if the user is looking at the outline.  otherwise, it gets
 	// annoying if the user is looking at run output, switches PHP files, and the outline
 	// gets changed.
 	if (window != NULL && IsOutlineWindowSelected(ID_WINDOW_OUTLINE)) {
@@ -186,7 +186,7 @@ void t4p::OutlineViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 }
 
 void t4p::OutlineViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-	
+
 	//if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	if (window != NULL) {
@@ -208,7 +208,7 @@ void t4p::OutlineViewClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventC
 	}
 }
 
-t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature, 
+t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId, OutlineFeatureClass& feature,
 		OutlineViewClass& view)
 	: OutlineViewGeneratedPanelClass(parent, windowId)
 	, OutlinedTags()
@@ -217,9 +217,9 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	, View(view)
 	, ShowMethods(true)
 	, ShowProperties(true)
-	, ShowConstants(true) 
+	, ShowConstants(true)
 	, ShowInherited(false)
-	, ShowPublicOnly(false) 
+	, ShowPublicOnly(false)
 	, ShowFunctionArgs(false)
 	, SortByName(true)
 	, SortByType(false) {
@@ -230,7 +230,7 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	HelpButtonIcon(HelpButton);
 
 	SetStatus(_(""));
-	
+
 	ImageList = new wxImageList(16, 16);
 	ImageList->Add(t4p::BitmapImageAsset(wxT("outline")));
 	ImageList->Add(t4p::BitmapImageAsset(wxT("document-php")));
@@ -253,7 +253,7 @@ t4p::OutlineViewPanelClass::OutlineViewPanelClass(wxWindow* parent, int windowId
 	// let the tree control managet the image list
 	// since it may need to use it in the destructor
 	Tree->AssignImageList(ImageList);
-	
+
 	Tree->SetIndent(10);
 }
 
@@ -283,20 +283,20 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 		// when search is a filename, the label is a full path to a file
 		if (fileId.IsOk() && searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
-			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label));
 		}
 		else if (searchTag->IsLabelFileName()) {
-			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label)); 
+			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label));
 		}
 		else if (fileId.IsOk() && !searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
-			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
+			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0);
 		}
 		else {
-			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0); 
+			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0);
 		}
 
-		std::map<wxString, std::vector<t4p::PhpTagClass> >::iterator mapTag; 		
+		std::map<wxString, std::vector<t4p::PhpTagClass> >::iterator mapTag;
 		std::vector<t4p::PhpTagClass>::const_iterator memberTag;
 		for (mapTag = searchTag->Tags.begin(); mapTag != searchTag->Tags.end(); ++mapTag) {
 			wxTreeItemId parent;
@@ -304,7 +304,7 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 				parent = fileId;
 			}
 			else {
-				parent = Tree->AppendItem(fileId, mapTag->first, IMAGE_OUTLINE_CLASS); 
+				parent = Tree->AppendItem(fileId, mapTag->first, IMAGE_OUTLINE_CLASS);
 			}
 			if (SortByName) {
 				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByName);
@@ -312,9 +312,9 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 			else if (SortByType) {
 				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByTypeAndName);
 			}
-			
+
 			// display all tags for this class or the class's base classes
-			for (memberTag = mapTag->second.begin(); memberTag !=  mapTag->second.end(); ++memberTag) {					
+			for (memberTag = mapTag->second.begin(); memberTag !=  mapTag->second.end(); ++memberTag) {
 				TagToNode(*memberTag, parent, t4p::WxToIcu(mapTag->first));
 			}
 		}
@@ -341,7 +341,7 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 	}
 	bool isInheritedTag = tagClassName.caseCompare(classNameNode, 0) != 0;
 	if (!classNameNode.isEmpty() && !ShowInherited) {
-		
+
 		// make sure that the inheritance check passes too
 		passesAccessCheck = passesAccessCheck && !isInheritedTag;
 	}
@@ -401,11 +401,11 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 		if (ShowFunctionArgs) {
 
 			// add the function args under the method name
-			int32_t argsStart = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("(")); 
-			int32_t argsEnd = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(")")); 
+			int32_t argsStart = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("("));
+			int32_t argsEnd = tag.Signature.indexOf(UNICODE_STRING_SIMPLE(")"));
 			if (argsStart > 0 && argsEnd > 0) {
 				UnicodeString sig(tag.Signature, argsStart + 1, argsEnd - argsStart - 1);
-				
+
 				wxStringTokenizer tok(t4p::IcuToWx(sig), wxT(","));
 				while (tok.HasMoreTokens()) {
 					Tree->AppendItem(funcId, tok.NextToken(), IMAGE_OUTLINE_ARGUMENT, -1, new t4p::IdTreeItemDataClass(tag.Id));
@@ -424,7 +424,7 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 		wxString label = t4p::IcuToWx(res);
 
 		// add the function signature to the label
-		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("function ")); 
+		int32_t sigIndex = tag.Signature.indexOf(UNICODE_STRING_SIMPLE("function "));
 		if (sigIndex >= 0) {
 			UnicodeString sig(tag.Signature, sigIndex + 9);
 			label = t4p::IcuToWx(sig);
@@ -500,16 +500,16 @@ void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 
 void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::PhpTagClass>& tags) {
 
-	// each tag could be a file or a class tag. 
+	// each tag could be a file or a class tag.
 	//if its a class tag, get all of members for the class
 	std::vector<t4p::PhpTagClass>::const_iterator chosenTag;
 	std::vector<UnicodeString> searchStrings;
-		
+
 	for (chosenTag = tags.begin(); chosenTag != tags.end(); ++chosenTag) {
 		if (chosenTag->Identifier.indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
-			
+
 			// user chose a file: get all classes / functions for that file
-			searchStrings.push_back(t4p::WxToIcu(chosenTag->FullPath));		
+			searchStrings.push_back(t4p::WxToIcu(chosenTag->FullPath));
 		}
 		else {
 
@@ -521,17 +521,17 @@ void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::PhpT
 }
 
 void t4p::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
-	
+
 	// show the delete menu only on the first level items
 	wxTreeItemId itemId = event.GetItem();
 	wxTreeItemId rootId = Tree->GetRootItem();
-	
+
 	// set the node that was clicked on, that way the context
 	// menu handlers know to work on the item that was clicked , which may
-	// not be the tree selected item 
+	// not be the tree selected item
 	Tree->SelectItem(itemId);
 	wxMenu menu;
-	if (itemId.IsOk() && rootId == Tree->GetItemParent(itemId)) {		
+	if (itemId.IsOk() && rootId == Tree->GetItemParent(itemId)) {
 		menu.Append(ID_OUTLINE_MENU_DELETE, _("Delete"), _("Delete the item from the tree"));
 	}
 	if (itemId.IsOk() && Tree->HasChildren(itemId)) {
@@ -544,7 +544,7 @@ void t4p::OutlineViewPanelClass::OnTreeItemRightClick(wxTreeEvent& event) {
 
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, _("Show Properties"), _("Toggle showing properties in the outline"));
 	item->Check(ShowProperties);
-	
+
 	item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 	item->Check(ShowConstants);
 
@@ -582,7 +582,7 @@ void t4p::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_PROPERTIES, _("Show Properties"), _("Toggle showing properties in the outline"));
 		item->Check(ShowProperties);
-		
+
 		item = menu.AppendCheckItem(ID_OUTLINE_MENU_TOGGLE_CONSTANTS, _("Show Class Constants"), _("Toggle showing class constants in the outline"));
 		item->Check(ShowConstants);
 
@@ -597,10 +597,10 @@ void t4p::OutlineViewPanelClass::OnFilterLeftDown(wxMouseEvent& event) {
 
 		FilterButton->PopupMenu(&menu, pos);
 	}
-	
+
 	// according to docs, always allow default processing of mouse down events to take place
 	//
-	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// The handler of this event should normally call event.Skip() to allow the default processing to take
 	// place as otherwise the window under mouse wouldn't get the focus.
 	event.Skip();
 }
@@ -623,13 +623,13 @@ void t4p::OutlineViewPanelClass::OnSortLeftDown(wxMouseEvent& event) {
 
 	// according to docs, always allow default processing of mouse down events to take place
 	//
-	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// The handler of this event should normally call event.Skip() to allow the default processing to take
 	// place as otherwise the window under mouse wouldn't get the focus.
 	event.Skip();
 }
 
 void t4p::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
-	
+
 	// only allow deletion on the first level items
 	wxTreeItemId rootId = Tree->GetRootItem();
 	wxTreeItemId itemId = Tree->GetSelection();
@@ -679,7 +679,7 @@ void t4p::OutlineViewPanelClass::OnTreeMenuExpandAll(wxCommandEvent& event) {
 void t4p::OutlineViewPanelClass::RedrawOutline() {
 	std::vector<t4p::OutlineSearchCompleteClass> tags = OutlinedTags;
 	OutlinedTags.clear(); // AddFileToOutline will add the given tags to this list
-	AddTagsToOutline(tags);		
+	AddTagsToOutline(tags);
 }
 
 void t4p::OutlineViewPanelClass::OnMethodsClick(wxCommandEvent& event) {
@@ -742,7 +742,7 @@ void t4p::FileSearchDialogClass::Init() {
 	for (size_t i = 0; i < Feature.App.Globals.Projects.size(); ++i) {
 		if (Feature.App.Globals.Projects[i].IsEnabled) {
 
-			// should be ok to reference this vector since it wont change because this is a 
+			// should be ok to reference this vector since it wont change because this is a
 			// modal dialog
 			ProjectChoice->Append(Feature.App.Globals.Projects[i].Label, &Feature.App.Globals.Projects[i]);
 		}
@@ -791,7 +791,7 @@ void t4p::FileSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	int selection = MatchesList->GetSelection();
-	if (keyCode == WXK_DOWN) {		
+	if (keyCode == WXK_DOWN) {
 		if (!MatchesList->IsEmpty() && t4p::NumberLessThan(selection, (MatchesList->GetCount() - 1))) {
 			MatchesList->SetSelection(selection + 1);
 		}
@@ -849,7 +849,7 @@ void t4p::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& fullPath)
 
 		// remove the file from the outlined tags list
 		std::vector<t4p::OutlineSearchCompleteClass>::iterator it = OutlinedTags.begin();
-		
+
 		while(it != OutlinedTags.end()) {
 			if (it->Label == label)  {
 				it = OutlinedTags.erase(it);
@@ -890,7 +890,7 @@ void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std
 	if (!showAllProjects) {
 		selectedProject = (t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
 	}
-	
+
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString projectLabel;
@@ -945,7 +945,7 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 			}
 		}
 		if (checks.Count() > 1) {
-		
+
 			// open the checked items
 			for (size_t i = 0; i < checks.Count(); ++i) {
 				size_t matchIndex = checks.Item(i);

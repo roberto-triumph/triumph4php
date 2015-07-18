@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,14 +27,14 @@
 #include <search/RecursiveDirTraverserClass.h>
 #include <globals/Assets.h>
 
-t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId) 
+t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
 	, Projects()
 	, FileTypes()
 	, DirectorySearch()
 	, TagFinderList()
-	, DoTouchedProjects(false) 
-	, FilesCompleted(0) 
+	, DoTouchedProjects(false)
+	, FilesCompleted(0)
 	, FilesTotal(0) {
 }
 
@@ -46,7 +46,7 @@ void t4p::ProjectTagActionClass::SetTouchedProjects(const std::vector<t4p::Proje
 bool t4p::ProjectTagActionClass::Init(t4p::GlobalsClass& globals) {
 	SetStatus(_("Tag Cache"));
 	SetProgressMode(t4p::ActionClass::DETERMINATE);
-	
+
 	// ATTN: assumes that all projects have the same extension
 	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
@@ -73,14 +73,14 @@ void t4p::ProjectTagActionClass::BackgroundWork() {
 		t4p::ProjectClass project = Projects[i];
 		if (DirectorySearch.Init(project.AllSources(FileTypes), t4p::DirectorySearchClass::PRECISE)) {
 			FilesTotal = DirectorySearch.GetTotalFileCount();
-			SetStatus(_("Tag Cache / ") + project.Label);			
+			SetStatus(_("Tag Cache / ") + project.Label);
 			IterateDirectory();
 		}
 	}
 }
 
 void t4p::ProjectTagActionClass::IterateDirectory() {
-	
+
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
 		TagFinderList.Walk(DirectorySearch);
@@ -135,7 +135,7 @@ void t4p::ProjectTagInitActionClass::Work(t4p::GlobalsClass &globals) {
 	globals.TagCache.Clear();
 	pelet::Versions version = globals.Environment.Php.Version;
 	std::vector<wxString> otherFileExtensions = globals.FileTypes.GetNonPhpFileExtensions();
-	
+
 	// the tag cache will own the global cache pointers
 	// register the project tag DB file now so that it is available for code completion
 	// even though we know it is stale. The user is notified that the
@@ -162,9 +162,9 @@ void t4p::ProjectTagInitActionClass::Work(t4p::GlobalsClass &globals) {
 }
 
 t4p::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, Project()
-	, Dir() 
+	, Dir()
 	, TagFinderList() {
 
 }
@@ -197,7 +197,7 @@ bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
 		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
 	}
-	return isDirFromProject; 
+	return isDirFromProject;
 }
 
 void t4p::ProjectTagDirectoryActionClass::BackgroundWork() {
@@ -214,7 +214,7 @@ void t4p::ProjectTagDirectoryActionClass::BackgroundWork() {
 			// this specific sequence is needed so that the source_id
 			// is set properly in the database
 			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
-			
+
 			std::vector<wxString> fullPaths;
 			t4p::RecursiveDirTraverserClass traverser(fullPaths);
 			wxDir dir;
@@ -222,7 +222,7 @@ void t4p::ProjectTagDirectoryActionClass::BackgroundWork() {
 				dir.Traverse(traverser, wxEmptyString, wxDIR_DIRS | wxDIR_FILES);
 				for (size_t i = 0; i < fullPaths.size(); ++i) {
 					TagFinderList.TagParser.Walk(fullPaths[i]);
-				}			
+				}
 			}
 			TagFinderList.TagParser.EndSearch();
 			break;
@@ -235,9 +235,9 @@ wxString t4p::ProjectTagDirectoryActionClass::GetLabel() const {
 }
 
 t4p::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) 
+	: GlobalActionClass(runningThreads, eventId)
 	, Project()
-	, FileName() 
+	, FileName()
 	, TagFinderList() {
 
 }
@@ -260,11 +260,11 @@ bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 		}
 	}
 	if (isFileFromProject) {
-		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
 			globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 
 	}
-	return isFileFromProject; 
+	return isFileFromProject;
 }
 
 void t4p::ProjectTagSingleFileActionClass::BackgroundWork() {
@@ -307,7 +307,7 @@ void t4p::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& oldPat
 }
 
 bool t4p::ProjectTagSingleFileRenameActionClass::Init(t4p::GlobalsClass& globals) {
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
 		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator src;
@@ -331,20 +331,20 @@ void t4p::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 
 	// checking to see if this rename was an actual permanent rename as opposed to
 	// file shuffling by apps.
-	// some apps (notably VIM) will do unexpected things like rename a file when 
+	// some apps (notably VIM) will do unexpected things like rename a file when
 	// they open it, then right away create a new file with the original name. if we captured a file rename
-	// but the old file still exists, assume that the old file was put right back. 
+	// but the old file still exists, assume that the old file was put right back.
 	bool oldFileExists = OldFileName.FileExists();
-	
+
 	// check to see if the original file was previosuly parsed
 	// if the original file was previosuly parsed, just rename the file (no need to retag the file)
 	if (!oldFileExists && TagFinderList.TagFinder.HasFullPath(OldFileName.GetFullPath())) {
 		TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
 	}
 	else if (!oldFileExists) {
-		
+
 		// tag the file since we have never seen it. this could be the same
-		// for example, when file with a non-php extension is renamed to have a 
+		// for example, when file with a non-php extension is renamed to have a
 		// php extension
 		// this specific sequence is needed so that the source_id
 		// is set properly in the database
@@ -379,7 +379,7 @@ void t4p::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& oldPath
 }
 
 bool t4p::ProjectTagDirectoryRenameActionClass::Init(t4p::GlobalsClass& globals) {
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), 
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
 		globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
 	return TagFinderList.IsTagFinderInit;
 }

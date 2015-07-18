@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -54,7 +54,7 @@ const int ID_MENU_ADD_SUPRESSION = wxNewId();
 /**
  * the maximum amount of errored files to tolerate.
  * Any more files than this anf we risk having too
- * many error instances in memory. Also, there is 
+ * many error instances in memory. Also, there is
  * way the user is going through every single file
  */
 static const int MAX_LINT_ERROR_FILES = 100;
@@ -63,7 +63,7 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id,
 														t4p::LintFeatureClass& feature,
 														t4p::LintViewClass& view,
 														wxWindow* topWindow)
-	: LintResultsGeneratedPanelClass(parent, id) 
+	: LintResultsGeneratedPanelClass(parent, id)
 	, Feature(feature)
 	, View(view)
 	, TopWindow(topWindow)
@@ -72,7 +72,7 @@ t4p::LintResultsPanelClass::LintResultsPanelClass(wxWindow *parent, int id,
 	RunButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check")));
 	SuppressionButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("lint-check-suppression")));
 	HelpButtonIcon(HelpButton);
-	
+
 	ErrorsList->AppendTextColumn(_("File"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 	ErrorsList->AppendTextColumn(_("Line  Number"), wxDATAVIEW_CELL_INERT,
@@ -94,16 +94,16 @@ void t4p::LintResultsPanelClass::AddErrors(const std::vector<pelet::LintResultsC
 	std::vector<pelet::LintResultsClass>::const_iterator it;
 	for (it = lintErrors.begin(); it != lintErrors.end(); ++it) {
 		pelet::LintResultsClass lintError = *it;
-		
+
 		Feature.LintErrors.push_back(lintError);
-		
+
 		wxString wxFile = t4p::IcuToWx(lintError.UnicodeFilename);
 		wxString errorMsg = t4p::IcuToWx(lintError.Error);
 		wxVector<wxVariant> values;
 		values.push_back(wxFile);
 		values.push_back(wxString::Format(wxT("%d"), lintError.LineNumber));
 		values.push_back(errorMsg);
-		
+
 		ErrorsList->AppendItem(values);
 	}
 }
@@ -116,8 +116,8 @@ void t4p::LintResultsPanelClass::ClearErrors() {
 }
 
 void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
-	
-	// remove the lint result data structures as well as the 
+
+	// remove the lint result data structures as well as the
 	// display list
 	std::vector<pelet::LintResultsClass>::iterator it = Feature.LintErrors.begin();
 	int i = 0;
@@ -166,7 +166,7 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 	}
 	else if (SkippedFiles > 0) {
 		this->Label->SetLabel(
-			wxString::Format(_("Found %d files with errors; checked %d files; skipped %d files"), 
+			wxString::Format(_("Found %d files with errors; checked %d files; skipped %d files"),
 			ErrorFiles, TotalFiles, SkippedFiles)
 		);
 	}
@@ -175,7 +175,7 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles)
 		);
 	}
-	
+
 	// now resize the columns so that the errors can be seen
 	t4p::DataViewGridAutoSizeAllColumns(ErrorsList);
 }
@@ -198,7 +198,7 @@ void t4p::LintResultsPanelClass::OnErrorContextMenu(wxDataViewEvent& event) {
 	menu.Append(ID_MENU_COPY_FILE, _("Copy File"));
 	menu.Append(ID_MENU_COPY_ERROR, _("Copy Error"));
 	menu.Append(ID_MENU_ADD_SUPRESSION, _("Add Suppression"));
-	
+
 	PopupMenu(&menu);
 }
 
@@ -209,7 +209,7 @@ void t4p::LintResultsPanelClass::OnCopyFile(wxCommandEvent& event) {
 	}
 	pelet::LintResultsClass results = Feature.LintErrors[index];
 	wxString file = t4p::IcuToWx(results.UnicodeFilename);
-	
+
 	if (wxTheClipboard->Open()) {
 		wxTheClipboard->AddData(new wxTextDataObject(file));
 		wxTheClipboard->Close();
@@ -234,67 +234,67 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 	if (!t4p::NumberLessThan(row, Feature.LintErrors.size())) {
 		return;
 	}
-	
+
 	// the linters provide the error info directly, but we don't
 	// get the specific lint errors at this point.
 	t4p::SuppressionRuleClass rule;
 	pelet::LintResultsClass results = Feature.LintErrors[row];
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown class "))  >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
-		
+
 		// 14 == length of  'unknown class '
 		results.Error.extractBetween(14, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown method ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
-		
+
 		// 15 == length of  'unknown method '
 		results.Error.extractBetween(15, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Unknown function ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
-		
+
 		// 17 = length of "unknown function "
 		results.Error.extractBetween(17, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Uninitialized variable ")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
-		
+
 		// 23 = length of "uninitialized variable "
 		results.Error.extractBetween(23, results.Error.length(), rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Missing arguments to function `")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH;
-		
+
 		// 31 = length of "Missing arguments to function `"
 		int32_t endTickPos = results.Error.indexOf('`', 32);
 		results.Error.extractBetween(31, endTickPos, rule.Target);
 	}
 	if (results.Error.indexOf(UNICODE_STRING_SIMPLE("Too many arguments to function `")) >= 0) {
 		rule.Type = t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH;
-		
+
 		// 32 = length of "Too many arguments to function `"
 		int32_t endTickPos = results.Error.indexOf('`', 33);
 		results.Error.extractBetween(32, endTickPos, rule.Target);
 	}
-	
+
 	if (!rule.Target.isEmpty()) {
-		
+
 		if (rule.Type != t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR) {
-			
-			// for unknown class/method/function, default the location to be the 
+
+			// for unknown class/method/function, default the location to be the
 			// source directory; if a class is not found in one file it will not
 			// be found in any files of the project
 			std::vector<t4p::ProjectClass>::const_iterator project;
 			std::vector<t4p::SourceClass>::const_iterator src;
 			bool isDirFromProject = false;
-			
+
 			for (project = Feature.App.Globals.Projects.begin(); !isDirFromProject && project != Feature.App.Globals.Projects.end(); ++project) {
 				if (project->IsEnabled) {
 					for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
 						if (src->IsInRootDirectory(results.File)) {
 							rule.Location.AssignDir(src->RootDirectory.GetPath());
-							isDirFromProject = true;							
+							isDirFromProject = true;
 							break;
 						}
 					}
@@ -304,20 +304,20 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 		else {
 			rule.Location.Assign(results.File);
 		}
-		
+
 		t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, rule);
 		if (dialog.ShowModal() == wxOK) {
-		
+
 			// now save the newly created
 			t4p::LintSuppressionClass suppressions;
 			std::vector<UnicodeString> errors;
-			
+
 			wxFileName suppressionFile = t4p::LintSuppressionsFileAsset();
 			suppressions.Init(suppressionFile, errors);
 			suppressions.Add(rule);
 			if (!suppressions.Save(suppressionFile)) {
 				t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
-			}		
+			}
 		}
 	}
 }
@@ -384,7 +384,7 @@ void t4p::LintResultsPanelClass::OnHelpButton(wxCommandEvent& event) {
 	dialog.ShowModal();
 }
 
-t4p::LintViewClass::LintViewClass(t4p::LintFeatureClass& feature) 
+t4p::LintViewClass::LintViewClass(t4p::LintFeatureClass& feature)
 	: FeatureViewClass()
 	, Feature(feature)
 	, RunningActionId(0) {
@@ -436,7 +436,7 @@ void t4p::LintViewClass::StartLint() {
 		std::vector<t4p::SourceClass>::const_iterator source;
 		for (source = phpSources.begin(); source != phpSources.end(); ++source) {
 			if (!source->Exists()) {
-				t4p::EditorLogError(t4p::ERR_INVALID_DIRECTORY, 
+				t4p::EditorLogError(t4p::ERR_INVALID_DIRECTORY,
 					source->RootDirectory.GetPath()
 				);
 			}
@@ -445,7 +445,7 @@ void t4p::LintViewClass::StartLint() {
 			RunningActionId = Feature.App.RunningThreads.Queue(reader);
 			t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->AddGauge(_("Lint Check"), ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-			
+
 			// create / open the results window
 			wxWindow* window = FindToolsWindow(ID_LINT_RESULTS_PANEL);
 			if (window) {
@@ -455,7 +455,7 @@ void t4p::LintViewClass::StartLint() {
 				SetFocusToToolsWindow(resultsPanel);
 			}
 			else {
-				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL, 
+				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL,
 						Feature, *this, GetMainWindow());
 				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
 				AddToolsWindow(resultsPanel, _("Lint Check"), wxEmptyString, lintBitmap);
@@ -526,13 +526,13 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 
 		// do not set focus the list, just the overlay
         // of the error
-        int i = Feature.LintErrors.size(); 
+        int i = Feature.LintErrors.size();
         resultsPanel->AddErrors(results);
-		resultsPanel->IncrementErrorFileCount(); 
+		resultsPanel->IncrementErrorFileCount();
 		resultsPanel->ShowLintError(i);
 	}
 	else if (codeControl && results.empty()) {
-		
+
 		// no errors!
 		codeControl->ClearLintErrors();
 	}
@@ -546,18 +546,18 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 		int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
 		int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
 		if (results[0].LineNumber < firstVisibleLine || results[0].LineNumber >= lastVisibleLine) {
-			
+
 			// the error is out of view show a message, remove any other existing message
-			
-			// freeze thaw the code control so that the popup is 
+
+			// freeze thaw the code control so that the popup is
 			// not drawn while its being moved into place
 			// in linux, freezing already happens internally so we don't
-			// want to do it here 
+			// want to do it here
 			wxPlatformInfo info;
 			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 				codeControl->Freeze();
 			}
-			
+
 			wxWindow* old = wxWindow::FindWindowById(ID_LINT_ERROR_PANEL, codeControl);
 			if (old) {
 				old->Destroy();
@@ -570,7 +570,7 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 			}
 			errorPanel->SetPosition(point);
 			errorPanel->SetFocus();
-			
+
 			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 				codeControl->Thaw();
 			}
@@ -596,7 +596,7 @@ void t4p::LintViewClass::OnLintComplete(t4p::ActionEventClass& event) {
 void t4p::LintViewClass::OnLintProgress(t4p::ActionProgressEventClass& event) {
 	t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	if (event.PercentComplete == 0) {
-			
+
 			// the start, turn the gauge into determinate mode
 			gauge->SwitchMode(ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);
 	}
@@ -623,10 +623,10 @@ void t4p::LintViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	if (hasErrors || Feature.Options.CheckOnSave) {
 		std::vector<pelet::LintResultsClass> lintResults;
 		t4p::LintBackgroundSingleFileClass* thread = new t4p::LintBackgroundSingleFileClass(
-			Feature.App.RunningThreads, ID_LINT_READER_SAVE, Feature.Options, t4p::LintSuppressionsFileAsset()			
+			Feature.App.RunningThreads, ID_LINT_READER_SAVE, Feature.Options, t4p::LintSuppressionsFileAsset()
 		);
 		bool good = thread->Init(fileName, Feature.App.Globals);
-	
+
 		// handle the case where user has saved a file but has not clicked
 		// on the Lint project button.
 		if (resultsPanel) {
@@ -652,7 +652,7 @@ void t4p::LintViewClass::OnNotebookPageClosed(wxAuiNotebookEvent& event) {
 			t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 			gauge->StopGauge(ID_LINT_RESULTS_GAUGE);
 		}
-		
+
 		// dont need to show the errors no need to keep the errors
 		Feature.LintErrors.clear();
 	}
@@ -672,9 +672,9 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 																t4p::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
-		
+
 	t4p::HelpButtonIcon(HelpButton);
-	
+
 	wxGenericValidator checkValidator(&Feature.Options.CheckOnSave);
 	CheckOnSave->SetValidator(checkValidator);
 
@@ -686,7 +686,7 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 
 	wxGenericValidator checkIdentifiersValidator(&Feature.Options.CheckUnknownIdentifiers);
 	CheckUnknownIdentifiers->SetValidator(checkIdentifiersValidator);
-	
+
 	wxGenericValidator checkFunctionArgumentCountValidator(&Feature.Options.CheckFunctionArgumentCount);
 	CheckFunctionArgumentCount->SetValidator(checkFunctionArgumentCountValidator);
 }
@@ -697,7 +697,7 @@ void t4p::LintPreferencesPanelClass::OnHelpClick(wxCommandEvent& event) {
 }
 
 t4p::LintErrorPanelClass::LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results)
-: LintErrorGeneratedPanelClass(parent, id) 
+: LintErrorGeneratedPanelClass(parent, id)
 , CodeControl(parent)
 , LintResults(results) {
 	wxString error = t4p::IcuToWx(results[0].Error);
@@ -739,7 +739,7 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 	DeleteButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("filter-delete")));
 	DeleteAllButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("stop")));
 	HelpButtonIcon(HelpButton);
-	
+
 	SuppressionsList->AppendTextColumn(_("Rule Type"), wxDATAVIEW_CELL_INERT,
 		wxCOL_WIDTH_AUTOSIZE, wxALIGN_LEFT, wxDATAVIEW_COL_RESIZABLE);
 	SuppressionsList->AppendTextColumn(_("Rule Target"), wxDATAVIEW_CELL_INERT,
@@ -760,11 +760,11 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 }
 
 void t4p::LintSuppressionsPanelClass::OnAddButton(wxCommandEvent& event) {
-	
+
 	t4p::SuppressionRuleClass newRule;
 	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, newRule);
 	if (wxOK == dialog.ShowModal()) {
-		
+
 		// update file and list control
 		Suppressions.Add(newRule);
 		SaveList();
@@ -773,10 +773,10 @@ void t4p::LintSuppressionsPanelClass::OnAddButton(wxCommandEvent& event) {
 }
 
 void t4p::LintSuppressionsPanelClass::OnDeleteAllButton(wxCommandEvent& event) {
-	int confirm = wxMessageBox(_("Are you sure you want to delete all suppressions?"), 
+	int confirm = wxMessageBox(_("Are you sure you want to delete all suppressions?"),
 		_("Lint Suppressions"), wxYES | wxNO | wxCENTER);
 	if (confirm == wxYES) {
-		
+
 		// update file and list control
 		Suppressions.Rules.clear();
 		SaveList();
@@ -789,7 +789,7 @@ void t4p::LintSuppressionsPanelClass::OnDeleteButton(wxCommandEvent& event) {
 	if (!t4p::NumberLessThan(row, Suppressions.Rules.size())) {
 		return;
 	}
-	
+
 	// update file and list control
 	Suppressions.Rules.erase(Suppressions.Rules.begin() + row);
 	SaveList();
@@ -804,11 +804,11 @@ void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 	t4p::SuppressionRuleClass editRule = Suppressions.Rules[row];
 	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, editRule);
 	if (wxOK == dialog.ShowModal()) {
-		
+
 		// update file and list control
 		Suppressions.Rules[row] = editRule;
 		SaveList();
-		
+
 		wxString wxTarget = t4p::IcuToWx(editRule.Target);
 		wxString wxFile = editRule.Location.IsDir() ? editRule.Location.GetPath() : editRule.Location.GetFullPath();
 		wxString wxType = _("");
@@ -872,10 +872,10 @@ void t4p::LintSuppressionsPanelClass::PopulateList() {
 	if (!Suppressions.Rules.empty()) {
 		SuppressionsList->SelectRow(0);
 	}
-	
+
 	// now resize the columns so that the suppressions can be seen
 	t4p::DataViewGridAutoSizeAllColumns(SuppressionsList);
-	
+
 	// don't know why the first column is not auto-sized all the way
 	// I have seen that on Mac OS X the first column is still truncated
 	SuppressionsList->GetColumn(0)->SetWidth(200);
@@ -908,12 +908,12 @@ void t4p::LintSuppressionsPanelClass::AppendRuleToList(const t4p::SuppressionRul
 		wxType = _("Skip All");
 		break;
 	}
-	
+
 	wxVector<wxVariant> values;
 	values.push_back(wxType);
 	values.push_back(wxTarget);
 	values.push_back(wxFile);
-	
+
 	SuppressionsList->AppendItem(values);
 }
 
@@ -924,14 +924,14 @@ void t4p::LintSuppressionsPanelClass::SaveList() {
 	}
 }
 
-t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* parent, int id, 
+t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* parent, int id,
 	t4p::SuppressionRuleClass& rule)
 : LintSuppressionRuleGeneratedDialogClass(parent, id)
 , Rule(rule)
 , EditRule(rule) {
 	t4p::UnicodeStringValidatorClass targetValidator(&EditRule.Target, true);
 	Target->SetValidator(targetValidator);
-	
+
 	switch (EditRule.Type) {
 		case t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS);
@@ -953,13 +953,13 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 			break;
 		case t4p::SuppressionRuleClass::SKIP_ALL:
 			Types->SetSelection(t4p::SuppressionRuleClass::SKIP_ALL);
-			
+
 			// the user doesn't need to enter a target for suppression
 			// rules of type 'all'
 			Target->Enable(false);
 			break;
 	}
-	
+
 	if (EditRule.Location.IsDir()) {
 		Directory->Enable(true);
 		File->Enable(false);
@@ -972,7 +972,7 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 		FileRadio->SetValue(true);
 		File->SetPath(EditRule.Location.GetFullPath());
 	}
-	
+
 	TransferDataToWindow();
 }
 
@@ -1000,8 +1000,8 @@ void t4p::LintSuppressionRuleDialogClass::OnOkButton(wxCommandEvent& event) {
 		wxMessageBox(_("Please enter a target"), _("Error"));
 		return;
 	}
-	
-	
+
+
 	switch (sel) {
 	case 0:
 		EditRule.Type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
@@ -1025,7 +1025,7 @@ void t4p::LintSuppressionRuleDialogClass::OnOkButton(wxCommandEvent& event) {
 		EditRule.Type = t4p::SuppressionRuleClass::SKIP_ALL;
 		break;
 	}
-	
+
 	TransferDataFromWindow();
 	if (DirectoryRadio->GetValue()) {
 		EditRule.Location.SetPath(Directory->GetPath());
@@ -1033,21 +1033,21 @@ void t4p::LintSuppressionRuleDialogClass::OnOkButton(wxCommandEvent& event) {
 	else if (FileRadio->GetValue()) {
 		EditRule.Location.Assign(File->GetPath());
 	}
-	
+
 	Rule = EditRule;
 	return EndModal(wxOK);
 }
 
 void t4p::LintSuppressionRuleDialogClass::OnTypeChoice(wxCommandEvent& event) {
 	int type = event.GetSelection();
-	
+
 	// the user doesn't need to enter a target for suppression
 	// rules of type 'all'
 	Target->Enable(t4p::SuppressionRuleClass::SKIP_ALL != type);
 }
 
 
-BEGIN_EVENT_TABLE(t4p::LintViewClass, t4p::FeatureViewClass) 
+BEGIN_EVENT_TABLE(t4p::LintViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_LINT_PHP + 0, t4p::LintViewClass::OnLintMenu)
 	EVT_MENU(t4p::MENU_LINT_PHP + 1, t4p::LintViewClass::OnLintSuppressionsMenu)
 	EVT_MENU(t4p::MENU_LINT_PHP + 2, t4p::LintViewClass::OnNextLintError)
@@ -1063,7 +1063,7 @@ BEGIN_EVENT_TABLE(t4p::LintViewClass, t4p::FeatureViewClass)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(t4p::LintResultsPanelClass, LintResultsGeneratedPanelClass)
-	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST, 
+	EVT_DATAVIEW_ITEM_ACTIVATED(LintResultsGeneratedPanelClass::ID_ERRORS_LIST,
 		t4p::LintResultsPanelClass::OnRowActivated)
 	EVT_DATAVIEW_ITEM_CONTEXT_MENU(LintResultsGeneratedPanelClass::ID_ERRORS_LIST,
 		t4p::LintResultsPanelClass::OnErrorContextMenu)

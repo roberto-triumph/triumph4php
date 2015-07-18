@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@
 #include <wx/ffile.h>
 
 t4p::ChangelogFeatureClass::ChangelogFeatureClass(t4p::AppClass& app)
-: FeatureClass(app) 
+: FeatureClass(app)
 , LastVersion() {
 }
 
@@ -37,7 +37,7 @@ void t4p::ChangelogFeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
 void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
-	
+
 	// version info is stored in a file
 	// for releases, the distribution script will properly fill in the
 	// version number using git describe
@@ -49,13 +49,13 @@ void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
 	}
 	version.Trim(false).Trim(true);
 	LastVersion.Trim(false).Trim(true);
-	
+
 	if (version.CmpNoCase(LastVersion) != 0) {
-		
+
 		// version changed, show the changelog
 		ShowChangeLog();
-		
-		
+
+
 		// store the version opened so that next time that the app
 		// is opened we don't show the changelog
 		LastVersion = version;
@@ -72,7 +72,7 @@ void t4p::ChangelogFeatureClass::OnSavePreferences(wxCommandEvent& event) {
 
 void t4p::ChangelogFeatureClass::ShowChangeLog() {
 	wxFileName changelogFile = t4p::ChangeLogFileAsset();
-	
+
 	wxCommandEvent fileCmd(t4p::EVENT_CMD_FILE_OPEN);
 	fileCmd.SetString(changelogFile.GetFullPath());
 	App.EventSink.Publish(fileCmd);

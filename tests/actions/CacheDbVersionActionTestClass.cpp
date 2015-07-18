@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,12 +39,12 @@ public:
 	t4p::TagCacheDbVersionActionClass Action;
 	t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;
 
-	CacheDbVersionActionFixtureClass() 
+	CacheDbVersionActionFixtureClass()
 		: ActionTestFixtureClass()
-		, FileTestFixtureClass(wxT("cache_db_version")) 
-		, Action(RunningThreads, wxID_ANY) 
+		, FileTestFixtureClass(wxT("cache_db_version"))
+		, Action(RunningThreads, wxID_ANY)
 		, DetectorCacheAction(RunningThreads, wxID_ANY) {
-	
+
 		// need to make sure the directory exists
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
@@ -71,7 +71,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
 
 	// create the db files
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error); 
+	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
@@ -86,7 +86,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 
 	// create the db files
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error); 
+	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
 
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";
@@ -120,7 +120,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
 
 	// create the db files
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error); 
+	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
@@ -135,7 +135,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 
 	// create the db files
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error); 
+	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
 
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";

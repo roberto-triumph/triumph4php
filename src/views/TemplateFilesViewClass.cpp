@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,13 +37,13 @@
 
 static const int ID_TEMPLATE_FILES_PANEL = wxNewId();
 
-t4p::TemplateFilesViewClass::TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature) 
+t4p::TemplateFilesViewClass::TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature)
 	: FeatureViewClass()
 	, Feature(feature) {
 }
 
 void t4p::TemplateFilesViewClass::AddViewMenuItems(wxMenu* viewMenu) {
-	viewMenu->Append(t4p::MENU_TEMPLATE_FILES + 0, _("PHP Template Files"), 
+	viewMenu->Append(t4p::MENU_TEMPLATE_FILES + 0, _("PHP Template Files"),
 		_("Shows the view (template) files for the currently selected URL"), wxITEM_NORMAL);
 }
 
@@ -53,7 +53,7 @@ void t4p::TemplateFilesViewClass::OnTemplateFilesMenu(wxCommandEvent& event) {
 		ShowPanel();
 	}
 	else {
-		t4p::EditorLogWarningFix("Template Feature", 
+		t4p::EditorLogWarningFix("Template Feature",
 			_("Could not determine template files because no URLs were detected. Template files feature depends on the URL detectors feature."));
 	}
 }
@@ -66,7 +66,7 @@ void t4p::TemplateFilesViewClass::ShowPanel() {
 		SetFocusToOutlineWindow(templateFilesPanel);
 	}
 	else {
-		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, 
+		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL,
 			Feature, *this);
 		wxBitmap templateFileBitmap = t4p::BitmapImageAsset(wxT("template-files"));
 		AddOutlineWindow(templateFilesPanel, _("Templates"), templateFileBitmap);
@@ -99,14 +99,14 @@ void t4p::TemplateFilesViewClass::OnTemplateDetectionComplete(t4p::ActionEventCl
 		templateFilesPanel = (t4p::TemplateFilesPanelClass*) window;
 	}
 	else {
-		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL, 
+		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL,
 			Feature, *this);
 		AddOutlineWindow(templateFilesPanel, _("Templates"));
 	}
 	templateFilesPanel->UpdateResults();
 }
 
-t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id, 
+t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id,
 		t4p::TemplateFilesFeatureClass& feature,
 		t4p::TemplateFilesViewClass& view)
 	: TemplateFilesPanelGeneratedClass(parent, id)
@@ -119,7 +119,7 @@ t4p::TemplateFilesPanelClass::TemplateFilesPanelClass(wxWindow* parent, int id,
 	ImageList.Add(t4p::BitmapImageAsset(wxT("folder-horizontal-open")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("template-files")));
 	ImageList.Add(t4p::BitmapImageAsset(wxT("variable-template")));
-	
+
 	// this class will own the imagelist
 	FileTree->SetImageList(&ImageList);
 	TemplateVariablesTree->SetImageList(&ImageList);
@@ -137,7 +137,7 @@ void t4p::TemplateFilesPanelClass::UpdateControllers() {
 	Controller->Append(wxControllers);
 }
 
-void t4p::TemplateFilesPanelClass::UpdateResults() {		
+void t4p::TemplateFilesPanelClass::UpdateResults() {
 	std::vector<t4p::TemplateFileTagClass> currentTemplates = Feature.App.Globals.CurrentTemplates();
 	StatusLabel->SetLabel(wxString::Format(_("Found %ld view files"), currentTemplates.size()));
 	FileTree->DeleteAllItems();
@@ -159,7 +159,7 @@ void t4p::TemplateFilesPanelClass::UpdateResults() {
 		FileTree->AppendItem(parent, text, IMAGE_TEMPLATE_FILE, -1, data);
 	}
 	FileTree->ExpandAll();
-	
+
 	int variableCount = 0;
 	for (size_t i = 0; i < currentTemplates.size(); ++i) {
 		variableCount += currentTemplates[i].Variables.size();
@@ -172,7 +172,7 @@ void t4p::TemplateFilesPanelClass::UpdateResults() {
 		t4p::TemplateFileTagClass templateFile = currentTemplates[i];
 		wxString text = templateFile.FullPath;
 		wxString projectLabel;
-		
+
 		// remove the project root so that the dialog is not too 'wordy'
 		text = Feature.App.Globals.RelativeFileName(text, projectLabel);
 		wxTreeItemId sub = TemplateVariablesTree->AppendItem(parent, text, IMAGE_TEMPLATE_FILE);
@@ -260,7 +260,7 @@ void t4p::TemplateFilesPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 	}
 }
 
-BEGIN_EVENT_TABLE(t4p::TemplateFilesViewClass, t4p::FeatureViewClass) 
+BEGIN_EVENT_TABLE(t4p::TemplateFilesViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_TEMPLATE_FILES + 0, t4p::TemplateFilesViewClass::OnTemplateFilesMenu)
 	EVT_ACTION_COMPLETE(t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR, t4p::TemplateFilesViewClass::OnTemplateDetectionComplete)
 END_EVENT_TABLE()

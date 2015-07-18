@@ -84,16 +84,16 @@ t4p::TotalSearchDialogClass::TotalSearchDialogClass(wxWindow* parent, t4p::Total
 , Feature(feature)
 , LastSearch()
 , Timer(this, ID_DIALOG_TIMER)
-, RunningThreads() 
-, Results() 
-, SelectedTags(selectedTags) 
-, LineNumber(lineNumber) 
+, RunningThreads()
+, Results()
+, SelectedTags(selectedTags)
+, LineNumber(lineNumber)
 , IsCacheBeingBuilt(false)
 , IsCacheEmpty(false) {
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 	Timer.Start(300, wxTIMER_CONTINUOUS);
-	
+
 	MatchesList->Clear();
 	CacheStatusLabel->SetLabel(wxT("Cache Status: OK"));
 
@@ -139,7 +139,7 @@ void t4p::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event
 }
 
 void t4p::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
-	
+
 	// open all checked tags
 	for (unsigned int i = 0; i < MatchesList->GetCount(); ++i) {
 		if (MatchesList->IsChecked(i)) {
@@ -187,7 +187,7 @@ void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	}
 	if (nextIndex < MatchesList->GetCount()) {
 		MatchesList->SetSelection(nextIndex);
-		
+
 		// in Mac os x the item is not scrolled to the
 		// viewable port when it is selected, we must do
 		// it ourselves
@@ -204,14 +204,14 @@ void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 void t4p::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 	UpdateCacheStatus();
 
-	// don't want to query the cache while the cache is being 
+	// don't want to query the cache while the cache is being
 	// built. this is because the tag cache is built using
 	// sqlite and sqlite cannot handle simultaneous reads and
 	// writes.
 	if (IsCacheBeingBuilt) {
 		return;
 	}
-	
+
 	wxString text = SearchText->GetValue();
 
 	// trim spaces from the ends
@@ -219,8 +219,8 @@ void t4p::TotalSearchDialogClass::OnTimer(wxTimerEvent& event) {
 	if (text != LastSearch && text.length() > 2) {
 		Timer.Stop();
 		LastSearch = text;
-		
-		t4p::TotalTagSearchActionClass* action =  
+
+		t4p::TotalTagSearchActionClass* action =
 			new t4p::TotalTagSearchActionClass(RunningThreads, ID_TAG_SEARCH);
 		action->SetSearch(Feature.App.Globals, text, Feature.App.Globals.AllEnabledSourceDirectories());
 		RunningThreads.Queue(action);
@@ -231,7 +231,7 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 	MatchesList->Clear();
 	Results = event.Tags;
 	LineNumber = event.LineNumber;
-	
+
 	std::vector<t4p::TotalTagResultClass>::const_iterator tag;
 	for (tag = Results.begin(); tag != Results.end(); ++tag) {
 		wxString value;
@@ -249,7 +249,7 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 			desc = tag->PhpTag.FullPath;
 		}
 		else if (t4p::TotalTagResultClass::METHOD_TAG == tag->Type) {
-			value = t4p::IcuToWx(tag->PhpTag.ClassName) + 
+			value = t4p::IcuToWx(tag->PhpTag.ClassName) +
 				wxT("::") + t4p::IcuToWx(tag->PhpTag.Identifier);
 			desc = tag->PhpTag.FullPath;
 		}
@@ -257,21 +257,21 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Data for ") 
-				+ tag->TableTag.TableName 
-				+ _(" in connection ") 
+			desc = _("Database Table Data for ")
+				+ tag->TableTag.TableName
+				+ _(" in connection ")
 				+ t4p::IcuToWx(dbTag.Label);
 		}
 		else if (t4p::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
 			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
-			desc = _("Database Table Definition for ") 
-				+ tag->TableTag.TableName 
-				+ _(" in connection ") 
+			desc = _("Database Table Definition for ")
+				+ tag->TableTag.TableName
+				+ _(" in connection ")
 				+ t4p::IcuToWx(dbTag.Label);
 		}
-		
+
 		MatchesList->Append(value + wxT(" - ") + desc);
 	}
 	if (MatchesList->GetCount() > 0) {
@@ -295,7 +295,7 @@ void t4p::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 	}
 	t4p::TotalTagResultClass tag = Results[selected];
 	SelectedTags.push_back(tag);
-	
+
 	RunningThreads.Shutdown();
 	RunningThreads.RemoveEventHandler(this);
 	EndModal(wxOK);
@@ -304,7 +304,7 @@ void t4p::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 	if (Feature.App.Sequences.Running()) {
 
-		// only update the label when there is a change in 
+		// only update the label when there is a change in
 		// indexing status, that way we eliminate flicker
 		if (!IsCacheBeingBuilt) {
 			wxWindowUpdateLocker locker(this);
@@ -314,7 +314,7 @@ void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 		IsCacheBeingBuilt = true;
 		return;
 	}
-	
+
 	if (Feature.App.Globals.TagCache.IsFileCacheEmpty()) {
 		if (!IsCacheEmpty) {
 			wxWindowUpdateLocker locker(this);
@@ -325,8 +325,8 @@ void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 		return;
 	}
 	if (IsCacheBeingBuilt && !Feature.App.Sequences.Running()) {
-		
-		// here the tag parsing has finished 
+
+		// here the tag parsing has finished
 		IsCacheBeingBuilt = false;
 		wxWindowUpdateLocker locker(this);
 		CacheStatusLabel->SetLabel(wxT("Cache Status: OK"));

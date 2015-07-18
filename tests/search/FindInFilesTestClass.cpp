@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -52,7 +52,7 @@ wxString FILE_2 = wxString::FromAscii(
 class FindInFilesTestFixtureClass : public FileTestFixtureClass {
 public:
 	FindInFilesTestFixtureClass()
-		: FileTestFixtureClass(wxT("find_in_files")) 
+		: FileTestFixtureClass(wxT("find_in_files"))
 		, FindInFiles() {
 	}
 
@@ -60,7 +60,7 @@ public:
 };
 
 SUITE(FindInFilesTestClass) {
-	
+
 TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturnsTrue) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");
@@ -85,7 +85,7 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearc
 	CHECK_EQUAL(5, FindInFiles.GetCurrentLineNumber());
 	CHECK_EQUAL(78, FindInFiles.GetFileOffset());
 	CHECK_EQUAL(false, FindInFiles.FindNext());
-	
+
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingCaseInsensitive) {
@@ -149,19 +149,19 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesInFileShouldReplaceAl
 	matches += FindInFiles.ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.inc"));
 	matches += FindInFiles.ReplaceAllMatchesInFile(TestProjectDir + wxT("admin.php_bak"));
 	CHECK_EQUAL(3, matches);
-	
+
 	// check that files were actually modified
 	 wxString fileContents = GetFileContents(wxT("user.php"));
 	 wxString expectedContents(FILE_1);
 	 expectedContents.Replace(wxT("UserClass"), wxT("GuestUserClass"));
 	 CHECK_EQUAL(expectedContents, fileContents);
-	 
+
 	 //check file #2
 	 fileContents = GetFileContents(wxT("admin.inc"));
 	 expectedContents = FILE_2;
 	 expectedContents.Replace(wxT("UserClass"), wxT("GuestUserClass"));
 	 CHECK_EQUAL(expectedContents, fileContents);
-	 
+
 	 //check file #3
 	 fileContents = GetFileContents(wxT("admin.php_bak"));
 	 expectedContents = FILE_2;

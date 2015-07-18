@@ -31,7 +31,7 @@
 #include <globals/Sqlite.h>
 #include <wx/ffile.h>
 
-t4p::VariableSymbolClass::VariableSymbolClass() 
+t4p::VariableSymbolClass::VariableSymbolClass()
 	: Type(t4p::VariableSymbolClass::SCALAR)
 	, DestinationVariable()
 	, ScalarValue()
@@ -39,10 +39,10 @@ t4p::VariableSymbolClass::VariableSymbolClass()
 	, SourceVariable()
 	, ObjectName()
 	, PropertyName()
-	, FunctionName() 
+	, FunctionName()
 	, ClassName()
 	, FunctionArguments() {
-		
+
 }
 
 void t4p::VariableSymbolClass::ToScalar(const UnicodeString& variableName, const UnicodeString& scalar) {
@@ -170,7 +170,7 @@ std::string t4p::VariableSymbolClass::ToString() const {
 	case BEGIN_FUNCTION:
 		line += FunctionName;
 		break;
-	}	
+	}
 	std::string stdLine = t4p::IcuToChar(line);
 	return stdLine;
 }
@@ -208,7 +208,7 @@ std::string t4p::VariableSymbolClass::TypeString() const {
 	case BEGIN_FUNCTION:
 		line = "BEGIN_FUNCTION";
 		break;
-	}	
+	}
 	return line;
 }
 
@@ -246,7 +246,7 @@ void t4p::CallStackClass::Clear() {
 	FoundScope = false;
 }
 
-bool t4p::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, 
+bool t4p::CallStackClass::Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName,
 		pelet::Versions version, t4p::CallStackClass::Errors& error) {
 	Clear();
 	t4p::PhpTagClass nextResource;
@@ -302,7 +302,7 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
 	ParsedMethods[key] = true;
 	if (ret && FoundScope) {
-		
+
 		// check to see if we have any new functions to parse
 		ResourcesRemaining.pop();
 		if (!ResourcesRemaining.empty()) {
@@ -316,9 +316,9 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 				wxFileName nextFile = nextItem.FileName;
 				bool alreadyParsed = false;
 				UnicodeString key = nextItem.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + nextItem.Resource.Identifier;
-				alreadyParsed =  ParsedMethods.find(key) == ParsedMethods.end();				
+				alreadyParsed =  ParsedMethods.find(key) == ParsedMethods.end();
 				if (alreadyParsed) {
-					
+
 					// already been parsed; write the function arguments for this call and nothing else
 					// this is because we want to write a function call if the same function is called
 					// twice but we don't want to parse it twice
@@ -357,12 +357,12 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 bool t4p::CallStackClass::Persist(soci::session& session) {
 	wxString error;
 	bool good = false;
-	try {		
+	try {
 		int stepNumber = 0;
 		std::string stepType;
 		std::string expression;
 		soci::transaction transaction(session);
-		
+
 		// TODO(roberto): prograte?
 		int sourceId = 0;
 
@@ -401,7 +401,7 @@ bool t4p::CallStackClass::InDesiredScope() const {
 }
 
 void t4p::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expression) {
-	
+
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -411,7 +411,7 @@ void t4p::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expressi
 }
 
 void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
-	
+
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -423,7 +423,7 @@ void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionC
 }
 
 void t4p::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
-	
+
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -499,7 +499,7 @@ void t4p::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressio
 
 void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression) {
 	t4p::VariableSymbolClass expressionResultSymbol;
-	
+
 	// follow associativity, do the right hand side first
 	size_t oldSize = Variables.size();
 	SymbolFromExpression(expression, Variables);
@@ -508,7 +508,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 	}
 
 	if (variable.ChainList.size() == 2 && variable.ChainList[1].IsArrayAccess) {
-		
+
 		// check to see if the array access key is a scalar
 		pelet::ExpressionClass* arrayAccessExpr = variable.ChainList[1].ArrayAccess;
 		UnicodeString arrayKey;
@@ -520,7 +520,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 		// add the variable to the list only if we have not added it yet
 		// an array key may be assigned if the variable is not yet
 		// seen; need to look for this case also
-		// ie.  $arr[] = 'name';  
+		// ie.  $arr[] = 'name';
 		// as the array initialization for $arr
 		std::vector<t4p::VariableSymbolClass>::iterator var;
 		bool foundIndex = false;
@@ -543,7 +543,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, arrayKey);
 			Variables.push_back(arrayVariableKeySymbol);
 		}
-		
+
 	}
 	else if (!variable.ChainList.empty()) {
 		UnicodeString destinationVariable = variable.ChainList[0].Name;
@@ -560,7 +560,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 				destinationVariable = Variables.back().DestinationVariable;
 			}
 		}
-		
+
 		// now assign the right side of the expression to the left side of the
 		// expression
 		t4p::VariableSymbolClass assignSymbol;
@@ -570,7 +570,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 }
 
 void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols) {
-	
+
 	// recurse down the arguments first
 	std::vector<UnicodeString> argumentVariables;
 	if (property.IsFunction && !property.CallArguments.empty()) {
@@ -592,7 +592,7 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 			}
 		}
 	}
-	
+
 	// now the symbol for this property
 	UnicodeString tempVarName = NewTempVariable();
 	t4p::VariableSymbolClass symbol;
@@ -606,7 +606,7 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 	}
 	/*
 	else if (property.IsArrayAccess && property.ArrayAccess) {
-		
+
 		// check to see if the array access key is a scalar
 		pelet::ExpressionClass* arrayAccessExpr = property.ArrayAccess;
 		UnicodeString arrayKey;
@@ -620,13 +620,13 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 		// add the variable to the list only if we have not added it yet
 		// an array key may be assigned if the variable is not yet
 		// seen; need to look for this case also
-		// ie.  $arr[] = 'name';  
-		// as the array initialization for $arr	
+		// ie.  $arr[] = 'name';
+		// as the array initialization for $arr
 	}
 	*/
 }
 
-void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<t4p::VariableSymbolClass>& symbols) {	
+void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<t4p::VariableSymbolClass>& symbols) {
 	if (pelet::ExpressionClass::SCALAR == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		t4p::VariableSymbolClass scalarSymbol;
@@ -677,14 +677,14 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 					argumentVariables.push_back(symbols.back().DestinationVariable);
 				}
 			}
-			
+
 			// variable for the function result
 			UnicodeString tempVarName = NewTempVariable();
 			t4p::VariableSymbolClass functionSymbol;
 			functionSymbol.ToFunctionCall(tempVarName, varExpression->ChainList[0].Name, argumentVariables);
 		}
 		else if (!varExpression->ChainList.empty()) {
-		
+
 			// add the variable to the list only if we have not added it yet
 			std::vector<t4p::VariableSymbolClass>::iterator var;
 			bool found = false;
@@ -699,9 +699,9 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 				varSymbol.ToAssignment(varExpression->ChainList[0].Name, UNICODE_STRING_SIMPLE(""));
 				symbols.push_back(varSymbol);
 			}
-			
+
 			if (varExpression->ChainList.size() > 1) {
-				
+
 				// now add any property / method accesses
 				std::vector<pelet::VariablePropertyClass>::const_iterator prop = varExpression->ChainList.begin();
 				prop++;
@@ -720,7 +720,7 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 
 UnicodeString t4p::CallStackClass::NewTempVariable() {
 	UnicodeString newName;
-	
+
 	// 11 == length of "$@tmp" + a 5 digit number + NUL should be big enough
 	// using $@tmp so that a temp variable will never collide with a variable found in
 	// the source
@@ -736,19 +736,19 @@ void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const 
 	CurrentClass = className;
 	CurrentMethod = methodName;
 	CurrentFunction.remove();
-	
+
 	if (ResourcesRemaining.empty()) {
 		return;
 	}
 
 	ResourceWithFile item = ResourcesRemaining.front();
-	
+
 	// if a method was found set the flag
 	// we need to do this because the method iself may be empty or not contain variable
 	// and we dont want to flag this as an error
 	if (item.Resource.ClassName == CurrentClass && item.Resource.Identifier == CurrentMethod) {
 		FoundScope = true;
-		
+
 		t4p::VariableSymbolClass beginScope;
 		beginScope.ToBeginMethod(className, methodName);
 		Variables.push_back(beginScope);
@@ -760,13 +760,13 @@ void t4p::CallStackClass::FunctionFound(const UnicodeString& namespaceName, cons
 	CurrentClass.remove();
 	CurrentMethod.remove();
 	CurrentFunction = functionName;
-	
+
 	if (ResourcesRemaining.empty()) {
 		return;
 	}
 
 	ResourceWithFile item = ResourcesRemaining.front();
-	
+
 	// if a method was found set the flag
 	// we need to do this because the method iself may be empty or not contain variable
 	// and we dont want to flag this as an error

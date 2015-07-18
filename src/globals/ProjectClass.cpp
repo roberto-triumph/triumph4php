@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,7 +45,7 @@ void t4p::ProjectClass::operator=(const t4p::ProjectClass& project) {
 	IsEnabled = project.IsEnabled;
 }
 
-void t4p::ProjectClass::AddSource(const t4p::SourceClass& src) { 
+void t4p::ProjectClass::AddSource(const t4p::SourceClass& src) {
 	Sources.push_back(src);
 }
 
@@ -67,10 +67,10 @@ std::vector<t4p::SourceClass> t4p::ProjectClass::AllPhpSources(const t4p::FileTy
 }
 
 std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources(const t4p::FileTypeClass& fileType) const {
-	
+
 	// get all extensions we know about
 	wxString allExtensionsString = fileType.GetAllSourceFileExtensionsString();
-	
+
 	// make the new sources to return
 	std::vector<t4p::SourceClass>::const_iterator src;
 	std::vector<t4p::SourceClass> allSources;
@@ -86,7 +86,7 @@ std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources(const t4p::FileTypeC
 
 bool t4p::ProjectClass::IsAPhpSourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const {
 	bool matches = false;
-	
+
 	// a file is considered a PHP file if its in a source directory and it matches
 	// the PHP file extensions
 	std::vector<t4p::SourceClass> phpSources = AllPhpSources(fileType);
@@ -99,7 +99,7 @@ bool t4p::ProjectClass::IsAPhpSourceFile(const wxString& fullPath, const t4p::Fi
 bool t4p::ProjectClass::IsASourceFile(const wxString& fullPath, const t4p::FileTypeClass& fileType) const {
 	bool matches = false;
 
-	// first do a directory check  only. since AllSources() clones the 
+	// first do a directory check  only. since AllSources() clones the
 	// Sources list; it can be expensive due to regex re-compilation of the
 	// wildcards. for performance, we make sure that the file in question
 	// is definitely in the sources before we copy the sources list

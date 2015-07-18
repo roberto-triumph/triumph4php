@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,8 +41,8 @@ Compatibility:	Wildcard matching available in 2.0.41 and later
 
 This directive allows inclusion of other configuration files from within the server configuration files.
 
-Shell-style (fnmatch()) wildcard characters can be used to include several files at once, in alphabetical order. In addition, if Include 
-points to a directory, rather than a file, Apache will read all files in that directory and any subdirectory. But including entire 
+Shell-style (fnmatch()) wildcard characters can be used to include several files at once, in alphabetical order. In addition, if Include
+points to a directory, rather than a file, Apache will read all files in that directory and any subdirectory. But including entire
 directories is not recommended, because it is easy to accidentally leave temporary files in a directory that can cause httpd to fail.
 
 The file path specified may be an absolute path, or may be relative to the ServerRoot directory.
@@ -55,7 +55,7 @@ Include /usr/local/apache2/conf/vhosts/ *.conf
 Or, providing paths relative to your ServerRoot directory:
 
 Include conf/ssl.conf
-Include conf/vhosts/ *.conf 
+Include conf/vhosts/ *.conf
 
 */
 
@@ -64,10 +64,10 @@ t4p::ApacheClass::ApacheClass()
 	, VirtualHostMappings()
 	, HttpdPath()
 	, ServerRoot()
-	, Port(0) { 
+	, Port(0) {
 }
 
-t4p::ApacheClass::ApacheClass(const t4p::ApacheClass& src) 
+t4p::ApacheClass::ApacheClass(const t4p::ApacheClass& src)
 	: ManualConfiguration()
 	, VirtualHostMappings()
 	, HttpdPath()
@@ -83,7 +83,7 @@ t4p::ApacheClass& t4p::ApacheClass::operator=(const t4p::ApacheClass& src) {
 
 void t4p::ApacheClass::Copy(const t4p::ApacheClass& src) {
 
-	// make sure to completely copy wxStrings 
+	// make sure to completely copy wxStrings
 	ManualConfiguration = src.ManualConfiguration;
 	VirtualHostMappings.clear();
 	HttpdPath = src.HttpdPath.c_str();
@@ -109,11 +109,11 @@ bool t4p::ApacheClass::SetHttpdPath(const wxString& httpdPath) {
 	HttpdPath = httpdPath;
 	if (!ManualConfiguration && Walk(httpdPath)) {
 		VirtualHostMappings.clear();
-		
+
 		// get the virtual hosts from the file
 		ServerRoot = wxT("");
 		Port = 0;
-		ParseApacheConfigFile(httpdPath);		
+		ParseApacheConfigFile(httpdPath);
 		return !VirtualHostMappings.empty();
 	}
 	return false;
@@ -134,11 +134,11 @@ void t4p::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPath, wxS
 }
 
 void t4p::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
-	
-	// normalize just like the SetVirtualHostMapping() method 
+
+	// normalize just like the SetVirtualHostMapping() method
 	wxFileName filename;
 	filename.AssignDir(fileSystemPath);
-	
+
 	std::map<wxString, wxString>::iterator it = VirtualHostMappings.find(filename.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
 	if (it != VirtualHostMappings.end()) {
 		VirtualHostMappings.erase(it);
@@ -167,14 +167,14 @@ wxString t4p::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 			hostRoot += wxFileName::GetPathSeparator();
 		}
 		if (0 == dir.Find(hostRoot)) {
-			
+
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
 
 			// look for a port (but careful of the protocol http://
 			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
-			if (Port > 0 && Port != 80 && !urlHasPort) {  
-				
+			if (Port > 0 && Port != 80 && !urlHasPort) {
+
 				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
 				baseUrl += wxString::Format(wxT(":%d/"), Port);
@@ -198,14 +198,14 @@ wxString t4p::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString
 		wxString hostRoot = it->first;
 		hostRoot.LowerCase();
 		if (0 == dir.Find(hostRoot)) {
-			
+
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
 
 			// look for a port (but careful of the protocol http://
 			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
-			if (Port > 0 && Port != 80 && !urlHasPort) {  
-				
+			if (Port > 0 && Port != 80 && !urlHasPort) {
+
 				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
 				baseUrl += wxString::Format(wxT(":%d/"), Port);
@@ -248,12 +248,12 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					currentDocumentRoot,
 					currentPort;
 			for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine()) {
-				
+
 				// apache directives are case insensitive, but file names are not
 				// so we need 2 variables for this ...
 				line = line.Trim(false).Trim(true);
 				wxString lineLower = line.Lower();
-				
+
 				if (0 == lineLower.Find(wxT("<ifmodule"))) {
 					skipParsing = true;
 				}
@@ -265,7 +265,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					currentDocumentRoot = wxT("");
 					currentPort = wxT("");
 					inVirtualHost = true;
-					
+
 					// handle the virtual host port
 					size_t colonPos = lineLower.find_last_of(wxT(":"));
 					if (colonPos != std::string::npos) {
@@ -275,7 +275,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 							portString.Trim();
 							long portLong = 0;
 							bool parsed = portString.ToLong(&portLong);
-							
+
 							// dont use port on default HTTP port; makes URLs 'prettier'
 							if (parsed && portLong <= 65535 && portLong != 80) {
 								currentPort = portString;
@@ -305,7 +305,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					// must get the line that has not been modified to lowercase
 					currentServerName = line.Mid(10).Trim(false).Trim(true); //10=length of "ServerName"
 					if (inVirtualHost && !currentPort.IsEmpty()) {
-						
+
 						// append the port information; sometimes virtual hosts have their own port
 						currentServerName.Append(wxT(":")).Append(currentPort);
 					}
@@ -319,7 +319,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					currentPort = line.Mid(6).Trim(false).Trim(true); //6=length of "listen"
 
 					// handle listen 127.0.0.1:8080
-					// hadle listen 8080 
+					// hadle listen 8080
 					if (currentPort.Contains(wxT(":"))) {
 						currentPort = currentPort.AfterLast(wxT(':'));
 					}
@@ -347,7 +347,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 			}
 		}
 	}
-	
+
 	// wxIsWild(wxT("C:\\*.conf")) returns false, maybe it doesn't do wilcards in windows??
 	else if (includedFile.Contains(wxT("*"))) {
 		wxFileName fileName(includedFile);
@@ -360,7 +360,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 			wxDir dir;
 			if (wxFileName::IsDirReadable(dirString) && dir.Open(dirString)) {
 				wxString file;
-				if (dir.GetFirst(&file, wildCard)) { 
+				if (dir.GetFirst(&file, wildCard)) {
 					ParseApacheConfigFile(dirString + file);
 					while (dir.GetNext(&file)) {
 						ParseApacheConfigFile(dirString + file);
@@ -374,7 +374,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 		if (wxFileName::IsDirReadable(includedFile) && dir.Open(includedFile)) {
 			wxString file;
 			wxString newConfigDir = includedFile + wxFileName::GetPathSeparator();
-			if (dir.GetFirst(&file)) { 				
+			if (dir.GetFirst(&file)) {
 				ParseApacheConfigFile(newConfigDir + file);
 				while (dir.GetNext(&file)) {
 					ParseApacheConfigFile(newConfigDir + file);
@@ -386,13 +386,13 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 
 wxString t4p::ApacheClass::MakeAbsolute(wxString configPath) {
 	wxString serverRootNative(ServerRoot);
-	
+
 	// in windows apache installs, paths use forward slashes ie. "c:/wamp/bin/apache/2.2.17/conf"
 	// in linux this code does nothing
 	wxString sep(wxFileName::GetPathSeparator());
 	serverRootNative.Replace(wxT("/"), sep);
 	configPath.Replace(wxT("/"), sep);
-	
+
 	wxFileName fileName(configPath);
 	wxFileName serverRootFileName;
 	serverRootFileName.AssignDir(serverRootNative);

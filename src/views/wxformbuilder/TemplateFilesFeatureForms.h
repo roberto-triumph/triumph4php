@@ -31,19 +31,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TemplateFilesPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TemplateFilesPanelGeneratedClass : public wxPanel 
+class TemplateFilesPanelGeneratedClass : public wxPanel
 {
 	DECLARE_EVENT_TABLE()
 	private:
-		
+
 		// Private event handlers
 		void _wxFB_OnControllerChoice( wxCommandEvent& event ){ OnControllerChoice( event ); }
 		void _wxFB_OnActionChoice( wxCommandEvent& event ){ OnActionChoice( event ); }
 		void _wxFB_OnHelpButton( wxCommandEvent& event ){ OnHelpButton( event ); }
 		void _wxFB_OnCurrentButton( wxCommandEvent& event ){ OnCurrentButton( event ); }
 		void _wxFB_OnTreeItemActivated( wxTreeEvent& event ){ OnTreeItemActivated( event ); }
-		
-	
+
+
 	protected:
 		enum
 		{
@@ -58,7 +58,7 @@ class TemplateFilesPanelGeneratedClass : public wxPanel
 			ID_TEMPLATEVARIABLESLABEL,
 			ID_VARIABLETREE,
 		};
-		
+
 		wxStaticText* ControllerLabel;
 		wxChoice* Controller;
 		wxStaticText* ActionLabel;
@@ -69,20 +69,20 @@ class TemplateFilesPanelGeneratedClass : public wxPanel
 		wxTreeCtrl* FileTree;
 		wxStaticText* TemplateVariablesLabel;
 		wxTreeCtrl* TemplateVariablesTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnControllerChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnActionChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTreeItemActivated( wxTreeEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TemplateFilesPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_VIEWFILESPANELGENERATEDCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 409,444 ), long style = wxTAB_TRAVERSAL );
 		~TemplateFilesPanelGeneratedClass();
-	
+
 };
 
 #endif //__TemplateFilesFeatureForms__

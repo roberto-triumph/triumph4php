@@ -52,18 +52,18 @@ class NavigationViewClass : public t4p::FeatureViewClass {
 public:
 
 	NavigationViewClass();
-	
+
 	void AddEditMenuItems(wxMenu* menu);
-	
+
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& commands);
 
 	private:
-	
+
 	/**
 	 * menu handler
 	 */
 	void OnEditNavigatePane(wxCommandEvent& event);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -74,21 +74,21 @@ public:
  */
 class NavigationChoiceClass {
 
-public: 
+public:
 
 	/**
 	 * The notebook that the user chose to be focused on
 	 * This class does not own this pointer.
 	 */
 	wxAuiNotebook* Notebook;
-	
+
 	/**
 	 * The page of the notebook that should be focused on
 	 */
 	int PageIndex;
-	
+
 	NavigationChoiceClass();
-	
+
 };
 
 /**
@@ -100,14 +100,14 @@ class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 
 public:
 
-	NavigationViewDialogClass(wxWindow* parent, 
-		t4p::NavigationViewClass& view, 
+	NavigationViewDialogClass(wxWindow* parent,
+		t4p::NavigationViewClass& view,
 		wxAuiManager& auiManager,
 		std::vector<t4p::NotebookClass*> notebooks,
-		wxAuiNotebook* outlineNotebook, 
+		wxAuiNotebook* outlineNotebook,
 		wxAuiNotebook* toolsNotebook,
 		t4p::NavigationChoiceClass& choice);
-	
+
 protected:
 
 	void OnFilesListKeyDown(wxKeyEvent& event);
@@ -119,7 +119,7 @@ private:
 	std::vector<t4p::NotebookClass*> CodeNotebooks;
 	wxAuiNotebook* OutlineNotebook;
 	wxAuiNotebook* ToolsNotebook;
-	
+
 	t4p::NavigationChoiceClass& Choice;
 };
 

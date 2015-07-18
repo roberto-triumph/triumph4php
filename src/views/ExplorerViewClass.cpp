@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -57,7 +57,7 @@ static int ID_FILTER_SQL = wxNewId();
 static int ID_FILTER_JS = wxNewId();
 
 t4p::ExplorerViewClass::ExplorerViewClass(t4p::ExplorerFeatureClass& feature)
-: FeatureViewClass() 
+: FeatureViewClass()
 , Feature(feature) {
 
 }
@@ -110,7 +110,7 @@ void t4p::ExplorerViewClass::OnProjectExplore(wxCommandEvent& event) {
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
 	wxCommandEvent cmdEvt;
 	if (sourceDirs.size() == 1) {
-	
+
 		// only 1 source dir, just open it now
 		cmdEvt.SetId(t4p::MENU_EXPLORER + 3);
 	}
@@ -128,9 +128,9 @@ void t4p::ExplorerViewClass::OnProjectOutline(wxCommandEvent& event) {
 		panel = (t4p::ExplorerOutlinePanelClass*)window;
 		SetFocusToOutlineWindow(panel);
 	}
-	
+
 	panel->FillSourcesList(Feature.EnabledSourceDirectories());
-	
+
 	// show the first project
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
 	if (!sourceDirs.empty()) {
@@ -153,16 +153,16 @@ void t4p::ExplorerViewClass::OnExplorerToolDropDown(wxAuiToolBarEvent& event) {
 		return;
 	}
 	ExplorerToolBar->SetToolSticky(event.GetId(), true);
-		
+
 	// gather all enabled source directories
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
-	
+
 	// create the popup menu that contains all the available browser names
 	wxMenu projectMenu;
 	for (size_t index = 0; index < sourceDirs.size(); ++index) {
 		projectMenu.Append(t4p::MENU_EXPLORER + 3 + index, sourceDirs[index].RootDirectory.GetDirs().Last());
 	}
-	
+
 	// line up our menu with the button
 	wxRect rect = ExplorerToolBar->GetToolRect(event.GetId());
 	wxPoint pt = ExplorerToolBar->ClientToScreen(rect.GetBottomLeft());
@@ -202,8 +202,8 @@ void t4p::ExplorerViewClass::OnAppPreferencesSaved(wxCommandEvent& event) {
 	t4p::ModalExplorerPanelClass* panel = NULL;
 	wxWindow* window = FindToolsWindow(ID_EXPLORER_PANEL);
 	if (window) {
-		std::vector<wxFileName> sourceDirs = Feature.EnabledSourceDirectories();	
-	
+		std::vector<wxFileName> sourceDirs = Feature.EnabledSourceDirectories();
+
 		panel = (t4p::ModalExplorerPanelClass*)window;
 		panel->FillSourcesList(sourceDirs);
 	}
@@ -227,7 +227,7 @@ void t4p::ExplorerViewClass::OnAppProjectCreated(wxCommandEvent& event) {
 }
 
 void t4p::ExplorerViewClass::OnCmdDirOpen(wxCommandEvent& event) {
-	
+
 	// the same for as when an app project is created, for now
 	OnAppProjectCreated(event);
 }
@@ -243,7 +243,7 @@ void t4p::ExplorerViewClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
-	
+
 	// show the selected project
 	size_t index = event.GetId() - t4p::MENU_EXPLORER - 3;
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
@@ -270,8 +270,8 @@ t4p::FileListingWidgetClass::FileListingWidgetClass(wxListCtrl* list, wxImageLis
 	wxWindow* parentPanel, t4p::ExplorerFeatureClass* feature)
 : wxEvtHandler()
 , List(list)
-, FilesImageList(imageList) 
-, FileListing(fileListing) 
+, FilesImageList(imageList)
+, FileListing(fileListing)
 , ParentPanel(parentPanel)
 , Feature(feature) {
 	List->Connect(wxEVT_COMMAND_LIST_END_LABEL_EDIT, wxListEventHandler(t4p::FileListingWidgetClass::OnListEndLabelEdit), NULL, this);
@@ -311,7 +311,7 @@ void t4p::FileListingWidgetClass::ShowDir() {
 	wxFileName currentDir = FileListing->WorkingDir;
 	std::vector<wxFileName> files = FileListing->Files;
 	std::vector<wxFileName>& dirs = FileListing->Dirs;
-												 
+
 	List->DeleteAllItems();
 	int newRowNumber = 0;
 
@@ -356,12 +356,12 @@ void t4p::FileListingWidgetClass::ShowDir() {
 		column1.SetImage(ListImageId(*file));
 		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
 		column1.SetText(file->GetFullName());
-			
+
 		List->InsertItem(column1);
 
 		newRowNumber++;
 	}
-	
+
 	// set the second item to be selected (first other than parent)
 	// except if the dir is empty
 	if (List->GetItemCount() >= 2) {
@@ -428,7 +428,7 @@ void t4p::FileListingWidgetClass::OnListMenuRename(wxCommandEvent& event) {
 	// dont allow the parent dir to be renamed
 	if (index > 0) {
 		wxTextCtrl* ctrl = List->EditLabel(index);
-		
+
 		// change the selection. select only the file name not the
 		// extension. if the file only has an extension, we
 		// leave it alone (by default the entire string is selected)
@@ -446,7 +446,7 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 	std::vector<wxFileName> dirs;
 	std::vector<wxFileName> files;
 	while (index != wxNOT_FOUND) {
-		
+
 		// dont allow the parent dir to be deleted
 		if (index > 0) {
 			wxString name = List->GetItemText(index);
@@ -465,7 +465,7 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 		index = List->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	}
 
-	// 1 file = don;'t ask for confirmation 
+	// 1 file = don;'t ask for confirmation
 	bool doDelete = false;
 	if ((dirs.size() + files.size()) == 1) {
 		doDelete = true;
@@ -623,8 +623,8 @@ void t4p::FileListingWidgetClass::OnListMenuFileManager(wxCommandEvent& event) {
 }
 
 void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
-	
-	// ideally we dont need to query the file system, but cant seem to get the 
+
+	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString newName = event.GetLabel();
 	long index = event.GetIndex();
@@ -639,11 +639,11 @@ void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
 	}
 
 	// dont attempt rename if they are new and old name are the same
-	else if (newName != name && !newName.IsEmpty()) {	
-		
+	else if (newName != name && !newName.IsEmpty()) {
+
 		wxFileName sourceFile(FileListing->WorkingDir.GetPath(), name);
 		wxFileName destFile(FileListing->WorkingDir.GetPath(), newName);
-		
+
 		FileListing->StartRename(sourceFile, newName);
 	}
 	else {
@@ -656,18 +656,18 @@ int t4p::FileListingWidgetClass::ListImageId(const wxFileName& fileName) {
 }
 
 
-t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
+t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature,
 	t4p::ExplorerViewClass& view)
-: ModalExplorerGeneratedPanelClass(parent, id) 
+: ModalExplorerGeneratedPanelClass(parent, id)
 , FilesImageList(NULL)
 , SourcesImageList(NULL)
-, Feature(feature) 
+, Feature(feature)
 , View(view)
 , FilterChoice(ID_FILTER_ALL) {
 	FileListing = new t4p::FileListingClass(*this);
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
 	FilesImageList = new wxImageList(16, 16);
-	
+
 	t4p::FileTypeImageList(*FilesImageList);
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
@@ -681,8 +681,8 @@ t4p::ModalExplorerPanelClass::ModalExplorerPanelClass(wxWindow* parent, int id, 
 	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
 	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
 	t4p::HelpButtonIcon(HelpButton);
-	
-	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();	
+
+	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
 	FillSourcesList(sourceDirs);
 }
 
@@ -693,7 +693,7 @@ t4p::ModalExplorerPanelClass::~ModalExplorerPanelClass() {
 
 void t4p::ModalExplorerPanelClass::RefreshDir(const wxFileName& dir) {
 	ListLabel->SetLabel(wxT(""));
-	
+
 	// when user choose ALL show hidden files too
 	FileListing->StartRefresh(dir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
 }
@@ -727,7 +727,7 @@ void t4p::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& event) {
 	// root directories don't have parents
 	if (curDir.GetDirCount() > 0) {
 		curDir.RemoveLastDir();
-		if (curDir.IsOk()) {	
+		if (curDir.IsOk()) {
 			RefreshDir(curDir);
 		}
 	}
@@ -735,13 +735,13 @@ void t4p::ModalExplorerPanelClass::OnParentButtonClick(wxCommandEvent& event) {
 
 void t4p::ModalExplorerPanelClass::ShowDir() {
 	FileListingWidget->ShowDir();
-	
+
 	Directory->SetValue(FileListing->WorkingDir.GetPath());
 
 	std::vector<wxFileName> files = FileListing->Files;
 	std::vector<wxFileName>& dirs = FileListing->Dirs;
 	int totalFiles = FileListing->TotalFiles;
-	
+
 	wxString label;
 	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
@@ -759,7 +759,7 @@ void t4p::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 	if (index != -1) {
 		wxString name = List->GetItemText(index);
 
-		// ideally we dont need to query the file system, but cant seem to get the 
+		// ideally we dont need to query the file system, but cant seem to get the
 		// item image to tell if selected item is a dir or not
 		wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + name;
 		if (wxFileName::FileExists(fullPath)) {
@@ -792,7 +792,7 @@ void t4p::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
 		return;
 	}
 	else {
-		
+
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -805,8 +805,8 @@ void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	wxCommandEvent cmdEvt;
 	switch (keyCode) {
-		
-		// note that F2 does not really work; since it is the 
+
+		// note that F2 does not really work; since it is the
 		// default shortcut for 'go to next bookmark'
 		// It could be overwritten by using a wxAcceleratorTable
 		// but that would mean that the 'go to bookmark' shortcut
@@ -835,8 +835,8 @@ void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 }
 
 bool t4p::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
-	
-	// ideally we dont need to query the file system, but cant seem to get the 
+
+	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + text;
 	if (wxFileName::FileExists(fullPath)) {
@@ -860,7 +860,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
-			
+
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
@@ -869,7 +869,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			}
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
-			
+
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
@@ -907,7 +907,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
 		}
 		else if (!event.Success) {
-			
+
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -926,7 +926,7 @@ void t4p::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
 		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
-			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") +
 			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT("; ...");
 
 		wxString allFiles = wxT("*");
@@ -935,7 +935,7 @@ void t4p::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 		wxString sqlExtensions = Feature.App.Globals.FileTypes.SqlFileExtensionsString;
 		wxString jsExtensions = Feature.App.Globals.FileTypes.JsFileExtensionsString;
 		wxMenu menu;
-	
+
 		wxMenuItem* item;
 		item = menu.AppendRadioItem(ID_FILTER_ALL_SOURCE, wxString::Format(wxT("Source Code Files (%s)"), allExtensions.c_str()), _("Show All Source Code Files"));
 		item->Check(ID_FILTER_ALL_SOURCE == FilterChoice);
@@ -960,7 +960,7 @@ void t4p::ModalExplorerPanelClass::OnFilterButtonLeftDown(wxMouseEvent& event) {
 
 	// according to docs, always allow default processing of mouse down events to take place
 	//
-	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// The handler of this event should normally call event.Skip() to allow the default processing to take
 	// place as otherwise the window under mouse wouldn't get the focus.
 	event.Skip();
 }
@@ -1006,7 +1006,7 @@ void t4p::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName>
 	SourcesList->DeleteAllItems();
 	std::vector<wxFileName>::const_iterator dir;
 	for (dir = sourceDirs.begin(); dir != sourceDirs.end(); ++dir) {
-		
+
 		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
 		int newRowNumber = SourcesList->GetItemCount();
 		wxString newName = dir->GetDirs().Last();
@@ -1034,30 +1034,30 @@ void t4p::ModalExplorerPanelClass::FocusOnSourcesList() {
 }
 
 void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
-	
+
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
 	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
 	if (!ctrl) {
 		return;
 	}
-	
+
 	// ask the user whether they want to
 	// 1. open the new file and close the old one
 	// 2. open the new file and keep the old one open
-	// 3. don't open the new one and close the old one 
+	// 3. don't open the new one and close the old one
 	wxArrayString choices;
 	choices.Add(_("Open the new file and close the old one"));
 	choices.Add(_("Open the new file and keep the old one open"));
 	choices.Add(_("Don't open the new one and close the old file"));
-	
+
 	wxFileName newFile(oldFile.GetPath(), newName);
-	wxSingleChoiceDialog choiceDialog(NULL, 
-			oldFile.GetFullPath() + 
+	wxSingleChoiceDialog choiceDialog(NULL,
+			oldFile.GetFullPath() +
 			_("\nhas been renamed to \n") +
 			newFile.GetFullPath() +
 			_("\nWhat would you like to do?"),
-			_("File Rename"), 
+			_("File Rename"),
 			choices
 		);
 	choiceDialog.SetWindowStyle(wxCENTER | wxOK);
@@ -1080,7 +1080,7 @@ void t4p::ModalExplorerPanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 	RefreshDir(FileListing->WorkingDir);
 }
 
-t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, 
+t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature,
 	t4p::ExplorerViewClass& view)
 : ExplorerOutlineGeneratedPanelClass(parent, id)
 , FilesImageList(NULL)
@@ -1090,7 +1090,7 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	FileListing = new t4p::FileListingClass(*this);
 	FileListingWidget = new t4p::FileListingWidgetClass(List, FilesImageList, FileListing, this, &Feature);
 	FilesImageList = new wxImageList(16, 16);
-	
+
 	t4p::FileTypeImageList(*FilesImageList);
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("folder-horizontal")));
 	FilesImageList->Add(t4p::BitmapImageAsset(wxT("arrow-up")));
@@ -1100,7 +1100,7 @@ t4p::ExplorerOutlinePanelClass::ExplorerOutlinePanelClass(wxWindow* parent, int 
 	ParentButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("arrow-up")));
 	RefreshButton->SetBitmapLabel(t4p::BitmapImageButtonPrepAsset(wxT("outline-refresh")));
 	t4p::HelpButtonIcon(HelpButton);
-	
+
 	List->DeleteAllColumns();
 	List->InsertColumn(0, _(""));
 }
@@ -1121,7 +1121,7 @@ void t4p::ExplorerOutlinePanelClass::FillSourcesList(const std::vector<wxFileNam
 
 void t4p::ExplorerOutlinePanelClass::RefreshDir(const wxFileName& dir) {
 	ListLabel->SetLabel(wxT(""));
-	
+
 	// when user choose ALL show hidden files too
 	FileListing->StartRefresh(dir, FilterFileExtensions(), ID_FILTER_ALL == FilterChoice);
 }
@@ -1162,7 +1162,7 @@ void t4p::ExplorerOutlinePanelClass::OnParentButtonClick(wxCommandEvent& event) 
 	// root directories don't have parents
 	if (curDir.GetDirCount() > 0) {
 		curDir.RemoveLastDir();
-		if (curDir.IsOk()) {	
+		if (curDir.IsOk()) {
 			RefreshDir(curDir);
 		}
 	}
@@ -1172,8 +1172,8 @@ void t4p::ExplorerOutlinePanelClass::OnListKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	wxCommandEvent cmdEvt;
 	switch (keyCode) {
-		
-		// note that F2 does not really work; since it is the 
+
+		// note that F2 does not really work; since it is the
 		// default shortcut for 'go to next bookmark'
 		// It could be overwritten by using a wxAcceleratorTable
 		// but that would mean that the 'go to bookmark' shortcut
@@ -1203,13 +1203,13 @@ void t4p::ExplorerOutlinePanelClass::OnListKeyDown(wxKeyEvent& event) {
 
 void t4p::ExplorerOutlinePanelClass::ShowDir() {
 	FileListingWidget->ShowDir();
-	
+
 	Directory->SetValue(FileListing->WorkingDir.GetPath());
 
 	std::vector<wxFileName> files = FileListing->Files;
 	std::vector<wxFileName>& dirs = FileListing->Dirs;
 	int totalFiles = FileListing->TotalFiles;
-	
+
 	wxString label;
 	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
@@ -1227,7 +1227,7 @@ void t4p::ExplorerOutlinePanelClass::OnListMenuOpen(wxCommandEvent& event) {
 	if (index != -1) {
 		wxString name = List->GetItemText(index);
 
-		// ideally we dont need to query the file system, but cant seem to get the 
+		// ideally we dont need to query the file system, but cant seem to get the
 		// item image to tell if selected item is a dir or not
 		wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + name;
 		if (wxFileName::FileExists(fullPath)) {
@@ -1260,7 +1260,7 @@ void t4p::ExplorerOutlinePanelClass::OnListItemActivated(wxListEvent& event) {
 		return;
 	}
 	else {
-		
+
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -1270,8 +1270,8 @@ void t4p::ExplorerOutlinePanelClass::OnListItemActivated(wxListEvent& event) {
 }
 
 bool t4p::ExplorerOutlinePanelClass::OpenIfListFile(const wxString& text) {
-	
-	// ideally we dont need to query the file system, but cant seem to get the 
+
+	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + text;
 	if (wxFileName::FileExists(fullPath)) {
@@ -1295,7 +1295,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
-			
+
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
@@ -1304,7 +1304,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 			}
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
-			
+
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
@@ -1342,7 +1342,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
 		}
 		else if (!event.Success) {
-			
+
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -1361,7 +1361,7 @@ void t4p::ExplorerOutlinePanelClass::OnFilterButtonLeftDown(wxMouseEvent& event)
 	if (FilterButton->HitTest(point) == wxHT_WINDOW_INSIDE) {
 		wxString allExtensions = Feature.App.Globals.FileTypes.PhpFileExtensionsString + wxT(";") +
 			Feature.App.Globals.FileTypes.CssFileExtensionsString + wxT(";") +
-			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") + 
+			Feature.App.Globals.FileTypes.SqlFileExtensionsString  + wxT(";") +
 			Feature.App.Globals.FileTypes.JsFileExtensionsString  + wxT("; ...");
 
 		wxString allFiles = wxT("*");
@@ -1370,7 +1370,7 @@ void t4p::ExplorerOutlinePanelClass::OnFilterButtonLeftDown(wxMouseEvent& event)
 		wxString sqlExtensions = Feature.App.Globals.FileTypes.SqlFileExtensionsString;
 		wxString jsExtensions = Feature.App.Globals.FileTypes.JsFileExtensionsString;
 		wxMenu menu;
-	
+
 		wxMenuItem* item;
 		item = menu.AppendRadioItem(ID_FILTER_ALL_SOURCE, wxString::Format(wxT("Source Code Files (%s)"), allExtensions.c_str()), _("Show All Source Code Files"));
 		item->Check(ID_FILTER_ALL_SOURCE == FilterChoice);
@@ -1395,7 +1395,7 @@ void t4p::ExplorerOutlinePanelClass::OnFilterButtonLeftDown(wxMouseEvent& event)
 
 	// according to docs, always allow default processing of mouse down events to take place
 	//
-	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// The handler of this event should normally call event.Skip() to allow the default processing to take
 	// place as otherwise the window under mouse wouldn't get the focus.
 	event.Skip();
 }
@@ -1430,30 +1430,30 @@ void t4p::ExplorerOutlinePanelClass::OnFilterMenuCheck(wxCommandEvent& event) {
 }
 
 void t4p::ExplorerOutlinePanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
-	
+
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
 	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
 	if (!ctrl) {
 		return;
 	}
-	
+
 	// ask the user whether they want to
 	// 1. open the new file and close the old one
 	// 2. open the new file and keep the old one open
-	// 3. don't open the new one and close the old one 
+	// 3. don't open the new one and close the old one
 	wxArrayString choices;
 	choices.Add(_("Open the new file and close the old one"));
 	choices.Add(_("Open the new file and keep the old one open"));
 	choices.Add(_("Don't open the new one and close the old file"));
-	
+
 	wxFileName newFile(oldFile.GetPath(), newName);
-	wxSingleChoiceDialog choiceDialog(NULL, 
-			oldFile.GetFullPath() + 
+	wxSingleChoiceDialog choiceDialog(NULL,
+			oldFile.GetFullPath() +
 			_("\nhas been renamed to \n") +
 			newFile.GetFullPath() +
 			_("\nWhat would you like to do?"),
-			_("File Rename"), 
+			_("File Rename"),
 			choices
 		);
 	choiceDialog.SetWindowStyle(wxCENTER | wxOK);
@@ -1476,12 +1476,12 @@ void t4p::ExplorerOutlinePanelClass::OnFsWatcher(wxFileSystemWatcherEvent& event
 	RefreshDir(FileListing->WorkingDir);
 }
 
-t4p::ExplorerNewFileDialogClass::ExplorerNewFileDialogClass(wxWindow* parent, const wxString& title, 
+t4p::ExplorerNewFileDialogClass::ExplorerNewFileDialogClass(wxWindow* parent, const wxString& title,
 	const wxString& currentDir, wxString& fileName)
 : ExplorerNewFileGeneratedDialogClass(parent, wxID_ANY, title)
 , CurrentDir(currentDir)
 , FileName(fileName) {
-	
+
 	FileNameText->SetValue(fileName);
 	size_t index = FileName.find_last_of(wxT('.'));
 	FileNameText->SetFocus();
@@ -1523,7 +1523,7 @@ t4p::ExplorerOptionsPanelClass::ExplorerOptionsPanelClass(wxWindow* parent, int 
 	t4p::FilePickerValidatorClass fileManagerValidator(&feature.FileManagerExecutable);
 	FileManager->SetValidator(fileManagerValidator);
 	t4p::FilePickerValidatorClass shellValidator(&feature.ShellExecutable);
-	Shell->SetValidator(shellValidator);	
+	Shell->SetValidator(shellValidator);
 
 	TransferDataToWindow();
 }
@@ -1540,7 +1540,7 @@ BEGIN_EVENT_TABLE(t4p::ModalExplorerPanelClass, ModalExplorerGeneratedPanelClass
 	EVT_MENU(ID_FILTER_SQL, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_JS, t4p::ModalExplorerPanelClass::OnFilterMenuCheck)
 	EVT_FSWATCHER(wxID_ANY, t4p::ModalExplorerPanelClass::OnFsWatcher)
-	
+
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, t4p::ModalExplorerPanelClass::OnExplorerListComplete)
 END_EVENT_TABLE()
 
@@ -1556,7 +1556,7 @@ BEGIN_EVENT_TABLE(t4p::ExplorerOutlinePanelClass, ExplorerOutlineGeneratedPanelC
 	EVT_MENU(ID_FILTER_SQL, t4p::ExplorerOutlinePanelClass::OnFilterMenuCheck)
 	EVT_MENU(ID_FILTER_JS, t4p::ExplorerOutlinePanelClass::OnFilterMenuCheck)
 	EVT_FSWATCHER(wxID_ANY, t4p::ExplorerOutlinePanelClass::OnFsWatcher)
-	
+
 	EVT_EXPLORER_COMPLETE(ID_EXPLORER_LIST_ACTION, t4p::ExplorerOutlinePanelClass::OnExplorerListComplete)
 END_EVENT_TABLE()
 

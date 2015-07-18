@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,7 +41,7 @@ static const int SCHEMA_VERSION_DETECTOR = 9;
 
 t4p::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
-	, TagDbs() 
+	, TagDbs()
 	, Session() {
 
 }
@@ -60,7 +60,7 @@ void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator filename;
 	for (filename = TagDbs.begin(); filename != TagDbs.end() && !IsCancelled(); ++filename) {
 		try {
-			
+
 			// if file does not exist create it
 			// if the directory that the sqlite file should be in does not exist
 			// then dont create the dirs.
@@ -90,8 +90,8 @@ wxString t4p::TagCacheDbVersionActionClass::GetLabel() const {
 }
 
 t4p::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
-	: GlobalActionClass(runningThreads, eventId) 
-	, DetectorDbs() 
+	: GlobalActionClass(runningThreads, eventId)
+	, DetectorDbs()
 	, Session() {
 
 }

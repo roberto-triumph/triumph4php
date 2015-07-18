@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -126,11 +126,11 @@ BEGIN_EVENT_TABLE(t4p::TagFeatureClass, wxEvtHandler)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_CREATED,  t4p::TagFeatureClass::OnAppDirCreated)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_DIR_DELETED,  t4p::TagFeatureClass::OnAppDirDeleted)
 	EVT_APP_DIR_RENAMED(t4p::TagFeatureClass::OnAppDirRenamed)
-	
+
 	// we will treat new exernal file and file external modified the same
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_CREATED, t4p::TagFeatureClass::OnAppFileExternallyModified)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_FILE_EXTERNALLY_MODIFIED, t4p::TagFeatureClass::OnAppFileExternallyModified)
-	
+
 
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, t4p::TagFeatureClass::OnAppStartSequenceComplete)
 END_EVENT_TABLE()

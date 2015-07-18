@@ -120,11 +120,11 @@ static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePrefere
  * Set the font, EOL, tab options of the source control
  * Set generic defaults for plain text editing.
  */
-static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, 
+static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles,
 						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
 						   wxBitmap& searchHitBadBitmap, wxBitmap& bookmarkBitmap,
 						   wxBitmap& executionLineBitmap, wxBitmap& breakpointBitmap) {
-	
+
 	// caret, line, selection, margin colors
 	for (size_t i = 0; i < styles.size(); ++i) {
 		t4p::StylePreferenceClass pref = styles[i];
@@ -165,11 +165,11 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
 				break;
 		}
 	}
-	
-	
+
+
 	// set the search hit margin; we want this marker to be available to
 	// all file types
-	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, searchHitGoodBitmap); 
+	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_GOOD_MARKER, searchHitGoodBitmap);
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_SEARCH_HIT_BAD_MARKER, searchHitBadBitmap);
 	ctrl->MarkerDefineBitmap(t4p::CODE_CONTROL_BOOKMARK_MARKER, bookmarkBitmap);
 	ctrl->MarkerDefine(t4p::CODE_CONTROL_LINT_RESULT_MARKER, wxSTC_MARK_ARROW, *wxRED, *wxRED);
@@ -309,7 +309,7 @@ static void SetPlainTextOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsC
 }
 
 t4p::SyntaxHighlightViewClass::SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature)
-	: FeatureViewClass() 
+	: FeatureViewClass()
 	, Feature(feature) {
 }
 
@@ -331,39 +331,39 @@ void t4p::SyntaxHighlightViewClass::OnPreferencesSaved(wxCommandEvent& event) {
 
 void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl, t4p::CodeControlOptionsClass& options) {
 	if (t4p::FILE_TYPE_PHP == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPhpOptions(ctrl, options, Feature.App.Globals);
 	}
 	else if (t4p::FILE_TYPE_CSS == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetCssOptions(ctrl, options);
 	}
 	else if (t4p::FILE_TYPE_SQL == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetSqlOptions(ctrl, options, Feature.App.Globals);
 	}
 	else if (t4p::FILE_TYPE_JS == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetJsOptions(ctrl, options);
 	}
 	else if (t4p::FILE_TYPE_CONFIG == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
 	}
 	else if (t4p::FILE_TYPE_CRONTAB == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
 	}
 	else if (t4p::FILE_TYPE_YAML == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 
@@ -372,7 +372,7 @@ void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl
 		ctrl->SetLexer(wxSTC_LEX_YAML);
 	}
 	else if (t4p::FILE_TYPE_XML == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
@@ -384,25 +384,25 @@ void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
 	}
 	else if (t4p::FILE_TYPE_LUA == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
 	}
 	else if (t4p::FILE_TYPE_MARKDOWN == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
 	}
 	else if (t4p::FILE_TYPE_BASH == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
 	}
 	else if (t4p::FILE_TYPE_DIFF == ctrl->GetFileType()) {
-		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_DIFF);
@@ -412,7 +412,7 @@ void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl
 
 		// plain text files don't have a lexer, but we still want to
 		// set a default background and foreground color
-		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap, 
+		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 	}
 
@@ -428,7 +428,7 @@ void t4p::SyntaxHighlightViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 }
 
 void t4p::SyntaxHighlightViewClass::OnAppReady(wxCommandEvent& event) {
-	
+
 	// load the images once at startup
 	LoadMarkerBitmaps();
 }
@@ -451,17 +451,17 @@ void t4p::SyntaxHighlightViewClass::LoadMarkerBitmaps() {
 	}
 }
 
-t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent, 
+t4p::EditColorsPanelClass::EditColorsPanelClass(wxWindow* parent,
 	t4p::SyntaxHighlightFeatureClass& feature,
 	t4p::SyntaxHighlightViewClass& view)
 : SyntaxHighlightPanelGeneratedClass(parent)
 , CodeControlOptions(feature.App.Preferences.CodeControlOptions)
 , EditedCodeControlOptions(feature.App.Preferences.CodeControlOptions)
-, PhpCodeCtrl(NULL) 
-, SqlCodeCtrl(NULL) 
-, CssCodeCtrl(NULL) 
-, JsCodeCtrl(NULL) 
-, Globals() 
+, PhpCodeCtrl(NULL)
+, SqlCodeCtrl(NULL)
+, CssCodeCtrl(NULL)
+, JsCodeCtrl(NULL)
+, Globals()
 , EventSink()
 , View(view) {
 	for (size_t i = 0; i < EditedCodeControlOptions.PhpStyles.size(); ++i) {
@@ -557,7 +557,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	);
 	PhpCodeCtrl->SetText(txt);
 	View.ApplyPreferences(PhpCodeCtrl, EditedCodeControlOptions);
-	
+
 	SqlCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
@@ -573,7 +573,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	SqlCodeCtrl->SetText(txt);
 	PreviewNotebook->AddPage(SqlCodeCtrl, _("SQL"));
 	View.ApplyPreferences(SqlCodeCtrl, EditedCodeControlOptions);
-	
+
 	CssCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
@@ -588,7 +588,7 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 	CssCodeCtrl->SetText(txt);
 	PreviewNotebook->AddPage(CssCodeCtrl, _("CSS"));
 	View.ApplyPreferences(CssCodeCtrl, EditedCodeControlOptions);
-	
+
 	JsCodeCtrl = new t4p::CodeControlClass(this,
 		EditedCodeControlOptions,
 		&Globals, EventSink, wxID_ANY);
@@ -610,9 +610,9 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 }
 
 bool t4p::EditColorsPanelClass::TransferDataFromWindow() {
-	
+
 	// ATTN: only copy the styles
-	// do not copy the other flags (editor behavior) since 
+	// do not copy the other flags (editor behavior) since
 	// they are being edited in the editor behavtior panel
 	// if we just copy the entire EditedCodeControlOption
 	// the we would revert the user's changes
@@ -712,7 +712,7 @@ void t4p::EditColorsPanelClass::OnFontChanged(wxFontPickerEvent& event) {
 	if (pref) {
 		wxFont font = event.GetFont();
 		pref->Font = font;
-		
+
 		PhpCodeCtrl->ApplyPreferences();
 		SqlCodeCtrl->ApplyPreferences();
 		CssCodeCtrl->ApplyPreferences();

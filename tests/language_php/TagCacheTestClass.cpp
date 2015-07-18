@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,8 +36,8 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 /**
- * fixture that holds the object under test for 
- * the resource collection tests 
+ * fixture that holds the object under test for
+ * the resource collection tests
  */
 class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 
@@ -55,14 +55,14 @@ public:
 		: FileTestFixtureClass(wxT("resource-cache"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache()
-		, Search() 
+		, Search()
 		, PhpFileExtensions()
 		, MiscFileExtensions()
-		, Matches() 
+		, Matches()
 		, SourceDirs() {
 		Search.Init(TestProjectDir);
 		PhpFileExtensions.push_back(wxT("*.php"));
-		
+
 		// create the test dir, since FileTestFixture class is lazy
 		if (!wxDirExists(TestProjectDir)) {
 			wxMkdir(TestProjectDir, 0777);
@@ -87,11 +87,11 @@ public:
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-			
+
 		wxFileName srcDir;
 		srcDir.AssignDir(TestProjectDir + srcDirectory);
 		SourceDirs.push_back(srcDir);
-			
+
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
 		cache->Walk(Search);
@@ -133,8 +133,8 @@ public:
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
 	soci::session* Session1;
-	
-	ExpressionCompletionMatchesFixtureClass() 
+
+	ExpressionCompletionMatchesFixtureClass()
 		: FileTestFixtureClass(wxT("tag-cache"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagCache()
@@ -162,18 +162,18 @@ public:
 		Scope.MethodName = UNICODE_STRING_SIMPLE("");
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(*Session1, t4p::ResourceSqlSchemaAsset());
-		
+
 		wxFileName srcDir;
 		srcDir.AssignDir(TestProjectDir + wxT("src"));
 		SourceDirs.push_back(srcDir);
 	}
-	
+
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& methodName) {
 		ParsedVariable.Clear();
 		pelet::VariablePropertyClass classProp;
 		classProp.Name = variableName;
 		ParsedVariable.ChainList.push_back(classProp);
-		
+
 		pelet::VariablePropertyClass methodProp;
 		methodProp.Name = methodName;
 		ParsedVariable.ChainList.push_back(methodProp);
@@ -190,7 +190,7 @@ public:
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-		
+
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
 		cache->Walk(Search);
@@ -214,10 +214,10 @@ public:
 	TagCacheSearchFixtureClass()
 		: FileTestFixtureClass(wxT("tag-cache"))
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
-		, TagCache() 
-		, Search() 
-		, PhpFileExtensions() 
-		, MiscFileExtensions() 
+		, TagCache()
+		, Search()
+		, PhpFileExtensions()
+		, MiscFileExtensions()
 		, Session1(NULL) {
 		PhpFileExtensions.push_back(wxT("*.php"));
 		Session1 = new soci::session(*soci::factory_sqlite3(), ":memory:");
@@ -227,7 +227,7 @@ public:
 	t4p::TagFinderListClass* CreateTagFinderList(const wxString& srcDirectory) {
 		t4p::TagFinderListClass* cache = new t4p::TagFinderListClass();
 		cache->CreateGlobalTag(PhpFileExtensions, MiscFileExtensions, pelet::PHP_53);
-			
+
 		// must call init() here since we want to parse files from disk
 		Search.Init(TestProjectDir + srcDirectory);
 		cache->Walk(Search);
@@ -238,9 +238,9 @@ public:
 SUITE(TagCacheTestClass) {
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFinderList) {
-	
+
 	// in this test we will create a class in file1; file2 will use that class
-	// the TagCache object should be able to detect the variable type of 
+	// the TagCache object should be able to detect the variable type of
 	// the variable in file2
 	wxString code1 =  wxT("<?php class ActionYou  { function w() {} }");
 	Code2 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
@@ -248,10 +248,10 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 
 	t4p::WorkingCacheClass* cache1 = CreateWorkingCache(File2, Code2);
 	t4p::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
-	
+
 	CHECK(TagCache.RegisterWorking(File2, cache1));
 	TagCache.RegisterGlobal(cache2);
-	
+
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	TagCache.ExpressionCompletionMatches(File2, ParsedVariable, Scope, SourceDirs,
 		VariableMatches, TagMatches, DoDuckTyping, Error);
@@ -260,20 +260,20 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 }
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderList) {
-	
+
 	// in this test we will create a class in file2; file1 will use that class
-	// the ResourceUpdate object should be able to detect the variable type of 
+	// the ResourceUpdate object should be able to detect the variable type of
 	// the variable in file1
 	Code1 = UNICODE_STRING_SIMPLE("<?php $action = new ActionYou(); $action->w(); ");
 	GlobalCode = wxT("<?php class ActionYou  { function w() {} }");
 	CreateFixtureFile(GlobalFile, GlobalCode);
-	
+
 	t4p::WorkingCacheClass* cache1 = CreateWorkingCache(File1, Code1);
 	t4p::TagFinderListClass* cache2 = CreateTagFinderList(wxT("src"));
-	
+
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
-	
+
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("w"));
 	TagCache.ResourceMatches(File1, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -300,7 +300,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 
 	CHECK(TagCache.RegisterWorking(File1, cache1));
 	TagCache.RegisterGlobal(cache2);
-	
+
 	ToProperty(UNICODE_STRING_SIMPLE("$action"), UNICODE_STRING_SIMPLE("methodA"));
 	TagCache.ResourceMatches(File1, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -312,7 +312,7 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches
 	// ie. the user opening a file.
 	t4p::WorkingCacheClass* cache3 = CreateWorkingCache(GlobalFile, Code2);
 	CHECK(TagCache.RegisterWorking(GlobalFile, cache3));
-	
+
 	TagMatches.clear();
 	TagCache.ResourceMatches(GlobalFile, ParsedVariable, Scope, SourceDirs,
 		TagMatches, DoDuckTyping, DoFullyQualifiedMatchOnly, Error);
@@ -323,10 +323,10 @@ TEST_FIXTURE(TagCacheSearchFixtureClass, ExactTags) {
 	wxString code = wxT("<?php class ActionYou  { function w() {} }");
 	CreateSubDirectory(wxT("src"));
 	CreateFixtureFile(wxT("src") + wxString(wxFileName::GetPathSeparator()) + wxT("file1.php"), code);
-	
+
 	t4p::TagFinderListClass* cache = CreateTagFinderList(wxT("src"));
 	TagCache.RegisterGlobal(cache);
-	
+
 	// empty means search all dirs
 	std::vector<wxFileName> searchDirs;
 	t4p::TagResultClass* result = TagCache.ExactTags(UNICODE_STRING_SIMPLE("ActionYou"), searchDirs);

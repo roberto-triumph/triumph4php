@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@
 #include <map>
 #include <wx/thread.h>
 #include <wx/event.h>
- 
+
 namespace t4p {
 
 // forward declarations
@@ -69,7 +69,7 @@ public:
 	wxString FileName;
 
 	/**
-	 * A unique, *non-empty* identifier string. 
+	 * A unique, *non-empty* identifier string.
 	 */
 	wxString FileIdentifier;
 
@@ -87,29 +87,29 @@ public:
 	 * In the case the give code has a syntax error this symbol table is built by using the
 	 * previous table's variables, then tokenizing the given code to add any additional
 	 * variables not found in the previous table.
-	 * 
+	 *
 	 * @param fileName the full path to the file being parsed
-	 * @param fileIdentifier  A unique, *non-empty* identifier string. 
+	 * @param fileIdentifier  A unique, *non-empty* identifier string.
 	 * @param isNew TRUE if the user is editing a new file
 	 * @param version the PHP version that the parser will check against
 	 * @param createSymbols if TRUE then the symbol table is built from the file
 	 *        if this is true then fileName must be a valid full path
 	 * @param previousSymbolTable used when code has a syntax error.
 	 */
-	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version, 
+	void Init(const wxString& fileName, const wxString& fileIdentifier, bool isNew, pelet::Versions version,
 		bool createSymbols, const t4p::SymbolTableClass& previousSymbolTable);
 
 	/**
-	 * Will parse the resources and determine type information for the given text 
+	 * Will parse the resources and determine type information for the given text
 	 * and store the results into the this cache.
-	 * 
+	 *
 	 * This method accepts the previously created symbol table, so that in case the given code
 	 * has a syntax error, we can use the previously built table's variables; that way code completion
 	 * can work even on files that contain syntax errors.
 	 * In the case the give code has a syntax error this symbol table is built by using the
 	 * previous table's variables, then tokenizing the given code to add any additional
 	 * variables not found in the previous table.
-	 * 
+	 *
 	 * @param code the file's most up-to-date source code (from the user-edited buffer)
 	 * @param previousSymbolTable used when code has a syntax error.
 	 * @return bool TRUE if code did not contain a syntax error
@@ -122,34 +122,34 @@ private:
 
 /**
  * This class represents all the most up-to-date resources of the currently opened project
- * in Triumph.  It consists of a series of "global" caches together with a 
+ * in Triumph.  It consists of a series of "global" caches together with a
  * separate cache for all files that are being edited.  The reason for putting opened files
  * in their own cache is for speed and accuracy; while a file is being edited (but the new
- * contents have not yet been flushed to disk) we can parse the code control content for resources without 
+ * contents have not yet been flushed to disk) we can parse the code control content for resources without
  * disturbing the global-wide cache; lookups are faster because the cache won't need to re-sort
  * the entire global list of resources since the resources from files that are not openeed are not affected.
- * Lookups are also accurate because we can parse contents that have not yet been parsed, allowing code 
+ * Lookups are also accurate because we can parse contents that have not yet been parsed, allowing code
  * completion to be helpful on code not yet saved.
  *
- * Since TagCacheClass is backed by ParsedTagFinderClass, the global tag finders 
- * are stored on disk and are preserved across application restarts. 
+ * Since TagCacheClass is backed by ParsedTagFinderClass, the global tag finders
+ * are stored on disk and are preserved across application restarts.
  *
  * Note that NONE of the methods of this class can be safely accessed by multiple
- * threads. Concurrency is achieved by creating separate instances of 
+ * threads. Concurrency is achieved by creating separate instances of
  * TagCacheClass with both pointing to the same DB files.
  */
 class TagCacheClass {
-	
+
 public:
 
 	TagCacheClass();
-	
+
 	~TagCacheClass();
-	
+
 	/**
-	 * Creates a new tag finder for the given file. This should be called 
+	 * Creates a new tag finder for the given file. This should be called
 	 * when the user opens a file.
-	 * 
+	 *
 	 * @param fileName unique identifier for a file
 	 * @param cache the working cache. Must have been initialized.
 	 *         This object will own the pointer and will delete
@@ -157,12 +157,12 @@ public:
 	 *         returns FALSE, then this object will NOT take ownership of the pointer and
 	 *         the caller must delete it.
 	 * @return bool TRUE if fileName was not previously registered
-	 * only a unique fileName can be registered 
+	 * only a unique fileName can be registered
 	 */
 	bool RegisterWorking(const wxString& fileName, t4p::WorkingCacheClass* cache);
 
 	/**
-	 * Updates the working cache for a given file. Cache should be updated often 
+	 * Updates the working cache for a given file. Cache should be updated often
 	 * so that the ExpressionCompletionMatches and ResourceMatches will return up-to-date info.
 	 * This method assumes that the cache is ready, ie. Update() method has been called
 	 * on it.
@@ -172,15 +172,15 @@ public:
 	 *        ownership of the cache, unlike RegisterWorking() method
 	 */
 	bool ReplaceWorking(const wxString& fileName, t4p::WorkingCacheClass* cache);
-	
+
 	/**
 	 * Cleans up the tag finder from the given file. This should be called whenever
 	 * the user is no longer editing the file.
-	 * 
+	 *
 	 * @param fileName unique identifier for a file
 	 */
 	void RemoveWorking(const wxString& fileName);
-	
+
 	/**
 	 * Get the working cache for a file. This should only be used as a last-resort;
 	 * it is preferred to use the other accessor methods instead ie. ExactTags, et al.
@@ -193,23 +193,23 @@ public:
 
 	/**
 	 * Set the global cache. After a call
-	 * to this method, the cache is available for use by 
+	 * to this method, the cache is available for use by
 	 * the ExpressionCompletionMatches and ResourceMatches methods
-	 * 
+	 *
 	 * @param tagFinderList this class will own the pointer
 	 */
 	void RegisterGlobal(t4p::TagFinderListClass* tagFinderList);
 
 	/**
 	 * Set the global cache using the default settings (from Asset). After a call
-	 * to this method, the cache is available for use by 
+	 * to this method, the cache is available for use by
 	 * the ExpressionCompletionMatches and ResourceMatches methods
 	 * This method clones data structures where necessary, so that this
 	 * TagCache can be used from a separate thread than where globals
 	 * resides
 	 */
 	void RegisterDefault(t4p::GlobalsClass& globals);
-	
+
 	/**
 	 * Searches the parsed tag finder
 	 * Will return only for full exact matches (it will call ExactTags).
@@ -238,7 +238,7 @@ public:
 	 *          returned pointer must be deleted by the caller.
 	 */
 	t4p::DetectedTagExactMemberResultClass* ExactDetectedTags(const UnicodeString& search, const std::vector<wxFileName>& searchDirs);
-	
+
 	/**
 	 * Searches the tag cache using near-match logic
 	 *
@@ -293,7 +293,7 @@ public:
 	 * Will return only for full exact matches (it will call ExactClassOrFile
 	 * on each tag finder).
 	 * @param search string to search for
-	 * @return std::vector<t4p::PhpTagClass> matched resources. will be either files or classes 
+	 * @return std::vector<t4p::PhpTagClass> matched resources. will be either files or classes
 	 */
 	std::vector<t4p::PhpTagClass> ExactClassOrFile(const UnicodeString& search);
 
@@ -334,7 +334,7 @@ public:
 	 * @return std::vector<t4p::PhpTagClass> matched resources. will be function tags only
 	 */
 	std::vector<t4p::PhpTagClass> ExactProperty(const UnicodeString& search, bool onlyStatic);
-	
+
 	/**
 	 * Searches all the registered caches (working AND global caches)
 	 * Will return near matches (it will call NearMatchClassesOrFiles
@@ -344,19 +344,19 @@ public:
 	 * @return std::vector<t4p::PhpTagClass> matched resources. will be either files or classes
 	 */
 	std::vector<t4p::PhpTagClass> NearMatchClassesOrFiles(const UnicodeString& search);
-	
+
 	/**
 	 * prepares the given result against the global tag cache
-	 * 
+	 *
 	 * @param result the statement to prepare
 	 * @param doLimit if TRUE the query will have a limit added to it
 	 * @return bool TRUE if the result was successfully prepared
 	 */
 	bool GlobalPrepare(t4p::SqliteResultClass& result, bool doLimit);
-	
+
 	/**
 	 * prepares the given result against the native tag cache
-	 * 
+	 *
 	 * @param result the statement to execute
 	 * @param doLimit if TRUE the query will have a limit added to it
 	 * @return bool TRUE if the result was successfully prepared
@@ -366,10 +366,10 @@ public:
 	/**
 	 * gets all tags for a single class
 	 * @param fullyQualifiedClassName the class to search.  fully qualified (with namespace)
-	 * @param fileTagId the file in which the class is found in. this is to filter out 
+	 * @param fileTagId the file in which the class is found in. this is to filter out
 	 *        classes if the same class name is found in multiple files
-	 * @param sourceDirs the source directories to look in 
-	 * @return vector of tags; 
+	 * @param sourceDirs the source directories to look in
+	 * @return vector of tags;
 	 *         all methods and properties that are defined in the class PLUS
 	 *         all methods and properties that are defined in any of its base classes PLUS
 	 *         all methods and properties that are defined in any of the traits used by any of the base classes
@@ -381,22 +381,22 @@ public:
 	 * inherited members) are returned as well.
 	 *
 	 * @param fullPath full path to a file to lookup
-	 * @return vector of tags; 
+	 * @return vector of tags;
 	 *         all classes, functions or define's in the give file
 	 */
-	std::vector<t4p::PhpTagClass> AllClassesFunctionsDefines(const wxString& fullPath); 
-	
+	std::vector<t4p::PhpTagClass> AllClassesFunctionsDefines(const wxString& fullPath);
+
 	/**
 	 * Collects all near matches that are possible candidates for completion of the parsed variable.
 	 * Basically just a calls the ExpressionCompletionResourceMatches() of the given file's SymbolTable. See that method for more info
-	 * 
+	 *
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @param parsedVariable the parsed variable to be completed; from ParserClass::ParseExpression() 
+	 * @param parsedVariable the parsed variable to be completed; from ParserClass::ParseExpression()
 	 * @param variableScope the scope where parsed variable is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
 	 * @param autoCompleteVariableList the results of the matches; these are the names of the variables that
-	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable. 
+	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable.
 	 * @param autoCompleteResourceList the results of the matches; these are the names of the items that
 	 *        are "near matches" to the parsed expression. This will be filled only when parsedExpression is a variable "chain" or
 	 *        a function / static class call.
@@ -405,9 +405,9 @@ public:
 	 *        slower because ParsedTagFinderClass still handles them
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ExpressionCompletionMatches(const wxString& fileName, 
-		const pelet::VariableClass& parsedVariable, 
-		const pelet::ScopeClass& variableScope, 
+	void ExpressionCompletionMatches(const wxString& fileName,
+		const pelet::VariableClass& parsedVariable,
+		const pelet::ScopeClass& variableScope,
 		const std::vector<wxFileName>& sourceDirs,
 		std::vector<UnicodeString>& autoCompleteList,
 		std::vector<t4p::PhpTagClass>& autoCompleteResourceList,
@@ -417,9 +417,9 @@ public:
 	/**
 	 * This method will resolve the given parsed variable and will figure out the type of a tag.
 	 * Basically just a calls the ResourceMatches() of the given file's SymbolTable. See that method for more info
-	 * 
+	 *
 	 * @param fileName the symbol table of this registered file will be searched
-	 * @param parsedVariable the parsed variable to lookup; from ParserClass::ParseExpression() 
+	 * @param parsedVariable the parsed variable to lookup; from ParserClass::ParseExpression()
 	 * @param variableScope the scope where parsed variable is located.  The scope let's us know which variables are
 	 *        available. See ScopeFinderClass for more info.
 	 * @param sourceDirs the list of enabled source directories, only tags whose source_id matches source directories will be returned
@@ -431,14 +431,14 @@ public:
 	 *        returned
 	 * @param error any errors / explanations will be populated here. error must be set to no error (initial state of object; or use Clear())
 	 */
-	void ResourceMatches(const wxString& fileName, 
-		const pelet::VariableClass& parsedVariable, 
-		const pelet::ScopeClass& variableScope, 
+	void ResourceMatches(const wxString& fileName,
+		const pelet::VariableClass& parsedVariable,
+		const pelet::ScopeClass& variableScope,
 		const std::vector<wxFileName>& sourceDirs,
 		std::vector<t4p::PhpTagClass>& matches,
 		bool doDuckTyping, bool doFullyQualifiedMatchOnly,
 		SymbolTableMatchErrorClass& error);
-	
+
 	/**
 	 * Returns the tags that matched the identifier in the given position
 	 *
@@ -452,16 +452,16 @@ public:
 	 * @return tag matches
 	 */
 	std::vector<t4p::PhpTagClass> GetTagsAtPosition(
-		const wxString& fileName, 
+		const wxString& fileName,
 		const UnicodeString& code, int posToCheck,
 		const std::vector<wxFileName>& sourceDirs, t4p::GlobalsClass& globals,
 		wxString& status);
-		
+
 	/**
 	 * print the tag cache to stdout. Really only useful for debugging and not much else
 	 */
 	void Print();
-	
+
 	/**
 	 * @return TRUE if the cache has not been initialized with either a call to RegisterWorking(), RegisterGlobal() or a call to WalkGlobal()
 	 */
@@ -471,7 +471,7 @@ public:
 	 * @return TRUE if the cache has not been initialized with either a call to RegisterWorking(), RegisterGlobal() or a call to WalkGlobal()
 	 */
 	bool IsResourceCacheEmpty();
-	
+
 	/**
 	 * Remove all items from all caches and also unregisters any and all files.
 	 */
@@ -486,7 +486,7 @@ public:
 
 	/**
 	 * retrieves a tag by its ID
-	 * 
+	 *
 	 * @param id the ID to query for
 	 * @param tag out parameter, will be filled in with the tag data
 	 * @return bool TRUE if the ID was found
@@ -514,23 +514,23 @@ public:
 	 * @return bool TRUE if the directory was seen by the tag parser
 	 */
 	bool HasDir(const wxString& dir);
-	 
+
 private:
-		
+
 	/**
 	 * Returns a list that contains all of the tag finders for the registered files plus
 	 * the global tag finders.
-	 * 
+	 *
 	 * This clas owns the tag finder pointers, do NOT delete them
 	 */
 	std::vector<t4p::ParsedTagFinderClass*> AllFinders();
-	
+
 	/**
 	 * These are the tag finders from the ALL projects and native functions; it may include stale resources
 	 * This class will own the pointer and will delete them when appropriate.
 	 */
 	t4p::TagFinderListClass* TagFinderList;
-	
+
 	/**
 	 * To calculate variable type information
 	 * This class will own these pointers and will delete them when appropriate.
@@ -539,7 +539,7 @@ private:
 };
 
 /**
- * Event that will hold the results of a tag finder 
+ * Event that will hold the results of a tag finder
  * parsing an entire directory.
  */
 extern const wxEventType EVENT_WORKING_CACHE_COMPLETE;
@@ -563,12 +563,12 @@ public:
 	 * @param evetId the event ID
 	 * @param fileName full path to the file that was parsed. note that this may
 	 *        not be unique; it can be empty if a "new" code control is being
-	 *        parsed 
+	 *        parsed
 	 * @param fileIdentifier a unique string
 	 * @param workingCache the parsed tag data for the file.
 	 *        this pointer will be owned by the event handler.
 	 */
-	WorkingCacheCompleteEventClass(int eventId, 
+	WorkingCacheCompleteEventClass(int eventId,
 		const wxString& fileName, const wxString& fileIdentifier, t4p::WorkingCacheClass* workingCache);
 
 	wxEvent* Clone() const;
@@ -584,7 +584,7 @@ public:
 	wxString GetFileName() const;
 
 private:
-	
+
 	wxString FileName;
 
 	wxString FileIdentifier;

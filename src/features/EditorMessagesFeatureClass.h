@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,7 +29,7 @@
 #include <wx/log.h>
 
 namespace t4p {
-	
+
 /**
  * event that gets generated whenever we get a log message from the
  * wxWidgets logging system. when we get a log message from the wxWidgets
@@ -46,9 +46,9 @@ public:
 	wxString Message;
 	wxLogLevel Level;
 	time_t Timestamp;
-	
+
 	EditorLogEventClass(const wxString& msg, wxLogLevel level, time_t timestamp);
-	
+
 	wxEvent* Clone() const;
 };
 
@@ -62,24 +62,24 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
 
 
 /**
- * This class is the handler for the editor message menu items.  
+ * This class is the handler for the editor message menu items.
  */
 class EditorMessagesFeatureClass : public FeatureClass {
 
 public:
 
 	EditorMessagesFeatureClass(t4p::AppClass& app);
-	
+
 private:
 
 	void OnAppReady(wxCommandEvent& event);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
 /**
  * This class will take care of receiving the log messages
- * and proxying them to the feature. 
+ * and proxying them to the feature.
  * It is done this way because wxWidgets will delete the Log target
  * (pointer given to wxLog::SetLogTarget()) so we need to
  * give it a pointer that is managed by wxWidgets

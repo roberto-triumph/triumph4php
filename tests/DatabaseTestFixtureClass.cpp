@@ -1,16 +1,16 @@
 /*
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,14 +25,14 @@
 #include <DatabaseTestFixtureClass.h>
 #include <soci/mysql/soci-mysql.h>
 #include <stdio.h>
- 
-// these macros will expand a macro into its 
+
+// these macros will expand a macro into its
 // these are needed to expand the DB user/pwd which
 // are given as macros by the premake script
 #define T4P_STR_EXPAND(s) #s
 #define T4P_STR(s) T4P_STR_EXPAND(s)
- 
- 
+
+
 DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDatabaseName)
 	: Session()
 	, ConnectionString("host=127.0.0.1 port=3306 user=") {
@@ -47,7 +47,7 @@ DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDataba
 	CreateDatabase(testDatabaseName);
 	Exec("USE " + testDatabaseName);
 }
-	
+
 DatabaseTestFixtureClass::~DatabaseTestFixtureClass() {
 	Session.close();
 }
@@ -81,7 +81,7 @@ bool DatabaseTestFixtureClass::CreateDatabase(const std::string& name) {
 bool DatabaseTestFixtureClass::Exec(const std::string& query) {
 	soci::statement stmt = (Session.prepare << query);
 	try {
-		
+
 		// execute returns true only when there are results; we want to return
 		// true on success
 		stmt.execute(false);

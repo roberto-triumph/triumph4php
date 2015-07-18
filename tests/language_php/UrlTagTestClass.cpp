@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,24 +45,24 @@ public:
 	UrlTagFixtureClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, Finder(DetectorTagSession)
-		, SourceDirs() 
+		, SourceDirs()
 		, SourceId(0) {
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(DetectorTagSession, t4p::DetectorSqlSchemaAsset());
-		
+
 		wxFileName tmpDir;
 		tmpDir.AssignDir(wxStandardPaths::Get().GetTempDir());
 		SourceDirs.push_back(tmpDir);
 		std::string stdDir = t4p::WxToChar(tmpDir.GetPathWithSep());
-		
+
 		// create the source
 		soci::statement stmt = (DetectorTagSession.prepare << "INSERT INTO sources(directory) VALUES(?)",
 			soci::use(stdDir));
 		stmt.execute(true);
 		soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
 		SourceId = sqlite3_last_insert_rowid(backend->session_.conn_);
-	
-		AddToDb1("http://localhost/index.php", 
+
+		AddToDb1("http://localhost/index.php",
 			"/home/user/welcome.php", "WelcomeController", "index");
 		AddToDb1("http://localhost/frontend.php",
 			"/home/user/frontend.php", "FrontendController", "action");
@@ -100,7 +100,7 @@ TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 	CHECK(Finder.FindByUrl(toFind, SourceDirs, urlTag));
 	CHECK(toFind == urlTag.Url);
 	CHECK_EQUAL(wxT("http://localhost/frontend.php"), urlTag.Url.BuildURI());
-	
+
 	// use filename to compare because we want this test to run on windows and on
 	// linux without needing modifications
 	CHECK(wxFileName(wxT("/home/user/frontend.php")) == urlTag.FileName);

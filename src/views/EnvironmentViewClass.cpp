@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,14 +40,14 @@ t4p::ApacheEnvironmentPanelClass::ApacheEnvironmentPanelClass(wxWindow* parent, 
 	, RunningActionId(0) {
 	RunningThreads.AddEventHandler(this);
 	EditedApache = environment.Apache;
-	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);	
+	wxGenericValidator manualValidator(&EditedApache.ManualConfiguration);
 	Manual->SetValidator(manualValidator);
-	
+
 	VirtualHostList->ClearAll();
 	VirtualHostList->InsertColumn(0, _("Root Directory"));
 	VirtualHostList->InsertColumn(1, _("Host Name"));
-	
-	// in case there are no virtual hosts still properly show the columns 
+
+	// in case there are no virtual hosts still properly show the columns
 	VirtualHostList->SetColumnWidth(0, 250);
 	VirtualHostList->SetColumnWidth(1, 250);
 	Populate();
@@ -85,10 +85,10 @@ void t4p::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 		}
 	}
 	else {
-		
+
 		// act like a stop button
 		Gauge->SetValue(0);
-		
+
 
 		RunningThreads.CancelAction(RunningActionId);
 		RunningActionId = 0;
@@ -116,7 +116,7 @@ void t4p::ApacheEnvironmentPanelClass::Populate() {
 }
 
 void t4p::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event) {
-		
+
 	// copy the result apache object to overwrite what is shown in the dialog
 	EditedApache.Copy(event.Apache);
 	Populate();
@@ -144,13 +144,13 @@ void t4p::ApacheEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 
 void t4p::ApacheEnvironmentPanelClass::OnAddButton(wxCommandEvent& event) {
 	wxFileName rootDirectory;
-	wxString hostName; 
+	wxString hostName;
 	t4p::VirtualHostCreateDialogClass dialog(this, EditedApache.GetVirtualHostMappings(), hostName, rootDirectory);
 	if (wxOK == dialog.ShowModal()) {
 		ListCtrlAdd(VirtualHostList, rootDirectory.GetFullPath(), hostName);
 		VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 		VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
-		
+
 		EditedApache.SetVirtualHostMapping(rootDirectory.GetFullPath(), hostName);
 		VirtualHostList->SetItemState(VirtualHostList->GetItemCount() - 1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
@@ -161,7 +161,7 @@ void t4p::ApacheEnvironmentPanelClass::OnUpdateUi(wxUpdateUIEvent& event) {
 	RemoveButton->Enable(enableButtons);
 	EditButton->Enable(enableButtons);
 	AddButton->Enable(enableButtons);
-	
+
 	// scan button is only for automatic configuration mode
 	ScanButton->Enable(!enableButtons && !ApacheConfigurationDirectory->GetPath().IsEmpty());
 	ApacheConfigurationDirectory->Enable(!enableButtons);
@@ -181,7 +181,7 @@ void t4p::ApacheEnvironmentPanelClass::OnEditButton(wxCommandEvent& event) {
 			ListCtrlEdit(VirtualHostList, newRootDirectory.GetFullPath(), newHostName, selection);
 			VirtualHostList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 			VirtualHostList->SetColumnWidth(1, wxLIST_AUTOSIZE);
-		
+
 			// in case the root directory changes
 			EditedApache.RemoveVirtualHostMapping(oldRootDirectory);
 			EditedApache.SetVirtualHostMapping(newRootDirectory.GetFullPath(), newHostName);
@@ -195,7 +195,7 @@ void t4p::ApacheEnvironmentPanelClass::OnRemoveButton(wxCommandEvent& event) {
 		wxString oldRootDirectory,
 			oldHostName;
 		ListCtrlGet(VirtualHostList, oldRootDirectory, oldHostName, selected);
-		VirtualHostList->DeleteItem(selected);		
+		VirtualHostList->DeleteItem(selected);
 		EditedApache.RemoveVirtualHostMapping(oldRootDirectory);
 	}
 }
@@ -229,7 +229,7 @@ void t4p::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event)
 	}
 	else {
 		wxMessageBox(_("Scan is already running. Stop and restart the scan so that the new directory can be scanned."));
-	}	
+	}
 }
 
 t4p::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, t4p::EnvironmentClass& environment)
@@ -313,13 +313,13 @@ void t4p::PhpEnvironmentPanelClass::OnResize(wxSizeEvent& event) {
 
 t4p::WebBrowserEditPanelClass::WebBrowserEditPanelClass(wxWindow* parent, t4p::EnvironmentClass& environment)
 	: WebBrowserEditPanelGeneratedClass(parent)
-	, Environment(environment) 
+	, Environment(environment)
 	, EditedWebBrowsers(environment.WebBrowsers) {
 	BrowserList->ClearAll();
 	BrowserList->InsertColumn(0, _("Web Browser Label"));
 	BrowserList->InsertColumn(1, _("Web Browser Path"));
-	
-	// in case there are no configured browsers still properly show the columns 
+
+	// in case there are no configured browsers still properly show the columns
 	BrowserList->SetColumnWidth(0, 250);
 	BrowserList->SetColumnWidth(1, 250);
 	std::vector<t4p::WebBrowserClass>::const_iterator it = EditedWebBrowsers.begin();
@@ -350,7 +350,7 @@ void t4p::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
 		ListCtrlAdd(BrowserList, newBrowser.Name, newBrowser.FullPath.GetFullPath());
 		BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 		BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
-		
+
 		EditedWebBrowsers.push_back(newBrowser);
 		BrowserList->SetItemState(BrowserList->GetItemCount() - 1, wxLIST_STATE_SELECTED, wxLIST_MASK_STATE | wxLIST_MASK_TEXT);
 	}
@@ -387,10 +387,10 @@ void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& eve
 		t4p::WebBrowserCreateDialogClass dialog(this, EditedWebBrowsers, oldBrowser);
 		if (wxOK == dialog.ShowModal()) {
 			ListCtrlEdit(BrowserList, oldBrowser.Name, oldBrowser.FullPath.GetFullPath(), selection);
-			
+
 			// remove the old name since name may have been changed
 			EditedWebBrowsers[selection] = oldBrowser;
-			
+
 			BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 			BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		}
@@ -401,7 +401,7 @@ void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& eve
 }
 
 void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
-	
+
 	// could not get the list selection function to work on windows
 	// when the button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -412,7 +412,7 @@ void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];
 		EditedWebBrowsers[selection - 1] = selected;
 		EditedWebBrowsers[selection] = top;
-		
+
 		ListCtrlEdit(BrowserList, selected.Name, selected.FullPath.GetFullPath(), selection - 1);
 		ListCtrlEdit(BrowserList, top.Name, top.FullPath.GetFullPath(), selection);
 
@@ -431,7 +431,7 @@ void t4p::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 	// when the button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < (BrowserList->GetItemCount() - 1)) {
-	
+
 		// the 'bottom' row will moved up one and the row at the selection will be moved down one
 		t4p::WebBrowserClass bottom =  EditedWebBrowsers[selection + 1];
 		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];
@@ -457,10 +457,10 @@ bool t4p::WebBrowserEditPanelClass::TransferDataFromWindow() {
 	return true;
 }
 
-t4p::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent, 
-																	std::vector<t4p::WebBrowserClass> existingBrowsers, 
+t4p::WebBrowserCreateDialogClass::WebBrowserCreateDialogClass(wxWindow* parent,
+																	std::vector<t4p::WebBrowserClass> existingBrowsers,
 																	t4p::WebBrowserClass& oldBrowser)
-	: WebBrowserCreateDialogGeneratedClass(parent) 
+	: WebBrowserCreateDialogGeneratedClass(parent)
 	, ExistingBrowsers(existingBrowsers)
 	, NewBrowser(oldBrowser)
 	, OriginalName(oldBrowser.Name) {
@@ -499,10 +499,10 @@ void t4p::WebBrowserCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 		TransferDataFromWindow();
 		NewBrowser.FullPath.Assign(path);
 		EndModal(wxOK);
-	}	
+	}
 }
 
-t4p::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* parent, 
+t4p::VirtualHostCreateDialogClass::VirtualHostCreateDialogClass(wxWindow* parent,
 		std::map<wxString, wxString> existingVirtualHosts, wxString& hostName, wxFileName& rootDirectory)
 	: VirtualHostCreateDialogGeneratedClass(parent)
 	, ExistingVirtualHosts(existingVirtualHosts)
@@ -534,12 +534,12 @@ void t4p::VirtualHostCreateDialogClass::OnOkButton(wxCommandEvent& event) {
 	}
 }
 t4p::EnvironmentViewClass::EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature)
-: FeatureViewClass() 
+: FeatureViewClass()
 , Feature(feature) {
 }
 
 void t4p::EnvironmentViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-	parent->AddPage(new t4p::WebBrowserEditPanelClass(parent, Feature.App.Globals.Environment), _("Web Browsers"));	
+	parent->AddPage(new t4p::WebBrowserEditPanelClass(parent, Feature.App.Globals.Environment), _("Web Browsers"));
 	parent->AddPage(new t4p::ApacheEnvironmentPanelClass(parent, Feature.App.RunningThreads, Feature.App.Globals.Environment), _("Apache"));
 	parent->AddPage(new t4p::PhpEnvironmentPanelClass(parent, Feature.App.Globals.Environment), _("PHP Executable"));
 }

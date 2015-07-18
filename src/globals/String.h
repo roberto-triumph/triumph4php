@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,12 +31,12 @@
 #include <map>
 
 namespace t4p {
-	
+
 /**
  * Case-sensitive string comparator for use as STL Predicate
  */
 class UnicodeStringComparatorClass {
-	
+
 public:
 	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const;
 
@@ -45,25 +45,25 @@ public:
 /**
  * Case-insensitive version of UnicodeString::beginsWith(); will return true if haystack
  * begins with needle performing case-insensitive searching. For example
- * 
+ *
  * haystack = "thisIsaString"
  * needle  =  "thisisa"
- * 
+ *
  * These inputs will make this function return TRUE.
- * 
- * 
+ *
+ *
  * @param haystack the string to search in
  * @param needle the string to search in
  * @return the index to haystack where needle begins; -1 if needle is not in haystack
  */
 bool CaseStartsWith(UnicodeString haystack, UnicodeString needle);
 
-/** 
+/**
  * This is a collection of functions that are necessary due to the many C++ string
  * objects used by various libraries.  Be careful when using any of these; using
  * any methods of this class should be done as a last resort because these methods
  * copy data. In a nutshell, the bulk of the time UnicodeString should
- * be used, and only when something is going to be displayed to the user then 
+ * be used, and only when something is going to be displayed to the user then
  * at that point convert it to a wx String.
  */
 
@@ -100,9 +100,9 @@ wxString CharToWx(const char* source);
 
 /**
  * Calculate the number of characters in a UTF-8 string.  Since UTF-8 is a multi-byte variable
- * encoding, we cannot easily tell how many characters (1 character may be 1, 2 ,3, or 4 bytes). 
+ * encoding, we cannot easily tell how many characters (1 character may be 1, 2 ,3, or 4 bytes).
  * This method answers the question: What is the character number that is located at byte N of a UTF-8 string?
- * 
+ *
  * @param const char* bytes the UTF-8 character array (the string to look in)
  * @param int bytesLength the size of bytes array (in bytes)
  * @param int bytePos the position number to convert from Returns a negative number when bytesPos >= bytesLength
@@ -112,9 +112,9 @@ int Utf8PosToChar(const char* bytes, int bytesLength, int bytePos);
 
 /**
  * Calculate the byte offset of a specific character in a UTF-8 string.  Since UTF-8 is a multi-byte variable
- * encoding (1 character may be 1, 2 ,3, or 4 bytes), we cannot easily tell how many characters. This method 
+ * encoding (1 character may be 1, 2 ,3, or 4 bytes), we cannot easily tell how many characters. This method
  * answers the question: What is the byte number of character N of a UTF-8 string?
- * 
+ *
  * @param const char* bytes the UTF-8 character array (the string to look in)
  * @param int bytesLength the size of bytes array (in bytes)
  * @param int charPos the character number to convert from.

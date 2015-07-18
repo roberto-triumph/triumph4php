@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,9 +45,9 @@
 #include <iostream>
 
 /**
- * Profiles the LexicalAnalyzerClass using the native.php file in resources 
+ * Profiles the LexicalAnalyzerClass using the native.php file in resources
  * directory.  It also profiles code that will loop through the file and
- * append it to a string(in order to calculate the overhead of the 
+ * append it to a string(in order to calculate the overhead of the
  * Lexical Analyzer).
  */
 void ProfileLexer();
@@ -73,40 +73,40 @@ void ProfileVariableLintOnLargeProject();
  */
 void ProfileTagSearch();
 
-/** 
+/**
  * This class will help in parsing the large project
  */
 class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
 public:
 
 	ParserDirectoryWalkerClass();
-	
+
 	virtual bool Walk(const wxString& file);
-	
+
 	int WithErrors;
-	
+
 	int WithNoErrors;
-	
+
 private:
 
 	pelet::ParserClass Parser;
 };
 
 
-/** 
+/**
  * This class will help in linting a large project
  */
 class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
 public:
 
 	VariableLinterWalkerClass(t4p::TagCacheClass& tagCache);
-	
+
 	virtual bool Walk(const wxString& file);
-	
+
 	int WithErrors;
-	
+
 	int WithNoErrors;
-	
+
 private:
 
 	t4p::PhpVariableLintOptionsClass Options;
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 			<< "5. TagFinder (On Project)" << std::endl
 			<< "6. Variable Linter (On Project)" << std::endl;
 		std::string in;
-		std::cin >> test;	
+		std::cin >> test;
 	}
 	else {
 		test = argv[1];
@@ -199,8 +199,8 @@ int main(int argc, char** argv) {
 	else {
 		std::cout << "unknown test:" << test << std::endl;
 	}
-	
-	// calling cleanup here so that we can run this binary through a memory leak detector 
+
+	// calling cleanup here so that we can run this binary through a memory leak detector
 	// ICU will cache many things and that will cause the detector to output "possible leaks"
 	u_cleanup();
 	return 0;
@@ -218,7 +218,7 @@ void ProfileLexer() {
 	time = wxGetLocalTimeMillis();
 	std::string stdFile(FileName.ToAscii());
 	lexer.OpenFile(stdFile);
-	int token = 0, 
+	int token = 0,
 		tokenCount = 0;
 	UnicodeString uniLexeme;
 	do  {
@@ -229,7 +229,7 @@ void ProfileLexer() {
 	time = wxGetLocalTimeMillis() - time;
 	printf("time for lexer:%ld ms tokenCount=%d\n", time.ToLong(), tokenCount);
 
-	
+
 	time = wxGetLocalTimeMillis();
 	UFILE* file = u_fopen(FileName.ToAscii(), "r", NULL, NULL);
 	UnicodeString ustr;
@@ -256,7 +256,7 @@ void ProfileLexer() {
 	} while (!u_feof(file));
 	u_fclose(file);
 	time = wxGetLocalTimeMillis() - time;
-	printf("time for file chunked iteration:%ld ms chars=%d\n", time.ToLong(), ustr.length());	
+	printf("time for file chunked iteration:%ld ms chars=%d\n", time.ToLong(), ustr.length());
 }
 
 void ProfileParser() {
@@ -302,7 +302,7 @@ void ProfileTagParserOnLargeProject() {
 	t4p::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName)) {
-		printf("Nor running ProfileResourceFinderOnLargeProject because file was not found: %s", 
+		printf("Nor running ProfileResourceFinderOnLargeProject because file was not found: %s",
 			(const char*)DirName.ToAscii());
 		return;
 	}
@@ -324,7 +324,7 @@ void ProfileTagSearch() {
 	size_t found = 0;
 
 	time = wxGetLocalTimeMillis();
-	
+
 	std::vector<t4p::PhpTagClass> matches;
 	t4p::TagSearchClass tagSearch(UNICODE_STRING_SIMPLE("Record::get"));
 	t4p::TagResultClass* result = tagSearch.CreateNearMatchResults();
@@ -340,7 +340,7 @@ void ProfileTagSearch() {
 	printf("time for tagFinder on entire project after caching:%ld ms found:%ld\n", time.ToLong(), found);
 }
 
-ParserDirectoryWalkerClass::ParserDirectoryWalkerClass() 
+ParserDirectoryWalkerClass::ParserDirectoryWalkerClass()
 	: WithErrors(0)
 	, WithNoErrors(0)
 	, Parser() {
@@ -360,7 +360,7 @@ bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 		}
 		else {
 			UFILE *out = u_finit(stdout, NULL, NULL);
-			u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(), 
+			u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
 				(const char*)file.ToAscii(), error.LineNumber);
 			u_fclose(out);
 			WithErrors++;
@@ -375,7 +375,7 @@ void ProfileParserOnLargeProject() {
 	t4p::DirectorySearchClass search;
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
-		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
+		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s",
 			(const char*)DirName.ToAscii());
 		return;
 	}
@@ -390,14 +390,14 @@ void ProfileParserOnLargeProject() {
 }
 
 
-VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCache) 
+VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCache)
 	: WithErrors(0)
 	, WithNoErrors(0)
 	, Options()
-	, Linter() 
+	, Linter()
 	, IdentifierLinter()
 	, CallLinter() {
-	
+
 	Options.CheckGlobalScope = false;
 	Options.Version = pelet::PHP_54;
 	Linter.SetOptions(Options);
@@ -415,21 +415,21 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 		std::vector<t4p::PhpFunctionCallLintResultClass> callResults;
 		std::string stdFile(file.ToAscii());
 		UFILE *out = u_finit(stdout, NULL, NULL);
-		if (Linter.ParseFile(wxFileName(file), results)) {			
+		if (Linter.ParseFile(wxFileName(file), results)) {
 			for (size_t i = 0; i < results.size(); ++i) {
-				u_fprintf(out, "unitialized variable `%S` on file %S around line %d\n", 
+				u_fprintf(out, "unitialized variable `%S` on file %S around line %d\n",
 					results[i].VariableName.getTerminatedBuffer(),
 					results[i].File.getTerminatedBuffer(),
 					results[i].LineNumber);
-			
+
 			}
 		}
 		if (IdentifierLinter.ParseFile(wxFileName(file), identifierResults)) {
 			for (size_t i = 0; i < identifierResults.size(); ++i) {
-				u_fprintf(out, "unknown %d `%S` on file %S around line %d\n", 
+				u_fprintf(out, "unknown %d `%S` on file %S around line %d\n",
 					identifierResults[i].Type,
 					identifierResults[i].Identifier.getTerminatedBuffer(),
-					identifierResults[i].File.getTerminatedBuffer(),				
+					identifierResults[i].File.getTerminatedBuffer(),
 					identifierResults[i].LineNumber);
 			}
 		}
@@ -441,7 +441,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 						callResults[i].Identifier.getTerminatedBuffer(),
 						callResults[i].ExpectedCount,
 						callResults[i].ActualCount,
-						callResults[i].File.getTerminatedBuffer(),				
+						callResults[i].File.getTerminatedBuffer(),
 						callResults[i].LineNumber
 					);
 				}
@@ -451,15 +451,15 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 						callResults[i].Identifier.getTerminatedBuffer(),
 						callResults[i].ExpectedCount,
 						callResults[i].ActualCount,
-						callResults[i].File.getTerminatedBuffer(),				
+						callResults[i].File.getTerminatedBuffer(),
 						callResults[i].LineNumber
 					);
 				}
 			}
 		}
-		
+
 		u_fclose(out);
-		
+
 		if (results.empty() && identifierResults.empty() && callResults.empty()) {
 			WithNoErrors++;
 		}
@@ -480,14 +480,14 @@ void ProfileVariableLintOnLargeProject() {
 	std::vector<wxString> phpFileExtensions;
 	phpFileExtensions.push_back(wxT("*.php"));
 	std::vector<wxString> miscFileExtensions;
-	
+
 	t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass();
 	tagFinderList->InitNativeTag(nativeDbFileName);
 	tagFinderList->InitGlobalTag(tagDbFileName, phpFileExtensions, miscFileExtensions, pelet::PHP_54);
 	tagCache.RegisterGlobal(tagFinderList);
 	wxLongLong time;
 	if (DirName.IsEmpty() || !wxDirExists(DirName) || !search.Init(DirName)) {
-		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s", 
+		printf("Nor running ProfileParserOnLargeProject because directory was not found or is empty: %s",
 			(const char*)DirName.ToAscii());
 		return;
 	}

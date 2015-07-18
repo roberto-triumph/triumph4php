@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,7 +45,7 @@ UnicodeString CODE = t4p::CharToIcu(
 	"?>");
 
 SUITE(FinderTestClass) {
-	
+
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
 	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
@@ -146,12 +146,12 @@ TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
 }
 
 TEST(FindPreviousShouldSkipToFirstInstance) {
-	UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));	
+	UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));
 	t4p::FinderClass finder(toFind, t4p::FinderClass::EXACT);
 	CHECK(finder.Prepare());
 
 	// find the 2nd instance of $MESSAGE
-	// the test here will be that if the Find starts from one position before the previous match 
+	// the test here will be that if the Find starts from one position before the previous match
 	// that the next call will find the previous match
 	// we are testing off-by-one errors
 	//
@@ -218,7 +218,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
 	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
 	UnicodeString expectedCode(CODE);
 	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE("$_PI"));
-	CHECK_EQUAL(expectedCode, newCode);	
+	CHECK_EQUAL(expectedCode, newCode);
 }
 
 
@@ -231,7 +231,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement)
 	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
 	UnicodeString expectedCode(CODE);
 	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
-	CHECK_EQUAL(expectedCode, newCode);	
+	CHECK_EQUAL(expectedCode, newCode);
 }
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
@@ -243,7 +243,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
 	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
 	UnicodeString expectedCode(CODE);
 	expectedCode.findAndReplace(UNICODE_STRING_SIMPLE("$PI"), UNICODE_STRING_SIMPLE("$_PI"));
-	CHECK_EQUAL(expectedCode, newCode);	
+	CHECK_EQUAL(expectedCode, newCode);
 }
 
 
@@ -256,7 +256,7 @@ TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmpty
 	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
 	UnicodeString expectedCode(CODE);
 	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
-	CHECK_EQUAL(expectedCode, newCode);	
+	CHECK_EQUAL(expectedCode, newCode);
 }
 
 TEST(PrepareShouldReturnFalseWhenExpressionIsEmpty) {

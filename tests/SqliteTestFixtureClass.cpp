@@ -1,16 +1,16 @@
 /*
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,7 +32,7 @@
 static std::string ResourceSchemaSql = "";
 static std::string DetectorSchemaSql = "";
 static std::string JsTagsSchemaSql = "";
- 
+
 SqliteTestFixtureClass::SqliteTestFixtureClass(const wxFileName& sqlScriptFile)
 	: Session()
 	, ConnectionString(":memory:") {
@@ -57,7 +57,7 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 	}
 
 	if (schemaSql.empty()) {
-		
+
 		// now get the contents of the script to be executed
 		// keep the contents in memory so that we dont have to read the file
 		// for each test
@@ -78,7 +78,7 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		}
 	}
 	try {
-	
+
 		// get the 'raw' connection because it can handle multiple statements at once
 		char *errorMessage = NULL;
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
@@ -96,7 +96,7 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		wxASSERT_MSG(false, t4p::CharToWx(e.what()));
 	}
 }
-	
+
 SqliteTestFixtureClass::~SqliteTestFixtureClass() {
 	Session.close();
 }

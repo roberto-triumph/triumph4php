@@ -24,19 +24,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FileWatcherPreferencesPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class FileWatcherPreferencesPanelGeneratedClass : public wxPanel 
+class FileWatcherPreferencesPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxCheckBox* Enabled;
-	
+
 	public:
-		
+
 		FileWatcherPreferencesPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~FileWatcherPreferencesPanelGeneratedClass();
-	
+
 };
 
 #endif //__FileWatcherFeatureForms__

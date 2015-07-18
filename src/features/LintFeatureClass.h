@@ -79,7 +79,7 @@ public:
 	 * the number of files with at least one error
 	 */
 	int ErrorFiles;
-	
+
 	/**
 	 * the number of files that were skipped due to
 	 * being larger than normal
@@ -98,7 +98,7 @@ typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClas
 	DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_LINT_ERROR, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent( LintResultsEventClassFunction, & fn ), (wxObject *) NULL ),
-	
+
 typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSummaryEventClass&);
 
 #define EVT_LINT_SUMMARY(id, fn) \
@@ -107,7 +107,7 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
     wxStaticCastEvent( LintResultsSummaryEventClassFunction, & fn ), (wxObject *) NULL ),
 
 /**
- * Stores flags that determine how strict linting will be 
+ * Stores flags that determine how strict linting will be
  */
 class LintFeatureOptionsClass {
 
@@ -127,14 +127,14 @@ public:
 
 	/**
 	 * if TRUE, then methods, classes will be checked for existence
-	 * when they are being called.  this requires that a project 
+	 * when they are being called.  this requires that a project
 	 * be indexed.
 	 */
 	bool CheckUnknownIdentifiers;
-	
+
 	/**
 	 * if TRUE, then a check is done to make sure that the arguments
-	 * in a function/method call match the number of arguments of the 
+	 * in a function/method call match the number of arguments of the
 	 * function/method declaration.  this requires that a project be indexed.
 	 */
 	bool CheckFunctionArgumentCount;
@@ -154,35 +154,35 @@ public:
 	void Copy(const t4p::LintFeatureOptionsClass& src);
 };
 
-/** 
+/**
  * This class will help in parsing the large project. It will enable access
  * to DirectorySearch and easily parse many files.
  */
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 public:
 
-	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options, 
+	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options,
 		const wxFileName& suppressionFile);
-	
+
 	/**
 	 * initializes the linters  with the tag cache.  The linters use the
 	 * tag cache to lookup classes, functions, methods.
 	 */
 	void Init(t4p::TagCacheClass& tagCache);
-	
+
 	/**
 	 * @param bool to set the 'CheckUnknownIdentifiers' flag on the lint options
 	 *        this method is useful to override the user's choice when we know
 	 *        that perforning identifiers would result in many false positives;
-	 *        for example when the user saves a file that exists outside of a 
-	 *        project. Such files use classes/methods/functions that are not in the 
+	 *        for example when the user saves a file that exists outside of a
+	 *        project. Such files use classes/methods/functions that are not in the
 	 *        tag cache.
 	 */
 	void OverrideIdentifierCheck(bool doIdentifierCheck);
-	
+
 	/**
 	 * This is the method where the parsing will take place. Will return true
-	 * if and only if there is a parse error.  
+	 * if and only if there is a parse error.
 	 */
 	virtual bool Walk(const wxString& file);
 
@@ -190,20 +190,20 @@ public:
 	 * set the file counters (WithErrors, WitNoErrors) back to zero
 	 */
 	void ResetTotals();
-	
+
 	/**
-	 * @param list of wildcard strings to perform lint checks on. Each item in the list 
+	 * @param list of wildcard strings to perform lint checks on. Each item in the list
 	 *        is a wilcard suitable for passing into the wxMatchWild() function
 	 * @param ignoreFilters regex string of files to ignore. This is a string suitable
 	 *        for the FindInFilesClass::CreateFilesFilterRegEx() method.
 	 */
 	void SetFilters(std::vector<wxString> includeFilters, wxString ignoreFilters);
-	
+
 	/**
 	 * Set the version of PHP to lint against
 	 */
 	void SetVersion(pelet::Versions version);
-	
+
 	/**
 	 * The last parsing results; minus any errors that were suppressed due
 	 * to the suppression rules.
@@ -214,18 +214,18 @@ public:
 	 * Running count of files that had parse errors.
 	 */
 	int WithErrors;
-	
+
 	/**
 	 * Running count of files that had zero parse errors.
 	 */
 	int WithNoErrors;
-	
+
 	/**
 	 * Running count of files that were skipped because they
 	 * are too big.
 	 */
 	int WithSkip;
-	
+
 private:
 
 	// flags that control which checks to perform
@@ -237,7 +237,7 @@ private:
 	t4p::PhpVariableLintClass VariableLinter;
 	t4p::PhpIdentifierLintClass IdentifierLinter;
 	t4p::PhpFunctionCallLintClass CallLinter;
-	
+
 	// to ignore files/classes/methods
 	wxFileName SuppressionFile;
 	t4p::LintSuppressionClass Suppressions;
@@ -248,7 +248,7 @@ private:
 	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
 	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
 	std::vector<t4p::PhpFunctionCallLintResultClass> CallResults;
-	
+
 };
 
 /**
@@ -257,7 +257,7 @@ private:
  */
 class LintActionClass : public t4p::ActionClass {
 
-public:	
+public:
 
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
@@ -270,7 +270,7 @@ public:
 	 */
 	LintActionClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const t4p::LintFeatureOptionsClass& options, const wxFileName& suppressionFile);
-	
+
 	/**
 	 * prepare to lint a list of directories
 	 *
@@ -282,14 +282,14 @@ public:
 	bool InitDirectoryLint(std::vector<t4p::SourceClass> sources, t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
-	
+
 protected:
 
 	/**
 	 * Will iterate through each source and parse it for errors
 	 */
 	void BackgroundWork();
-	
+
 private:
 
 	/**
@@ -298,7 +298,7 @@ private:
 	 */
 	void IterateDirectory();
 
-	
+
 	/**
 	 * needed by PhpIdentifierLintClass in order to find
 	 * function/class names
@@ -309,24 +309,24 @@ private:
 	 * performs the lint logic on a single file
 	 */
 	ParserDirectoryWalkerClass ParserDirectoryWalker;
-	
+
 	/**
 	 * The directories to be parsed for errors
 	 */
 	 std::vector<t4p::SourceClass> Sources;
-	 
+
 	 /**
 	  * used to recurse through directories
 	  */
 	 t4p::DirectorySearchClass Search;
-	
+
 	// to show progress
 	int FilesCompleted;
 	int FilesTotal;
 };
 
 /**
- * This class will allow us to perform parsing on a single 
+ * This class will allow us to perform parsing on a single
  * file in a background thread.
  */
 class LintBackgroundSingleFileClass : public t4p::ActionClass {
@@ -344,7 +344,7 @@ public:
 	 */
 	LintBackgroundSingleFileClass(t4p::RunningThreadsClass& runningThreads, int eventId,
 		const t4p::LintFeatureOptionsClass& options, const wxFileName& suppressionFile);
-	
+
 	/**
 	 * prepare to lint a list a single file
 	 *
@@ -355,14 +355,14 @@ public:
 	bool Init(const wxFileName& fileName, t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
-	
+
 protected:
 
 	/**
-	 * Will parse the current file. 
+	 * Will parse the current file.
 	 */
 	void BackgroundWork();
-	
+
 private:
 
 	/**
@@ -382,9 +382,9 @@ private:
  * for the feature
  */
 class LintFeatureClass : public FeatureClass {
-	
+
 public:
-	
+
 	t4p::LintFeatureOptionsClass Options;
 
 	/**
@@ -399,7 +399,7 @@ public:
 	LintFeatureClass(t4p::AppClass& app);
 
 	void LoadPreferences(wxConfigBase* config);
-		
+
 private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
@@ -407,10 +407,10 @@ private:
 	void OnProjectsUpdated(t4p::ProjectEventClass& event);
 
 	void OnProjectsRemoved(t4p::ProjectEventClass& event);
-	
+
 	void OnProjectCreated(wxCommandEvent& event);
 
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

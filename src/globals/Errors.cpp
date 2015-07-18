@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,11 +33,11 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 	wxString msg;
 	switch (error) {
 		case t4p::ERR_BAD_EXPLORER_EXCUTABLE:
-			msg = t4p::MessageWithFix(_("Could not run explorer. ") + extra, 
+			msg = t4p::MessageWithFix(_("Could not run explorer. ") + extra,
 				_("Go To Edit ... Preferences, choose the Project tab to change the location of the explorer binary."));
 			break;
 		case t4p::ERR_PHP_EXECUTABLE_NONE:
-			msg = t4p::MessageWithFix(_("PHP executable location not set. ") + extra, 
+			msg = t4p::MessageWithFix(_("PHP executable location not set. ") + extra,
 				_("Go To Edit ... Preferences, choose the PHP Executable tab to change the location of the PHP executable binary."));
 			break;
 		case t4p::ERR_BAD_PHP_EXECUTABLE:
@@ -45,7 +45,7 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 				_("Go To Project ... Environment to choose the location of the PHP binary."));
 			break;
 		case t4p::ERR_MISSING_PHP_EXTENSIONS:
-			msg = t4p::MessageWithFix(_("Missing required extensions. ") + extra, 
+			msg = t4p::MessageWithFix(_("Missing required extensions. ") + extra,
 				_("Enable the PDO and pdo_sqlite extensions in your PHP installation."));
 			break;
 		case t4p::ERR_LOW_RESOURCES:

@@ -44,7 +44,7 @@ namespace t4p {
 class FileCabinetFeatureClass : public t4p::FeatureClass {
 
 public:
-	
+
 	FileCabinetFeatureClass(t4p::AppClass& app);
 
 	/**
@@ -61,14 +61,14 @@ public:
 	 * removes the given cabinet item from the file cabinet store (sqlite)
 	 */
 	void DeleteCabinetItem(int id);
-		
+
 private:
 
 	/**
 	 * to modify the file cabinet
 	 */
 	t4p::FileCabinetStoreClass Store;
-	
+
 };
 
 }

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -84,7 +84,7 @@ void t4p::TagViewClass::OnAppExit(wxCommandEvent& event) {
 
 void t4p::TagViewClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 
-	// stop the working cache timer because we are going to delete the rows from 
+	// stop the working cache timer because we are going to delete the rows from
 	// the database
 	// we want to avoid locking the database
 	Timer.Stop();
@@ -111,10 +111,10 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 		int startPos = codeControl->WordStartPosition(currentPos, true);
 		int endPos = codeControl->WordEndPosition(currentPos, true);
 		wxString term = codeControl->GetTextRange(startPos, endPos);
-	
+
 		wxString matchError;
 		std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
-			codeControl->GetIdString(), codeControl->GetSafeText(), endPos, 
+			codeControl->GetIdString(), codeControl->GetSafeText(), endPos,
 			Feature.App.Globals.AllEnabledSourceDirectories(),
 			Feature.App.Globals,
 			matchError
@@ -122,7 +122,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 		if (!matchError.empty()) {
 			GetStatusBarWithGauge()->SetColumn0Text(matchError);
 		}
-		
+
 		t4p::TagListRemoveNativeMatches(matches);
 		if (!matches.empty()) {
 			UnicodeString res = matches[0].ClassName + UNICODE_STRING_SIMPLE("::") + matches[0].Identifier;
@@ -141,7 +141,7 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 					std::vector<t4p::PhpTagClass>::const_iterator tag;
 					for (tag = matches.begin(); tag != matches.end(); ++tag) {
 						for (project = Feature.App.Globals.Projects.begin(); project != Feature.App.Globals.Projects.end(); ++project) {
-							if (project->IsAPhpSourceFile(openedFile.GetFullPath(), Feature.App.Globals.FileTypes) 
+							if (project->IsAPhpSourceFile(openedFile.GetFullPath(), Feature.App.Globals.FileTypes)
 									&& project->IsAPhpSourceFile(tag->FullPath, Feature.App.Globals.FileTypes)) {
 								tagProjectMatch = *tag;
 								tagProjectMatchCount++;
@@ -189,19 +189,19 @@ void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const 
 	LoadCodeControl(tag.GetFullPath());
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-		int32_t position, 
+		int32_t position,
 			length;
 		bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
 		if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
-				
-			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the 
+
+			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the
 			// center of the screen
 			int pos = codeControl->PositionFromLine(tagSearch.GetLineNumber() - 1);
 			codeControl->SetSelectionAndEnsureVisible(pos, pos);
 			codeControl->GotoLineAndEnsureVisible(tagSearch.GetLineNumber());
 		}
 		if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType()) {
-				
+
 			// nothing; just open the file but don't scroll down to any place
 		}
 		else if (found) {
@@ -244,7 +244,7 @@ void t4p::TagViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	// Notebook class assigns unique IDs to CodeControlClass objects
 	// the event ID is the ID of the code control that was closed
 	Feature.App.Globals.TagCache.RemoveWorking(codeCtrl->GetIdString());
-	
+
 	if (codeCtrl->IsNew()) {
 
 		// if a new file was closed but never saved remove it from the tag cache
@@ -276,7 +276,7 @@ void t4p::TagViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 			Feature.App.Globals,
 			codeControl->GetFileName(),
 			codeControl->GetIdString(),
-			text, 
+			text,
 			codeControl->IsNew(),
 			Feature.App.Globals.Environment.Php.Version,
 
@@ -287,8 +287,8 @@ void t4p::TagViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 		Feature.App.SqliteRunningThreads.Queue(builder);
 	}
 	else if (Feature.App.Globals.IsASourceFile(codeControl->GetFileName())) {
-		
-		// for other project files, we still want to "tag" them so that 
+
+		// for other project files, we still want to "tag" them so that
 		// we record their name, that way total search filename lookups
 		// will include these files
 		t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(Feature.App.SqliteRunningThreads, wxID_ANY);
@@ -330,12 +330,12 @@ void t4p::TagViewClass::OnAppFileReverted(t4p::CodeControlEventClass& event) {
 			Feature.App.Globals,
 			codeControl->GetFileName(),
 			codeControl->GetIdString(),
-			text, 
+			text,
 			codeControl->IsNew(),
 			Feature.App.Globals.Environment.Php.Version,
 
-			// The logic is a bit 
-			//  different than OnAppFileOpened, when a file is reverted we will re-tag the file and 
+			// The logic is a bit
+			//  different than OnAppFileOpened, when a file is reverted we will re-tag the file and
 			// rebuild the symbol table, while when we open a file we dont need to re-tag the file
 			// because it has not changed.
 			true);
@@ -349,7 +349,7 @@ void t4p::TagViewClass::OnTimerComplete(wxTimerEvent& event) {
 	if (!codeControl) {
 		return;
 	}
-	
+
 	// if the contents of the code control have not changed since we last parsed
 	// the code then don't do anything.
 	// this will be most of the time, since programmers like to think!
@@ -358,7 +358,7 @@ void t4p::TagViewClass::OnTimerComplete(wxTimerEvent& event) {
 		return;
 	}
 	codeControl->SetTouched(false);
-	
+
 	// builder action could take a while (more than the timer)
 	// stop the timer so that we dont queue up a builder actions before the previous one
 	// finishes
@@ -368,7 +368,7 @@ void t4p::TagViewClass::OnTimerComplete(wxTimerEvent& event) {
 		Feature.App.Globals,
 		codeControl->GetFileName(),
 		codeControl->GetIdString(),
-		codeControl->GetSafeText(), 
+		codeControl->GetSafeText(),
 		codeControl->IsNew(),
 		Feature.App.Globals.Environment.Php.Version,
 		true);
@@ -381,14 +381,14 @@ void t4p::TagViewClass::OnCodeControlHotspotClick(wxStyledTextEvent& event) {
 		return;
 	}
 	int pos = event.GetPosition();
-	
+
 	// if the cursor is in the middle of an identifier, find the end of the
 	// current identifier; that way we can know the full name of the tag we want
 	// to get
 	int endPos = ctrl->WordEndPosition(pos, true);
 	wxString matchError;
 	std::vector<t4p::PhpTagClass> matches = Feature.App.Globals.TagCache.GetTagsAtPosition(
-		ctrl->GetIdString(), ctrl->GetSafeText(), endPos, 
+		ctrl->GetIdString(), ctrl->GetSafeText(), endPos,
 		Feature.App.Globals.AllEnabledSourceDirectories(),
 		Feature.App.Globals,
 		matchError
@@ -405,7 +405,7 @@ void t4p::TagViewClass::OnAppReady(wxCommandEvent& event) {
 	ProjectIndexMenu->Enable(Feature.App.Globals.HasSources());
 }
 
-t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent, 
+t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 													  t4p::GlobalsClass& globals,
 													  wxString cacheStatus,
 													  wxString& term,
@@ -413,8 +413,8 @@ t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	: TagSearchDialogGeneratedClass(parent)
 	, RunningThreads()
 	, Globals(globals)
-	, ChosenResources(chosenResources) 
-	, MatchedResources() 
+	, ChosenResources(chosenResources)
+	, MatchedResources()
 	, Timer(this, ID_SEARCH_TIMER)
 	, LastInput(term) {
 	wxGenericValidator termValidator(&term);
@@ -426,7 +426,7 @@ t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	for (size_t i = 0; i < Globals.Projects.size(); ++i) {
 		if (Globals.Projects[i].IsEnabled) {
 
-			// should be ok to reference this vector since it wont change because this is a 
+			// should be ok to reference this vector since it wont change because this is a
 			// modal dialog
 			ProjectChoice->Append(Globals.Projects[i].Label, &Globals.Projects[i]);
 		}
@@ -473,13 +473,13 @@ void t4p::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 
 void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchedResources.empty()) {
-		
+
 		// dont dismiss the dialog when no tags are shown
 		return;
 	}
 	Timer.Stop();
 	RunningThreads.Shutdown();
-		
+
 	if (MatchedResources.size() == 1) {
 
 		// if there is only match, just take the user to it
@@ -496,7 +496,7 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 		}
 	}
 	if (checks.Count() > 1) {
-	
+
 		// open the checked items
 		for (size_t i = 0; i < checks.Count(); ++i) {
 			int matchIndex = checks.Item(i);
@@ -528,7 +528,7 @@ void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, c
 	if (!showAllProjects) {
 		selectedProject = (t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection());
 	}
-	
+
 	// dont show the project path to the user
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		wxString projectLabel;
@@ -563,7 +563,7 @@ void t4p::TagSearchDialogClass::ShowJumpToResults(const wxString& finderQuery, c
 	if (!MatchesList->IsEmpty()) {
 		MatchesList->Select(0);
 	}
-	MatchesLabel->SetLabel(wxString::Format("Found %ld files for %s. Please choose file(s) to open.", 
+	MatchesLabel->SetLabel(wxString::Format("Found %ld files for %s. Please choose file(s) to open.",
 		allMatches.size(), finderQuery));
 }
 
@@ -576,7 +576,7 @@ void t4p::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 		}
 	}
 	if (!isChecked) {
-		
+
 		// nothing chosen
 		return;
 	}
@@ -603,9 +603,9 @@ void t4p::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vec
 	SearchText->SetValue(term);
 	ShowJumpToResults(term, MatchedResources);
 }
-	
+
 void t4p::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
-	
+
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
 		"user.php\n"
@@ -625,13 +625,13 @@ void t4p::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
 		"will be OK after you have indexed the projects. "
 	);
 	help = wxGetTranslation(help);
-	wxMessageBox(help, _("Resource Search Help"), wxOK, this);	
+	wxMessageBox(help, _("Resource Search Help"), wxOK, this);
 }
 
 void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	size_t selection = MatchesList->GetSelection();
-	if (keyCode == WXK_DOWN) {		
+	if (keyCode == WXK_DOWN) {
 		if (!MatchesList->IsEmpty() && selection < (MatchesList->GetCount() - 1)) {
 			MatchesList->SetSelection(selection + 1);
 		}
@@ -661,16 +661,16 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	int selection = event.GetSelection();
 	if (selection == wxNOT_FOUND) {
-		
+
 		// no item chosen
 		return;
 	}
 	Timer.Stop();
 	RunningThreads.Shutdown();
-	
+
 	TransferDataFromWindow();
 	ChosenResources.clear();
-	
+
 	if (t4p::NumberLessThan(selection, MatchesList->GetCount())) {
 		ChosenResources.push_back(MatchedResources[selection]);
 	}
@@ -739,7 +739,7 @@ BEGIN_EVENT_TABLE(t4p::TagViewClass, t4p::FeatureViewClass)
 	EVT_APP_FILE_OPEN(t4p::TagViewClass::OnAppFileOpened)
 	EVT_APP_FILE_REVERTED(t4p::TagViewClass::OnAppFileReverted)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_APP_READY, t4p::TagViewClass::OnAppReady)
-	
+
 	// we will treat file new and file opened the same
 	EVT_APP_FILE_NEW(t4p::TagViewClass::OnAppFileOpened)
 
@@ -751,7 +751,7 @@ BEGIN_EVENT_TABLE(t4p::TagViewClass, t4p::FeatureViewClass)
 	EVT_ACTION_COMPLETE(ID_WORKING_CACHE, t4p::TagViewClass::OnActionComplete)
 	EVT_APP_PROJECTS_UPDATED(t4p::TagViewClass::OnProjectsUpdated)
 	EVT_APP_PROJECTS_REMOVED(t4p::TagViewClass::OnProjectsUpdated)
-	
+
 	EVT_STC_HOTSPOT_CLICK(wxID_ANY, t4p::TagViewClass::OnCodeControlHotspotClick)
 END_EVENT_TABLE()
 

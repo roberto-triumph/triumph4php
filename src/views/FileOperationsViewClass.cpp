@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -44,7 +44,7 @@ static bool SaveAllModifiedPages(std::vector<t4p::NotebookClass*> notebooks, wxW
 	std::vector<wxString> modifiedPageNames;
 	std::vector<int> notebookIndexes;
 	bool changed = true;
-	
+
 	for (size_t n = 0; n < notebooks.size(); n++) {
 		t4p::NotebookClass* notebook = notebooks[n];
 		for (size_t p = 0; p < notebook->GetPageCount(); ++p) {
@@ -66,7 +66,7 @@ static bool SaveAllModifiedPages(std::vector<t4p::NotebookClass*> notebooks, wxW
 		}
 		wxMultiChoiceDialog dialog(mainWindow, wxT(
 			"Do you wish to save any files before exiting?"),
-			wxT("Save Files"), modifiedPageNamesArray, 
+			wxT("Save Files"), modifiedPageNamesArray,
 			wxDEFAULT_DIALOG_STYLE | wxOK | wxCANCEL | wxRESIZE_BORDER);
 		dialog.Center();
 		if (wxID_CANCEL == dialog.ShowModal()) {
@@ -103,7 +103,7 @@ void t4p::FileOperationsViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 4, _("Save A&ll\tCTRL+SHIFT+S"), _("Save all opened files to disk"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 5, _("&Revert"), _("Reload the file from Disk"), wxITEM_NORMAL);
 	fileMenu->Append(wxID_CLOSE, _("&Close"), _("Close the current file"), wxITEM_NORMAL);
-	
+
 	fileMenu->Enable(wxID_SAVE, false);
 	fileMenu->Enable(wxID_SAVEAS, false);
 	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 4, false); // save all
@@ -266,9 +266,9 @@ void t4p::FileOperationsViewClass::EnableSave(wxStyledTextEvent& event) {
 void t4p::FileOperationsViewClass::DisableSave(wxStyledTextEvent& event) {
 	ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, false);
 	ToolBar->Refresh();
-	
+
 	MenuUpdate(false);
-	
+
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
@@ -368,7 +368,7 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
 		if (isClosingPage) {
-			
+
 			// since we get the close event BEFORE the code control
 			// is removed
 			hasEditors = notebook->GetPageCount() > 1;
@@ -376,7 +376,7 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 		else {
 			hasEditors = notebook->GetPageCount() > 0;
 		}
-		
+
 		currentPage = notebook->GetSelection();
 	}
 		// if at least one document needs to be saved, enable the save all menu
@@ -388,7 +388,7 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 			someModified |= ctrl->GetModify();
 		}
 	}
-	
+
 	MenuBar->Enable(wxID_SAVE, hasEditors && notebook && notebook->IsPageModified(currentPage));
 	MenuBar->Enable(wxID_SAVEAS, hasEditors && NULL != codeControl);
 	MenuBar->Enable(wxID_CLOSE, hasEditors);

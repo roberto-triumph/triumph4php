@@ -26,30 +26,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class GaugeDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class GaugeDialogGeneratedClass : public wxDialog 
+class GaugeDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_GAUGE = 1000,
 			ID_HIDEBUTTON,
 		};
-		
+
 		wxStaticText* Label;
 		wxGauge* Gauge;
 		wxButton* HideButton;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHideButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		GaugeDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Indexing ..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 448,156 ), long style = wxCAPTION|wxSTAY_ON_TOP );
 		~GaugeDialogGeneratedClass();
-	
+
 };
 
 #endif //__GaugeDialogWidget__

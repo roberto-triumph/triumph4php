@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,8 +32,8 @@
 namespace t4p {
 
 /**
- * the set of parameters that will be used for each 
- * external url detector PHP script call. All of 
+ * the set of parameters that will be used for each
+ * external url detector PHP script call. All of
  * these params are required with the exception of
  * OutputDbFileName.
  */
@@ -48,7 +48,7 @@ public:
 	wxString PhpExecutablePath;
 
 	/**
-	 * the base location of the php detector scripts. this is used as the 
+	 * the base location of the php detector scripts. this is used as the
 	 * include path so that both local detectors and global detectors
 	 * can access the php detector sources (since local detectors and global
 	 * detectors are located in separate directories, we need to use
@@ -68,13 +68,13 @@ public:
 
 	/**
 	 * Argument to the URL detector script; the location of the resource cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the 
+	 * this db is created when the project is indexed and can be accessed via the
 	 * GlobalsClass::Projects list
 	 */
 	wxFileName ResourceDbFileName;
 
 	/**
-	 * Argument to the URL detector script; the base URL of the project in question. This is 
+	 * Argument to the URL detector script; the base URL of the project in question. This is
 	 * usually calculated with the help of ApacheClass.
 	 * Examples: "http://localhost" ; "http://dev.localhost"
 	 */
@@ -82,7 +82,7 @@ public:
 
 	/**
 	 * Argument to the URL detector script; the location of th detectors cache SQLite db.
-	 * this db is created when the project is indexed and can be accessed via the 
+	 * this db is created when the project is indexed and can be accessed via the
 	 * GlobalsClass::Projects list. This argument is optional; it can be empty in which
 	 * case the script outputs to STDOUT; leaving this argument empty is useful
 	 * for testing url detectors; so that the results are visible in the console wthout
@@ -133,7 +133,7 @@ private:
 	std::queue<t4p::UrlTagDetectorParamsClass> ParamsQueue;
 
 	/**
-	 * pop the next set of params from the queue and call the php url 
+	 * pop the next set of params from the queue and call the php url
 	 * detector.
 	 * @return bool TRUE if the detection was started succesfully
 	 */

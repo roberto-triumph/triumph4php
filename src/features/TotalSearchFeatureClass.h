@@ -43,13 +43,13 @@ class TotalSearchFeatureClass : public t4p::FeatureClass {
 public:
 
 	TotalSearchFeatureClass(t4p::AppClass& app);
-	
+
 	void OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber);
-	
+
 	void OpenPhpTag(const t4p::PhpTagClass& tag);
-	
+
 	void OpenDbTable(const t4p::DatabaseTableTagClass& tableTag);
-	
+
 	void OpenDbData(const t4p::DatabaseTableTagClass& tableTag);
 
 };

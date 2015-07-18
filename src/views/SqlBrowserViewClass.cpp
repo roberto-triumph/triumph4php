@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -93,7 +93,7 @@ static void FillGridWithResults(wxGrid* grid, t4p::SqlResultClass* results) {
 			for (size_t colNumber = 0; colNumber < columnValues.size(); colNumber++) {
 				grid->SetCellValue(rowNumber - 1, colNumber, t4p::IcuToWx(columnValues[colNumber]));
 				if (columnValues[colNumber].length() > 50) {
-					autoSizeColumns[colNumber] = false; 
+					autoSizeColumns[colNumber] = false;
 				}
 			}
 			grid->SetRowLabelValue(rowNumber - 1, wxString::Format(wxT("%d"), rowNumber));
@@ -141,7 +141,7 @@ t4p::SqliteConnectionDialogClass::SqliteConnectionDialogClass(wxWindow* parent, 
 	File->SetValidator(fileValidator);
 	File->SetName(wxT("file"));
 	TransferDataToWindow();
-	
+
 	// dont allow editing of detected connections
 	if (tag.IsDetected) {
 		Label->Enable(false);
@@ -158,7 +158,7 @@ t4p::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, t4
 , ConnectionIdentifier()
 , RunningActionId() {
 	RunningThreads.AddEventHandler(this);
-	
+
 	t4p::UnicodeStringValidatorClass labelValidator(&tag.Label, false);
 	Label->SetValidator(labelValidator);
 	Label->SetName(wxT("label"));
@@ -173,9 +173,9 @@ t4p::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, t4
 	User->SetValidator(userValidator);
 	t4p::UnicodeStringValidatorClass passwordValidator(&tag.Password, true);
 	Password->SetValidator(passwordValidator);
-	
+
 	TransferDataToWindow();
-	
+
 	// dont allow editing of detected connections
 	if (tag.IsDetected) {
 		Label->Enable(false);
@@ -184,7 +184,7 @@ t4p::MysqlConnectionDialogClass::MysqlConnectionDialogClass(wxWindow* parent, t4
 		Database->Enable(false);
 		User->Enable(false);
 		Password->Enable(false);
-		
+
 		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
 	}
 }
@@ -204,17 +204,17 @@ void t4p::MysqlConnectionDialogClass::OnTestButton(wxCommandEvent& event) {
 	TestQuery.DatabaseTag.Schema = t4p::WxToIcu(Database->GetValue());
 	TestQuery.DatabaseTag.User = t4p::WxToIcu(User->GetValue());
 	TestQuery.DatabaseTag.Password = t4p::WxToIcu(Password->GetValue());
-	
+
 	wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
 	wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
-	
+
 	t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_EDIT_TEST, ConnectionIdentifier);
 	thread->Init(UNICODE_STRING_SIMPLE("SELECT 1"), TestQuery);
 	RunningThreads.Queue(thread);
 }
 
 void t4p::MysqlConnectionDialogClass::OnCancelButton(wxCommandEvent& event) {
-	
+
 	// in case the test query is stuck, send a kill command to mysql
 	soci::session session;
 	UnicodeString error;
@@ -230,17 +230,17 @@ void t4p::MysqlConnectionDialogClass::ShowTestResults(t4p::QueryCompleteEventCla
 	t4p::SqlResultClass* result = event.Results;
 	wxString error = t4p::IcuToWx(result->Error);
 	bool success = result->Success;
-	
-	wxString creds = t4p::IcuToWx(TestQuery.DatabaseTag.User + 
+
+	wxString creds = t4p::IcuToWx(TestQuery.DatabaseTag.User +
 			UNICODE_STRING_SIMPLE("@") +
 			TestQuery.DatabaseTag.Host);
-	
+
 	wxString msg = _("Connection to %s was successful");
 	msg = wxString::Format(msg, creds.c_str());
 	if (!success) {
 		msg = _("Connection to %s failed: %s");
-		msg = wxString::Format(msg, 
-		creds, 
+		msg = wxString::Format(msg,
+		creds,
 		error.c_str());
 	}
 	wxMessageBox(msg);
@@ -250,9 +250,9 @@ void t4p::MysqlConnectionDialogClass::ShowTestResults(t4p::QueryCompleteEventCla
 }
 
 
-t4p::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags, 
+t4p::SqlConnectionListDialogClass::SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags,
 															  t4p::RunningThreadsClass& runningThreads)
-	: SqlConnectionListDialogGeneratedClass(parent, wxID_ANY) 
+	: SqlConnectionListDialogGeneratedClass(parent, wxID_ANY)
 	, DatabaseTags(dbTags)
 	, EditedDatabaseTags()
 	, TestQuery()
@@ -293,13 +293,13 @@ void t4p::SqlConnectionListDialogClass::OnCloneButton(wxCommandEvent& event) {
 	if (List->GetSelections(toCloneIndexes)) {
 		for (size_t i = 0; i < toCloneIndexes.GetCount(); ++i) {
 			size_t indexToClone = toCloneIndexes[i];
-			
+
 			t4p::DatabaseTagClass clonedTag;
 			clonedTag.Copy(EditedDatabaseTags[indexToClone]);
-			
+
 			// clone == the user created it
 			clonedTag.IsDetected = false;
-			
+
 			// add a postfix to the clone label
 			clonedTag.Label = clonedTag.Label + UNICODE_STRING_SIMPLE(" clone");
 			Push(clonedTag);
@@ -312,16 +312,16 @@ void t4p::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEvent& e
 	if (List->GetSelections(toRemoveIndexes)) {
 		std::vector<t4p::DatabaseTagClass> remaining;
 		for (size_t i = 0; i < EditedDatabaseTags.size(); ++i) {
-			
+
 			// dont allow the user to delete a detected connection
 			if (toRemoveIndexes.Index(i) == wxNOT_FOUND || EditedDatabaseTags[i].IsDetected) {
 				remaining.push_back(EditedDatabaseTags[i]);
 			}
 		}
-		
+
 		EditedDatabaseTags.clear();
 		List->Clear();
-		
+
 		for (size_t i = 0; i < remaining.size(); ++i) {
 			Push(remaining[i]);
 		}
@@ -329,7 +329,7 @@ void t4p::SqlConnectionListDialogClass::OnRemoveSelectedButton(wxCommandEvent& e
 }
 
 void t4p::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event) {
-	
+
 	// remove from the backing list
 	// but don't allow the user to delete a detected connection
 	std::vector<t4p::DatabaseTagClass> newList;
@@ -339,11 +339,11 @@ void t4p::SqlConnectionListDialogClass::OnRemoveAllButton(wxCommandEvent& event)
 			newList.push_back(*tag);
 		}
 	}
-	
+
 	// delete all tags from the list
 	EditedDatabaseTags.clear();
 	List->Clear();
-	
+
 	// add the tags that we didn't delete
 	for (tag = newList.begin(); tag != newList.end(); ++tag) {
 		Push(*tag);
@@ -373,12 +373,12 @@ void t4p::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event)
 		}
 		if (wxID_OK == res) {
 			EditedDatabaseTags[sel] = editTag;
-			
+
 			// update the list label
 			List->SetString(sel, t4p::IcuToWx(editTag.Label));
 		}
 	}
-	
+
 }
 
 void t4p::SqlConnectionListDialogClass::Push(const t4p::DatabaseTagClass& newTag) {
@@ -387,11 +387,11 @@ void t4p::SqlConnectionListDialogClass::Push(const t4p::DatabaseTagClass& newTag
 		label += _(" <Detected>");
 	}
 	EditedDatabaseTags.push_back(newTag);
-		
+
 	List->Append(label);
 	List->Check(List->GetCount() - 1, newTag.IsEnabled);
 }
-	
+
 void t4p::SqlConnectionListDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow()) {
 		DatabaseTags.clear();
@@ -425,7 +425,7 @@ void t4p::SqlConnectionListDialogClass::OnTestSelectedButton(wxCommandEvent& eve
 	if (t4p::NumberLessThan(index, EditedDatabaseTags.size())) {
 		wxWindow::FindWindowById(wxID_OK, this)->Enable(false);
 		wxWindow::FindWindowById(ID_TESTBUTTON, this)->Enable(false);
-	
+
 
 		// get the most up-to-date values that the user has input
 		TestQuery.DatabaseTag.Copy(EditedDatabaseTags[index]);
@@ -440,23 +440,23 @@ void t4p::SqlConnectionListDialogClass::ShowTestResults(t4p::QueryCompleteEventC
 	t4p::SqlResultClass* result = event.Results;
 	wxString error = t4p::IcuToWx(result->Error);
 	bool success = result->Success;
-	
+
 	wxString creds;
 	if (TestQuery.DatabaseTag.FileName.IsOk()) {
 		creds = TestQuery.DatabaseTag.FileName.GetFullPath();
 	}
 	else {
-		creds = t4p::IcuToWx(TestQuery.DatabaseTag.User + 
+		creds = t4p::IcuToWx(TestQuery.DatabaseTag.User +
 			UNICODE_STRING_SIMPLE("@") +
 			TestQuery.DatabaseTag.Host);
 	}
 	wxString msg = _("Connection to %s was successful");
-	msg = wxString::Format(msg, 
+	msg = wxString::Format(msg,
 		creds.c_str());
 	if (!success) {
 		msg = _("Connection to %s failed: %s");
-		msg = wxString::Format(msg, 
-		creds, 
+		msg = wxString::Format(msg,
+		creds,
 		error.c_str());
 	}
 	wxMessageBox(msg, _("Test"), wxOK | wxCENTRE, this);
@@ -465,10 +465,10 @@ void t4p::SqlConnectionListDialogClass::ShowTestResults(t4p::QueryCompleteEventC
 	delete result;
 }
 
-t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id, 
+t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 		t4p::StatusBarWithGaugeClass* gauge, const t4p::SqlQueryClass& other,
 		t4p::SqlBrowserFeatureClass& feature,
-		t4p::SqlBrowserViewClass& view) 
+		t4p::SqlBrowserViewClass& view)
 	: SqlBrowserPanelGeneratedClass(parent, id)
 	, SelectedCol(-1)
 	, SelectedRow(-1)
@@ -476,12 +476,12 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 	, ConnectionIdentifier()
 	, LastError()
 	, LastQuery()
-	, RunningActionId(0) 
+	, RunningActionId(0)
 	, Results()
 	, RowToSqlInsert()
 	, RowToPhp()
 	, Gauge(gauge)
-	, Feature(feature) 
+	, Feature(feature)
 	, View(view)
 	, CopyOptions() {
 	CodeControl = NULL;
@@ -498,7 +498,7 @@ t4p::SqlBrowserPanelClass::SqlBrowserPanelClass(wxWindow* parent, int id,
 }
 
 t4p::SqlBrowserPanelClass::~SqlBrowserPanelClass() {
-	
+
 }
 
 bool t4p::SqlBrowserPanelClass::Check() {
@@ -508,7 +508,7 @@ bool t4p::SqlBrowserPanelClass::Check() {
 		ret = !LastQuery.isEmpty();
 	}
 	if (ret) {
-		
+
 		// make sure a connection has been chosen
 		size_t sel = Connections->GetSelection();
 		std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
@@ -526,7 +526,7 @@ void t4p::SqlBrowserPanelClass::ExecuteCodeControl() {
 	if (Check() && 0 == RunningActionId) {
 		t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(
 			Feature.App.RunningThreads, QueryId, ConnectionIdentifier);
-		if (thread->Init(LastQuery, Query)) { 
+		if (thread->Init(LastQuery, Query)) {
 			RunningActionId = Feature.App.RunningThreads.Queue(thread);
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 		}
@@ -559,7 +559,7 @@ void t4p::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const t4p::Dat
 	RunningActionId = 0;
 	t4p::MultipleSqlExecuteClass* thread = new t4p::MultipleSqlExecuteClass(
 		Feature.App.RunningThreads, QueryId, ConnectionIdentifier);
-	if (thread->Init(LastQuery, Query)) { 
+	if (thread->Init(LastQuery, Query)) {
 		RunningActionId = Feature.App.RunningThreads.Queue(thread);
 		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
 	}
@@ -590,14 +590,14 @@ void t4p::SqlBrowserPanelClass::OnQueryComplete(t4p::QueryCompleteEventClass& ev
 	if (event.GetId() == QueryId) {
 		t4p::SqlResultClass* result = event.Results;
 		Results.push_back(result);
-		
+
 		RowToSqlInsert.Columns = result->ColumnNames;
 		RowToSqlInsert.CheckedColumns = result->ColumnNames;
 		RowToSqlInsert.TableName = UNICODE_STRING_SIMPLE("");
 		if (result->TableNames.size() == 1) {
 			RowToSqlInsert.TableName = result->TableNames[0];
 		}
-		
+
 		RowToPhp.Columns = result->ColumnNames;
 		RowToPhp.CheckedColumns = result->ColumnNames;
 	}
@@ -624,13 +624,13 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 		ResultsGrid->SetColLabelValue(1, _("Query"));
 		ResultsGrid->SetColLabelValue(2, _("Result"));
 	}
-	
+
 	for (size_t i = 0; i < Results.size(); i++) {
 		t4p::SqlResultClass* results = Results[i];
 		UnicodeString error;
-		
+
 		// if only one query was executed: render the results in this panel
-		// if more than one query was executed: render any messages for 
+		// if more than one query was executed: render any messages for
 		//	in this panel, each new resultset in a new panel
 		if (results->Success && results->HasRows && !outputSummary) {
 			Fill(results);
@@ -644,7 +644,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 			// put summary in the summary GRID
 			wxString msg;
 			if (results->Success) {
-				msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows, 
+				msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows,
 					(results->QueryTime.ToLong() / 1000.00));
 			}
 			else {
@@ -654,7 +654,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 			wxString queryStart = t4p::IcuToWx(results->Query);
 			ResultsGrid->AppendRows(1);
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 0), wxString::Format(wxT("%d"), results->LineNumber));
-			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), queryStart.Mid(0, 100)); 
+			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 1), queryStart.Mid(0, 100));
 			ResultsGrid->SetCellValue(wxGridCellCoords(rowNumber , 2), msg);
 		}
 		if (!outputSummary && !results->Error.isEmpty()) {
@@ -666,7 +666,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 
 			// put summary in the summary LABEL
 			wxDateTime now = wxDateTime::Now();
-			wxString msg = wxString::Format(_("%d rows affected in %.3f sec [%s]"), results->AffectedRows, 
+			wxString msg = wxString::Format(_("%d rows affected in %.3f sec [%s]"), results->AffectedRows,
 				(results->QueryTime.ToLong() / 1000.00), now.FormatTime().c_str());
 			UpdateLabels(msg);
 		}
@@ -685,7 +685,7 @@ void t4p::SqlBrowserPanelClass::Fill(t4p::SqlResultClass* results) {
 		UpdateLabels(t4p::IcuToWx(results->Error));
 	}
 	else {
-		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"), 
+		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"),
 			results->AffectedRows, (results->QueryTime.ToLong() / 1000.00)));
 	}
 }
@@ -716,12 +716,12 @@ void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 		RunningActionId = 0;
 		Gauge->StopGauge(ID_SQL_GAUGE);
 		View.AuiManagerUpdate();
-		
+
 		if (CodeControl) {
-			
+
 			// give focus back to the editor
 			// this is the behavior in other sql browsers (sqlyog et al)
-			// this way the user can modify the query or 
+			// this way the user can modify the query or
 			// write another one without having to use the mouse
 			CodeControl->SetFocus();
 		}
@@ -733,7 +733,7 @@ void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 
 void t4p::SqlBrowserPanelClass::LinkToCodeControl(t4p::CodeControlClass* codeControl) {
 	CodeControl = codeControl;
-	
+
 	// set the current selected db tag, so that code completion works
 	int sel = Connections->GetSelection();
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
@@ -779,16 +779,16 @@ void t4p::SqlBrowserPanelClass::OnConnectionChoice(wxCommandEvent& event) {
 void t4p::SqlBrowserPanelClass::OnGridRightClick(wxGridEvent& event) {
 	wxMenu menu;
 	wxMenuItem* item;
-	
+
 	item = menu.Append(ID_GRID_COPY_ALL, _("Copy All Rows"), _("Copies all rows to the clipboard"));
 	item = menu.Append(ID_GRID_COPY_CELL, _("Copy Cell Data"), _("Copies cell data to the clipboard"));
 	item = menu.Append(ID_GRID_COPY_ROW, _("Copy Row"), _("Copies the entire row to the clipboard"));
 	item = menu.Append(ID_GRID_COPY_ROW_SQL, _("Copy Row As SQL"), _("Copies the entire row As SQL to the clipboard"));
 	item->Enable(!RowToSqlInsert.TableName.isEmpty());
-		
+
 	item = menu.Append(ID_GRID_COPY_ROW_PHP, _("Copy Row As PHP"), _("Copies the entire row As a PHP Array to the clipboard"));
 	item = menu.Append(ID_GRID_OPEN_IN_EDITOR, _("Open Cell in New Buffer"), _("Opens the cell data into an untitled doc"));
-	
+
 	SelectedCol = event.GetCol();
 	SelectedRow = event.GetRow();
 	this->PopupMenu(&menu, event.GetPosition());
@@ -842,7 +842,7 @@ void t4p::SqlBrowserPanelClass::OnCopyRow(wxCommandEvent& event) {
 			values.push_back(val);
 		}
 		CopyOptions.Export(values, tstream);
-		
+
 		wxString toExport = ostream.GetString();
 		if (!toExport.empty()) {
 			if (wxTheClipboard->Open()) {
@@ -867,12 +867,12 @@ void t4p::SqlBrowserPanelClass::OnCopyRowAsSql(wxCommandEvent& event) {
 		RowToSqlInsert.Values.push_back(t4p::WxToIcu(val));
 	}
 	RowToSqlInsert.CheckedValues = RowToSqlInsert.Values;
-		
+
 	t4p::SqlCopyAsInsertDialogClass copyDialog(this, wxID_ANY, RowToSqlInsert);
-	if (wxOK == copyDialog.ShowModal() && !RowToSqlInsert.CheckedColumns.empty() 
+	if (wxOK == copyDialog.ShowModal() && !RowToSqlInsert.CheckedColumns.empty()
 			&& !RowToSqlInsert.CheckedValues.empty()) {
 		UnicodeString sql = RowToSqlInsert.CreateStatement(Query.DatabaseTag.Driver);
-		
+
 		wxString wxSql = t4p::IcuToWx(sql);
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(wxSql));
@@ -891,12 +891,12 @@ void t4p::SqlBrowserPanelClass::OnCopyRowAsPhp(wxCommandEvent& event) {
 		wxString val = ResultsGrid->GetCellValue(SelectedRow, i);
 		RowToPhp.Values.push_back(t4p::WxToIcu(val));
 	}
-		
+
 	t4p::SqlCopyAsPhpDialogClass copyDialog(this, wxID_ANY, RowToPhp);
-	if (wxOK == copyDialog.ShowModal() && !RowToPhp.CheckedColumns.empty() 
+	if (wxOK == copyDialog.ShowModal() && !RowToPhp.CheckedColumns.empty()
 			&& !RowToPhp.CheckedValues.empty()) {
 		UnicodeString code = RowToPhp.CreatePhpArray();
-		
+
 		wxString wxCode = t4p::IcuToWx(code);
 		if (wxTheClipboard->Open()) {
 			wxTheClipboard->SetData(new wxTextDataObject(wxCode));
@@ -928,10 +928,10 @@ void t4p::SqlBrowserPanelClass::OnOpenInEditor(wxCommandEvent& event) {
 	}
 }
 
-t4p::SqlBrowserViewClass::SqlBrowserViewClass(t4p::SqlBrowserFeatureClass& feature) 
-	: FeatureViewClass() 
+t4p::SqlBrowserViewClass::SqlBrowserViewClass(t4p::SqlBrowserFeatureClass& feature)
+	: FeatureViewClass()
 	, Feature(feature)
-	, SqlCodeCompletionProvider(feature.App.Globals) 
+	, SqlCodeCompletionProvider(feature.App.Globals)
 	, SqlBraceMatchStyler() {
 }
 
@@ -939,7 +939,7 @@ t4p::SqlBrowserViewClass::~SqlBrowserViewClass() {
 }
 
 void t4p::SqlBrowserViewClass::SetCurrentInfo(const t4p::DatabaseTagClass& databaseTag) {
-	SqlCodeCompletionProvider.SetDbTag(databaseTag);	
+	SqlCodeCompletionProvider.SetDbTag(databaseTag);
 }
 
 void t4p::SqlBrowserViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
@@ -973,7 +973,7 @@ void  t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 			num++;
 		}
 	}
-	
+
 	t4p::CodeControlClass* ctrl = CreateCodeControl(wxString::Format(_("SQL Browser %d"), num), t4p::FILE_TYPE_SQL);
 	CreateResultsPanel(ctrl);
 	ctrl->SetFocus();
@@ -981,7 +981,7 @@ void  t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu(wxCommandEvent& event) {
 
 t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::CodeControlClass* codeControl) {
 	t4p::SqlQueryClass query;
-	t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+	t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(),
 		query, Feature, *this);
 	wxString tabText = GetCodeNotebookTabText(codeControl);
 
@@ -996,7 +996,7 @@ t4p::SqlBrowserPanelClass* t4p::SqlBrowserViewClass::CreateResultsPanel(t4p::Cod
 void t4p::SqlBrowserViewClass::OnRun(wxCommandEvent& event) {
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl && ctrl->GetFileType() == t4p::FILE_TYPE_SQL) {
-		
+
 		// look for results panel that corresponds to the current code control
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		bool found = false;
@@ -1004,12 +1004,12 @@ void t4p::SqlBrowserViewClass::OnRun(wxCommandEvent& event) {
 			wxWindow* window = notebook->GetPage(i);
 
 			// only cast when we are sure of the type of window
-			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 			// methods
 			if (window->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)window;
 				if (panel->IsLinkedToCodeControl(ctrl)) {
-				
+
 					// we found the panel bring it to the forefront and run the query
 					found = true;
 					SetFocusToToolsWindow(window);
@@ -1028,22 +1028,22 @@ void t4p::SqlBrowserViewClass::OnRun(wxCommandEvent& event) {
 void t4p::SqlBrowserViewClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 
 	// decided to always allow the user to edit the connection info in order to
-	// allow the user to create a new database from within the editor (the very 
+	// allow the user to create a new database from within the editor (the very
 	// first time a new project is created; its database may not exist).
 	// before, a user would not be able to edit the connection info once it was detected
 	// in order to make it less confusing about where the connection info comes from.
 	t4p::SqlConnectionListDialogClass dialog(GetMainWindow(), Feature.App.Globals.DatabaseTags, Feature.App.RunningThreads);
 	if (dialog.ShowModal() == wxOK) {
-		
+
 		// if chosen connection changed need to update the code control so that it knows to use the new
 		// connection for auto completion purposes
 		// all SQL panels are updated.
 		wxAuiNotebook* notebook = GetToolsNotebook();
 		for (size_t i = 0; i < notebook->GetPageCount(); ++i) {
 			wxWindow* window = notebook->GetPage(i);
-			
+
 			// only cast when we are sure of the type of window
-			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 			// methods
 			if (window->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)window;
@@ -1075,15 +1075,15 @@ void t4p::SqlBrowserViewClass::OnAppFilePageChanged(t4p::CodeControlEventClass& 
 			wxWindow* toolsWindow = notebook->GetPage(i);
 
 			// only cast when we are sure of the type of window
-			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 			// methods
 			if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
 				if (panel->IsLinkedToCodeControl(contentWindow)) {
-					
+
 					// we found the panel bring it to the forefront and run the query
 					SetFocusToToolsWindow(toolsWindow);
-					
+
 					int sel = panel->SelectedConnectionIndex();
 					std::vector<t4p::DatabaseTagClass> allDbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 					if (t4p::NumberLessThan(sel, allDbTags.size())) {
@@ -1105,7 +1105,7 @@ void t4p::SqlBrowserViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event
 			wxWindow* toolsWindow = notebook->GetPage(i);
 
 			// only cast when we are sure of the type of window
-			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+			// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 			// methods
 			if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 				t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
@@ -1123,7 +1123,7 @@ void t4p::SqlBrowserViewClass::OnToolsNotebookPageClose(wxAuiNotebookEvent& even
 	wxWindow* toolsWindow = notebook->GetPage(sel);
 
 	// only cast when we are sure of the type of window
-	// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+	// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 	// methods
 	if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 		t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
@@ -1140,7 +1140,7 @@ void t4p::SqlBrowserViewClass::OnAppExit(wxCommandEvent& event) {
 		wxWindow* toolsWindow = notebook->GetPage(i);
 
 		// only cast when we are sure of the type of window
-		// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required 
+		// not using wxDynamicCast since SqlBrowserPanelClass does not implement the required
 		// methods
 		if (toolsWindow->GetName() == wxT("t4p::SqlBrowserPanelClass")) {
 			t4p::SqlBrowserPanelClass* panel = (t4p::SqlBrowserPanelClass*)toolsWindow;
@@ -1166,15 +1166,15 @@ void t4p::SqlBrowserViewClass::AuiManagerUpdate() {
 }
 
 void t4p::SqlBrowserViewClass::OnCmdTableDataOpen(t4p::OpenDbTableCommandEventClass& event) {
-	
-	// find the connection to use by hash, 
+
+	// find the connection to use by hash,
 	t4p::DatabaseTagClass tag;
 	bool found = Feature.App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
 	if (found) {
 		t4p::SqlQueryClass query;
-		t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(), 
+		t4p::SqlBrowserPanelClass* sqlPanel = new SqlBrowserPanelClass(GetToolsNotebook(), wxNewId(), GetStatusBarWithGauge(),
 			query, Feature, *this);
-		
+
 		wxString tabText = event.DbTableName;
 		wxString sql = "SELECT * FROM " + event.DbTableName + " LIMIT 100";
 
@@ -1201,12 +1201,12 @@ void t4p::SqlBrowserViewClass::NewTextBuffer(const wxString& text) {
 }
 
 void t4p::SqlBrowserViewClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandEventClass& event) {
-	
-	// find the connection to use by hash, 
+
+	// find the connection to use by hash,
 	t4p::DatabaseTagClass tag;
 	bool found = Feature.App.Globals.FindDatabaseTagByHash(event.ConnectionHash, tag);
 	if (found) {
-		
+
 		// if there is an existing table definition panel use that
 		wxWindow* win = wxWindow::FindWindowById(ID_PANEL_TABLE_DEFINITION, GetToolsNotebook());
 		t4p::TableDefinitionPanelClass* sqlPanel = NULL;
@@ -1215,10 +1215,10 @@ void t4p::SqlBrowserViewClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandE
 			SetFocusToToolsWindow(win);
 		}
 		else {
-			sqlPanel = new TableDefinitionPanelClass(GetMainWindow(), ID_PANEL_TABLE_DEFINITION, 
+			sqlPanel = new TableDefinitionPanelClass(GetMainWindow(), ID_PANEL_TABLE_DEFINITION,
 				Feature, *this);
 			wxString tabText = wxT("Table Definition");
-		
+
 			// name the windows, since there could be multiple windows from various features; we want to know which opened tools windows
 			// are from this feature
 			wxBitmap tableBitmap = t4p::BitmapImageAsset(wxT("database-medium"));
@@ -1228,14 +1228,14 @@ void t4p::SqlBrowserViewClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandE
 	}
 }
 
-t4p::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id, 
+t4p::TableDefinitionPanelClass::TableDefinitionPanelClass(wxWindow* parent, int id,
 		t4p::SqlBrowserFeatureClass& feature,
 		t4p::SqlBrowserViewClass& view)
 : TableDefinitionPanelGeneratedClass(parent, id)
-, Feature(feature) 
+, Feature(feature)
 , View(view)
 , RunningThreads()
-, TableConnectionIdentifier() 
+, TableConnectionIdentifier()
 , IndexConnectionIdentifier() {
 	Connections->Clear();
 	FillConnectionList();
@@ -1266,7 +1266,7 @@ void t4p::TableDefinitionPanelClass::FillConnectionList() {
 
 void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag, const wxString& tableName) {
 	TableName->SetValue(tableName);
-	
+
 	// select the connection to the one to show
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	int indexToSelect = 0;
@@ -1277,7 +1277,7 @@ void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag,
 			break;
 		}
 	}
-	
+
 	// trigger the description query
 	t4p::SqlQueryClass query;
 	query.DatabaseTag = tag;
@@ -1288,12 +1288,12 @@ void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag,
 	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
 		columnSql = t4p::WxToIcu("PRAGMA table_info('" + tableName + "')");
 	}
-	t4p::MultipleSqlExecuteClass* sqlDefExecute = 
+	t4p::MultipleSqlExecuteClass* sqlDefExecute =
 		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_DEFINITION, TableConnectionIdentifier);
 	if (sqlDefExecute->Init(columnSql, query)) {
 		RunningThreads.Queue(sqlDefExecute);
 	}
-	
+
 	UnicodeString indexSql;
 	if (t4p::DatabaseTagClass::MYSQL == tag.Driver) {
 		indexSql = t4p::WxToIcu("SHOW INDEX FROM " + tableName);
@@ -1301,7 +1301,7 @@ void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag,
 	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
 		indexSql = t4p::WxToIcu("PRAGMA index_list('" + tableName + "')");
 	}
-	t4p::MultipleSqlExecuteClass* sqlIndexExecute = 
+	t4p::MultipleSqlExecuteClass* sqlIndexExecute =
 		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_INDICES, IndexConnectionIdentifier);
 	if (sqlIndexExecute->Init(indexSql, query)) {
 		RunningThreads.Queue(sqlIndexExecute);
@@ -1330,7 +1330,7 @@ void t4p::TableDefinitionPanelClass::OnIndexSqlComplete(t4p::QueryCompleteEventC
 
 
 void t4p::TableDefinitionPanelClass::OnTableNameEnter(wxCommandEvent& event) {
-	
+
 	// select the connection to the one to show
 	std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 	int selectedIndex = Connections->GetSelection();
@@ -1347,8 +1347,8 @@ void t4p::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
 		return;
 	}
 	t4p::DatabaseTagClass selectedTag = dbTags[selectedIndex];
-	
-	
+
+
 	UnicodeString createSql;
 	wxString tableName = TableName->GetValue();
 	if (t4p::DatabaseTagClass::MYSQL == selectedTag.Driver) {
@@ -1359,7 +1359,7 @@ void t4p::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
 	}
 	t4p::SqlQueryClass query;
 	query.DatabaseTag = selectedTag;
-	t4p::MultipleSqlExecuteClass* sqlCreateExecute = 
+	t4p::MultipleSqlExecuteClass* sqlCreateExecute =
 		new t4p::MultipleSqlExecuteClass(RunningThreads, ID_SQL_TABLE_CREATE, IndexConnectionIdentifier);
 	if (sqlCreateExecute->Init(createSql, query)) {
 		RunningThreads.Queue(sqlCreateExecute);
@@ -1375,20 +1375,20 @@ void t4p::TableDefinitionPanelClass::OnCreateSqlComplete(t4p::QueryCompleteEvent
 		DefinitionColumnsPanel->Fill(result);
 	}
 	else if (!result->StringResults.empty() && result->StringResults[0].size() == 2) {
-		
+
 		// mysql results
 		UnicodeString table = result->StringResults[0][1];
 		wxString sqlText = t4p::IcuToWx(table);
 		View.NewSqlBuffer(sqlText);
 	}
 	else if (!result->StringResults.empty() && result->StringResults[0].size() == 1) {
-		
+
 		// sqlite results
 		UnicodeString table = result->StringResults[0][0];
 		wxString sqlText = t4p::IcuToWx(table);
 		View.NewSqlBuffer(sqlText);
 	}
-	
+
 	delete result;
 }
 
@@ -1419,18 +1419,18 @@ void t4p::DefinitionColumnsPanelClass::Fill(t4p::SqlResultClass* result) {
 
 t4p::SqlCopyDialogClass::SqlCopyDialogClass(wxWindow* parent, int id, t4p::SqlCopyOptionsClass& options)
 : SqlCopyDialogGeneratedClass(parent, id)
-, EditedOptions(options) 
+, EditedOptions(options)
 , OriginalOptions(options) {
-	
+
 	wxTextValidator columnDelimValidator(wxFILTER_NONE, &EditedOptions.ColumnDelim);
 	ColumnDelim->SetValidator(columnDelimValidator);
-	
+
 	wxTextValidator columnEnclosureValidator(wxFILTER_NONE, &EditedOptions.ColumnEnclosure);
 	ColumnEnclosure->SetValidator(columnEnclosureValidator);
-	
+
 	wxTextValidator rowDelimValidator(wxFILTER_NONE, &EditedOptions.RowDelim);
 	RowDelim->SetValidator(rowDelimValidator);
-	
+
 	wxTextValidator nullFillerValidator(wxFILTER_NONE, &EditedOptions.NullFiller);
 	NullFiller->SetValidator(nullFillerValidator);
 }
@@ -1442,23 +1442,23 @@ void t4p::SqlCopyDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 void t4p::SqlCopyDialogClass::OnOkButton(wxCommandEvent& event) {
 	OriginalOptions = EditedOptions;
-	
+
 	EndModal(wxOK);
 }
 
 
-t4p::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, int id, 
+t4p::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, int id,
 	t4p::RowToSqlInsertClass& rowToSql)
 : SqlCopyAsInsertDialogGeneratedClass(parent, id)
 , EditedRowToSql(rowToSql)
 , RowToSql(rowToSql)
 , HasCheckedAll(false) {
-	
+
 	for (size_t i = 0; i < RowToSql.Columns.size(); ++i) {
 		Columns->Append(t4p::IcuToWx(RowToSql.Columns[i]));
 		Columns->Check(i);
 	}
-	
+
 	if (EditedRowToSql.LineMode == t4p::RowToSqlInsertClass::SINGLE_LINE) {
 		LineModeRadio->SetSelection(0);
 	}
@@ -1480,7 +1480,7 @@ void t4p::SqlCopyAsInsertDialogClass::OnCancelButton(wxCommandEvent& event) {
 
 void t4p::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
-	
+
 	EditedRowToSql.CheckedColumns.clear();
 	EditedRowToSql.CheckedValues.clear();
 	for (size_t i = 0; i < Columns->GetCount(); ++i) {
@@ -1491,25 +1491,25 @@ void t4p::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 			}
 		}
 	}
-	
+
 	if (LineModeRadio->GetSelection() == 0) {
 		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::SINGLE_LINE;
 	}
 	else {
 		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::MULTI_LINE;
 	}
-	
+
 	RowToSql = EditedRowToSql;
-	
+
 	return EndModal(wxOK);
 }
 
 t4p::SqlCopyAsPhpDialogClass::SqlCopyAsPhpDialogClass(wxWindow* parent, int id, t4p::RowToPhpClass& rowToPhp)
 : SqlCopyAsPhpDialogGeneratedClass(parent, id)
 , EditedRowToPhp(rowToPhp)
-, RowToPhp(rowToPhp) 
+, RowToPhp(rowToPhp)
 , HasCheckedAll(false) {
-	
+
 	if (t4p::RowToPhpClass::SYNTAX_KEYWORD == rowToPhp.ArraySyntax) {
 		ArraySyntaxRadio->SetSelection(0);
 	}
@@ -1552,10 +1552,10 @@ void t4p::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
 	else {
 		EditedRowToPhp.CopyValues = t4p::RowToPhpClass::VALUES_EMPTY;
 	}
-	
+
 	EditedRowToPhp.CheckedColumns.clear();
 	EditedRowToPhp.CheckedValues.clear();
-	
+
 	for (size_t i = 0; i < Columns->GetCount(); ++i) {
 		if (Columns->IsChecked(i)) {
 			EditedRowToPhp.CheckedColumns.push_back(EditedRowToPhp.Columns[i]);
@@ -1564,14 +1564,14 @@ void t4p::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
 			}
 		}
 	}
-	
+
 	RowToPhp = EditedRowToPhp;
-	
+
 	EndModal(wxOK);
 }
 
 t4p::SqlCodeCompletionProviderClass::SqlCodeCompletionProviderClass(t4p::GlobalsClass& globals)
-: CodeCompletionProviderClass() 
+: CodeCompletionProviderClass()
 , Globals(globals) {
 }
 
@@ -1582,14 +1582,14 @@ std::vector<wxString> t4p::SqlCodeCompletionProviderClass::HandleAutoCompletionM
 	 }
 	wxString symbol = t4p::IcuToWx(word);
 	symbol = symbol.Lower();
-	
+
 	t4p::KeywordsTokenizeMatch(t4p::KEYWORDS_MYSQL, symbol, autoCompleteList);
 	for (size_t i = 0; i < autoCompleteList.size(); ++i) {
-		
+
 		// make keywords uppercase for SQL keywords
 		autoCompleteList[i].MakeUpper();
 	}
-	
+
 	// look at the meta data
 	if (!CurrentDbTag.Label.isEmpty()) {
 		UnicodeString error;
@@ -1612,10 +1612,10 @@ void t4p::SqlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, s
 	int startPos = ctrl->WordStartPosition(currentPos, true);
 	int endPos = ctrl->WordEndPosition(currentPos, true);
 	UnicodeString symbol = 	ctrl->GetSafeSubstring(startPos, endPos);
-	
+
 	std::vector<wxString> autoCompleteList = HandleAutoCompletionMySql(symbol);
 	if (!autoCompleteList.empty()) {
-		
+
 		// scintilla needs the keywords sorted.
 		std::sort(autoCompleteList.begin(), autoCompleteList.end());
 		wxString list;
@@ -1641,7 +1641,7 @@ bool t4p::SqlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
 
 t4p::SqlBraceMatchStylerClass::SqlBraceMatchStylerClass()
 : BraceMatchStylerClass() {
-	
+
 }
 
 bool t4p::SqlBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
@@ -1676,7 +1676,7 @@ void t4p::SqlBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 }
 
 BEGIN_EVENT_TABLE(t4p::SqlBrowserViewClass, t4p::FeatureViewClass)
-	EVT_MENU(t4p::MENU_SQL + 0, t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu)	
+	EVT_MENU(t4p::MENU_SQL + 0, t4p::SqlBrowserViewClass::OnSqlBrowserToolsMenu)
 	EVT_MENU(t4p::MENU_SQL + 1, t4p::SqlBrowserViewClass::OnSqlConnectionMenu)
 	EVT_MENU(t4p::MENU_SQL + 2, t4p::SqlBrowserViewClass::OnRun)
 	EVT_MENU(t4p::MENU_SQL + 3, t4p::SqlBrowserViewClass::OnSqlDetectMenu)

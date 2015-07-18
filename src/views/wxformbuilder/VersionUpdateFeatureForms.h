@@ -28,10 +28,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class VersionUpdateGeneratedDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class VersionUpdateGeneratedDialogClass : public wxDialog 
+class VersionUpdateGeneratedDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* StatusLabel;
 		wxStaticText* Result;
@@ -43,34 +43,34 @@ class VersionUpdateGeneratedDialogClass : public wxDialog
 		wxHyperlinkCtrl* DownloadLink;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		VersionUpdateGeneratedDialogClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Version Update Check"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 371,209 ), long style = wxCAPTION|wxCLOSE_BOX );
 		~VersionUpdateGeneratedDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class VersionUpdatePreferencesGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class VersionUpdatePreferencesGeneratedPanelClass : public wxPanel 
+class VersionUpdatePreferencesGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxCheckBox* CheckForUpdates;
-	
+
 	public:
-		
+
 		VersionUpdatePreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~VersionUpdatePreferencesGeneratedPanelClass();
-	
+
 };
 
 #endif //__VersionUpdateFeatureForms__

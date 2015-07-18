@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,7 +45,7 @@ public:
 	 * Get any connection errors that occurred in the background thread.
 	 */
 	std::vector<UnicodeString> Errors;
-	
+
 	SqlMetaDataEventClass(int eventId, const std::vector<UnicodeString>& errors);
 
 	wxEvent* Clone() const;
@@ -54,8 +54,8 @@ public:
 
 /**
  * This class will performt SQL metadata indexing (grabbing table and column names)
- * from all of the connections of the current project). Once the list of tables 
- * and columns has been retrieved, a SqlMetaDataEventClass event is generated 
+ * from all of the connections of the current project). Once the list of tables
+ * and columns has been retrieved, a SqlMetaDataEventClass event is generated
  * with the new resources
  */
 class SqlMetaDataActionClass : public GlobalActionClass {
@@ -67,7 +67,7 @@ public:
 	 *        and the EVENT_SQL_META_DATA_COMPLETE event
 	 */
 	SqlMetaDataActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
-	
+
 	/**
 	 * Initialize the connections to be scanned.  This needs to be done before
 	 * the thread is started (CreateSingleInstance).
@@ -83,12 +83,12 @@ public:
 	wxString GetLabel() const;
 
 private:
-	
+
 	/**
-	 * The connections to query; where the tables / columns will be fetched from 
+	 * The connections to query; where the tables / columns will be fetched from
 	 */
 	std::vector<DatabaseTagClass> DatabaseTags;
-	
+
 	/**
 	 * location where sql table names will be stored
 	 */
@@ -96,15 +96,15 @@ private:
 };
 
 class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
-	
+
 public:
 
 	SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
-	
+
 	void Work(t4p::GlobalsClass& globals);
-	
+
 protected:
-	
+
 	wxString GetLabel() const;
 };
 

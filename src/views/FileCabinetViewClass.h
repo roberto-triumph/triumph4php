@@ -37,19 +37,19 @@ namespace t4p {
 class FileCabinetViewClass : public t4p::FeatureViewClass {
 
 public:
-	
+
 	FileCabinetViewClass(t4p::FileCabinetFeatureClass& feature);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 	void AddViewMenuItems(wxMenu* viewMenu);
-	
+
 private:
 
 	void OnViewFileCabinet(wxCommandEvent& event);
 	void OnEditAddCurrentFileToCabinet(wxCommandEvent& event);
 
 	t4p::FileCabinetFeatureClass& Feature;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -59,9 +59,9 @@ private:
  * and allows the user to add a file/dir to the cabinet.
  */
 class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
-	
+
 public:
-	
+
 	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, wxWindow* mainWindow);
 
 	/**
@@ -79,18 +79,18 @@ private:
 	void OnListItemRightClick(wxListEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnListItemOpen(wxCommandEvent& event);
-	
+
 	/**
 	 * Deletes the item at index.  The item is deleted from
 	 * the list and the file cabinet table.
-	 * 
+	 *
 	 * @param int index list item index
 	 */
 	void DeleteItemAt(int index);
 
 	/**
 	 * Opens the item at index.
-	 * 
+	 *
 	 * @param int index list item index
 	 */
 	void OpenItemAt(int index);
@@ -100,20 +100,20 @@ private:
 	 * already stored in the file cabinet
 	 */
 	void FillList();
-	
+
 	/**
-	 * to list the existing files/dirs in the 
+	 * to list the existing files/dirs in the
 	 * file cabinet
 	 */
 	t4p::SqliteFinderClass SqliteFinder;
 	t4p::AllFileCabinetResultClass FileCabinet;
-	
+
 	/**
 	 * to get the sqlite connection where the file cabinet
 	 * is stored
 	 */
 	t4p::FileCabinetFeatureClass& Feature;
-	
+
 	/**
 	 * images for the files/directories
 	 *  The list control will own this pointer
@@ -124,11 +124,11 @@ private:
 	 * The parent window. Used to make sure dialogs are centered
 	 */
 	wxWindow* MainWindow;
-	
+
 	enum ListImages {
 		LIST_FOLDER = t4p::IMGLIST_NONE + 1
 	};
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

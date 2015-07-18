@@ -37,10 +37,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlBrowserPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlBrowserPanelGeneratedClass : public wxPanel 
+class SqlBrowserPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -49,36 +49,36 @@ class SqlBrowserPanelGeneratedClass : public wxPanel
 			ID_RESULTSLABEL,
 			ID_DATAGRID,
 		};
-		
+
 		wxBitmapButton* RefreshButton;
 		wxBitmapButton* HelpButton;
 		wxStaticText* ConnectionLabel;
 		wxChoice* Connections;
-		
+
 		wxStaticText* ResultsLabel;
 		wxGrid* ResultsGrid;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnectionChoice( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGridRightClick( wxGridEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SqlBrowserPanelGeneratedClass( wxWindow* parent, wxWindowID id = ID_PANEL, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 830,490 ), long style = wxTAB_TRAVERSAL );
 		~SqlBrowserPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MysqlConnectionDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class MysqlConnectionDialogGeneratedClass : public wxDialog 
+class MysqlConnectionDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -97,7 +97,7 @@ class MysqlConnectionDialogGeneratedClass : public wxDialog
 			ID_PASSWORD,
 			ID_TESTBUTTON,
 		};
-		
+
 		wxStaticText* WarningLabel;
 		wxStaticText* NameLabel;
 		wxTextCtrl* Label;
@@ -111,33 +111,33 @@ class MysqlConnectionDialogGeneratedClass : public wxDialog
 		wxTextCtrl* User;
 		wxStaticText* PasswordLabel;
 		wxTextCtrl* Password;
-		
+
 		wxButton* TestButton;
 		wxStdDialogButtonSizer* StdButtonsSizer;
 		wxButton* StdButtonsSizerOK;
 		wxButton* StdButtonsSizerCancel;
 		wxButton* StdButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnLabelText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		MysqlConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("MySQL Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~MysqlConnectionDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqliteConnectionDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqliteConnectionDialogGeneratedClass : public wxDialog 
+class SqliteConnectionDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxStaticText* NameLabel;
@@ -147,27 +147,27 @@ class SqliteConnectionDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-	
+
 	public:
-		
+
 		SqliteConnectionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQLite Connection"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 491,208 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqliteConnectionDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlConnectionListDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlConnectionListDialogGeneratedClass : public wxDialog 
+class SqlConnectionListDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_TESTBUTTON = 1000,
 		};
-		
+
 		wxStaticText* HelpLabel;
 		wxHyperlinkCtrl* HelpLink;
 		wxCheckListBox* List;
@@ -180,7 +180,7 @@ class SqlConnectionListDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCheckToggled( wxCommandEvent& event ) { event.Skip(); }
@@ -191,22 +191,22 @@ class SqlConnectionListDialogGeneratedClass : public wxDialog
 		virtual void OnRemoveSelectedButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveAllButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SqlConnectionListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQL Connections"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~SqlConnectionListDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TableDefinitionPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TableDefinitionPanelGeneratedClass : public wxPanel 
+class TableDefinitionPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxBitmapButton* RefreshButton;
 		wxButton* ShowSqlButton;
@@ -215,61 +215,61 @@ class TableDefinitionPanelGeneratedClass : public wxPanel
 		wxStaticText* TableLabel;
 		wxTextCtrl* TableName;
 		wxAuiNotebook* Notebook;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRefreshButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSqlButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnTableNameEnter( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TableDefinitionPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 719,415 ), long style = wxTAB_TRAVERSAL );
 		~TableDefinitionPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DefinitionIndicesPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class DefinitionIndicesPanelGeneratedClass : public wxPanel 
+class DefinitionIndicesPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxGrid* IndicesGrid;
-	
+
 	public:
-		
+
 		DefinitionIndicesPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 666,260 ), long style = wxTAB_TRAVERSAL );
 		~DefinitionIndicesPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DefinitionColumnsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class DefinitionColumnsPanelGeneratedClass : public wxPanel 
+class DefinitionColumnsPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxGrid* ColumnsGrid;
-	
+
 	public:
-		
+
 		DefinitionColumnsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 690,299 ), long style = wxTAB_TRAVERSAL );
 		~DefinitionColumnsPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlCopyDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlCopyDialogGeneratedClass : public wxDialog 
+class SqlCopyDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ColumnDelimLabel;
 		wxTextCtrl* ColumnDelim;
@@ -282,26 +282,26 @@ class SqlCopyDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SqlCopyDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy Format"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlCopyAsInsertDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlCopyAsInsertDialogGeneratedClass : public wxDialog 
+class SqlCopyAsInsertDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ColumnsLabel;
 		wxCheckListBox* Columns;
@@ -310,27 +310,27 @@ class SqlCopyAsInsertDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCheckAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SqlCopyAsInsertDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As SQL Insert"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,478 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyAsInsertDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlCopyAsPhpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlCopyAsPhpDialogGeneratedClass : public wxDialog 
+class SqlCopyAsPhpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ColumnsLabel;
 		wxCheckListBox* Columns;
@@ -340,38 +340,38 @@ class SqlCopyAsPhpDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCheckAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SqlCopyAsPhpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Copy As PHP Array"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,510 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlCopyAsPhpDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SqlBrowserHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class SqlBrowserHelpDialogGeneratedClass : public wxDialog 
+class SqlBrowserHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		SqlBrowserHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("SQL Browser Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~SqlBrowserHelpDialogGeneratedClass();
-	
+
 };
 
 #endif //__SqlBrowserFeatureForms__

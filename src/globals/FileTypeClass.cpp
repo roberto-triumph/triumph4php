@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,10 +22,10 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- 
+
 #include <globals/FileTypeClass.h>
 #include <wx/tokenzr.h>
-#include <wx/filefn.h> 
+#include <wx/filefn.h>
 #include <wx/filename.h>
 
 /**
@@ -44,7 +44,7 @@ static std::vector<wxString> Explode(const wxString& extensionsString) {
 /**
  * Checks the given file against the given set of wildcards.
  * @return TRUE if the fullPath matches at least one of
- *          the wildcards. 
+ *          the wildcards.
  */
 static bool HasExtension(const wxString& fullPath, const wxString& extensionsString) {
 	std::vector<wxString> wildcards = Explode(extensionsString);
@@ -60,7 +60,7 @@ static bool HasExtension(const wxString& fullPath, const wxString& extensionsStr
 	}
 	return found;
 }
-	
+
 t4p::FileTypeClass::FileTypeClass()
 : PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
 , CssFileExtensionsString(wxT("*.css"))
@@ -78,7 +78,7 @@ t4p::FileTypeClass::FileTypeClass()
 , MiscFileExtensionsString(wxT("*.json;*.twig;*.txt")) {
 }
 
-t4p::FileTypeClass::FileTypeClass(const t4p::FileTypeClass& src) 
+t4p::FileTypeClass::FileTypeClass(const t4p::FileTypeClass& src)
 : PhpFileExtensionsString(wxT("*.php;*.phtml;*.html;*.php3"))
 , CssFileExtensionsString(wxT("*.css"))
 , SqlFileExtensionsString(wxT("*.sql"))
@@ -102,7 +102,7 @@ t4p::FileTypeClass& t4p::FileTypeClass::operator=(const t4p::FileTypeClass& src)
 }
 
 void t4p::FileTypeClass::Copy(const t4p::FileTypeClass& src) {
-	
+
 	// copy in a thread-safe way
 	CssFileExtensionsString        = CssFileExtensionsString.c_str();
 	PhpFileExtensionsString        = PhpFileExtensionsString.c_str();

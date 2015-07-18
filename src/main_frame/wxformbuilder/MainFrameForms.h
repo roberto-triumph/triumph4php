@@ -35,11 +35,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MainFrameGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class MainFrameGeneratedClass : public wxFrame 
+class MainFrameGeneratedClass : public wxFrame
 {
 	DECLARE_EVENT_TABLE()
 	private:
-		
+
 		// Private event handlers
 		void _wxFB_OnClose( wxCloseEvent& event ){ OnClose( event ); }
 		void _wxFB_OnFileExit( wxCommandEvent& event ){ OnFileExit( event ); }
@@ -50,8 +50,8 @@ class MainFrameGeneratedClass : public wxFrame
 		void _wxFB_OnHelpAbout( wxCommandEvent& event ){ OnHelpAbout( event ); }
 		void _wxFB_OnHelpCredits( wxCommandEvent& event ){ OnHelpCredits( event ); }
 		void _wxFB_OnHelpLicense( wxCommandEvent& event ){ OnHelpLicense( event ); }
-		
-	
+
+
 	protected:
 		enum
 		{
@@ -62,7 +62,7 @@ class MainFrameGeneratedClass : public wxFrame
 			ID_MENUITEMCREDITS,
 			ID_MENUITEMLICENSE,
 		};
-		
+
 		wxBoxSizer* MainSizer;
 		wxMenuBar* MenuBar;
 		wxMenu* FileMenu;
@@ -70,7 +70,7 @@ class MainFrameGeneratedClass : public wxFrame
 		wxMenu* ViewMenu;
 		wxMenu* SearchMenu;
 		wxMenu* HelpMenu;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnFileExit( wxCommandEvent& event ) { event.Skip(); }
@@ -81,28 +81,28 @@ class MainFrameGeneratedClass : public wxFrame
 		virtual void OnHelpAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpCredits( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpLicense( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		MainFrameGeneratedClass( wxWindow* parent, wxWindowID id = ID_MAINFRAMEGENERATEDCLASS, const wxString& title = _("Triumph 4 PHP"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~MainFrameGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class CreditsDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class CreditsDialogClass : public wxDialog 
+class CreditsDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_CREDITSDIALOGGENERATEDCLASS = 1000,
 		};
-		
+
 		wxStaticText* m_staticText8;
 		wxStaticText* m_staticText12;
 		wxHyperlinkCtrl* m_hyperlink3;
@@ -127,21 +127,21 @@ class CreditsDialogClass : public wxDialog
 		wxHyperlinkCtrl* m_hyperlink11;
 		wxStdDialogButtonSizer* m_sdbSizer2;
 		wxButton* m_sdbSizer2OK;
-	
+
 	public:
-		
+
 		CreditsDialogClass( wxWindow* parent, wxWindowID id = ID_CREDITSDIALOGGENERATEDCLASS, const wxString& title = _("Credits"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~CreditsDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class LicenseDialogClass
 ///////////////////////////////////////////////////////////////////////////////
-class LicenseDialogClass : public wxDialog 
+class LicenseDialogClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
@@ -149,33 +149,33 @@ class LicenseDialogClass : public wxDialog
 			ID_TEXT,
 			ID_LICENSELINK,
 		};
-		
+
 		wxStaticText* Text;
 		wxHyperlinkCtrl* LicenseLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		LicenseDialogClass( wxWindow* parent, wxWindowID id = ID_LICENSEDIAOGCLASS, const wxString& title = _("License"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~LicenseDialogClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class SettingsDirectoryGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class SettingsDirectoryGeneratedPanelClass : public wxPanel 
+class SettingsDirectoryGeneratedPanelClass : public wxPanel
 {
 	DECLARE_EVENT_TABLE()
 	private:
-		
+
 		// Private event handlers
 		void _wxFB_OnUserDataDir( wxCommandEvent& event ){ OnUserDataDir( event ); }
 		void _wxFB_OnAppDir( wxCommandEvent& event ){ OnAppDir( event ); }
 		void _wxFB_OnCustomDir( wxCommandEvent& event ){ OnCustomDir( event ); }
-		
-	
+
+
 	protected:
 		enum
 		{
@@ -187,24 +187,24 @@ class SettingsDirectoryGeneratedPanelClass : public wxPanel
 			ID_CUSTOMDIRECTORY,
 			ID_SETTINGSDIRECTORY,
 		};
-		
+
 		wxStaticText* HelpLabel;
 		wxRadioButton* UserDataDirectory;
 		wxRadioButton* ApplicationDirectory;
 		wxRadioButton* CustomDirectory;
 		wxDirPickerCtrl* SettingsDirectory;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUserDataDir( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAppDir( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCustomDir( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		SettingsDirectoryGeneratedPanelClass( wxWindow* parent, wxWindowID id = ID_SETTINGSDIRECTORYGENERATEDPANELCLASS, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~SettingsDirectoryGeneratedPanelClass();
-	
+
 };
 
 #endif //__MainFrameForms__

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,7 +32,7 @@ namespace t4p {
 
 /**
  * @return the file location of the PHP native functions SQLite file. This file contains all of the
- *         classes, methods, functions, that are documented on the php.net site.  The file 
+ *         classes, methods, functions, that are documented on the php.net site.  The file
  *         was generated using the script resources/native_resources_convert.php
  */
 wxFileName NativeFunctionsAsset();
@@ -67,9 +67,9 @@ wxBitmap BitmapImageAsset(wxString imageName);
  * of prep work for images that go inside buttons, because
  * in Mac OS X the images that we have are too small
  * and they make the buttons look bad. Ideally we would have
- * "retina ready" pngs but I am not an artist and have 
+ * "retina ready" pngs but I am not an artist and have
  * zero clue as to how to do that.
- * 
+ *
  * @param the name of an image, minus the .png extension
  * @return the loaded bitmap of the given icon image.  The image name must exist; if it
  * does not an assertion is triggered.
@@ -166,7 +166,7 @@ wxFileName DetectorSqlSchemaAsset();
 
 /**
  * @return the base directory location of the skeletons.  Skeletons are "templates"
- * that are used when the editor needs to paste source code in a (new) file; we 
+ * that are used when the editor needs to paste source code in a (new) file; we
  * don't hardcode the code in the executable.
  */
 wxFileName SkeletonsBaseAsset();
@@ -199,7 +199,7 @@ wxFileName BootstrapConfigFileAsset();
 
 /**
  * @return the full path to the settings directory. This setting is read from
- *         the bootstrap config file.  See  BootstrapConfigFileAsset() 
+ *         the bootstrap config file.  See  BootstrapConfigFileAsset()
  *         to see where the bootstrap config file is stored.
  *         Note that this value is always read from the file system
  *         care should be taken when calling this function many times
@@ -210,10 +210,10 @@ wxFileName BootstrapConfigFileAsset();
 wxFileName SettingsDirAsset();
 
 /**
- * @param settingsDir the location of the settings directory (contents of this string 
+ * @param settingsDir the location of the settings directory (contents of this string
  *        will be stored in the config file)
  *        If the settings directory is located in the same directory as the executable,
- *        the the settings directory will be stored in the "local" bootstrap config 
+ *        the the settings directory will be stored in the "local" bootstrap config
  *        file (located in the same directory
  *        as the executable). Otherwise, the settings directory will be saved to the
  *        global bootstrap config file (located in the
@@ -242,7 +242,7 @@ void SetSettingsDirLocation(const wxFileName& settingsDir);
 wxFileName TagCacheAsset();
 
 /**
- * A separate db file that contains the same schema as TagCache, but this DB is 
+ * A separate db file that contains the same schema as TagCache, but this DB is
  * used to store tags for opened files only.  The samve version checking mechanism
  * that applies to TagCache also applies to WorkingCache
  *
@@ -252,7 +252,7 @@ wxFileName TagCacheAsset();
 wxFileName TagCacheWorkingAsset();
 
 /**
- * The location of the detectors cache for all defined projects. 
+ * The location of the detectors cache for all defined projects.
  *
  * The SQL schema for this cache can be found in resources/sql/detectors.sql
  * Schema management will be done by DetectorCacheDbVersionClass. We will check the version
@@ -284,14 +284,14 @@ wxFileName JsTagCacheAsset();
 wxFileName VersionFileAsset();
 
 /**
- * @return wxFileName the full path to the file that stores the application's 
+ * @return wxFileName the full path to the file that stores the application's
  *         ChangeLog file
  */
 wxFileName ChangeLogFileAsset();
 
 /**
  * @return wxFileName the full path to the file that stores the lint suppression
- *         rules (a CSV file). Note that file may not actually exist, since 
+ *         rules (a CSV file). Note that file may not actually exist, since
  *         the lint suppressions feature was added after initial release.
  */
 wxFileName LintSuppressionsFileAsset();

@@ -28,17 +28,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TagSearchDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TagSearchDialogGeneratedClass : public wxDialog 
+class TagSearchDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_SEARCHLABEL = 1000,
 			ID_SEARCHTEXT,
 		};
-		
+
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
 		wxStaticText* m_staticText4;
@@ -50,7 +50,7 @@ class TagSearchDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
 		wxButton* ButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchText( wxCommandEvent& event ) { event.Skip(); }
@@ -61,13 +61,13 @@ class TagSearchDialogGeneratedClass : public wxDialog
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TagSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Search For PHP Tags"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 634,333 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~TagSearchDialogGeneratedClass();
-	
+
 };
 
 #endif //__TagFeatureForms__

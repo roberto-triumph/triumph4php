@@ -58,7 +58,7 @@ class SqliteFinderClass {
 	SqliteFinderClass(soci::session& session);
 
 	virtual ~SqliteFinderClass();
-	
+
 	/**
 	 * prepares  a query against this sqlite db. There is no need to
 	 * call this call this for one-time queries; as Exec() will prepare

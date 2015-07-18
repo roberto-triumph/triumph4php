@@ -40,22 +40,22 @@ class LintViewClass;
  * This panel will show the list of lint errors.
  */
 class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
-	
+
 public:
 
-	LintResultsPanelClass(wxWindow *parent, int id, t4p::LintFeatureClass& feature, 
+	LintResultsPanelClass(wxWindow *parent, int id, t4p::LintFeatureClass& feature,
 		t4p::LintViewClass& lintView, wxWindow* topWindow);
-	
+
 	/**
 	 * @param doEnable TRUE if the button should be enabled
 	 */
 	void EnableRunButton(bool doEnable);
-	
+
 	/**
 	 * adds to the list box widget AND the global list
 	 */
 	void AddErrors(const std::vector<pelet::LintResultsClass>& lintErrors);
-	
+
 	/**
 	 * deletes from the list box widget AND the parseResults data structure
 	 */
@@ -69,7 +69,7 @@ public:
 
 	/**
 	 * Marks up the source code control window with the error that is located
-	 * at the given index.  For example; if given index is 0 then the first lint 
+	 * at the given index.  For example; if given index is 0 then the first lint
 	 * result file (added via AddError()) . This method will NOT scroll the errored
 	 * line into view.
 	 */
@@ -77,21 +77,21 @@ public:
 
 	/**
 	 * Marks up the source code control window with the error that is located
-	 * at the given index.  For example; if given index is 0 then the first lint 
-	 * result file (added via AddError()) will be opened, scrolled to the lint error line, and the 
+	 * at the given index.  For example; if given index is 0 then the first lint
+	 * result file (added via AddError()) will be opened, scrolled to the lint error line, and the
 	 * editor will be marked up. This method WILL scroll the errored
 	 * line into view.
 	 */
 	void GoToAndDisplayLintError(int index);
 
 	/**
-	 * Will highlight the next error (from the one that is currently selected) in the lint results list AND 
+	 * Will highlight the next error (from the one that is currently selected) in the lint results list AND
 	 * will markup the source control window appropriately.
 	 */
 	void SelectNextError();
 
 	/**
-	 * Will highlight the previous error (from the one that is currently selected) in the lint results list AND 
+	 * Will highlight the previous error (from the one that is currently selected) in the lint results list AND
 	 * will markup the source control window appropriately.
 	 */
 	void SelectPreviousError();
@@ -102,40 +102,40 @@ public:
 	void PrintSummary(int totalFiles, int errorFiles, int skippedFiles);
 
 	/**
-	 * updates the file count label based on errors that have been fixed or new errors that 
+	 * updates the file count label based on errors that have been fixed or new errors that
 	 * have been introduced
 	 */
 	void UpdateSummary();
-	
+
 	/**
-	 * Adds 1 to the error file count. this is used when a file is saved right 
+	 * Adds 1 to the error file count. this is used when a file is saved right
 	 * after the user sees a lint error, fixes the error, but the linter finds another
 	 * error
 	 */
 	void IncrementErrorFileCount();
-	
+
 	void OnRowActivated(wxDataViewEvent& event);
-	
+
 	void OnRunButton(wxCommandEvent& event);
-	
+
 	void OnHelpButton(wxCommandEvent& event);
-	
+
 	void OnSuppressionButton(wxCommandEvent& event);
-	
+
 	void OnErrorContextMenu(wxDataViewEvent& event);
-	
+
 	void OnCopyFile(wxCommandEvent& event);
-	
+
 	void OnCopyError(wxCommandEvent& event);
-	
+
 	void OnAddSuppression(wxCommandEvent& event);
 
 private:
 
 	t4p::LintFeatureClass& Feature;
-	
+
 	t4p::LintViewClass& View;
-	
+
 	/**
 	 * to display the help dialog centered on the screen
 	 * and not just centered on the lint results panel
@@ -145,9 +145,9 @@ private:
 	int TotalFiles;
 
 	int ErrorFiles;
-	
+
 	int SkippedFiles;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -186,9 +186,9 @@ private:
  * for the feature
  */
 class LintViewClass : public FeatureViewClass {
-	
+
 public:
-	
+
 	t4p::LintFeatureClass& Feature;
 
 	LintViewClass(t4p::LintFeatureClass& feature);
@@ -196,31 +196,31 @@ public:
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
-	
+
 	/**
 	 * start a lint projects action. only 1 action at a time can be started.
 	 * (doesn't make sense to run multiple lints simulatenously)
 	 */
 	void StartLint();
-	
+
 	void ShowSuppressionPanel();
-	
+
 	void AddViewMenuItems(wxMenu* viewMenu);
-	
+
 	void AddToolBarItems(wxAuiToolBar* toolBar);
-	
+
 private:
 
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnLintMenu(wxCommandEvent& event);
-	
+
 	void OnLintSuppressionsMenu(wxCommandEvent& event);
 
 	void OnNextLintError(wxCommandEvent& event);
 
 	void OnPreviousLintError(wxCommandEvent& event);
-	
+
 	void OnLintError(t4p::LintResultsEventClass& event);
 
 	void OnLintErrorAfterSave(t4p::LintResultsEventClass& event);
@@ -230,18 +230,18 @@ private:
 	void OnLintComplete(t4p::ActionEventClass& event);
 
 	void OnLintSummary(t4p::LintResultsSummaryEventClass& event);
-	
+
 	void OnLintProgress(t4p::ActionProgressEventClass& event);
-	
+
 	void OnFileSaved(t4p::CodeControlEventClass& event);
-	
-	void OnNotebookPageClosed(wxAuiNotebookEvent& event);	
-	
+
+	void OnNotebookPageClosed(wxAuiNotebookEvent& event);
+
 	/**
 	 * to stop the lint action if the user closes the tab
 	 */
 	int RunningActionId;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -269,7 +269,7 @@ public:
 
 	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
 		wxWindow* topWindow);
-	
+
 private:
 
 	// event handlers
@@ -280,44 +280,44 @@ private:
 	void OnHelpButton(wxCommandEvent& event);
 	void OnRowActivated(wxDataViewEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
-	
+
 	/**
 	 * refresh viewable list from the suppressions file
 	 */
 	void PopulateList();
-	
+
 	/**
 	 * adds the given rule to the list control
 	 */
 	void AppendRuleToList(const t4p::SuppressionRuleClass& rule);
-	
+
 	/**
 	 * saves the suppression rules to the suppressions
 	 * file
 	 */
 	void SaveList();
-	
+
 	/**
 	 * the location of the suppressions file
 	 */
 	wxFileName SuppressionFile;
-	
+
 	/**
 	 * the list of rules
 	 */
 	t4p::LintSuppressionClass Suppressions;
-	
+
 	/**
 	 * errors when loading suppressions
 	 */
 	std::vector<UnicodeString> Errors;
-	
+
 	/**
 	 * to display the help dialog centered on the screen
 	 * and not just centered on the lint results panel
 	 */
 	wxWindow* TopWindow;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -325,11 +325,11 @@ private:
  * Shows the user a form to add or edit a suppression rule
  */
 class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialogClass {
-	
+
 public:
 
 	LintSuppressionRuleDialogClass(wxWindow* parent, int id, t4p::SuppressionRuleClass& rule);
-	
+
 private:
 
 	// events to prevent invalid inputs
@@ -337,12 +337,12 @@ private:
 	void OnDirectoryRadio(wxCommandEvent& event);
 	void OnFileRadio(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
-	
+
 	/**
 	 * the rule that will get modified once the user clicks OK
 	 */
 	t4p::SuppressionRuleClass& Rule;
-	
+
 	/**
 	 * the rule being edited
 	 */

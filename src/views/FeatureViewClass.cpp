@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,16 +29,16 @@
 #include <wx/wupdlock.h>
 
 /**
- * Checks that the given possible code control is in fact part of 
+ * Checks that the given possible code control is in fact part of
  * a notebook.
- * 
+ *
  * @param possible a window to test
  * @param mainWindow the main app frame
  * @param auiManager the AUI manager, used to get the notebooks
  * @return the code control that has focus, or NULL if focus is on
  *         another window
  */
-static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* possible, 
+static t4p::CodeControlClass* EnsureValidCodeControl(t4p::CodeControlClass* possible,
 		wxWindow* mainWindow, wxAuiManager& auiManager) {
 	t4p::CodeControlClass* codeCtrl = NULL;
 
@@ -78,21 +78,21 @@ static bool EnsureValidCodeControlWithNotebook(t4p::CodeControlClass* possible, 
 	return found;
 }
 
-t4p::FeatureViewClass::FeatureViewClass() 
-: wxEvtHandler() 
+t4p::FeatureViewClass::FeatureViewClass()
+: wxEvtHandler()
 , AuiManager(NULL)
 , MenuBar(NULL)
 , ToolBar(NULL)
-, StatusBarWithGauge(NULL) 
+, StatusBarWithGauge(NULL)
 , ToolsNotebook(NULL)
 , OutlineNotebook(NULL)
 , CurrentFocusCodeControl(NULL) {
 }
 
 void t4p::FeatureViewClass::InitWindow(
-		StatusBarWithGaugeClass* statusBarWithGauge, 
+		StatusBarWithGaugeClass* statusBarWithGauge,
 		wxAuiNotebook* toolsNotebook,
-		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager, 
+		wxAuiNotebook* outlineNotebook, wxAuiManager* auiManager,
 		wxMenuBar* menuBar, wxAuiToolBar* toolBar) {
 	AuiManager = auiManager;
 	StatusBarWithGauge = statusBarWithGauge;
@@ -156,19 +156,19 @@ bool t4p::FeatureViewClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
-		
+
 		// if the notebook itself is not shown, it means that the window
 		// is hidden because its parent is hidden
 		return false;
 	}
-	int windowIndex = ToolsNotebook->GetPageIndex(window); 
+	int windowIndex = ToolsNotebook->GetPageIndex(window);
 	return windowIndex != wxNOT_FOUND && windowIndex == ToolsNotebook->GetSelection();
 }
 
 bool t4p::FeatureViewClass::IsToolsWindowSelectedByName(const wxString& name) const {
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
-		
+
 		// if the notebook itself is not shown, it means that the outline window
 		// is hidden because its parent is hidden
 		return false;
@@ -181,16 +181,16 @@ bool t4p::FeatureViewClass::IsToolsWindowSelectedByName(const wxString& name) co
 }
 
 bool t4p::FeatureViewClass::IsOutlineWindowSelected(int windowId) const {
-	
+
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
 	if (!info.IsShown()) {
-		
+
 		// if the notebook itself is not shown, it means that the window
 		// is hidden because its parent is hidden
 		return false;
 	}
-	int windowIndex = OutlineNotebook->GetPageIndex(window); 
+	int windowIndex = OutlineNotebook->GetPageIndex(window);
 	return windowIndex != wxNOT_FOUND && windowIndex == OutlineNotebook->GetSelection();
 }
 

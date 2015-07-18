@@ -34,7 +34,7 @@
 
 /**
  * Add a flag to the given regular expression string, taking care not to clobber existing flags
- * 
+ *
  * @param wxComboBox& the textbox containing the regular expression (will be modified in place)
  * @param wxString flag the flag to add to the regular expression
  * @param int currentInsertionPoint the position of the cursor
@@ -111,13 +111,13 @@ static wxString errorString(UErrorCode err) {
 }
 
 t4p::RegularExpressionValidatorClass::RegularExpressionValidatorClass(UnicodeString *data,
-													  wxRadioBox* modeRadio) 
-	: wxValidator() 
-	, ModeRadio(modeRadio) 
+													  wxRadioBox* modeRadio)
+	: wxValidator()
+	, ModeRadio(modeRadio)
 	, Data(data) {
 }
 
-t4p::RegularExpressionValidatorClass::RegularExpressionValidatorClass() 
+t4p::RegularExpressionValidatorClass::RegularExpressionValidatorClass()
 	: wxValidator()
 	, ModeRadio(NULL)
 	, Data(NULL) {
@@ -176,7 +176,7 @@ bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 		ret = true;
 	}
 	else {
-		
+
 		// need to validate the reg ex
 		wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 		wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
@@ -316,7 +316,7 @@ void t4p::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInse
 		symbols = wxT("\\s+");
 	}
 	if (!symbols.IsEmpty()) {
-	
+
 		// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
 		// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
 		// also; on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -324,11 +324,11 @@ void t4p::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInse
 		wxString val = text->GetValue();
 		wxString newVal = val.Mid(0, currentInsertionPoint) + symbols + val.Mid(currentInsertionPoint);
 		text->SetValue(newVal);
-		
+
 		text->SetFocus();
 		text->SetInsertionPoint(currentInsertionPoint + symbols.Length());
 	}
-	
+
 	// reg ex flags always go at the beginning
 	else if (id == ID_MENU_REG_EX_CASE_SENSITIVE) {
 		AddFlagToRegEx(text, wxT("i"), currentInsertionPoint);
@@ -373,7 +373,7 @@ void t4p::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int curr
 		wxString val = text->GetValue();
 		wxString newVal = val.Mid(0, currentInsertionPoint) + symbols + val.Mid(currentInsertionPoint);
 		text->SetValue(newVal);
-		
+
 		text->SetFocus();
 		text->SetInsertionPoint(currentInsertionPoint + symbols.Length());
 	}
@@ -381,7 +381,7 @@ void t4p::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int curr
 
 void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) {
 	wxString value = text->GetValue();
-	
+
 	//meta syntax (?i) at the start of the regex. we need to put the new flag, but only if it is not already there
 	wxString startFlag(wxT("(?"));
 	if (0 == value.Find(startFlag)) {
@@ -395,11 +395,11 @@ void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) 
 				wxString val = text->GetValue();
 				wxString newVal = val.Mid(0, afterMetasPos - 1) + flag + val.Mid(afterMetasPos - 1);
 				text->SetValue(newVal);
-				
+
 				text->SetFocus();
 				text->SetInsertionPoint(currentInsertionPoint + flag.Length());
 			}
-		} 
+		}
 	}
 	else {
 		value = startFlag + flag + wxT(")") + value;

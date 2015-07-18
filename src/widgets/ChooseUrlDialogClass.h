@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,13 +37,13 @@ namespace t4p {
  * is populated from the URL detector cache (UrlTagFinder).
  */
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
-	
+
 public:
-	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls, 
+	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls,
 		const std::vector<t4p::ProjectClass>& projects,
 		const t4p::FileTypeClass& fileType,
 		UrlTagClass& chosenUrl);
-	
+
 protected:
 
 	void OnOkButton(wxCommandEvent& event);
@@ -55,13 +55,13 @@ protected:
 	void OnFilterText(wxCommandEvent& event);
 	void OnFilterTextEnter(wxCommandEvent& event);
 	void OnFilterKeyDown(wxKeyEvent& event);
-	
+
 	/**
-	 * updates the URL label so that the user can see the exact URL to 
+	 * updates the URL label so that the user can see the exact URL to
 	 * be opened in the browser
 	 */
 	void OnListItemSelected(wxCommandEvent& event);
-	
+
 	/**
 	 * double click == ok button
 	 */
@@ -83,32 +83,32 @@ protected:
 private:
 
 	/**
-	 * Get the matching urls. a matching url is one that starts with the 
+	 * Get the matching urls. a matching url is one that starts with the
 	 * filter string (case insensitive).
 	 *
-	 * @return the urls that match filter. 
+	 * @return the urls that match filter.
 	 */
 	std::vector<t4p::UrlTagClass> GetFilteredUrls(const wxString& filter);
 
 	/**
-	 * Get the matching urls. a matching url is one that starts with the 
+	 * Get the matching urls. a matching url is one that starts with the
 	 * filter string (case insensitive) AND the URL belongs to the given project.
 	 * A URL belongs to a project if the URL's controller file is in the project's
 	 * sources.
 	 *
-	 * @return the urls that match filter and the project. 
+	 * @return the urls that match filter and the project.
 	 */
-	std::vector<t4p::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter, 
+	std::vector<t4p::UrlTagClass> GetFilteredUrlsByProject(const wxString& filter,
 		const t4p::ProjectClass& project);
 
 	/**
-	 * fills the url list box with the given urls. any previously existing urls in the 
+	 * fills the url list box with the given urls. any previously existing urls in the
 	 * list box are removed.
 	 */
 	void FillUrlList(const std::vector<t4p::UrlTagClass>& urls);
 
 	/**
-	 * @return list of source directories 
+	 * @return list of source directories
 	 */
 	std::vector<wxFileName> ActiveSourceDirectories();
 
@@ -129,7 +129,7 @@ private:
 	 * by project
 	 */
 	std::vector<t4p::ProjectClass> Projects;
-	
+
 	/**
 	 * The configured file type extensions.
 	 */

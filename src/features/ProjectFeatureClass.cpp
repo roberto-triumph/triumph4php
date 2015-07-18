@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@
 #include <wx/dir.h>
 #include <algorithm>
 
-t4p::ProjectFeatureClass::ProjectFeatureClass(t4p::AppClass& app) 
+t4p::ProjectFeatureClass::ProjectFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
 }
 
@@ -57,7 +57,7 @@ void t4p::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 	config->Read(wxT("/Project/BashFileExtensions"), &App.Globals.FileTypes.BashFileExtensionsString);
 	config->Read(wxT("/Project/DiffFileExtensions"), &App.Globals.FileTypes.DiffFileExtensionsString);
 	config->Read(wxT("/Project/MiscFileExtensions"), &App.Globals.FileTypes.MiscFileExtensionsString);
-	
+
 	App.Globals.Projects.clear();
 	wxString key;
 	long index;
@@ -83,7 +83,7 @@ void t4p::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
 				wxString rootDir = config->Read(keyRootPath);
 				wxString includeWildcards = config->Read(keyInclude);
 				wxString excludeWildcards = config->Read(keyExclude);
-				
+
 				src.RootDirectory.AssignDir(rootDir);
 				src.SetIncludeWildcards(includeWildcards);
 				src.SetExcludeWildcards(excludeWildcards);
@@ -114,7 +114,7 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	config->Write(wxT("/Project/LuaFileExtensions"), App.Globals.FileTypes.LuaFileExtensionsString);
 	config->Write(wxT("/Project/MarkdownFileExtensions"), App.Globals.FileTypes.MarkdownFileExtensionsString);
 	config->Write(wxT("/ProjectBashFileExtensions"), App.Globals.FileTypes.BashFileExtensionsString);
-	config->Write(wxT("/Project/DiffFileExtensions"), App.Globals.FileTypes.DiffFileExtensionsString);	
+	config->Write(wxT("/Project/DiffFileExtensions"), App.Globals.FileTypes.DiffFileExtensionsString);
 	config->Write(wxT("/Project/MiscFileExtensions"), App.Globals.FileTypes.MiscFileExtensionsString);
 
 	// remove all project from the config
@@ -131,7 +131,7 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	for (size_t i = 0; i < keysToDelete.size(); ++i) {
 		config->DeleteGroup(keysToDelete[i]);
 	}
-	
+
 	for (size_t i = 0; i < App.Globals.Projects.size(); ++i) {
 		t4p::ProjectClass project = App.Globals.Projects[i];
 		wxString keyLabel = wxString::Format(wxT("/Project_%ld/Label"), i);
@@ -141,10 +141,10 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 		config->Write(keyEnabled, project.IsEnabled);
 		config->Write(keySourceCount, static_cast<int>(project.Sources.size()));
 		for (size_t j = 0; j < project.Sources.size(); ++j) {
-			t4p::SourceClass source = project.Sources[j];			
+			t4p::SourceClass source = project.Sources[j];
 			wxString keyRootPath = wxString::Format(wxT("/Project_%ld/Source_%ld_RootDirectory"), i, j);
 			wxString keyInclude = wxString::Format(wxT("/Project_%ld/Source_%ld_IncludeWildcards"), i, j);
-			wxString keyExclude = wxString::Format(wxT("/Project_%ld/Source_%ld_ExcludeWildcards"), i, j);			
+			wxString keyExclude = wxString::Format(wxT("/Project_%ld/Source_%ld_ExcludeWildcards"), i, j);
 			config->Write(keyRootPath, source.RootDirectory.GetFullPath());
 			config->Write(keyInclude, source.IncludeWildcardsString());
 			config->Write(keyExclude, source.ExcludeWildcardsString());
@@ -153,11 +153,11 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
-	
+
 	// start the sequence that will update all global data structures
 	// at this point, we dont know which projects need to be reparsed
-	// since another instance of triumph4php added them, it is assumed that 
-	// the other instance has parsed them and built the cache.  
+	// since another instance of triumph4php added them, it is assumed that
+	// the other instance has parsed them and built the cache.
 	// this instance will just load the cache into memory
 	std::vector<t4p::ProjectClass> touchedProjects, removedProjects;
 	App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
@@ -182,11 +182,11 @@ void t4p::ProjectFeatureClass::CreateProject(const wxString& dir, bool doTag) {
 	App.EventSink.Publish(evt);
 	wxConfigBase* config = wxConfig::Get();
 	config->Flush();
-	
+
 	// signal that this app has modified the config file, that way the external
 	// modification check fails and the user will not be prompted to reload the config
 	App.UpdateConfigModifiedTime();
-	
+
 	if (doTag) {
 		// user wants to re-tag newly enabled projects
 		std::vector<t4p::ProjectClass> empty;
@@ -194,7 +194,7 @@ void t4p::ProjectFeatureClass::CreateProject(const wxString& dir, bool doTag) {
 		touchedProjects.push_back(newProject);
 		App.Sequences.ProjectDefinitionsUpdated(touchedProjects, empty);
 	}
-	
+
 	// notity the rest of the app that a project has been created.
 	wxCommandEvent newProjectEvt(t4p::EVENT_APP_PROJECT_CREATED);
 	newProjectEvt.SetString(dir);

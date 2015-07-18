@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -55,7 +55,7 @@ static const int ID_MOVE_TAB_TO_NOTEBOOK_5 = wxNewId();
 
 int t4p::NotebookClass::NewPageNumber = 1;
 
-t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id, 
+t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 	const wxPoint& pos, const wxSize& size, long style, const wxString& name)
 	: wxAuiNotebook(parent, id, pos, size, style)
 	, CodeControlOptions(NULL)
@@ -152,7 +152,7 @@ void t4p::NotebookClass::AdoptOrphan(t4p::CodeControlClass* codeCtrl, wxString t
 		t4p::FileTypeImageList(*ImageList);
 		AssignImageList(ImageList);
 	}
-	
+
 	// GetPageImage is not implemented in wxAuiNotebook
 	int tabImageId = t4p::FileTypeImageIdFromType(codeCtrl->GetFileType());
 	AddPage(codeCtrl, tabName, false, tabImageId);
@@ -173,9 +173,9 @@ void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 			pageName = pageName.SubString(0, pageName.size() -2);
 		}
 		wxString msg = pageName + wxT(" has not been saved. Save changes?");
-		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
+		int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO |
 			wxCANCEL | wxICON_QUESTION, this);
-		if (wxCANCEL == response || (wxYES == response && 
+		if (wxCANCEL == response || (wxYES == response &&
 				!SavePage(currentPage, true))) {
 			vetoed = false;
 			event.Veto();
@@ -199,7 +199,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 	if (phpSourceCodeCtrl && phpSourceCodeCtrl->IsNew()) {
 		wxString fileFilter = CreateWildcardString();
 		int filterIndex = WilcardIndex(phpSourceCodeCtrl->GetFileType());
-		wxFileDialog fileDialog(this, wxT("Save a File"), wxT(""), wxT(""), 
+		wxFileDialog fileDialog(this, wxT("Save a File"), wxT(""), wxT(""),
 				fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 		fileDialog.SetFilterIndex(filterIndex);
 		if (wxID_OK == fileDialog.ShowModal()) {
@@ -210,7 +210,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 			else {
 				wxString newFilename, extension;
 				bool hasExtension = false;
-				wxFileName::SplitPath(newFullPath, NULL, NULL, &newFilename, 
+				wxFileName::SplitPath(newFullPath, NULL, NULL, &newFilename,
 					&extension, &hasExtension);
 				newFilename = hasExtension ? newFilename + wxT(".") + extension
 					: newFilename;
@@ -302,24 +302,24 @@ void t4p::NotebookClass::AddTriumphPage(t4p::FileType type) {
 			format = _("Untitled %d.diff");
 			break;
 	}
-	
+
 	// make sure to use a unique ID, other source code depends on this
 	CodeControlClass* page = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 	page->SetFileType(type);
-	
+
 	int imgId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(format));
-	
+
 	AddPage(page, wxString::Format(format, NewPageNumber++), true, imgId);
 
 	t4p::CodeControlEventClass newEvent(t4p::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
-	
+
 }
 
 void t4p::NotebookClass::LoadPage() {
 	wxString fileFilter = CreateWildcardString();
-	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""), 
-			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST | 
+	wxFileDialog fileDialog(this, wxT("Open a File"), wxT(""), wxT(""),
+			fileFilter, wxFD_OPEN | wxFD_FILE_MUST_EXIST |
 			wxFD_MULTIPLE);
 	if (wxID_OK == fileDialog.ShowModal()) {
 		wxArrayString filenames;
@@ -338,7 +338,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		t4p::FileTypeImageList(*ImageList);
 		AssignImageList(ImageList);
 	}
-	
+
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
@@ -349,7 +349,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		this->Freeze();
 	}
 	bool found = false;
-	
+
 	// if file is already opened just bring it to the forefront
 	for (size_t j = 0; j < GetPageCount(); ++j) {
 		CodeControlClass* control = GetCodeControl(j);
@@ -358,7 +358,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			// only set the selection when it's different
 			// if it gets called for the window that's already opened
 			// focus goes to the notebook. Meaning that if LoadPage gets
-			// called on a file that is already at the forefront the 
+			// called on a file that is already at the forefront the
 			// code control will lose focus.
 			if (!t4p::NumberEqualTo(GetSelection(), j)) {
 				SetSelection(j);
@@ -368,7 +368,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		}
 	}
 	if (!found) {
-		UnicodeString fileContents;	
+		UnicodeString fileContents;
 
 		// not using wxStyledTextCtrl::LoadFile() because it does not correctly handle files with high ascii characters
 		bool hasSignature = false;
@@ -381,7 +381,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			newCode->TrackFile(filename, fileContents, charset, hasSignature);
 
 			int imgId = t4p::FileTypeImageId(Globals->FileTypes, wxFileName(filename));
-			
+
 			// if user dragged in a file on an opened file we want still want to accept dragged files
 			newCode->SetDropTarget(new FileDropTargetClass(this));
 			wxFileName fileName(filename);
@@ -407,7 +407,7 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 }
 
 void t4p::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
-	
+
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
@@ -431,7 +431,7 @@ void t4p::NotebookClass::RefreshCodeControlOptions() {
 		if (control) {
 			control->ApplyPreferences();
 		}
-	}	
+	}
 }
 
 bool t4p::NotebookClass::SaveCurrentPage() {
@@ -450,11 +450,11 @@ bool t4p::NotebookClass::SaveCurrentPageAsNew() {
 		else {
 	 		wxString fileFilter = CreateWildcardString();
 			int filterIndex = WilcardIndex(codeCtrl->GetFileType());
-			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""), 
+			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""),
 					fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			fileDialog.SetFilterIndex(filterIndex);
 			if (wxID_OK == fileDialog.ShowModal()) {
-				
+
 				// SaveAs should have no effect on the state of the
 				// code control so dont use the control's save methods
 				wxString newFullPath = fileDialog.GetPath();
@@ -487,7 +487,7 @@ bool t4p::NotebookClass::SaveAllModifiedPages() {
 		}
 		wxMultiChoiceDialog dialog(this, wxT(
 			"Do you wish to save any files before exiting?"),
-			wxT("Save Files"), modifiedPageNamesArray, 
+			wxT("Save Files"), modifiedPageNamesArray,
 			wxDEFAULT_DIALOG_STYLE | wxOK | wxCANCEL);
 		dialog.Center();
 		if (wxID_CANCEL == dialog.ShowModal()) {
@@ -556,7 +556,7 @@ void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 			}
 		}
 	}
-	
+
 	PopupMenu(&menu);
 }
 
@@ -571,9 +571,9 @@ void t4p::NotebookClass::OnMovePage(wxCommandEvent& event) {
 	if (!ctrl) {
 		return;
 	}
-	
+
 	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
-	
+
 	// when there are 2  notebooks, then just move from one to the other
 	if (notebooks.size() == 2) {
 		if (notebooks[0] == this) {
@@ -625,7 +625,7 @@ void t4p::NotebookClass::ClosePage(int index) {
 			pageName = pageName.SubString(0, pageName.size() -2);
 		}
 		wxString msg = pageName + wxT(" has not been saved. Save changes?");
-			int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO | 
+			int response = wxMessageBox(msg, wxT("Save PHP File"), wxYES_NO |
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL != response) {
 			if (wxYES == response && !SavePage(index, true)) {
@@ -677,7 +677,7 @@ wxString t4p::NotebookClass::CreateWildcardString() const {
 		markdownLabel = Globals->FileTypes.MarkdownFileExtensionsString,
 		bashLabel = Globals->FileTypes.BashFileExtensionsString,
 		diffLabel = Globals->FileTypes.DiffFileExtensionsString;
-		
+
 	/*phpLabel.Replace(wxT(";"), wxT(" "));
 	cssLabel.Replace(wxT(";"), wxT(" "));
 	sqlLabel.Replace(wxT(";"), wxT(" "));
@@ -705,10 +705,10 @@ wxString t4p::NotebookClass::CreateWildcardString() const {
 		markdown = Globals->FileTypes.MarkdownFileExtensionsString,
 		bash = Globals->FileTypes.BashFileExtensionsString,
 		diff = Globals->FileTypes.DiffFileExtensionsString;
-	wxString allSourceCode = 
+	wxString allSourceCode =
 			Globals->FileTypes.GetAllSourceFileExtensionsString();
 
-	wxString fileFilter = 
+	wxString fileFilter =
 		wxString::Format(wxT("All Source Code Files (%s)|%s|"), allSourceCode.c_str(), allSourceCode.c_str()) +
 		wxString::Format(wxT("PHP Files (%s)|%s|"), phpLabel.c_str(), php.c_str()) +
 		wxString::Format(wxT("CSS Files (%s)|%s|"), cssLabel.c_str(), css.c_str()) +
@@ -780,7 +780,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 	if (!newNotebook) {
 		return;
 	}
-	
+
 	wxSize newNotebookSize = GetSize();
 	wxAuiPaneInfo currentNotebookInfo = AuiManager->GetPane(this);
 	int row = currentNotebookInfo.dock_row;
@@ -788,7 +788,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 	int layer = currentNotebookInfo.dock_layer;
 	int insertLevel = wxAUI_INSERT_ROW;
 	int direction = currentNotebookInfo.dock_direction;
-	
+
 	// splitting horizontally
 	// if we are splitting the center notebook, then
 	// we split horizontally by putting the new notebook
@@ -797,7 +797,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 	// row, and position.
 	if (currentNotebookInfo.dock_direction == wxAUI_DOCK_CENTER) {
 		direction = wxAUI_DOCK_BOTTOM;
-		
+
 		// 2 because we always want the finder panel and the tools
 		// notebook to be closest to the bottom
 		row = 2;
@@ -829,7 +829,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 		insertLevel
 	);
 	AuiManager->GetPane(newNotebook).Show();
-	
+
 	// when there are more than 2 notebooks, given them names so
 	// that the user can tell them apart (for "moving tabs" purposes)
 	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
@@ -839,7 +839,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 			info.CaptionVisible(true);
 		}
 	}
-	
+
 	AuiManager->Update();
 }
 
@@ -855,7 +855,7 @@ void t4p::NotebookClass::SplitVertically() {
 	int layer = currentNotebookInfo.dock_layer;
 	int insertLevel = wxAUI_INSERT_PANE;
 	int direction = currentNotebookInfo.dock_direction;
-	
+
 	// splitting vertically
 	// if we are splitting the center notebook, then
 	// we split vertically by putting the new notebook
@@ -892,7 +892,7 @@ void t4p::NotebookClass::SplitVertically() {
 		insertLevel
 	);
 	AuiManager->GetPane(newNotebook).Show();
-	
+
 	// when there are more than 2 notebooks, given them names so
 	// that the user can tell them apart (for "moving tabs" purposes)
 	std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
@@ -904,7 +904,7 @@ void t4p::NotebookClass::SplitVertically() {
 			info.CaptionVisible(true);
 		}
 	}
-	
+
 	AuiManager->Update();
 }
 
@@ -926,7 +926,7 @@ bool t4p::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArraySt
 	std::vector<wxString> fileVector;
 	for (size_t i = 0; i < files.GetCount(); ++i) {
 		fileVector.push_back(files[i]);
-	}	
+	}
 	Notebook->LoadPages(fileVector);
 	return true;
 }

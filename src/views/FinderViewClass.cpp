@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,8 +38,8 @@
 #include <wx/stc/stc.h>
 #include <Triumph.h>
 
-static const int ID_FIND_PANEL = wxNewId(); 
-static const int ID_REPLACE_PANEL = wxNewId(); 
+static const int ID_FIND_PANEL = wxNewId();
+static const int ID_REPLACE_PANEL = wxNewId();
 
 // these IDs are needed so that the IDs of the Regular expression help menu
 // do not collide with the menu IDs of the FindInFilesFeature
@@ -48,7 +48,7 @@ static const int ID_REGEX_REPLACE_FIND_MENU_START = 12000;
 static const int ID_REGEX_REPLACE_MENU_START = 13000;
 
 t4p::FinderViewClass::FinderViewClass(t4p::FinderFeatureClass& feature)
-: FeatureViewClass() 
+: FeatureViewClass()
 , Feature(feature) {
 
 }
@@ -75,7 +75,7 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	parent->Freeze();
 	bool transferExpression = false;
-	
+
 	// hide replace panel id it is shown, doesnt look good when find and the replace panel are shown
 	wxWindow* replaceWindow = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (replaceWindow) {
@@ -83,15 +83,15 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 		replaceWindow->TransferDataFromWindow();
 		transferExpression = true;
 	}
-	
-	// show the find panel 
+
+	// show the find panel
 	wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
 	if (!window) {
 		window = new FinderPanelClass(parent, ID_FIND_PANEL, Feature.Finder, *this, AuiManager);
 		wxAuiPaneInfo info;
-		
+
 		// always put the finder panel at row 1
-		// row=1 means that it will show up above the 
+		// row=1 means that it will show up above the
 		// tools notebook (row = 0) but below any code
 		// notebooks (row=2+)
 		int row = 1;
@@ -117,11 +117,11 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 	parent->Thaw();
 	AuiManager->Update();
 }
-	
+
 void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-		
+
 		// a couple of situations may be possible here
 		// 1. the replace panel is shown
 		// 2. the find panel is shown
@@ -137,14 +137,14 @@ void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 		if (replaceWindow && AuiManager->GetPane(replaceWindow).IsShown()) {
 			ReplacePanelClass* panel = reinterpret_cast<ReplacePanelClass*>(replaceWindow);
 			panel->FindNext();
-			
+
 			// give focus back to code control this is just better user experience
 			codeControl->SetFocus();
 		}
 		else if (findWindow && AuiManager->GetPane(findWindow).IsShown()) {
 			FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(findWindow);
 			panel->FindNext();
-			
+
 			// give focus back to code control this is just better user experience
 			codeControl->SetFocus();
 		}
@@ -153,14 +153,14 @@ void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 		}
 	}
 }
-	
+
 void t4p::FinderViewClass::OnEditFindPrevious(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeControl  = GetCurrentCodeControl();
 	if (codeControl) {
 		OnEditFind(event);
 		wxWindow* window = wxWindow::FindWindowById(ID_FIND_PANEL,  GetMainWindow());
 		FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(window);
-		panel->FindPrevious();	
+		panel->FindPrevious();
 		// give focus back to code control this is just better user experience
 		codeControl->SetFocus();
 	}
@@ -169,7 +169,7 @@ void t4p::FinderViewClass::OnEditFindPrevious(wxCommandEvent& event) {
 void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 	wxWindow* parent = GetMainWindow();
 	parent->Freeze();
-	bool transferExpression = false; 
+	bool transferExpression = false;
 
 	// hide find panel id it is shown, doesnt look good when find and the replace panel are shown
 	wxWindow* findWindow = wxWindow::FindWindowById(ID_FIND_PANEL, parent);
@@ -180,15 +180,15 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 		AuiManager->GetPane(findWindow).Show(false);
 		transferExpression = true;
 	}
-	
+
 	// show the replace panel
 	wxWindow* window = wxWindow::FindWindowById(ID_REPLACE_PANEL, parent);
 	if (!window) {
 		window = new ReplacePanelClass(parent, ID_REPLACE_PANEL, Feature.FinderReplace, *this, AuiManager);
 		wxAuiPaneInfo info;
-		
+
 		// always put the finder panel at row 1
-		// row=1 means that it will show up above the 
+		// row=1 means that it will show up above the
 		// tools notebook (row = 0) but below any code
 		// notebooks (row=2+)
 		int row = 1;
@@ -209,7 +209,7 @@ void t4p::FinderViewClass::OnEditReplace(wxCommandEvent& event) {
 		if (!selectedText.empty()) {
 			panel->SetExpression(selectedText);
 		}
-		
+
 		// row == 1 means that the finder bar goes below any code
 		// notebook but above the tools notebook
 		int row = 1;
@@ -238,12 +238,12 @@ void t4p::FinderViewClass::OnDoubleClick(wxStyledTextEvent& event) {
 	}
 	UnicodeString word = ctrl->WordAtCurrentPos();
 	if (!word.isEmpty()) {
-		
+
 		int documentLength = ctrl->GetTextLength();
-		
+
 		// the action will delete it
 		char* buf = new char[documentLength];
-		
+
 		// GET_TEXT  message
 		ctrl->SendMsg(2182, documentLength, (long)buf);
 		Feature.StartFinderAction(word, buf, documentLength);
@@ -257,14 +257,14 @@ void t4p::FinderViewClass::OnFinderHit(t4p::FinderHitEventClass& event) {
 	}
 }
 
-t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId, 
+t4p::FinderPanelClass::FinderPanelClass(wxWindow* parent, int windowId,
 											  t4p::FinderClass& finder,
 											  t4p::FinderViewClass& view, wxAuiManager* auiManager)
 		: FinderPanelGeneratedClass(parent, windowId)
 		, Finder(finder)
 		, ComboBoxHistory(FindText)
 		, View(view)
-		, AuiManager(auiManager) 
+		, AuiManager(auiManager)
 		, CurrentInsertionPointFind(0) {
 	t4p::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
@@ -286,7 +286,7 @@ void t4p::FinderPanelClass::SetFocusOnFindText() {
 
 void t4p::FinderPanelClass::SetExpression(const wxString& expression) {
 	FindText->SetValue(expression);
-	
+
 	// set the expression on the underlying finder  object
 	TransferDataFromWindow();
 }
@@ -295,15 +295,15 @@ void t4p::FinderPanelClass::FindNext() {
 	if (Validate() && TransferDataFromWindow()) {
 		if (Finder.Prepare()) {
 			Find();
-				
+
 			wxConfigBase* config = wxConfigBase::Get();
 			config->Write(wxT("/Finder/Wrap"), Finder.Wrap);
 			config->Write(wxT("/Finder/Mode"), Finder.Mode);
 		}
 		else {
-			SetStatus(_("Status: Invalid Expression"));	
+			SetStatus(_("Status: Invalid Expression"));
 		}
-	}	
+	}
 }
 
 void t4p::FinderPanelClass::FindPrevious() {
@@ -316,17 +316,17 @@ void t4p::FinderPanelClass::FindPrevious() {
 			config->Write(wxT("/Finder/Mode"), Finder.Mode);
 		}
 		else {
-			SetStatus(_("Status: Invalid Expression"));	
+			SetStatus(_("Status: Invalid Expression"));
 		}
-	}	
+	}
 }
 
 void t4p::FinderPanelClass::Find(bool findNext) {
-	
+
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-		
+
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
 		// we searching backwards, start from 2 positions before because the selection
@@ -338,14 +338,14 @@ void t4p::FinderPanelClass::Find(bool findNext) {
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
 				int lineNumber = codeControl->LineFromPosition(position);
-				
+
 				// lineNumber seems to start at zero
 				++lineNumber;
 				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
 		}
-		else {			
+		else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -372,14 +372,14 @@ void t4p::FinderPanelClass::OnPreviousButton(wxCommandEvent& event) {
 
 void t4p::FinderPanelClass::SetStatus(const wxString& message) {
 	ResultText->SetLabel(message);
-	
+
 	// label might grow/shrink according to new text, must
 	// tell the sizer to re-position the label correctly
 	// we need this for the label to be right-aligned after
 	// the text change
 	ResultText->GetContainingSizer()->Layout();
 
-	// NOTE: had to add these calls otherwise the find panel would not 
+	// NOTE: had to add these calls otherwise the find panel would not
 	// totally repaint itself and it looks garbled when the status
 	// message changes
 	GetContainingSizer()->Layout();
@@ -405,7 +405,7 @@ void t4p::FinderPanelClass::OnFindEnter(wxCommandEvent& event) {
 void t4p::FinderPanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
 	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_MENU_START);
-	PopupMenu(&regExMenu);	
+	PopupMenu(&regExMenu);
 }
 
 void t4p::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
@@ -437,7 +437,7 @@ void t4p::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	}
 	else {
 		event.Skip();
-	}	
+	}
 }
 
 t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::FinderClass& finder,
@@ -448,7 +448,7 @@ t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::F
 		, ReplaceHistory(ReplaceWithText)
 		, View(view)
 		, AuiManager(auiManager)
-		, CurrentInsertionPointFind(0) 
+		, CurrentInsertionPointFind(0)
 		, CurrentInsertionPointReplace(0) {
 	t4p::RegularExpressionValidatorClass regExValidator(&Finder.Expression, FinderMode);
 	FindText->SetValidator(regExValidator);
@@ -461,7 +461,7 @@ t4p::ReplacePanelClass::ReplacePanelClass(wxWindow* parent, int windowId, t4p::F
 	PreviousButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_GO_UP));
 	CloseButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_ERROR));
 	HelpButtonIcon(HelpButton);
-	
+
 	UnicodeStringValidatorClass replaceValidator(&Finder.ReplaceExpression, true);
 	ReplaceWithText->SetValidator(replaceValidator);
 	ReplaceButton->SetBitmapLabel(wxArtProvider::GetBitmap(wxART_FIND_AND_REPLACE));
@@ -478,7 +478,7 @@ void t4p::ReplacePanelClass::SetFocusOnFindText() {
 
 void t4p::ReplacePanelClass::SetExpression(const wxString& expression) {
 	FindText->SetValue(expression);
-	
+
 	// set the expression on the underlying finder  object
 	TransferDataFromWindow();
 }
@@ -493,9 +493,9 @@ void t4p::ReplacePanelClass::FindNext() {
 			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
 		}
 		else {
-			SetStatus(_("Status: Invalid Expression"));	
+			SetStatus(_("Status: Invalid Expression"));
 		}
-	}	
+	}
 }
 
 void t4p::ReplacePanelClass::FindPrevious() {
@@ -508,17 +508,17 @@ void t4p::ReplacePanelClass::FindPrevious() {
 			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
 		}
 		else {
-			SetStatus(_("Status: Invalid Expression"));	
+			SetStatus(_("Status: Invalid Expression"));
 		}
-	}	
+	}
 }
 
 void t4p::ReplacePanelClass::Find(bool findNext) {
-	
+
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-		
+
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
 		// we searching backwards, start from 2 positions before because the selection
@@ -530,14 +530,14 @@ void t4p::ReplacePanelClass::Find(bool findNext) {
 		if (found) {
 			if (Finder.GetLastMatch(position, length)) {
 				int lineNumber = codeControl->LineFromPosition(position);
-				
+
 				// lineNumber seems to start at zero
 				++lineNumber;
 				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
 		}
-		else {			
+		else {
 			SetStatus(_("Status: Not Found"));
 		}
 		EnableReplaceButtons(found);
@@ -565,14 +565,14 @@ void t4p::ReplacePanelClass::OnPreviousButton(wxCommandEvent& event) {
 
 void t4p::ReplacePanelClass::SetStatus(const wxString& message) {
 	ResultText->SetLabel(message);
-	
+
 	// label might grow/shrink according to new text, must
 	// tell the sizer to re-position the label correctly
 	// we need this for the label to be right-aligned after
 	// the text change
 	ResultText->GetContainingSizer()->Layout();
 
-	// NOTE: had to add these calls otherwise the find panel would not 
+	// NOTE: had to add these calls otherwise the find panel would not
 	// totally repaint itself and it looks garbled when the status
 	// message changes
 	GetContainingSizer()->Layout();
@@ -597,7 +597,7 @@ void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 		int32_t position = 0,
 			length = 0;
 		UnicodeString replaceText;
-		
+
 		// if user changed tabs, GetLastReplacementText will return false
 		UnicodeString text = codeControl->GetSafeText();
 		if (codeControl && Finder.GetLastMatch(position, length) &&
@@ -616,17 +616,17 @@ void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 
 void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow() && Finder.Prepare()) {
-		
+
 		// if user changed tabs, GetLastReplacementText will return false
 		CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		 if (codeControl) {
 			 UnicodeString text = codeControl->GetSafeText();
 			 int matches = Finder.ReplaceAllMatches(text);
 			 codeControl->SetUnicodeText(text);
-			 SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));	
+			 SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));
 			 ReplaceHistory.Save();
 		}
-		else {			
+		else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -634,7 +634,7 @@ void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 
 void t4p::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeControl = View.GetCurrentCodeControl();
-			
+
 	// if user changes to new tab, undo will undo changes to that file
 	 if (codeControl) {
 		codeControl->Undo();
@@ -642,7 +642,7 @@ void t4p::ReplacePanelClass::OnUndoButton(wxCommandEvent& event) {
 			length;
 		if (Finder.GetLastMatch(position, length)) {
 			Finder.FindPrevious(codeControl->GetSafeText(), position);
-			if (Finder.GetLastMatch(position, length)) {	
+			if (Finder.GetLastMatch(position, length)) {
 				codeControl->SetSelectionByCharacterPosition(position, position + length, false);
 			}
 		}
@@ -714,7 +714,7 @@ void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 void t4p::ReplacePanelClass::OnRegExFindHelpButton(wxCommandEvent& event) {
 	wxMenu regExMenu;
 	t4p::PopulateRegExFindMenu(regExMenu, ID_REGEX_REPLACE_FIND_MENU_START);
-	PopupMenu(&regExMenu);	
+	PopupMenu(&regExMenu);
 }
 
 void t4p::ReplacePanelClass::OnReplaceRegExFindHelpButton(wxCommandEvent& event) {
@@ -815,7 +815,7 @@ BEGIN_EVENT_TABLE(t4p::ReplacePanelClass, ReplacePanelGeneratedClass)
 	EVT_MENU(ID_REGEX_REPLACE_FIND_MENU_START + ID_MENU_REG_EX_PHP_WHITESPACE, t4p::ReplacePanelClass::InsertRegExSymbol)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(t4p::FinderViewClass, t4p::FeatureViewClass) 
+BEGIN_EVENT_TABLE(t4p::FinderViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_FINDER + 0, t4p::FinderViewClass::OnEditFind)
 	EVT_MENU(t4p::MENU_FINDER + 1, t4p::FinderViewClass::OnEditFindNext)
 	EVT_MENU(t4p::MENU_FINDER + 2, t4p::FinderViewClass::OnEditFindPrevious)

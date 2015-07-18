@@ -32,10 +32,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ChooseUrlDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ChooseUrlDialogGeneratedClass : public wxDialog 
+class ChooseUrlDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* UrlLabel;
 		wxTextCtrl* Filter;
@@ -50,7 +50,7 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
 		wxButton* ButtonSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnFilterKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
@@ -61,13 +61,13 @@ class ChooseUrlDialogGeneratedClass : public wxDialog
 		virtual void OnExtraChar( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnExtraText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ChooseUrlDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Choose URL To Open"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,503 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ChooseUrlDialogGeneratedClass();
-	
+
 };
 
 #endif //__ChooseUrlDialogWidget__

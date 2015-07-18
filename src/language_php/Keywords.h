@@ -30,7 +30,7 @@
 #include <pelet/TokenClass.h>
 
 namespace t4p {
-	
+
 /**
  * keywords for PHP 5.3
  */
@@ -46,7 +46,7 @@ extern const wxString KEYWORDS_PHP_54;
  * want to support both HTML4 and HTML5, using both sets of keywords.
  */
 extern const wxString KEYWORDS_HTML_TAG_NAMES;
-	
+
 /**
  * HTML tag attributes
  * want to support both HTML4 and HTML5, using both sets of keywords.
@@ -80,18 +80,18 @@ extern const wxString KEYWORDS_CSS_PSEUDOCLASSES;
 extern const wxString KEYWORDS_JAVASCRIPT;
 
 /**
- * splits a keyword string into keywords, compares to see if 
+ * splits a keyword string into keywords, compares to see if
  * they begin with prefixMatch, and if so adds them to results.
  * comparison with prefixMatch is case SENSITIVE, but keywords
  * are usually all lower case.  if you want to do case-insentive
  * matching, lowercase prefixMatch before calling this function
- * 
+ *
  * @param keywords the string to split, one of KEYWORDS_* constants
  * @param prefixMatch the string to compare each keyword against
  * @param results the matching keywords will be pushed into this vector
  * @return bool TRUE if at least 1 keyword matched
  */
-bool KeywordsTokenizeMatch(const wxString& keywords, const wxString& prefixMatch, 
+bool KeywordsTokenizeMatch(const wxString& keywords, const wxString& prefixMatch,
 	std::vector<wxString>& results);
 
 /**
@@ -109,4 +109,4 @@ wxString KeywordsHtmlAll();
 }
 
 #endif
- 
+

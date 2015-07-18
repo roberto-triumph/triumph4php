@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -47,11 +47,11 @@ public:
 
 	/**
 	 * The environment stack.
-	 * 
+	 *
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass Environment;
-	
+
 	/**
 	 * This object will be used to parse the resources of files that are currently open.
 	 */
@@ -76,11 +76,11 @@ public:
 	soci::session JsCacheSession;
 
 	/**
-	 * The URLs (entry points to the current project) that have been detected so far. Also holds the 
+	 * The URLs (entry points to the current project) that have been detected so far. Also holds the
 	 * "current" URL.
 	 */
 	UrlTagFinderClass UrlTagFinder;
-	
+
 	/**
 	 * To grab SQL table meta data
 	 */
@@ -90,12 +90,12 @@ public:
 	 * To grab javascript functions
 	 */
 	SqliteFinderClass JsResourceFinder;
-	
+
 	/**
-	 * The datatabase connections. These are all of the connections, there may be a 
+	 * The datatabase connections. These are all of the connections, there may be a
 	 * mix of connections created by the user and connections that were detected
 	 * by the DatabaseTagDetector scripts.
-	 */ 
+	 */
 	std::vector<DatabaseTagClass> DatabaseTags;
 
 	/**
@@ -112,7 +112,7 @@ public:
 	 * The name of the browser that is selected
 	 */
 	wxString ChosenBrowser;
-	
+
 	/**
 	 * Holds all of the file type => file extension associations
 	 */
@@ -136,7 +136,7 @@ public:
 	wxFileName TagCacheDbFileName;
 
 	/**
-	 * The location of the detectors cache for all defined projects. 
+	 * The location of the detectors cache for all defined projects.
 	 *
 	 * The SQL schema for this cache can be found in resources/sql/detectors.sql
 	 * Schema management will be done by DetectorCacheDbVersionClass. We will check the version
@@ -159,7 +159,7 @@ public:
 	 * @return the full path to the tag database that stores detected tags for all defined projects
 	 */
 	wxFileName JsCacheDbFileName;
-	
+
 	/**
 	 * List of the local volumes that are mounted and writable.
 	 * if any source directories
@@ -183,7 +183,7 @@ public:
 
 	/**
 	 * Same as AllEnabledSources() but each returned source
-	 * will have the the PHP file filters as its include wildcards, not the same wildcards 
+	 * will have the the PHP file filters as its include wildcards, not the same wildcards
 	 * as the original source.
 	 *
 	 * @return vector of all directories of all source files in all enabled
@@ -212,16 +212,16 @@ public:
 
 	/**
 	 * @return TRUE if given full path is a PHP file, as determined by
-	 * the sources directories and the php file 
-	 * extensions wilcard. Careful, This method will return FALSE 
-	 * for php files that are NOT in a project. 
+	 * the sources directories and the php file
+	 * extensions wilcard. Careful, This method will return FALSE
+	 * for php files that are NOT in a project.
 	 */
 	bool IsAPhpSourceFile(const wxString& fullPath) const;
-	
+
 	/**
 	 * @return TRUE if given full path is a file that triumph tracks, as determined by
 	 * the sources directories and any of the configure file extensions.
-	 * Careful, This method will return FALSE 
+	 * Careful, This method will return FALSE
 	 * for php files that are NOT in a project, or files that triumph
 	 * is not set to look at.
 	 */
@@ -233,13 +233,13 @@ public:
 	 * source RootDirectory = /home/roberto/
 	 * fullPath = /home/roberto/workspace/now.php
 	 * Then this method returns "workspace/now.php"
-	 * 
+	 *
 	 * @param full path to a file
 	 * @param projectLabel will be filled in with the label of the project
-	 *       where that contains the given fullPath. Note that this is 
+	 *       where that contains the given fullPath. Note that this is
 	 *       the first matching project
 	 * @return the part of the file without the source prefix
-	 * In the case that fullPath is not contained in any 
+	 * In the case that fullPath is not contained in any
 	 * project's sources, then this method returns nothing.
 	 */
 	wxString RelativeFileName(const wxString& fullPath, wxString& projectLabel) const;
@@ -259,23 +259,23 @@ public:
 	// are for the url as picked in the template files panel and NOT
 	// the URL dialog.
 	std::vector<t4p::TemplateFileTagClass> CurrentTemplates() const;
-	
+
 	/**
 	 * @return all of the database tags that are enabled.
 	 */
 	std::vector<t4p::DatabaseTagClass> AllEnabledDatabaseTags() const;
-	
+
 	/**
 	 * find a db tag by hash
 	 * will find even tags that are not enabled
 	 */
 	bool FindDatabaseTagByHash(const wxString& connectionHash, t4p::DatabaseTagClass& tag) const;
-	
+
 	/**
 	 * check to see if the given file is located in a local volume.
 	 * Note that this check is quick because the volumes
 	 * are scanned only once at app start.
-	 * 
+	 *
 	 * @param the file to check
 	 * @return bool if TRUE, it means that the given file is located in one of
 	 *         the system's local volumes (hard drives). If false, then
@@ -283,7 +283,7 @@ public:
 	 *         media.
 	 */
 	bool IsInLocalVolume(const wxFileName& fileName) const;
-	
+
 };
 
 }

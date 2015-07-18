@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@ namespace t4p {
 /**
  * escape a value so that it is suitable for using in a LIKE SQL clause
  * ie. so that underscores, percents are treated literally
- * We escape ourselves because SOCI uses sqlite3_prepare instead of sqlite3_prepare_v2, and 
+ * We escape ourselves because SOCI uses sqlite3_prepare instead of sqlite3_prepare_v2, and
  * sqlite3_prepare will make LIKE queries not use the index. But this means we have to escape ourselves
  * see http://sqlite.org/optoverview.html (LIKE optimization)
  *
@@ -50,7 +50,7 @@ std::string SqliteSqlLikeEscape(const std::string& value, char c);
  * Run multiple SQL statements that are located in fileName
  * using the given connection. Note that the database is completely
  * cleared (all tables are deleted) before this is run and any info is lost;
- * Tables are cleared so that the sql statements will never error out, 
+ * Tables are cleared so that the sql statements will never error out,
  * for example this function is called
  * with a CREATE TABLE statement of a database that already has
  * a table.
@@ -73,7 +73,7 @@ bool SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& session
  * This function will never throw an exception. On SQL exception, this
  * function will return 0 (an assert will be generated)
  *
- * @param session opened connection to detector db or tag db 
+ * @param session opened connection to detector db or tag db
  * @return int the number in the schema_version table
  */
 int SqliteSchemaVersion(soci::session& session);
@@ -92,7 +92,7 @@ bool SqliteTables(soci::session& session, std::vector<std::string>& tableNames, 
 /**
  * set the busy timeout on the opened sqlite connection; the effect is that
  * when a sqlite db is locked the sqlite client api will sleep for a bit and then
- * re-attempt the query; this function should be called so that we get 
+ * re-attempt the query; this function should be called so that we get
  * less soci exceptions due to sqlite complaining that the file is locked.
  *
  * @param session opened connection. MUST BE a SQLITE connection otherwise the program will crash!
@@ -102,7 +102,7 @@ void SqliteSetBusyTimeout(soci::session& session, int timeoutMs = 100);
 
 /**
  * Get the ID of the last insert, useful for auto incremented primary keys
- * 
+ *
  * @param stmt the insert statement that was executed
  * @return int the last insert ID, -1 if there's an error
  */

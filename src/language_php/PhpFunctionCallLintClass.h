@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,11 +35,11 @@ namespace t4p {
 class TagCacheClass;
 
 /**
- * name and position of an the function call that is 
+ * name and position of an the function call that is
  * in error because of too many / too few arguments
  */
 class PhpFunctionCallLintResultClass {
-	
+
 public:
 
 	enum Types {
@@ -62,7 +62,7 @@ public:
 	 * the line number (1- based) the uninitialized variable was found in
 	 */
 	int LineNumber;
-	
+
 	/**
 	 * the character offset (0-based) in the file where the uninitialized variable was
 	 * found at
@@ -70,35 +70,35 @@ public:
 	int Pos;
 
 	Types Type;
-	
+
 	/**
 	 * the number of arguments that the called function definition has
 	 */
 	int ExpectedCount;
-	
+
 	/**
-	 * the number of arguments that the function call has. Will never 
-	 * be equal to ExpectedCount 
+	 * the number of arguments that the function call has. Will never
+	 * be equal to ExpectedCount
 	 */
 	int ActualCount;
 
 	PhpFunctionCallLintResultClass();
 
 	PhpFunctionCallLintResultClass(const t4p::PhpFunctionCallLintResultClass& src);
-	
+
 	t4p::PhpFunctionCallLintResultClass& operator=(const t4p::PhpFunctionCallLintResultClass& src);
-	
+
 	void Copy(const t4p::PhpFunctionCallLintResultClass& src);
-	
+
 };
 
 /**
  * The PhpFunctionCallLintClass will check that each function
  * or method that is called has the exact number of arguments
  * as the function/method signature containts. Logic:
- * 
+ *
  * 1. If the function has variable arguments, then the check is skipped.
- *    Variable arguments are detected by the parser; if the 
+ *    Variable arguments are detected by the parser; if the
  *    function body has calls to `func_get_args` and friends
  * 2. function signature with default values are accounted for
  * 3. if the function signature is not found in the tag cache
@@ -111,30 +111,30 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 public:
 
 	PhpFunctionCallLintClass();
-	
+
 	/**
 	 * prepares the internal cache used for function lookups. This needs
 	 * to be called before any file is checked.
 	 * the tag cache is used to lookup function signatures in order to
 	 * check if the argument count
-	 * 
+	 *
 	 * @param tagCache the tag dbs
 	 */
 	void Init(t4p::TagCacheClass& tagCache);
-	
+
 	/**
 	 * Set the version that the PHP parser should use. This method should be
 	 * called BEFORE parsing a file / string
 	 */
 	void SetVersion(pelet::Versions version);
-	
+
 	/**
 	 * Init() method should be called before a file is parsed. Note that
-	 * if a file has many errors, this class will stop adding	
+	 * if a file has many errors, this class will stop adding
 	 * errors after a certain amount.
-	 * 
+	 *
 	 * @param fileName the file to parse and report errors on.
-	 * @param errors any argument count mismatch errors will be 
+	 * @param errors any argument count mismatch errors will be
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
@@ -142,11 +142,11 @@ public:
 
 	/**
 	 * Init() method should be called before a string is parsed. Note that
-	 * if a string has many errors, this class will stop adding	
+	 * if a string has many errors, this class will stop adding
 	 * errors after a certain amount.
-	 *  
+	 *
 	 * @param code the string to parse and report errors on
-	 * @param errors any uninitialized variable errors will be 
+	 * @param errors any uninitialized variable errors will be
 	 *        appended to this parameter.
 	 * @return bool TRUE if there is at least one error
 	 */
@@ -154,9 +154,9 @@ public:
 
 	/**
 	 * @param var the expression to check. A Check  will be
-	 *       done to see if any of the function calls used in the 
+	 *       done to see if any of the function calls used in the
 	 *       given expression have the correct number of
-	 *       arguments. if not, then a new error is 
+	 *       arguments. if not, then a new error is
 	 *       created and appended to the Errors vector.
 	 */
 	void OnAnyExpression(pelet::ExpressionClass* expr);
@@ -168,19 +168,19 @@ private:
 	 * when a variable, expression, etc.. is found
 	 */
 	pelet::ParserClass Parser;
-	
+
 	/**
 	 * the file being currently parsed. empty string if a string of
 	 * code is being parsed
 	 */
 	UnicodeString File;
-	
+
 	/**
 	 * errors will be pushed into this vector while the code
 	 * is being parsed
 	 */
 	std::vector<t4p::PhpFunctionCallLintResultClass> Errors;
-	
+
 	/**
 	 * used to query the tag cache for function / method
 	 * signatures. This allows us to prepare the query only once

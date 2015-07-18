@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,20 +41,20 @@ static bool AllSourcesExist(const std::vector<t4p::SourceClass>& sources) {
 		}
 	}
 	return !sources.empty();
-	
+
 }
 
-t4p::SourceClass::SourceClass()  
+t4p::SourceClass::SourceClass()
 	: RootDirectory()
-	, IncludeWildcards() 
+	, IncludeWildcards()
 	, ExcludeWildcards() {
 	IncludeRegEx = NULL;
 	ExcludeRegEx = NULL;
 }
 
-t4p::SourceClass::SourceClass(const t4p::SourceClass& src)  
+t4p::SourceClass::SourceClass(const t4p::SourceClass& src)
 	: RootDirectory()
-	, IncludeWildcards() 
+	, IncludeWildcards()
 	, ExcludeWildcards() {
 	IncludeRegEx = NULL;
 	ExcludeRegEx = NULL;
@@ -154,8 +154,8 @@ wxString t4p::SourceClass::ExcludeWildcardsString() const {
 }
 
 bool t4p::SourceClass::Contains(const wxString& fullPath) {
-	
-	// validations: 
+
+	// validations:
 	// 1. fullPath must be in RootDirectory
 	// 2. fullPath must NOT match the exclude wildcards if set
 	// 2. fullPath must match wildcards
@@ -170,7 +170,7 @@ bool t4p::SourceClass::Contains(const wxString& fullPath) {
 			return false;
 		}
 	}
-	if (!IncludeRegEx && !IncludeWildcards.IsEmpty()) {		
+	if (!IncludeRegEx && !IncludeWildcards.IsEmpty()) {
 		IncludeRegEx = new wxRegEx(WildcardRegEx(IncludeWildcards), wxRE_ICASE | wxRE_ADVANCED);
 	}
 	bool matchedInclude = IncludeRegEx  && IncludeRegEx->IsValid() && IncludeRegEx->Matches(fullPath);
@@ -190,11 +190,11 @@ bool t4p::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 	af.AssignDir(fullPath);
 
 	wxFileName bf(RootDirectory);
-	
+
 	if (af.GetPathWithSep().Find(bf.GetPathWithSep()) == 0) {
 		return true;
 	}
-	
+
 	// not a match, normalize in case the OS uses case sensitive
 	// file names.
 	af.Normalize();
@@ -204,7 +204,7 @@ bool t4p::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
 
 wxString t4p::SourceClass::WildcardRegEx(const wxString& wildCardString) {
 	wxString escapedExpression(wildCardString);
-	
+
 	// allow ? and * wildcards, turn ';' into '|'
 	wxString symbols = wxT("!@#$%^&()[]{}\\-+.\"|,~");
 	int pos = escapedExpression.find_first_of(symbols, 0);
@@ -258,7 +258,7 @@ bool t4p::CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::
 }
 
 t4p::DirectorySearchClass::DirectorySearchClass()
-	: MatchedFiles() 
+	: MatchedFiles()
 	, CurrentFiles()
 	, Directories()
 	, InitSources()
@@ -289,7 +289,7 @@ bool t4p::DirectorySearchClass::Init(const std::vector<t4p::SourceClass>& source
 	}
 	InitSources.clear();
 	MatchedFiles.clear();
-	
+
 	if (!AllSourcesExist(sources)) {
 		return false;
 	}
@@ -297,7 +297,7 @@ bool t4p::DirectorySearchClass::Init(const std::vector<t4p::SourceClass>& source
 
 	for (size_t i = 0; i < Sources.size(); ++i) {
 		t4p::SourceClass source = Sources[i];
-		wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
+		wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();
 		if (wxDir::Exists(pathWithSeparator)) {
 			InitSources.push_back(pathWithSeparator);
 			if (RECURSIVE == mode) {
@@ -305,12 +305,12 @@ bool t4p::DirectorySearchClass::Init(const std::vector<t4p::SourceClass>& source
 			}
 		}
 	}
-	
+
 	if (PRECISE == mode) {
 		for (size_t i = 0; i < Sources.size(); ++i) {
 			t4p::SourceClass source = Sources[i];
-			wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();	
-			
+			wxString pathWithSeparator = source.RootDirectory.GetPathWithSep();
+
 
 			// put the source in the list so that when we are walking through
 			// the files we know when we have started to walk a new source dir
@@ -355,14 +355,14 @@ void t4p::DirectorySearchClass::EnumerateNextDir(t4p::DirectoryWalkerClass& walk
 		// enumerate the next directory, stop when we have a file to search
 		Directories.pop();
 		wxDir dir(path);
-		if (dir.IsOpened()) {			
+		if (dir.IsOpened()) {
 			AddSubDirectories(dir);
 			AddFiles(dir);
-		}		
+		}
 	}
 }
 
-// TODO(roberto): there is a bug in here when using recursive mode and 
+// TODO(roberto): there is a bug in here when using recursive mode and
 // there is this structure
 // |
 // ==> apache_config
@@ -380,7 +380,7 @@ bool t4p::DirectorySearchClass::Walk(t4p::DirectoryWalkerClass& walker) {
 	if (!CurrentFiles.empty()) {
 		wxString filename = CurrentFiles.top();
 		CurrentFiles.pop();
-		
+
 		// if we have come across the new source dir, notify the walker that we are beginning a search
 		// on a new source directory
 		std::vector<wxString>::const_iterator it = std::find(InitSources.begin(), InitSources.end(), filename);
@@ -399,14 +399,14 @@ bool t4p::DirectorySearchClass::Walk(t4p::DirectoryWalkerClass& walker) {
 			if (!CurrentFiles.empty()) {
 				wxString filename = CurrentFiles.top();
 				CurrentFiles.pop();
-				hit = walker.Walk(filename); 
+				hit = walker.Walk(filename);
 				if (hit) {
 					MatchedFiles.push_back(filename);
 				}
 			}
 		}
 		else {
-			hit = walker.Walk(filename); 
+			hit = walker.Walk(filename);
 			if (hit) {
 				MatchedFiles.push_back(filename);
 			}

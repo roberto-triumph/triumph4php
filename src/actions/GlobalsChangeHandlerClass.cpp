@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,7 @@
 #include <globals/Errors.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 
-t4p::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(t4p::GlobalsClass& globals) 
+t4p::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(t4p::GlobalsClass& globals)
 	: wxEvtHandler()
 	, Globals(globals) {
 }
@@ -42,7 +42,7 @@ void t4p::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(t4p::SqlMetaDataEvent
 }
 
 void t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(t4p::ActionEventClass& event) {
-	
+
 	// first remove all detected connections that were previously detected
 	std::vector<t4p::DatabaseTagClass>::iterator info;
 	info = Globals.DatabaseTags.begin();

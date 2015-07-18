@@ -38,10 +38,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class UrlDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class UrlDetectorPanelGeneratedClass : public wxPanel 
+class UrlDetectorPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
@@ -50,25 +50,25 @@ class UrlDetectorPanelGeneratedClass : public wxPanel
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		UrlDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~UrlDetectorPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TemplateFilesDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TemplateFilesDetectorPanelGeneratedClass : public wxPanel 
+class TemplateFilesDetectorPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
@@ -80,27 +80,27 @@ class TemplateFilesDetectorPanelGeneratedClass : public wxPanel
 		wxButton* ChooseUrlButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnTestButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChooseUrlButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TemplateFilesDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~TemplateFilesDetectorPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TagDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TagDetectorPanelGeneratedClass : public wxPanel 
+class TagDetectorPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
@@ -109,25 +109,25 @@ class TagDetectorPanelGeneratedClass : public wxPanel
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TagDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~TagDetectorPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DatabaseDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class DatabaseDetectorPanelGeneratedClass : public wxPanel 
+class DatabaseDetectorPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
@@ -136,25 +136,25 @@ class DatabaseDetectorPanelGeneratedClass : public wxPanel
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		DatabaseDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~DatabaseDetectorPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ConfigDetectorPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ConfigDetectorPanelGeneratedClass : public wxPanel 
+class ConfigDetectorPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* ProjectLabel;
 		wxChoice* ProjectChoice;
@@ -163,96 +163,96 @@ class ConfigDetectorPanelGeneratedClass : public wxPanel
 		wxBitmapButton* HelpButton;
 		wxStaticText* Label;
 		wxTreeCtrl* DetectorTree;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ConfigDetectorPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL );
 		~ConfigDetectorPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class UrlDetectorHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class UrlDetectorHelpDialogGeneratedClass : public wxDialog 
+class UrlDetectorHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		UrlDetectorHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("URL Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~UrlDetectorHelpDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TemplateFilesDetectorHelpGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TemplateFilesDetectorHelpGeneratedClass : public wxDialog 
+class TemplateFilesDetectorHelpGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		TemplateFilesDetectorHelpGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Template File Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~TemplateFilesDetectorHelpGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ConfigDetectorsHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ConfigDetectorsHelpDialogGeneratedClass : public wxDialog 
+class ConfigDetectorsHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		ConfigDetectorsHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Config Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~ConfigDetectorsHelpDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class DatabaseDetectorHelpDialogGenereatedClass
 ///////////////////////////////////////////////////////////////////////////////
-class DatabaseDetectorHelpDialogGenereatedClass : public wxDialog 
+class DatabaseDetectorHelpDialogGenereatedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-	
+
 	public:
-		
+
 		DatabaseDetectorHelpDialogGenereatedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Database Detectors Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~DatabaseDetectorHelpDialogGenereatedClass();
-	
+
 };
 
 #endif //__DetectorFeatureForms__

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,7 +41,7 @@ class KeyboardShortcutsPanelClass : public wxKeyConfigPanel {
 
 public:
 
-	KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position = wxDefaultPosition, 
+	KeyboardShortcutsPanelClass(wxWindow* parent, int id, wxPoint position = wxDefaultPosition,
 		wxSize size = wxDefaultSize, long style = 0);
 
 	void AddDynamicCmds(const std::vector<t4p::DynamicCmdClass>& cmds);
@@ -49,7 +49,7 @@ public:
 
 /** Implementing PreferencesDialogGeneratedClass */
 class PreferencesDialogClass : public wxPropertySheetDialog {
-	
+
 public:
 	/**
 	 * @param parent the parent window
@@ -61,41 +61,41 @@ public:
 	 * @param needsRetags bool [out] if TRUE the active projects should be retagged because
 	 *        a settings that affects PHP parsing was changed
 	 */
-	PreferencesDialogClass(wxWindow* parent, 
+	PreferencesDialogClass(wxWindow* parent,
 		t4p::GlobalsClass& globals,
-		t4p::PreferencesClass& preferences, 
+		t4p::PreferencesClass& preferences,
 		wxFileName& settingsDir, bool& changedSettingsDir, bool& needsRetag);
-	
+
 	/**
 	 * Call this after all property sheets have been added but before they are shown. This method
 	 * will transfer all variables to the windows.
 	 */
 	void Prepare();
-	
+
 	/**
 	 * Saves the user's changes.
 	 */
 	void OnOkButton(wxCommandEvent& event);
 
 private:
-	
+
 	/**
 	 * The dialog to let the user create shortcut keys
-	 * 
+	 *
 	 * @var KeyboardShortcutsPanelClass
 	 */
 	KeyboardShortcutsPanelClass* KeyboardShortcutsPanel;
 
 	/**
 	 * The preferences object to show & manipulate
-	 * 
+	 *
 	 * @var PreferencesClass
 	 */
 	PreferencesClass& Preferences;
 
 	/**
 	 * The Globals object to check for modifications
-	 * 
+	 *
 	 * @var GlobalsClass
 	 */
 	GlobalsClass& Globals;

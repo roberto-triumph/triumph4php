@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,10 +27,10 @@
 #include <globals/Sqlite.h>
 #include <soci.h>
 #include <algorithm>
-	
+
 t4p::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {
-		
+
 }
 
 bool t4p::SqlResourceFetchClass::Fetch(const DatabaseTagClass& info, UnicodeString& error) {
@@ -60,7 +60,7 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 	bool hasError = false;
 	t4p::SqlQueryClass query;
 	query.DatabaseTag.Copy(info);
-	
+
 	// the local session connects to the db we want to extract the tables / columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
@@ -68,11 +68,11 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		try {
-			
+
 			std::string schema = t4p::IcuToChar(info.Schema);
 			std::string tableName;
 
-			// populate information_schema tables we want SQL code completion to work for the 
+			// populate information_schema tables we want SQL code completion to work for the
 			// information_schema tables / columns
 			std::string sql = "SELECT table_name FROM information_schema.tables WHERE table_schema IN((:schema), 'information_schema')";
 			soci::statement stmt = (session.prepare << sql, soci::into(tableName), soci::use(schema));
@@ -95,7 +95,7 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 			}
 			if (!hasError) {
 				std::string columnName;
-				
+
 				// only getting unique columns names for now
 				// no need to know what tables they came from since we are not yet able to
 				// auto complete properly. proper auto complete would require a proper SQL lexer and parser
@@ -109,7 +109,7 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 				query.Close(stmt);
 			}
 			error = !StoreTables(hash, tables) || !StoreColumns(hash, columns);
-		} 
+		}
 		catch (std::exception const& e) {
 			hasError = true;
 			error = t4p::CharToIcu(e.what());
@@ -125,17 +125,17 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 	bool hasError = false;
 	t4p::SqlQueryClass query;
 	query.DatabaseTag.Copy(info);
-	
+
 	// this local session connects to the db we want to fetch tables/columns from
 	soci::session session;
 	if (query.Connect(session, error)) {
 		std::string hash = t4p::IcuToChar(info.ConnectionHash());
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
-		
+
 		try {
 
-			// populate information_schema tables we want SQL code completion to work for the 
+			// populate information_schema tables we want SQL code completion to work for the
 			// information_schema tables / columns
 			wxString wxError;
 			if (!t4p::SqliteTables(session, tables, wxError)) {
@@ -144,7 +144,7 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 			}
 			if (!hasError) {
 				for (size_t i = 0; i < tables.size(); ++i) {
-					
+
 					// get the columns for the table
 					// only getting unique columns names for now
 					// no need to know what tables they came from since we are not yet able to
@@ -152,7 +152,7 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 					// and its not worth it for now
 					std::string stdTable = tables[i];
 					std::string sql = "pragma table_info('" + stdTable + "')";
-					
+
 					int cid;
 					std::string name;
 					std::string type;
@@ -160,7 +160,7 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 					std::string defaultValue;
 					int pk;
 					soci::indicator defaultValueNullIndicator;
-					
+
 					soci::statement stmt = (session.prepare << sql, soci::into(cid), soci::into(name),
 						soci::into(type), soci::into(notNull), soci::into(defaultValue, defaultValueNullIndicator),
 						soci::into(pk));
@@ -172,15 +172,15 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 				}
 			}
 			std::sort(columns.begin(), columns.end());
-			
+
 			// want to get only unique cols for now
 			std::vector<std::string>::iterator it = std::unique(columns.begin(), columns.end());
 			if (it != columns.end()) {
 				columns.erase(it, columns.end());
 			}
-			
+
 			error = !StoreTables(hash, tables) || !StoreColumns(hash, columns);
-		} 
+		}
 		catch (std::exception const& e) {
 			hasError = true;
 			error = t4p::CharToIcu(e.what());
@@ -202,7 +202,7 @@ bool t4p::SqlResourceFetchClass::StoreTables(const std::string& hash, const std:
 	sql += "?, ?";
 	sql += ");";
 	bool ret = false;
-	
+
 	try {
 		std::string tableName;
 		soci::transaction txn(Session);
@@ -229,7 +229,7 @@ bool t4p::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std
 	sql += "?, ?";
 	sql += ");";
 	bool ret = false;
-	
+
 	try {
 		std::string columnName;
 		soci::transaction txn(Session);
@@ -251,13 +251,13 @@ bool t4p::SqlResourceFetchClass::StoreColumns(const std::string& hash, const std
 t4p::SqlResourceTableResultClass::SqlResourceTableResultClass()
  : SqliteResultClass()
  , TableName()
- , Connection() 
- , Lookup() 
- , LookupEnd() 
+ , Connection()
+ , Lookup()
+ , LookupEnd()
  , ConnectionHash() {
-	 
+
  }
- 
+
 void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
 	Lookup = t4p::WxToChar(lookup);
 	LookupEnd = Lookup + "zzzzzzz";
@@ -265,7 +265,7 @@ void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const s
 }
 
 bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
 	// see http://sqlite.org/optoverview.html (LIKE optimization)
@@ -275,7 +275,7 @@ bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doL
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name BETWEEN ? AND ? ";
 	if (!ConnectionHash.empty()) {
-		
+
 		// no connection hash = search for table on all connections
 		sql += "AND connection_label = ? ";
 	}
@@ -283,7 +283,7 @@ bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doL
 	if (doLimit) {
 		sql += "LIMIT 100";
 	}
-	
+
 	stmt.prepare(sql);
 	stmt.exchange(soci::use(Lookup));
 	stmt.exchange(soci::use(LookupEnd));
@@ -305,12 +305,12 @@ void t4p::SqlResourceTableResultClass::Next() {
 t4p::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
  : SqliteResultClass()
  , TableName()
- , Connection() 
- , Lookup() 
+ , Connection()
+ , Lookup()
  , ConnectionHash() {
-	 
+
  }
- 
+
 void t4p::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
 	Lookup = t4p::WxToChar(lookup);
 	ConnectionHash = connectionHash;
@@ -321,7 +321,7 @@ bool t4p::ExactSqlResourceTableResultClass::DoPrepare(soci::statement& stmt, boo
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name = ? ";
 	if (!ConnectionHash.empty()) {
-		
+
 		// no connection hash = search for table on all connections
 		sql += "AND connection_label = ? ";
 	}
@@ -329,7 +329,7 @@ bool t4p::ExactSqlResourceTableResultClass::DoPrepare(soci::statement& stmt, boo
 	if (doLimit) {
 		sql += "LIMIT 100";
 	}
-	
+
 	stmt.prepare(sql);
 	stmt.exchange(soci::use(Lookup));
 	if (!ConnectionHash.empty()) {
@@ -351,9 +351,9 @@ t4p::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
 : SqliteResultClass()
 , ColumnName()
 , Lookup()
-, LookupEnd() 
+, LookupEnd()
 , ConnectionHash() {
-	
+
 }
 
 void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
@@ -363,7 +363,7 @@ void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const 
 }
 
 bool t4p::SqlResourceColumnResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-	
+
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
 	// see http://sqlite.org/optoverview.html (LIKE optimization)
@@ -376,12 +376,12 @@ bool t4p::SqlResourceColumnResultClass::DoPrepare(soci::statement& stmt, bool do
 	if (doLimit) {
 		sql += "LIMIT 100";
 	}
-	
+
 	stmt.prepare(sql);
 	stmt.exchange(soci::use(Lookup));
 	stmt.exchange(soci::use(LookupEnd));
 	stmt.exchange(soci::use(ConnectionHash));
-	
+
 	return true;
 }
 
@@ -395,13 +395,13 @@ void t4p::SqlResourceColumnResultClass::Next() {
 
 t4p::SqlResourceFinderClass::SqlResourceFinderClass(soci::session& session)
 	: SqliteFinderClass(session) {
-		
+
 }
 
 std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindTables(const t4p::DatabaseTagClass& info, const UnicodeString& partialTableName) {
 	std::vector<UnicodeString> ret;
 	std::string hash = t4p::IcuToChar(info.ConnectionHash());
-	
+
 	t4p::SqlResourceTableResultClass tableLookup;
 	tableLookup.SetLookup(t4p::IcuToWx(partialTableName), hash);
 
@@ -418,7 +418,7 @@ std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindTables(const t4p::Da
 std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindColumns(const t4p::DatabaseTagClass& info, const UnicodeString& partialColumnName) {
 	std::vector<UnicodeString> ret;
 	std::string hash = t4p::IcuToChar(info.ConnectionHash());
-	
+
 	t4p::SqlResourceColumnResultClass columnLookup;
 	columnLookup.SetLookup(t4p::IcuToWx(partialColumnName), hash);
 

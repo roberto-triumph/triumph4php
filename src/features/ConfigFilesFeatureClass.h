@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,26 +38,26 @@ namespace t4p {
 * project, that way we can build the submenus.
 */
 class ConfigFilesFeaturePairClass {
-	
+
 public:
-	
+
 	/**
 	 * the label of the project that the config files were
 	 * found in
 	 */
 	wxString ProjectLabel;
-	
+
 	/**
 	 * the config files that were found in this project.
 	 */
 	std::vector<t4p::ConfigTagClass> ConfigTags;
-	
+
 	ConfigFilesFeaturePairClass();
-	
+
 	ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src);
-	
+
 	ConfigFilesFeaturePairClass& operator=(const t4p::ConfigFilesFeaturePairClass& src);
-	
+
 	void Copy(const t4p::ConfigFilesFeaturePairClass& src);
 };
 
@@ -70,7 +70,7 @@ public:
 class ConfigFilesFeatureClass : public t4p::FeatureClass {
 
 	public:
-	
+
 	/**
 	 * max amount of menu items to show
 	 * the 100 is due to the menu ids allocated to each feature in
@@ -86,15 +86,15 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 	 * This method is required for the menu handlers to work.
 	 */
 	bool BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& pairs);
-	 
+
 	 /**
 	 * When a menu item is selected; open the corresponding config
 	 * file
-	 * 
+	 *
 	 * @param index index into ConfigTags
 	 */
 	void OpenConfigItem(size_t index);
-	
+
 private:
 
 	/**

@@ -27,7 +27,7 @@
 #include <wx/msgdlg.h>
 
 t4p::DirPickerValidatorClass::DirPickerValidatorClass(wxFileName* data)
-: wxValidator() 
+: wxValidator()
 , Data(data) {
 
 }

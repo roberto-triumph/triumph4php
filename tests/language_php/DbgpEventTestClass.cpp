@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@
 SUITE(DbgpEventClassTest) {
 
 TEST(BreakpointResponse) {
-	
+
 	// 5 breakpoints
 	// 1 line breakpoint
 	// 1 call breakpoint
@@ -41,7 +41,7 @@ TEST(BreakpointResponse) {
 	wxString xml = wxString::FromAscii(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<response command=\"breakpoint_list\" \n"
-		"	transaction_id=\"transaction_id\" >\n"	
+		"	transaction_id=\"transaction_id\" >\n"
 		"<breakpoint id=\"BREAKPOINT_123\" \n"
 		"        type=\"line\" \n"
 		"        state=\"enabled\" \n"
@@ -90,10 +90,10 @@ TEST(BreakpointResponse) {
 	t4p::DbgpBreakpointListEventClass breakpointEvt;
 	t4p::DbgpXmlErrors error = t4p::DBGP_XML_ERROR_NONE;
 	bool success = breakpointEvt.FromXml(xml, error);
-	
+
 	CHECK(success);
 	CHECK_VECTOR_SIZE(5, breakpointEvt.Breakpoints);
-	
+
 	CHECK_EQUAL(wxT("BREAKPOINT_123"), breakpointEvt.Breakpoints[0].BreakpointId);
 	CHECK_EQUAL(wxT("line"), breakpointEvt.Breakpoints[0].BreakpointType);
 	CHECK(breakpointEvt.Breakpoints[0].IsEnabled);
@@ -184,7 +184,7 @@ TEST(DebugEngineErrorResponse) {
 		"          transaction_id=\"transaction_id\"> \n"
 		"    <error code=\"3\" \n"
 		"           apperr=\"app specific error code\"> \n"
-		"       <message>invalid context name</message>" // error messages are not base64 encoded 
+		"       <message>invalid context name</message>" // error messages are not base64 encoded
 		"    </error> \n"
 		"</response>\n"
 	);
@@ -223,7 +223,7 @@ TEST(InvalidXml) {
 	bool success = errorEvt.FromXml(xml, error);
 
 	wxLog::EnableLogging(oldValue);
-	
+
 	CHECK_EQUAL(false, success);
 	CHECK_EQUAL(t4p::DBGP_XML_ERROR_PARSE, error);
 }

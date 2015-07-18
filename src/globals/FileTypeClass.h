@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,7 +22,7 @@
  * @copyright  2014 Roberto Perpuly
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
- 
+
 #ifndef T4P_FILETYPECLASS_H
 #define T4P_FILETYPECLASS_H
 
@@ -65,7 +65,7 @@ enum FileType {
 	 * Javascript (pure JS files only)
 	 */
 	FILE_TYPE_JS,
-	
+
 	// the rest of the document types are only slightly supported
 	// syntax highlighting works but not much else
 	FILE_TYPE_CONFIG,
@@ -80,8 +80,8 @@ enum FileType {
 };
 
 /**
- * This class holds the wildcards for all of the 
- * different file types that are treated specially by 
+ * This class holds the wildcards for all of the
+ * different file types that are treated specially by
  * Triumph. There is one class total, not one class per
  * file type.
  */
@@ -108,7 +108,7 @@ public:
 	wxString MarkdownFileExtensionsString;
 	wxString BashFileExtensionsString;
 	wxString DiffFileExtensionsString;
-	
+
 	/**
 	 * Serialized miscalleneous file filters string from the config
 	 * basically any files that we want to open in the editor, like
@@ -117,18 +117,18 @@ public:
 	wxString MiscFileExtensionsString;
 
 	FileTypeClass();
-	
+
 	FileTypeClass(const t4p::FileTypeClass& src);
-	
+
 	t4p::FileTypeClass& operator=(const t4p::FileTypeClass& src);
-	
+
 	void Copy(const t4p::FileTypeClass& src);
-	
+
 	/**
 	 * The methods below returns the list of wildcard file extensions for
 	 * the specified file type, each wildcard on its own string
 	 */
-	 
+
 	std::vector<wxString> GetPhpFileExtensions() const;
 	std::vector<wxString> GetCssFileExtensions() const;
 	std::vector<wxString> GetSqlFileExtensions() const;
@@ -142,7 +142,7 @@ public:
 	std::vector<wxString> GetBashFileExtensions() const;
 	std::vector<wxString> GetDiffFileExtensions() const;
 	std::vector<wxString> GetMiscFileExtensions() const;
-	
+
 	/**
 	 * Returns the all file extensions exception PHP file extensions
 	 * @return std::vector<wxString> a copy of the file extensions
@@ -155,20 +155,20 @@ public:
 	 * @return std::vector<wxString> a copy of the file extensions
 	 */
 	std::vector<wxString> GetAllSourceFileExtensions() const;
-	
+
 	/**
 	 * @return all of the file extensions, concatenated with semicolon
 	 */
 	wxString GetAllSourceFileExtensionsString() const;
 
 	/**
-	 * The methods below return TRUE 
+	 * The methods below return TRUE
 	 * @return TRUE if given full path is a file of the specified
-	 * type, as determined only by the appropriate file extensions 
+	 * type, as determined only by the appropriate file extensions
 	 * wilcard. For example, HasAPhpExtension returns TRUE if
 	 * fullPath has one of the extensions configure in PhpExtensionsString
 	 */
-	 
+
 	bool HasAPhpExtension(const wxString& fullPath) const;
 	bool HasASqlExtension(const wxString& fullPath) const;
 	bool HasAJsExtension(const wxString& fullPath) const;
@@ -186,7 +186,7 @@ public:
 
 	/**
 	 * @params fullPath the look at
-	 * @return boolean TRUE if the given file is any 
+	 * @return boolean TRUE if the given file is any
 	 *         of the configured file types; ie. if the file
 	 *         is a php OR sql OR js OR css OR .... file
 	 */

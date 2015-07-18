@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,7 +62,7 @@ bool t4p::OutlineSearchCompleteClass::IsLabelFileName() const {
 	return Label.Find(wxT(".")) != wxNOT_FOUND;
 }
 
-t4p::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventId, 
+t4p::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventId,
 																	const std::vector<t4p::OutlineSearchCompleteClass>& tags)
 	: wxEvent(eventId, t4p::EVENT_OUTLINE_SEARCH_COMPLETE)
 	, Tags(tags) {
@@ -77,7 +77,7 @@ t4p::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(t4p::Run
 																int eventId)
 	: ActionClass(runningThreads, eventId)
 	, TagCache()
-	, SearchStrings() 
+	, SearchStrings()
 	, EnabledSourceDirs() {
 
 }
@@ -85,13 +85,13 @@ t4p::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(t4p::Run
 void t4p::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals) {
 	SearchStrings = searches;
 	t4p::TagFinderListClass* cache = new t4p::TagFinderListClass;
-	cache->InitGlobalTag(globals.TagCacheDbFileName, 
+	cache->InitGlobalTag(globals.TagCacheDbFileName,
 		globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetMiscFileExtensions(),
 		globals.Environment.Php.Version);
 	cache->InitNativeTag(t4p::NativeFunctionsAsset());
 	cache->InitDetectorTag(globals.DetectorCacheDbFileName);
 	TagCache.RegisterGlobal(cache);
-	
+
 	EnabledSourceDirs.clear();
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator source;
@@ -115,10 +115,10 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 			OutlineSearchCompleteClass tagSearchComplete;
 			tagSearchComplete.Label = t4p::IcuToWx(*search);
 			if (search->indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
-				
+
 				// searching for all tags in the file
 				tags = TagCache.AllClassesFunctionsDefines(t4p::IcuToWx(*search));
-				
+
 				// now for each class, collect all methods/properties for any class.
 				for (tag = tags.begin(); tag != tags.end(); ++tag) {
 					if (tag->Type == t4p::PhpTagClass::CLASS) {
@@ -134,7 +134,7 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				}
 			}
 			else {
-				
+
 				// searching for all members in a class name
 				t4p::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
 				if (results) {
@@ -162,7 +162,7 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 
 		// PostEvent will set the correct event ID
 		t4p::OutlineSearchCompleteEventClass evt(wxID_ANY, topLevelTags);
-		PostEvent(evt);	
+		PostEvent(evt);
 	}
 }
 wxString t4p::OutlineTagCacheSearchActionClass::GetLabel() const {

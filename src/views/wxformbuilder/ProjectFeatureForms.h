@@ -33,10 +33,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ProjectPreferencesGeneratedPanelClass
 ///////////////////////////////////////////////////////////////////////////////
-class ProjectPreferencesGeneratedPanelClass : public wxPanel 
+class ProjectPreferencesGeneratedPanelClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* WildcardHelpText;
 		wxStaticText* PhpLabel;
@@ -67,21 +67,21 @@ class ProjectPreferencesGeneratedPanelClass : public wxPanel
 		wxTextCtrl* BashFileExtensions;
 		wxStaticText* MiscLabel;
 		wxTextCtrl* MiscFileExtensions;
-	
+
 	public:
-		
+
 		ProjectPreferencesGeneratedPanelClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,550 ), long style = wxTAB_TRAVERSAL );
 		~ProjectPreferencesGeneratedPanelClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ProjectDefinitionDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ProjectDefinitionDialogGeneratedClass : public wxDialog 
+class ProjectDefinitionDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxStaticText* LabelStatic;
@@ -94,29 +94,29 @@ class ProjectDefinitionDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSourcesListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddSource( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSource( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ProjectDefinitionDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Definition"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 536,492 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectDefinitionDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ProjectSourceDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ProjectSourceDialogGeneratedClass : public wxDialog 
+class ProjectSourceDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxHyperlinkCtrl* HelpLink;
@@ -129,25 +129,25 @@ class ProjectSourceDialogGeneratedClass : public wxDialog
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ProjectSourceDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Project Source"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectSourceDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class ProjectListDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class ProjectListDialogGeneratedClass : public wxDialog 
+class ProjectListDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxHyperlinkCtrl* HelpLink;
@@ -161,7 +161,7 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
 		wxButton* ButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnProjectsListDoubleClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnProjectsListCheckbox( wxCommandEvent& event ) { event.Skip(); }
@@ -173,39 +173,39 @@ class ProjectListDialogGeneratedClass : public wxDialog
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		ProjectListDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Defined Projects"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~ProjectListDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MultipleSelectDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class MultipleSelectDialogGeneratedClass : public wxDialog 
+class MultipleSelectDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* Label;
 		wxCheckListBox* Checklist;
 		wxStdDialogButtonSizer* ButtonsSizer;
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		MultipleSelectDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~MultipleSelectDialogGeneratedClass();
-	
+
 };
 
 #endif //__ProjectFeatureForms__

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -59,18 +59,18 @@ public:
  * contains the results of the search.
  */
 class OutlineSearchCompleteEventClass : public wxEvent {
-        
+
         public:
-        
+
         /**
          * Will contain all of the resulting tags.
          */
         std::vector<t4p::OutlineSearchCompleteClass> Tags;
-        
+
         OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
-        
+
         wxEvent* Clone() const;
-        
+
 };
 
 extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
@@ -87,7 +87,7 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
  * the results will be posted in an event.
  */
 class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
-	
+
 public:
 
 	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
@@ -112,7 +112,7 @@ private:
 	t4p::TagCacheClass TagCache;
 
 	std::vector<UnicodeString> SearchStrings;
-	
+
 	/**
 	 * the directories to look in
 	 */
@@ -120,13 +120,13 @@ private:
 };
 
 /**
- * This is a feature that is designed to let the user see the classes / methods of 
+ * This is a feature that is designed to let the user see the classes / methods of
  * the opened files and of related files.  The related files / classes / methods that are mentioned
  * in the opened files.
  */
 class OutlineFeatureClass : public FeatureClass {
 public:
-	
+
 	/**
 	 * Creates a new OutlineViewFeature.
 	 */

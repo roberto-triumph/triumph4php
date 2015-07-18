@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ static int ID_NEW_USER_TIMER = wxNewId();
 
 t4p::NewUserViewClass::NewUserViewClass(t4p::NewUserFeatureClass& feature)
 : FeatureViewClass()
-, Timer(this, ID_NEW_USER_TIMER) 
+, Timer(this, ID_NEW_USER_TIMER)
 , Feature(feature) {
 }
 
@@ -51,7 +51,7 @@ void t4p::NewUserViewClass::OnAppReady(wxCommandEvent &event) {
 void t4p::NewUserViewClass::OnTimer(wxTimerEvent& event) {
 	wxFileName settingsDir;
 	wxWizard wizard(GetMainWindow(), wxID_ANY, _("Welcome New User"));
-	
+
 	wxWizardPageSimple* page1 = new wxWizardPageSimple(&wizard);
 	page1->SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY);
 	wxWizardPageSimple* page2 = new wxWizardPageSimple(&wizard);
@@ -68,7 +68,7 @@ void t4p::NewUserViewClass::OnTimer(wxTimerEvent& event) {
 	wizard.GetPageAreaSizer()->Add(page1);
 	wizard.GetPageAreaSizer()->Add(page2);
 	wizard.GetPageAreaSizer()->Add(page3);
-	
+
 	if (wizard.RunWizard(page1)) {
 
 		// true means that we will
@@ -115,14 +115,14 @@ void t4p::NewUserViewClass::OnWizardCancel(wxWizardEvent& event) {
 	wxMessageBox(_("Default settings will be used"), _("Triumph 4 PHP"));
 }
 
-t4p::NewUserSettingsPanelClass::NewUserSettingsPanelClass(wxWindow *parent, 
-														  t4p::GlobalsClass &globals, 
+t4p::NewUserSettingsPanelClass::NewUserSettingsPanelClass(wxWindow *parent,
+														  t4p::GlobalsClass &globals,
 														  t4p::PreferencesClass& preferences,
 														  wxFileName& configFileDir)
 : NewUserSettingsPanelGeneratedClass(parent, ID_NEW_USER_DIALOG)
 , Preferences(preferences)
 , ConfigFileDir(configFileDir) {
-	
+
 	wxString label = UserDataDirectory->GetLabel();
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
@@ -147,7 +147,7 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 		return good;
 	}
 	if (CustomDirectory->GetValue()) {
-		
+
 		// if user chose to store settings in a custom directory it must exist
 		wxString settingsDir = SettingsDirectory->GetPath();
 		if (!wxFileName::DirExists(settingsDir)) {
@@ -161,7 +161,7 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 	}
 	wxStandardPaths paths = wxStandardPaths::Get();
 	if (ApplicationDirectory->GetValue()) {
-		
+
 		// create our subDir if it does not exist
 		wxFileName tempDir;
 		tempDir.AssignDir(paths.GetExecutablePath());
@@ -221,28 +221,28 @@ t4p::NewUserAssociationsPanelClass::NewUserAssociationsPanelClass(wxWindow* pare
 
 	NonEmptyTextValidatorClass sqlFileExtensionsValidator(&Globals.FileTypes.SqlFileExtensionsString, SqlLabel);
 	SqlFileExtensions->SetValidator(sqlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass jsFileExtensionsValidator(&Globals.FileTypes.JsFileExtensionsString, JsLabel);
 	JsFileExtensions->SetValidator(jsFileExtensionsValidator);
 
 	NonEmptyTextValidatorClass configFileExtensionsValidator(&Globals.FileTypes.ConfigFileExtensionsString, ConfigLabel);
 	ConfigFileExtensions->SetValidator(configFileExtensionsValidator);
-		
+
 	NonEmptyTextValidatorClass yamlFileExtensionsValidator(&Globals.FileTypes.YamlFileExtensionsString, YamlLabel);
 	YamlFileExtensions->SetValidator(yamlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass xmlFileExtensionsValidator(&Globals.FileTypes.XmlFileExtensionsString, XmlLabel);
 	XmlFileExtensions->SetValidator(xmlFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass markdownFileExtensionsValidator(&Globals.FileTypes.MarkdownFileExtensionsString, MarkdownLabel);
 	MarkdownFileExtensions->SetValidator(markdownFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass bashFileExtensionsValidator(&Globals.FileTypes.BashFileExtensionsString, BashLabel);
 	BashFileExtensions->SetValidator(bashFileExtensionsValidator);
-	
+
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
-	
+
 	TransferDataToWindow();
 }
 
@@ -265,7 +265,7 @@ bool t4p::NewUserPhpSettingsPanelClass::TransferDataFromWindow() {
 	}
 	if (Installed->GetValue()) {
 
-		// only if the user has php installed do we check to see if the 
+		// only if the user has php installed do we check to see if the
 		// executable is good
 		wxString phpPath = PhpExecutable->GetPath();
 		if (!wxFileName::FileExists(phpPath)) {

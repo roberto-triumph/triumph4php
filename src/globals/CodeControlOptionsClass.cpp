@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,8 +26,8 @@
 #include <wx/platinfo.h>
 #include <wx/utils.h>
 
-t4p::CodeControlOptionsClass::CodeControlOptionsClass() 
-: PhpStyles() 
+t4p::CodeControlOptionsClass::CodeControlOptionsClass()
+: PhpStyles()
 , SqlStyles()
 , CssStyles()
 , JsStyles()
@@ -39,29 +39,29 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 , MarkdownStyles()
 , BashStyles()
 , DiffStyles()
-, CodeStyles() 
-, SpacesPerIndent(0) 
-, TabWidth(4) 
-, RightMargin(0) 
+, CodeStyles()
+, SpacesPerIndent(0)
+, TabWidth(4)
+, RightMargin(0)
 , LineEndingMode(2)
-, IndentUsingTabs(true) 
-, EnableCodeFolding(true) 
+, IndentUsingTabs(true)
+, EnableCodeFolding(true)
 , EnableAutomaticLineIndentation(true)
 , EnableLineNumbers(true)
-, EnableIndentationGuides(false) 
-, EnableLineEndings(false) 
+, EnableIndentationGuides(false)
+, EnableLineEndings(false)
 , EnableAutoCompletion(true)
-, EnableDynamicAutoCompletion(false) 
-, EnableWordWrap(false) 
-, TrimTrailingSpaceBeforeSave(false) 
-, RemoveTrailingBlankLinesBeforeSave(true) 
-, EnableCallTipsOnMouseHover(true) 
+, EnableDynamicAutoCompletion(false)
+, EnableWordWrap(false)
+, TrimTrailingSpaceBeforeSave(false)
+, RemoveTrailingBlankLinesBeforeSave(true)
+, EnableCallTipsOnMouseHover(true)
 , EnableMultipleSelection(true)
 , EnableVirtualSpace(false)
 , EnableRectangularSelection(false)
 , ShowWhitespace(false)
 , Zoom(0) {
-	
+
 }
 
 t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
@@ -70,12 +70,12 @@ t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p:
 }
 
 void t4p::CodeControlOptionsClass::CopyStyles(const t4p::CodeControlOptionsClass& src) {
-	PhpStyles = src.PhpStyles; 
+	PhpStyles = src.PhpStyles;
 	SqlStyles = src.SqlStyles;
 	CssStyles = src.CssStyles;
 	JsStyles = src.JsStyles;
 	ConfigStyles = src.ConfigStyles;
-	CrontabStyles = src.CrontabStyles; 
+	CrontabStyles = src.CrontabStyles;
 	YamlStyles = src.YamlStyles;
 	RubyStyles = src.RubyStyles;
 	LuaStyles = src.LuaStyles;
@@ -87,7 +87,7 @@ void t4p::CodeControlOptionsClass::CopyStyles(const t4p::CodeControlOptionsClass
 void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src) {
 	CopyStyles(src);
 
-	CodeStyles = src.CodeStyles; 
+	CodeStyles = src.CodeStyles;
 	SpacesPerIndent = src.SpacesPerIndent;
 	TabWidth = src.TabWidth;
 	RightMargin = src.RightMargin;
@@ -102,7 +102,7 @@ void t4p::CodeControlOptionsClass::Copy(const t4p::CodeControlOptionsClass& src)
 	EnableDynamicAutoCompletion = src.EnableDynamicAutoCompletion;
 	EnableWordWrap = src.EnableWordWrap;
 	TrimTrailingSpaceBeforeSave = src.TrimTrailingSpaceBeforeSave;
-	RemoveTrailingBlankLinesBeforeSave = src.RemoveTrailingBlankLinesBeforeSave; 
+	RemoveTrailingBlankLinesBeforeSave = src.RemoveTrailingBlankLinesBeforeSave;
 	EnableCallTipsOnMouseHover = src.EnableCallTipsOnMouseHover;
 	EnableMultipleSelection = src.EnableMultipleSelection;
 	EnableVirtualSpace = src.EnableVirtualSpace;
@@ -122,7 +122,7 @@ t4p::StylePreferenceClass& t4p::CodeControlOptionsClass::FindByStcStyle(std::vec
 
 std::vector<t4p::StylePreferenceClass> t4p::CodeControlOptionsClass::AllStyles() const {
 	std::vector<t4p::StylePreferenceClass> all;
-	
+
 	all.insert(all.end(), PhpStyles.begin(), PhpStyles.end());
 	all.insert(all.end(), SqlStyles.begin(), SqlStyles.end());
 	all.insert(all.end(), CssStyles.begin(), CssStyles.end());
@@ -135,7 +135,7 @@ std::vector<t4p::StylePreferenceClass> t4p::CodeControlOptionsClass::AllStyles()
 	all.insert(all.end(), MarkdownStyles.begin(), MarkdownStyles.end());
 	all.insert(all.end(), BashStyles.begin(), BashStyles.end());
 	all.insert(all.end(), DiffStyles.begin(), DiffStyles.end());
-	
+
 	return all;
 }
 
@@ -161,13 +161,13 @@ void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	config->Read(wxT("EditorBehavior/EnableWordWrap"), &EnableWordWrap);
 	config->Read(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), &TrimTrailingSpaceBeforeSave);
 	config->Read(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), &RemoveTrailingBlankLinesBeforeSave);
-	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover); 
-	config->Read(wxT("EditorBehavior/EnableMultipleSelection"), &EnableMultipleSelection); 
-	config->Read(wxT("EditorBehavior/EnableVirtualSpace"), &EnableVirtualSpace); 
-	config->Read(wxT("EditorBehavior/EnableRectangularSelection"), &EnableRectangularSelection); 
-	config->Read(wxT("EditorBehavior/Showhitespace"), &ShowWhitespace); 
-	config->Read(wxT("EditorBehavior/Zoom"), &Zoom); 
-		
+	config->Read(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), &EnableCallTipsOnMouseHover);
+	config->Read(wxT("EditorBehavior/EnableMultipleSelection"), &EnableMultipleSelection);
+	config->Read(wxT("EditorBehavior/EnableVirtualSpace"), &EnableVirtualSpace);
+	config->Read(wxT("EditorBehavior/EnableRectangularSelection"), &EnableRectangularSelection);
+	config->Read(wxT("EditorBehavior/Showhitespace"), &ShowWhitespace);
+	config->Read(wxT("EditorBehavior/Zoom"), &Zoom);
+
 	ReadStyles(PhpStyles, config);
 	ReadStyles(SqlStyles, config);
 	ReadStyles(CssStyles, config);
@@ -180,7 +180,7 @@ void t4p::CodeControlOptionsClass::Load(wxConfigBase* config) {
 	ReadStyles(BashStyles, config);
 	ReadStyles(DiffStyles, config);
 }
-	 
+
 void t4p::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/SpacesPerIndent"), SpacesPerIndent);
 	config->Write(wxT("EditorBehavior/TabWidth"), TabWidth);
@@ -198,19 +198,19 @@ void t4p::CodeControlOptionsClass::Save(wxConfigBase* config) {
 	config->Write(wxT("EditorBehavior/TrimTrailingSpaceBeforeSave"), TrimTrailingSpaceBeforeSave);
 	config->Write(wxT("EditorBehavior/RemoveTrailingBlankLinesBeforeSave"), RemoveTrailingBlankLinesBeforeSave);
 	config->Write(wxT("EditorBehavior/EnableCallTipsOnMouseHover"), EnableCallTipsOnMouseHover);
-	config->Write(wxT("EditorBehavior/EnableMultipleSelection"), EnableMultipleSelection); 
-	config->Write(wxT("EditorBehavior/EnableVirtualSpace"), EnableVirtualSpace); 
-	config->Write(wxT("EditorBehavior/EnableRectangularSelection"), EnableRectangularSelection); 
-	config->Write(wxT("EditorBehavior/Showhitespace"), ShowWhitespace); 
-	config->Write(wxT("EditorBehavior/Zoom"), Zoom); 
-	
+	config->Write(wxT("EditorBehavior/EnableMultipleSelection"), EnableMultipleSelection);
+	config->Write(wxT("EditorBehavior/EnableVirtualSpace"), EnableVirtualSpace);
+	config->Write(wxT("EditorBehavior/EnableRectangularSelection"), EnableRectangularSelection);
+	config->Write(wxT("EditorBehavior/Showhitespace"), ShowWhitespace);
+	config->Write(wxT("EditorBehavior/Zoom"), Zoom);
+
 	std::vector<t4p::StylePreferenceClass> allStyles = AllStyles();
 	for (size_t i = 0; i < allStyles.size(); ++i) {
 		allStyles[i].Write(config);
 	}
 }
 
-t4p::StylePreferenceClass::StylePreferenceClass() 
+t4p::StylePreferenceClass::StylePreferenceClass()
 : Font()
 , Color()
 , BackgroundColor()
@@ -218,7 +218,7 @@ t4p::StylePreferenceClass::StylePreferenceClass()
 , StcStyle(0)
 , IsBold(false)
 , IsItalic(false) {
-		
+
 }
 
 t4p::StylePreferenceClass::StylePreferenceClass(const t4p::StylePreferenceClass& src)

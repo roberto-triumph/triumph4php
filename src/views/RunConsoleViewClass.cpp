@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -93,7 +93,7 @@ void t4p::CliCommandEditDialogClass::OnFileChanged(wxFileDirPickerEvent& event) 
 }
 
 t4p::CliCommandListDialogClass::CliCommandListDialogClass(wxWindow* parent, int id, std::vector<t4p::CliCommandClass>& commands)
-	: CliCommandListDialogGeneratedClass(parent, id)	
+	: CliCommandListDialogGeneratedClass(parent, id)
 	, Commands(commands)
 	, EditedCommands(commands) {
 	FillList();
@@ -149,7 +149,7 @@ void t4p::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
 	if (t4p::NumberLessThan(selection, EditedCommands.size())) {
 		CommandsList->Delete(selection);
 		EditedCommands.erase(EditedCommands.begin() + selection);
-		
+
 		if (!t4p::NumberLessThan(selection, EditedCommands.size()) && !EditedCommands.empty()) {
 			CommandsList->SetSelection(EditedCommands.size() - 1);
 		}
@@ -200,8 +200,8 @@ void t4p::CliCommandListDialogClass::OnHelpButton(wxCommandEvent& event) {
 	wxMessageBox(help, _("CLI Command Help"), wxOK, this);
 }
 
-t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id, 
-													   t4p::StatusBarWithGaugeClass* gauge, 
+t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
+													   t4p::StatusBarWithGaugeClass* gauge,
 													   t4p::RunConsoleFeatureClass& feature,
 													   t4p::RunConsoleViewClass& view)
 	: RunConsolePanelGeneratedClass(parent, id)
@@ -221,7 +221,7 @@ t4p::RunConsolePanelClass::RunConsolePanelClass(wxWindow* parent, int id,
 	// so that we can cleanup the child process AND also remove any open gauge
 	// can't do this in destructor because we need to guarantee
 	// that the gauge pointer is valid
-	parent->Connect(wxID_ANY, wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
+	parent->Connect(wxID_ANY, wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,
 		wxAuiNotebookEventHandler(t4p::RunConsolePanelClass::OnPageClose), NULL, this);
 }
 
@@ -235,7 +235,7 @@ void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 			ProcessWithHeartbeat.Stop(CurrentPid);
 		}
 		Gauge->StopGauge(IdProcessGauge);
-		GetParent()->Disconnect(wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, 
+		GetParent()->Disconnect(wxID_ANY, wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,
 			wxAuiNotebookEventHandler(t4p::RunConsolePanelClass::OnPageClose), NULL, this);
 	}
 	evt.Skip();
@@ -243,7 +243,7 @@ void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 
 void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const wxFileName& workingDirectory,
 		bool waitForArguments) {
-	
+
 	// cannot run new files that have not been saved yet
 	if (!cmdLine.empty()) {
 		CommandString = cmdLine;
@@ -267,14 +267,14 @@ void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const
 }
 
 void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
-	
+
 	// do not run a process if one is already running. the 'Run' button
 	// converts to a 'stop' button when a process is running.
 	if (!CurrentPid && TransferDataFromWindow() && !CommandString.IsEmpty()) {
 		Command->Enable(false);
 		RunButton->SetLabel(_("Stop"));
 		if (ProcessWithHeartbeat.Init(CommandString, WorkingDirectory, ID_PROCESS, CurrentPid)) {
-			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);	
+			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
 		}
 		else {
 			Command->Enable(true);
@@ -282,14 +282,14 @@ void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 		}
 	}
 	else if (CurrentPid > 0) {
-		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);		
+		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);
 		if (!stopped) {
 
 			// stale PID??
-			t4p::EditorLogError(t4p::ERR_ROGUE_PROCESS, 
+			t4p::EditorLogError(t4p::ERR_ROGUE_PROCESS,
 				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
 		}
-		
+
 		Gauge->StopGauge(IdProcessGauge);
 		CurrentPid = 0;
 		Command->Enable(true);
@@ -325,7 +325,7 @@ void  t4p::RunConsolePanelClass::OnProcessInProgress(wxCommandEvent& event) {
 	Gauge->IncrementGauge(IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE);
 }
 
-void  t4p::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) { 
+void  t4p::RunConsolePanelClass::OnProcessComplete(wxCommandEvent& event) {
 	wxString output = event.GetString();
 
 	// if no output, do not append.  This will allow the user the ability to select the text when the process is silent
@@ -349,7 +349,7 @@ void t4p::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 			newCommand.Arguments = fullLine.Mid(spacePos + 1);
 			newCommand.ShowInToolbar = false;
 			newCommand.WaitForArguments = false;
-			
+
 			// prime the description with the base name in case
 			// executable is a full path
 			size_t pos = newCommand.Executable.Length() - 1;
@@ -385,13 +385,13 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 	t4p::FinderClass finder;
 	finder.Mode = t4p::FinderClass::REGULAR_EXPRESSION;
 	finder.Expression = FileNameRegularExpression();
-	
+
 	// this way so that gcc does not think that good is an unused variable
 	bool prep;
 	wxUnusedVar(prep);
 	prep = finder.Prepare();
 	wxASSERT(prep);
-	
+
 	UnicodeString uniText = t4p::WxToIcu(text);
 	int32_t totalLength = uniText.length();
 
@@ -408,7 +408,7 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 		t4p::FileNameHitClass hit;
 		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hit.StartIndex, hit.Length)) {
 			if (hit.StartIndex > index) {
-			
+
 				// render the text prior to the hit as normal
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString beforeHit(uniText, index, hit.StartIndex - index);
@@ -422,7 +422,7 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 			hitTrimmed.Trim(false).Trim(true);
 			if (wxFileName::FileExists(hitTrimmed)) {
 				OutputWindow->SetDefaultStyle(fileAttr);
-				
+
 				// store it so that we can use it during mouse hover
 				FileNameHits.push_back(hit);
 			}
@@ -433,7 +433,7 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 			index = hit.StartIndex + hit.Length + 1;
 
 			if ((hit.StartIndex + hit.Length) < totalLength) {
-				
+
 				// render the ending boundary that was taken by the regular expression
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
@@ -452,10 +452,10 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 	wxPlatformInfo info;
 	std::vector<wxString> allExtensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
-	
+
 	wxString extensionsRegEx;
 	for (size_t i = 0; i < allExtensions.size(); ++i) {
-		
+
 		// turn wilcards into proper regular expression syntax
 		wxString ext = allExtensions[i];
 		ext.Replace(wxT("."), wxT("\\."));
@@ -466,24 +466,24 @@ UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 			extensionsRegEx += wxT("|");
 		}
 	}
-	extensionsRegEx = wxT("(") + extensionsRegEx  + wxT(")"); 
-	
+	extensionsRegEx = wxT("(") + extensionsRegEx  + wxT(")");
+
 	UnicodeString uniRegEx = UNICODE_STRING_SIMPLE("(?mi)");
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
-		
+
 		// pattern C:\\folder1\\folder2
 		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
 		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
 		uniRegEx += t4p::WxToIcu(extensionsRegEx);
-		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
-		
+		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)");
+
 	}
 	else {
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
 		uniRegEx += UNICODE_STRING_SIMPLE("([\\w_. /]+)");
 		uniRegEx += t4p::WxToIcu(extensionsRegEx);
-		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)"); 
+		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)");
 	}
 	return uniRegEx;
 }
@@ -516,7 +516,7 @@ void t4p::RunConsolePanelClass::OnLeftDown(wxMouseEvent& event) {
 
 	// according to docs, always allow default processing of mouse down events to take place
 	//
-	// The handler of this event should normally call event.Skip() to allow the default processing to take 
+	// The handler of this event should normally call event.Skip() to allow the default processing to take
 	// place as otherwise the window under mouse wouldn't get the focus.
 	event.Skip();
 }
@@ -544,27 +544,27 @@ t4p::RunConsoleViewClass::RunConsoleViewClass(t4p::RunConsoleFeatureClass& featu
 	, RunCliMenuItem(NULL)
 	, RunCliWithArgsMenuItem(NULL)
 	, RunCliInNewWindowMenuItem(NULL)
-	, RunCliWithArgsInNewWindowMenuItem(NULL) 
+	, RunCliWithArgsInNewWindowMenuItem(NULL)
 	, CommandToolbar(NULL) {
 }
 
 void t4p::RunConsoleViewClass::AddNewMenu(wxMenuBar* menuBar) {
 	wxMenu* cliMenu = new wxMenu();
-	RunCliMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 0, _("Run As CLI\tF7"), 
+	RunCliMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 0, _("Run As CLI\tF7"),
 		_("Run File As a PHP Command Line Script"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliMenuItem);
-	RunCliWithArgsMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"), 
+	RunCliWithArgsMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 1, _("Run As CLI With Arguments\tSHIFT+F7"),
 		_("Run File As a PHP Command Line Script With Arguments"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliWithArgsMenuItem);
-	RunCliInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"), 
+	RunCliInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 2, _("Run As CLI In New Window\tCTRL+F7"),
 		_("Run File As a PHP Command Line Script In a New Window"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliInNewWindowMenuItem);
-	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 3, 
-		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"), 
+	RunCliWithArgsInNewWindowMenuItem = new wxMenuItem(cliMenu, t4p::MENU_RUN_PHP + 3,
+		_("Run As CLI In New Window With Arguments\tCTRL+SHIFT+F7"),
 		_("Run File As a PHP Command Line Script In a New Window With Arguments"), wxITEM_NORMAL);
 	cliMenu->Append(RunCliWithArgsInNewWindowMenuItem);
 	cliMenu->AppendSeparator();
-	cliMenu->Append(t4p::MENU_RUN_PHP + 4, 
+	cliMenu->Append(t4p::MENU_RUN_PHP + 4,
 		_("Saved CLI Commands"),
 		_("Open a dialog that shows the saved CLI commands"),
 		wxITEM_NORMAL);
@@ -578,7 +578,7 @@ void t4p::RunConsoleViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>
 	menuItemIds[t4p::MENU_RUN_PHP + 2] = wxT("Console-Run In New Window");
 	menuItemIds[t4p::MENU_RUN_PHP + 3] = wxT("Console-Run-In New Window With Arguments");
 	AddDynamicCmd(menuItemIds, shortcuts);
-	
+
 	FillCommandPanel();
 }
 
@@ -604,7 +604,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCli(wxCommandEvent& event) {
 
 			// if theres a window already opened, just re-run the selected window.
 			// make sure that the selected window is a run console panel. if we don't explictly
-			// check the name, the program will crash. Because we are typecasting we 
+			// check the name, the program will crash. Because we are typecasting we
 			// need to be careful
 			if (IsToolsWindowSelectedByName(wxT("t4p::RunConsolePanelClass"))) {
 				int selection = GetToolsNotebook()->GetSelection();
@@ -616,7 +616,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCli(wxCommandEvent& event) {
 		else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
 		}
-	}	
+	}
 }
 
 void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) {
@@ -643,7 +643,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) 
 
 void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFileName& workingDirectory, bool waitForArguments, bool inNewWindow) {
 	if (inNewWindow) {
-		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
+		RunConsolePanelClass* window = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE,
 			GetStatusBarWithGauge(), Feature, *this);
 
 		// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
@@ -664,15 +664,15 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFile
 			runConsolePanel = (t4p::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
 		}
 		else {
-			runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE, 
+			runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE,
 				GetStatusBarWithGauge(), Feature, *this);
-			
+
 			// set the name so that we can know which window pointer can be safely cast this panel back to the RunConsolePanelClass
 			wxBitmap runBitmap = t4p::BitmapImageAsset(wxT("run"));
 			AddToolsWindow(runConsolePanel, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap);
 		}
 		if (runConsolePanel) {
-			
+
 			// window already created, will just re-run the command that's already there
 			runConsolePanel->SetToRunCommand(cmdLine, wxFileName(), waitForArguments);
 		}
@@ -724,7 +724,7 @@ void t4p::RunConsoleViewClass::OnRunSavedCommands(wxCommandEvent& event) {
 
 void t4p::RunConsoleViewClass::FillCommandPanel() {
 	if (CommandToolbar == NULL) {
-		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize, 
+		CommandToolbar = new wxAuiToolBar(GetMainWindow(), wxID_ANY, wxDefaultPosition, wxDefaultSize,
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 		CommandToolbar->SetToolBitmapSize(wxSize(16, 16));
 		CommandToolbar->SetOverflowVisible(false);
@@ -732,7 +732,7 @@ void t4p::RunConsoleViewClass::FillCommandPanel() {
 	else {
 		AuiManager->DetachPane(CommandToolbar);
 	}
-	CommandToolbar->Clear();	
+	CommandToolbar->Clear();
 	for (size_t i = 0; i < Feature.CliCommands.size(); ++i) {
 		t4p::CliCommandClass cmd = Feature.CliCommands[i];
 		if (cmd.ShowInToolbar) {
@@ -745,7 +745,7 @@ void t4p::RunConsoleViewClass::FillCommandPanel() {
 		}
 	}
 	CommandToolbar->Realize();
-	if (CommandToolbar->GetToolCount() > 0) {	
+	if (CommandToolbar->GetToolCount() > 0) {
 		wxAuiPaneInfo paneInfo;
 		paneInfo.Bottom().Layer(2)
 			.CaptionVisible(false).CloseButton(false)
@@ -773,13 +773,13 @@ void t4p::RunConsoleViewClass::OnAppCommandRun(wxCommandEvent& event) {
 	RunCommand(event.GetString(), wxFileName(), false, false);
 }
 
-BEGIN_EVENT_TABLE(t4p::RunConsolePanelClass, wxPanel) 
+BEGIN_EVENT_TABLE(t4p::RunConsolePanelClass, wxPanel)
 	EVT_COMMAND(ID_PROCESS, t4p::EVENT_PROCESS_COMPLETE, t4p::RunConsolePanelClass::OnProcessComplete)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_PROCESS_IN_PROGRESS, t4p::RunConsolePanelClass::OnProcessInProgress)
 	EVT_COMMAND(ID_PROCESS, t4p::EVENT_PROCESS_FAILED, t4p::RunConsolePanelClass::OnProcessFailed)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(t4p::RunConsoleViewClass, t4p::FeatureViewClass) 
+BEGIN_EVENT_TABLE(t4p::RunConsoleViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_RUN_PHP + 0, t4p::RunConsoleViewClass::OnRunFileAsCli)
 	EVT_MENU(t4p::MENU_RUN_PHP + 1, t4p::RunConsoleViewClass::OnRunFileAsCli)
 	EVT_MENU(t4p::MENU_RUN_PHP + 2, t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow)
@@ -787,9 +787,9 @@ BEGIN_EVENT_TABLE(t4p::RunConsoleViewClass, t4p::FeatureViewClass)
 	EVT_MENU(t4p::MENU_RUN_PHP + 4, t4p::RunConsoleViewClass::OnRunSavedCommands)
 
 	// take up all the rest of the IDs for the command buttons
-	EVT_MENU_RANGE(t4p::MENU_RUN_PHP + 5, t4p::MENU_RUN_PHP + 55, 
+	EVT_MENU_RANGE(t4p::MENU_RUN_PHP + 5, t4p::MENU_RUN_PHP + 55,
 	t4p::RunConsoleViewClass::OnCommandButtonClick)
-	
+
 	EVT_APP_FILE_NEW(t4p::RunConsoleViewClass::OnAppFileNew)
 	EVT_APP_FILE_OPEN(t4p::RunConsoleViewClass::OnAppFileOpened)
 	EVT_APP_FILE_CLOSED(t4p::RunConsoleViewClass::OnAppFileClosed)

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ class DetectorViewClass : public t4p::FeatureViewClass {
 public:
 
 	DetectorViewClass(t4p::DetectorFeatureClass& feature);
-	
+
 	void AddViewMenuItems(wxMenu* viewMenu);
 
 	void AddNewMenu(wxMenuBar* menuBar);
@@ -58,11 +58,11 @@ public:
 	void OnRunTagDetectors(wxCommandEvent& event);
 	void OnRunDatabaseDetectors(wxCommandEvent& event);
 	void OnRunConfigDetectors(wxCommandEvent& event);
-	
+
 	void OnPreferencesSaved(wxCommandEvent& event);
-	
+
 	t4p::DetectorFeatureClass& Feature;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -73,12 +73,12 @@ public:
 	/**
 	 * @param detectorTree the wxTreeCtrl that renders the files. pointer will NOT be
 	 *        owned by this class
-	 * @param testButton pointer will NOT be owned by this class. this can be NULL. if NULL, 
+	 * @param testButton pointer will NOT be owned by this class. this can be NULL. if NULL,
 	 *        it will be up to the caller to handle the test button event.
 	 * @param addButton pointer will NOT be owned by this class
 	 * @param helpButton pointer will NOT be owned by this class
 	 * @param detector to get the file locations. pointer will NOT be owned by this class
-	 * @param globals to fill the projects choice list 
+	 * @param globals to fill the projects choice list
 	 * @param eventSink to send test button click events to
 	 * @param rootImage the bitmap to be shown in the root of the tree
 	 */
@@ -121,7 +121,7 @@ private:
 		IMAGE_FOLDER_OPEN,
 		IMAGE_SCRIPT
 	};
-	
+
 	/**
 	 * this pointer will be managed by the tree control, since the tree control
 	 * may use the pointer in the destructor.
@@ -145,7 +145,7 @@ private:
 	 */
 	t4p::EventSinkClass& EventSink;
 
-}; 
+};
 
 class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 
@@ -179,7 +179,7 @@ private:
 	t4p::UrlTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
-	
+
 	void OnHelpButton(wxCommandEvent& event);
 };
 
@@ -221,22 +221,22 @@ private:
 	 * The class to use for testing the detector
 	 */
 	t4p::UrlTagClass TestUrl;
-	
+
 	/**
 	 * to access the url resource list
 	 */
 	t4p::GlobalsClass& Globals;
 
 	t4p::RunningThreadsClass& RunningThreads;
-	
+
 	t4p::EventSinkClass& EventSink;
-	
+
 	void OnChooseUrlButton(wxCommandEvent& event);
-	
+
 	void OnTestButton(wxCommandEvent& event);
-	
+
 	void OnCallStackComplete(wxCommandEvent& event);
-	
+
 	void OnHelpButton(wxCommandEvent& event);
 };
 
@@ -276,7 +276,7 @@ private:
 	t4p::TagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
-	
+
 	void OnHelpButton(wxCommandEvent& event);
 };
 
@@ -312,7 +312,7 @@ private:
 	t4p::DatabaseTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
-	
+
 	void OnHelpButton(wxCommandEvent& event);
 };
 
@@ -348,7 +348,7 @@ private:
 	t4p::ConfigTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
-	
+
 	void OnHelpButton(wxCommandEvent& event);
 };
 

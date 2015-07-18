@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,22 +40,22 @@ class VolumeListEventClass;
  *
  * Only files that are part of enabled projects are watched.
  * Files will be monitored using wxWigets
- * wxFileSystemWatcher, which efficiently notifies our application when a 
- * file inside a project changes.  
+ * wxFileSystemWatcher, which efficiently notifies our application when a
+ * file inside a project changes.
  * For now, projects are watched only if they reside in a local volume.
  * projects in a network share will not be watched because
  * underlying file system does not propagate events properly. Take, for
  * example, a linux network share that is mounted
  * in a MSW machine. In this case, fs events that happen in a subdirectory
  * of a watched directory are not propagated to MSW, even though
- * we tell MSW to watch for directory changes recursively. 
+ * we tell MSW to watch for directory changes recursively.
  *
  * Note that we do not directly propagate wxFileSystemWatcher events
  * to the rest of the app as they come in. This feature will buffer
  * FS events a bit, wait until events stop coming in, and then notify
  * the rest of the app. This is because a file save may generate
  * more than 1 FS event depending on how it is saved by an application,
- * for example, a file may be flushed multiple times to disk. Also, a 
+ * for example, a file may be flushed multiple times to disk. Also, a
  * deep directory recursive copy will generate many FS events; this feature
  * will "collapse" these into a single NEW_DIR event.
  */
@@ -70,27 +70,27 @@ public:
 	bool Enabled;
 
 	FileWatcherFeatureClass(t4p::AppClass& app);
-	
+
 	void LoadPreferences(wxConfigBase* config);
-	
+
 	/**
 	 * @param fullPath the full path to add to the list of string of full paths of
 	 *        files that are opened in this editor. This feature
-	 *        will send different events based on whether or 
+	 *        will send different events based on whether or
 	 *        not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
 	 *        This method should be called every time the user opens a file
 	 */
 	void TrackOpenedFile(wxString fullPath);
-	
+
 	/**
 	 * @param fullPath the full path to remove from the list of string of full paths of
 	 *        files that are opened in this editor. This feature
-	 *        will send different events based on whether or 
+	 *        will send different events based on whether or
 	 *        not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
 	 *        This method should be called every time the user closes a file.
 	 */
 	void UntrackOpenedFile(wxString fullPath);
-	
+
 private:
 
 	/**
@@ -102,9 +102,9 @@ private:
 	 * when the app stops then stop the watches
 	 */
 	void OnAppExit(wxCommandEvent& event);
-	
+
 	/**
-	 * when the timer is up then handle the files that the fs watcher notified us 
+	 * when the timer is up then handle the files that the fs watcher notified us
 	 * that were changed
 	 */
 	void OnTimer(wxTimerEvent& event);
@@ -116,7 +116,7 @@ private:
 
 	/**
 	 * when a file has been externally modified / added / deleted we need to
-	 * upate the tag cache. 
+	 * upate the tag cache.
 	 */
 	void OnFsWatcher(wxFileSystemWatcherEvent& event);
 
@@ -152,12 +152,12 @@ private:
 	/**
 	 * object that will notify us when a file has been modified outside the editor.
 	 * This class will own the pointer
-	 * on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
+	 * on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old
 	 * watches.
 	 * that is why we are using a pointer; deleting the object does remove the
 	 * old watches
 	 * see http://trac.wxwidgets.org/ticket/12847
-	 */ 
+	 */
 	wxFileSystemWatcher* FsWatcher;
 
 	/**
@@ -199,22 +199,22 @@ private:
 	 * PHP tags.
 	 */
 	wxDateTime LastWatcherEventTime;
-	
+
 	/**
 	 *  list of string of full paths of
 	 *  files that are opened in this editor. This feature
-	 *  will send different events based on whether or 
+	 *  will send different events based on whether or
 	 *  not a file is open (EVENT_APP_FILE_EXTERNALLY_MODIFIED)
 	 */
 	std::vector<wxString> OpenedFiles;
-	
+
 	/**
-	 * will be set to TRUE if the watcher saw an error event.  We may get 
-	 * error events when a project source dir has been deleted. In this case, 
+	 * will be set to TRUE if the watcher saw an error event.  We may get
+	 * error events when a project source dir has been deleted. In this case,
 	 * we want to prompt the user on what action to take
 	 */
 	bool IsWatchError;
-	
+
 	DECLARE_EVENT_TABLE()
 
 };
@@ -223,7 +223,7 @@ private:
  * A class that lists the LOCAL file system volumes. This
  * is used only on windows in order to find the volumes
  * on a system; we determine if a source directory is located in a network
- * share and if so we don't watch it for changes (because we can't, 
+ * share and if so we don't watch it for changes (because we can't,
  * file changes in network drives don't work properly when
  * watching entire directory structures). This action will
  * return the local, writable drives only, meaning that any project

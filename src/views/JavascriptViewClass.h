@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,7 +41,7 @@ class AppClass;
  * code completes javascript function names
  */
 class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-	
+
 	public:
 
 	/**
@@ -55,9 +55,9 @@ class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProvider
 	 * sql statement.
 	 */
 	void Init();
-	
+
 	bool DoesSupport(t4p::FileType type);
-	
+
 	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 
 private:
@@ -84,13 +84,13 @@ private:
  * this class highlights matching braces {}, [], and ()
  */
 class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-	
+
 public:
 
 	JavascriptBraceMatchStylerClass();
-	
+
 	bool DoesSupport(t4p::FileType type);
-	
+
 	void Style(t4p::CodeControlClass* ctrl, int postToCheck);
 };
 
@@ -104,21 +104,21 @@ class JavascriptViewClass : public t4p::FeatureViewClass {
 public:
 
 	JavascriptViewClass(t4p::AppClass& app);
-	
+
 private:
 
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
-	
+
 	/**
 	 * to implement code completion of html tags and attributes
 	 */
 	t4p::JavascriptCodeCompletionProviderClass JavascriptCompletionProvider;
-	
+
 	/**
 	 * to implement brace matching
 	 */
 	t4p::JavascriptBraceMatchStylerClass BraceStyler;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

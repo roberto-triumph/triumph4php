@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -154,7 +154,7 @@ static int StringToModifiers(const wxString& str) {
     // case-insensitive, ctrl == CTRL
     wxString keyModifier(str);
 	keyModifier.MakeUpper();
-	
+
     if (keyModifier.Contains(wxT("ALT"))) {
         mod |= wxACCEL_ALT;
 	}
@@ -175,7 +175,7 @@ void t4p::ShortcutStringToKeyCode(const wxString& str, int& modifiers, int& keyC
 }
 
 wxString t4p::KeyCodeToShortcutString(int modifiers, int keyCode) {
-	
+
 	// there is a bug with wxKeyBind::KeyCodeToString
 	// it does not handle non-alphanumerics like [ or /
 	// we check here
@@ -205,12 +205,12 @@ static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds
 
 	// shortcuts will be stored with a prefix of "shortcut-XXX"
 	// where XXX is the command identifer, which should be unique.
-	// loop through all stored shortcuts, remove the prefix, 
+	// loop through all stored shortcuts, remove the prefix,
 	// then update the binding by locating the command in the dynamicCmds
 	// [by looping through the already created commands]
 	//
 	// Example: config file will look like this
-	// 
+	//
 	//  ... other top-level confg items ...
 	//  ProfileSelected = 1
 	//  [keyprof_0]
@@ -258,7 +258,7 @@ static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds
  * gracefully handles non-existant menus
  * @param dynamicCmds the commands to modify.  This vector should not be empty; it should contain the default bindings
  *        after this function is called, the bindings will have been updated based on the config file. This function
- *        will only update the bindings, it wont add new commands. *        
+ *        will only update the bindings, it wont add new commands. *
  * @param profile will update the profile name and description only. The bindings will be handled by the vector dynamicCmds
  * @param config the stored config settings
  * @param configKey the name of the config group to load.
@@ -298,7 +298,7 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 	long configIterator;
 	wxString configName;
 
-	// multiple shorcut profiles can be found in the config. Each saved profile is 
+	// multiple shorcut profiles can be found in the config. Each saved profile is
 	// stored with a prefix
     bool next = config->GetFirstGroup(configName, configIterator);
     while (next) {
@@ -346,7 +346,7 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 /*
  * @param defaultShortcuts when saving commands, we will use the Identifier of the command and NOT the ID, since ID
  *        can change between application runs
- * @param profiles contains the actual bindings.  Since we use the default wxKeyConfigPanel; when the user updates shortcuts 
+ * @param profiles contains the actual bindings.  Since we use the default wxKeyConfigPanel; when the user updates shortcuts
  *        wxKeyProfileArray is actually the data stucture that is modified
  * @param config the shortcuts will be stored to the given config
  * @param configKey the shortcuts will be stored to the given config group
@@ -354,7 +354,7 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
 
 	// Example config file will look like this
-	// 
+	//
 	//  ... other top-level confg items ...
 	//  ProfileSelected = 1
 	//  [keyprof_0]
@@ -445,17 +445,17 @@ wxString t4p::DynamicCmdClass::GetIdentifier() const {
 
 t4p::PreferencesClass::PreferencesClass()
 	: CodeControlOptions()
-	, KeyProfiles() 
+	, KeyProfiles()
 	, ApplicationFont()
 	, CheckForUpdates(true) {
-	
+
 }
 
 void t4p::PreferencesClass::Init() {
 	wxPlatformInfo info;
-	
+
 	ApplicationFont.SetFamily(wxFONTFAMILY_DEFAULT);
-	
+
 	// ATTN: on linux, default fonts are too big
 	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
 		ApplicationFont.SetPointSize(8);
@@ -481,13 +481,13 @@ void t4p::PreferencesClass::ClearAllShortcuts() {
 void t4p::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	KeyProfiles.Cleanup();
 	CodeControlOptions.Load(config);
-	
+
 	wxString applicationFontInfo = config->Read(wxT("ApplicationFont"));
 	if (!applicationFontInfo.IsEmpty()) {
 		ApplicationFont.SetNativeFontInfo(applicationFontInfo);
 	}
 	config->Read(wxT("CheckForUpdates"), &CheckForUpdates);
-	
+
 	int totalCmdCount = 0;
 
 	// call out own key profile load function
@@ -498,7 +498,7 @@ void t4p::PreferencesClass::Load(wxConfigBase* config, wxFrame* frame) {
 	for (int i = 0; i < KeyProfiles.GetCount(); ++i) {
 		totalCmdCount += KeyProfiles.Item(i)->GetCmdCount();
 	}
-	
+
 	// keybinder sets the config path, must reset it back to normal
 	config->SetPath(wxT("/"));
 	EnableSelectedProfile(frame);
@@ -521,7 +521,7 @@ void t4p::PreferencesClass::Save() {
 	config->Write(wxT("ApplicationFont"), ApplicationFont.GetNativeFontInfoDesc());
 	config->Write(wxT("CheckForUpdates"), CheckForUpdates);
 	SaveKeyProfileArray(DefaultKeyboardShortcutCmds, KeyProfiles, config, wxT(""));
-	
+
 	// keybinder sets the config path, must reset it back to normal
 	config->SetPath(wxT("/"));
 	config->Flush();
@@ -532,7 +532,7 @@ bool t4p::PreferencesClass::InitConfig() {
 	wxFileName configDir = t4p::ConfigDirAsset();
 	if (configDir.DirExists()) {
 		wxFileName configFileName(configDir.GetPath(), wxT("triumph4php.ini"));
-		
+
 		// this config will be automatically deleted by wxWidgets at the end
 		wxFileConfig* config = new wxFileConfig(wxT("triumph4php"), wxEmptyString, configFileName.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 		wxConfigBase::Set(config);
@@ -548,10 +548,10 @@ bool t4p::PreferencesClass::InitConfig() {
 }
 
 void t4p::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {
-	
+
 	// save the settings dir in the bootstrap file
 	t4p::SetSettingsDirLocation(settingsDir);
-	
+
 	// delete the old config and set the global config object
 	wxConfigBase* config = wxConfig::Get();
 	delete config;

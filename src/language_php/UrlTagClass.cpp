@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,7 +37,7 @@ t4p::UrlTagClass::UrlTagClass()
 
  }
 
-t4p::UrlTagClass::UrlTagClass(wxString uri) 
+t4p::UrlTagClass::UrlTagClass(wxString uri)
 	: Url(uri)
 	, FileName()
 	, ClassName()
@@ -45,7 +45,7 @@ t4p::UrlTagClass::UrlTagClass(wxString uri)
 }
 
 t4p::UrlTagClass::UrlTagClass(const t4p::UrlTagClass& src)
-	: Url()	
+	: Url()
 	, FileName()
 	, ClassName()
 	, MethodName() {
@@ -73,7 +73,7 @@ void t4p::UrlTagClass::Copy(const t4p::UrlTagClass& src) {
 
 t4p::UrlTagFinderClass::UrlTagFinderClass(soci::session& session)
 	: SqliteFinderClass(session) {
-		
+
 }
 
 bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
@@ -182,7 +182,7 @@ bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const 
 bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const std::vector<wxFileName>& sourceDirs, std::vector<UrlTagClass>& urlTags) {
 	bool ret = false;
 	std::string stdFullPathWhere = t4p::WxToChar(fullPath);
-	
+
 	std::string stdUrl;
 	std::string stdFullPath;
 	std::string stdClassName;
@@ -237,7 +237,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 	std::string stdUrl = t4p::WxToChar(url.BuildURI());
 	try {
 		std::vector<std::string> stdSourceDirs;
-		std::string sql = "DELETE FROM url_tags WHERE url = ? AND source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
+		std::string sql = "DELETE FROM url_tags WHERE url = ? AND source_id IN(SELECT source_id FROM sources WHERE directory IN(";
 		for (size_t i = 0; i < sourceDirs.size(); ++i) {
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
@@ -247,7 +247,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 				sql += ",?";
 			}
 		}
-		sql += "))"; 
+		sql += "))";
 		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::use(stdUrl));
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
@@ -255,7 +255,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 		}
 		stmt.define_and_bind();
 		stmt.execute(true);
-		
+
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
 		wxString msg = t4p::CharToWx(e.what());
@@ -322,7 +322,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 	}
 	try {
 		std::vector<std::string> stdSourceDirs;
-		std::string sql = "DELETE FROM url_tags WHERE source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
+		std::string sql = "DELETE FROM url_tags WHERE source_id IN(SELECT source_id FROM sources WHERE directory IN(";
 		for (size_t i = 0; i < sourceDirs.size(); ++i) {
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
@@ -332,7 +332,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 				sql += ",?";
 			}
 		}
-		sql += "))"; 
+		sql += "))";
 		soci::statement stmt = Session.prepare << sql;
 		for (size_t i = 0; i < stdSourceDirs.size(); ++i) {
 			stmt.exchange(soci::use(stdSourceDirs[i]));
@@ -366,7 +366,7 @@ int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 		}
 	}
 	sql += ")";
-	
+
 	try {
 		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(dbCount));
@@ -446,7 +446,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllMethodNames(const wxString& con
 		}
 	}
 	sql += ")";
-	
+
 	try {
 		soci::statement stmt = Session.prepare << sql;
 		stmt.exchange(soci::into(methodName));

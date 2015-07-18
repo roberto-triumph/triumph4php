@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,7 +40,7 @@ public:
 	 * Create a new instance of ProjectViewClass.
 	 */
 	ProjectViewClass(t4p::ProjectFeatureClass& feature);
-	
+
 	/**
 	 * Add menu items to the file menu
 	 */
@@ -68,15 +68,15 @@ private:
 	 * Open up a "simple" dialog so that the user create a new project
 	 */
 	void OnCreateNewProject(wxCommandEvent& event);
-	
+
 	t4p::ProjectFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
-	
+
 };
 
 class ProjectPreferencesPanelClass : public ProjectPreferencesGeneratedPanelClass {
-	
+
 public:
 
 	/**
@@ -175,11 +175,11 @@ public:
 	 * @param touchedProjects the list of projects that have been . This list will
 	 *        get populated only when the user clicks OK (and has touched a project). "Touched"
 	 *        means that at the project's source directories list has been changed in any way;
-	 *        if a project has a new source, a project has one fewer source, a source's 
+	 *        if a project has a new source, a project has one fewer source, a source's
 	 *        include/exclude wildcards have been changed. This list also includes any completely
 	 *        new projects as well.
 	 */
-	ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects, 
+	ProjectListDialogClass(wxWindow* parent, std::vector<t4p::ProjectClass>& projects,
 		std::vector<t4p::ProjectClass>& removedProjects,
 		std::vector<t4p::ProjectClass>& touchedProjects);
 

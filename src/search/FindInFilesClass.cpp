@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,19 +58,19 @@ static const char* CharsetDetection(const char* buffer, int bufferLength) {
 	return name;
 }
 
-t4p::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, t4p::FinderClass::Modes mode) 
+t4p::FindInFilesClass::FindInFilesClass(const UnicodeString& expression, t4p::FinderClass::Modes mode)
 	: Expression(expression)
 	, ReplaceExpression()
 	, Source()
 	, Mode(mode)
-	, Finder(expression, mode) 
+	, Finder(expression, mode)
 	, FFile()
 	, File(NULL)
 	, CurrentLine()
-	, LineNumber(0) 
+	, LineNumber(0)
 	, LineOffset(0)
 	, FileOffset(0)
-	, LineStartOffset(0) 
+	, LineStartOffset(0)
 	, MatchLength(0) {
 }
 
@@ -79,14 +79,14 @@ t4p::FindInFilesClass::FindInFilesClass(const FindInFilesClass& findInFiles)
 	, ReplaceExpression()
 	, Source()
 	, Mode()
-	, Finder() 
+	, Finder()
 	, FFile()
 	, File(NULL)
 	, CurrentLine()
-	, LineNumber(0) 
+	, LineNumber(0)
 	, LineOffset(0)
 	, FileOffset(0)
-	, LineStartOffset(0) 
+	, LineStartOffset(0)
 	, MatchLength(0) {
 	Copy(findInFiles);
 }
@@ -112,7 +112,7 @@ bool t4p::FindInFilesClass::Walk(const wxString& fileName) {
 	CurrentLine.remove();
 	CleanupStreams();
 	if (!fileName.empty()) {
-		
+
 		// use wxWidgets file class as it allows us to properly open
 		// unicode filenames
 		if (FFile.Open(fileName, wxT("r"))) {
@@ -130,7 +130,7 @@ bool t4p::FindInFilesClass::FindNext() {
 	if (File) {
 		while (!u_feof(File)) {
 			++LineNumber;
-			
+
 			// ATTN: docs lie,... giving it a -1 for arg 2 does not work
 			UChar* buf = CurrentLine.getBuffer(2048);
 			u_fgets(buf, 2047, File);
@@ -214,7 +214,7 @@ void t4p::FindInFilesClass::CopyFinder(FinderClass& dest) {
 	dest.Wrap = Finder.Wrap;
 }
 
-t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxString& fileName, 
+t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxString& fileName,
 		UnicodeString& fileContents, wxString& charset, bool& hasSignature) {
 	OpenErrors error = NONE;
 	charset = wxT("");
@@ -233,13 +233,13 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 		// got this code by looking at the code of wxFFile::ReadAll
 		wxFileOffset offset = fFile.Length();
 		size_t bufferSize = wx_truncate_cast(size_t, fFile.Length());
-		if ((wxFileOffset)bufferSize == offset) { 
+		if ((wxFileOffset)bufferSize == offset) {
 			char* buffer = new char[bufferSize];
 			fFile.Read(buffer, bufferSize);
 			fFile.Close();
 
 			// what encoding is it??
-			// we first look for a BOM marker, and if the file does 
+			// we first look for a BOM marker, and if the file does
 			// not have one then attempt to detect the encoding
 			error = CHARSET_DETECTION;
 			const char* name = CharsetFromSignature(buffer, bufferSize);
@@ -265,8 +265,8 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 					}
 					ucnv_close(converter);
 					if (hasSignature) {
-						
-						// remove the BOM marker 
+
+						// remove the BOM marker
 						fileContents.remove(0, 1);
 					}
 					charset = t4p::CharToWx(name);

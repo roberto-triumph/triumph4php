@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,23 +34,23 @@ static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 
 t4p::HtmlCodeCompletionProviderClass::HtmlCodeCompletionProviderClass()
 : CodeCompletionProviderClass() {
-	
+
 }
 
 bool t4p::HtmlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
-	
+
 	// not yet implemented
 	return false;
 }
 
 void t4p::HtmlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
-	
+
 }
 
 
 t4p::CssBraceMatchStylerClass::CssBraceMatchStylerClass()
 : BraceMatchStylerClass() {
-	
+
 }
 
 bool t4p::CssBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
@@ -86,9 +86,9 @@ void t4p::CssBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 
 t4p::HtmlViewClass::HtmlViewClass()
 : FeatureViewClass()
-, HtmlCompletionProvider() 
+, HtmlCompletionProvider()
 , CssBraceStyler() {
-	
+
 }
 
 void t4p::HtmlViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {

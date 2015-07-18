@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ namespace t4p {
  * are SCINTILLA numbers and NOT wx Numbers; ie. wxSTC_SCMOD_* instead
  * of wxACCEL_* and so on.
  *
- * See http://www.scintilla.org/ScintillaDoc.html 
+ * See http://www.scintilla.org/ScintillaDoc.html
  * under "Key bindings"
  */
 class EditorKeyboardCommandClass {
@@ -52,11 +52,11 @@ public:
 	 * the scintilla command number. one of wxSTC_CMD_*
 	 */
 	int CmdId;
-	
+
 	/**
 	 * bitwise mask of ALT, CTRL, SHIFT that will trigger
 	 * this command.
-	 * these are scintilla modifiers, not WX modifiers. ie. 
+	 * these are scintilla modifiers, not WX modifiers. ie.
 	 * wxSTC_SCMOD_SHIFT, wxSTC_SCMOD_CTRL, wxSTC_SCMOD_ALT
 	 * This can be zero; if zero it means that we don't have
 	 * a shortcut for this command.
@@ -85,14 +85,14 @@ public:
 	void Copy(const t4p::EditorKeyboardCommandClass& src);
 
 	bool IsOk() const;
-	
+
 	void InitFromString(const wxString& str);
-	
+
 	wxString ToString() const;
 };
-	
+
 /**
- * The EditorFeatureClass exposes scintilla features like 
+ * The EditorFeatureClass exposes scintilla features like
  * virtual space, multiple selection, and zoom
  */
 class EditorBehaviorFeatureClass : public t4p::FeatureClass {
@@ -104,11 +104,11 @@ public:
 	 * control.
 	 */
 	std::vector<t4p::EditorKeyboardCommandClass> KeyboardCommands;
-	
+
 	EditorBehaviorFeatureClass(t4p::AppClass& app);
 
 	void LoadPreferences(wxConfigBase* config);
-	
+
 	void ToggleWordWrap();
 	void ToggleIndentationGuides();
 	void ToggleWhitespace();
@@ -116,12 +116,12 @@ public:
 	void ZoomOut();
 	void ZoomReset();
 	void EditConvertEols();
-	
+
 	// translations of scintilla commands to menu IDs
 	// and vice versa
 	int SciCommandToMenuId(int cmdId);
 	int MenuIdToSciCommand(int menuId);
-	
+
 private:
 
 	/**

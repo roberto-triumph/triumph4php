@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,7 @@
  #include <views/BookmarkViewClass.h>
  #include <features/BookmarkFeatureClass.h>
  #include <code_control/CodeControlClass.h>
- 
+
  t4p::BookmarkViewClass::BookmarkViewClass(t4p::BookmarkFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
@@ -33,23 +33,23 @@
 
 void t4p::BookmarkViewClass::AddEditMenuItems(wxMenu* editMenu) {
 	editMenu->Append(t4p::MENU_BOOKMARK + 0,
-		_("Toggle Bookmark\tCTRL+B"), 
-		_("Toggle Bookmark on or off in the current cursor location"), 
+		_("Toggle Bookmark\tCTRL+B"),
+		_("Toggle Bookmark on or off in the current cursor location"),
 		wxITEM_NORMAL
 	);
 	editMenu->Append(t4p::MENU_BOOKMARK + 1,
-		_("Go to next Bookmark\tF2"), 
-		_("Navigate the cursor to the next bookmark"), 
+		_("Go to next Bookmark\tF2"),
+		_("Navigate the cursor to the next bookmark"),
 		wxITEM_NORMAL
 	);
 	editMenu->Append(t4p::MENU_BOOKMARK + 2,
-		_("Go to previous Bookmark\tSHIFT+F2"), 
-		_("Navigate the cursor to the previous bookmark"), 
+		_("Go to previous Bookmark\tSHIFT+F2"),
+		_("Navigate the cursor to the previous bookmark"),
 		wxITEM_NORMAL
 	);
 	editMenu->Append(t4p::MENU_BOOKMARK + 3,
-		_("Clear all Bookmarks"), 
-		_("Clears all of the bookmarks for all files"), 
+		_("Clear all Bookmarks"),
+		_("Clears all of the bookmarks for all files"),
 		wxITEM_NORMAL
 	);
 }
@@ -64,21 +64,21 @@ void t4p::BookmarkViewClass::AddKeyboardShortcuts(std::vector<t4p::DynamicCmdCla
 
 void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
-	
+
 	// not sure how to handle buffers that have not been saved at all
 	if (!ctrl || ctrl->IsNew()) {
 		return;
 	}
-	
+
 	// look to see if the line is already bookmarked
 	t4p::BookmarkClass toFind;
 	toFind.FileName.Assign(ctrl->GetFileName());
 	toFind.LineNumber = ctrl->GetCurrentLine() + 1; // scintilla lines start at 0
-	
+
 	std::vector<t4p::BookmarkClass>::iterator it;
 	it = std::find(Feature.Bookmarks.begin(), Feature.Bookmarks.end(), toFind);
 	if (it == Feature.Bookmarks.end()) {
-			
+
 		// line has not been bookmarked, lets add it
 		wxFileName fileName(ctrl->GetFileName());
 		int lineNumber = 0;
@@ -90,7 +90,7 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 		}
 	}
 	else {
-		
+
 		// need to remove the bookmark from the list AND from
 		// the code control
 		ctrl->BookmarkClearAt(it->LineNumber);
@@ -100,7 +100,7 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 
 void t4p::BookmarkViewClass::OnEditClearAllBookmarks(wxCommandEvent& event) {
 	Feature.Bookmarks.clear();
-	
+
 	// remove any existing bookmarks from the code controls also
 	std::vector<t4p::CodeControlClass*> ctrls = AllCodeControls();
 	for (size_t i = 0; i < ctrls.size(); ++i) {
@@ -138,11 +138,11 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 		bookmarkCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
 	}
 	else {
-		
+
 		// need to open the file first
 		LoadCodeControl(bookmark.FileName.GetFullPath());
 		t4p::CodeControlClass* newlyOpenedCtrl = GetCurrentCodeControl();
-		
+
 		// now we add all bookmarks for the newly opened file
 		AddBookmarks(bookmark.FileName, newlyOpenedCtrl);
 		newlyOpenedCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber );
@@ -151,13 +151,13 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 
 void t4p::BookmarkViewClass::AddBookmarks(const wxFileName& fileName, t4p::CodeControlClass* ctrl) {
 	std::vector<t4p::BookmarkClass>::iterator it;
-	it = Feature.Bookmarks.begin(); 
+	it = Feature.Bookmarks.begin();
 	while (it != Feature.Bookmarks.end()) {
 		if (it->FileName == fileName) {
 			int handle = -1;
 			bool added = ctrl->BookmarkMarkAt(it->LineNumber, handle);
 			if (!added) {
-				
+
 				// file does not contain this line number, this is a bad bookmark
 				it = Feature.Bookmarks.erase(it);
 			}
@@ -175,7 +175,7 @@ void t4p::BookmarkViewClass::AddBookmarks(const wxFileName& fileName, t4p::CodeC
 void t4p::BookmarkViewClass::OnStyledTextModified(wxStyledTextEvent& event) {
 	int mask = wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT;
 	if (event.GetModificationType() & mask) {
-		
+
 		// lets update the location of the bookmarks in this file
 		t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
 		if (!ctrl->IsNew()) {
@@ -183,7 +183,7 @@ void t4p::BookmarkViewClass::OnStyledTextModified(wxStyledTextEvent& event) {
 			std::vector<t4p::BookmarkClass>::iterator it;
 			for (it = Feature.Bookmarks.begin(); it != Feature.Bookmarks.end(); ++it) {
 				if (it->FileName == ctrlFileName) {
-					
+
 					// only update when line >= 1.  if line == 0 then it means
 					// that the entire text has been deleted. this is most likely
 					// scenario when the user reloads the file.
@@ -198,11 +198,11 @@ void t4p::BookmarkViewClass::OnAppFileReverted(t4p::CodeControlEventClass& event
 	t4p::CodeControlClass* ctrl = event.GetCodeControl();
 	if (ctrl) {
 		wxFileName ctrlFileName(ctrl->GetFileName());
-		
+
 		// file has been reverted, all bookmarks in the file have been deleted
 		// delete the bookmarks from out list
 		std::vector<t4p::BookmarkClass>::iterator it;
-		it = Feature.Bookmarks.begin(); 
+		it = Feature.Bookmarks.begin();
 		while (it != Feature.Bookmarks.end()) {
 			if (it->FileName == ctrlFileName) {
 				it = Feature.Bookmarks.erase(it);

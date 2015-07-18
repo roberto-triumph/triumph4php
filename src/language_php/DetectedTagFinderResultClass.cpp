@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@
 #include <language_php/DetectedTagFinderResultClass.h>
 
 t4p::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
-: SqliteResultClass() 
+: SqliteResultClass()
 , TotalCount(0) {
 
 }
@@ -59,7 +59,7 @@ int t4p::DetectedTagTotalCountResultClass::GetTotalCount() const {
 }
 
 t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
-: SqliteResultClass() 
+: SqliteResultClass()
 , Tag()
 , Keys()
 , SourceDirectories()
@@ -72,7 +72,7 @@ t4p::DetectedTagExactMemberResultClass::DetectedTagExactMemberResultClass()
 , ReturnType()
 , NamespaceName()
 , Signature()
-, Comment() 
+, Comment()
 , IsStatic(0) {
 	TagTypes.push_back(t4p::PhpTagClass::MEMBER);
 	TagTypes.push_back(t4p::PhpTagClass::METHOD);
@@ -91,7 +91,7 @@ void t4p::DetectedTagExactMemberResultClass::DoBind(soci::statement&  stmt) {
 		stmt.exchange(soci::into(Signature));
 		stmt.exchange(soci::into(Comment));
 		stmt.exchange(soci::into(IsStatic));
-	
+
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -154,7 +154,7 @@ bool t4p::DetectedTagExactMemberResultClass::DoPrepare(soci::statement& stmt, bo
 	if (doLimit) {
 		sql += " LIMIT 100";
 	}
-	
+
 	stmt.prepare(sql);
 
 	for (size_t i = 0; i < Keys.size(); i++) {
@@ -169,7 +169,7 @@ bool t4p::DetectedTagExactMemberResultClass::DoPrepare(soci::statement& stmt, bo
 	return true;
 }
 
-t4p::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass() 
+t4p::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass()
 : DetectedTagExactMemberResultClass()
 , KeyUpper() {
 

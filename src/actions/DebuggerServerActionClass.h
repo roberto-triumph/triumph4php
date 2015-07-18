@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -112,7 +112,7 @@ extern const wxEventType EVENT_DEBUGGER_CMD;
  * into the appropriate Dbgp*EventClass instance and Post
  * the results to the feature.
  *
- * the debugger server action listens for connections from the 
+ * the debugger server action listens for connections from the
  * debug engine (xdebug) in a background thread.  The debugger
  * server action parses the xdebug responses and publishes
  * t4p::DBGP_* events.
@@ -136,7 +136,7 @@ public:
 	DebuggerServerActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, t4p::EventSinkLockerClass& eventSinkLocker);
 
 	~DebuggerServerActionClass();
-	
+
 	/**
 	 * set the port that will be listened on.  this should be the same as the "xdebug.remote_port"
 	 * setting in the user's php.ini.
@@ -158,7 +158,7 @@ protected:
 	 * and posts the event.
 	 *
 	 * @param xml the xml response from xdebug
-	 * @param cmd the command that we sent to xdebug 
+	 * @param cmd the command that we sent to xdebug
 	 * @param [out] isDebuggerStopped will be set to TRUE when the debugger responds
 	 *        that the script has finished running (ie. "step over" the last line of the script)
 	 */
@@ -199,11 +199,11 @@ protected:
 
 	/**
 	 * commands to be sent by triumph to the debugger engine. These strings
-	 * are built with DbgpCommandClass. Examples of commands: set a 
+	 * are built with DbgpCommandClass. Examples of commands: set a
 	 * breakpoint, get a variable value, get the runtime stack
 	 */
 	std::queue<std::string> Commands;
-	
+
 	/**
 	 * prevent simulatenous access to commands list
 	 */

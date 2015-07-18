@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,30 +40,30 @@ namespace t4p {
 
 /**
  * The TagParser is used to store parsed tags(classes, functions, methods, properties) into a
- * SQLite database. This class is used in conjunction with the DirectorySearchClass; the 
+ * SQLite database. This class is used in conjunction with the DirectorySearchClass; the
  * DirectorySearchClass is used to iterate files; while this class takes each file from the
  * DirectorySearchClass and parses the source code for tags.
  *
  * The TagParserClass can only handle PHP source code files; it uses the pelet library to
  * do the actual PHP parsing.
- * 
+ *
  * The TagParser has an exception-free API, no exceptions will be ever thrown, even though
  * it uses SOCI to execute queries (and SOCI uses exceptions). Instead
- * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose 
+ * the return values for methods of this class will be false, empty, or zero. Currently this class does not expose
  * the specific error code from SQLite.
  */
-class TagParserClass : public pelet::ClassObserverClass, 
-	public pelet::ClassMemberObserverClass, 
-	public pelet::FunctionObserverClass, 
+class TagParserClass : public pelet::ClassObserverClass,
+	public pelet::ClassMemberObserverClass,
+	public pelet::FunctionObserverClass,
 	public t4p::DirectoryWalkerClass {
 
 public:
 
 	/**
-	 * The files to be parsed; these are php source code file 
+	 * The files to be parsed; these are php source code file
 	 * extensions
-	 * 
-	 * @var vector<wxString> a lst of file filters 
+	 *
+	 * @var vector<wxString> a lst of file filters
 	 * Each item in the array will be one wildcard expression; where each
 	 * expression can contain either a '*' or a '?' for use in the
 	 * wxMatchWild() function.
@@ -73,32 +73,32 @@ public:
 	/**
 	 * The files to be recorded but not parsed; these are YML files, text
 	 * files, any other file extensions that we want to keep track of.
-	 * 
-	 * @var vector<wxString> a lst of file filters 
+	 *
+	 * @var vector<wxString> a lst of file filters
 	 * Each item in the array will be one wildcard expression; where each
 	 * expression can contain either a '*' or a '?' for use in the
 	 * wxMatchWild() function.
 	 */
 	std::vector<wxString> MiscFileExtensions;
-	
+
 	TagParserClass();
 	~TagParserClass();
 
 	/**
-	 * Create the tag database that is backed by the given session. 
+	 * Create the tag database that is backed by the given session.
 	 * This method can used to have the tag parser write to either a SQLite hard disk file
 	 * or a SQLite in-memory database.
 	 * By using an in-memory database, lookups are faster. This method would be used
-	 * when parsing resources for a single file only. Also note that if a DB 
+	 * when parsing resources for a single file only. Also note that if a DB
 	 * file / memory DB was previously open, this method will close the existing db before the new db is opened.
-	 * 
+	 *
 	 * Note that this method assumes that the schema has already been created (unlike
 	 * the InitFile() method)
-	 * 
+	 *
 	 * @param soci::session* the session. this class will NOT own the pointer
 	 */
 	void Init(soci::session* session);
-	
+
 	/**
 	 * closes any opened connection / transaction
 	 */
@@ -108,10 +108,10 @@ public:
 	 * Implement the DirectoryWalkerClass method; will start a transaction
 	 */
 	void BeginSearch(const wxString& fullPath);
-		
+
 	/**
 	 * Parses the given file for resources. Note that one of the Init() method
-	 * must have been called before a call to this method is made. Also, BeginSearch() must 
+	 * must have been called before a call to this method is made. Also, BeginSearch() must
 	 * have been called already (if using a DirectorySearchClass, the DirectorySearchClass
 	 * will take care of calling that method before this method gets called).
 	 *
@@ -120,19 +120,19 @@ public:
 	virtual bool Walk(const wxString& fileName);
 
 	/**
-	 * Implement the DirectoryWalkerClass method; will commit a transaction. If 
+	 * Implement the DirectoryWalkerClass method; will commit a transaction. If
 	 * using a DirectorySearchClass, the DirectorySearchClass
 	 * will take care of calling that method before after all files have been recursed.
 	 */
 	void EndSearch();
-	
+
 	/**
 	 * Parses the given string for resources.  This method would be used, for example, when wanting
 	 * to be able to find resources from a file currently being edited by a user but the user
 	 * has not yet saved the file so the new contents are not yet on disk.
 	 * Note that one of the Init method
 	 * must have been called before a call to this method is made.
-	 * 
+	 *
      * @param const wxString& sourceDir the source directory that the file is a part of
      *        this means that the given file must be part of a project.
      *        source directory must have the ending dir separator
@@ -141,12 +141,12 @@ public:
 	 * @param bool if TRUE then tileName is a new file that is not yet written to disk
 	 */
 	void BuildResourceCacheForFile(const wxString& sourceDir, const wxString& fileName, const UnicodeString& code, bool isNew);
-		
+
 	/**
 	 * Implement class observer.  When a class has been parsed, add it to the Resource Cache.
 	 */
-	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className, 
-		const UnicodeString& signature, 
+	void ClassFound(const UnicodeString& namespaceName, const UnicodeString& className,
+		const UnicodeString& signature,
 		const UnicodeString& baseClassName,
 		const UnicodeString& implementsList,
 		const UnicodeString& comment, const int lineNumber);
@@ -154,9 +154,9 @@ public:
 	/**
 	 * When a define has been found, add it to the tag cache
 	 */
-	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue, 
+	void DefineDeclarationFound(const UnicodeString& namespaceName, const UnicodeString& variableName, const UnicodeString& variableValue,
 			const UnicodeString& comment, const int lineNumber);
-			
+
 	void TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 		const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility);
 
@@ -164,26 +164,26 @@ public:
 		const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList);
 
 	void TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& fullyQualifiedTraitName);
-	
+
 	/**
 	 * Implement class member observer.  When a class method has been parsed, add it to the Resource Cache.
 	 */
-	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
+	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments);
- 
+
 	/**
 	 * Implement class member observer.  When a class property has been parsed, add it to the Resource Cache.
 	 */
-	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName, 
-		const UnicodeString& propertyType, const UnicodeString& comment, 
+	void PropertyFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& propertyName,
+		const UnicodeString& propertyType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isConst, bool isStatic, const int lineNumber);
-		
+
 	/**
 	 * Implement function observer.  When a function has been parsed, add it to the Resource Cache.
 	 */
-	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, 
+	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& methodName,
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber,
 		bool hasVariableArguments);
 
 	/**
@@ -218,7 +218,7 @@ public:
 	 * This method deletes all resource tags and the file tag too.
 	 */
 	void DeleteFromFile(const wxString& fullPath);
-	
+
 	/**
 	 * set the PHP version to handle
 	 */
@@ -241,17 +241,17 @@ public:
 	 * @param newDir the new directory
 	 */
 	void RenameDir(const wxFileName& oldDir, const wxFileName& newDir);
-	
+
 private:
-	
+
 	/**
-	 * cache of namespaces, used because the same namespace may be declared in multiple 
+	 * cache of namespaces, used because the same namespace may be declared in multiple
 	 * files and we don't want to insert multiple rows of the same namespace name. Since
 	 * our transaction is commited once ALL files have been parsed, the DB will
 	 * not able to help us in determining duplicates.
 	 */
 	std::map<UnicodeString, int, UnicodeStringComparatorClass> NamespaceCache;
-		
+
 	/**
 	 * trait info for each class that uses a trait. The trait cache will contain the
 	 * aliases and naming resolutions (insteadof). Since a single class can use multiple traits
@@ -259,14 +259,14 @@ private:
 	 * the key to this map is the current file item ID + class name + trait name being parsed
 	 * key is a concatenation of file item id, fully qualified class and fully qualified trait
 	 * this will make the alias and instead easier to update.
-	 * the value will always be a 2 item vector: item 0 is the fully qualified key and 
+	 * the value will always be a 2 item vector: item 0 is the fully qualified key and
 	 * item 1 is the class only key
 	 */
 	std::map<UnicodeString, std::vector<TraitTagClass>, UnicodeStringComparatorClass> TraitCache;
-	
+
 	/**
 	 * Used to parse through code for classes & methods
-	 * 
+	 *
 	 * @var pelet::ParserClass
 	 */
 	pelet::ParserClass Parser;
@@ -305,10 +305,10 @@ private:
 	int IsDynamic;
 	int IsNative;
 	int HasVariableArgs;
-		
+
 	/**
 	 * The current file item being indexed.  We keep a class-wide member when parsing through many files.
-	 * 
+	 *
 	 * @var int fileTagId the dataabse ID of the FileTag entry that corresponds to the file located at fullPath
 	 */
 	int CurrentFileTagId;
@@ -321,7 +321,7 @@ private:
 
 	/**
 	 * count the number of files that have been parsed so that we commit to sqlite at regular
-	 * intervals. 
+	 * intervals.
 	 */
 	int FilesParsed;
 
@@ -329,24 +329,24 @@ private:
 	 * Flag to make sure we initialize the tag database.
 	 */
 	bool IsCacheInitialized;
-	
+
 	/**
 	 * Goes through the given file and parses out resources.
-	 * 
+	 *
 	 * @param wxString fullPath full path to the file to look at
 	 * @param bool parseClasses if TRUE, file will be opened and TagCache will be populated.  Otherwise, only FileCache
 	 *        will be populated.
 	 */
 	void BuildResourceCache(const wxString& fullPath, bool parseClasses);
-	
+
 	/**
 	 * remove all resources for the given file_item_ids.
-	 * 
+	 *
 	 * @param fileTagids the list of file_item_id that will be deleted from the SQLite database.
 	 * @param removeFileTag if true, file_item tags are removed as well.
 	 */
 	void RemovePersistedResources(const std::vector<int>& fileTagIds, bool removeFileTag);
-	
+
 	/**
 	 * Write the file item into the database. The item's FileId member will be set as well.
 	 */
@@ -405,4 +405,4 @@ private:
 };
 
 }
-#endif 
+#endif

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,7 +26,7 @@
 
 const static int ID_GAUGE_DIALOG_TIMER = wxNewId();
 
-t4p::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label) 
+t4p::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label)
 	: GaugeDialogGeneratedClass(parent, wxID_ANY, title)
 	, Timer(this, ID_GAUGE_DIALOG_TIMER) {
 	Label->SetLabel(label);
@@ -47,5 +47,5 @@ void t4p::GaugeDialogClass::OnTimer(wxTimerEvent& event) {
 }
 
 BEGIN_EVENT_TABLE(t4p::GaugeDialogClass, GaugeDialogGeneratedClass)
-	EVT_TIMER(ID_GAUGE_DIALOG_TIMER, t4p::GaugeDialogClass::OnTimer) 
+	EVT_TIMER(ID_GAUGE_DIALOG_TIMER, t4p::GaugeDialogClass::OnTimer)
 END_EVENT_TABLE()

@@ -1,16 +1,16 @@
 /**
  * The MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,9 +35,9 @@
 #include <vector>
 
 namespace t4p {
-	
+
 class TotalTagResultClass {
-	
+
 public:
 
 	enum Types {
@@ -48,47 +48,47 @@ public:
 		TABLE_DATA_TAG,
 		TABLE_DEFINITION_TAG
 	};
-	
+
 	/**
 	 * will only be valid when this result is a file
 	 */
 	t4p::FileTagClass FileTag;
-	
+
 	/**
 	 * will only be valid when this result is a class, function, or method
 	 */
 	t4p::PhpTagClass PhpTag;
-	
+
 	/**
 	 * will only be valid when this result is a database table
 	 */
 	t4p::DatabaseTableTagClass TableTag;
-	
+
 	Types Type;
-	
+
 	TotalTagResultClass();
 	TotalTagResultClass(const t4p::FileTagClass& file);
 	TotalTagResultClass(const t4p::PhpTagClass& tag);
 	TotalTagResultClass(const t4p::DatabaseTableTagClass& table);
-	
+
 	TotalTagResultClass(const t4p::TotalTagResultClass& src);
-		
+
 	void Copy(const t4p::TotalTagResultClass& src);
 };
-	
+
 /**
  * event that is generated when a tag query is completed.  this event
  * contains the results of the search.
  */
 class TotalTagSearchCompleteEventClass : public wxEvent {
-        
+
     public:
 
 	/**
 	 * The string that was searched for.
 	 */
 	UnicodeString SearchString;
-	
+
 	/**
 	 * line number parsed from the user query (ie. the end after colon; user.php:299)
 	 */
@@ -99,9 +99,9 @@ class TotalTagSearchCompleteEventClass : public wxEvent {
      */
 	std::vector<t4p::TotalTagResultClass> Tags;
 
-    TotalTagSearchCompleteEventClass(int eventId, const UnicodeString& searchString, 
+    TotalTagSearchCompleteEventClass(int eventId, const UnicodeString& searchString,
 		int lineNumber, const std::vector<t4p::TotalTagResultClass>& tags);
-    
+
     wxEvent* Clone() const;
 
 };
@@ -119,16 +119,16 @@ typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagS
 class TotalTagSearchActionClass : public t4p::ActionClass {
 
 public:
-	
+
 	TotalTagSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
-	
+
 	/**
 	 * set the search parameters.  this should be called before the action is
 	 * added to the run queue
 	 * This won't be a straight equals search; it will be a "near match"
 	 * as defined by ParsedTagFinderClass::CollectNearMathResources()
 	 * when the given search string is more than 2 characters long, and will
-	 * be an exact search as defined by CollectFullyQualifiedResources when the 
+	 * be an exact search as defined by CollectFullyQualifiedResources when the
 	 * search string is 2 characters long
 	 * This method assumes that index is up-to-date, if not matches may be stale.
 	 *
@@ -150,7 +150,7 @@ private:
 	 * perform a search on all items using exact, case
 	 * insensitive searches
 	 *
-	 * @param matches the found items will be added to this vector 
+	 * @param matches the found items will be added to this vector
 	 * @return bool TRUE if at least 1 match was found
 	 */
 	bool SearchExact(std::vector<t4p::TotalTagResultClass>& matches);
@@ -163,7 +163,7 @@ private:
 	 * @return bool TRUE if at least 1 match was found
 	 */
 	bool SearchNearMatch(std::vector<t4p::TotalTagResultClass>& matches);
-	
+
 	/**
 	 * the thing to search in
 	 */
@@ -176,7 +176,7 @@ private:
 
 	/**
 	 * the thing to search for database table tags in
-	 */	
+	 */
 	t4p::SqlResourceFinderClass SqlTagCache;
 
 	/**

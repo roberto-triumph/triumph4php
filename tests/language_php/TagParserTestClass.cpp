@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ public:
 
 	t4p::TagParserClass TagParser;
 
-	TagParserTestFixtureClass() 
+	TagParserTestFixtureClass()
 		: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, TagParser() {
 		TagParser.Init(&Session);
@@ -64,7 +64,7 @@ public:
 
 /**
  * ATTN: currently most of the testing for TagParserClass is done in ParsedTagFinderTestClass
- * because the logic of what is now TagParserClass and ParsedTagFinderClass were originally 
+ * because the logic of what is now TagParserClass and ParsedTagFinderClass were originally
  * in the same class.
  */
 SUITE(TagParserTestClass) {
@@ -146,7 +146,7 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectoriesWithSubDirectories) {
 	dir2.RemoveLastDir();
 	dirsToDelete.push_back(dir2);
 	TagParser.DeleteDirectories(dirsToDelete);
-	
+
 	count = RowCount("file_items");
 	CHECK_EQUAL(0, count);
 	count = RowCount("resources");
@@ -162,17 +162,17 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameFile) {
 
 	std::string stdFullPath = t4p::WxToChar(file1.GetFullPath());
 	int count = 0;
-	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 
+	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"),
 		soci::use(stdFullPath), soci::into(count);
 	CHECK_EQUAL(1, count);
 
 	wxFileName newFileName(file1.GetPath(), wxT("admin.php"));
 	TagParser.RenameFile(file1, newFileName);
-	
+
 	stdFullPath = t4p::WxToChar(newFileName.GetFullPath());
 	count = 0;
 	std::string newName;
-	Session << ("SELECT name FROM file_items WHERE full_path= ?"), 
+	Session << ("SELECT name FROM file_items WHERE full_path= ?"),
 		soci::use(stdFullPath), soci::into(newName);
 	CHECK_EQUAL("admin.php", newName);
 }
@@ -192,15 +192,15 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameDir) {
 	newDir.AssignDir(file1.GetPath());
 	newDir.RemoveLastDir();
 	newDir.AppendDir(wxT("project_2"));
-	
-	
+
+
 	TagParser.RenameDir(oldDir, newDir);
-	
+
 	wxFileName newFileName(newDir.GetPath(), wxT("user.php"));
 	std::string stdFullPath = t4p::WxToChar(newFileName.GetFullPath());
 
 	int count = 0;
-	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"), 
+	Session << ("SELECT COUNT(*) FROM file_items WHERE full_path= ?"),
 		soci::use(stdFullPath), soci::into(count);
 	CHECK_EQUAL(1, count);
 }

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,7 +32,7 @@
  * @param document the parsed xml
  * @param xmlString the xml to be parsed
  * @param rootName the name that the root tag should have
- * @return bool TRUE if 
+ * @return bool TRUE if
  *         xmlString is well-formed xml AND it's root tag
  *         has the given name.
  */
@@ -75,7 +75,7 @@ static bool GetNodeAttributeString(wxXmlNode* node, const wxString& attributeNam
 /**
  * @param node the XML node to search in
  * @param attributeName the attribute to search for
- * @param value the attribute's value is written to this variable. if attribute does 
+ * @param value the attribute's value is written to this variable. if attribute does
  *        not exist or is not a number, or is less than or equal to zero then 0 will be written
  */
 static void GetNodeAttributeBool(wxXmlNode* node, const wxString& attributeName, bool& value) {
@@ -93,7 +93,7 @@ static void GetNodeAttributeBool(wxXmlNode* node, const wxString& attributeName,
 /**
  * @param node the XML node to search in
  * @param attributeName the attribute to search for
- * @param value the attribute's value is written to this variable. if attribute does 
+ * @param value the attribute's value is written to this variable. if attribute does
  *        not exist or is not a number then 0 will be written
  */
 static void GetNodeAttributeInt(wxXmlNode* node, const wxString& attributeName, int& value) {
@@ -133,7 +133,7 @@ static wxXmlNode* GetNodeChild(wxXmlNode* node, const wxString& childName, t4p::
 static void GetNodeText(wxXmlNode* node, wxString& contents, bool doBase64Decode = true) {
 
 	// dbgp base64 encodes the contents, we must decode it
-	// TODO(roberto): what about when there are NULLs we would like to 
+	// TODO(roberto): what about when there are NULLs we would like to
 	// show them
 	contents = node->GetNodeContent();
 	if (doBase64Decode) {
@@ -215,7 +215,7 @@ static t4p::DbgpFeatures FeatureFromString(const wxString& str) {
 	else if (str == wxT("max_data")) {
 		return t4p::DBGP_FEATURE_MAX_DATA;
 	}
-	
+
 	else if (str == wxT("max_depth")) {
 		return t4p::DBGP_FEATURE_MAX_DEPTH;
 	}
@@ -256,7 +256,7 @@ static bool BreakpointFromXmlNode(wxXmlNode* breakpointNode, t4p::DbgpBreakpoint
 	return true;
 }
 
-static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t4p::DbgpXmlErrors& error) { 
+static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t4p::DbgpXmlErrors& error) {
 	GetNodeAttributeInt(stackNode, "level", stack.Level);
 
 	if (!GetNodeAttributeString(stackNode, "type", stack.Type, error)) {
@@ -268,21 +268,21 @@ static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t
 	GetNodeAttributeInt(stackNode, "lineno", stack.LineNumber);
 
 	t4p::DbgpXmlErrors ignoredError;
-	
+
 	// these are optional
 	GetNodeAttributeString(stackNode, "where", stack.Where, ignoredError);
 	GetNodeAttributeString(stackNode, "cmdbegin", stack.CmdBegin, ignoredError);
 	GetNodeAttributeString(stackNode, "cmdend", stack.CmdEnd, ignoredError);
-	
+
 	return true;
 }
 
 static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t4p::DbgpXmlErrors& error) {
-	
+
 	// name is optional when we parse properties from an eval response
 	// class name, full name are optional
 	t4p::DbgpXmlErrors ignored;
-	
+
 	if (!GetNodeAttributeString(node, "type", prop.DataType, error)) {
 		return false;
 	}
@@ -292,7 +292,7 @@ static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t
 
 	GetNodeAttributeInt(node, "page", prop.Page);
 	GetNodeAttributeInt(node, "pagesize", prop.PageSize);
-	
+
 	// more optional response items
 	GetNodeAttributeString(node, "facet", prop.Facet, ignored);
 	GetNodeAttributeInt(node, "size", prop.Size);
@@ -423,7 +423,7 @@ t4p::DbgpPropertyClass::DbgpPropertyClass()
 , Key()
 , Encoding()
 , NumChildren()
-, Value() 
+, Value()
 , ChildProperties() {
 
 }
@@ -443,7 +443,7 @@ t4p::DbgpPropertyClass::DbgpPropertyClass(const t4p::DbgpPropertyClass& src)
 , Key()
 , Encoding()
 , NumChildren()
-, Value() 
+, Value()
 , ChildProperties() {
 	Copy(src);
 }
@@ -535,13 +535,13 @@ bool t4p::DbgpInitEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& e
 	if (!GetNodeAttributeString(root, "idekey", IdeKey, error)) {
 		return false;
 	}
-	
+
 	// optional
 	t4p::DbgpXmlErrors ignoredError;
 	GetNodeAttributeString(root, "session", Session, ignoredError);
 	GetNodeAttributeString(root, "thread", Thread, error);
 	GetNodeAttributeString(root, "parent", Parent, error);
-		
+
 
 	if (!GetNodeAttributeString(root, "language", Language, error)) {
 		return false;
@@ -596,7 +596,7 @@ bool t4p::DbgpErrorEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& 
 	}
 
 	GetNodeAttributeInt(errorNode, "code", ErrorCode);
-	
+
 	wxXmlNode* messageNode = GetNodeChild(errorNode, "message", error);
 	if (!messageNode) {
 		return false;
@@ -605,8 +605,8 @@ bool t4p::DbgpErrorEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& 
 
 	t4p::DbgpXmlErrors ignored;
 	GetNodeAttributeString(errorNode, "apperr", AppErrorCode, ignored);
-	
-	
+
+
 	error = t4p::DBGP_XML_ERROR_NONE;
 	return true;
 }
@@ -1006,7 +1006,7 @@ bool t4p::DbgpStackGetEventClass::FromXml(const wxString& xml, t4p::DbgpXmlError
 		return false;
 	}
 	wxXmlNode* root = doc.GetRoot();
-	
+
 	wxXmlNode* child = root->GetChildren();
 	while (child) {
 		t4p::DbgpStackClass stack;
@@ -1061,7 +1061,7 @@ bool t4p::DbgpContextNamesEventClass::FromXml(const wxString& xml, t4p::DbgpXmlE
 
 t4p::DbgpContextGetEventClass::DbgpContextGetEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_CONTEXTGET)
-, Properties() 
+, Properties()
 , ContextId() {
 
 }
@@ -1091,7 +1091,7 @@ bool t4p::DbgpContextGetEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErr
 		}
 		child = child->GetNext();
 	}
-	
+
 	GetNodeAttributeInt(root, wxT("context"), ContextId);
 
 	error = t4p::DBGP_XML_ERROR_NONE;
@@ -1166,7 +1166,7 @@ bool t4p::DbgpPropertyValueEventClass::FromXml(const wxString& xml, t4p::DbgpXml
 	if (!GetNodeAttributeString(root, "transaction_id", TransactionId, error)) {
 		return false;
 	}
-	
+
 	t4p::DbgpXmlErrors ignored;
 	wxString encoding;
 	GetNodeAttributeString(root, "encoding", encoding, ignored);
@@ -1247,7 +1247,7 @@ t4p::DbgpEvalEventClass::DbgpEvalEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_EVAL)
 , Command()
 , TransactionId()
-, Property() 
+, Property()
 , Success() {
 
 }
@@ -1274,7 +1274,7 @@ bool t4p::DbgpEvalEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& e
 		return false;
 	}
 	GetNodeAttributeBool(root, "success", Success);
-	
+
 	t4p::DbgpXmlErrors ignoredError;
 	wxXmlNode* propNode = GetNodeChild(root, "property", ignoredError);
 	if (propNode) {
@@ -1285,7 +1285,7 @@ bool t4p::DbgpEvalEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErrors& e
 }
 
 
-t4p::DbgpCommandClass::DbgpCommandClass() 
+t4p::DbgpCommandClass::DbgpCommandClass()
 : TransactionId(0)
 , Pid(0)
 , MachineName() {
@@ -1429,7 +1429,7 @@ std::string t4p::DbgpCommandClass::BreakpointException(const wxString& exception
 	else {
 		args += wxT(" -s disabled");
 	}
-	
+
 	return Build(
 		"breakpoint_set",
 		args
@@ -1478,7 +1478,7 @@ std::string t4p::DbgpCommandClass::BreakpointRunToCursor(const wxString& filenam
 	args += wxString::Format(" -n %d", lineNumber);
 	args += wxT(" -s enabled");
 	args += wxT(" -r 1");
-	
+
 	return Build(
 		"breakpoint_set",
 		args
@@ -1603,7 +1603,7 @@ std::string t4p::DbgpCommandClass::PropertyValue(int stackDepth, int contextId, 
 std::string t4p::DbgpCommandClass::Break() {
 	return Build(
 		"break",
-		"" 
+		""
 	);
 }
 
@@ -1616,7 +1616,7 @@ std::string t4p::DbgpCommandClass::Eval(const wxString& expression) {
 }
 
 std::string t4p::DbgpCommandClass::Build(const std::string& cmd, const wxString& args, const wxString& data) {
-	
+
 	// command [SPACE] [arguments] [SPACE] -- base64(data) [NULL]
 	// transaction id is always included
 	std::string line = cmd;

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ namespace t4p {
 class StatusBarWithGaugeClass : public wxStatusBar {
 public:
     StatusBarWithGaugeClass(wxWindow *parent, int id = wxID_ANY);
-	
+
 	/**
 	 * When window is resized redraw accordingly
 	 */
@@ -46,28 +46,28 @@ public:
 	 * @return bool TRUE if the gauge with the given ID already exists
 	 */
 	bool HasGauge(int id) const;
-	
+
 	/**
 	 * Adds a progress bar to this status bar.
-	 * 
+	 *
 	 * @param wxString title will be displayed next to the progress bar
 	 * @param int id the gauge ID
 	 * @param int maxValue the maximum value of the gauge. INDETERMINATE_MODE can be used to make the gauge just pulse
 	 * @param int flags wxWindow style flags
 	 */
 	void AddGauge(const wxString& title, int id, int maxValue, int flags);
-	
+
 	/**
 	 * Increment / decrement the progress.
-	 * 
-	 * @param int id the gauge ID 
+	 *
+	 * @param int id the gauge ID
 	 * @param update new progress bar value can be INDETERMINATE_MODE to make the gauge just pulse
 	 */
 	void UpdateGauge(int id, int update);
-	
+
 	/**
 	 * Increments the progress.
-	 * 
+	 *
 	 * @param int id the gauge ID
 	 * @param update number to increment by can be INDETERMINATE_MODE to make the gauge just pulse
 	 */
@@ -75,7 +75,7 @@ public:
 
 	/**
 	 * Increments the progress.
-	 * 
+	 *
 	 * @param int id the gauge ID
 	 * @param wxString new title for the gauge, will be displayed next to the progress bar
 	 * @param update number to increment by can be INDETERMINATE_MODE to make the gauge just pulse
@@ -84,18 +84,18 @@ public:
 
 	/**
 	 * Updates the gauge text, leaving the progress alone
-	 * 
+	 *
 	 * @param int id the gauge ID
 	 * @param wxString new title for the gauge, will be displayed next to the progress bar
 	 */
 	void RenameGauge(int id, const wxString& title);
-	
+
 	/**
 	 * @param int id the gauge ID
 	 * @param mode the mode to switch to, INDETERMINATE_MODE (ie pulse, no bar that increments steadily)
 	 *        or DETERMINATE_MODE (bar has a range, and it increments steadily until bar is filled.
-	 * @param range, current value of gauge, only needed for DETERMINATE_MODE 
-	 * @param range, maximum value of gauge, only needed for DETERMINATE_MODE 
+	 * @param range, current value of gauge, only needed for DETERMINATE_MODE
+	 * @param range, maximum value of gauge, only needed for DETERMINATE_MODE
 	 */
 	void SwitchMode(int id, int mode, int value, int range);
 
@@ -113,7 +113,7 @@ public:
 	 * Set the text of the column index 1 (the second column)
 	 */
 	void SetColumn1Text(const wxString& text);
-	
+
 	enum {
 		INDETERMINATE_MODE = -1,
 		DETERMINATE_MODE = -2
@@ -126,16 +126,16 @@ private:
 		FIELD_GAUGE,
 		FIELD_MAX
     };
-	
+
 	std::map<int, wxGauge*> Gauges;
 	std::map<int, wxString> GaugeTitles;
 	static const int BITMAP_SIZE_Y = 15;
-	
+
 	/**
-	 * This method should be called when a new gauge is added or removed.  
+	 * This method should be called when a new gauge is added or removed.
 	 */
 	void RedrawGauges();
-	
+
 	DECLARE_EVENT_TABLE()
 };
 

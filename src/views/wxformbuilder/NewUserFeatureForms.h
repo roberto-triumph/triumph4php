@@ -29,10 +29,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class NewUserSettingsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class NewUserSettingsPanelGeneratedClass : public wxPanel 
+class NewUserSettingsPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* MoreLabel;
 		wxStaticText* VersionUpdateHelp;
@@ -42,21 +42,21 @@ class NewUserSettingsPanelGeneratedClass : public wxPanel
 		wxRadioButton* ApplicationDirectory;
 		wxRadioButton* CustomDirectory;
 		wxDirPickerCtrl* SettingsDirectory;
-	
+
 	public:
-		
+
 		NewUserSettingsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~NewUserSettingsPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class NewUserAssociationsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class NewUserAssociationsPanelGeneratedClass : public wxPanel 
+class NewUserAssociationsPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpLabel;
 		wxStaticText* PhpLabel;
@@ -79,21 +79,21 @@ class NewUserAssociationsPanelGeneratedClass : public wxPanel
 		wxTextCtrl* BashFileExtensions;
 		wxStaticText* MiscLabel;
 		wxTextCtrl* MiscFileExtensions;
-	
+
 	public:
-		
+
 		NewUserAssociationsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 640,480 ), long style = wxTAB_TRAVERSAL );
 		~NewUserAssociationsPanelGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class NewUserPhpSettingsPanelGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class NewUserPhpSettingsPanelGeneratedClass : public wxPanel 
+class NewUserPhpSettingsPanelGeneratedClass : public wxPanel
 {
 	private:
-	
+
 	protected:
 		wxStaticText* PhpHelpLabel;
 		wxHyperlinkCtrl* PhpDetectorsLink;
@@ -101,12 +101,12 @@ class NewUserPhpSettingsPanelGeneratedClass : public wxPanel
 		wxFilePickerCtrl* PhpExecutable;
 		wxStaticText* VersionLabel;
 		wxChoice* Version;
-	
+
 	public:
-		
+
 		NewUserPhpSettingsPanelGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~NewUserPhpSettingsPanelGeneratedClass();
-	
+
 };
 
 #endif //__NewUserFeatureForms__

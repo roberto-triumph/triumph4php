@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,7 +41,7 @@ namespace t4p {
 /**
  * This event will be propagated when the SQL query completes
  * execution
- * event.GetClientData() will have a pointer to a SqlResultClass pointer. ClientData pointer will contain 
+ * event.GetClientData() will have a pointer to a SqlResultClass pointer. ClientData pointer will contain
  * everything necessary to iterate through a result. Event handlers will own the pointer and will need to delete it when they
  * are done reading the result. This pointer may be NULL when there are no results.
  * event.GetId() will contain the ID of query (as given to MultiplSqlExecuteClass::Init).
@@ -50,16 +50,16 @@ extern const wxEventType QUERY_COMPLETE_EVENT;
 
 class QueryCompleteEventClass : public wxEvent {
 
-public: 
+public:
 	/**
-	 * this class will not delete the pointer; the 
+	 * this class will not delete the pointer; the
 	 * event handler should
 	 */
 	t4p::SqlResultClass* Results;
-	
-	
+
+
 	QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId);
-	
+
 	wxEvent* Clone() const;
 
 };
@@ -80,7 +80,7 @@ class SqlBrowserFeatureClass;
  * Class that will take a string of SQL statements and will execute them.
  */
 class MultipleSqlExecuteClass : public t4p::ActionClass {
-	
+
 public:
 
 	/**
@@ -92,7 +92,7 @@ public:
 	 *        the connection ID to kill a query when the user wants to cancel it
 	 */
 	MultipleSqlExecuteClass(t4p::RunningThreadsClass& runningThreads, int queryId, t4p::ConnectionIdentifierClass& connectionIdentifier);
-	
+
 	/**
 	 * Prepares queries to be run
 	 * @param sql the entire SQL contents to be executed. This may contain more than one query.
@@ -102,7 +102,7 @@ public:
 	bool Init(const UnicodeString& sql, const SqlQueryClass& query);
 
 	wxString GetLabel() const;
-	
+
 protected:
 
 	void BackgroundWork();
@@ -122,14 +122,14 @@ private:
 	void Close();
 
 	/**
-	 * we will handle multiple queries here by splitting the contents of the 
+	 * we will handle multiple queries here by splitting the contents of the
 	 * code control into multiple queries and send one query at a time to the server.
 	 * Doing it this way because it will work for all SQL backends uniformly
-	 * 
-	 * To handle multiple queries. When execute happens; a query object is made 
+	 *
+	 * To handle multiple queries. When execute happens; a query object is made
 	 * for each query.  Each query is executed one by one in a background thread (one query will
 	 * be executed; the next query will only be executed once the first query returns.).
-	 * When a query is finished, an event [wis propagated. 
+	 * When a query is finished, an event [wis propagated.
 	 * This object will handle the event by rendering the result of the query and
 	 * cleaning up the result set. The results rendering
 	 * depends on whether a query returned a result set. If a query returned a result
@@ -137,7 +137,7 @@ private:
 	 * returned then set to a special grid.
 	 */
 	SqlLexicalAnalyzerClass SqlLexer;
-	
+
 	/**
 	 * To execute the queries
 	 */
@@ -167,22 +167,22 @@ private:
  * or to a file
  */
 class SqlCopyOptionsClass {
-	
+
 public:
-	
+
 	/**
 	 * string to put before / after each cell
 	 *  (except first and last)
 	 */
 	wxString ColumnDelim;
-	
+
 	/**
 	 * string to put before / after each cell
 	 * but before / after each delimiter. Any
-	 * 
+	 *
 	 */
 	wxString ColumnEnclosure;
-	
+
 	/**
 	 * string to put before / after each row
 	 *  (except first and last)
@@ -194,21 +194,21 @@ public:
 	 * seen
 	 */
 	wxString NullFiller;
-	
+
 	SqlCopyOptionsClass();
-	
+
 	SqlCopyOptionsClass(const t4p::SqlCopyOptionsClass& src);
-	
+
 	t4p::SqlCopyOptionsClass& operator=(const t4p::SqlCopyOptionsClass& src);
-	
+
 	void Copy(const t4p::SqlCopyOptionsClass& src);
-	
+
 	/**
 	 * writes the given rows to the given output stream using
-	 * the delimiters that are set 
+	 * the delimiters that are set
 	 */
 	void Export(std::vector<wxString> values, wxTextOutputStream& stream);
-	
+
 	/**
 	 * write the row delimiter to the stream
 	 */
@@ -220,7 +220,7 @@ public:
  * a SQL INSERT statement
  */
 class RowToSqlInsertClass {
-	
+
 	public:
 
 	/**
@@ -228,49 +228,49 @@ class RowToSqlInsertClass {
 	 * the INSERT statement
 	 */
 	std::vector<UnicodeString> Values;
-	
+
 	/**
 	 * All of the available columns of the table
 	 */
 	std::vector<UnicodeString> Columns;
-	
+
 	/**
-	 * The name of the table; to put in the 
+	 * The name of the table; to put in the
 	 * INSERT statement
 	 */
 	UnicodeString TableName;
-	
+
 	/**
 	 * The columns that will be used in the INSERT
 	 * statement
 	 */
 	std::vector<UnicodeString> CheckedColumns;
-	
+
 	/**
 	 * The values that will be used in the INSERT
 	 * statement
 	 */
 	std::vector<UnicodeString> CheckedValues;
-	
+
 	/**
 	 * 0 == put entire statement in one line
 	 * 1 == put statement in multiple lines
 	 */
 	int LineMode;
-	
+
 	enum {
 		SINGLE_LINE,
 		MULTI_LINE
 	};
-	
+
 	RowToSqlInsertClass();
-	
+
 	RowToSqlInsertClass(const t4p::RowToSqlInsertClass& src);
-	
+
 	UnicodeString CreateStatement(t4p::DatabaseTagClass::Drivers driver) const;
-	
+
 	t4p::RowToSqlInsertClass& operator=(const t4p::RowToSqlInsertClass& src);
-	
+
 	void Copy(const t4p::RowToSqlInsertClass& src);
 };
 
@@ -279,31 +279,31 @@ class RowToSqlInsertClass {
  * array
  */
 class RowToPhpClass {
-	
+
 public:
 
 	/**
 	 * All of the available columns of the table
 	 */
 	std::vector<UnicodeString> Columns;
-	
+
 	/**
 	 * All of the row's values
 	 */
 	std::vector<UnicodeString> Values;
-	
+
 	/**
 	 * The columns that will be used in the INSERT
 	 * statement
 	 */
 	std::vector<UnicodeString> CheckedColumns;
-	
+
 	/**
 	 * The values that will be used in the INSERT
 	 * statement
 	 */
 	std::vector<UnicodeString> CheckedValues;
-	
+
 	/**
 	 * 0 == the array will contain the row's values as
 	 * the array values
@@ -311,47 +311,47 @@ public:
 	 * the array values
 	 */
 	int CopyValues;
-	
+
 	enum {
 		VALUES_ROW,
 		VALUES_EMPTY
 	};
-	
+
 	/**
-	 * 0 == the array will be written using PHP < 5.4 
+	 * 0 == the array will be written using PHP < 5.4
 	 * syntax (array keyword)
 	 * 1 ==  the array will be written using PHP 5.4+
 	 * syntax ( short array syntax '[')
 	 */
 	int ArraySyntax;
-	
+
 	enum {
 		SYNTAX_KEYWORD,
 		SYNTAX_OPERATOR
 	};
-	
+
 	RowToPhpClass();
-	
+
 	RowToPhpClass(const t4p::RowToPhpClass& src);
-	
+
 	t4p::RowToPhpClass& operator=(const t4p::RowToPhpClass& src);
-	
+
 	void Copy(const t4p::RowToPhpClass& src);
-	
+
 	UnicodeString CreatePhpArray();
 };
- 
+
 /**
  * This is a feature to manage SQL connections and make queries to the database.
  */
 class SqlBrowserFeatureClass : public FeatureClass {
 public:
 	SqlBrowserFeatureClass(t4p::AppClass& app);
-	
+
 	~SqlBrowserFeatureClass();
 
 	void LoadPreferences(wxConfigBase* config);
-	
+
 	/**
 	 * Will start the SQL meta data background task
 	 */
@@ -362,8 +362,8 @@ public:
 	 */
 	void SavePreferences();
 
-private:	
-	
+private:
+
 };
 
 }

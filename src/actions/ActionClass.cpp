@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,19 +27,19 @@
 #include <algorithm>
 
 t4p::ThreadCleanupClass::ThreadCleanupClass() {
-	
+
 }
 
 t4p::ThreadCleanupClass::~ThreadCleanupClass() {
-	
+
 }
-	
+
 t4p::ActionClass::ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: RunningThreads(runningThreads)
 	, EventId(eventId)
 	, ActionId(0)
 	, Mutex()
-	, Cancelled(false) 
+	, Cancelled(false)
 	, Mode(INDETERMINATE)
 	, PercentComplete(0) {
 }
@@ -116,15 +116,15 @@ void t4p::ActionClass::SignalEnd() {
 	PostEvent(evt);
 }
 
-t4p::ThreadActionClass::ThreadActionClass(std::queue<t4p::ActionClass*>& actions, wxMutex& actionsMutex, 
+t4p::ThreadActionClass::ThreadActionClass(std::queue<t4p::ActionClass*>& actions, wxMutex& actionsMutex,
 												wxSemaphore& finishSemaphore,
 												t4p::ThreadCleanupClass* threadCleanup)
-	: wxThread(wxTHREAD_DETACHED) 
+	: wxThread(wxTHREAD_DETACHED)
 	, Actions(actions)
-	, ActionsMutex(actionsMutex) 
-	, FinishSemaphore(finishSemaphore) 
-	, RunningActionMutex() 
-	, RunningAction(NULL) 
+	, ActionsMutex(actionsMutex)
+	, FinishSemaphore(finishSemaphore)
+	, RunningActionMutex()
+	, RunningAction(NULL)
 	, ThreadCleanup(threadCleanup) {
 
 }
@@ -148,7 +148,7 @@ void t4p::ThreadActionClass::PostProgressEvent() {
 	if (RunningAction) {
 		int eventId = RunningAction->GetEventId();
 		t4p::ActionProgressEventClass evt(eventId, RunningAction->GetProgressMode(), RunningAction->GetPercentComplete(), wxT(""));
-		RunningAction->PostEvent(evt);	
+		RunningAction->PostEvent(evt);
 	}
 }
 
@@ -156,11 +156,11 @@ void* t4p::ThreadActionClass::Entry() {
 	while (!TestDestroy()) {
 		t4p::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
-			
+
 			// signal the start of this action
 			t4p::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
 			action->PostEvent(evt);
-			
+
 			try {
 				action->BackgroundWork();
 			} catch (std::exception& e) {
@@ -169,14 +169,14 @@ void* t4p::ThreadActionClass::Entry() {
 			ActionComplete(action);
 		}
 		else if (action) {
-			
-			// we want to exit, don't call action->BackgroundWork 
+
+			// we want to exit, don't call action->BackgroundWork
 			// as it can take a while to complete
 			ActionComplete(action);
 			break;
 		}
 		else if (!TestDestroy()) {
-			// no action to work on, wait a bit 
+			// no action to work on, wait a bit
 			// 100 milliseconds = 100 microseconds * 1000
 			wxMicroSleep(100 * 1000);
 		}
@@ -217,7 +217,7 @@ void t4p::ThreadActionClass::ActionComplete(t4p::ActionClass* action) {
 	action->SignalEnd();
 	wxMutexLocker actionLocker(RunningActionMutex);
 	delete action;
-	RunningAction = NULL;	
+	RunningAction = NULL;
 }
 
 void t4p::ThreadActionClass::CleanupAllActions() {
@@ -227,20 +227,20 @@ void t4p::ThreadActionClass::CleanupAllActions() {
 		Actions.pop();
 	}
 }
-  
+
 t4p::RunningThreadsClass::RunningThreadsClass(bool doPostEvents)
 	: wxEvtHandler()
 	, Actions()
 	, ActionMutex()
-	, ThreadActions() 
+	, ThreadActions()
 	, Handlers()
 	, HandlerMutex()
 	, Semaphore(NULL)
-	, Timer() 
+	, Timer()
 	, ThreadCleanup(NULL)
-	, DoPostEvents(doPostEvents) 
-	, NextActionId(0) 
-	, MaxThreads(0) 
+	, DoPostEvents(doPostEvents)
+	, NextActionId(0)
+	, MaxThreads(0)
 	, IsShutdown(false) {
 	Timer.SetOwner(this);
 	SetMaxThreads(wxThread::GetCPUCount());
@@ -267,7 +267,7 @@ void t4p::RunningThreadsClass::SetMaxThreads(int maxThreads) {
 	}
 	Semaphore = new wxSemaphore(0, MaxThreads);
 }
-  
+
 int t4p::RunningThreadsClass::Queue(t4p::ActionClass* action) {
 	if (IsShutdown) {
 		delete action;
@@ -277,13 +277,13 @@ int t4p::RunningThreadsClass::Queue(t4p::ActionClass* action) {
 	if (!Timer.IsRunning()) {
 		Timer.Start(200, wxTIMER_CONTINUOUS);
 	}
-	
+
 	// prevent multiple accesses to Actions queue
 	wxMutexLocker locker(ActionMutex);
-		
+
 	Actions.push(action);
 
-	// assign the action a unique ID 
+	// assign the action a unique ID
 	int actionId = -1;
 	actionId = NextActionId++;
 	action->SetActionId(actionId);
@@ -296,10 +296,10 @@ int t4p::RunningThreadsClass::Queue(t4p::ActionClass* action) {
 				cleanup = ThreadCleanup->Clone();
 			}
 			t4p::ThreadActionClass* thread = new t4p::ThreadActionClass(
-				Actions, ActionMutex, *Semaphore, 
-				
+				Actions, ActionMutex, *Semaphore,
+
 				// each thread gets its own instance, so that we dont have to worry about
-				// synchronization 
+				// synchronization
 				cleanup);
 			wxThreadError error = wxTHREAD_NO_ERROR;
 			error = thread->Create();
@@ -340,10 +340,10 @@ void t4p::RunningThreadsClass::CancelAction(int actionId) {
 
 			// this action we need to remove
 			delete action;
-		}		
+		}
 		Actions.pop();
 	}
-	
+
 	// now put back the actions we checked
 	while (!checked.empty()) {
 		Actions.push(checked.front());
@@ -354,7 +354,7 @@ void t4p::RunningThreadsClass::CancelAction(int actionId) {
 	// note that if the action is being run, ThreadAction will delete the pointer once
 	// the thread dies.  we cannot delete it here because the thread
 	// is still running and delete it will cause crashes (invalid memory
-	// accesses)	
+	// accesses)
 	std::vector<t4p::ThreadActionClass*>::iterator thread;
 	for (thread = ThreadActions.begin(); thread != ThreadActions.end(); ++thread) {
 		(*thread)->CancelRunningActionIf(actionId);
@@ -450,7 +450,7 @@ void t4p::RunningThreadsClass::SetThreadCleanup(t4p::ThreadCleanupClass* threadC
 	ThreadCleanup = threadCleanup;
 }
 
-t4p::ActionEventClass::ActionEventClass(int id, wxEventType type, const wxString& msg) 
+t4p::ActionEventClass::ActionEventClass(int id, wxEventType type, const wxString& msg)
 : wxEvent(id, type)
 , Message() {
 	Message.append(msg);
@@ -464,7 +464,7 @@ wxEvent* t4p::ActionEventClass::Clone() const {
 t4p::ActionProgressEventClass::ActionProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg)
 : wxEvent(id, t4p::EVENT_ACTION_PROGRESS)
 , Mode(mode)
-, PercentComplete(percentComplete) 
+, PercentComplete(percentComplete)
 
 // thread-safe clone of the string
 , Message(msg.c_str()) {

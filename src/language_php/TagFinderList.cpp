@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,12 +49,12 @@ t4p::TagFinderListClass::~TagFinderListClass() {
 	NativeDbSession.close();
 }
 
-void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName, 
-									   const std::vector<wxString>& phpFileExtensions, 
+void t4p::TagFinderListClass::InitGlobalTag(const wxFileName& tagDbFileName,
+									   const std::vector<wxString>& phpFileExtensions,
 									   const std::vector<wxString>& miscFileExtensions,
 									   pelet::Versions version) {
 	wxASSERT_MSG(!IsTagFinderInit, wxT("tag finder can only be initialized once"));
-	
+
 	// make sure to clone files and strings so
 	// that this cache object can be used
 	// in a background thread
@@ -118,7 +118,7 @@ std::vector<UnicodeString> t4p::TagFinderListClass::ClassParents(UnicodeString c
 
 		// each parent class may be located in any of the finders. in practice this code is not as slow
 		// as it looks; class hierarchies are usually not very deep (1-4 parents)
-		found = false;		
+		found = false;
 		UnicodeString parentClass;
 		if (IsTagFinderInit) {
 			parentClass = TagFinder.ParentClassName(classToLookup, 0);
@@ -140,12 +140,12 @@ std::vector<UnicodeString> t4p::TagFinderListClass::ClassParents(UnicodeString c
 	return parents;
 }
 
-std::vector<UnicodeString> t4p::TagFinderListClass::ClassUsedTraits(const UnicodeString& className, 
-												  const std::vector<UnicodeString>& parentClassNames, 
+std::vector<UnicodeString> t4p::TagFinderListClass::ClassUsedTraits(const UnicodeString& className,
+												  const std::vector<UnicodeString>& parentClassNames,
 												  const UnicodeString& methodName,
 												  const std::vector<wxFileName>& sourceDirs) {
 
-	// trait support; a class can use multiple traits; hence the different logic 
+	// trait support; a class can use multiple traits; hence the different logic
 	std::vector<UnicodeString> classesToLookup;
 	classesToLookup.push_back(className);
 	classesToLookup.insert(classesToLookup.end(), parentClassNames.begin(), parentClassNames.end());
@@ -188,7 +188,7 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 	tagSearch.SetParentClasses(ClassParents(tagSearch.GetClassName(), tagSearch.GetMethodName()));
 	tagSearch.SetSourceDirs(sourceDirs);
 	tagSearch.SetTraits(ClassUsedTraits(tagSearch.GetClassName(), tagSearch.GetParentClasses(), tagSearch.GetMethodName(), sourceDirs));
-	
+
 	if (IsDetectedTagFinderInit && !tagSearch.GetClassName().isEmpty()) {
 		t4p::DetectedTagExactMemberResultClass detectedResult;
 		std::vector<UnicodeString> classNames = tagSearch.GetClassHierarchy();
@@ -224,7 +224,7 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 			}
 			else {
 
-				// the parser will always return fully qualified class name for return type that is 
+				// the parser will always return fully qualified class name for return type that is
 				// based on the namespace aliases
 				type = tagResults->Tag.ReturnType;
 			}
@@ -271,7 +271,7 @@ void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch
 		}
 	}
 	delete result;
-	
+
 	// tags in the native db file do not have a source_id
 	// when we query do not use source_id
 	std::vector<wxFileName> emptyVector;
@@ -301,7 +301,7 @@ void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch
 void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	if (tagSearch.GetClassName().isEmpty() && tagSearch.GetMethodName().isEmpty() && tagSearch.GetNamespaceName().length() <= 1) {
-		
+
 		// empty query, do not attempt as we dont want to query for all tagsd
 		return;
 	}
@@ -314,7 +314,7 @@ void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch,
 		}
 	}
 	delete result;
-	
+
 	// tags in the native db file do not have a source_id
 	// when we query do not use source_id
 	std::vector<wxFileName> emptyVector;

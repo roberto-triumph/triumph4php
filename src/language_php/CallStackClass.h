@@ -34,76 +34,76 @@
 #include <queue>
 
 namespace t4p {
-	
+
 /**
  * This is a representation of a single variable assignment.  A variable
  * may be assigned with different values (scalar, object, return
  * values from methods, properties).
  * Note that this represents "simple" assignments. For example,
- * this class is no suitable to hold assignments such as 
- * 
+ * this class is no suitable to hold assignments such as
+ *
  * $name = Person::getInstance()->name;
- * 
+ *
  * Statements like above are broken up into multiple temporary
- * variables.  
+ * variables.
  */
 class VariableSymbolClass {
 
 public:
 
 	enum Types {
-		
-		/** 
-		 * variable is assigned a scalar (string or number) 
+
+		/**
+		 * variable is assigned a scalar (string or number)
 		 */
 		SCALAR,
-		
-		/** 
-		 * variable is assigned an array. Note that there will be one ARRAY_KEY 
+
+		/**
+		 * variable is assigned an array. Note that there will be one ARRAY_KEY
 		 *  assignment for each array key
 		 */
 		ARRAY,
-		
-		/** 
+
+		/**
 		 * a new key being assigned to an array.
 		 */
 		ARRAY_KEY,
-		
-		/** 
+
+		/**
 		 * variable is created using the new operator
 		 */
 		NEW_OBJECT,
-		
-		/** 
+
+		/**
 		 * variable is assigned another variable
 		 */
 		ASSIGN,
-		
-		/** 
+
+		/**
 		 * variable is assigned an object property
 		 */
 		PROPERTY,
-		
-		/** 
+
+		/**
 		 * variable is assigned the return value of an object method
 		 */
 		METHOD_CALL,
-		
-		/** 
+
+		/**
 		 * variable is assigned the return value of a function
 		 */
 		FUNCTION_CALL,
-		
-		/** 
+
+		/**
 		 * not a variable; this symbol declares that a new scope
 		 * has started.  All of the symbols that follow this symbol belong
 		 * in the scope of this function.
-		 * FunctionName will contain the function name 
+		 * FunctionName will contain the function name
 		 * of the scope
 		 */
 		BEGIN_FUNCTION,
-		
-		/** 
+
+		/**
 		 * not a variable; this symbol declares that a new scope
 		 * has started.  All of the symbols that follow this symbol belong
 		 * in the scope of this method.
@@ -112,15 +112,15 @@ public:
 		 */
 		BEGIN_METHOD
 	};
-	
-	Types Type; 
-	
+
+	Types Type;
+
 	/**
-	 *  the variable being assigned (the left side of 
+	 *  the variable being assigned (the left side of
 	 *  $a = $b). Will contain the siguil ('$')
 	 */
 	UnicodeString DestinationVariable;
-	
+
 	/**
 	 *  if type = SCALAR, then this will be the scalar's lexeme (the contents)
 	 *  for the code:
@@ -128,7 +128,7 @@ public:
 	 *  ScalarValue will be 'hello' (no quotes)
 	 */
 	UnicodeString ScalarValue;
-	
+
 	/**
 	 * if type = ARRAY_KEY this is the key that was assigned to the array
 	 *  for the code:
@@ -136,13 +136,13 @@ public:
 	 * ArrayKey will be 'greeting' (no quotes)
 	 */
 	UnicodeString ArrayKey;
-	
+
 	/**
-	 *  the name of the variable to assign (the right side of 
+	 *  the name of the variable to assign (the right side of
 	 *  $a = $b)
 	 */
 	UnicodeString SourceVariable;
-	
+
 	/**
 	 * if type = METHOD or type = PROPERTY, this is the name of the
 	 * variable used
@@ -151,7 +151,7 @@ public:
 	 * ObjectName will be $person
 	 */
 	UnicodeString ObjectName;
-	
+
 	/**
 	 * if type = PROPERTY, this is the name of the property
 	 * .  this never contains a siguil
@@ -160,85 +160,85 @@ public:
 	 * PropertyName will be firstName
 	 */
 	UnicodeString PropertyName;
-	
+
 	/**
-	 * if type = METHOD, this is the name of the method being 
+	 * if type = METHOD, this is the name of the method being
 	 * called.
 	 *  for the code:
 	 *    $name = $person->getName()
 	 * MethodName will be getName
-	 * 
-	 * if type = BEGIN_METHOD, this is the name of the 
+	 *
+	 * if type = BEGIN_METHOD, this is the name of the
 	 * method where all of the subsquent variables are located in
 	 */
 	UnicodeString MethodName;
-	
+
 	/**
-	 * if type = FUNCTION, this is the name of the function being 
+	 * if type = FUNCTION, this is the name of the function being
 	 * called.
 	 *  for the code:
 	 *    $name = getName()
 	 * FunctionName will be getName
-	 * 
-	 * if type = BEGIN_FUNCTION, this is the name of the 
+	 *
+	 * if type = BEGIN_FUNCTION, this is the name of the
 	 * function where all of the subsquent variables are located in
 	 */
 	UnicodeString FunctionName;
-	
+
 	/**
-	 * if type = NEW_OBJECT, this is the name of the class being 
+	 * if type = NEW_OBJECT, this is the name of the class being
 	 * instatiated.
 	 *  for the code:
 	 *    $user = new UserClass;
 	 * ClassName will be UserClass
-	 
-	 * if type = BEGIN_METHOD, this is the name of the 
+
+	 * if type = BEGIN_METHOD, this is the name of the
 	 * class where all of the subsquent variables are located in
 	 */
 	UnicodeString ClassName;
-	
+
 	/**
 	 * if type = METHOD or type = FUNCTION this is the list of
 	 * variables that were passed into the function / method. These are the
 	 * "simple" variables; ie the temporary variables that are
 	 * assigned for example the code:
-	 * 
+	 *
 	 * $name = buildName(getFirstName($a), getLastName($a));
-	 * 
+	 *
 	 * then FunctionArguments are [ $@tmp1, $@tmp2 ]
 	 * because the resul of getFirstName and getLastName get assigned to
 	 * a temp variable.
-	 * 
+	 *
 	 */
 	std::vector<UnicodeString> FunctionArguments;
-	
+
 	VariableSymbolClass();
-	
+
 	void ToScalar(const UnicodeString& variableName, const UnicodeString& scalar);
-	
+
 	void ToArray(const UnicodeString& variableName);
-	
+
 	void ToArrayKey(const UnicodeString& variableName, const UnicodeString& keyName);
-	
+
 	void ToNewObject(const UnicodeString& variableName, const UnicodeString& className);
-	
+
 	void ToAssignment(const UnicodeString& variableName, const UnicodeString& sourceVariableName);
-	
+
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName);
-	
+
 	void ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments);
-	
+
 	void ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments);
-	
+
 	void ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName);
-	
+
 	void ToBeginFunction(const UnicodeString& functionName);
-	
+
 	/**
 	 *  @return std::string serialization
 	 */
 	std::string ToString() const;
-	
+
 	std::string TypeString() const;
 };
 
@@ -248,9 +248,9 @@ public:
  * functions are getting called.
  *
  */
-class CallStackClass : 
-	public pelet::ClassMemberObserverClass, 
-	public pelet::FunctionObserverClass, 
+class CallStackClass :
+	public pelet::ClassMemberObserverClass,
+	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass,
 	public pelet::ClassObserverClass {
 
@@ -283,9 +283,9 @@ public:
 	     * this error code may mean that the function observer cannot handle a certain piece of code.
 	     */
 	    STACK_LIMIT,
-		
+
 		/**
-		 * the given tag cache is empty; the call stack class wont be able to quickly know where a 
+		 * the given tag cache is empty; the call stack class wont be able to quickly know where a
 		 * specific class is located.
 		 */
 		EMPTY_CACHE
@@ -296,15 +296,15 @@ public:
 	 * Build() method is called.
 	 */
 	std::vector<VariableSymbolClass> Variables;
-	
+
 	/**
 	 * If given code has a parser error (PARSE_ERR0R), the error will be stored here
 	 */
 	pelet::LintResultsClass LintResults;
-	
+
 	/**
 	 * If the call stack could not be completed because a variable method could not be resolved (RESOLUTION_ERROR)
-	 * then the error will be stored here. Note that this is NOT a fatal error; CallStack.List is populated, and the 
+	 * then the error will be stored here. Note that this is NOT a fatal error; CallStack.List is populated, and the
 	 * list is correct; it just means that the call stack may be incomplete.
 	 */
 	SymbolTableMatchErrorClass MatchError;
@@ -327,12 +327,12 @@ public:
 	 * @return TRUE on success, if FALSE then error will be filled.
 	 */
 	bool Build(const wxFileName& fileName, const UnicodeString& className, const UnicodeString& methodName, pelet::Versions version, Errors& error);
-	
+
 	/**
 	 * Saves the call stack to a file; in CSV format
 	 * Format is as follows:
 	 * ResourceType,Identifier,Resource, Arg1 lexeme, Arg2 lexeme, ... Arg N lexeme
-	 * 
+	 *
 	 * where
 	 * ResourceType = FUNCTION | METHOD
 	 * Identifier is the name of the function / method
@@ -340,19 +340,19 @@ public:
 	 * ArgN Lexeme is the lexeme (string) of the Nth argument; lexeme is either the constant (when argument is a string / number)
 	 * or it can be a variable name.
 	 *  TODO: object operator chains are not currently supported
-	 * 
-	 * @param session connection where data will be INSERTed to 
+	 *
+	 * @param session connection where data will be INSERTed to
 	 * @return TRUE if file was successfully written to
 	 */
 	bool Persist(soci::session& session);
-	
-	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, 
-		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment, 
+
+	void MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
+		const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 		pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments);
 
-	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType, 
+	void FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
 		const UnicodeString& comment, const int lineNumber, bool hasVariableArguments);
-		
+
 	void ExpressionVariableFound(pelet::VariableClass* expression);
 
 	void ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression);
@@ -371,7 +371,7 @@ public:
 
 	void ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression);
 
-	
+
 private:
 
 	/**
@@ -396,34 +396,34 @@ private:
 	 * use this to filter out the expressions that we want
 	 */
 	UnicodeString CurrentFunction;
-	
+
 	/**
 	 * a small struct to keep file and resources together while
 	 * jumping through the code
 	 */
 	struct ResourceWithFile {
-		
+
 		wxFileName FileName;
-		
+
 		t4p::PhpTagClass Resource;
-		
+
 		std::vector<pelet::ExpressionClass> CallArguments;
-		
+
 		std::vector<t4p::SymbolClass> ScopeVariables;
 	};
-	
+
 	/**
 	 * These are the scopes that we want to collect function calls from.
 	 * this is a queue because we want to "follow" calls (open the functions and look inside
 	 * those functions for new function calls)
 	 */
 	std::queue<ResourceWithFile> ResourcesRemaining;
-	
+
 	/**
 	 * Used to 'jump' to the calling function
 	 */
 	TagCacheClass& TagCache;
-		
+
 	/**
 	 * flag each method after we parse it, that way recursice functions
 	 * don't cause infinte loops
@@ -434,55 +434,55 @@ private:
 	 * index appended to the temporary variables. will be reset every scope.
 	 */
 	int TempVarIndex;
-	
+
 	/**
 	 * this flag will be set when the parser hits the scope (tag) we are looking for.  If we dont
 	 * find the scope we are looking for, then either the input scope was wrong, or some other
 	 * unknown error has occurred
 	 */
 	bool FoundScope;
-	
+
 	void Clear();
-	
+
 	bool Recurse(pelet::Versions version, Errors& error);
-	
+
 	/**
 	 *  breaks up an assignment expression into multiple VariableSymbolClass instances
 	 *  We break up a potentially huge statements into simple assignments so that
 	 *  we can tell exactly what methods are being called.
-	 * 
+	 *
 	 *  For example, take this assignment expression:
-	 * 
+	 *
 	 *    $this->view->name = $this->getFullNameFromRequest($this->getRequest());
-	 * 
+	 *
 	 * the assignment will be broken up into these variable symbols:
-	 * 
+	 *
 	 *   variable      |     type       |     lexemes (class + method + args or class + property or variable)
 	 *   -----------------------------------------------------------------------------------------------
-	 *   $this         |   ASSIGN       |     
+	 *   $this         |   ASSIGN       |
 	 *   $@tmp1        |   METHOD       |     $this, getRequest
 	 *   $@tmp2        |   METHOD       |     $this, getFullNameFromRequest, $@tmp1
 	 *   $@tmp3        |   PROPERTY     |     $this, view
 	 *   $@tmp4        |   PROPERTY     |     $@tmp3, name
 	 *   $@tmp4        |   ASSIGN       |     $@tmp2
-	 * 
+	 *
 	 * note that this method creates "temporary" variables that are not present in the actual
 	 * source code (as denoted by "$@", which can never happen in valid php).
 	 */
 	void SymbolsFromVariable(const pelet::VariableClass& variable, pelet::ExpressionClass* expression);
-	
-	
+
+
 	void SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols);
-	
+
 	void SymbolFromExpression(pelet::ExpressionClass* expression, std::vector<t4p::VariableSymbolClass>& symbols);
-	
+
 	/**
 	 * @return the name for a new template variable; the variable name will be unique for the current scope
 	 */
 	UnicodeString NewTempVariable();
 
 	/**
-	 * @return bool TRUE if the current function is the method / function that we want to 
+	 * @return bool TRUE if the current function is the method / function that we want to
 	 *         capture variables from.
 	 */
 	bool InDesiredScope() const;

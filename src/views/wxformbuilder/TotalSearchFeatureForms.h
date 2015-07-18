@@ -28,17 +28,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TotalSearchDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TotalSearchDialogGeneratedClass : public wxDialog 
+class TotalSearchDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		enum
 		{
 			ID_SEARCHLABEL = 1000,
 			ID_SEARCHTEXT,
 		};
-		
+
 		wxStaticText* SearchLabel;
 		wxTextCtrl* SearchText;
 		wxStaticText* MatchesLabel;
@@ -48,7 +48,7 @@ class TotalSearchDialogGeneratedClass : public wxDialog
 		wxButton* ButtonsSizerOK;
 		wxButton* ButtonsSizerCancel;
 		wxButton* ButtonsSizerHelp;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSearchKeyDown( wxKeyEvent& event ) { event.Skip(); }
 		virtual void OnSearchEnter( wxCommandEvent& event ) { event.Skip(); }
@@ -57,37 +57,37 @@ class TotalSearchDialogGeneratedClass : public wxDialog
 		virtual void OnCancelButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelpButton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TotalSearchDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Search For Tags"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 634,398 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~TotalSearchDialogGeneratedClass();
-	
+
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class TotalSearchHelpDialogGeneratedClass
 ///////////////////////////////////////////////////////////////////////////////
-class TotalSearchHelpDialogGeneratedClass : public wxDialog 
+class TotalSearchHelpDialogGeneratedClass : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxStaticText* HelpText;
 		wxHyperlinkCtrl* HelpLink;
 		wxStdDialogButtonSizer* ButtonSizer;
 		wxButton* ButtonSizerOK;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnOkButton( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
+
 		TotalSearchHelpDialogGeneratedClass( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Total Search Help"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~TotalSearchHelpDialogGeneratedClass();
-	
+
 };
 
 #endif //__TotalSearchFeatureForms__

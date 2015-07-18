@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,7 +35,7 @@ namespace t4p {
 /**
  * This is the feature that check for new versions of Triumph
  * Version checking is done by posting to
- * http://updates.triumph4php.com/updates.php and reading the 
+ * http://updates.triumph4php.com/updates.php and reading the
  * latest version from the response.
  */
 class VersionUpdateViewClass : public FeatureViewClass {
@@ -57,13 +57,13 @@ private:
 	/**
 	 * when preferences are saved, start or stop the
 	 * version check timer depending on user preferences
-	 */	 
+	 */
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	/**
 	 * when preferences are updated, start or stop the
 	 * version check timer depending on user preferences
-	 */	 
+	 */
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
 
 	/**
@@ -77,11 +77,11 @@ private:
 	void OnTimer(wxTimerEvent& event);
 
 	/**
-	 * read the response from the update server.  if there is a new version, 
+	 * read the response from the update server.  if there is a new version,
 	 * tell the user.
 	 */
 	void OnUpdateCheckComplete(wxCommandEvent& event);
-	
+
 	/**
 	 * contains application logic
 	 */
@@ -91,7 +91,7 @@ private:
 	 * the timer is used to see if its time to do a version check
 	 */
 	wxTimer Timer;
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -99,9 +99,9 @@ class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
 
 public:
 
-	VersionUpdateDialogClass(wxWindow* parent, int id, 
+	VersionUpdateDialogClass(wxWindow* parent, int id,
 		t4p::RunningThreadsClass& runningThreads,
-		const wxString& currentVersion, 
+		const wxString& currentVersion,
 		bool showNewVersion,
 		wxString newVersion);
 

@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,7 +39,7 @@ t4p::SequenceClass::SequenceClass(t4p::GlobalsClass& globals, t4p::RunningThread
 	, Globals(globals)
 	, RunningThreads(runningThreads)
 	, Steps()
-	, IsRunning(false) 
+	, IsRunning(false)
 	, IsCurrentStepAsync(false) {
 	RunningThreads.AddEventHandler(this);
 }
@@ -85,15 +85,15 @@ bool t4p::SequenceClass::AppStart() {
 	// code expects them to be
 	AddStep(new t4p::TagCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
 	AddStep(new t4p::DetectorCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
-	
+
 	// open the detector tags db file
 	AddStep(new t4p::DetectorDbInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_DB_INIT));
 
 	// this will load the cache from the hard disk
-	// load the cache from hard disk so that code completion and 
+	// load the cache from hard disk so that code completion and
 	// tag searching is available immediately after the app starts
 	AddStep(new t4p::ProjectTagInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_INIT));
-	
+
 	// this will load the discovered the db schema info (tables, columns)
 	AddStep(new t4p::SqlMetaDataInitActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
@@ -106,7 +106,7 @@ bool t4p::SequenceClass::ProjectDefinitionsUpdated(const std::vector<t4p::Projec
 	if (Running()) {
 		return false;
 	}
-	
+
 	// in case newly enabled projects are no longer in the file system
 	SourceCheck();
 
@@ -123,7 +123,7 @@ bool t4p::SequenceClass::ProjectDefinitionsUpdated(const std::vector<t4p::Projec
 			sourceDirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	
+
 	// remove tags from the deleted projects since we will never use them
 	for (project = removedProjects.begin(); project != removedProjects.end(); ++project) {
 		for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
@@ -140,18 +140,18 @@ bool t4p::SequenceClass::ProjectDefinitionsUpdated(const std::vector<t4p::Projec
 	AddStep(new t4p::DatabaseTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DATABASE_TAG_DETECTOR));
 
 	// this will update the tag cache by parsing newly modified files
-	t4p::ProjectTagActionClass* action = 
+	t4p::ProjectTagActionClass* action =
 		new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
 	action->SetTouchedProjects(touchedProjects);
 	AddStep(action);
-	
+
 	// this will discover the db schema info (tables, columns)
 	AddStep(new t4p::SqlMetaDataActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
 	// this will detect the urls (entry points) that a project has
 	AddStep(new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR));
 
-	// this will discover any new detected tags 
+	// this will discover any new detected tags
 	AddStep(new t4p::TagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_DETECTOR));
 
 	Run();
@@ -174,9 +174,9 @@ bool t4p::SequenceClass::TagCacheWipeAndIndex(const std::vector<t4p::ProjectClas
 			sourceDirsToDelete.push_back(source->RootDirectory);
 		}
 	}
-	
+
 	AddStep(new t4p::TagDeleteSourceActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST_WIPE, sourceDirsToDelete));
-	
+
 	// this will detect all of the config files for projects
 	AddStep(new t4p::ConfigTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CONFIG_TAG_DETECTOR));
 
@@ -190,9 +190,9 @@ bool t4p::SequenceClass::TagCacheWipeAndIndex(const std::vector<t4p::ProjectClas
 	// this will detect the urls (entry points) that a project has
 	AddStep(new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR));
 
-	// this will discover any new detected tags 
+	// this will discover any new detected tags
 	AddStep(new t4p::TagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_DETECTOR));
-	
+
 	// this will discover the db schema info (tables, columns)
 	AddStep(new t4p::SqlMetaDataActionClass(RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA));
 
@@ -291,7 +291,7 @@ void t4p::SequenceClass::RunNextStep() {
 			}
 			else {
 				// step does not involve async; we are done with this step
-				// even though we dont start a background thread, the 
+				// even though we dont start a background thread, the
 				// sync actions still generate EVT_WORK_COMPLETE events. let's
 				// wait for it.
 				IsRunning = true;
@@ -326,8 +326,8 @@ void t4p::SequenceClass::RunNextStep() {
 		}
 	}
 	if (isSequenceDone) {
-		
-		// this can happen when the last step could not be 
+
+		// this can happen when the last step could not be
 		// initialized; then no EVT_WORK_COMPLETE will be generated
 		wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
 		sequenceEvent.SetId(wxID_ANY);
@@ -340,7 +340,7 @@ bool t4p::SequenceClass::Running() const {
 }
 
 void t4p::SequenceClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
-	
+
 	// if there is an action that is running then send an in-progress event
 	// for it
 	t4p::SequenceProgressEventClass sequenceEvt(wxID_ANY, event.Mode, event.PercentComplete, event.Message);

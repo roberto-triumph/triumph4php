@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,19 +27,19 @@
 #include <wx/confbase.h>
 #include <wx/utils.h>
 
-t4p::WebBrowserClass::WebBrowserClass() 
+t4p::WebBrowserClass::WebBrowserClass()
 	: Name()
 	, FullPath() {
 
 }
 
-t4p::WebBrowserClass::WebBrowserClass(const t4p::WebBrowserClass& src) 
+t4p::WebBrowserClass::WebBrowserClass(const t4p::WebBrowserClass& src)
 	: Name()
 	, FullPath() {
 	Copy(src);
 }
 
-t4p::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath) 
+t4p::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath)
 	: Name(name.c_str())
 	, FullPath(fullPath) {
 
@@ -59,17 +59,17 @@ void t4p::WebBrowserClass::Copy(const t4p::WebBrowserClass& src) {
 	FullPath = src.FullPath;
 }
 
-t4p::PhpEnvironmentClass::PhpEnvironmentClass() 
+t4p::PhpEnvironmentClass::PhpEnvironmentClass()
 	: PhpExecutablePath(wxT(""))
-	, Version(pelet::PHP_53) 
+	, Version(pelet::PHP_53)
 	, IsAuto(true)
 	, Installed(false) {
 }
 
-t4p::PhpEnvironmentClass::PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src) 
+t4p::PhpEnvironmentClass::PhpEnvironmentClass(const t4p::PhpEnvironmentClass& src)
 	: PhpExecutablePath()
 	, Version(pelet::PHP_53)
-	, IsAuto(true) 
+	, IsAuto(true)
 	, Installed(false) {
 	Copy(src);
 }
@@ -141,7 +141,7 @@ void t4p::PhpEnvironmentClass::AutoDetermine() {
 		Version = pelet::PHP_53;
 	}
 	else {
-		
+
 		// if version string changes
 		Version = pelet::PHP_53;
 	}
@@ -163,7 +163,7 @@ void t4p::EnvironmentClass::Init() {
 	AddDefaults();
 }
 
-t4p::EnvironmentClass::EnvironmentClass(const t4p::EnvironmentClass& src) 
+t4p::EnvironmentClass::EnvironmentClass(const t4p::EnvironmentClass& src)
 	: Apache()
 	, Php()
 	, WebBrowsers() {
@@ -216,24 +216,24 @@ void t4p::EnvironmentClass::AddDefaults() {
 }
 
 void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
-	
+
 	int version = 0;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
 	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
 	config->Read(wxT("Environment/PhpVersion"), &version);
 	config->Read(wxT("Environment/PhpInstalled"), &Php.Installed);
-	
+
 	if (1 == version) {
 		Php.Version = pelet::PHP_53;
 	}
 	else if (2 == version) {
 		Php.Version = pelet::PHP_54;
 	}
-	
+
 	if (Php.IsAuto) {
 		Php.AutoDetermine();
 	}
-	
+
 	wxString httpdPath;
 	config->Read(wxT("Environment/ApacheHttpdPath"), &httpdPath);
 	config->Read(wxT("Environment/ManualConfiguration"), &Apache.ManualConfiguration);
@@ -246,12 +246,12 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	config->SetPath(wxT("Environment"));
 	bool found = config->GetFirstGroup(groupName, index);
 	if (found) {
-		
+
 		// only remove the defaults when the config file has something
 		WebBrowsers.clear();
 	}
 	while (found) {
-		
+
 		// the web browsers; there are many groups; each group is named "WebBrowser_#"
 		if (groupName.Find(wxT("WebBrowser_")) >= 0) {
 			wxString key = groupName + wxT("/Name");
@@ -262,7 +262,7 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 			WebBrowsers.push_back(t4p::WebBrowserClass(browserName, browserFileName));
 		}
 		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
-			
+
 			// the manual virtual host entries there are many groups; each group is named "VirtualHost_#"
 			// only fill in when Manual flag is off (otherwise we want to parse from the file
 			// in case settings have changed)
@@ -288,8 +288,8 @@ void t4p::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);
 	config->Write(wxT("Environment/PhpVersionIsAuto"), Php.IsAuto);
 	config->Write(wxT("Environment/PhpVersion"), version);
-	config->Write(wxT("Environment/PhpInstalled"), Php.Installed);	
-	
+	config->Write(wxT("Environment/PhpInstalled"), Php.Installed);
+
 	config->Write(wxT("Environment/ApacheHttpdPath"), Apache.GetHttpdPath());
 	config->Write(wxT("Environment/ManualConfiguration"), Apache.ManualConfiguration);
 	int i = 0;
@@ -297,7 +297,7 @@ void t4p::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 		wxString key = wxString::Format(wxT("Environment/WebBrowser_%d/Name"), i);
 		config->Write(key, it->Name);
 		key = wxString::Format(wxT("Environment/WebBrowser_%d/Path"), i);
-		config->Write(key, it->FullPath.GetFullPath()); 
+		config->Write(key, it->FullPath.GetFullPath());
 		i++;
 	}
 	if (Apache.ManualConfiguration) {
@@ -307,7 +307,7 @@ void t4p::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 			wxString key = wxString::Format(wxT("Environment/VirtualHost_%d/RootDirectory"), i);
 			config->Write(key, it->first);
 			key = wxString::Format(wxT("Environment/VirtualHost_%d/HostName"), i);
-			config->Write(key, it->second); 
+			config->Write(key, it->second);
 			i++;
 		}
 	}

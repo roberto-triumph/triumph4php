@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,11 +35,11 @@ static int ID_FILE_MODIFIED_CHECK = wxNewId();
 
 /**
  * collapse a list of paths into files and directories.  The collapsing part is that
- * if list contains a directory and a file in that directory (or a sub-directory) the it is 
+ * if list contains a directory and a file in that directory (or a sub-directory) the it is
  * ignored.
  *
  * For example:
- * paths = { "/home/user/project1/index.php" => 1, "/home/user/project1/js/index.js" => 1, 
+ * paths = { "/home/user/project1/index.php" => 1, "/home/user/project1/js/index.js" => 1,
  *           "/home/user/project1/" => 1, "/home/user/project2/index.php" => 1 }
  *
  * Then, the final result will be
@@ -70,7 +70,7 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 		if (wxFileName::DirExists(*path) || tagCache.HasDir(*path)) {
 			wxFileName dirCreated;
 			dirCreated.AssignDir(*path);
-			
+
 			// if a parent dir already exists, then it means that this is a subdir and we want to skip it
 			size_t dirCount = dirCreated.GetDirCount();
 			bool foundSubDir = false;
@@ -86,7 +86,7 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 			}
 		}
 		else if (wxFileName::FileExists(*path) || tagCache.HasFullPath(*path)) {
-			
+
 			// if the file's dir parent dir has been labeled as created, we want to skip it
 			wxFileName fileCreated(*path);
 			wxFileName fileDir;
@@ -113,20 +113,20 @@ t4p::FileWatcherFeatureClass::FileWatcherFeatureClass(t4p::AppClass& app)
 , Timer(this, ID_FILE_MODIFIED_CHECK)
 , FilesExternallyCreated()
 , FilesExternallyModified()
-, FilesExternallyDeleted() 
+, FilesExternallyDeleted()
 , DirsExternallyCreated()
 , DirsExternallyModified()
 , DirsExternallyDeleted()
 , PathsExternallyCreated()
 , PathsExternallyModified()
-, PathsExternallyDeleted() 
+, PathsExternallyDeleted()
 , PathsExternallyRenamed()
-, LastWatcherEventTime() 
+, LastWatcherEventTime()
 , OpenedFiles()
 , IsWatchError(false) {
 	FsWatcher = NULL;
 	LastWatcherEventTime = wxDateTime::Now();
-	
+
 	// by default, disable on mac os x because wxFileSystemWatcher
 	// users kqueue for fs notifications, and this requires an open
 	// file handle for each patch being watched.
@@ -142,7 +142,7 @@ void t4p::FileWatcherFeatureClass::LoadPreferences(wxConfigBase* config) {
 
 void t4p::FileWatcherFeatureClass::OnAppReady(wxCommandEvent& event) {
 #ifdef __WXMSW__
-	
+
 	// on windows, we check for network drives
 	t4p::VolumeListActionClass* volumeAction = new t4p::VolumeListActionClass(App.RunningThreads, wxID_ANY);
 	App.RunningThreads.Queue(volumeAction);
@@ -157,7 +157,7 @@ void t4p::FileWatcherFeatureClass::OnAppReady(wxCommandEvent& event) {
 void t4p::FileWatcherFeatureClass::OnAppExit(wxCommandEvent& event) {
 	Timer.Stop();
 
-	// unregister ourselves as the event handler from watcher 
+	// unregister ourselves as the event handler from watcher
 	if (FsWatcher) {
 		FsWatcher->SetOwner(NULL);
 		delete FsWatcher;
@@ -168,8 +168,8 @@ void t4p::FileWatcherFeatureClass::OnAppExit(wxCommandEvent& event) {
 void t4p::FileWatcherFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 	wxConfigBase* config = wxConfig::Get();
 	config->Write(wxT("FileWatcher/Enabled"), Enabled);
-	
-	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old 
+
+	// on MSW, wxFileSystemWatcher.RemoveAll does not actually remove the old
 	// watches.
 	// that is why we are using a pointer; deleting the object does remove the
 	// old watches
@@ -204,9 +204,9 @@ void t4p::FileWatcherFeatureClass::StartWatch() {
 		// it means that its in a network drive.
 		bool doAdd = App.Globals.IsInLocalVolume(sourceDir);
 		if (doAdd) {
-			int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY | 
+			int flags = wxFSW_EVENT_CREATE  | wxFSW_EVENT_DELETE  | wxFSW_EVENT_RENAME | wxFSW_EVENT_MODIFY |
 				wxFSW_EVENT_ERROR | wxFSW_EVENT_WARNING;
-			
+
 			if (sourceDir.DirExists()) {
 				sourceDir.DontFollowLink();
 				FsWatcher->AddTree(sourceDir, flags);
@@ -226,7 +226,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 	if (span.GetSeconds() <= 2) {
 
 		// we are still getting file change events. let's wait until all
-		// of the changes are done 
+		// of the changes are done
 		return;
 	}
 	if (PathsExternallyCreated.empty() && PathsExternallyModified.empty() && PathsExternallyDeleted.empty() && PathsExternallyRenamed.empty()) {
@@ -247,13 +247,13 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 
 	// clear out the paths. we do this here because when we process a file we may create a prompt dialog
 	// that the user needs to take action and that may take a while. If we cleared the paths after the prompt
-	// we may delete paths we have not processed yet 
+	// we may delete paths we have not processed yet
 	PathsExternallyCreated.clear();
 	PathsExternallyModified.clear();
 	PathsExternallyDeleted.clear();
 	PathsExternallyRenamed.clear();
-	
-	// make sure deleted files are actually deleted. sometime editors will swap files 
+
+	// make sure deleted files are actually deleted. sometime editors will swap files
 	// instead of overwriting them, and this results in DELETE events
 	std::map<wxString, int>::iterator it = FilesExternallyDeleted.begin();
 	while (it != FilesExternallyDeleted.end()) {
@@ -268,11 +268,11 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 			++it;
 		}
 	}
-	
+
 	std::map<wxString, wxString>::iterator rename = pathsRenamed.begin();
 	while (rename != pathsRenamed.end()) {
-		
-		// make sure renamed files are actually renamed. sometime editors will swap files 
+
+		// make sure renamed files are actually renamed. sometime editors will swap files
 		// instead of overwriting them, and this results in RENAME events
 		wxFileName fileName(rename->first);
 		if (fileName.FileExists()) {
@@ -281,7 +281,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 			pathsRenamed.erase(toErase->first);
 			continue;
 		}
-		
+
 		// if a file has been renamed, then remove any modify events for it
 		std::map<wxString, int>::iterator it = FilesExternallyModified.find(rename->first);
 		if (it != FilesExternallyModified.end()) {
@@ -304,7 +304,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 			++rename;
 		}
 	}
-	
+
 	HandleNonOpenedFiles(OpenedFiles, pathsRenamed);
 	if (IsWatchError) {
 		HandleWatchError();
@@ -362,7 +362,7 @@ void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(const std::vector<wxStri
 	}
 	std::map<wxString, wxString>::iterator pair;
 	for (pair = pathsRenamed.begin(); pair != pathsRenamed.end(); ++pair) {
-		
+
 		// figure out if we renamed a file or a dir
 		if (wxFileName::DirExists(pair->second)) {
 			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
@@ -392,7 +392,7 @@ void t4p::FileWatcherFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 		PathsExternallyRenamed[path] = event.GetNewPath().GetFullPath();
 	}
 	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
-	
+
 		// too many files being added/removed
 		// this is probably a big directory being added / removed
 		// hopefully the root directory is caught
@@ -444,7 +444,7 @@ void t4p::FileWatcherFeatureClass::TrackOpenedFile(wxString fullPath) {
 
 void t4p::FileWatcherFeatureClass::UntrackOpenedFile(wxString fullPath) {
 	std::vector<wxString>::iterator it = std::find(OpenedFiles.begin(), OpenedFiles.end(), fullPath);
-	
+
 	while (it != OpenedFiles.end()) {
 		it = OpenedFiles.erase(it);
 		it = std::find(it, OpenedFiles.end(), fullPath);
@@ -458,9 +458,9 @@ t4p::VolumeListActionClass::VolumeListActionClass(t4p::RunningThreadsClass& runn
 void t4p::VolumeListActionClass::BackgroundWork() {
 #ifdef __WXMSW__
 
-	wxArrayString localVolArray = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED, 
+	wxArrayString localVolArray = wxFSVolume::GetVolumes(wxFS_VOL_MOUNTED,
 		wxFS_VOL_REMOTE | wxFS_VOL_REMOVABLE | wxFS_VOL_READONLY);
-	
+
 
 	std::vector<wxString> localVols;
 	for (size_t i = 0; i < localVolArray.GetCount(); ++i) {
@@ -481,12 +481,12 @@ wxString t4p::VolumeListActionClass::GetLabel() const {
 	return wxT("Volume List");
 }
 
-t4p::VolumeListEventClass::VolumeListEventClass(int id, 
+t4p::VolumeListEventClass::VolumeListEventClass(int id,
 												const std::vector<wxString>& localVolumes)
 : wxEvent(id, t4p::EVENT_ACTION_VOLUME_LIST)
 , LocalVolumes() {
 	t4p::DeepCopy(LocalVolumes, localVolumes);
-}	
+}
 
 wxEvent* t4p::VolumeListEventClass::Clone() const {
 	return new t4p::VolumeListEventClass(GetId(), LocalVolumes);

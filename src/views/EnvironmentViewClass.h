@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -35,20 +35,20 @@ namespace t4p {
 // forward declaration, declared in another file
 class ApacheFileReadCompleteEventClass;
 class EnvironmentFeatureClass;
-	
+
 class EnvironmentViewClass : public t4p::FeatureViewClass {
 
 public:
 
 	EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature);
-	
+
 	/**
 	 * Add the environment dialogs to the preferences notebook
 	 */
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
-	
+
 private:
-	
+
 	t4p::EnvironmentFeatureClass& Feature;
 };
 
@@ -61,7 +61,7 @@ public:
 
 	VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
 			wxString& hostname, wxFileName& rootDirectory);
-			
+
 protected:
 
 	/**
@@ -76,12 +76,12 @@ private:
 	 * This is used to check that the same directory is not entered twice
 	 */
 	std::map<wxString, wxString> ExistingVirtualHosts;
-	
+
 	/**
 	 * Used because there is to validator for wxDirPickerCtrl
 	 */
 	wxFileName& RootDirectoryFileName;
-		
+
 };
 
 /**
@@ -100,30 +100,30 @@ protected:
 public:
 	/** Constructor */
 	ApacheEnvironmentPanelClass(wxWindow* parent, t4p::RunningThreadsClass& runningThreads, EnvironmentClass& environment);
-	
+
 	~ApacheEnvironmentPanelClass();
-	
+
 	/**
 	 * transfers the settings from the window to the Environment data structure
 	 */
 	bool TransferDataFromWindow();
 
 private:
-	
-	/** 
+
+	/**
 	 * The configuration class
-	 * 
+	 *
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass& Environment;
-	
+
 	/**
 	 * keeps track of background threads
 	 */
 	t4p::RunningThreadsClass& RunningThreads;
-		
+
 	/**
-	 * A copy of the current virtual hosts; this is the data structure that the 
+	 * A copy of the current virtual hosts; this is the data structure that the
 	 * user modifies (while the dialog is opened)
 	 */
 	ApacheClass EditedApache;
@@ -132,17 +132,17 @@ private:
 	 * the action identifier, used to stop any running actions
 	 */
 	int RunningActionId;
-	
+
 	/**
 	 * populate the dialog according to the ApacheClass settings
 	 */
 	void OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event);
-	
+
 	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label 
+	 * When this panel is resized automatically re-adjust the wrapping the label
 	 */
 	void OnResize(wxSizeEvent& event);
-	
+
 	/**
 	 * tick the gauge here
 	 */
@@ -152,22 +152,22 @@ private:
 	 * stop the gauge here
 	 */
 	void OnActionComplete(t4p::ActionEventClass& event);
-	
+
 	/**
 	 * Fills in the dialogs based on the Apache environment
 	 */
 	void Populate();
-	
+
 	/**
 	 * disable the CRUD buttons according to the Manual flag
 	 */
 	void OnUpdateUi(wxUpdateUIEvent& event);
-	
+
 	/**
 	 * when the user picks a directory start the scan
 	 */
 	void OnDirChanged(wxFileDirPickerEvent& event);
-	
+
 	DECLARE_EVENT_TABLE()
 };
 
@@ -179,39 +179,39 @@ class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
 public:
 
 	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
-	
+
 	/**
 	 * applies the settings that were changed to the Environment reference [given
 	 * in the constructor].
 	 */
 	bool TransferDataFromWindow();
-	
+
 protected:
 
 	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label 
+	 * When this panel is resized automatically re-adjust the wrapping the label
 	 */
 	void OnResize(wxSizeEvent& event);
-	
+
 	void OnRemoveSelectedWebBrowser(wxCommandEvent& event);
-	
+
 	void OnAddWebBrowser(wxCommandEvent& event);
-	
+
 	void OnEditSelectedWebBrowser(wxCommandEvent& event);
 
 	void OnMoveUp(wxCommandEvent& event);
 
 	void OnMoveDown(wxCommandEvent& event);
-	
+
 private:
 
-	/** 
+	/**
 	 * The configuration class
-	 * 
+	 *
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass& Environment;
-	
+
 	/**
 	 * The web browsers being modified. this is the vector that is the recipient
 	 * of all of the user's operations; it will be copied only when the
@@ -226,11 +226,11 @@ private:
 class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
 
 public:
-	
+
 	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
-	
+
 	bool TransferDataFromWindow();
-	
+
 protected:
 
 	/**
@@ -242,43 +242,43 @@ protected:
 	 * disable the file picker when the checkbox is checked
 	 */
 	void OnInstalledCheck(wxCommandEvent& event);
-	
+
 	/**
-	 * When this panel is resized automatically re-adjust the wrapping the label 
+	 * When this panel is resized automatically re-adjust the wrapping the label
 	 */
 	void OnResize(wxSizeEvent& event);
-	
+
 private:
 
-	/** 
+	/**
 	 * The configuration class
-	 * 
+	 *
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass& Environment;
-	
+
 };
 
 /**
  * Dialog that allows the user to enter a web browser name and executable
- * location 
+ * location
  */
 class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass {
-	
+
 public:
 
-	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers, 
+	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers,
 		WebBrowserClass& newBrowser);
-	
+
 protected:
 
 	void OnOkButton(wxCommandEvent& event);
-	
-	/** 
+
+	/**
 	 * to prevent multiple browsers with the same name
 	 */
 	std::vector<WebBrowserClass> ExistingBrowsers;
-	
+
 	/**
 	 * to transfer the chosen file path
 	 */
@@ -290,7 +290,7 @@ protected:
 	 * path only).
 	 */
 	wxString OriginalName;
-	
+
 };
 
 }

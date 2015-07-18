@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@
 
 static int ID_SQL_METADATA_FETCH = wxNewId();
 
-class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass, 
+class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass,
 	public DatabaseTestFixtureClass, public SqliteTestFixtureClass, public FileTestFixtureClass {
 
 public:
@@ -46,10 +46,10 @@ public:
 
 	SqlMetaDataActionTestFixtureClass()
 		: ActionTestFixtureClass()
-		, DatabaseTestFixtureClass("metadata_fetch") 
+		, DatabaseTestFixtureClass("metadata_fetch")
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 		, FileTestFixtureClass(wxT("metadata_fetch"))
-		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH) 
+		, SqlMetaDataAction(RunningThreads, ID_SQL_METADATA_FETCH)
 		, Results(Globals.ResourceCacheSession) {
 		t4p::DatabaseTagClass dbTag;
 		dbTag.Schema = UNICODE_STRING_SIMPLE("metadata_fetch");
@@ -90,7 +90,7 @@ TEST_FIXTURE(SqlMetaDataActionTestFixtureClass, Fetch) {
 
 	std::vector<UnicodeString> tables = Results.FindTables(Globals.DatabaseTags[0], UNICODE_STRING_SIMPLE("my_users"));
 	CHECK_VECTOR_SIZE(1, tables);
-	CHECK_UNISTR_EQUALS("my_users", tables[0]); 
+	CHECK_UNISTR_EQUALS("my_users", tables[0]);
 }
 
 }

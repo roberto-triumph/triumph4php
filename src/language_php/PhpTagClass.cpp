@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,18 +34,18 @@ t4p::PhpTagClass::PhpTagClass()
 	, Comment()
 	, Id(0)
 	, FileIsNew(false)
-	, Type(CLASS) 
+	, Type(CLASS)
 	, IsProtected(false)
-	, IsPrivate(false) 
+	, IsPrivate(false)
 	, IsStatic(false)
 	, IsDynamic(false)
 	, IsNative(false)
 	, HasVariableArgs(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) 
+	, FileTagId(-1)
 	, SourceId(-1) {
-		
+
 }
 
 t4p::PhpTagClass::PhpTagClass(const t4p::PhpTagClass& src)
@@ -57,16 +57,16 @@ t4p::PhpTagClass::PhpTagClass(const t4p::PhpTagClass& src)
 	, Comment()
 	, Id(0)
 	, FileIsNew(false)
-	, Type(CLASS)	
+	, Type(CLASS)
 	, IsProtected(false)
-	, IsPrivate(false) 
+	, IsPrivate(false)
 	, IsStatic(false)
 	, IsDynamic(false)
 	, IsNative(false)
 	, HasVariableArgs(false)
 	, Key()
 	, FullPath()
-	, FileTagId(-1) 
+	, FileTagId(-1)
 	, SourceId(-1) {
 	Copy(src);
 }
@@ -105,7 +105,7 @@ bool t4p::PhpTagClass::operator<(const t4p::PhpTagClass& a) const {
 
 bool t4p::PhpTagClass::operator==(const t4p::PhpTagClass& a) const {
 	return Identifier == a.Identifier && ClassName == a.ClassName && NamespaceName == a.NamespaceName;
-} 
+}
 
 bool t4p::PhpTagClass::IsKeyEqualTo(const UnicodeString& key) const {
 	return Key.caseCompare(key, 0) == 0;
@@ -171,15 +171,15 @@ UnicodeString t4p::PhpTagClass::FullyQualifiedClassName() const {
 	return qualifiedName;
 }
 
-t4p::TraitTagClass::TraitTagClass() 
+t4p::TraitTagClass::TraitTagClass()
 	: TraitClassName()
 	, Aliased()
-	, InsteadOfs() 
+	, InsteadOfs()
 	, FileTagId(0) {
-		
+
 }
 
-t4p::FileTagClass::FileTagClass() 
+t4p::FileTagClass::FileTagClass()
 	: FullPath()
 	, DateTime()
 	, FileId(0)

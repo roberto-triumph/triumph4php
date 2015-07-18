@@ -1,16 +1,16 @@
 /**
  * This software is released under the terms of the MIT License
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,15 +38,15 @@ class EditorBehaviorViewClass : public t4p::FeatureViewClass {
 public:
 
 	EditorBehaviorViewClass(t4p::EditorBehaviorFeatureClass& feature);
-	
+
 	void AddToolBarItems(wxAuiToolBar* toolBar);
-	
+
 	void AddEditMenuItems(wxMenu* editMenu);
-	
+
 	void AddViewMenuItems(wxMenu* viewMenu);
-		
+
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
-	
+
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
@@ -63,11 +63,11 @@ private:
 	void AddKeyboardCommands(wxMenu* menu, bool isTextSelected);
 	void SetFeaturesOnNotebook();
 	void SetFeatures(const t4p::CodeControlOptionsClass& options, wxStyledTextCtrl* codeCtrl);
-	
+
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAppFileNew(t4p::CodeControlEventClass& event);
 	void OnAppFileClosed(t4p::CodeControlEventClass& event);
-	
+
 	void OnToggleWordWrap(wxCommandEvent& event);
 	void OnToggleIndentationGuides(wxCommandEvent& event);
 	void OnToggleWhitespace(wxCommandEvent& event);
@@ -113,7 +113,7 @@ private:
 class EditorBehaviorPanelClass : public EditorBehaviorPanelGeneratedClass {
 
 public:
-	
+
 	EditorBehaviorPanelClass(wxWindow* parent, CodeControlOptionsClass& options);
 	bool TransferDataToWindow();
 	bool TransferDataFromWindow();
@@ -129,7 +129,7 @@ protected:
 /**
  * The editor command panel allows the user to edit the keyboard commands
  * that scintilla exposes.
- * They are separate from menu accelators because menu accelators 
+ * They are separate from menu accelators because menu accelators
  * respond to their keystrokes at the application level; meaning that
  * if we had the "move to next word" command (CTRL+RIGHT)in the menu, then
  * hitting CTRL+RIGHT in ANY textbox will move the code control, not the
