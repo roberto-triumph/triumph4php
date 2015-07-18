@@ -122,7 +122,6 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 		}
 		else {
 			IsEmpty = true;
-			error = wxT("No results");
 		}
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
