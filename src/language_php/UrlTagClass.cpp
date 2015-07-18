@@ -238,7 +238,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 	try {
 		std::vector<std::string> stdSourceDirs;
 		std::string sql = "DELETE FROM url_tags WHERE url = ? AND source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
-		for (size_t i = 0; i < sourceDirs.size(); ++ i) {
+		for (size_t i = 0; i < sourceDirs.size(); ++i) {
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";
@@ -323,7 +323,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 	try {
 		std::vector<std::string> stdSourceDirs;
 		std::string sql = "DELETE FROM url_tags WHERE source_id IN(SELECT source_id FROM sources WHERE directory IN("; 
-		for (size_t i = 0; i < sourceDirs.size(); ++ i) {
+		for (size_t i = 0; i < sourceDirs.size(); ++i) {
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";

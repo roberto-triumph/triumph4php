@@ -501,7 +501,7 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		else {
 			ext = extensions[0];
 		}
-		dialogTitle =_("Create a new PHP file");
+		dialogTitle = _("Create a new PHP file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
 		extensions = Feature->App.Globals.FileTypes.GetSqlFileExtensions();
@@ -511,7 +511,7 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		else {
 			ext = extensions[0];
 		}
-		dialogTitle =_("Create a new SQL file");
+		dialogTitle = _("Create a new SQL file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
 		extensions = Feature->App.Globals.FileTypes.GetCssFileExtensions();
@@ -521,7 +521,7 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		else {
 			ext = extensions[0];
 		}
-		dialogTitle =_("Create a new CSS file");
+		dialogTitle = _("Create a new CSS file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_JS) {
 		extensions = Feature->App.Globals.FileTypes.GetJsFileExtensions();
@@ -531,15 +531,15 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		else {
 			ext = extensions[0];
 		}
-		dialogTitle =_("Create a new JS file");
+		dialogTitle = _("Create a new JS file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_TEXT) {
 		ext = wxT("*.txt");
-		dialogTitle =_("Create a new text file");
+		dialogTitle = _("Create a new text file");
 	}
 	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_DIRECTORY) {
 		ext = wxT("");
-		dialogTitle =_("Create a directory");
+		dialogTitle = _("Create a directory");
 	}
 	ext.Replace(wxT("*"), wxT("New File"));
 

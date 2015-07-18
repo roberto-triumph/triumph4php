@@ -56,7 +56,7 @@ void t4p::WebBrowserClass::Copy(const t4p::WebBrowserClass& src) {
 	// the assignment operator is a shallow copy
 	// this makes the copies thread-safe
 	Name = src.Name.c_str();
-	FullPath= src.FullPath;
+	FullPath = src.FullPath;
 }
 
 t4p::PhpEnvironmentClass::PhpEnvironmentClass() 

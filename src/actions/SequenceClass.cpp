@@ -350,7 +350,7 @@ void t4p::SequenceClass::OnActionProgress(t4p::ActionProgressEventClass& event) 
 void t4p::SequenceClass::SourceCheck() {
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::SourceClass>::const_iterator source;
-	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++ project) {
+	for (project = Globals.Projects.begin(); project != Globals.Projects.end(); ++project) {
 		if (project->IsEnabled) {
 			for (source = project->Sources.begin(); source != project->Sources.end(); ++source) {
 				if (!source->Exists()) {

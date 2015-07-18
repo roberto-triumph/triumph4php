@@ -133,7 +133,7 @@ void t4p::FileModifiedCheckViewClass::FilesDeletedPrompt(std::map<wxString, t4p:
 	std::map<wxString, int>::const_iterator file;
 	wxString files;
 	bool deletingOpened = false;
-	for (file = deletedFiles.begin(); file != deletedFiles.end(); ++ file) {
+	for (file = deletedFiles.begin(); file != deletedFiles.end(); ++file) {
 		wxString fullPath = file->first;
 
 		// find the control for the file
