@@ -482,7 +482,6 @@ void t4p::TagCacheClass::ExpressionCompletionMatches(const wxString& fileName,
 		t4p::WorkingCacheClass* cache = itWorkingCache->second;
 		cache->SymbolTable.ExpressionCompletionMatches(parsedVariable, variableScope, sourceDirs, *TagFinderList,
 			autoCompleteList, resourceMatches, doDuckTyping, error);
-
 	}
 	if (!foundSymbolTable) {
 		error.Type = t4p::SymbolTableMatchErrorClass::UNREGISTERED_FILE;

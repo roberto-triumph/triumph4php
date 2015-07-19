@@ -193,7 +193,6 @@ class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 		// clean up the MySQL library.
 		// mysql has stuff that gets created per each thread
 		mysql_thread_end();
-
 	}
 
 	t4p::ThreadCleanupClass* Clone() {

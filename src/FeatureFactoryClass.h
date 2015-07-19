@@ -149,7 +149,6 @@ class FeatureFactoryClass {
 	t4p::PhpCodeCompletionFeatureClass*    PhpCodeCompletion;
 	t4p::NotebookLayoutFeatureClass*       NotebookLayout;
 	t4p::TestFeatureClass*                 Test;
-
 };
 }
 

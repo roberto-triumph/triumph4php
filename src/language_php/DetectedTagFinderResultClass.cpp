@@ -90,7 +90,6 @@ void t4p::DetectedTagExactMemberResultClass::DoBind(soci::statement&  stmt) {
 		stmt.exchange(soci::into(Signature));
 		stmt.exchange(soci::into(Comment));
 		stmt.exchange(soci::into(IsStatic));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);

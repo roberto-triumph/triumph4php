@@ -438,7 +438,6 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 }
 
 void t4p::PhpVariableLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
-
 	// isset expressions have a bit of logic
 	//
 	// examples that don't trigger PHP notices
@@ -549,7 +548,6 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
 			NativeFunctionSignatureLookup.Set(unqualifiedName);
 			hasSet = true;
-
 		}
 		else {
 			NativeFunctionSignatureLookup.Set(functionName);

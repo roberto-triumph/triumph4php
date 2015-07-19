@@ -1031,7 +1031,6 @@ bool t4p::FunctionLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(FunctionName));
 		stmt.exchange(soci::use(TagType));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1073,7 +1072,6 @@ bool t4p::ClassLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(ClassName));
 		stmt.exchange(soci::use(TagType));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1116,7 +1114,6 @@ bool t4p::NamespaceLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(NamespaceName));
 		stmt.exchange(soci::use(TagType));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1177,7 +1174,6 @@ bool t4p::MethodLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		stmt.exchange(soci::use(TagType));
 		stmt.exchange(soci::use(IsStaticTrue));
 		stmt.exchange(soci::use(IsStaticFalse));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1242,7 +1238,6 @@ bool t4p::PropertyLookupClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		stmt.exchange(soci::use(TagTypeConstant));
 		stmt.exchange(soci::use(IsStaticTrue));
 		stmt.exchange(soci::use(IsStaticFalse));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1288,7 +1283,6 @@ bool t4p::FunctionSignatureLookupClass::DoPrepare(soci::statement& stmt, bool do
 		stmt.prepare(sql);
 		stmt.exchange(soci::use(FunctionName));
 		stmt.exchange(soci::use(TagType));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1369,7 +1363,6 @@ bool t4p::MethodSignatureLookupClass::DoPrepare(soci::statement& stmt, bool doLi
 		stmt.exchange(soci::use(TagType));
 		stmt.exchange(soci::use(IsStaticTrue));
 		stmt.exchange(soci::use(IsStaticFalse));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);
@@ -1765,7 +1758,6 @@ void t4p::TagResultClass::DoBind(soci::statement& stmt) {
 		stmt.exchange(soci::into(IsNative));
 		stmt.exchange(soci::into(HasVariableArgs));
 		stmt.exchange(soci::into(FileIsNew, FileIsNewIndicator));
-
 	} catch (std::exception& e) {
 		error = t4p::CharToWx(e.what());
 		wxASSERT_MSG(false, error);

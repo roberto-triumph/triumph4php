@@ -225,7 +225,6 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 			}
 		}
 		delete tagResults;
-
 	}
 	if (type.isEmpty() && IsNativeTagFinderInit) {
 		// tags in the native db file do not have a source_id
@@ -238,7 +237,6 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 			type =  t4p::PhpTagClass::CLASS == tagResults->Tag.Type ? tagResults->Tag.ClassName : tagResults->Tag.ReturnType;
 		}
 		delete tagResults;
-
 	}
 	return type;
 }

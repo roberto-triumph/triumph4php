@@ -195,7 +195,6 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				type = tagFinderList.ResolveResourceType(resourceToLookup, sourceDirs);
 			}
 			else if (!symbol.ChainList.empty()) {
-
 				// go through the chain list; the first item in the list may be a variable
 				pelet::ScopeClass peletScope;
 				pelet::VariableClass parsedVariable(peletScope);

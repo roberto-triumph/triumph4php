@@ -769,7 +769,6 @@ void t4p::TagParserClass::Print() {
 				u_fprintf(out, "\tINSTEADOF METHOD=%S\n", trait.InsteadOfs[k].getTerminatedBuffer());
 			}
 		}
-
 	}
 	u_fclose(out);
 }
@@ -942,7 +941,6 @@ void t4p::TagParserClass::PersistResources(const t4p::PhpTagClass& resource, int
 		IsNative = resource.IsNative;
 		HasVariableArgs = resource.HasVariableArgs;
 		InsertStmt->execute(true);
-
 	} catch (std::exception& e) {
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC

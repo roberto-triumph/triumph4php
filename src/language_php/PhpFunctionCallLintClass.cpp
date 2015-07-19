@@ -202,7 +202,6 @@ static bool LookupFunction(const UnicodeString& name, int& signatureRequiredArgC
 				}
 			}
 		}
-
 	}
 	return found;
 }

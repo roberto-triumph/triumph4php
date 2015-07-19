@@ -54,7 +54,6 @@ void t4p::DetectorDbClass::DeleteSource(const wxFileName& sourceDir) {
 		Session->once << "DELETE FROM detected_tags WHERE source_id = ? ", soci::use(sourceId);
 		Session->once << "DELETE FROM url_tags WHERE source_id = ? ", soci::use(sourceId);
 		Session->once << "DELETE FROM sources WHERE source_id = ? ", soci::use(sourceId);
-
 	} catch (std::exception& e) {
 		t4p::EditorLogWarning(t4p::ERR_TAG_READ, wxString::FromAscii(e.what()));
 	}

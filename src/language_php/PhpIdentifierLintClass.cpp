@@ -500,7 +500,6 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			// and unserializing data from strings (json_encode)
 			CheckPropertyName(prop, var);
 		}
-
 	}
 }
 

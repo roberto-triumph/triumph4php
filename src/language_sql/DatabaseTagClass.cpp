@@ -274,7 +274,6 @@ bool t4p::SqlQueryClass::Execute(soci::statement& stmt, UnicodeString& error) {
 		// execute will return false if statement does not return any rows
 		// but we want to return true for INSERTs and UPDATEs too
 		success = true;
-
 	} catch (std::exception const& e) {
 		success = false;
 		error = t4p::CharToIcu(e.what());
@@ -521,7 +520,6 @@ std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::v
 				dbTag.User = t4p::CharToIcu(user.c_str());
 
 				allDbTags.push_back(dbTag);
-
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {

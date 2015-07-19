@@ -94,9 +94,7 @@ std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vecto
 				t4p::ConfigTagClass configTag;
 				configTag.Label = t4p::CharToWx(label.c_str());
 				configTag.ConfigFileName.Assign(t4p::CharToWx(fullPath.c_str()));
-
 				allConfigTags.push_back(configTag);
-
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {

@@ -229,8 +229,8 @@ static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds
 	//  Shortcut-File-New = "CTRL+SHIFT+N|CTRL+ALT_N"
 	//
 	bool next = config->GetFirstEntry(configName, configIterator);
-    while (next) {
-        if (configName.StartsWith(wxT("Shortcut-"))) {
+	while (next) {
+		if (configName.StartsWith(wxT("Shortcut-"))) {
 			wxString shortcutIdentifier = configName.Mid(9); // 9 = length of prefix
 			for (size_t i = 0; i < dynamicCmds.size(); ++i) {
 				if (shortcutIdentifier == dynamicCmds[i].GetIdentifier()) {
@@ -246,11 +246,10 @@ static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds
 					break;
 				}
 			}
-
-        }
-        next = config->GetNextEntry(configName, configIterator);
-    }
-    return total;
+		}
+		next = config->GetNextEntry(configName, configIterator);
+	}
+	return total;
 }
 
 /* this function was ripped off from wxKeyProfile::Load() but this function

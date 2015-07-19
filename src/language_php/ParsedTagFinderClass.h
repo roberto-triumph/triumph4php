@@ -907,7 +907,6 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 	 * bound to the prepared statment as an output
 	 */
 	std::string StdSignature;
-
 };
 
 

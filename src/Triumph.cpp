@@ -78,7 +78,6 @@ t4p::AppClass::~AppClass() {
 }
 
 void t4p::AppClass::CreateFeatures() {
-
 	// connect the features to the event sink so that they can
 	// receive app events
 	FeatureFactory.CreateFeatures();

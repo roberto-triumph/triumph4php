@@ -524,7 +524,6 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, arrayKey);
 			Variables.push_back(arrayVariableKeySymbol);
 		}
-
 	}
 	else if (!variable.ChainList.empty()) {
 		UnicodeString destinationVariable = variable.ChainList[0].Name;

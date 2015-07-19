@@ -253,7 +253,6 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 		}
 		stmt.define_and_bind();
 		stmt.execute(true);
-
 	} catch (std::exception& e) {
 		wxUnusedVar(e);
 		wxString msg = t4p::CharToWx(e.what());
