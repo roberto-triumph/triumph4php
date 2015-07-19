@@ -31,15 +31,12 @@
 #include <wx/stc/stc.h>
 
 namespace t4p {
-
 /**
  * The FileOperationsViewClass view handles the menu operations
  * for "macro" file operations: load, save, revert.
  */
 class FileOperationsViewClass : public t4p::FeatureViewClass {
-
 	public:
-
     FileOperationsViewClass(t4p::FileOperationsFeatureClass& feature);
 
 	void AddFileMenuItems(wxMenu* fileMenu);
@@ -49,7 +46,6 @@ class FileOperationsViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& cmds);
 
 	private:
-
 	/**
 	 * Loads the given files into the application, one page for each file.
 	 * File names must be fully qualified.
@@ -176,7 +172,6 @@ class FileOperationsViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

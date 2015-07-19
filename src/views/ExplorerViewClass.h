@@ -31,11 +31,8 @@
 #include <widgets/FileTypeImageList.h>
 
 namespace t4p {
-
 class ExplorerViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	ExplorerViewClass(t4p::ExplorerFeatureClass& feature);
 
 	/**
@@ -56,7 +53,6 @@ class ExplorerViewClass : public t4p::FeatureViewClass {
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
 	t4p::ExplorerFeatureClass& Feature;
 
 	/**
@@ -116,9 +112,7 @@ class ExplorerViewClass : public t4p::FeatureViewClass {
 };
 
 class FileListingWidgetClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * this class will not own any of these pointers
 	 */
@@ -138,7 +132,6 @@ class FileListingWidgetClass : public wxEvtHandler {
 	void OnListMenuFileManager(wxCommandEvent& event);
 
 	private:
-
 	// events handlers for the files list
 	void OnListItemRightClick(wxListEvent& event);
 	void OnListEndLabelEdit(wxListEvent& event);
@@ -186,7 +179,6 @@ class FileListingWidgetClass : public wxEvtHandler {
 
 class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 	public:
-
 	ModalExplorerPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::ExplorerViewClass& view);
 	~ModalExplorerPanelClass();
 
@@ -199,8 +191,6 @@ class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 	void ShowDir();
 
 	private:
-
-
 	/**
 	 * the listing model; the object that "backs" the panel and performs
 	 * the actions (in the background). this class owns the pointer
@@ -275,7 +265,6 @@ class ModalExplorerPanelClass : public ModalExplorerGeneratedPanelClass {
 
 class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
 	public:
-
 	ExplorerOutlinePanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature, t4p::ExplorerViewClass& view);
 	~ExplorerOutlinePanelClass();
 
@@ -286,8 +275,6 @@ class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
 	void ShowDir();
 
 	private:
-
-
 	/**
 	 * the listing model; the object that "backs" the panel and performs
 	 * the actions (in the background). this class owns the pointer
@@ -353,11 +340,8 @@ class ExplorerOutlinePanelClass : public ExplorerOutlineGeneratedPanelClass {
  * Panel that shows the explorer options: locations of Operation System shell, file manager
  */
 class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
-
 	public:
-
 	ExplorerOptionsPanelClass(wxWindow* parent, int id, t4p::ExplorerFeatureClass& feature);
-
 };
 
 /**
@@ -366,19 +350,15 @@ class ExplorerOptionsPanelClass : public ExplorerOptionsGeneratedPanelClass {
  * not the extension.
  */
 class ExplorerNewFileDialogClass : public ExplorerNewFileGeneratedDialogClass {
-
 	public:
-
 	ExplorerNewFileDialogClass(wxWindow* parent, const wxString& title,
 		const wxString& currentDir, wxString& fileName);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 	void OnTextEnter(wxCommandEvent& event);
 
 	private:
-
 	/**
 	 * the CurrentDir is used to check that the user does not enter
 	 * a file name that already exists in the CurrentDir
@@ -390,7 +370,6 @@ class ExplorerNewFileDialogClass : public ExplorerNewFileGeneratedDialogClass {
 	 */
 	wxString& FileName;
 };
-
 }
 
 #endif

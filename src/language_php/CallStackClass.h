@@ -34,7 +34,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * This is a representation of a single variable assignment.  A variable
  * may be assigned with different values (scalar, object, return
@@ -48,11 +47,8 @@ namespace t4p {
  * variables.
  */
 class VariableSymbolClass {
-
 	public:
-
 	enum Types {
-
 		/**
 		 * variable is assigned a scalar (string or number)
 		 */
@@ -253,9 +249,7 @@ class CallStackClass :
 	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass,
 	public pelet::ClassObserverClass {
-
 	public:
-
 	/**
 	 * reasons why building of the call stack could not be completeed
 	 */
@@ -373,7 +367,6 @@ class CallStackClass :
 
 
 	private:
-
 	/**
 	 * this is the class that will parse the source code
 	 */
@@ -402,7 +395,6 @@ class CallStackClass :
 	 * jumping through the code
 	 */
 	struct ResourceWithFile {
-
 		wxFileName FileName;
 
 		t4p::PhpTagClass Resource;
@@ -487,7 +479,6 @@ class CallStackClass :
 	 */
 	bool InDesiredScope() const;
 };
-
 }
 
 #endif

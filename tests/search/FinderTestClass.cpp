@@ -45,7 +45,6 @@ UnicodeString CODE = t4p::CharToIcu(
 	"?>");
 
 SUITE(FinderTestClass) {
-
 TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
 	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
 	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
@@ -168,7 +167,6 @@ TEST(FindPreviousShouldSkipToFirstInstance) {
 	CHECK(finder.GetLastMatch(position, length));
 	CHECK_EQUAL(firstIndex, position);
 	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$MESSAGE")));
-
 }
 
 TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
@@ -206,7 +204,6 @@ TEST(GetLastReplacementTextShouldReturnFalseWhenTextDoesNotHaveAMatch) {
 	changedCode.findAndReplace(UNICODE_STRING_SIMPLE("3.14"), UNICODE_STRING_SIMPLE("3.33"));
 	CHECK_EQUAL(false, finder.GetLastReplacementText(changedCode, match));
 	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match);
-
 }
 
 TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
@@ -269,5 +266,4 @@ TEST(PrepareShouldReturnTrueWhenExpressionAndReplaceExpressionAreValid) {
 	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$1bc");
 	CHECK(finder.Prepare());
 }
-
 }

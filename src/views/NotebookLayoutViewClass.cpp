@@ -83,7 +83,6 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 					break;
 				}
 				else if (visible[i] == ctrlNotebook) {
-
 					// the code control is already at a visible notebook.
 					// move on to the next code control
 					moved = true;
@@ -105,7 +104,6 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 
 t4p::NotebookLayoutViewClass::NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature)
 : FeatureViewClass() {
-
 }
 
 void t4p::NotebookLayoutViewClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -143,12 +141,10 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeCtrl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeCtrl, &currentNotebook)) {
 		if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 0)) {
-
 			// splitting horizontally
 			currentNotebook->SplitHorizontally();
 		}
 		else if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 1)) {
-
 			// splitting vertically
 			currentNotebook->SplitVertically();
 		}
@@ -156,7 +152,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event) {
-
 	//
 	// Implementation notes:
 	// see src/widgets/AuiManager.h for more info about how panes
@@ -220,7 +215,6 @@ void t4p::NotebookLayoutViewClass::OnNotebookCreateColumns(wxCommandEvent& event
 }
 
 void t4p::NotebookLayoutViewClass::OnNotebookCreateRows(wxCommandEvent& event) {
-
 	//
 	// Implementation notes:
 	// see src/widgets/AuiManager.h for more info about how panes

@@ -43,7 +43,6 @@
 
 class MyApp : public wxApp {
 	public:
-
 	MyApp();
 	bool OnInit();
 	int OnExit();
@@ -81,7 +80,6 @@ class MyApp : public wxApp {
 	 * the sequence being tested
 	 */
 	t4p::SequenceClass Sequence;
-
 };
 
 class MyFrame: public wxFrame {
@@ -91,7 +89,6 @@ class MyFrame: public wxFrame {
 	void Log(wxString msg);
 
 	private:
-
 	wxTextCtrl* TextCtrl;
 	MyApp& App;
 	int Lines;
@@ -112,7 +109,6 @@ MyApp::MyApp()
 , RunningThreads()
 , Globals()
 , Sequence(Globals, RunningThreads) {
-
 }
 
 bool MyApp::OnInit() {
@@ -192,7 +188,6 @@ void MyApp::CreateProject(wxString projectName, wxString rootDir) {
 }
 
 int MyApp::OnExit() {
-
 	// external libs use memory pools; close these
 	// down so that we can run this program thtough memory checkers
 	// and the memcheckers will not complain.
@@ -219,15 +214,12 @@ void MyFrame::Log(wxString msg) {
 	}
 	TextCtrl->AppendText(msg);
 	TextCtrl->AppendText(wxT("\n"));
-
 }
 
 void MyFrame::OnActionComplete(wxCommandEvent& event) {
-
 }
 
 void MyFrame::OnActionInProgress(wxCommandEvent& event) {
-
 }
 
 void MyFrame::OnClose(wxCloseEvent& event) {

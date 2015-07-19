@@ -32,15 +32,12 @@
 #include <vector>
 
 namespace t4p {
-
 /**
 * pair together a project name and the config files for that
 * project, that way we can build the submenus.
 */
 class ConfigFilesFeaturePairClass {
-
 	public:
-
 	/**
 	 * the label of the project that the config files were
 	 * found in
@@ -68,9 +65,7 @@ class ConfigFilesFeaturePairClass {
  * and are read with the help of ConfigTagFinderClass.
  */
 class ConfigFilesFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	/**
 	 * max amount of menu items to show
 	 * the 100 is due to the menu ids allocated to each feature in
@@ -96,7 +91,6 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 	void OpenConfigItem(size_t index);
 
 	private:
-
 	/**
 	 * Read all of the detected config tags into memory; that way we can
 	 * assign them a menu ID (the index into this vector will be used
@@ -113,7 +107,6 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

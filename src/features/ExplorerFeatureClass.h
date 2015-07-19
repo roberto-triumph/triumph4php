@@ -31,15 +31,12 @@
 #include <wx/fswatcher.h>
 
 namespace t4p {
-
 // forward declaration, defined below
 class ExplorerEventClass;
 class ExplorerModifyEventClass;
 
 class FileListingClass : public wxEvtHandler {
-
 	public:
-
 	wxFileName WorkingDir;
 	std::vector<wxFileName> Files;
 	std::vector<wxFileName> Dirs;
@@ -56,7 +53,6 @@ class FileListingClass : public wxEvtHandler {
 	void StartDelete(const std::vector<wxFileName>& dirs, const std::vector<wxFileName>& files);
 
 	private:
-
 	// when a file is added/remove update the panel
 	void OnFsWatcher(wxFileSystemWatcherEvent& event);
 
@@ -100,9 +96,7 @@ class FileListingClass : public wxEvtHandler {
  * and files for any path in the file system.
  */
 class ExplorerFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	/**
 	 * executable of the operating system file manager
 	 */
@@ -128,7 +122,6 @@ class ExplorerFeatureClass : public t4p::FeatureClass {
 	std::vector<wxFileName> EnabledSourceDirectories() const;
 
 	private:
-
 	/**
 	 * when projects list is updated, we need to update our sources list
 	 */
@@ -151,9 +144,7 @@ typedef void (wxEvtHandler::*ExplorerEventClassFunction)(t4p::ExplorerEventClass
  * results of a directory listing
  */
 class ExplorerEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 *  the dir that was searched
 	 */
@@ -197,7 +188,6 @@ class ExplorerEventClass : public wxEvent {
  * action is to get files that we have not indexed yet for whatever reason.
  */
 class ExplorerFileSystemActionClass : public t4p::ActionClass {
-
 	public:
 	ExplorerFileSystemActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
@@ -212,10 +202,9 @@ class ExplorerFileSystemActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
-	private:
 
+	private:
 	wxFileName Dir;
 
 	/**
@@ -238,9 +227,7 @@ class ExplorerFileSystemActionClass : public t4p::ActionClass {
  * The action will post EVENT_EXPLORER_MODIFY events
  */
 class ExplorerModifyActionClass : public t4p::ActionClass {
-
 	public:
-
 	enum Actions {
 		NONE,
 		DELETE_FILES_DIRS,
@@ -262,7 +249,6 @@ class ExplorerModifyActionClass : public t4p::ActionClass {
 	void SetFileToRename(const wxFileName& file, const wxString& newName);
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;
@@ -309,9 +295,7 @@ typedef void (wxEvtHandler::*ExplorerModifyEventClassFunction)(t4p::ExplorerModi
  * results of a file system modification (delete / rename)
  */
 class ExplorerModifyEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * name of the item renamed
 	 */
@@ -373,7 +357,6 @@ class ExplorerModifyEventClass : public wxEvent {
 
 	wxEvent* Clone() const;
 };
-
 }
 
 #endif

@@ -31,7 +31,6 @@
 #include <memory>
 
 namespace t4p {
-
 /**
  * The man common menu bar is the menu bar that is
  * shown to the user has closed the main frame.  It
@@ -54,9 +53,7 @@ namespace t4p {
  * event handler system
  */
 class MacCommonMenuBarClass {
-
 	public:
-
 	enum {
 		ID_COMMON_MENU_NEW = wxID_HIGHEST + 1,
 		ID_COMMON_MENU_OPEN
@@ -65,7 +62,6 @@ class MacCommonMenuBarClass {
 	MacCommonMenuBarClass(wxApp& app);
 
 	private:
-
 	wxApp& App;
 
 	/**
@@ -75,7 +71,6 @@ class MacCommonMenuBarClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

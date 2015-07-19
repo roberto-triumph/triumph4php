@@ -31,7 +31,6 @@
 #include <wx/stc/stc.h>
 
 namespace t4p {
-
 /**
  * The bookmark feature keeps track of bookmarks at the user's request.
  * The bookmark feature allows the user to cycle through their
@@ -51,7 +50,6 @@ namespace t4p {
  * is because bookmarks are often used for short periods of time.
  */
 class BookmarkViewClass : public t4p::FeatureViewClass {
-
 	public:
 	BookmarkViewClass(t4p::BookmarkFeatureClass& feature);
 
@@ -66,7 +64,6 @@ class BookmarkViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& shortcuts);
 
 	private:
-
 	/**
 	 * this menu handler will toggle the bookmark in the current
 	 * file / line on or off.
@@ -117,7 +114,6 @@ class BookmarkViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P__BOOKMARKFEATURECLASS_H

@@ -38,7 +38,6 @@ t4p::DatabaseTableTagClass::DatabaseTableTagClass(const t4p::DatabaseTableTagCla
 }
 
 void t4p::DatabaseTableTagClass::Copy(const t4p::DatabaseTableTagClass& src) {
-
 	// want copies to be thread safe
 	TableName = src.TableName.c_str();
 	ConnectionHash = src.ConnectionHash.c_str();

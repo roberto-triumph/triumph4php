@@ -34,7 +34,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration
 class TagFinderListClass;
 
@@ -43,11 +42,8 @@ class TagFinderListClass;
  * to match a symbol or failed to complete an expression.
  */
 class SymbolTableMatchErrorClass {
-
 	public:
-
 	enum ErrorTypes {
-
 		/** success */
 		NONE,
 
@@ -168,7 +164,6 @@ class SymbolTableMatchErrorClass {
 	 * @param className the name of the class that was searched
 	 */
 	void ToUnknownResource(const pelet::VariableClass& parsedVariable, const UnicodeString& className);
-
 };
 
 /**
@@ -199,9 +194,7 @@ class SymbolTableMatchErrorClass {
  * Will create one symbol "person" with the type string.
  */
 class SymbolClass {
-
 	public:
-
 	/**
 	 * The variable type
 	 * UNKNOWN: could not determine / or a variable variable $us{$userName}
@@ -257,7 +250,6 @@ class SymbolClass {
 	Types Type;
 
 	SymbolClass(const UnicodeString& variable, Types type = UNKNOWN);
-
 };
 
 /**
@@ -279,7 +271,6 @@ class SymbolTableClass :
 	public pelet::FunctionObserverClass,
 	public pelet::VariableObserverClass,
 	public pelet::AnyExpressionObserverClass {
-
 	public:
 	SymbolTableClass();
 
@@ -429,7 +420,6 @@ class SymbolTableClass :
 	void SetVersion(pelet::Versions version);
 
 	private:
-
 	/**
 	 * Get the vector of variables for the given scope. If scope does not exist it will
 	 * be created.
@@ -512,9 +502,7 @@ class ScopeFinderClass :
 	public pelet::ClassObserverClass,
 	public pelet::ClassMemberObserverClass,
 	public pelet::FunctionObserverClass {
-
 	public:
-
 	ScopeFinderClass();
 
 	/**
@@ -544,7 +532,6 @@ class ScopeFinderClass :
 	void SetVersion(pelet::Versions version);
 
 	private:
-
 	/**
 	 * if the given namespace is different than the current one, it indicates that the file has
 	 * switched to a new declared namespace.
@@ -575,9 +562,7 @@ class ScopeFinderClass :
 	 * this will tell us when to stop annotating
 	 */
 	int PosToCheck;
-
 };
-
 }
 
 

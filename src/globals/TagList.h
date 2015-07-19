@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration
 class ProjectClass;
 
@@ -53,7 +52,6 @@ void TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches);
  */
 void TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
 	std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType);
-
 
 }
 #endif

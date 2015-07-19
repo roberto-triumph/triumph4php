@@ -81,7 +81,6 @@ bool DatabaseTestFixtureClass::CreateDatabase(const std::string& name) {
 bool DatabaseTestFixtureClass::Exec(const std::string& query) {
 	soci::statement stmt = (Session.prepare << query);
 	try {
-
 		// execute returns true only when there are results; we want to return
 		// true on success
 		stmt.execute(false);

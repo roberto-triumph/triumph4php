@@ -42,7 +42,6 @@ t4p::VariableSymbolClass::VariableSymbolClass()
 	, FunctionName()
 	, ClassName()
 	, FunctionArguments() {
-
 }
 
 void t4p::VariableSymbolClass::ToScalar(const UnicodeString& variableName, const UnicodeString& scalar) {
@@ -262,7 +261,6 @@ bool t4p::CallStackClass::Build(const wxFileName& fileName, const UnicodeString&
 }
 
 bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::Errors& error) {
-
 	// base case: no more functions to parse
 	if (ResourcesRemaining.empty()) {
 		return true;
@@ -302,11 +300,9 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 	UnicodeString key = item.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + item.Resource.Identifier;
 	ParsedMethods[key] = true;
 	if (ret && FoundScope) {
-
 		// check to see if we have any new functions to parse
 		ResourcesRemaining.pop();
 		if (!ResourcesRemaining.empty()) {
-
 			// need to get the file that the next function is in
 			// make sure we don't go over the same function again in case there is a
 			// recursive function call along the way
@@ -318,7 +314,6 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 				UnicodeString key = nextItem.Resource.ClassName + UNICODE_STRING_SIMPLE("::")  + nextItem.Resource.Identifier;
 				alreadyParsed =  ParsedMethods.find(key) == ParsedMethods.end();
 				if (alreadyParsed) {
-
 					// already been parsed; write the function arguments for this call and nothing else
 					// this is because we want to write a function call if the same function is called
 					// twice but we don't want to parse it twice
@@ -340,18 +335,15 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 		error = RESOURCE_NOT_FOUND;
 	}
 	if (newlyRegistered) {
-
 		// clean up, but only if this method created the symbols
 		// this call will delete the WorkingCache pointer for us
 		TagCache.RemoveWorking(fileName.GetFullPath());
 	}
 	else {
-
 		// tag cache did not use the cache, delete it ourselves
 		delete workingCache;
 	}
 	return ret;
-
 }
 
 bool t4p::CallStackClass::Persist(soci::session& session) {
@@ -400,7 +392,6 @@ bool t4p::CallStackClass::InDesiredScope() const {
 }
 
 void t4p::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -410,7 +401,6 @@ void t4p::CallStackClass::ExpressionVariableFound(pelet::VariableClass* expressi
 }
 
 void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -422,7 +412,6 @@ void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionC
 }
 
 void t4p::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -432,7 +421,6 @@ void t4p::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCom
 }
 
 void t4p::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOperationClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -443,7 +431,6 @@ void t4p::CallStackClass::ExpressionBinaryOperationFound(pelet::BinaryOperationC
 }
 
 void t4p::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperationClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -453,7 +440,6 @@ void t4p::CallStackClass::ExpressionUnaryOperationFound(pelet::UnaryOperationCla
 }
 
 void t4p::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVariableOperationClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -463,7 +449,6 @@ void t4p::CallStackClass::ExpressionUnaryVariableOperationFound(pelet::UnaryVari
 }
 
 void t4p::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOperationClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -477,7 +462,6 @@ void t4p::CallStackClass::ExpressionTernaryOperationFound(pelet::TernaryOperatio
 }
 
 void t4p::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -487,7 +471,6 @@ void t4p::CallStackClass::ExpressionScalarFound(pelet::ScalarExpressionClass* ex
 }
 
 void t4p::CallStackClass::ExpressionNewInstanceFound(pelet::NewInstanceExpressionClass* expression) {
-
 	// only collect expressions that are in the scope we want
 	if (!InDesiredScope()) {
 		return;
@@ -507,7 +490,6 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 	}
 
 	if (variable.ChainList.size() == 2 && variable.ChainList[1].IsArrayAccess) {
-
 		// check to see if the array access key is a scalar
 		pelet::ExpressionClass* arrayAccessExpr = variable.ChainList[1].ArrayAccess;
 		UnicodeString arrayKey;
@@ -569,7 +551,6 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 }
 
 void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols) {
-
 	// recurse down the arguments first
 	std::vector<UnicodeString> argumentVariables;
 	if (property.IsFunction && !property.CallArguments.empty()) {
@@ -581,10 +562,8 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 				argumentVariables.push_back(symbols.back().DestinationVariable);
 			}
 			else if (pelet::ExpressionClass::VARIABLE == (*expr)->ExpressionType) {
-
 				pelet::VariableClass* varExpr = (pelet::VariableClass*)(*expr);
 				if (!varExpr->ChainList.empty()) {
-
 					// a new variable symbol was not created because the argument already exists in the symbols list
 					argumentVariables.push_back(varExpr->ChainList[0].Name);
 				}
@@ -605,7 +584,6 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 	}
 	/*
 	else if (property.IsArrayAccess && property.ArrayAccess) {
-
 		// check to see if the array access key is a scalar
 		pelet::ExpressionClass* arrayAccessExpr = property.ArrayAccess;
 		UnicodeString arrayKey;
@@ -683,7 +661,6 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 			functionSymbol.ToFunctionCall(tempVarName, varExpression->ChainList[0].Name, argumentVariables);
 		}
 		else if (!varExpression->ChainList.empty()) {
-
 			// add the variable to the list only if we have not added it yet
 			std::vector<t4p::VariableSymbolClass>::iterator var;
 			bool found = false;
@@ -700,7 +677,6 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 			}
 
 			if (varExpression->ChainList.size() > 1) {
-
 				// now add any property / method accesses
 				std::vector<pelet::VariablePropertyClass>::const_iterator prop = varExpression->ChainList.begin();
 				prop++;

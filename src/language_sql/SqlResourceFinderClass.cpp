@@ -30,7 +30,6 @@
 
 t4p::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {
-
 }
 
 bool t4p::SqlResourceFetchClass::Fetch(const DatabaseTagClass& info, UnicodeString& error) {
@@ -68,7 +67,6 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 		std::vector<std::string> tables;
 		std::vector<std::string> columns;
 		try {
-
 			std::string schema = t4p::IcuToChar(info.Schema);
 			std::string tableName;
 
@@ -82,7 +80,6 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 			}
 			query.Close(stmt);
 			if (!hasError) {
-
 				// getting the schema names, populate into tables for now
 				sql = "SELECT schema_name FROM information_schema.schemata";
 				std::string schemaName;
@@ -134,7 +131,6 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 		std::vector<std::string> columns;
 
 		try {
-
 			// populate information_schema tables we want SQL code completion to work for the
 			// information_schema tables / columns
 			wxString wxError;
@@ -144,7 +140,6 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 			}
 			if (!hasError) {
 				for (size_t i = 0; i < tables.size(); ++i) {
-
 					// get the columns for the table
 					// only getting unique columns names for now
 					// no need to know what tables they came from since we are not yet able to
@@ -253,7 +248,6 @@ t4p::SqlResourceTableResultClass::SqlResourceTableResultClass()
 , Lookup()
 , LookupEnd()
 , ConnectionHash() {
-
 }
 
 void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
@@ -263,7 +257,6 @@ void t4p::SqlResourceTableResultClass::SetLookup(const wxString& lookup, const s
 }
 
 bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
 	// see http://sqlite.org/optoverview.html (LIKE optimization)
@@ -273,7 +266,6 @@ bool t4p::SqlResourceTableResultClass::DoPrepare(soci::statement& stmt, bool doL
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name BETWEEN ? AND ? ";
 	if (!ConnectionHash.empty()) {
-
 		// no connection hash = search for table on all connections
 		sql += "AND connection_label = ? ";
 	}
@@ -306,7 +298,6 @@ t4p::ExactSqlResourceTableResultClass::ExactSqlResourceTableResultClass()
 , Connection()
 , Lookup()
 , ConnectionHash() {
-
 }
 
 void t4p::ExactSqlResourceTableResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
@@ -319,7 +310,6 @@ bool t4p::ExactSqlResourceTableResultClass::DoPrepare(soci::statement& stmt, boo
 	sql += "FROM db_tables ";
 	sql += "WHERE table_name = ? ";
 	if (!ConnectionHash.empty()) {
-
 		// no connection hash = search for table on all connections
 		sql += "AND connection_label = ? ";
 	}
@@ -351,7 +341,6 @@ t4p::SqlResourceColumnResultClass::SqlResourceColumnResultClass()
 , Lookup()
 , LookupEnd()
 , ConnectionHash() {
-
 }
 
 void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const std::string& connectionHash) {
@@ -361,7 +350,6 @@ void t4p::SqlResourceColumnResultClass::SetLookup(const wxString& lookup, const 
 }
 
 bool t4p::SqlResourceColumnResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-
 	// not using LIKE operator here, there are way too many situations where it wont use the index
 	// index won't be used when ESCAPE is used or when sqlite3_prepare_v2 is NOT used (which soci does not use)
 	// see http://sqlite.org/optoverview.html (LIKE optimization)
@@ -393,7 +381,6 @@ void t4p::SqlResourceColumnResultClass::Next() {
 
 t4p::SqlResourceFinderClass::SqlResourceFinderClass(soci::session& session)
 	: SqliteFinderClass(session) {
-
 }
 
 std::vector<UnicodeString> t4p::SqlResourceFinderClass::FindTables(const t4p::DatabaseTagClass& info, const UnicodeString& partialTableName) {

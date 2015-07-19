@@ -29,11 +29,8 @@
 
 namespace t4p {
 
-
 class ProjectFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * the location of the "file explorer" binary.  This is dependent per OS.
 	 * @var wxString
@@ -71,7 +68,6 @@ class ProjectFeatureClass : public FeatureClass {
 	void CreateProject(const wxString& dir, bool doTag);
 
 	private:
-
 	/**
 	 * Save the preferences to persistent storage
 	 */
@@ -85,9 +81,7 @@ class ProjectFeatureClass : public FeatureClass {
 	void CleanupProjects();
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

@@ -44,7 +44,6 @@ const wxEventType t4p::EVENT_OUTLINE_SEARCH_COMPLETE = wxNewEventType();
 t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass()
 	: Label()
 	, Tags() {
-
 }
 
 t4p::OutlineSearchCompleteClass::OutlineSearchCompleteClass(const t4p::OutlineSearchCompleteClass& src)
@@ -66,7 +65,6 @@ t4p::OutlineSearchCompleteEventClass::OutlineSearchCompleteEventClass(int eventI
 																	const std::vector<t4p::OutlineSearchCompleteClass>& tags)
 	: wxEvent(eventId, t4p::EVENT_OUTLINE_SEARCH_COMPLETE)
 	, Tags(tags) {
-
 }
 
 wxEvent* t4p::OutlineSearchCompleteEventClass::Clone() const {
@@ -79,7 +77,6 @@ t4p::OutlineTagCacheSearchActionClass::OutlineTagCacheSearchActionClass(t4p::Run
 	, TagCache()
 	, SearchStrings()
 	, EnabledSourceDirs() {
-
 }
 
 void t4p::OutlineTagCacheSearchActionClass::SetSearch(const std::vector<UnicodeString>& searches, t4p::GlobalsClass& globals) {
@@ -115,7 +112,6 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 			OutlineSearchCompleteClass tagSearchComplete;
 			tagSearchComplete.Label = t4p::IcuToWx(*search);
 			if (search->indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
-
 				// searching for all tags in the file
 				tags = TagCache.AllClassesFunctionsDefines(t4p::IcuToWx(*search));
 
@@ -134,7 +130,6 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 				}
 			}
 			else {
-
 				// searching for all members in a class name
 				t4p::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
 				if (results) {
@@ -159,7 +154,6 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 		}
 	}
 	if (!IsCancelled()) {
-
 		// PostEvent will set the correct event ID
 		t4p::OutlineSearchCompleteEventClass evt(wxID_ANY, topLevelTags);
 		PostEvent(evt);

@@ -33,7 +33,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class StatusBarWithGaugeClass;
 class NotebookClass;
@@ -76,9 +75,7 @@ class CodeControlEventClass;
  * application logic; that should be delegated to other classes.
  */
 class FeatureViewClass : public wxEvtHandler {
-
 	public:
-
 	FeatureViewClass();
 
 	/**
@@ -268,7 +265,6 @@ class FeatureViewClass : public wxEvtHandler {
 	void CloseCodeControl(t4p::CodeControlClass* codeCtrl);
 
 	protected:
-
 	/**
 	 * This is a helper method that will add each of the given menu items as a
 	 * shortcut.  The map will contain the menu Item IDs; each of these IDs will
@@ -444,7 +440,6 @@ class FeatureViewClass : public wxEvtHandler {
 	wxAuiToolBar* ToolBar;
 
 	private:
-
 	/**
 	 * The widget that feature uses to display status to the user.
 	 *
@@ -488,9 +483,7 @@ class FeatureViewClass : public wxEvtHandler {
 	void OnAppFilePageChanged(t4p::CodeControlEventClass& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

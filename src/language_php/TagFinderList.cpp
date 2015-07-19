@@ -39,7 +39,6 @@ t4p::TagFinderListClass::TagFinderListClass()
 	, IsNativeTagFinderInit(false)
 	, IsTagFinderInit(false)
 	, IsDetectedTagFinderInit(false) {
-
 }
 
 t4p::TagFinderListClass::~TagFinderListClass() {
@@ -115,7 +114,6 @@ std::vector<UnicodeString> t4p::TagFinderListClass::ClassParents(UnicodeString c
 	bool found = false;
 	UnicodeString classToLookup = className;
 	do {
-
 		// each parent class may be located in any of the finders. in practice this code is not as slow
 		// as it looks; class hierarchies are usually not very deep (1-4 parents)
 		found = false;
@@ -144,7 +142,6 @@ std::vector<UnicodeString> t4p::TagFinderListClass::ClassUsedTraits(const Unicod
 												  const std::vector<UnicodeString>& parentClassNames,
 												  const UnicodeString& methodName,
 												  const std::vector<wxFileName>& sourceDirs) {
-
 	// trait support; a class can use multiple traits; hence the different logic
 	std::vector<UnicodeString> classesToLookup;
 	classesToLookup.push_back(className);
@@ -201,7 +198,6 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 	if (type.isEmpty() && IsTagFinderInit) {
 		t4p::TagResultClass* tagResults = tagSearch.CreateExactResults();
 		if (TagFinder.Exec(tagResults)) {
-
 			// since we are doing fully qualified matches, all matches are from the inheritance chain; ie. all methods
 			// should have the same signature (return type)
 			tagResults->Next();
@@ -223,7 +219,6 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 				type = fullyQualifiedClass;
 			}
 			else {
-
 				// the parser will always return fully qualified class name for return type that is
 				// based on the namespace aliases
 				type = tagResults->Tag.ReturnType;
@@ -233,7 +228,6 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 
 	}
 	if (type.isEmpty() && IsNativeTagFinderInit) {
-
 		// tags in the native db file do not have a source_id
 		// when we query do not use source_id
 		std::vector<wxFileName> emptySourceDirs;
@@ -301,7 +295,6 @@ void t4p::TagFinderListClass::ExactMatchesFromAll(t4p::TagSearchClass& tagSearch
 void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches,
 		const std::vector<wxFileName>& sourceDirs) {
 	if (tagSearch.GetClassName().isEmpty() && tagSearch.GetMethodName().isEmpty() && tagSearch.GetNamespaceName().length() <= 1) {
-
 		// empty query, do not attempt as we dont want to query for all tagsd
 		return;
 	}
@@ -343,7 +336,6 @@ void t4p::TagFinderListClass::NearMatchesFromAll(t4p::TagSearchClass& tagSearch,
 
 void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
-
 		// no class = impossible to have traits
 		return;
 	}
@@ -365,7 +357,6 @@ void t4p::TagFinderListClass::ExactTraitAliasesFromAll(t4p::TagSearchClass& tagS
 
 void t4p::TagFinderListClass::NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches) {
 	if (tagSearch.GetClassName().isEmpty()) {
-
 		// no class = impossible to have traits
 		return;
 	}

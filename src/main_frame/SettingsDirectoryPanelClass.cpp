@@ -59,7 +59,6 @@ static wxFileName UserDir() {
 
 t4p::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir)
 : SettingsDirectoryGeneratedPanelClass(parent, id) {
-
 	t4p::DirPickerValidatorClass validator(&settingsDir);
 	SettingsDirectory->SetValidator(validator);
 	SettingsDirectory->SetName(wxT("Settings directory"));

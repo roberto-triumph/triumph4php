@@ -80,7 +80,6 @@ t4p::NotebookClass::NotebookClass(wxWindow* parent, wxWindowID id,
 }
 
 t4p::NotebookClass::~NotebookClass() {
-
 	// delete the DropTarget that was created in the constructor
 	SetDropTarget(NULL);
 
@@ -106,7 +105,6 @@ void t4p::NotebookClass::InitApp(t4p::CodeControlOptionsClass* options,
 	//       this code makes them smaller
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
-
 		// so that the tabs use the same font
 		SetFont(preferences->ApplicationFont);
 		SetNormalFont(preferences->ApplicationFont);
@@ -182,7 +180,6 @@ void t4p::NotebookClass::SavePageIfModified(wxAuiNotebookEvent& event) {
 		}
 	}
 	if (!vetoed && codeCtrl) {
-
 		// tell the app that a file has been closed
 		t4p::CodeControlEventClass codeControlEvent(t4p::EVENT_APP_FILE_CLOSED, codeCtrl);
 		EventSink->Publish(codeControlEvent);
@@ -313,7 +310,6 @@ void t4p::NotebookClass::AddTriumphPage(t4p::FileType type) {
 
 	t4p::CodeControlEventClass newEvent(t4p::EVENT_APP_FILE_NEW, page);
 	EventSink->Publish(newEvent);
-
 }
 
 void t4p::NotebookClass::LoadPage() {
@@ -354,7 +350,6 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 	for (size_t j = 0; j < GetPageCount(); ++j) {
 		CodeControlClass* control = GetCodeControl(j);
 		if (control && control->GetFileName() == filename) {
-
 			// only set the selection when it's different
 			// if it gets called for the window that's already opened
 			// focus goes to the notebook. Meaning that if LoadPage gets
@@ -375,7 +370,6 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 		wxString charset;
 		t4p::FindInFilesClass::OpenErrors error = FindInFilesClass::FileContents(filename, fileContents, charset, hasSignature);
 		if (error == t4p::FindInFilesClass::NONE) {
-
 			// make sure to use a unique ID, other source code depends on this
 			CodeControlClass* newCode = new CodeControlClass(this, *CodeControlOptions, Globals, *EventSink, wxNewId());
 			newCode->TrackFile(filename, fileContents, charset, hasSignature);
@@ -407,7 +401,6 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 }
 
 void t4p::NotebookClass::LoadPages(const std::vector<wxString>& filenames) {
-
 	// when we used wxWidgets 2.8 we would freeze the notebook, add all pages,
 	// then thaw the notebook
 	// when upgrading to wxWidgets 2.9, the notebook get frozen/thawed once for
@@ -454,7 +447,6 @@ bool t4p::NotebookClass::SaveCurrentPageAsNew() {
 					fileFilter, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 			fileDialog.SetFilterIndex(filterIndex);
 			if (wxID_OK == fileDialog.ShowModal()) {
-
 				// SaveAs should have no effect on the state of the
 				// code control so dont use the control's save methods
 				wxString newFullPath = fileDialog.GetPath();
@@ -765,7 +757,6 @@ void t4p::NotebookClass::OnPageChanged(wxAuiNotebookEvent& event) {
 
 
 void t4p::NotebookClass::OnMenuClosePage(wxCommandEvent& event) {
-
 	// get the tab that was right clicked; the tab right menu event holds
 	// the index of the tab we want to close
 	if (t4p::NumberLessThan(TabIndexRightClickEvent, GetPageCount())) {
@@ -919,7 +910,6 @@ void t4p::NotebookClass::OnMenuSplit(wxCommandEvent& event) {
 
 t4p::FileDropTargetClass::FileDropTargetClass(t4p::NotebookClass* notebook) :
 	Notebook(notebook) {
-
 }
 
 bool t4p::FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files) {

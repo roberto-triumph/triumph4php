@@ -31,7 +31,6 @@
 #include <globals/CodeControlOptionsClass.h>
 
 namespace t4p {
-
 /**
  * use our own function to convert string to key codes
  * because the wxKeyBinder function does not handle
@@ -65,9 +64,7 @@ wxString KeyCodeToShortcutString(int modifiers, int keyCode);
  *     app instances (depending on features and projects).
  */
 class DynamicCmdClass {
-
 	public:
-
 	/**
 	 *
 	 * @param item the menu item. This class will NOT own the pointer
@@ -115,7 +112,6 @@ class DynamicCmdClass {
 	wxString GetIdentifier() const;
 
 	private:
-
 	/**
 	 * This is the binding; menu item-shortcut(s) combination.
 	 */
@@ -131,9 +127,7 @@ class DynamicCmdClass {
  * This class is the composite set of all preferences/options that a user can change.
  */
 class PreferencesClass {
-
 	public:
-
 	/**
 	 * Construct preferences. Creates on keyboard profile.
 	 */
@@ -248,8 +242,6 @@ class PreferencesClass {
 	 * @var bool
 	 */
 	bool CheckForUpdates;
-
 };
-
 }
 #endif // __preferencesclass__

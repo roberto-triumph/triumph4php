@@ -80,14 +80,12 @@ void t4p::ProjectTagActionClass::BackgroundWork() {
 }
 
 void t4p::ProjectTagActionClass::IterateDirectory() {
-
 	// careful to test for destroy first
 	while (!IsCancelled() && DirectorySearch.More()) {
 		TagFinderList.Walk(DirectorySearch);
 
 		// if we have a total file count it means we want to send progress events
 		if (FilesTotal > 0) {
-
 			// we will try to send at most 100 events, this is in case we have big
 			// projects with 10,000+ files we dont want to flood the system with events
 			// that will barely be noticeable in the gauge.
@@ -104,7 +102,6 @@ void t4p::ProjectTagActionClass::IterateDirectory() {
 
 		if (!DirectorySearch.More()) {
 			if (!IsCancelled()) {
-
 				// eventId will be set by the PostEvent method
 				t4p::TagFinderListCompleteEventClass evt(wxID_ANY);
 				PostEvent(evt);
@@ -119,7 +116,6 @@ wxString t4p::ProjectTagActionClass::GetLabel() const {
 
 t4p::ProjectTagInitActionClass::ProjectTagInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerGlobalActionClass(runningThreads, eventId) {
-
 }
 
 
@@ -166,7 +162,6 @@ t4p::ProjectTagDirectoryActionClass::ProjectTagDirectoryActionClass(t4p::Running
 	, Project()
 	, Dir()
 	, TagFinderList() {
-
 }
 
 void t4p::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
@@ -174,7 +169,6 @@ void t4p::ProjectTagDirectoryActionClass::SetDirToParse(const wxString& path) {
 }
 
 bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
-
 	// get the project that the directory is in
 	// TODO(roberto): what if the directory is in more than 1 project?
 	std::vector<t4p::ProjectClass>::const_iterator project;
@@ -195,7 +189,6 @@ bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	if (isDirFromProject) {
 		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
-
 	}
 	return isDirFromProject;
 }
@@ -210,7 +203,6 @@ void t4p::ProjectTagDirectoryActionClass::BackgroundWork() {
 	std::vector<t4p::SourceClass>::iterator src;
 	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
 		if (src->IsInRootDirectory(dirWithSep)) {
-
 			// this specific sequence is needed so that the source_id
 			// is set properly in the database
 			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
@@ -239,7 +231,6 @@ t4p::ProjectTagSingleFileActionClass::ProjectTagSingleFileActionClass(t4p::Runni
 	, Project()
 	, FileName()
 	, TagFinderList() {
-
 }
 
 void t4p::ProjectTagSingleFileActionClass::SetFileToParse(const wxString& fullPath) {
@@ -247,7 +238,6 @@ void t4p::ProjectTagSingleFileActionClass::SetFileToParse(const wxString& fullPa
 }
 
 bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
-
 	// get the project that the file is in
 	// TODO(roberto): what if the file is in more than 1 project?
 	std::vector<t4p::ProjectClass>::const_iterator project;
@@ -262,7 +252,6 @@ bool t4p::ProjectTagSingleFileActionClass::Init(t4p::GlobalsClass& globals) {
 	if (isFileFromProject) {
 		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(),
 			globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
-
 	}
 	return isFileFromProject;
 }
@@ -276,7 +265,6 @@ void t4p::ProjectTagSingleFileActionClass::BackgroundWork() {
 	wxString fullPath = FileName.GetFullPath();
 	for (src = Project.Sources.begin(); src != Project.Sources.end(); ++src) {
 		if (src->Contains(fullPath)) {
-
 			// this specific sequence is needed so that the source_id
 			// is set properly in the database
 			TagFinderList.TagParser.BeginSearch(src->RootDirectory.GetPath());
@@ -298,7 +286,6 @@ t4p::ProjectTagSingleFileRenameActionClass::ProjectTagSingleFileRenameActionClas
 , NewFileName()
 , TagFinderList()
 , Project() {
-
 }
 
 void t4p::ProjectTagSingleFileRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {
@@ -328,7 +315,6 @@ bool t4p::ProjectTagSingleFileRenameActionClass::Init(t4p::GlobalsClass& globals
 }
 
 void t4p::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
-
 	// checking to see if this rename was an actual permanent rename as opposed to
 	// file shuffling by apps.
 	// some apps (notably VIM) will do unexpected things like rename a file when
@@ -342,7 +328,6 @@ void t4p::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 		TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
 	}
 	else if (!oldFileExists) {
-
 		// tag the file since we have never seen it. this could be the same
 		// for example, when file with a non-php extension is renamed to have a
 		// php extension
@@ -370,7 +355,6 @@ t4p::ProjectTagDirectoryRenameActionClass::ProjectTagDirectoryRenameActionClass(
 , OldDirectory()
 , NewDirectory()
 , TagFinderList() {
-
 }
 
 void t4p::ProjectTagDirectoryRenameActionClass::SetPaths(const wxString& oldPath, const wxString& newPath) {

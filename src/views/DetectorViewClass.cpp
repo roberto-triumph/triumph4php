@@ -67,7 +67,6 @@ t4p::DetectorTreeHandlerClass::DetectorTreeHandlerClass(wxTreeCtrl* detectorTree
 	, Detector(detector)
 	, Globals(globals)
 	, EventSink(eventSink) {
-
 	// Connect Events
 	t4p::HelpButtonIcon(HelpButton);
 	if (TestButton) {
@@ -155,7 +154,6 @@ void t4p::DetectorTreeHandlerClass::FillSubTree(const wxString& detectorRootDir,
 				TreeItemDataStringClass* treeItemData = new TreeItemDataStringClass(fullPath.GetFullPath());
 				DetectorTree->AppendItem(treeItemDir, fileName, IMAGE_SCRIPT, IMAGE_SCRIPT, treeItemData);
 			} while (dir.GetNext(&fileName));
-
 		}
 	}
 }
@@ -191,7 +189,6 @@ void t4p::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 
 	wxFile file;
 	if (file.Create(localDetectorScript.GetFullPath())) {
-
 		// populate the file with some starter code to guide the user
 		wxFileName urlDetectorSkeleton = Detector->SkeletonFile();
 		wxFFile skeletonFile(urlDetectorSkeleton.GetFullPath(), wxT("rb"));
@@ -329,7 +326,6 @@ void t4p::DetectorTreeHandlerClass::OnMenuDeleteDetector(wxCommandEvent& event) 
 }
 
 void t4p::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& event) {
-
 	// only allow edited when detector is a "local" detector
 	wxTreeItemId i = event.GetItem();
 	bool isLocalDetector = false;
@@ -361,7 +357,6 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 		event.Veto();
 	}
 	else {
-
 		// rename the file and set the tree item data; the label itself will be set
 		// by the next event handler
 		TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
@@ -369,7 +364,6 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 		wxFileName oldFileName(data->Str);
 		wxFileName newFileName(oldFileName.GetPath(), newName);
 		if (oldFileName == newFileName) {
-
 			// no name change== dont try to move files
 			return;
 		}
@@ -390,7 +384,6 @@ t4p::UrlTagDetectorPanelClass::UrlTagDetectorPanelClass(wxWindow* parent, int id
 	: UrlDetectorPanelGeneratedClass(parent, id)
 	, Detector()
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("url-detectors"))) {
-
 	// propagate the menu events to the handler since the handler is not connected to the
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -437,7 +430,6 @@ t4p::TemplateFileTagsDetectorPanelClass::TemplateFileTagsDetectorPanelClass(wxWi
 	, Globals(globals)
 	, RunningThreads(runningThreads)
 	, EventSink(eventSink) {
-
 	// propagate the menu events to the handler since the handler is not connected to the
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -530,7 +522,6 @@ void t4p::TemplateFileTagsDetectorPanelClass::OnTestButton(wxCommandEvent& event
 	// to get the templates, we first need to build the call stack
 	if (!TestUrl.ClassName.IsEmpty() &&
 		!TestUrl.MethodName.IsEmpty()) {
-
 		t4p::CallStackActionClass* callStackAction = new t4p::CallStackActionClass(RunningThreads, t4p::ID_EVENT_ACTION_CALL_STACK);
 		callStackAction->SetCallStackStart(fileName,
 			t4p::WxToIcu(TestUrl.ClassName),
@@ -575,7 +566,6 @@ t4p::TagDetectorPanelClass::TagDetectorPanelClass(wxWindow* parent, int id, t4p:
 	: TagDetectorPanelGeneratedClass(parent, id)
 	, Detector()
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("tag-detectors"))) {
-
 	// propagate the menu events to the handler since the handler is not connected to the
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -621,7 +611,6 @@ t4p::DatabaseTagDetectorPanelClass::DatabaseTagDetectorPanelClass(wxWindow* pare
 	: DatabaseDetectorPanelGeneratedClass(parent, id)
 	, Detector()
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("database-detectors"))) {
-
 	// propagate the menu events to the handler since the handler is not connected to the
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -661,7 +650,6 @@ t4p::ConfigTagDetectorPanelClass::ConfigTagDetectorPanelClass(wxWindow* parent, 
 	: ConfigDetectorPanelGeneratedClass(parent, id)
 	, Detector()
 	, Handler(DetectorTree, TestButton, AddButton, HelpButton, ProjectChoice, &Detector, globals, eventSink, t4p::BitmapImageAsset(wxT("config-detectors"))) {
-
 	// propagate the menu events to the handler since the handler is not connected to the
 	// GUI it will not get them by default
 	Connect(ID_DETECTOR_TREE_OPEN, wxEVT_COMMAND_MENU_SELECTED,
@@ -698,7 +686,6 @@ void t4p::ConfigTagDetectorPanelClass::OnHelpButton(wxCommandEvent& event) {
 t4p::DetectorViewClass::DetectorViewClass(t4p::DetectorFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::DetectorViewClass::AddViewMenuItems(wxMenu* menu) {

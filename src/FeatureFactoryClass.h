@@ -28,7 +28,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * The feature factory class will take care of instantiating
  * and deleting features along with corresponding views.
@@ -81,9 +80,7 @@ class FileOperationsFeatureClass;
 class NotebookLayoutFeatureClass;
 
 class FeatureFactoryClass {
-
 	public:
-
 	/**
 	 * This class owns these pointers; do not delete them
 	 */
@@ -118,7 +115,6 @@ class FeatureFactoryClass {
 	void DeleteViews();
 
 	private:
-
 	t4p::AppClass& App;
 
 	t4p::FileOperationsFeatureClass*       FileOperations;
@@ -154,9 +150,7 @@ class FeatureFactoryClass {
 	t4p::NotebookLayoutFeatureClass*       NotebookLayout;
 	t4p::TestFeatureClass*                 Test;
 
-
 };
-
 }
 
 #endif

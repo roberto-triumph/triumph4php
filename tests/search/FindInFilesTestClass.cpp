@@ -60,7 +60,6 @@ class FindInFilesTestFixtureClass : public FileTestFixtureClass {
 };
 
 SUITE(FindInFilesTestClass) {
-
 TEST_FIXTURE(FindInFilesTestFixtureClass, WalkShouldLocateNextMatchWhenItReturnsTrue) {
 	CreateFixtureFile(wxT("user.php"), FILE_1);
 	FindInFiles.Expression = UNICODE_STRING_SIMPLE("UserClass");
@@ -85,7 +84,6 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearc
 	CHECK_EQUAL(5, FindInFiles.GetCurrentLineNumber());
 	CHECK_EQUAL(78, FindInFiles.GetFileOffset());
 	CHECK_EQUAL(false, FindInFiles.FindNext());
-
 }
 
 TEST_FIXTURE(FindInFilesTestFixtureClass, FindNextShouldLocateNextMatchWhenSearchingCaseInsensitive) {

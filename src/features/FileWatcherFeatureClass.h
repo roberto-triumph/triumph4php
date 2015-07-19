@@ -30,7 +30,6 @@
 #include <wx/fswatcher.h>
 
 namespace t4p {
-
 // forward declaration, defined below
 class VolumeListEventClass;
 
@@ -60,9 +59,7 @@ class VolumeListEventClass;
  * will "collapse" these into a single NEW_DIR event.
  */
 class FileWatcherFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	/**
 	 * Flag to turn this feature on or off, we want this so that in case
 	 * there are bugs with this feature users can turn this feature off.
@@ -92,7 +89,6 @@ class FileWatcherFeatureClass : public t4p::FeatureClass {
 	void UntrackOpenedFile(wxString fullPath);
 
 	private:
-
 	/**
 	 * when the app starts then start the watches
 	 */
@@ -216,7 +212,6 @@ class FileWatcherFeatureClass : public t4p::FeatureClass {
 	bool IsWatchError;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 /**
@@ -233,13 +228,10 @@ class FileWatcherFeatureClass : public t4p::FeatureClass {
  * This action generates event of type t4p::EVENT_ACTION_VOLUME_LIST
  */
 class VolumeListActionClass : public t4p::ActionClass {
-
 	public:
-
 	VolumeListActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	protected:
-
 	void BackgroundWork();
 
 	void DoCancel();
@@ -257,9 +249,7 @@ typedef void (wxEvtHandler::*VolumeListEventClassFunction)(VolumeListEventClass&
     wxStaticCastEvent(VolumeListEventClassFunction, & fn), (wxObject *) NULL),
 
 class VolumeListEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * List of the LOCAL volumes that are mounted. this will
 	 * not include remote drives
@@ -271,7 +261,6 @@ class VolumeListEventClass : public wxEvent {
 
 	wxEvent* Clone() const;
 };
-
 }
 
 #endif

@@ -40,9 +40,7 @@
  * linter, default it to suer PHP 5.3 syntax
  */
 class PhpVariableLintTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
@@ -83,7 +81,6 @@ class PhpVariableLintTestFixtureClass : public FileTestFixtureClass, public Sqli
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-
 		// make the cache consume the source code file; to prime it with the resources because the
 		// variable linter uses the tag cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -98,12 +95,10 @@ class PhpVariableLintTestFixtureClass : public FileTestFixtureClass, public Sqli
 		}
 		TagCache.RegisterGlobal(tagFinderList);
 	}
-
 };
 
 
 SUITE(PhpVariableLintTestClass) {
-
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IntializedWithObject) {
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -189,7 +184,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, PredefinedVariables) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
-
 	// function parameters should be automatically declared
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -205,7 +199,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionParameters) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
-
 	// no errors on exception blocks as exceptions
 	// caught are already initialized
 	UnicodeString code = t4p::CharToIcu(
@@ -226,7 +219,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ExceptionBlocks) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
-
 	// if the options say to not check global variables, then
 	// don't check global variables
 	Options.CheckGlobalScope = false;
@@ -239,7 +231,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, DoNotCheckGlobalScope) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInMethod) {
-
 	// $this variable is always defined in methods
 	Options.CheckGlobalScope = false;
 	UnicodeString code = t4p::CharToIcu(
@@ -271,7 +262,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, StaticMethods) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
-
 	// when the extract() function is used, we can't really
 	// detect wich variables have been initialized, as
 	// extract defines variables based on the array keys.
@@ -293,7 +283,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtract) {
 
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
-
 	// when the extract() function is used, we can't really
 	// detect wich variables have been initialized, as
 	// extract defines variables based on the array keys.
@@ -320,7 +309,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithExtractInNamespace) {
 
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
-
 	// when the eval() function is used, we can't really
 	// detect wich variables have been initialized, as
 	// eval can create new variables.
@@ -341,7 +329,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithEval) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
-
 	// when include() is used, we can't really
 	// detect wich variables have been initialized, as
 	// include brings in new variables to the current scope
@@ -362,7 +349,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithInclude) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
-
 	// arrays can be initialized and assigned at the same time
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -376,7 +362,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, InitializedArrays) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInConditonal) {
-
 	// assignment in conditional still counts as initialized
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -412,7 +397,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInSwitch) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
-
 	// a variable being checked with the isset keyword
 	// should not be labeled as unitialized
 	UnicodeString code = t4p::CharToIcu(
@@ -429,7 +413,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIsset) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIssetArrayKeys) {
-
 	// a variable that is used as a key inside an isset statement
 	// should in fact be labeled as uninitialized
 	UnicodeString code = t4p::CharToIcu(
@@ -449,7 +432,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, WithIssetArrayKeys) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, AssignmentInArrayAccess) {
-
 	// assignment in conditional still count as initialized
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -484,7 +466,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariable) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
-
 	// test that variables are stored by scope; meaning
 	// that the same named-variable in different functions
 	// must be initialized in bothe functions
@@ -514,7 +495,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableScopes) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
-
 	// test that arguments to calling function are checked
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -535,7 +515,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedVariableArguments) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
-
 	// test that when an argument is passed by reference, it is NOT counted
 	// as uninitialized, since the function being called can
 	// set the variable's value
@@ -557,7 +536,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceArguments) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceMethodArguments) {
-
 	// test that when an argument to a method is passed by reference, it is NOT counted
 	// as uninitialized, since the method being called can
 	// set the variable's value
@@ -581,7 +559,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ReferenceMethodArguments) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
-
 	// test that arguments to calling function are checked
 	// must recurse down function calls in case an argument
 	// is the result of another function call
@@ -608,7 +585,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseFunctionArguments) {
 
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, RecurseConstructorArguments) {
-
 	// test that arguments to a constructor are checked
 	// must recurse down constructor call and any method chaining
 	// in case an argument
@@ -674,7 +650,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedIncludeVariables) {
 	CHECK_VECTOR_SIZE(1, Results);
 	CHECK_UNISTR_EQUALS("$file", Results[0].VariableName);
 	CHECK_EQUAL(2, Results[0].LineNumber);
-
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
@@ -697,7 +672,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, UnitializedInClosure) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionDefinedInClosure) {
-
 	// define a function inside of a closure, make sure
 	// that the function arguments are correctly captured
 	// as being initialized
@@ -717,7 +691,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, FunctionDefinedInClosure) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
-
 	// test that when a closure uses variables that are passed by
 	// reference, the linter does NOT label them as un-initialized
 	UnicodeString code = t4p::CharToIcu(
@@ -737,7 +710,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, PassByReferenceClosure) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
-
 	// $this variable is never defined in a function
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -752,7 +724,6 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, ThisInFunction) {
 }
 
 TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
-
 	// when we see a variable variable ie. '$$clazz' in the assignment
 	// we should turn off uninitialized variable checks, since the
 	// code is making variables assignments that we cannot know
@@ -770,5 +741,4 @@ TEST_FIXTURE(PhpVariableLintTestFixtureClass, IndirectVariables) {
 	CHECK_EQUAL(false, HasError);
 	CHECK_VECTOR_SIZE(0, Results);
 }
-
 }

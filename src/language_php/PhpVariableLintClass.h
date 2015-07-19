@@ -33,7 +33,6 @@
 
 namespace t4p {
 
-
 // forward declaration
 class TagCacheClass;
 
@@ -42,9 +41,7 @@ class TagCacheClass;
  * found in a PHP file.
  */
 class PhpVariableLintResultClass {
-
 	public:
-
 	enum Types {
 		NONE,
 		UNINITIALIZED_VARIABLE,
@@ -87,9 +84,7 @@ class PhpVariableLintResultClass {
  * options that control how the variable linter works
  */
 class PhpVariableLintOptionsClass {
-
 	public:
-
 	/**
 	 * if true, variables in the global scope will be checked.  if false,
 	 * only variables inside a method / function will be checked. this is
@@ -110,7 +105,6 @@ class PhpVariableLintOptionsClass {
 	PhpVariableLintOptionsClass& operator=(const t4p::PhpVariableLintOptionsClass& src);
 
 	void Copy(const t4p::PhpVariableLintOptionsClass& src);
-
 };
 
 /**
@@ -124,9 +118,7 @@ class PhpVariableLintClass :
 	public pelet::ClassMemberObserverClass,
 	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass  {
-
 	public:
-
 	PhpVariableLintClass();
 
 	/**
@@ -222,7 +214,6 @@ class PhpVariableLintClass :
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
 	private:
-
 	/**
 	 * errors found so far
 	 */
@@ -329,7 +320,6 @@ class PhpVariableLintClass :
 	 */
 	bool LookupSignature(UnicodeString& signature, const UnicodeString& functionName, bool isMethod, bool isStatic);
 };
-
 }
 
 #endif

@@ -58,7 +58,6 @@ static size_t curl_ostream_write(void* ptr, size_t size, size_t nmemb, void* str
 t4p::VersionUpdateFeatureClass::VersionUpdateFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , NextCheckTime() {
-
 }
 
 
@@ -79,7 +78,6 @@ void t4p::VersionUpdateFeatureClass::OnAppReady(wxCommandEvent& event) {
 
 
 wxString t4p::VersionUpdateFeatureClass::GetCurrentVersion() const {
-
 	// version info is stored in a file
 	// for releases, the distribution script will properly fill in the
 	// version number using git describe
@@ -110,7 +108,6 @@ void t4p::VersionUpdateActionClass::BackgroundWork() {
 }
 
 wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVersion, long& statusCode) {
-
 	// T4P_UPDATE_HOST is a define from the premake script
 	// it will be different in debug vs release
 	const char* host = T4P_STR(T4P_UPDATE_HOST);
@@ -140,7 +137,6 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 		if (statusCode == 200) {
 			wxString contents = ostream.GetString();
 			if (!contents.empty()) {
-
 				// the update query can return
 				// 1. A single line: "UP_TO_DATE"
 				// or
@@ -157,7 +153,6 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 		}
 		else {
 			newVersion = t4p::CharToWx(curl_easy_strerror(ret));
-
 		}
 	}
 	curl_easy_cleanup(curl);

@@ -43,11 +43,9 @@ wxEvent* t4p::SqlMetaDataEventClass::Clone() const {
 
 t4p::SqlMetaDataInitActionClass::SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : InitializerGlobalActionClass(runningThreads, eventId) {
-
 }
 
 void t4p::SqlMetaDataInitActionClass::Work(t4p::GlobalsClass& globals) {
-
 	// prime the sql resource finder
 	// the tag db may not exist if the user screwed up and pointed their settings
 	// dir to a non-existing location.
@@ -69,7 +67,6 @@ t4p::SqlMetaDataActionClass::SqlMetaDataActionClass(t4p::RunningThreadsClass& ru
 	: GlobalActionClass(runningThreads, eventId)
 	, DatabaseTags()
 	, CacheDbFileName() {
-
 }
 
 bool t4p::SqlMetaDataActionClass::Init(t4p::GlobalsClass& globals) {
@@ -137,7 +134,6 @@ void t4p::SqlMetaDataActionClass::BackgroundWork() {
 		}
 	}
 	if (!IsCancelled()) {
-
 		// PostEvent() will set the correct event Id
 		t4p::SqlMetaDataEventClass evt(wxID_ANY, errors);
 		PostEvent(evt);

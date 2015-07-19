@@ -38,9 +38,7 @@ static int ID_SQL_METADATA_FETCH = wxNewId();
 
 class SqlMetaDataActionTestFixtureClass : public ActionTestFixtureClass,
 	public DatabaseTestFixtureClass, public SqliteTestFixtureClass, public FileTestFixtureClass {
-
 	public:
-
 	t4p::SqlMetaDataActionClass SqlMetaDataAction;
 	t4p::SqlResourceFinderClass Results;
 
@@ -82,7 +80,6 @@ BEGIN_EVENT_TABLE(SqlMetaDataActionTestFixtureClass, ActionTestFixtureClass)
 END_EVENT_TABLE()
 
 SUITE(SqlMetaDataActionTestClass) {
-
 TEST_FIXTURE(SqlMetaDataActionTestFixtureClass, Fetch) {
 	CHECK(SqlMetaDataAction.Init(Globals));
 
@@ -92,5 +89,4 @@ TEST_FIXTURE(SqlMetaDataActionTestFixtureClass, Fetch) {
 	CHECK_VECTOR_SIZE(1, tables);
 	CHECK_UNISTR_EQUALS("my_users", tables[0]);
 }
-
 }

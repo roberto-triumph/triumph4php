@@ -14,7 +14,6 @@ t4p::CallStackActionClass::CallStackActionClass(t4p::RunningThreadsClass& runnin
 	, StartClassName()
 	, StartMethodName()
 	, Version(pelet::PHP_53) {
-
 }
 
 wxString t4p::CallStackActionClass::GetLabel() const {
@@ -43,7 +42,6 @@ bool t4p::CallStackActionClass::Init(t4p::GlobalsClass& globals) {
 
 bool t4p::CallStackActionClass::SetCallStackStart(const wxFileName& startFileName, const UnicodeString& className,
 														const UnicodeString& methodName, const wxFileName& detectorDbFileName) {
-
 	// make sure to set these BEFORE calling CreateSingleInstance
 	// in order to prevent Entry from reading them while we write to them
 	StartFileName.Assign(startFileName);

@@ -111,7 +111,6 @@ bool t4p::SqliteTables(soci::session& session, std::vector<std::string>& tableNa
 int t4p::SqliteSchemaVersion(soci::session& session) {
 	int versionNumber = 0;
 	try {
-
 		// check to see if table exists, on first the very first program run
 		// there won't be any tables
 		std::string table;
@@ -128,7 +127,6 @@ int t4p::SqliteSchemaVersion(soci::session& session) {
 }
 
 void t4p::SqliteSetBusyTimeout(soci::session& session, int timeoutMs) {
-
 	// get the 'raw' sqlite connection
 	soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
 	sqlite_api::sqlite3_busy_timeout(backend->conn_, timeoutMs);

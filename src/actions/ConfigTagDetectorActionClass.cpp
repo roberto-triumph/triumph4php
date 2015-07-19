@@ -35,7 +35,6 @@ t4p::ConfigTagDetectorParamsClass::ConfigTagDetectorParamsClass()
 	, ScriptName()
 	, SourceDir()
 	, OutputDbFileName() {
-
 }
 
 wxString t4p::ConfigTagDetectorParamsClass::BuildCmdLine() const {
@@ -53,7 +52,6 @@ t4p::ConfigTagDetectorActionClass::ConfigTagDetectorActionClass(t4p::RunningThre
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
-
 }
 
 bool t4p::ConfigTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
@@ -91,7 +89,6 @@ bool t4p::ConfigTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-
 		// start the first external process
 		started = NextDetection();
 	}

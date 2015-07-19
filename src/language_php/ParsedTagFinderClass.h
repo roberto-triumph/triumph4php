@@ -35,7 +35,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration, defined below
 class TagResultClass;
 class FileTagResultClass;
@@ -54,9 +53,7 @@ class FileTagResultClass;
  *
  */
 class TagSearchClass {
-
 	public:
-
 	/**
 	 * These are the different near match scenarios that can occur.
 	 *
@@ -248,7 +245,6 @@ class TagSearchClass {
 	TagSearchClass::ResourceTypes GetResourceType() const;
 
 	private:
-
 	/**
 	 * the file name parsed from tag string
 	 *
@@ -315,16 +311,13 @@ class TagSearchClass {
 	 * @var int
 	 */
 	int LineNumber;
-
 };
 
 /**
  * The TagResult is used to loop through database rows of the tag table
  */
 class TagResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	t4p::PhpTagClass Tag;
 
 	TagResultClass();
@@ -339,7 +332,6 @@ class TagResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * bind the sql columns to the instance variables
 	 */
@@ -371,9 +363,7 @@ class TagResultClass : public t4p::SqliteResultClass {
 };
 
 class FileTagResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	t4p::FileTagClass FileTag;
 
 	FileTagResultClass();
@@ -394,7 +384,6 @@ class FileTagResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * this method builds the SQL and prepares it.
 	 *
@@ -409,7 +398,6 @@ class FileTagResultClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * Get the line count from the given file.
 	 *
@@ -446,9 +434,7 @@ class FileTagResultClass : public t4p::SqliteResultClass {
 };
 
 class TraitTagResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	t4p::TraitTagClass TraitTag;
 
 	TraitTagResultClass();
@@ -469,7 +455,6 @@ class TraitTagResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * build the SQL and prepare it.
 	 *
@@ -484,7 +469,6 @@ class TraitTagResultClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * only tags that were found in files located in the given directories will match.
 	 * search is recursive, sourceDirs and all of their subdirs are searched
@@ -518,15 +502,12 @@ class TraitTagResultClass : public t4p::SqliteResultClass {
 };
 
 class ExactMemberTagResultClass : public t4p::TagResultClass {
-
 	public:
-
 	ExactMemberTagResultClass();
 
 	virtual void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, const std::vector<wxFileName>& sourceDirs);
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	std::vector<std::string> Keys;
@@ -537,19 +518,15 @@ class ExactMemberTagResultClass : public t4p::TagResultClass {
 };
 
 class NearMatchMemberTagResultClass : public t4p::ExactMemberTagResultClass {
-
 	public:
-
 	NearMatchMemberTagResultClass();
 
 	void SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	private:
-
 	// number of classes we want to search for
 	int ClassCount;
 
@@ -566,9 +543,7 @@ class NearMatchMemberTagResultClass : public t4p::ExactMemberTagResultClass {
  * from the db, thereby preventing memory allocations.
  */
 class FunctionLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	FunctionLookupClass();
 
 	/**
@@ -579,7 +554,6 @@ class FunctionLookupClass : public t4p::SqliteResultClass {
 	bool Found();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -600,7 +574,6 @@ class FunctionLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	private:
-
 	/**
 	 *  bound to the prepared statement as an input
 	 */
@@ -622,9 +595,7 @@ class FunctionLookupClass : public t4p::SqliteResultClass {
  * from the db, thereby preventing memory allocations.
  */
 class ClassLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	ClassLookupClass();
 
 	/**
@@ -648,7 +619,6 @@ class ClassLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -663,7 +633,6 @@ class ClassLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 *  bound to the prepared statement as an input
 	 */
@@ -685,9 +654,7 @@ class ClassLookupClass : public t4p::SqliteResultClass {
  * from the db, thereby preventing memory allocations.
  */
 class NamespaceLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	NamespaceLookupClass();
 
 	/**
@@ -710,7 +677,6 @@ class NamespaceLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -725,7 +691,6 @@ class NamespaceLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 *  bound to the prepared statement as an input
 	 */
@@ -747,9 +712,7 @@ class NamespaceLookupClass : public t4p::SqliteResultClass {
  * from the db, thereby preventing memory allocations.
  */
 class MethodLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	MethodLookupClass();
 
 	/**
@@ -774,7 +737,6 @@ class MethodLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -789,7 +751,6 @@ class MethodLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * bound to the prepared statement as an input
 	 * see comment in DoPrepare for the reasoning
@@ -815,9 +776,7 @@ class MethodLookupClass : public t4p::SqliteResultClass {
  * from the db, thereby preventing memory allocations.
  */
 class PropertyLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	PropertyLookupClass();
 
 	/**
@@ -842,7 +801,6 @@ class PropertyLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -857,7 +815,6 @@ class PropertyLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * bound to the prepared statement as an input
 	 * see comment in DoPrepare for the reasoning
@@ -883,9 +840,7 @@ class PropertyLookupClass : public t4p::SqliteResultClass {
  * prepare the query once and execute it over and over again
  */
 class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	/**
 	 * the function's signature that was found in the db
 	 */
@@ -918,7 +873,6 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -933,7 +887,6 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 *  bound to the prepared statement as an input
 	 */
@@ -955,7 +908,6 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
 	 */
 	std::string StdSignature;
 
-
 };
 
 
@@ -967,9 +919,7 @@ class FunctionSignatureLookupClass : public t4p::SqliteResultClass {
  * prepare the query once and execute it over and over again
  */
 class MethodSignatureLookupClass : public t4p::SqliteResultClass {
-
 	public:
-
 	/**
 	 * the method's signature that was found in the db
 	 */
@@ -1004,7 +954,6 @@ class MethodSignatureLookupClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input parameters.
 	 *
@@ -1019,7 +968,6 @@ class MethodSignatureLookupClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * bound to the prepared statement as an input
 	 * see comment in DoPrepare for the reasoning
@@ -1070,9 +1018,7 @@ class MethodSignatureLookupClass : public t4p::SqliteResultClass {
  * the specific error code from SQLite.
  */
 class ParsedTagFinderClass : public t4p::SqliteFinderClass {
-
 	public:
-
 	ParsedTagFinderClass(soci::session& session);
 
 	/**
@@ -1276,7 +1222,6 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	bool HasDir(const wxString& dir);
 
 	protected:
-
 	/**
 	 * Find the FileTag entry that has the given full path (exact, case insensitive search into
 	 * the database).
@@ -1289,7 +1234,6 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	bool FindFileTagByFullPathExact(const wxString& fullPath, t4p::FileTagClass& fileTag);
 
 	private:
-
 	/**
 	 * Collects all resources that are classes / functions / defines and match the the given Resource search.
 	 * Any hits will be returned. Search is done for all tags that start with the tagSearch string; unless
@@ -1342,6 +1286,5 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
 };
-
 }
 #endif // T4P_RESOURCEFINDER_H

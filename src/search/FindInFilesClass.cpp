@@ -112,7 +112,6 @@ bool t4p::FindInFilesClass::Walk(const wxString& fileName) {
 	CurrentLine.remove();
 	CleanupStreams();
 	if (!fileName.empty()) {
-
 		// use wxWidgets file class as it allows us to properly open
 		// unicode filenames
 		if (FFile.Open(fileName, wxT("r"))) {
@@ -181,7 +180,6 @@ int t4p::FindInFilesClass::ReplaceAllMatches(UnicodeString& text) const {
 int t4p::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileName) const {
 	int matches = 0;
 	if (!fileName.empty() && wxFileName::IsFileReadable(fileName)) {
-
 		// ATTN: problems here: this code will load entire file into memory not too efficient
 		// but the regular expression classes do not work with strings
 		UnicodeString fileContents;
@@ -224,7 +222,6 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 	}
 	wxFFile fFile(fileName, wxT("rb"));
 	if (fFile.IsOpened()) {
-
 		// need to detect the character set so we can decode it correctly
 		// at this point I could only find the character set detection code that works for
 		// byte arrays; not sure one exists to detect charset from files
@@ -251,7 +248,6 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 				name = CharsetDetection(buffer, bufferSize);
 			}
 			if (NULL != name) {
-
 				// encode to Unicode from the detected charset. file already opened, just translate the
 				// buffer from memory
 				UErrorCode status = U_ZERO_ERROR;
@@ -265,7 +261,6 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 					}
 					ucnv_close(converter);
 					if (hasSignature) {
-
 						// remove the BOM marker
 						fileContents.remove(0, 1);
 					}

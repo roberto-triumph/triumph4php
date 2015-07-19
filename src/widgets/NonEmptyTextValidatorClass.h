@@ -35,9 +35,7 @@
  * Currently this only works on TextCtrl.
  */
 class NonEmptyTextValidatorClass : public wxValidator {
-
 	public:
-
 	/**
 	 * Constructor takes in a static text so that the error message will sound proper.
 	 *
@@ -55,7 +53,6 @@ class NonEmptyTextValidatorClass : public wxValidator {
 	virtual wxObject* Clone() const;
 
 	private:
-
 	NonEmptyTextValidatorClass();
 
 	/**

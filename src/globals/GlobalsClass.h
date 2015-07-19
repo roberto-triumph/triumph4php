@@ -36,15 +36,12 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * Class that groups together all of the Analysis source code; ie
  * the source code's resources, URLs, and templates.
  */
 class GlobalsClass {
-
 	public:
-
 	/**
 	 * The environment stack.
 	 *
@@ -283,8 +280,6 @@ class GlobalsClass {
 	 *         media.
 	 */
 	bool IsInLocalVolume(const wxFileName& fileName) const;
-
 };
-
 }
 #endif

@@ -29,7 +29,6 @@
 t4p::FileWatcherViewClass::FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::FileWatcherViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {

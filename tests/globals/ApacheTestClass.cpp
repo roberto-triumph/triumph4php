@@ -32,7 +32,6 @@
 
 class ApacheTestClass : public FileTestFixtureClass {
 	public:
-
 	wxString PhpFile;
 	wxString HttpdFile;
 	wxString ConfigSubDirectory;
@@ -48,7 +47,6 @@ class ApacheTestClass : public FileTestFixtureClass {
 		, VirtualHostFile(wxT("host.conf"))
 		, Search()
 		, Apache() {
-
 		// all tests will need a file to resolve
 		CreateFixtureFile(PhpFile, wxString::FromAscii(
 			"<?php"));
@@ -169,7 +167,6 @@ class ApacheTestClass : public FileTestFixtureClass {
 };
 
 SUITE(ApacheTestClass) {
-
 TEST_FIXTURE(ApacheTestClass, WalkShouldFindApacheConfigFile) {
 	CreateHttpdFile(wxT(""));
 	Walk();
@@ -229,7 +226,6 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
-
 		// paths in apache config file have forward slashes
 		// windows paths are not like regular windows path c:\\dir\\dir2
 		// they are  c:/dir1/dir2
@@ -249,7 +245,6 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenDocumentRootHasAWindowsPath) {
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
-
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this
 	ConfigSubDirectory = wxT("apache_CONFIG");
@@ -266,7 +261,6 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsInHttpConfFile) {
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenListeningOnANonStandardPortAndIsVirtualHost) {
-
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this.
 	ConfigSubDirectory = wxT("apache_CONFIG");
@@ -283,7 +277,6 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenListeningOnANonStandardPortAnd
 }
 
 TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostIsOnDifferentPort) {
-
 	// make sub directory name a mixture of lower/uppercase there
 	// was once a bug for this.
 	ConfigSubDirectory = wxT("apache_CONFIG");
@@ -305,7 +298,6 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkWhenVirtualHostHasAWindowsPath) {
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
-
 		// paths in apache config file have forward slashes
 		// windows paths are not like regular windows path c:\\dir\\dir2
 		// they are  c:/dir1/dir2
@@ -436,7 +428,6 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRoot) {
 }
 
 TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldParseDocumentRootWhenRootIsMissingEndingSeparator) {
-
 	// document root without ending separator
 	wxString documentRoot(TestProjectDir);
 	documentRoot.RemoveLast();
@@ -461,7 +452,6 @@ TEST_FIXTURE(ApacheTestClass, SetHttpdPathShouldWorkForWindowsPaths) {
 		minor;
 	wxOperatingSystemId systemId = wxGetOsVersion(&major, &minor);
 	if (wxOS_WINDOWS_NT == systemId) {
-
 		// paths in apache config file have forward slashes
 		// windows paths are not like regular windows path c:\\dir\\dir2
 		// they are  c:/dir1/dir2
@@ -494,5 +484,4 @@ TEST_FIXTURE(ApacheTestClass, GetUriShouldWorkWithoutVirtualHosts) {
 	wxString expectedUrl = wxT("http://localhost:8080/news/index");
 	CHECK_EQUAL(expectedUrl, url);
 }
-
 }

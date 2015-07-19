@@ -31,15 +31,12 @@
 #include <wx/event.h>
 
 namespace t4p {
-
 /**
  * Class that holds a file along with its modified time. The modified time
  * is saved in a variable so that we can tell when it changes.
  */
 class FileModifiedTimeClass {
-
 	public:
-
 	wxFileName FileName;
 
 	wxDateTime ModifiedTime;
@@ -56,9 +53,7 @@ class FileModifiedTimeClass {
  * have been modified or deleted externally
  */
 class FilesModifiedEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * files that have been modified externally (outside the editor)
 	 */
@@ -99,9 +94,7 @@ extern const wxEventType EVENT_FILES_EXTERNALLY_MODIFIED;
  * as having changed.
  */
 class FileModifiedCheckActionClass : public t4p::ActionClass {
-
 	public:
-
 	FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -121,10 +114,8 @@ class FileModifiedCheckActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
 };
-
 }
 
 typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModifiedEventClass&);

@@ -31,7 +31,6 @@
 #include <globals/FileTypeClass.h>
 
 namespace t4p {
-
 /**
  * The file types that we have an icon for
  */
@@ -77,7 +76,6 @@ int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileN
  *         this function returns t4p::IMGLIST_PHP
  */
 int FileTypeImageIdFromType(t4p::FileType type);
-
 
 }
 

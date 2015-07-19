@@ -29,7 +29,6 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * A JsTag is a code artifact that was parsed out of a user's
  * project. An example of this is a function declaration. JsTags
@@ -37,9 +36,7 @@ namespace t4p {
  * the JsTagFinderClass.
  */
 class JsTagClass {
-
 	public:
-
 	/**
 	 * primary key, unique identifier for this tag.
 	 * @var int
@@ -112,7 +109,6 @@ class JsTagClass {
 
 	void Copy(const t4p::JsTagClass& src);
 };
-
 }
 
 #endif

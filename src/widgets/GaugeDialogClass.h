@@ -29,7 +29,6 @@
 #include <wx/timer.h>
 
 namespace t4p {
-
 /**
  * A small dialog that contains a Gauge (progress bar) and a label. This dialog
  * will make the gauge pulse without any outside code.
@@ -38,9 +37,7 @@ namespace t4p {
  * located in the lower status bar might not be enough feedback for the user.
  */
 class GaugeDialogClass : public GaugeDialogGeneratedClass {
-
 	public:
-
 	GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label);
 
 	/**
@@ -49,18 +46,15 @@ class GaugeDialogClass : public GaugeDialogGeneratedClass {
 	void Start();
 
 	protected:
-
 	void OnHideButton(wxCommandEvent& event);
 
 	void OnTimer(wxTimerEvent& event);
 
 	private:
-
 	wxTimer Timer;
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

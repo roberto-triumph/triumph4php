@@ -30,7 +30,6 @@
 
 t4p::TotalSearchFeatureClass::TotalSearchFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {
-
 }
 
 

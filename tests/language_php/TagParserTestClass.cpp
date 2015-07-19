@@ -31,9 +31,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 class TagParserTestFixtureClass : public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagParserClass TagParser;
 
 	TagParserTestFixtureClass()
@@ -68,7 +66,6 @@ class TagParserTestFixtureClass : public SqliteTestFixtureClass {
  * in the same class.
  */
 SUITE(TagParserTestClass) {
-
 TEST_FIXTURE(TagParserTestFixtureClass, WipeAll) {
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
 	AddFile(file1, t4p::CharToIcu(
@@ -90,7 +87,6 @@ TEST_FIXTURE(TagParserTestFixtureClass, WipeAll) {
 }
 
 TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectories) {
-
 	// create 2 files, each in different directories
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
 	AddFile(file1, t4p::CharToIcu(
@@ -121,7 +117,6 @@ TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectories) {
 }
 
 TEST_FIXTURE(TagParserTestFixtureClass, DeleteDirectoriesWithSubDirectories) {
-
 	// create 2 files, each in different directories
 	wxFileName file1 = TestFile(wxT("project1"), wxT("user.php"));
 	AddFile(file1, t4p::CharToIcu(
@@ -204,5 +199,4 @@ TEST_FIXTURE(TagParserTestFixtureClass, RenameDir) {
 		soci::use(stdFullPath), soci::into(count);
 	CHECK_EQUAL(1, count);
 }
-
 }

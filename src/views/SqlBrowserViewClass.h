@@ -40,7 +40,6 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 // forward declaration, defined below
 class SqlBrowserViewClass;
 
@@ -48,20 +47,15 @@ class SqlBrowserViewClass;
  * dialog to create / edit an sqlite connection
  */
 class SqliteConnectionDialogClass : public SqliteConnectionDialogGeneratedClass {
-
 	public:
-
 	SqliteConnectionDialogClass(wxWindow* parent, t4p::DatabaseTagClass& tag);
-
 };
 
 /**
  * dialog to create / edit / test MySQL connection
  */
 class MysqlConnectionDialogClass : public MysqlConnectionDialogGeneratedClass {
-
 	public:
-
 	/**
 	 * @param wxWindow* the parent window
 	 * @param DatabaseTagClass& will get populated with the values that the user entered.
@@ -73,7 +67,6 @@ class MysqlConnectionDialogClass : public MysqlConnectionDialogGeneratedClass {
 	~MysqlConnectionDialogClass();
 
 	private:
-
 	void OnTestButton(wxCommandEvent& event);
 
 	/**
@@ -111,15 +104,12 @@ class MysqlConnectionDialogClass : public MysqlConnectionDialogGeneratedClass {
  * dialog that shows all connections; user can add / edit / delete them
  */
 class SqlConnectionListDialogClass : public SqlConnectionListDialogGeneratedClass {
-
 	public:
-
 	SqlConnectionListDialogClass(wxWindow* parent, std::vector<t4p::DatabaseTagClass>& dbTags, t4p::RunningThreadsClass& runningThreads);
 
 	~SqlConnectionListDialogClass();
 
 	private:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
@@ -186,9 +176,7 @@ class SqlConnectionListDialogClass : public SqlConnectionListDialogGeneratedClas
  * Panel which shows results from a SQL query.
  */
 class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * Creates a new SQL browser panel. After creation, the panel needs to be linked to a CodeControl
 	 * in order for Execute() to work properly.
@@ -269,7 +257,6 @@ class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
 	int SelectedConnectionIndex();
 
 	private:
-
 	/**
 	 * Transfers all of the variables from the controls to the Query data structure
 	 * and will return true if all values are valid
@@ -407,9 +394,7 @@ class SqlBrowserPanelClass : public SqlBrowserPanelGeneratedClass {
  * panel that shows a grid of all indices of a database table
  */
 class DefinitionIndicesPanelClass : public DefinitionIndicesPanelGeneratedClass {
-
 	public:
-
 	DefinitionIndicesPanelClass(wxWindow* parent);
 
 	void Fill(t4p::SqlResultClass* result);
@@ -419,19 +404,14 @@ class DefinitionIndicesPanelClass : public DefinitionIndicesPanelGeneratedClass 
  * panel that shows a grid of all columns of a database table
  */
 class DefinitionColumnsPanelClass : public DefinitionColumnsPanelGeneratedClass {
-
 	public:
-
 	DefinitionColumnsPanelClass(wxWindow* parent);
 
 	void Fill(t4p::SqlResultClass* result);
-
 };
 
 class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
-
 	public:
-
 	TableDefinitionPanelClass(wxWindow* parent, int id, t4p::SqlBrowserFeatureClass& feature,
 		t4p::SqlBrowserViewClass& view);
 	~TableDefinitionPanelClass();
@@ -444,7 +424,6 @@ class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
 	void FillConnectionList();
 
 	private:
-
 	void OnColumnSqlComplete(t4p::QueryCompleteEventClass& event);
 
 	void OnIndexSqlComplete(t4p::QueryCompleteEventClass& event);
@@ -497,9 +476,7 @@ class TableDefinitionPanelClass : public TableDefinitionPanelGeneratedClass {
  *  (table names, column names, sql keywords) for the user when the user is edting SQL
  */
 class SqlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-
 	public:
-
 	SqlCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
 	bool DoesSupport(t4p::FileType type);
@@ -509,7 +486,6 @@ class SqlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 	void SetDbTag(const t4p::DatabaseTagClass& dbTag);
 
 	private:
-
 	std::vector<wxString> HandleAutoCompletionMySql(const UnicodeString& word);
 
 	/**
@@ -524,9 +500,7 @@ class SqlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 };
 
 class SqlBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-
 	public:
-
 	SqlBraceMatchStylerClass();
 
 	bool DoesSupport(t4p::FileType type);
@@ -568,7 +542,6 @@ class SqlBrowserViewClass : public FeatureViewClass {
 	void SetCurrentInfo(const DatabaseTagClass& info);
 
 	private:
-
 	void OnSqlBrowserToolsMenu(wxCommandEvent& event);
 
 	void OnSqlConnectionMenu(wxCommandEvent& event);
@@ -630,19 +603,15 @@ class SqlBrowserViewClass : public FeatureViewClass {
  * or to a file
  */
 class SqlCopyDialogClass : public SqlCopyDialogGeneratedClass {
-
 	public:
-
 	SqlCopyDialogClass(wxWindow* parent, int id, t4p::SqlCopyOptionsClass& options);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
 
 	private:
-
 	t4p::SqlCopyOptionsClass EditedOptions;
 
 	t4p::SqlCopyOptionsClass& OriginalOptions;
@@ -654,14 +623,11 @@ class SqlCopyDialogClass : public SqlCopyDialogGeneratedClass {
  * to the clipboard
  */
 class SqlCopyAsInsertDialogClass : public SqlCopyAsInsertDialogGeneratedClass {
-
 	public:
-
 	SqlCopyAsInsertDialogClass(wxWindow* parent, int id,
 		t4p::RowToSqlInsertClass& rowToSql);
 
 	private:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
@@ -683,13 +649,10 @@ class SqlCopyAsInsertDialogClass : public SqlCopyAsInsertDialogGeneratedClass {
 };
 
 class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
-
 	public:
-
 	SqlCopyAsPhpDialogClass(wxWindow* parent, int id, t4p::RowToPhpClass& rowToPhp);
 
 	private:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
@@ -702,7 +665,6 @@ class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
 
 	bool HasCheckedAll;
 };
-
 }
 
 #endif

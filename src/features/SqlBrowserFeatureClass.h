@@ -37,7 +37,6 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 /**
  * This event will be propagated when the SQL query completes
  * execution
@@ -49,7 +48,6 @@ namespace t4p {
 extern const wxEventType QUERY_COMPLETE_EVENT;
 
 class QueryCompleteEventClass : public wxEvent {
-
 	public:
 	/**
 	 * this class will not delete the pointer; the
@@ -61,7 +59,6 @@ class QueryCompleteEventClass : public wxEvent {
 	QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId);
 
 	wxEvent* Clone() const;
-
 };
 
 typedef void (wxEvtHandler::*QueryCompleteEventClassFunction)(QueryCompleteEventClass&);
@@ -80,9 +77,7 @@ class SqlBrowserFeatureClass;
  * Class that will take a string of SQL statements and will execute them.
  */
 class MultipleSqlExecuteClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads the object that will receive the EVENT_WORK_* events when queries are
 	 *        finished being executed
@@ -104,7 +99,6 @@ class MultipleSqlExecuteClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	/**
@@ -114,7 +108,6 @@ class MultipleSqlExecuteClass : public t4p::ActionClass {
 	void DoCancel();
 
 	private:
-
 	/**
 	 * cleans up the current connection. After a call to this session, stmt, and row are no longer
 	 * valid.
@@ -167,9 +160,7 @@ class MultipleSqlExecuteClass : public t4p::ActionClass {
  * or to a file
  */
 class SqlCopyOptionsClass {
-
 	public:
-
 	/**
 	 * string to put before / after each cell
 	 *  (except first and last)
@@ -220,9 +211,7 @@ class SqlCopyOptionsClass {
  * a SQL INSERT statement
  */
 class RowToSqlInsertClass {
-
 	public:
-
 	/**
 	 * The values of the row; to be put in
 	 * the INSERT statement
@@ -279,9 +268,7 @@ class RowToSqlInsertClass {
  * array
  */
 class RowToPhpClass {
-
 	public:
-
 	/**
 	 * All of the available columns of the table
 	 */
@@ -363,9 +350,7 @@ class SqlBrowserFeatureClass : public FeatureClass {
 	void SavePreferences();
 
 	private:
-
 };
-
 }
 
 #endif

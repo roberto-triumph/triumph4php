@@ -33,7 +33,6 @@
 #include <wx/imaglist.h>
 
 namespace t4p {
-
 /**
  * This is a class that will show the user any view files that are
  * associated with the current URL (the URL that the user chose in
@@ -47,9 +46,7 @@ namespace t4p {
  * for the URL that the user has selected.
  */
 class TemplateFilesViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	TemplateFilesViewClass(t4p::TemplateFilesFeatureClass& feature);
 
 	void SetCurrentUrl(t4p::UrlTagClass url);
@@ -69,7 +66,6 @@ class TemplateFilesViewClass : public t4p::FeatureViewClass {
 	void OpenFile(wxString file);
 
 	private:
-
 	/**
 	 * show (or create) the view files window and start the calculations if needed
 	 */
@@ -88,9 +84,7 @@ class TemplateFilesViewClass : public t4p::FeatureViewClass {
 };
 
 class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
-
 	public:
-
 	TemplateFilesFeatureClass& Feature;
 
 	TemplateFilesViewClass& View;
@@ -106,7 +100,6 @@ class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 	void UpdateControllers();
 
 	protected:
-
 	void OnHelpButton(wxCommandEvent& event);
 
 	void OnCurrentButton(wxCommandEvent& event);
@@ -118,7 +111,6 @@ class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 	void OnTreeItemActivated(wxTreeEvent& event);
 
 	private:
-
 	enum {
 		IMAGE_TEMPLATE_FOLDER = 0,
 		IMAGE_TEMPLATE_FOLDER_OPEN,
@@ -128,7 +120,6 @@ class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 
 	wxImageList ImageList;
 };
-
 }
 
 #endif

@@ -28,16 +28,13 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * A bookmark is a location in a file; it consists of a
  * full path to a file together with a line number.  Triumph
  * will keep track of bookmarks at the user's request.
  */
 class BookmarkClass {
-
 	public:
-
 	/**
 	 * the file being bookmarked
 	 */
@@ -87,9 +84,7 @@ class BookmarkClass {
  * is because bookmarks are often used for short periods of time.
  */
 class BookmarkFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	/**
 	 * all bookmarks added by the user
 	 */
@@ -101,9 +96,7 @@ class BookmarkFeatureClass : public t4p::FeatureClass {
 	int CurrentBookmarkIndex;
 
 	BookmarkFeatureClass(t4p::AppClass& app);
-
 };
-
 }
 
 #endif // T4P__BOOKMARKFEATURECLASS_H

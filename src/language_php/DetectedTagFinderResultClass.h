@@ -31,11 +31,8 @@
 #include <language_php/PhpTagClass.h>
 
 namespace t4p {
-
 class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	DetectedTagTotalCountResultClass();
 
 	int GetTotalCount() const;
@@ -43,20 +40,16 @@ class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	int TotalCount;
 };
 
 class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	/**
 	 * this object is the current row of the result.
 	 */
@@ -70,7 +63,6 @@ class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	void DoBind(soci::statement& stmt);
@@ -93,28 +85,22 @@ class DetectedTagExactMemberResultClass : public t4p::SqliteResultClass {
 	std::string Signature;
 	std::string Comment;
 	int IsStatic;
-
 };
 
 class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMemberResultClass {
-
 	public:
-
 	DetectedTagNearMatchMemberResultClass();
 
 	void Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
 		const std::vector<wxFileName>& sourceDirectories);
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 	private:
-
 	std::string KeyUpper;
 
 	int ClassCount;
 };
-
 }
 
 #endif

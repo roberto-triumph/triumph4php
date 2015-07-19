@@ -39,7 +39,6 @@ t4p::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int even
 , SearchString(searchString)
 , LineNumber(lineNumber)
 , Tags(tags) {
-
 }
 
 wxEvent* t4p::TotalTagSearchCompleteEventClass::Clone() const {
@@ -98,7 +97,6 @@ t4p::TotalTagResultClass::TotalTagResultClass(const t4p::DatabaseTableTagClass& 
 , PhpTag()
 , TableTag(tableTag)
 , Type(t4p::TotalTagResultClass::TABLE_DATA_TAG) {
-
 }
 
 void t4p::TotalTagResultClass::Copy(const t4p::TotalTagResultClass& src) {
@@ -116,11 +114,9 @@ t4p::TotalTagSearchActionClass::TotalTagSearchActionClass(t4p::RunningThreadsCla
 , SqlTagCache(Session)
 , SearchString()
 , SearchDirs() {
-
 }
 
 void t4p::TotalTagSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
-
 	// deep copy the string, wxString not thread safe
 	SearchString = t4p::WxToIcu(search);
 	SearchDirs = t4p::DeepCopyFileNames(dirs);

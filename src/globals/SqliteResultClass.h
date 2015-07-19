@@ -30,7 +30,6 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * Generic class that will encapsulate a single query, the prepared statement,
  * and the result. Subclassses will override the DoPrepare(), DoBind(), and Next()
@@ -61,9 +60,7 @@ namespace t4p {
  *
  */
 class SqliteResultClass {
-
 	public:
-
 	SqliteResultClass();
 	virtual ~SqliteResultClass();
 
@@ -122,7 +119,6 @@ class SqliteResultClass {
 	bool ReExec(wxString& error);
 
 	protected:
-
 	/**
 	 * in this method subclasses will build the SQL and bind the input
 	 * parameters as needed.
@@ -149,7 +145,6 @@ class SqliteResultClass {
 	bool Fetch();
 
 	private:
-
 	/**
 	 * the statement to iterate through
 	 */
@@ -167,7 +162,6 @@ class SqliteResultClass {
 	 */
 	bool IsFetched;
 };
-
 }
 
 #endif

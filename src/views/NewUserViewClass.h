@@ -31,20 +31,16 @@
 #include <wx/wizard.h>
 
 namespace t4p {
-
 /**
  * The New User feature is a feature that will show the
  * user the welcome wizard the very first time that
  * the user runs the program.
  */
 class NewUserViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	NewUserViewClass(t4p::NewUserFeatureClass& feature);
 
 	private:
-
 	void OnAppReady(wxCommandEvent& event);
 
 	void OnTimer(wxTimerEvent& event);
@@ -64,16 +60,13 @@ class NewUserViewClass : public t4p::FeatureViewClass {
  * to the user - the first time the program is run on a machine.
 - */
 class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
-
 	public:
-
 	NewUserSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals,
 		t4p::PreferencesClass& preferences, wxFileName& configFileDir);
 
 	bool TransferDataFromWindow();
 
 	private:
-
 	void OnUpdateUi(wxUpdateUIEvent& event);
 
 	t4p::PreferencesClass& Preferences;
@@ -88,37 +81,29 @@ class NewUserSettingsPanelClass : public NewUserSettingsPanelGeneratedClass {
  * a type (language)
  */
 class NewUserAssociationsPanelClass : public NewUserAssociationsPanelGeneratedClass {
-
 	public:
-
 	NewUserAssociationsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
 	private:
-
 	t4p::GlobalsClass& Globals;
-
 };
 
 /**
  * The dialog that shows the user the php settings
  */
 class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClass {
-
 	public:
-
 	NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals);
 
 	bool TransferDataFromWindow();
 
 	private:
-
 	void OnUpdateUi(wxUpdateUIEvent& event);
 
 	t4p::GlobalsClass& Globals;
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

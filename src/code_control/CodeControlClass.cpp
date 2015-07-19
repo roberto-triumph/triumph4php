@@ -67,7 +67,6 @@ const int t4p::CODE_CONTROL_INDICATOR_FIND = 1;
 const int t4p::CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION = wxSTC_HJA_START;
 
 namespace t4p {
-
 /**
  * This class is the process that will copy the contents of
  * a the code control into a file that the current user does not
@@ -78,9 +77,7 @@ namespace t4p {
  * to the rest of the Triumph application
  */
 class ElevatedSaveProcessClass : public wxProcess {
-
 	public:
-
 	// the temp file and script temp are used to copy the
 	// contents that the user has edited into the original
 	// file.
@@ -115,9 +112,7 @@ class ElevatedSaveProcessClass : public wxProcess {
 	 * streams to show the user
 	 */
 	wxString GetProcessOutput() const;
-
 };
-
 }
 
 t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink)
@@ -126,7 +121,6 @@ t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* c
 , ScriptTempFile()
 , CodeCtrl(ctrl)
 , EventSink(eventSink) {
-
 }
 
 void t4p::ElevatedSaveProcessClass::OnTerminate(int pid, int status) {
@@ -193,7 +187,6 @@ static bool SaveFileWithCharset(const wxString& fullPath, const wxString& conten
 		ret = file.Write(contents, conv);
 	}
 	return ret;
-
 }
 
 static bool SavePrivilegedFileWithCharsetLinux(const wxString& fullPath, const wxString& contents,
@@ -377,7 +370,6 @@ static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxStri
 t4p::CodeCompletionItemClass::CodeCompletionItemClass()
 : Label()
 , Code() {
-
 }
 
 t4p::CodeCompletionItemClass::CodeCompletionItemClass(const t4p::CodeCompletionItemClass& src)
@@ -397,27 +389,21 @@ void t4p::CodeCompletionItemClass::Copy(const t4p::CodeCompletionItemClass& src)
 }
 
 t4p::CodeCompletionProviderClass::CodeCompletionProviderClass() {
-
 }
 
 t4p::CodeCompletionProviderClass::~CodeCompletionProviderClass() {
-
 }
 
 t4p::CallTipProviderClass::CallTipProviderClass() {
-
 }
 
 t4p::CallTipProviderClass::~CallTipProviderClass() {
-
 }
 
 t4p::BraceMatchStylerClass::BraceMatchStylerClass() {
-
 }
 
 t4p::BraceMatchStylerClass::~BraceMatchStylerClass() {
-
 }
 
 t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClass& options,
@@ -440,7 +426,6 @@ t4p::CodeControlClass::CodeControlClass(wxWindow* parent, CodeControlOptionsClas
 		, HasSearchMarkers(false)
 		, HasFileSignature(false)
 		, Charset() {
-
 	// we will handle right-click menu ourselves
 	UsePopUp(false);
 	SetYCaretPolicy(wxSTC_CARET_EVEN, 0);
@@ -465,7 +450,6 @@ void t4p::CodeControlClass::TrackFile(const wxString& filename, UnicodeString& c
 }
 
 void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
-
 	// lets avoid the IcuToWx to prevent going from
 	// UnicodeString -> UTF8 -> wxString  -> UTF8 -> Scintilla
 	// cost of translation (computation and memoory) could be big for big sized files
@@ -483,7 +467,6 @@ void t4p::CodeControlClass::SetUnicodeText(UnicodeString& contents) {
 	int32_t written;
 	u_strToUTF8(dest, rawLength + 1, &written, src, length, &status);
 	if(U_SUCCESS(status)) {
-
 		// SetText message
 		SendMsg(2181, 0, (long)(const char*)dest);
 	}
@@ -539,7 +522,6 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 
 	bool isAsyncSave = false;
 	if (!CurrentFilename.empty() || CurrentFilename == newFilename) {
-
 		// if file is not changing name then its not changing extension
 		// no need to auto detect the file type
 		bool isWritable = wxFileName::IsFileWritable(CurrentFilename);
@@ -609,7 +591,6 @@ wxDateTime t4p::CodeControlClass::GetFileOpenedDateTime() const {
 }
 
 void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
-
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
 	SetSelectionByCharacterPosition(start, end, true);
@@ -618,7 +599,6 @@ void t4p::CodeControlClass::SetSelectionAndEnsureVisible(int start, int end) {
 }
 
 void t4p::CodeControlClass::GotoLineAndEnsureVisible(int lineNumber) {
-
 	// make sure that selection ends up in the middle of the screen, hence the new caret policy
 	SetYCaretPolicy(wxSTC_CARET_JUMPS | wxSTC_CARET_EVEN, 0);
 
@@ -664,7 +644,6 @@ void t4p::CodeControlClass::OnCharAdded(wxStyledTextEvent &event) {
 		HandleAutomaticIndentation(ch);
 	}
 	if (CodeControlOptions.EnableAutoCompletion) {
-
 		// attempt to show code completion on method operator / scope operator
 		// since this event happens after currentPos is advanced; so
 		// current char is now at currentPos - 1, so previous char is at currentPos - 2
@@ -693,7 +672,6 @@ void t4p::CodeControlClass::HandleAutomaticIndentation(char chr) {
 			lineIndentation = GetLineIndentation(currentLine - 1);
 		}
 		if (lineIndentation > 0) {
-
 			// must check if the code uses tabs or spaces
 			int indentSize = GetIndent() ? GetIndent() : GetTabWidth();
 			int tabs = lineIndentation / indentSize;
@@ -776,7 +754,6 @@ void t4p::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 		ToggleFold(line);
 	}
 	else {
-
 		// features will not be interested in  the margin click of the code
 		// folding markers
 		EventSink.Publish(event);
@@ -963,7 +940,6 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 
 void t4p::CodeControlClass::UndoHighlight() {
 	if (WordHighlightIsWordHighlighted) {
-
 		// kill any current highlight searches
 		SetIndicatorCurrent(CODE_CONTROL_INDICATOR_FIND);
 		SetIndicatorValue(CODE_CONTROL_INDICATOR_FIND);
@@ -981,7 +957,6 @@ void t4p::CodeControlClass::HighlightWord(int utf8Start, int utf8Length) {
 }
 
 void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result) {
-
 	// positions in scintilla are byte offsets. convert chars to bytes so we can mark
 	// the squigglies properly
 	int byteNumber = 0;
@@ -1016,7 +991,6 @@ void t4p::CodeControlClass::MarkLintError(const pelet::LintResultsClass& result)
 }
 
 void t4p::CodeControlClass::MarkLintErrorAndGoto(const pelet::LintResultsClass& result) {
-
 	// positions in scintilla are byte offsets. convert chars to bytes so we can jump properly
 	int byteNumber = 0;
 	if (result.CharacterPosition >= 0) {
@@ -1051,7 +1025,6 @@ void t4p::CodeControlClass::ClearLintErrors() {
 }
 
 void t4p::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
-
 	// line is 1-based but wxSTC lines start at zero
 	if (goodHit) {
 		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
@@ -1077,7 +1050,6 @@ bool t4p::CodeControlClass::BookmarkMarkCurrent(int& lineNumber, int& handle) {
 	int currentLine = GetCurrentLine();
 	int newHandle = MarkerAdd(currentLine, CODE_CONTROL_BOOKMARK_MARKER);
 	if (newHandle != -1) {
-
 		// we want to return 1-based line numbers, easier for the end user
 		lineNumber = currentLine + 1;
 		handle = newHandle;
@@ -1086,7 +1058,6 @@ bool t4p::CodeControlClass::BookmarkMarkCurrent(int& lineNumber, int& handle) {
 }
 
 bool t4p::CodeControlClass::BookmarkMarkAt(int lineNumber, int& handle) {
-
 	// given line is 1-based, scintilla lines are 0-based
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
 	if (newHandle != -1) {
@@ -1108,13 +1079,11 @@ void t4p::CodeControlClass::BookmarkClearAll() {
 }
 
 void t4p::CodeControlClass::BookmarkClearAt(int lineNumber) {
-
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDelete(lineNumber - 1, CODE_CONTROL_BOOKMARK_MARKER);
 }
 
 bool t4p::CodeControlClass::ExecutionMarkAt(int lineNumber) {
-
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDeleteAll(CODE_CONTROL_EXECUTION_MARKER);
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_EXECUTION_MARKER);
@@ -1128,7 +1097,6 @@ void t4p::CodeControlClass::ExecutionMarkRemove() {
 }
 
 bool t4p::CodeControlClass::BreakpointMarkAt(int lineNumber, int& handle) {
-
 	// given line is 1-based, scintilla lines are 0-based
 	int newHandle = MarkerAdd(lineNumber - 1, CODE_CONTROL_BREAKPOINT_MARKER);
 	if (newHandle != -1) {
@@ -1138,7 +1106,6 @@ bool t4p::CodeControlClass::BreakpointMarkAt(int lineNumber, int& handle) {
 }
 
 void t4p::CodeControlClass::BreakpointRemove(int lineNumber) {
-
 	// given line is 1-based, scintilla lines are 0-based
 	MarkerDelete(lineNumber - 1, CODE_CONTROL_BREAKPOINT_MARKER);
 }
@@ -1221,7 +1188,6 @@ void t4p::CodeControlClass::RemoveTrailingBlankLines() {
 	bool seenQuestion = false;
 	for (int i = maxPos - 1; i >= 0 && !done; i--) {
 		if ('>' == prev && '?' == c) {
-
 			// if we get here then the first non-space characters that were found were
 			// the PHP end tags
 			// 3 = don't remove the ending PHP tag
@@ -1262,7 +1228,6 @@ void t4p::CodeControlClass::RemoveTrailingBlankLines() {
 }
 
 wxString t4p::CodeControlClass::GetIdString() const {
-
 	// make sure string is unique across program instances
 	long pid = wxGetProcessId();
 	wxString idString = wxString::Format(wxT("File_%ld_%d"), pid, GetId());

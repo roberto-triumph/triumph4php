@@ -37,7 +37,6 @@ class MyApp : public wxApp {
 class MyFrame: public wxFrame {
 	public:
 	MyFrame();
-
 };
 
 IMPLEMENT_APP(MyApp)

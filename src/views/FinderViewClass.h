@@ -32,11 +32,8 @@
 #include <wx/stc/stc.h>
 
 namespace t4p {
-
 class FinderViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	FinderViewClass(t4p::FinderFeatureClass& feature);
 
 	/**
@@ -49,7 +46,6 @@ class FinderViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	t4p::FinderFeatureClass& Feature;
 
 		/**
@@ -99,7 +95,6 @@ class FinderViewClass : public t4p::FeatureViewClass {
 	void OnDoubleClick(wxStyledTextEvent& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 /**
@@ -107,7 +102,6 @@ class FinderViewClass : public t4p::FeatureViewClass {
  * for desired text.
  */
 class FinderPanelClass : public FinderPanelGeneratedClass {
-
 	protected:
 	// Handlers for FindDialogGeneratedClass events.
 	void OnHelpButton(wxCommandEvent& event);
@@ -128,7 +122,6 @@ class FinderPanelClass : public FinderPanelGeneratedClass {
 	void OnFindKillFocus(wxFocusEvent& event);
 
 	public:
-
 	/**
 	 * Construct a new finder dialog
 	 *
@@ -167,7 +160,6 @@ class FinderPanelClass : public FinderPanelGeneratedClass {
 	void FindPrevious();
 
 	private:
-
 	/**
 	 * Execute a find on the currently active notebook page
 	 */
@@ -226,11 +218,9 @@ class FinderPanelClass : public FinderPanelGeneratedClass {
 	int CurrentInsertionPointFind;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 class ReplacePanelClass : public ReplacePanelGeneratedClass {
-
 	protected:
 	void OnHelpButton(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
@@ -262,7 +252,6 @@ class ReplacePanelClass : public ReplacePanelGeneratedClass {
 	void OnReplaceKillFocus(wxFocusEvent& event);
 
 	public:
-
 	/**
 	 * Construct a new finder dialog
 	 *
@@ -307,7 +296,6 @@ class ReplacePanelClass : public ReplacePanelGeneratedClass {
 	void FindPrevious();
 
 	private:
-
 	/**
 	 * Execute a find on the currently active notebook page
 	 */
@@ -380,7 +368,6 @@ class ReplacePanelClass : public ReplacePanelGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 
 }
 

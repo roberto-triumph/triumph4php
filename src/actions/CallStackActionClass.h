@@ -29,7 +29,6 @@
 #include <language_php/CallStackClass.h>
 
 namespace t4p {
-
 /**
  * Generates the call stack file in a background thread. This class
  * needs as input the starting entry point from which to start
@@ -38,9 +37,7 @@ namespace t4p {
  *
  */
 class CallStackActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads will be notified of EVENT_WORK_* events and EVENT_CALL_STACK_COMPLETE events as well
 	 */
@@ -65,7 +62,6 @@ class CallStackActionClass : public t4p::GlobalActionClass {
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * This is used by the call stack class to find out the file name (full paths) of the
 	 * classes / methods.
@@ -98,7 +94,6 @@ class CallStackActionClass : public t4p::GlobalActionClass {
 	 */
 	pelet::Versions Version;
 };
-
 }
 
 #endif

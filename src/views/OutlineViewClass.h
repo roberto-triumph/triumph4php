@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * This is a feature that is designed to let the user see the classes / methods of
  * the opened files and of related files.  The related files / classes / methods that are mentioned
@@ -39,7 +38,6 @@ namespace t4p {
  */
 class OutlineViewClass : public FeatureViewClass {
 	public:
-
 	/**
 	 * Creates a new OutlineView.
 	 */
@@ -75,7 +73,6 @@ class OutlineViewClass : public FeatureViewClass {
 	void StartTagSearch(const std::vector<UnicodeString>& searchStrings);
 
 	private:
-
 	/**
 	 * Updates the outlines based on the currently opened (and focused) file.
 	*/
@@ -103,9 +100,7 @@ class OutlineViewClass : public FeatureViewClass {
 };
 
 class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
-
 	public:
-
 	/**
 	 * Create a new outline view panel.
 	 *
@@ -134,7 +129,6 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	 void RemoveFileFromOutline(const wxString& fullPath);
 
 	protected:
-
 	/**
 	 * Shows the help
 	 */
@@ -156,7 +150,6 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	void OnTreeItemRightClick(wxTreeEvent& event);
 
 	private:
-
 	// image IDs used by the Tree ImageList
 	enum {
 		IMAGE_OUTLINE_ROOT = 0,
@@ -343,13 +336,10 @@ class OutlineViewPanelClass : public OutlineViewGeneratedPanelClass {
 	void RedrawOutline();
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent the parent window
 	 * @param feature to get the project list and to search for files
@@ -359,7 +349,6 @@ class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 		std::vector<t4p::PhpTagClass>& chosenTags);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 	void OnSearchText(wxCommandEvent& event);
 	void OnProjectChoice(wxCommandEvent& event);
@@ -370,7 +359,6 @@ class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 
 
 	private:
-
 	/**
 	 * populate the project choice
 	 */
@@ -402,7 +390,6 @@ class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 	 */
 	std::vector<t4p::PhpTagClass>& ChosenTags;
 };
-
 }
 
 #endif

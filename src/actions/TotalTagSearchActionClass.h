@@ -35,11 +35,8 @@
 #include <vector>
 
 namespace t4p {
-
 class TotalTagResultClass {
-
 	public:
-
 	enum Types {
 		FILE_TAG,
 		CLASS_TAG,
@@ -81,9 +78,7 @@ class TotalTagResultClass {
  * contains the results of the search.
  */
 class TotalTagSearchCompleteEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * The string that was searched for.
 	 */
@@ -103,7 +98,6 @@ class TotalTagSearchCompleteEventClass : public wxEvent {
 		int lineNumber, const std::vector<t4p::TotalTagResultClass>& tags);
 
     wxEvent* Clone() const;
-
 };
 
 extern const wxEventType EVENT_TOTAL_TAG_SEARCH_COMPLETE;
@@ -117,9 +111,7 @@ typedef void (wxEvtHandler::*TotalTagSearchCompleteEventClassFunction)(TotalTagS
 
 
 class TotalTagSearchActionClass : public t4p::ActionClass {
-
 	public:
-
 	TotalTagSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -141,11 +133,9 @@ class TotalTagSearchActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * perform a search on all items using exact, case
 	 * insensitive searches
@@ -188,9 +178,7 @@ class TotalTagSearchActionClass : public t4p::ActionClass {
 	 * directories to search in. If empty, then the entire cache will be searched.
 	 */
 	std::vector<wxFileName> SearchDirs;
-
 };
-
 }
 
 #endif // T4P_TOTALTAGSEARCHACTIONCLASS_H

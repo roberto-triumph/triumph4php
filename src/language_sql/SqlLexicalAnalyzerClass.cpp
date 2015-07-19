@@ -35,7 +35,6 @@ t4p::SqlLexicalAnalyzerClass::SqlLexicalAnalyzerClass()
 	: Buffer()
 	, QueryStartLineNumber(0)
 	, CurrentCondition(SQL_ANY) {
-
 }
 
 void t4p::SqlLexicalAnalyzerClass::Close() {
@@ -56,7 +55,6 @@ bool t4p::SqlLexicalAnalyzerClass::NextQuery(UnicodeString& query) {
 	const UChar *start = Buffer.TokenStart;
 	const UChar *end =  Buffer.Current;
 	if ((end - start) > 0 && Buffer.Current <= Buffer.Limit) {
-
 		// if passed by the EOF need to step back otherwise we insert
 		// a null character
 		if (Buffer.Current >= Buffer.Limit) {
@@ -328,5 +326,4 @@ sql_lexical_analyzer_77:
 		++Buffer.Current;
 		{ goto sql_lexical_analyzer_next; }
 	}
-
 }

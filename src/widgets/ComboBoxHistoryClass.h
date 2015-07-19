@@ -29,7 +29,6 @@
 #include <wx/event.h>
 
 namespace t4p {
-
 /**
  * This class add functionality to a wxComboBox.  It will remember previous user inputs and recall them.
  * It will do so by listening to its events and acting accordingly.
@@ -38,9 +37,7 @@ namespace t4p {
  * of th
  */
 class ComboBoxHistoryClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * Construct a new history
 	 * @param The combo box we are to add history to.  We will not own this pointer; calling code needs to delete it.
@@ -74,7 +71,6 @@ class ComboBoxHistoryClass : public wxEvtHandler {
 	void Detach();
 
 	private:
-
 	/**
 	 * We will use this only for modal dialogs; in order to persist items accross many instances of the same dialog.
 	 * @param wxArrayString
@@ -93,7 +89,6 @@ class ComboBoxHistoryClass : public wxEvtHandler {
 	 */
 	void OnComboSelected(wxCommandEvent& event);
 };
-
 }
 
 #endif

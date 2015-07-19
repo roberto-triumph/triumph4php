@@ -183,7 +183,6 @@ void t4p::RunBrowserViewClass::OnRunInWebBrowser(wxCommandEvent& event) {
 }
 
 void t4p::RunBrowserViewClass::OnPreferencesSaved(wxCommandEvent& event) {
-
 	// need to update the browser toolbar if the user updates the environment
 	std::vector<wxString> browserNames = Feature.App.Globals.Environment.BrowserNames();
 
@@ -308,7 +307,6 @@ void t4p::RunBrowserViewClass::ShowUrlDialog() {
 	t4p::ChooseUrlDialogClass dialog(GetMainWindow(), Feature.App.Globals.UrlTagFinder,
 		Feature.App.Globals.Projects, Feature.App.Globals.FileTypes, Feature.App.Globals.CurrentUrl);
 	if (wxOK == dialog.ShowModal() && !Feature.App.Globals.CurrentUrl.Url.BuildURI().IsEmpty()) {
-
 		// 'select' the URL (make it the current in the toolbar)
 		BrowserToolbar->SetToolLabel(t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 3, Feature.App.Globals.CurrentUrl.Url.BuildURI());
 		BrowserToolbar->Realize();
@@ -335,7 +333,6 @@ void t4p::RunBrowserViewClass::ShowUrlDialog() {
 }
 
 void t4p::RunBrowserViewClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
-
 	// detect the chosen browser based on the menu item name
 	// change the current selection only if name is found
 	// change both the data structure and the toolbar
@@ -359,7 +356,6 @@ void t4p::RunBrowserViewClass::OnBrowserToolMenuItem(wxCommandEvent& event) {
 }
 
 void t4p::RunBrowserViewClass::OnUrlToolMenuItem(wxCommandEvent& event) {
-
 	// detect the chosen url based on the menu item name
 	// change the current selection only if name is found
 	// change both the data structure and the toolbar
@@ -385,7 +381,6 @@ void t4p::RunBrowserViewClass::OnUrlToolMenuItem(wxCommandEvent& event) {
 
 void t4p::RunBrowserViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 	if (IsUrlCacheStale) {
-
 		// already know that cache is stale, then no need to check for dirty again
 		return;
 	}
@@ -406,7 +401,6 @@ void t4p::RunBrowserViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 void t4p::RunBrowserViewClass::OnUrlDetectionComplete(t4p::ActionEventClass& event) {
 	IsUrlCacheStale = false;
 	if (!IsWaitingForUrlDetection) {
-
 		// we did not trigger the url detection
 		return;
 	}

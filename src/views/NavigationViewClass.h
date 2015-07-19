@@ -30,7 +30,6 @@
 #include <wx/aui/auibook.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class NotebookClass;
 
@@ -48,9 +47,7 @@ class NotebookClass;
  * to catch CTRL+TAB key events.
  */
 class NavigationViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	NavigationViewClass();
 
 	void AddEditMenuItems(wxMenu* menu);
@@ -58,7 +55,6 @@ class NavigationViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<t4p::DynamicCmdClass>& commands);
 
 	private:
-
 	/**
 	 * menu handler
 	 */
@@ -73,9 +69,7 @@ class NavigationViewClass : public t4p::FeatureViewClass {
  * the index of the page to be selected.
  */
 class NavigationChoiceClass {
-
 	public:
-
 	/**
 	 * The notebook that the user chose to be focused on
 	 * This class does not own this pointer.
@@ -88,7 +82,6 @@ class NavigationChoiceClass {
 	int PageIndex;
 
 	NavigationChoiceClass();
-
 };
 
 /**
@@ -97,9 +90,7 @@ class NavigationChoiceClass {
  * notebooks (lint results, find in files results, outline).
  */
 class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
-
 	public:
-
 	NavigationViewDialogClass(wxWindow* parent,
 		t4p::NavigationViewClass& view,
 		wxAuiManager& auiManager,
@@ -109,20 +100,17 @@ class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 		t4p::NavigationChoiceClass& choice);
 
 	protected:
-
 	void OnFilesListKeyDown(wxKeyEvent& event);
 	void OnPanelsListKeyDown(wxKeyEvent& event);
 	void OnFileItemActivated(wxListEvent& event);
 	void OnPanelItemActivated(wxListEvent& event);
 	private:
-
 	std::vector<t4p::NotebookClass*> CodeNotebooks;
 	wxAuiNotebook* OutlineNotebook;
 	wxAuiNotebook* ToolsNotebook;
 
 	t4p::NavigationChoiceClass& Choice;
 };
-
 }
 
 #endif // T4P_NAVIGATIONVIEWCLASS_H

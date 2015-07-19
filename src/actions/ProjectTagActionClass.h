@@ -32,7 +32,6 @@
 #define T4P_RESOURCECACHEACTIONCLASS_H
 
 namespace t4p {
-
 /**
  * This class will take care of iterating through all files in a project
  * and parsing the resources so that queries to ParsedTagFinderClass
@@ -41,9 +40,7 @@ namespace t4p {
  * event once each project  has been parsed.
  */
 class ProjectTagActionClass : public GlobalActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads will receive EVENT_FILE_* and EVENT_WORK_* events when all
 	 * files have been iterated through.
@@ -76,7 +73,6 @@ class ProjectTagActionClass : public GlobalActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	/**
 	 * Queue of projects to be indexed.
 	 */
@@ -126,9 +122,7 @@ class ProjectTagActionClass : public GlobalActionClass {
  * stale.
  */
 class ProjectTagInitActionClass : public t4p::InitializerGlobalActionClass {
-
 	public:
-
 	ProjectTagInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(t4p::GlobalsClass& globals);
@@ -140,9 +134,7 @@ class ProjectTagInitActionClass : public t4p::InitializerGlobalActionClass {
  * this action will re-tag a single directory (and its subdirs)
  */
 class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	ProjectTagDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -163,7 +155,6 @@ class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
 	bool Init(t4p::GlobalsClass& globals);
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;
@@ -188,9 +179,7 @@ class ProjectTagDirectoryActionClass : public t4p::GlobalActionClass {
  * this action will re-tag a single file only
  */
 class ProjectTagSingleFileActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	ProjectTagSingleFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -213,7 +202,6 @@ class ProjectTagSingleFileActionClass : public t4p::GlobalActionClass {
 
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;
@@ -238,9 +226,7 @@ class ProjectTagSingleFileActionClass : public t4p::GlobalActionClass {
  * this action will rename the file tag for a single file only
  */
 class ProjectTagSingleFileRenameActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	ProjectTagSingleFileRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -259,7 +245,6 @@ class ProjectTagSingleFileRenameActionClass : public t4p::GlobalActionClass {
 
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;
@@ -287,9 +272,7 @@ class ProjectTagSingleFileRenameActionClass : public t4p::GlobalActionClass {
  * this action will rename the file tag for an entire directory
  */
 class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	ProjectTagDirectoryRenameActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -308,7 +291,6 @@ class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
 
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;

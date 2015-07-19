@@ -30,7 +30,6 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * This feature sets the appropriate colors
  * to code control.  Syntax highlighting is already
@@ -39,14 +38,11 @@ namespace t4p {
  * also set colors for the code control margins
  */
 class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
-
 	public:
 	SyntaxHighlightFeatureClass(t4p::AppClass& app);
 
 	private:
-
 };
-
 }
 
 #endif // T4P_SYNTAXHIGHLIGHTFEATURECLASS_H

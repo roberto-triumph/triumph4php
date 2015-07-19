@@ -38,7 +38,6 @@
 const static size_t MAX_ERRORS = 100;
 
 static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
-
 	// magic methods, never unknown
 	methods[UNICODE_STRING_SIMPLE("__construct")] = 1;
 	methods[UNICODE_STRING_SIMPLE("__destruct")] = 1;
@@ -62,7 +61,6 @@ t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass()
 , LineNumber(0)
 , Pos(0)
 , Type(NONE) {
-
 }
 
 t4p::PhpIdentifierLintResultClass::PhpIdentifierLintResultClass(const t4p::PhpIdentifierLintResultClass& src)
@@ -175,7 +173,6 @@ bool t4p::PhpIdentifierLintClass::ParseFile(const wxFileName& fileName,
 
 bool t4p::PhpIdentifierLintClass::ParseString(const UnicodeString& code,
 															  std::vector<t4p::PhpIdentifierLintResultClass>& errors) {
-
 	Errors.clear();
 	FoundClasses.clear();
 	FoundMethods.clear();
@@ -208,7 +205,6 @@ void t4p::PhpIdentifierLintClass::DefineDeclarationFound(const UnicodeString& na
 													 const UnicodeString& variableValue,
 													 const UnicodeString& comment,
 													 const int lineNumber) {
-
 }
 
 void t4p::PhpIdentifierLintClass::ClassFound(const UnicodeString& namespaceName, const UnicodeString& className,
@@ -320,7 +316,6 @@ void t4p::PhpIdentifierLintClass::ExpressionInstanceOfOperationFound(pelet::Inst
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
-
 	// nothing as scalars cannot be undefined
 }
 
@@ -342,12 +337,10 @@ void t4p::PhpIdentifierLintClass::ExpressionNewInstanceFound(pelet::NewInstanceE
 }
 
 void t4p::PhpIdentifierLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
-
 	// global statement only contain "simple" variables, ie no function/method calls
 }
 
 void t4p::PhpIdentifierLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
-
 	// static statements only contain "simple" variables, ie no function/method calls
 }
 
@@ -356,7 +349,6 @@ void t4p::PhpIdentifierLintClass::ExpressionIncludeFound(pelet::IncludeExpressio
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
-
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
 	// scope for the closure.
@@ -378,7 +370,6 @@ void t4p::PhpIdentifierLintClass::ExpressionClosureFound(pelet::ClosureExpressio
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
-
 	// check any array accesses in the destination variables
 	// ie $user[$name]
 	for (size_t i = 0; i < expression->Destinations.size(); ++i) {
@@ -390,7 +381,6 @@ void t4p::PhpIdentifierLintClass::ExpressionAssignmentListFound(pelet::Assignmen
 }
 
 void t4p::PhpIdentifierLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
-
 	// check any array accesses in the destination variables
 	// ie $user[$name]
 	for (size_t i = 0; i < expression->Expressions.size(); ++i) {
@@ -482,7 +472,6 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 		}
 	}
 	else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
-
 		// a classname in a static method call, ie User::DEFAULT_NAME
 		CheckClassNameAndLog(var->ChainList[0].Name, var->LineNumber, var->Pos);
 	}
@@ -500,12 +489,10 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			}
 		}
 		else if (prop.IsArrayAccess && prop.ArrayAccess) {
-
 			// check for array accesees ie $user[$name]
 			CheckExpression(var->ChainList[i].ArrayAccess);
 		}
 		else if (!prop.IsArrayAccess && prop.IsStatic) {
-
 			// only check for static properties (and constants)
 			// for now
 			// testing for instance properties results in many false
@@ -662,7 +649,6 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 	// this same code will work for those also
 	bool isStaticCall = methodProp.IsStatic;
 	if (isStaticCall && var->ChainList.size() == 2) {
-
 		// check for calls to the base class
 		// these calls are NOT static
 		//
@@ -821,7 +807,6 @@ void t4p::PhpIdentifierLintClass::CheckClassNameAndLog(const UnicodeString& clas
 }
 
 bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className) {
-
 	// some class names are never unknown
 	if (className.isEmpty() ||
 		className.compare(UNICODE_STRING_SIMPLE("parent")) == 0 ||

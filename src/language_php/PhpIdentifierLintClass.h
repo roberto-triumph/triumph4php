@@ -33,7 +33,6 @@
 #include <wx/filename.h>
 
 namespace t4p {
-
 // forward declaration
 class TagCacheClass;
 
@@ -42,9 +41,7 @@ class TagCacheClass;
  * found in a PHP file.
  */
 class PhpIdentifierLintResultClass {
-
 	public:
-
 	enum Types {
 		NONE,
 		UNKNOWN_CLASS,
@@ -97,9 +94,7 @@ class PhpIdentifierLintClass :
 	public pelet::ClassMemberObserverClass,
 	public pelet::FunctionObserverClass,
 	public pelet::ExpressionObserverClass  {
-
 	public:
-
 	PhpIdentifierLintClass();
 
 	/**
@@ -201,7 +196,6 @@ class PhpIdentifierLintClass :
 	void ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression);
 
 	private:
-
 	/**
 	 * errors found so far
 	 */
@@ -359,9 +353,7 @@ class PhpIdentifierLintClass :
 	 *        error string
 	 */
 	void CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var);
-
 };
-
 }
 
 #endif

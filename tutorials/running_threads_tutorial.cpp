@@ -61,7 +61,6 @@ class MyFrame: public wxFrame {
 };
 
 class MyAction : public t4p::ActionClass {
-
 	public:
 	MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label);
 	wxString GetLabel() const;
@@ -158,7 +157,6 @@ void MyFrame::OnClose(wxCloseEvent& event) {
 MyAction::MyAction(t4p::RunningThreadsClass& runningThreads, int eventId, wxString label)
 	: t4p::ActionClass(runningThreads, eventId)
 	, Label(label) {
-
 }
 
 void MyAction::BackgroundWork() {

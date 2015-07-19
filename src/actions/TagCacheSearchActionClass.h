@@ -33,15 +33,12 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * event that is generated when a tag query is completed.  this event
  * contains the results of the search.
  */
 class TagCacheSearchCompleteEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * The string that was searched for.
 	 */
@@ -56,7 +53,6 @@ class TagCacheSearchCompleteEventClass : public wxEvent {
 		const std::vector<t4p::PhpTagClass>& tags);
 
     wxEvent* Clone() const;
-
 };
 
 extern const wxEventType EVENT_TAG_CACHE_SEARCH_COMPLETE;
@@ -74,9 +70,7 @@ typedef void (wxEvtHandler::*TagCacheSearchCompleteEventClassFunction)(TagCacheS
  * the results will be posted in an event of type EVENT_TAG_CACHE_SEARCH_COMPLETE.
  */
 class TagCacheSearchActionClass : public t4p::ActionClass {
-
 	public:
-
 	TagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -98,11 +92,9 @@ class TagCacheSearchActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * the thing to search in
 	 */

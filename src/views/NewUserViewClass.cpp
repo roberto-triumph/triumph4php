@@ -70,7 +70,6 @@ void t4p::NewUserViewClass::OnTimer(wxTimerEvent& event) {
 	wizard.GetPageAreaSizer()->Add(page3);
 
 	if (wizard.RunWizard(page1)) {
-
 		// true means that we will
 		// re trigger the app start sequence, that way the tag dbs get created
 		// in the new location
@@ -122,7 +121,6 @@ t4p::NewUserSettingsPanelClass::NewUserSettingsPanelClass(wxWindow *parent,
 : NewUserSettingsPanelGeneratedClass(parent, ID_NEW_USER_DIALOG)
 , Preferences(preferences)
 , ConfigFileDir(configFileDir) {
-
 	wxString label = UserDataDirectory->GetLabel();
 	wxStandardPaths paths = wxStandardPaths::Get();
 	wxFileName tempDir;
@@ -147,7 +145,6 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 		return good;
 	}
 	if (CustomDirectory->GetValue()) {
-
 		// if user chose to store settings in a custom directory it must exist
 		wxString settingsDir = SettingsDirectory->GetPath();
 		if (!wxFileName::DirExists(settingsDir)) {
@@ -161,7 +158,6 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 	}
 	wxStandardPaths paths = wxStandardPaths::Get();
 	if (ApplicationDirectory->GetValue()) {
-
 		// create our subDir if it does not exist
 		wxFileName tempDir;
 		tempDir.AssignDir(paths.GetExecutablePath());
@@ -188,7 +184,6 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 		ConfigFileDir.AssignDir(SettingsDirectory->GetPath());
 	}
 	else {
-
 		// use the user data directory
 		// create our subDir if it does not exist
 		wxFileName tempDir;
@@ -249,7 +244,6 @@ t4p::NewUserAssociationsPanelClass::NewUserAssociationsPanelClass(wxWindow* pare
 t4p::NewUserPhpSettingsPanelClass::NewUserPhpSettingsPanelClass(wxWindow* parent, t4p::GlobalsClass& globals)
 : NewUserPhpSettingsPanelGeneratedClass(parent, wxID_ANY)
 , Globals(globals) {
-
 	wxGenericValidator phpInstalledValidator(&Globals.Environment.Php.Installed);
 	Installed->SetValidator(phpInstalledValidator);
 }
@@ -264,7 +258,6 @@ bool t4p::NewUserPhpSettingsPanelClass::TransferDataFromWindow() {
 		return good;
 	}
 	if (Installed->GetValue()) {
-
 		// only if the user has php installed do we check to see if the
 		// executable is good
 		wxString phpPath = PhpExecutable->GetPath();
@@ -274,7 +267,6 @@ bool t4p::NewUserPhpSettingsPanelClass::TransferDataFromWindow() {
 		}
 	}
 	else if (Version->GetSelection() == 0) {
-
 		// no PHP then dont try to detect version
 		// but the user must have not have chosen auto
 		wxMessageBox(wxT("Since PHP is not available you must provide the PHP version to use during parsing."), wxT("Error"));

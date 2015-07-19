@@ -31,7 +31,6 @@
 #include <map>
 
 namespace t4p {
-
 /**
  * The ApacheClass searches through Apache config files for virtual host entries.  It enables
  * the user of this class to transform file system paths into web-browser accessible URLs. This class does not
@@ -66,9 +65,7 @@ namespace t4p {
  * </code>
  */
 class ApacheClass : public DirectoryWalkerClass {
-
 	public:
-
 	/**
 	 * if this is TRUE, then apache files will not be parsed; the virtual hosts
 	 * will need to be created manually using SetVirtualHostMapping()
@@ -180,7 +177,6 @@ class ApacheClass : public DirectoryWalkerClass {
 	wxString GetUri(const wxString& fileSystemPath, const wxString& uriPath) const;
 
 	private:
-
 	/**
 	 * Open an apache config file extract virtual host information.  This method will correctly handle
 	 * files, directories, as well as wilcard characters.
@@ -224,6 +220,5 @@ class ApacheClass : public DirectoryWalkerClass {
 	  */
 	 int Port;
 };
-
 }
 #endif // __apacheclass__

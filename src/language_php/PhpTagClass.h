@@ -33,14 +33,11 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * This class represents each tag we have found in the user's source code.
  */
 class PhpTagClass {
-
 	public:
-
 	/**
 	 * All the resources we collect
 	 */
@@ -233,13 +230,10 @@ class PhpTagClass {
 	 * @return UnicodeString the fully qualified class name of this tag
 	 */
 	UnicodeString FullyQualifiedClassName() const;
-
 };
 
 class TraitTagClass {
-
 	public:
-
 	/**
 	 * the key is used to perform lookups into this table. The key will be either
 	 * 1. The name of the class that uses a trait (same as ClassName property)
@@ -295,9 +289,7 @@ class TraitTagClass {
  * will be used so that we dont look at files that have not been modified since we last parsed them
  */
 class FileTagClass {
-
 	public:
-
 	/**
 	 * The full path to the file where this tag was found
 	 */
@@ -356,7 +348,6 @@ class FileTagClass {
 	 */
 	wxString Name() const;
 };
-
 }
 
 #endif

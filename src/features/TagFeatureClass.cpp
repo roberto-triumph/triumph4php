@@ -53,7 +53,6 @@ wxString t4p::TagFeatureClass::CacheStatus() {
 }
 
 void t4p::TagFeatureClass::OnAppFileDeleted(wxCommandEvent& event) {
-
 	// clean up the cache in a background thread
 	std::vector<wxFileName> filesToDelete;
 	filesToDelete.push_back(wxFileName(event.GetString()));
@@ -71,7 +70,6 @@ void t4p::TagFeatureClass::OnAppFileRenamed(t4p::RenameEventClass& event) {
 }
 
 void t4p::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
-
 	// the file is assumed not be opened, we don't need to build the symbol table
 	// just retag it
 	// see the comment for EVENT_APP_FILE_EXTERNALLY_MODIFIED in Events.h

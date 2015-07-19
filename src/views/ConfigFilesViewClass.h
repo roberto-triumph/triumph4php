@@ -29,7 +29,6 @@
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class ConfigFilesFeatureClass;
 
@@ -38,15 +37,12 @@ class ConfigFilesFeatureClass;
  * based on the config files that were parsed.
  */
 class ConfigFilesViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature);
 
 	void AddNewMenu(wxMenuBar* menuBar);
 
 	private:
-
 	/**
 	 * rebuilds the config files menu based on the current config
 	 * tags.
@@ -85,7 +81,6 @@ class ConfigFilesViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

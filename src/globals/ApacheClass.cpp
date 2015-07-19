@@ -82,7 +82,6 @@ t4p::ApacheClass& t4p::ApacheClass::operator=(const t4p::ApacheClass& src) {
 }
 
 void t4p::ApacheClass::Copy(const t4p::ApacheClass& src) {
-
 	// make sure to completely copy wxStrings
 	ManualConfiguration = src.ManualConfiguration;
 	VirtualHostMappings.clear();
@@ -134,7 +133,6 @@ void t4p::ApacheClass::SetVirtualHostMapping(const wxString& fileSystemPath, wxS
 }
 
 void t4p::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) {
-
 	// normalize just like the SetVirtualHostMapping() method
 	wxFileName filename;
 	filename.AssignDir(fileSystemPath);
@@ -146,7 +144,6 @@ void t4p::ApacheClass::RemoveVirtualHostMapping(const wxString& fileSystemPath) 
 }
 
 wxString t4p::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
-
 	// normalize the given path; also convert to lower case so that we make case-insesitive
 	// comparisons (to handle windows paths). also add a trailing slash if fileSystemPath
 	// is a directory; when comparing fileSystemPaths the ending separator is irrelevant
@@ -167,14 +164,12 @@ wxString t4p::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 			hostRoot += wxFileName::GetPathSeparator();
 		}
 		if (0 == dir.Find(hostRoot)) {
-
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
 
 			// look for a port (but careful of the protocol http://
 			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
 			if (Port > 0 && Port != 80 && !urlHasPort) {
-
 				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
 				baseUrl += wxString::Format(wxT(":%d/"), Port);
@@ -187,7 +182,6 @@ wxString t4p::ApacheClass::GetUrl(const wxString& fileSystemPath) const {
 }
 
 wxString t4p::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString& uriPath) const {
-
 	// normalize the given path; also convert to lower case so that we make case-insesitive
 	// comparisons (to handle windows paths)
 	wxFileName fileToGet(fileSystemPath);
@@ -198,14 +192,12 @@ wxString t4p::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString
 		wxString hostRoot = it->first;
 		hostRoot.LowerCase();
 		if (0 == dir.Find(hostRoot)) {
-
 			// file is inside this virtual host. remove the root and append to host
 			wxString baseUrl = it->second;
 
 			// look for a port (but careful of the protocol http://
 			bool urlHasPort = baseUrl.find_last_of(wxT(":")) > 4;
 			if (Port > 0 && Port != 80 && !urlHasPort) {
-
 				// host already has a slash; only append port if virtual host does not have it
 				baseUrl.RemoveLast();
 				baseUrl += wxString::Format(wxT(":%d/"), Port);
@@ -248,7 +240,6 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					currentDocumentRoot,
 					currentPort;
 			for (wxString line = file.GetFirstLine(); !file.Eof(); line = file.GetNextLine()) {
-
 				// apache directives are case insensitive, but file names are not
 				// so we need 2 variables for this ...
 				line = line.Trim(false).Trim(true);
@@ -301,11 +292,9 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					ParseApacheConfigFile(nextFile);
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("servername"))) {
-
 					// must get the line that has not been modified to lowercase
 					currentServerName = line.Mid(10).Trim(false).Trim(true); //10=length of "ServerName"
 					if (inVirtualHost && !currentPort.IsEmpty()) {
-
 						// append the port information; sometimes virtual hosts have their own port
 						currentServerName.Append(wxT(":")).Append(currentPort);
 					}
@@ -352,7 +341,6 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 	else if (includedFile.Contains(wxT("*"))) {
 		wxFileName fileName(includedFile);
 		if (fileName.IsOk()) {
-
 			// ATTN: careful, in windows we need the volume in case the executable
 			// is in a different drive than the config file
 			wxString dirString = fileName.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME);

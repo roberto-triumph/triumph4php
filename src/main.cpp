@@ -50,7 +50,6 @@ static int ID_EVENT_CONFIG_FILE_CHECK = wxNewId();
 class GuiAppClass;
 
 namespace t4p {
-
 /**
  * We use this to generate a one-time ready event that features can
  * listen for when they want to perform something
@@ -59,9 +58,7 @@ namespace t4p {
  * to the global config file.
  */
 class AppTimerClass : public wxTimer {
-
 	public:
-
 	/**
 	 * create AND begin the timer
 	 */
@@ -73,15 +70,12 @@ class AppTimerClass : public wxTimer {
 	void Notify();
 
 	private:
-
 	GuiAppClass& GuiApp;
 
 	void OnConfigFileModified(t4p::FilesModifiedEventClass& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 /**
@@ -94,9 +88,7 @@ class AppTimerClass : public wxTimer {
  * "do their thing".
  */
 class GuiAppClass : public wxApp {
-
 	public:
-
 	/**
 	 * With this timer, we will generate an EVENT_APP_INITIALIZED after the
 	 * window is initially shown to the user. We want to show the main
@@ -133,7 +125,6 @@ class GuiAppClass : public wxApp {
 	void FeatureWindows(t4p::MainFrameClass* mainFrame);
 
 	private:
-
 	void LoadPreferences(t4p::MainFrameClass* mainFrame);
 
 	/**
@@ -192,18 +183,13 @@ IMPLEMENT_APP(GuiAppClass)
  * when the thread dies.
  */
 namespace t4p {
-
 class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
-
 	public:
-
 	MysqlThreadCleanupClass()
 	: ThreadCleanupClass() {
-
 	}
 
 	void ThreadEnd() {
-
 		// clean up the MySQL library.
 		// mysql has stuff that gets created per each thread
 		mysql_thread_end();
@@ -214,7 +200,6 @@ class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 		return new MysqlThreadCleanupClass();
 	}
 };
-
 }
 
 GuiAppClass::GuiAppClass()
@@ -406,7 +391,6 @@ t4p::AppTimerClass::AppTimerClass(GuiAppClass& guiApp)
 }
 
 void t4p::AppTimerClass::Notify() {
-
 	// tell all features that the app is ready to use
 	// the features will do / should do  their grunt
 	// work in their event handler
@@ -442,7 +426,6 @@ void t4p::AppTimerClass::Notify() {
 }
 
 void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& event) {
-
 	// stop the timer so that we dont show this prompt multiple times
 	GuiApp.Timer.Stop();
 	if (event.Modified.empty()) {
@@ -456,7 +439,6 @@ void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& even
 	msg = wxGetTranslation(msg);
 	int res = wxMessageBox(msg, _("Reload preferences"), wxCENTRE | wxYES_NO);
 	if (wxYES == res) {
-
 		// delete the old config ourselves
 		wxConfigBase* oldConfig = wxConfig::Get();
 		delete oldConfig;
@@ -473,7 +455,6 @@ void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& even
 		GuiApp.App.ConfigLastModified = event.ModifiedTimes[0];
 	}
 	else {
-
 		// update the time so that we don't continually ask the user the prompt
 		GuiApp.App.ConfigLastModified = event.ModifiedTimes[0];
 	}

@@ -34,9 +34,7 @@
  * fixture is useful for the tests that deal with tag searching and tag parsing.
  */
 class SqliteTestFixtureClass {
-
 	public:
-
 	/**
 	 * @param sqlScriptFile the file that contains the CREATE table statements
 	 *        to seed the database.
@@ -65,7 +63,6 @@ class SqliteTestFixtureClass {
 	bool Exec(const std::string& query);
 
 	protected:
-
 	/**
 	 * The active connection
 	 */

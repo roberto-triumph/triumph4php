@@ -35,11 +35,8 @@
 #include <memory>
 
 namespace t4p {
-
 class RunBrowserViewClass : public FeatureViewClass {
-
 	public:
-
 	RunBrowserViewClass(t4p::RunBrowserFeatureClass& feature);
 
 	void AddWindows();
@@ -47,7 +44,6 @@ class RunBrowserViewClass : public FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	/**
 	 * when a file is saved and that file is from an enabled project
 	 * we set a dirty flag so that we can re-run url detection
@@ -135,7 +131,6 @@ class RunBrowserViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

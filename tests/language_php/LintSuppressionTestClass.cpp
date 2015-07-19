@@ -29,9 +29,7 @@
 #include <unicode/unistr.h>
 
 class LintSuppressionFixtureClass : public FileTestFixtureClass {
-
 	public:
-
 	/**
 	 * the object under test
 	 */
@@ -79,7 +77,6 @@ class LintSuppressionFixtureClass : public FileTestFixtureClass {
 	 * suppress uninitialized variables for code.php
 	 */
 	void DefaultSuppressions() {
-
 		// create a file of suppressions
 		// 1 of each kind of suppression
 		wxString contents = wxString::FromAscii(
@@ -104,9 +101,7 @@ class LintSuppressionFixtureClass : public FileTestFixtureClass {
 };
 
 SUITE(LintSuppressionTestClass) {
-
 TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFile) {
-
 	// test that the suppressions can be loaded from
 	// a CSV file
 	DefaultSuppressions();
@@ -115,7 +110,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFile) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFileWithErrors) {
-
 	// test that when a suppression file has some invalid rules
 	// the good rules are still loaded from the CSV file
 
@@ -147,7 +141,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFileWithErrors) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, TypeAllDirectory) {
-
 	// test that the "all" suppressions properly ignores
 	// all types when using directory suppressions
 	DefaultSuppressions();
@@ -194,7 +187,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeAllDirectory) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownClass) {
-
 	// test that the class suppressions are properly ignored
 	DefaultSuppressions();
 
@@ -214,7 +206,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownClass) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownMethod) {
-
 	// test that the method suppressions are properly ignored
 	DefaultSuppressions();
 
@@ -234,7 +225,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownMethod) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownFunction) {
-
 	// test that the function suppressions are properly ignored
 	DefaultSuppressions();
 
@@ -255,7 +245,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownFunction) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, TypeUninitializedVariable) {
-
 	// test that the variable suppressions are properly ignored
 	DefaultSuppressions();
 
@@ -275,7 +264,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, TypeUninitializedVariable) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRule) {
-
 	// make sure that adding a directory rule will add a rule
 	t4p::SuppressionRuleClass rule;
 	rule.SkipAllRule(CodeDir);
@@ -290,7 +278,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRule) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRuleWithDuplicates) {
-
 	// make sure that adding a directory rule
 	// will not add a rule if another rule for the dir
 	// already exists
@@ -304,7 +291,6 @@ TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRuleWithDuplicates) {
 }
 
 TEST_FIXTURE(LintSuppressionFixtureClass, RemoveDirectoryRuleWithExistingRules) {
-
 	// add 2 rules, then attempt to remove 1
 	t4p::SuppressionRuleClass ruleDir;
 	ruleDir.SkipAllRule(CodeDir);
@@ -317,7 +303,5 @@ TEST_FIXTURE(LintSuppressionFixtureClass, RemoveDirectoryRuleWithExistingRules) 
 	// now call the method being tested
 	CHECK_EQUAL(true, Suppressions.RemoveRulesForDirectory(CodeDir));
 	CHECK_VECTOR_SIZE(1, Suppressions.Rules);
-
 }
-
 }

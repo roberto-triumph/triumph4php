@@ -61,7 +61,6 @@ t4p::AppClass::AppClass(wxTimer& configModifiedTimer)
  * when app starts, create the new app frame
  */
 void t4p::AppClass::Init() {
-
 	// 1 ==> to make sure any queued items are done one at a time
 	SqliteRunningThreads.SetMaxThreads(1);
 	Globals.Environment.Init();
@@ -79,7 +78,6 @@ t4p::AppClass::~AppClass() {
 }
 
 void t4p::AppClass::CreateFeatures() {
-
 
 	// connect the features to the event sink so that they can
 	// receive app events
@@ -122,7 +120,6 @@ void t4p::AppClass::DeleteFeatureViews() {
 }
 
 void t4p::AppClass::LoadPreferences() {
-
 	// load any settings from .INI files
 	bool validConfigDir = PreferencesClass::InitConfig();
 	if (!validConfigDir) {
@@ -143,7 +140,6 @@ void t4p::AppClass::LoadPreferences() {
 
 void t4p::AppClass::SavePreferences(const wxFileName& settingsDir, bool changedDirectory) {
 	if (changedDirectory) {
-
 		// write the location of the settings dir to the bootstrap file
 		Preferences.SetSettingsDir(settingsDir);
 

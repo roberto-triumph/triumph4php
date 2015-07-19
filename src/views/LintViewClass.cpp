@@ -115,7 +115,6 @@ void t4p::LintResultsPanelClass::ClearErrors() {
 }
 
 void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
-
 	// remove the lint result data structures as well as the
 	// display list
 	std::vector<pelet::LintResultsClass>::iterator it = Feature.LintErrors.begin();
@@ -274,9 +273,7 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 	}
 
 	if (!rule.Target.isEmpty()) {
-
 		if (rule.Type != t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR) {
-
 			// for unknown class/method/function, default the location to be the
 			// source directory; if a class is not found in one file it will not
 			// be found in any files of the project
@@ -302,7 +299,6 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 
 		t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, rule);
 		if (dialog.ShowModal() == wxOK) {
-
 			// now save the newly created
 			t4p::LintSuppressionClass suppressions;
 			std::vector<UnicodeString> errors;
@@ -524,12 +520,10 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 		resultsPanel->ShowLintError(i);
 	}
 	else if (codeControl && results.empty()) {
-
 		// no errors!
 		codeControl->ClearLintErrors();
 	}
 	else if (codeControl && !results.empty()) {
-
 		// if the lint results panel is not open, just show
 		// a small panel instead of creating the tools window,
 		// which will startle the user
@@ -538,7 +532,6 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 		int firstVisibleLine = codeControl->GetFirstVisibleLine() + 1;
 		int lastVisibleLine = firstVisibleLine + codeControl->LinesOnScreen();
 		if (results[0].LineNumber < firstVisibleLine || results[0].LineNumber >= lastVisibleLine) {
-
 			// the error is out of view show a message, remove any other existing message
 
 			// freeze thaw the code control so that the popup is
@@ -568,7 +561,6 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 			}
 		}
 		else {
-
 			// the error is in view, just show an annotation
 			codeControl->MarkLintError(results[0]);
 		}
@@ -576,7 +568,6 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 }
 
 void t4p::LintViewClass::OnLintFileComplete(wxCommandEvent& event) {
-
 }
 
 void t4p::LintViewClass::OnLintComplete(t4p::ActionEventClass& event) {
@@ -588,7 +579,6 @@ void t4p::LintViewClass::OnLintComplete(t4p::ActionEventClass& event) {
 void t4p::LintViewClass::OnLintProgress(t4p::ActionProgressEventClass& event) {
 	t4p::StatusBarWithGaugeClass* gauge = GetStatusBarWithGauge();
 	if (event.PercentComplete == 0) {
-
 			// the start, turn the gauge into determinate mode
 			gauge->SwitchMode(ID_LINT_RESULTS_GAUGE, t4p::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);
 	}
@@ -663,7 +653,6 @@ t4p::LintPreferencesPanelClass::LintPreferencesPanelClass(wxWindow* parent,
 																t4p::LintFeatureClass& feature)
 	: LintPreferencesGeneratedPanelClass(parent, wxID_ANY)
 	, Feature(feature) {
-
 	t4p::HelpButtonIcon(HelpButton);
 
 	wxGenericValidator checkValidator(&Feature.Options.CheckOnSave);
@@ -751,11 +740,9 @@ t4p::LintSuppressionsPanelClass::LintSuppressionsPanelClass(wxWindow* parent, in
 }
 
 void t4p::LintSuppressionsPanelClass::OnAddButton(wxCommandEvent& event) {
-
 	t4p::SuppressionRuleClass newRule;
 	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, newRule);
 	if (wxOK == dialog.ShowModal()) {
-
 		// update file and list control
 		Suppressions.Add(newRule);
 		SaveList();
@@ -767,7 +754,6 @@ void t4p::LintSuppressionsPanelClass::OnDeleteAllButton(wxCommandEvent& event) {
 	int confirm = wxMessageBox(_("Are you sure you want to delete all suppressions?"),
 		_("Lint Suppressions"), wxYES | wxNO | wxCENTER);
 	if (confirm == wxYES) {
-
 		// update file and list control
 		Suppressions.Rules.clear();
 		SaveList();
@@ -795,7 +781,6 @@ void t4p::LintSuppressionsPanelClass::OnEditButton(wxCommandEvent& event) {
 	t4p::SuppressionRuleClass editRule = Suppressions.Rules[row];
 	t4p::LintSuppressionRuleDialogClass dialog(TopWindow, wxID_ANY, editRule);
 	if (wxOK == dialog.ShowModal()) {
-
 		// update file and list control
 		Suppressions.Rules[row] = editRule;
 		SaveList();

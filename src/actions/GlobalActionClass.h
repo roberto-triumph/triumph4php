@@ -29,7 +29,6 @@
 #include <globals/GlobalsClass.h>
 
 namespace t4p {
-
 /**
  * An action is any short or long-lived process that reads Global data structures
  * and performs an action.
@@ -41,9 +40,7 @@ namespace t4p {
  * shallow copies)
  */
 class GlobalActionClass : public t4p::ActionClass {
-
 	public:
-
 	GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	virtual bool Init(t4p::GlobalsClass& globals) = 0;
@@ -57,9 +54,7 @@ class GlobalActionClass : public t4p::ActionClass {
  * manner.
  */
 class InitializerGlobalActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -69,9 +64,7 @@ class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 	void BackgroundWork();
 
 	bool DoAsync();
-
 };
-
 }
 
 #endif

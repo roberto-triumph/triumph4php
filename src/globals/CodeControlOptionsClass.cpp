@@ -61,7 +61,6 @@ t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 , EnableRectangularSelection(false)
 , ShowWhitespace(false)
 , Zoom(0) {
-
 }
 
 t4p::CodeControlOptionsClass& t4p::CodeControlOptionsClass::operator=(const t4p::CodeControlOptionsClass& src) {
@@ -218,7 +217,6 @@ t4p::StylePreferenceClass::StylePreferenceClass()
 , StcStyle(0)
 , IsBold(false)
 , IsItalic(false) {
-
 }
 
 t4p::StylePreferenceClass::StylePreferenceClass(const t4p::StylePreferenceClass& src)

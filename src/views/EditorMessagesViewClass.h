@@ -29,14 +29,11 @@
 #include <views/wxformbuilder/EditorMessagesFeatureForms.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class EditorLogEventClass;
 
 class EditorMessagesViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	EditorMessagesViewClass();
 
 	void AddViewMenuItems(wxMenu* toolsMenu);
@@ -44,7 +41,6 @@ class EditorMessagesViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	/**
 	 * When the user clicks on the editor messages menu
 	 * show the editor messages window
@@ -67,9 +63,7 @@ class EditorMessagesViewClass : public t4p::FeatureViewClass {
  * messages.
  */
 class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
-
 	public:
-
 	EditorMessagesPanelClass(wxWindow* parent, int id);
 
 	/**
@@ -78,14 +72,11 @@ class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
 	void AddMessage(wxLogLevel level, const wxChar *msg, time_t timestamp);
 
 	protected:
-
 	/**
 	 * Removes all messages from the display grid.
 	 */
 	void OnClearButton(wxCommandEvent& event);
-
 };
-
 }
 
 #endif

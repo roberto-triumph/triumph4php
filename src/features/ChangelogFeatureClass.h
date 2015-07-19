@@ -28,16 +28,13 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * This is a small feature that shows the user the
  * change log file; the file that describes the various
  * updates that triump4hp has released
  */
 class ChangelogFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	ChangelogFeatureClass(t4p::AppClass& app);
 
 	void LoadPreferences(wxConfigBase* config);
@@ -45,7 +42,6 @@ class ChangelogFeatureClass : public t4p::FeatureClass {
 	void ShowChangeLog();
 
 	private:
-
 	void OnAppReady(wxCommandEvent& event);
 
 	void OnSavePreferences(wxCommandEvent& event);
@@ -61,7 +57,6 @@ class ChangelogFeatureClass : public t4p::FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_CHANGELOGFEATURECLASS_H

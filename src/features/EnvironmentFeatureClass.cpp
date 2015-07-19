@@ -32,7 +32,6 @@ const wxEventType t4p::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 t4p::ApacheFileReadCompleteEventClass::ApacheFileReadCompleteEventClass(int eventId, const t4p::ApacheClass &apache)
 	: wxEvent(eventId, t4p::EVENT_APACHE_FILE_READ_COMPLETE)
 	, Apache(apache) {
-
 }
 
 wxEvent* t4p::ApacheFileReadCompleteEventClass::Clone() const {
@@ -65,7 +64,6 @@ bool t4p::ApacheFileReaderClass::BackgroundFileRead(t4p::DirectorySearchClass& s
 		ret = true;
 	}
 	if (!search.More() && !IsCancelled()) {
-
 		// when we are done recursing, parse the matched files
 		std::vector<wxString> possibleConfigFiles = search.GetMatchedFiles();
 

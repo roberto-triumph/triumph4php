@@ -50,14 +50,12 @@ static bool IsFunctionArgumentByReference(const UnicodeString& signature, int ar
 	int32_t start = signature.indexOf('(');
 	int32_t next = signature.indexOf(',', start);
 	if (next < 0) {
-
 		// only 1 argument, look for the ending )
 		next = signature.indexOf(')', next + 1);
 	}
 	int arg = 0;
 	while (next >= 0) {
 		if (arg == argIndex) {
-
 			// this is the argument that we want to
 			// check
 			UnicodeString variable;
@@ -75,7 +73,6 @@ static bool IsFunctionArgumentByReference(const UnicodeString& signature, int ar
 		start = next;
 		next = signature.indexOf(',', start + 1);
 		if (next < 0) {
-
 			// last argument, look for the ending )
 			next = signature.indexOf(')', next + 1);
 		}
@@ -89,7 +86,6 @@ t4p::PhpVariableLintResultClass::PhpVariableLintResultClass()
 , LineNumber(0)
 , Pos(0)
 , Type(NONE) {
-
 }
 
 t4p::PhpVariableLintResultClass::PhpVariableLintResultClass(const t4p::PhpVariableLintResultClass& src)
@@ -134,7 +130,6 @@ void t4p::PhpVariableLintOptionsClass::Copy(const t4p::PhpVariableLintOptionsCla
 t4p::PhpVariableLintOptionsClass::PhpVariableLintOptionsClass()
 : CheckGlobalScope(false)
 , Version(pelet::PHP_53) {
-
 }
 
 t4p::PhpVariableLintClass::PhpVariableLintClass()
@@ -210,7 +205,6 @@ bool t4p::PhpVariableLintClass::ParseFile(const wxFileName& fileName,
 
 bool t4p::PhpVariableLintClass::ParseString(const UnicodeString& code,
 															  std::vector<t4p::PhpVariableLintResultClass>& errors) {
-
 	Errors.clear();
 	ScopeVariables.clear();
 	Parser.SetVersion(Options.Version);
@@ -230,7 +224,6 @@ void t4p::PhpVariableLintClass::DefineDeclarationFound(const UnicodeString& name
 													 const UnicodeString& variableValue,
 													 const UnicodeString& comment,
 													 const int lineNumber) {
-
 }
 
 void t4p::PhpVariableLintClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className,
@@ -257,7 +250,6 @@ void t4p::PhpVariableLintClass::FunctionFound(const UnicodeString& namespaceName
 }
 
 void t4p::PhpVariableLintClass::ExpressionFunctionArgumentFound(pelet::VariableClass* variable) {
-
 	// function arguments go in the initialized list
 	if (!variable->ChainList.empty()) {
 		ScopeVariables[variable->ChainList[0].Name] = 1;
@@ -269,7 +261,6 @@ void t4p::PhpVariableLintClass::ExpressionVariableFound(pelet::VariableClass* ex
 }
 
 void t4p::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpressionClass* expression) {
-
 	// if an assigned variable is an indirect or variable variable
 	// like so " $$name = '123'; "
 	// we turn off uninitialized varaible checks
@@ -292,12 +283,10 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpre
 	// but we want to check arrays ie $data['name'] = '';
 	if (expression->Destination.ChainList.size() == 1 &&
 		!expression->Destination.ChainList[0].IsFunction) {
-
 		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
 	}
 	else if (expression->Destination.ChainList.size() > 1 &&
 		expression->Destination.ChainList[1].IsArrayAccess) {
-
 		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
 	}
 }
@@ -308,7 +297,6 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentCompoundFound(pelet::Assignm
 	// for now, ignore assignments to properties ie. $obj->prop1
 	if (expression->Variable.ChainList.size() == 1 &&
 		!expression->Variable.ChainList[0].IsFunction) {
-
 		ScopeVariables[expression->Variable.ChainList[0].Name] = 1;
 	}
 }
@@ -339,7 +327,6 @@ void t4p::PhpVariableLintClass::ExpressionInstanceOfOperationFound(pelet::Instan
 }
 
 void t4p::PhpVariableLintClass::ExpressionScalarFound(pelet::ScalarExpressionClass* expression) {
-
 	// nothing as scalars cannot be undefined
 }
 
@@ -360,7 +347,6 @@ void t4p::PhpVariableLintClass::ExpressionNewInstanceFound(pelet::NewInstanceExp
 }
 
 void t4p::PhpVariableLintClass::StatementGlobalVariablesFound(pelet::GlobalVariableStatementClass* variables) {
-
 	// global statement brings in variables, so we add them to
 	// the defined list
 	for (size_t i = 0; i < variables->Variables.size(); ++i) {
@@ -372,7 +358,6 @@ void t4p::PhpVariableLintClass::StatementGlobalVariablesFound(pelet::GlobalVaria
 }
 
 void t4p::PhpVariableLintClass::StatementStaticVariablesFound(pelet::StaticVariableStatementClass* variables) {
-
 	// static statement brings in variables, so we add them to
 	// the defined list
 	for (size_t i = 0; i < variables->Variables.size(); ++i) {
@@ -392,7 +377,6 @@ void t4p::PhpVariableLintClass::ExpressionIncludeFound(pelet::IncludeExpressionC
 }
 
 void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionClass* expr) {
-
 	// for a closure, we add the closure parameters and the lexical
 	// var ("use" variables) as into the scope.  we also define a new
 	// scope for the closure.
@@ -402,7 +386,6 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 		if (!param->ChainList.empty()) {
 			UnicodeString paramName = param->ChainList[0].Name;
 			if (param->IsReference) {
-
 				// if this is a parameter passed by reference, then add
 				// it to the function scope
 				ScopeVariables[paramName] = 1;
@@ -415,7 +398,6 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 		if (!param->ChainList.empty()) {
 			UnicodeString paramName = param->ChainList[0].Name;
 			if (param->IsReference) {
-
 				// if this is a parameter passed by reference, then add
 				// it to the function scope
 				ScopeVariables[paramName] = 1;
@@ -457,7 +439,6 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 
 void t4p::PhpVariableLintClass::ExpressionIssetFound(pelet::IssetExpressionClass* expression) {
 
-
 	// isset expressions have a bit of logic
 	//
 	// examples that don't trigger PHP notices
@@ -492,7 +473,6 @@ void t4p::PhpVariableLintClass::ExpressionEvalFound(pelet::EvalExpressionClass* 
 }
 
 void t4p::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentListExpressionClass* expression) {
-
 	// check any array accesses in the destination variables
 	// ie $user[$name]
 	for (size_t i = 0; i < expression->Destinations.size(); ++i) {
@@ -512,7 +492,6 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentListFound(pelet::AssignmentL
 		pelet::VariableClass var = expression->Destinations[i];
 		if (var.ChainList.size() == 1 &&
 			!var.ChainList[0].IsFunction) {
-
 			ScopeVariables[var.ChainList[0].Name] = 1;
 		}
 	}
@@ -540,7 +519,6 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 		FunctionSignatureLookup.Set(functionName);
 		FunctionSignatureLookup.ReExec(error);
 		if (FunctionSignatureLookup.IsOk() && FunctionSignatureLookup.Found()) {
-
 			// we only return true if there is 1 and only 1 match
 			FunctionSignatureLookup.Next();
 			if (!FunctionSignatureLookup.More()) {
@@ -553,7 +531,6 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 		MethodSignatureLookup.Set(functionName, isStatic);
 		MethodSignatureLookup.ReExec(error);
 		if (MethodSignatureLookup.Found()) {
-
 			// we only return true if there is 1 and only 1 match
 			MethodSignatureLookup.Next();
 			if (!MethodSignatureLookup.More()) {
@@ -563,7 +540,6 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 		}
 	}
 	if (!found && NativeFunctionSignatureLookup.IsOk()) {
-
 		// as a last resort, check to see if this is a native function
 		// in PHP, native functions do not need to be fully qualified
 		UnicodeString unqualifiedName;
@@ -667,7 +643,6 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	}
 
 	if (HasIndirectVariable) {
-
 		// an indirect assignment was found, lets not check for uninitialized
 		// variables in this scope; we don't want to show false positives.
 		return;
@@ -682,7 +657,6 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 	// we skip this
 	if (!var->ChainList[0].IsFunction &&  !var->ChainList[0].Name.isEmpty() &&
 		var->ChainList[0].Name.charAt(0) == '$') {
-
 		// if options say to not check variables in global scope, then dont check
 		if (!var->Scope.IsGlobalScope() || Options.CheckGlobalScope) {
 			UnicodeString varName = var->ChainList[0].Name;
@@ -702,13 +676,11 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 		}
 	}
 	if (var->ChainList[0].IsFunction) {
-
 		// is this a call to extract()
 		if (var->ChainList[0].Name.caseCompare(UNICODE_STRING_SIMPLE("extract"), 0) == 0) {
 			HasExtractCall = true;
 		}
 		if (var->ChainList[0].Name.endsWith(UNICODE_STRING_SIMPLE("\\extract"))) {
-
 			// this is a call to extract but this call is within a declared namespace.
 			// PHP has a fallback mechanism for namespaced functions; if a function is
 			// called inside  namespace, it looks for a function in the declared
@@ -732,7 +704,6 @@ void t4p::PhpVariableLintClass::CheckVariable(pelet::VariableClass* var) {
 				if ((*it)->ExpressionType == pelet::ExpressionClass::VARIABLE) {
 					pelet::VariableClass* argVar = (pelet::VariableClass*)*it;
 					if (argVar->ChainList.size() == 1 && !argVar->ChainList[0].IsFunction) {
-
 						// check to see if the argument is passed-by-reference. a
 						// variable passed by reference could be counted as initialized
 						// by the function being called; we want to not label these

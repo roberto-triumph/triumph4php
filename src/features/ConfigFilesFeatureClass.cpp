@@ -31,7 +31,6 @@
 t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass()
 : ProjectLabel()
 , ConfigTags() {
-
 }
 
 t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass(const t4p::ConfigFilesFeaturePairClass& src)
@@ -53,7 +52,6 @@ void t4p::ConfigFilesFeaturePairClass::Copy(const t4p::ConfigFilesFeaturePairCla
 t4p::ConfigFilesFeatureClass::ConfigFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)
 	, ConfigTags() {
-
 }
 
 bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFilesFeaturePairClass>& configPairs) {
@@ -69,7 +67,6 @@ bool t4p::ConfigFilesFeatureClass::BuildConfigPairs(std::vector<t4p::ConfigFiles
 		allConfigTags = finder.All(sourceDirs);
 	}
 	if (!allConfigTags.empty()) {
-
 		// doing 2 for-loops because we need the index into ConfigTags to line up
 		// with the way we create the menu items
 		std::vector<t4p::ProjectClass>::const_iterator project;

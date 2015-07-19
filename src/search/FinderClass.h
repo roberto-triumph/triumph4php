@@ -29,7 +29,6 @@
 #include <unicode/regex.h>
 
 namespace t4p {
-
 /**
  * This class can be used to search for a subset of text within a given
  * text. The FindNext & FindPrevious methods perform the search, while iterating through the
@@ -56,9 +55,7 @@ namespace t4p {
  *
  */
 class FinderClass {
-
 	public:
-
 	/**
 	 * All possible search modes
 	 * EXACT - exact case sensitive matching
@@ -195,7 +192,6 @@ class FinderClass {
 	bool Wrap;
 
 	private:
-
 	/**
 	 * The compiled regular expression
 	 * @var RegExPattern*
@@ -279,6 +275,5 @@ class FinderClass {
 	 */
 	bool FindNextRegularExpression(const UnicodeString& text, int32_t start = 0);
 };
-
 }
 #endif /*T4P_FINDERCLASS_H_*/

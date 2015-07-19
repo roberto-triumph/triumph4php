@@ -31,7 +31,6 @@
 
 
 namespace t4p {
-
 // defined below
 class RunConsoleFeatureClass;
 
@@ -40,9 +39,7 @@ class RunConsoleFeatureClass;
  * 'console' (CLI).
  */
 class CliCommandClass {
-
 	public:
-
 	/**
 	 * Binary to be run. This may be a full path, or just the
 	 * binary name if the binary is already in the PATH.
@@ -87,16 +84,13 @@ class CliCommandClass {
 	 * @return the command to be executed
 	 */
 	wxString CmdLine() const;
-
 };
 
 /**
  * Keeps track of the position of a file name in the output.
  */
 class FileNameHitClass {
-
 	public:
-
 	/**
 	 * The 0-based index into output string. This is the start of the file name
 	 */
@@ -108,13 +102,10 @@ class FileNameHitClass {
 	int32_t Length;
 
 	FileNameHitClass();
-
 };
 
 class RunConsoleFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * The list of commands to be persisted.
 	 */
@@ -145,12 +136,10 @@ class RunConsoleFeatureClass : public FeatureClass {
 	void LoadPage(const wxString& fileName);
 
 	private:
-
 	/**
 	 * Handles the click of the saved command buttons
 	 */
 	void OnCommandButtonClick(wxCommandEvent& evt);
 };
-
 }
 #endif // __RUNCONSOLEFEATURECLASS_H

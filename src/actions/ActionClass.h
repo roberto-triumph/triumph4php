@@ -31,7 +31,6 @@
 #include <queue>
 
 namespace t4p {
-
 // defined below
 class RunningThreadsClass;
 
@@ -65,9 +64,7 @@ class RunningThreadsClass;
  *
  */
 class ActionClass {
-
 	public:
-
 	/**
 	 * ProgressMode can be one of two modes: determinate or indeterminate.
 	 * Determinate mode means that an action is able to give an accurate estimate of
@@ -156,7 +153,6 @@ class ActionClass {
 	void PostEvent(wxEvent& event);
 
 	protected:
-
 	/**
 	 * Generates a EVENT_ACTION_STATUS event with the given string
 	 * as the wxCommandEvent.GetString
@@ -180,7 +176,6 @@ class ActionClass {
 	void SetPercentComplete(int percentComplete);
 
 	private:
-
 	/**
 	 * Keeps a reference to this object's running thread; that way
 	 * we can send events to other threads.
@@ -231,9 +226,7 @@ class ActionClass {
  * context of the background thread.
  */
 class ThreadCleanupClass {
-
 	public:
-
 	ThreadCleanupClass();
 
 	virtual ~ThreadCleanupClass();
@@ -261,9 +254,7 @@ class ThreadCleanupClass {
  * BackgroundWork() has finished.
  */
 class ThreadActionClass : public wxThread {
-
 	public:
-
 	/**
 	 *
 	 * @param actions to be run; First In First Out
@@ -310,7 +301,6 @@ class ThreadActionClass : public wxThread {
 	void PostProgressEvent();
 
 	private:
-
 	/**
 	 * actions to be run; First In First Out
 	 */
@@ -376,9 +366,7 @@ class ThreadActionClass : public wxThread {
  * This class will own all given actions, and will delete them need.
  */
 class RunningThreadsClass : public wxEvtHandler {
-
 	public:
-
 	RunningThreadsClass(bool doPostEvents = true);
 
 	~RunningThreadsClass();
@@ -459,7 +447,6 @@ class RunningThreadsClass : public wxEvtHandler {
 	void PostEvent(wxEvent& event);
 
 	private:
-
 	/**
 	 * holds all actions that need to be run. This class will add
 	 * actions to the queue. An action will be removed as soon as it
@@ -600,9 +587,7 @@ extern const wxEventType EVENT_ACTION_PROGRESS;
  * the task and 100 being the end of the task.
  */
 class ActionProgressEventClass : public wxEvent {
-
 	public:
-
 	/** on of  either determinate or indeterminate */
 	t4p::ActionClass::ProgressMode Mode;
 
@@ -615,7 +600,6 @@ class ActionProgressEventClass : public wxEvent {
 	ActionProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
 
 	wxEvent* Clone() const;
-
 };
 
 /**
@@ -625,9 +609,7 @@ class ActionProgressEventClass : public wxEvent {
  * copy any strings that we pass from one thread to another.
  */
 class ActionEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * a string, copied between threads in a safe way
 	 */
@@ -636,7 +618,6 @@ class ActionEventClass : public wxEvent {
 	ActionEventClass(int id, wxEventType type, const wxString& msg);
 
 	wxEvent* Clone() const;
-
 };
 
 typedef void (wxEvtHandler::*ActionEventClassFunction)(t4p::ActionEventClass&);
@@ -652,7 +633,6 @@ typedef void (wxEvtHandler::*ActionProgressEventClassFunction)(t4p::ActionProgre
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_ACTION_COMPLETE, id, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(ActionEventClassFunction, & fn), (wxObject *) NULL),
-
 
 }
 

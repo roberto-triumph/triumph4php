@@ -32,7 +32,6 @@
 #include <views/wxformbuilder/LintFeatureForms.h>
 
 namespace t4p {
-
 // forward declaration, defined below
 class LintViewClass;
 
@@ -40,9 +39,7 @@ class LintViewClass;
  * This panel will show the list of lint errors.
  */
 class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
-
 	public:
-
 	LintResultsPanelClass(wxWindow *parent, int id, t4p::LintFeatureClass& feature,
 		t4p::LintViewClass& lintView, wxWindow* topWindow);
 
@@ -131,7 +128,6 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
 	void OnAddSuppression(wxCommandEvent& event);
 
 	private:
-
 	t4p::LintFeatureClass& Feature;
 
 	t4p::LintViewClass& View;
@@ -156,13 +152,10 @@ class LintResultsPanelClass : public LintResultsGeneratedPanelClass {
  * somewhere outside the visible part of a file.
  */
 class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
-
 	public:
-
 	LintErrorPanelClass(t4p::CodeControlClass* parent, int id, const std::vector<pelet::LintResultsClass>& results);
 
 	private:
-
 	void OnKeyDown(wxKeyEvent& event);
 	void OnGoToLink(wxHyperlinkEvent& event);
 	void OnDismissLink(wxHyperlinkEvent& event);
@@ -186,9 +179,7 @@ class LintErrorPanelClass : public LintErrorGeneratedPanelClass {
  * for the feature
  */
 class LintViewClass : public FeatureViewClass {
-
 	public:
-
 	t4p::LintFeatureClass& Feature;
 
 	LintViewClass(t4p::LintFeatureClass& feature);
@@ -210,7 +201,6 @@ class LintViewClass : public FeatureViewClass {
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
 	private:
-
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnLintMenu(wxCommandEvent& event);
@@ -250,9 +240,7 @@ class LintViewClass : public FeatureViewClass {
  * what checks to perform
  */
 class LintPreferencesPanelClass : public LintPreferencesGeneratedPanelClass {
-
 	public:
-
 	t4p::LintFeatureClass& Feature;
 
 	LintPreferencesPanelClass(wxWindow* parent, t4p::LintFeatureClass& feature);
@@ -264,14 +252,11 @@ class LintPreferencesPanelClass : public LintPreferencesGeneratedPanelClass {
  * Shows the user the list of suppression rules
  */
 class LintSuppressionsPanelClass : public LintSuppressionsGeneratedPanelClass {
-
 	public:
-
 	LintSuppressionsPanelClass(wxWindow* parent, int id, wxFileName suppressionFile,
 		wxWindow* topWindow);
 
 	private:
-
 	// event handlers
 	void OnAddButton(wxCommandEvent& event);
 	void OnEditButton(wxCommandEvent& event);
@@ -325,13 +310,10 @@ class LintSuppressionsPanelClass : public LintSuppressionsGeneratedPanelClass {
  * Shows the user a form to add or edit a suppression rule
  */
 class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialogClass {
-
 	public:
-
 	LintSuppressionRuleDialogClass(wxWindow* parent, int id, t4p::SuppressionRuleClass& rule);
 
 	private:
-
 	// events to prevent invalid inputs
 	void OnTypeChoice(wxCommandEvent& event);
 	void OnDirectoryRadio(wxCommandEvent& event);
@@ -348,7 +330,6 @@ class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialog
 	 */
 	t4p::SuppressionRuleClass EditRule;
 };
-
 }
 
 #endif

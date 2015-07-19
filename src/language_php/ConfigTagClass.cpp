@@ -29,7 +29,6 @@
 t4p::ConfigTagClass::ConfigTagClass()
 	: Label()
 	, ConfigFileName() {
-
 }
 
 t4p::ConfigTagClass::ConfigTagClass(const t4p::ConfigTagClass& src)
@@ -39,7 +38,6 @@ t4p::ConfigTagClass::ConfigTagClass(const t4p::ConfigTagClass& src)
 }
 
 void t4p::ConfigTagClass::Copy(const t4p::ConfigTagClass& src) {
-
 	// make sure wxString copy in thread-safe manner
 	Label = src.Label.c_str();
 	ConfigFileName.Assign(src.ConfigFileName.GetFullPath().c_str());
@@ -58,7 +56,6 @@ wxString t4p::ConfigTagClass::MenuLabel() const {
 
 t4p::ConfigTagFinderClass::ConfigTagFinderClass(soci::session& session)
 : SqliteFinderClass(session) {
-
 }
 
 std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vector<wxFileName>& sourceDirectories) {

@@ -48,7 +48,6 @@ void  t4p::RunBrowserFeatureClass::ExternalBrowser(const wxString& browserName, 
 
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN && browserName.CmpNoCase(wxT("Safari")) == 0) {
-
 		// safari on Mac does not handle command line URL arguments
 		// need to use the "open" program
 		// see http://superuser.com/questions/459268/run-safari-from-command-line-with-url-parameter

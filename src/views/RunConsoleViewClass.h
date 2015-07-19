@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration, defined below
 class RunConsoleViewClass;
 
@@ -40,17 +39,13 @@ class RunConsoleViewClass;
  * run console command.
  */
 class CliCommandEditDialogClass : public CliCommandEditDialogGeneratedClass {
-
 	public:
-
 	CliCommandEditDialogClass(wxWindow* parent, int id, t4p::CliCommandClass& command);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnFileChanged(wxFileDirPickerEvent& event);
-
 };
 
 /**
@@ -58,14 +53,11 @@ class CliCommandEditDialogClass : public CliCommandEditDialogGeneratedClass {
  * commands also.
  */
 class CliCommandListDialogClass : public CliCommandListDialogGeneratedClass {
-
 	public:
-
 	CliCommandListDialogClass(wxWindow* parent, int id, std::vector<t4p::CliCommandClass>& commands);
 
 
 	protected:
-
 	// to manage the list of commands
 	// UP & DOWN control the order of the commands
 	// in the toolbar
@@ -79,7 +71,6 @@ class CliCommandListDialogClass : public CliCommandListDialogGeneratedClass {
 	void OnHelpButton(wxCommandEvent& event);
 
 	private:
-
 	/**
 	 * List of commands that are bound to this dialog. They will only be
 	 * modified when the user clicks OK
@@ -96,19 +87,16 @@ class CliCommandListDialogClass : public CliCommandListDialogGeneratedClass {
 	 * from Commands
 	 */
 	void FillList();
-
 };
 
 class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
 	protected:
-
 	/**
 	 * Handle the clear button.
 	 */
 	void OnClear(wxCommandEvent& event);
 
 	public:
-
 	/*
 	 * @param parent the parent of this pane
 	 * @param id window ID
@@ -152,7 +140,6 @@ class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
 	wxString GetCommand() const;
 
 	private:
-
 	/**
 	 * The command to run
 	 */
@@ -254,9 +241,7 @@ class RunConsolePanelClass : public RunConsolePanelGeneratedClass {
 };
 
 class RunConsoleViewClass : public FeatureViewClass {
-
 	public:
-
 	/**
 	 * Constructor
  	 */
@@ -292,7 +277,6 @@ class RunConsoleViewClass : public FeatureViewClass {
 	void LoadPage(const wxString& fileName);
 
 	private:
-
 	/**
 	 * handler for the menu
 	 */
@@ -359,6 +343,5 @@ class RunConsoleViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif // __RUNCONSOLEFEATURECLASS_H

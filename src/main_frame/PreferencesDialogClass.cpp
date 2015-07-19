@@ -108,7 +108,6 @@ t4p::KeyboardShortcutsPanelClass::KeyboardShortcutsPanelClass(wxWindow* parent, 
 }
 
 void t4p::KeyboardShortcutsPanelClass::AddDynamicCmds(const std::vector<t4p::DynamicCmdClass>& cmds) {
-
 	// add the dynamic commands in the tree control; this code assumes that the command
 	// identifier is delimited with dashes; and the identifier will always contain
 	// at least one dash;

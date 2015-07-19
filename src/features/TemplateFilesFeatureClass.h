@@ -31,7 +31,6 @@
 #include <language_php/UrlTagClass.h>
 
 namespace t4p {
-
 /**
  * This is a class that will show the user any view files that are
  * associated with the current URL (the URL that the user chose in
@@ -45,9 +44,7 @@ namespace t4p {
  * for the URL that the user has selected.
  */
 class TemplateFilesFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	TemplateFilesFeatureClass(t4p::AppClass& app);
 
 	void SetCurrentUrl(t4p::UrlTagClass url);
@@ -62,9 +59,7 @@ class TemplateFilesFeatureClass : public t4p::FeatureClass {
 	void StartDetection();
 
 	private:
-
 };
-
 }
 
 #endif

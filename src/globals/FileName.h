@@ -29,7 +29,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * Deep Copy a a wxFileName. This is not trivial since wxFileName's assignment performs shallow copies
  * of internal wxStrings.
@@ -49,7 +48,6 @@ wxFileName FileNameCopy(const wxFileName& fileName);
  * @return the cloned filenames
  */
 std::vector<wxFileName> DeepCopyFileNames(const std::vector<wxFileName>& fileNames);
-
 }
 
 #endif

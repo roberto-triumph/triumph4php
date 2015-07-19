@@ -57,7 +57,6 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 	}
 
 	if (schemaSql.empty()) {
-
 		// now get the contents of the script to be executed
 		// keep the contents in memory so that we dont have to read the file
 		// for each test
@@ -78,7 +77,6 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		}
 	}
 	try {
-
 		// get the 'raw' connection because it can handle multiple statements at once
 		char *errorMessage = NULL;
 		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());

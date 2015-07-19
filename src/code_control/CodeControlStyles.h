@@ -28,7 +28,6 @@
 #include <globals/CodeControlOptionsClass.h>
 
 namespace t4p {
-
 /**
  * Initializes the color schemes for the source code editor.
  * These are the hard-coded program defaults only.
@@ -44,7 +43,6 @@ void CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxSt
  * @return all of the theme names
  */
 wxArrayString CodeControlStylesGetThemes();
-
 }
 
 #endif

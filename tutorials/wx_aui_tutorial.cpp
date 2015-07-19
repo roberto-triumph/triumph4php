@@ -58,7 +58,6 @@ const static int ID_MENU_MOVE_7 = wxNewId();
 
 class ChangeDialogGeneratedClass : public wxDialog {
 	private:
-
 	protected:
 		wxStaticText* LayerLabel;
 		wxSpinCtrl* Layer;
@@ -71,10 +70,8 @@ class ChangeDialogGeneratedClass : public wxDialog {
 		wxButton* m_sdbSizer1Cancel;
 
 	public:
-
 	ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 	~ChangeDialogGeneratedClass();
-
 };
 
 ChangeDialogGeneratedClass::ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style) {
@@ -141,9 +138,7 @@ ChangeDialogGeneratedClass::~ChangeDialogGeneratedClass() {
 
 
 class ChangeDialogClass : public ChangeDialogGeneratedClass {
-
 	public:
-
 	ChangeDialogClass(wxWindow* parent, wxString name, int& dock, int& row, int& position, int& layer)
 	: ChangeDialogGeneratedClass(parent, wxID_ANY,  "Change " + name) {
 		wxGenericValidator valRow(&row);
@@ -157,7 +152,6 @@ class ChangeDialogClass : public ChangeDialogGeneratedClass {
 
 		TransferDataToWindow();
 	}
-
 };
 
 
@@ -166,9 +160,7 @@ class ChangeDialogClass : public ChangeDialogGeneratedClass {
  */
 class MyApp : public wxApp {
 	public:
-
 	bool OnInit();
-
 };
 
 class MyFrame: public wxFrame {
@@ -177,7 +169,6 @@ class MyFrame: public wxFrame {
 	~MyFrame();
 
 	private:
-
 	void OnAdjust(wxCommandEvent& event);
 	void OnMovePanel7(wxCommandEvent& event);
 	wxAuiManager AuiManager;
@@ -198,7 +189,6 @@ MyFrame::MyFrame() :
 	wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition,
 			wxSize(640, 480))
 	, AuiManager() {
-
 	wxAuiNotebook* book = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 		wxAUI_NB_TOP | wxAUI_NB_SCROLL_BUTTONS | wxAUI_NB_CLOSE_ON_ACTIVE_TAB);
 

@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace t4p {
-
 	/**
 	 * Get the file_item_id for all files that are in any of the given directories. Files
 	 * that are inside of sub-directories of any of the directories are also returned.
@@ -54,6 +53,5 @@ namespace t4p {
 	 * @return bool TRUE if INSERT succeeded
 	 */
 	bool FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag);
-
 }
 #endif

@@ -151,7 +151,6 @@ void t4p::TemplateFilesPanelClass::UpdateResults() {
 		wxString projectLabel;
 		wxString text = Feature.App.Globals.RelativeFileName(templateFile, projectLabel);
 		if (!wxFileName::FileExists(templateFile)) {
-
 			// show that the view file is missing
 			text = wxT("[X] ") + text;
 		}

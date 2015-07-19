@@ -41,9 +41,7 @@
  * linter, default it to use PHP 5.3 syntax
  */
 class PhpIdentifierLintTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
@@ -78,7 +76,6 @@ class PhpIdentifierLintTestFixtureClass : public FileTestFixtureClass, public Sq
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-
 		// make the cache consume the source code file; to prime it with the resources because the
 		// identifier linter won't work without the cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -97,9 +94,7 @@ class PhpIdentifierLintTestFixtureClass : public FileTestFixtureClass, public Sq
 
 
 SUITE(PhpIdentifierLintTestClass) {
-
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassAndFunction) {
-
 	// calling defined classes and defined functions should
 	// not generate any errors
 	wxString cacheCode = t4p::CharToWx(
@@ -118,7 +113,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, DefinedClassAndFunction) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
-
 	// test that we resolve the "use" statement when
 	// looking up class names
 	wxString cacheCode = t4p::CharToWx(
@@ -138,7 +132,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassImportedNamespace) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassSelfReference) {
-
 	// test that the "self" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"
@@ -161,7 +154,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassSelfReference) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassParentReference) {
-
 	// test that the "parent" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"
@@ -184,7 +176,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassParentReference) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
-
 	// test that the "static" keyword is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"
@@ -208,7 +199,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassStaticReference) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
-
 	// test that the "parent" keyword is never seen as an unknown class
 	// and that the method is not treated as a static method call
 	wxString cacheCode = t4p::CharToWx(
@@ -235,7 +225,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ParentReference) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, SameClassReference) {
-
 	// test that the static calls to the same class are treated as
 	// instance calls
 	wxString cacheCode = t4p::CharToWx(
@@ -259,7 +248,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, SameClassReference) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
-
 	// test that the "__constructor" method is never seen as an unknown class
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"
@@ -282,7 +270,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, ClassConstructor) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
-
 	// test that the "magic" method is never seen as an unknown method
 	wxString cacheCode = t4p::CharToWx(
 		"<?php \n"
@@ -305,7 +292,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MagicMethod) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
-
 	// test that we don't flag native functions (strlen, strcmp, etc....)
 	// as unknown, we should always look them up in the global
 	// namespace even when the code is inside a namespace
@@ -326,7 +312,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeFunctionInNamespace) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
-
 	// test that we don't flag global functions defined by user code
 	// as unknown, we should always look them up in the global
 	// namespace even when the code is inside a namespace
@@ -346,7 +331,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UserFunctionInNamespace) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeProperty) {
-
 	// test that we don't flag native properties
 	// as unkown, we should always find them if we are guaranteed
 	// to know the type involved
@@ -366,7 +350,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NativeProperty) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
-
 	// instantiating an unknown class should generate
 	// an error
 	wxString cacheCode = t4p::CharToWx(
@@ -386,7 +369,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClass) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
-
 	// calling a static method on an unknown class should generate
 	// an error
 	wxString cacheCode = t4p::CharToWx(
@@ -408,7 +390,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownClassInVariable) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownBaseClass) {
-
 	// make sure that the class being extended from actually
 	// exists
 	wxString cacheCode = t4p::CharToWx(
@@ -430,7 +411,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownBaseClass) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
-
 	// make sure that the class being extended from actually
 	// exists
 	wxString cacheCode = t4p::CharToWx(
@@ -453,7 +433,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownImplementedClasses) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCode) {
-
 	// class name resolution should look properly
 	// look at namespaces; when a piece of code does
 	// not declare a namespace then it should
@@ -478,7 +457,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, NamespacedClassInNonNamespacedCo
 
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
-
 	// class name resolution should look at namespaces too
 	// so if the class being used matches the class
 	// but its from a different namespace then we should
@@ -504,7 +482,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownNamespacedClass) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
-
 	// calling undefined functions should generate an
 	// error
 	wxString cacheCode = t4p::CharToWx(
@@ -524,7 +501,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunction) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
-
 	// when checking methods/classes, we should recurse through function
 	// arguments.  so we should be able to find an undefined
 	// function that is being called as an argument to another
@@ -547,7 +523,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInArgument) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownFunctionInAssignment) {
-
 	// we should also lookup functions used in
 	// the left hand of the assignment
 	wxString cacheCode = t4p::CharToWx(
@@ -592,7 +567,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownMethod) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticMethod) {
-
 	// when we lookup methods, we should lookup only static
 	// methods when a static call is being done.  even
 	// if we have the same method name, the method must
@@ -637,7 +611,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownStaticProperty) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
-
 	// if a piece of code calls method_exists, it means that the code
 	// accounts for methods not being available, therefore we should
 	// stop checking methods as when the code runs it will never generate
@@ -664,7 +637,6 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, MethodExistsCalls) {
 }
 
 TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
-
 	// test that when a unknown namespace is "used" with a use statement
 	// that we generate an error
 	wxString cacheCode = t4p::CharToWx(
@@ -693,5 +665,4 @@ TEST_FIXTURE(PhpIdentifierLintTestFixtureClass, UnknownUseNamespace) {
 	CHECK_EQUAL(t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS, Results[1].Type);
 	CHECK_EQUAL(3, Results[1].LineNumber);
 }
-
 }

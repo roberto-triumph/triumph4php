@@ -38,7 +38,6 @@
 #include <vector>
 
 namespace t4p {
-
 // some forward declarations to prevent re-compilation as much as possible
 // Since this file is included by many features whenever a change to any included header
 // files is maded most features have to be re-compiled.
@@ -82,9 +81,7 @@ extern const int CODE_CONTROL_STYLE_PHP_LINT_ANNOTATION;
  * based on the user input
  */
 class CodeCompletionItemClass {
-
 	public:
-
 	/**
 	 * the string that will be shown to the user
 	 */
@@ -114,9 +111,7 @@ class CodeCompletionItemClass {
  * to the user.
  */
 class CodeCompletionProviderClass {
-
 	public:
-
 	CodeCompletionProviderClass();
 
 	virtual ~CodeCompletionProviderClass();
@@ -160,9 +155,7 @@ class CodeCompletionProviderClass {
  * the user triggers a call tip
  */
 class CallTipProviderClass {
-
 	public:
-
 	CallTipProviderClass();
 	virtual ~CallTipProviderClass();
 
@@ -195,9 +188,7 @@ class CallTipProviderClass {
  * to decorate matching braces.
  */
 class BraceMatchStylerClass {
-
 	public:
-
 	BraceMatchStylerClass();
 	virtual ~BraceMatchStylerClass();
 
@@ -230,9 +221,7 @@ class BraceMatchStylerClass {
  * - Automatic indentation
  */
 class CodeControlClass : public wxStyledTextCtrl {
-
 	public:
-
 	/**
 	 * Constructor.
 	 * @param GlobalsClass* To get items needed for autocompletion. This object
@@ -670,7 +659,6 @@ class CodeControlClass : public wxStyledTextCtrl {
 
 
 	private:
-
 	/**
 	 * Opens the file, loads its contents of the given file, and initializes the
 	 * proper lexer so that the file gets syntax highlight according to the language
@@ -894,6 +882,5 @@ class CodeControlClass : public wxStyledTextCtrl {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif /*T4P_CODECONTROLCLASS_H_*/

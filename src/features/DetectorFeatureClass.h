@@ -28,11 +28,8 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 class DetectorClass {
-
 	public:
-
 	DetectorClass();
 
 	virtual ~DetectorClass();
@@ -49,12 +46,10 @@ class DetectorClass {
 	virtual wxFileName SkeletonFile() = 0;
 
 	virtual wxString Label() = 0;
-
 };
 
 class UrlTagDetectorClass : public t4p::DetectorClass {
 	public:
-
 	UrlTagDetectorClass();
 
 	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
@@ -73,7 +68,6 @@ class UrlTagDetectorClass : public t4p::DetectorClass {
 
 class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
 	public:
-
 	TemplateFileTagsDetectorClass();
 
 	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
@@ -92,7 +86,6 @@ class TemplateFileTagsDetectorClass : public t4p::DetectorClass {
 
 class TagDetectorClass : public t4p::DetectorClass {
 	public:
-
 	TagDetectorClass();
 
 	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
@@ -111,7 +104,6 @@ class TagDetectorClass : public t4p::DetectorClass {
 
 class DatabaseTagDetectorClass : public t4p::DetectorClass {
 	public:
-
 	DatabaseTagDetectorClass();
 
 	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
@@ -130,7 +122,6 @@ class DatabaseTagDetectorClass : public t4p::DetectorClass {
 
 class ConfigTagDetectorClass : public t4p::DetectorClass {
 	public:
-
 	ConfigTagDetectorClass();
 
 	bool CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project);
@@ -148,9 +139,7 @@ class ConfigTagDetectorClass : public t4p::DetectorClass {
 };
 
 class DetectorFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	DetectorFeatureClass(t4p::AppClass& app);
 
 	void RunUrlDetectors();
@@ -158,9 +147,7 @@ class DetectorFeatureClass : public t4p::FeatureClass {
 	void RunTagDetectors();
 	void RunDatabaseDetectors();
 	void RunConfigDetectors();
-
 };
-
 }
 
 #endif

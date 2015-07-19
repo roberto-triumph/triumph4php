@@ -30,7 +30,6 @@
 #include <actions/GlobalActionClass.h>
 
 namespace t4p {
-
 /**
  * This event is generated once all of the meta data has been
  * fetched from all of the SQL connections
@@ -38,9 +37,7 @@ namespace t4p {
 extern const wxEventType EVENT_SQL_META_DATA_COMPLETE;
 
 class SqlMetaDataEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * Get any connection errors that occurred in the background thread.
 	 */
@@ -49,7 +46,6 @@ class SqlMetaDataEventClass : public wxEvent {
 	SqlMetaDataEventClass(int eventId, const std::vector<UnicodeString>& errors);
 
 	wxEvent* Clone() const;
-
 };
 
 /**
@@ -59,9 +55,7 @@ class SqlMetaDataEventClass : public wxEvent {
  * with the new resources
  */
 class SqlMetaDataActionClass : public GlobalActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads will get notified with EVENT_WORK_* events
 	 *        and the EVENT_SQL_META_DATA_COMPLETE event
@@ -83,7 +77,6 @@ class SqlMetaDataActionClass : public GlobalActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	/**
 	 * The connections to query; where the tables / columns will be fetched from
 	 */
@@ -96,18 +89,14 @@ class SqlMetaDataActionClass : public GlobalActionClass {
 };
 
 class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
-
 	public:
-
 	SqlMetaDataInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(t4p::GlobalsClass& globals);
 
 	protected:
-
 	wxString GetLabel() const;
 };
-
 }
 
 typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEventClass&);

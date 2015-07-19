@@ -44,7 +44,6 @@ t4p::DatabaseTagClass::DatabaseTagClass()
 	, Port()
 	, IsDetected(false)
 	, IsEnabled(true) {
-
 }
 
 t4p::DatabaseTagClass::DatabaseTagClass(const t4p::DatabaseTagClass& other)
@@ -96,7 +95,6 @@ t4p::SqlResultClass::SqlResultClass()
 	, AffectedRows(0)
 	, Success(false)
 	, HasRows(false) {
-
 }
 
 t4p::SqlResultClass::~SqlResultClass() {
@@ -326,7 +324,6 @@ bool t4p::SqlQueryClass::TableNames(soci::session& session, soci::statement& stm
 	std::vector<UnicodeString>& tableNames, UnicodeString& error) {
 	bool data = false;
 	try {
-
 		// soci does not have an interface for getting table names,
 		// we do it ourselves by accessing the "backends"
 		std::string backendName = session.get_backend_name();
@@ -400,7 +397,6 @@ bool t4p::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& col
 						out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
 					}
 					else {
-
 						// mysql allows dates of 0000-00-00
 						out << "0000-00-00 00:00:00";
 					}

@@ -462,7 +462,6 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -652,7 +651,6 @@ static void SetToOblivionThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToOblivionThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D8D8D8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#C7DD0C"));
@@ -992,7 +990,6 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -1182,7 +1179,6 @@ static void SetToRettaThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToRettaThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8E1AA"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#83786E"));
@@ -1522,7 +1518,6 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -1712,7 +1707,6 @@ static void SetToSolarized_lightThemePhp(t4p::CodeControlOptionsClass& options) 
 }
 
 static void SetToSolarized_lightThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#657A81"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2052,7 +2046,6 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -2242,7 +2235,6 @@ static void SetToSolarized_darkThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToSolarized_darkThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#839496"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#586E75"));
@@ -2582,7 +2574,6 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -2772,7 +2763,6 @@ static void SetToGedit_original_oblivionThemePhp(t4p::CodeControlOptionsClass& o
 }
 
 static void SetToGedit_original_oblivionThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#d3d7cf"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#888a85"));
@@ -3112,7 +3102,6 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -3302,7 +3291,6 @@ static void SetToWombatThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToWombatThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#f6f3e8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#99968b"));
@@ -3642,7 +3630,6 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -3832,7 +3819,6 @@ static void SetToBlack_pastelThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToBlack_pastelThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0C0C0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -4172,7 +4158,6 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -4362,7 +4347,6 @@ static void SetToVisual_studioThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToVisual_studioThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00cc00"));
@@ -4702,7 +4686,6 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -4892,7 +4875,6 @@ static void SetToObsidianThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToObsidianThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -5232,7 +5214,6 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -5422,7 +5403,6 @@ static void SetToAs_visual_studio_2010ThemePhp(t4p::CodeControlOptionsClass& opt
 }
 
 static void SetToAs_visual_studio_2010ThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
@@ -5762,7 +5742,6 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -5952,7 +5931,6 @@ static void SetToHavenjarkThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToHavenjarkThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#C0B6A8"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AEAEAE"));
@@ -6292,7 +6270,6 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -6482,7 +6459,6 @@ static void SetToTangoThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToTangoThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#17608f"));
@@ -6822,7 +6798,6 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -7012,7 +6987,6 @@ static void SetToSchussThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToSchussThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#430400"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#d5d9e5"));
@@ -7352,7 +7326,6 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -7542,7 +7515,6 @@ static void SetToNotepad_defaultThemePhp(t4p::CodeControlOptionsClass& options) 
 }
 
 static void SetToNotepad_defaultThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#008000"));
@@ -7882,7 +7854,6 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -8072,7 +8043,6 @@ static void SetToVibrant_inkThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToVibrant_inkThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#8C3FC8"));
@@ -8412,7 +8382,6 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -8602,7 +8571,6 @@ static void SetToRecogneyesThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToRecogneyesThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#D0D0D0"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#00E000"));
@@ -8942,7 +8910,6 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -9132,7 +9099,6 @@ static void SetToMrThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToMrThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#333333"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FF9900"));
@@ -9472,7 +9438,6 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -9662,7 +9627,6 @@ static void SetToSunburstThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToSunburstThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F9F9F9"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#A8A8A8"));
@@ -10002,7 +9966,6 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -10192,7 +10155,6 @@ static void SetToInkpotThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToInkpotThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#CD8B00"));
@@ -10532,7 +10494,6 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -10722,7 +10683,6 @@ static void SetToMinimalThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToMinimalThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#000000"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#334466"));
@@ -11062,7 +11022,6 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -11252,7 +11211,6 @@ static void SetToNightlion_aptana_themeThemePhp(t4p::CodeControlOptionsClass& op
 }
 
 static void SetToNightlion_aptana_themeThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E2E2E2"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#73879B"));
@@ -11592,7 +11550,6 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -11782,7 +11739,6 @@ static void SetToMonokaiThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToMonokaiThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#F8F8F2"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#75715e"));
@@ -12122,7 +12078,6 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -12312,7 +12267,6 @@ static void SetToSublime_text_2ThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToSublime_text_2ThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#CFBFAD"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#FFFFFF"));
@@ -12652,7 +12606,6 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -12842,7 +12795,6 @@ static void SetToPastelThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToPastelThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#E0E2E4"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7D8C93"));
@@ -13182,7 +13134,6 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -13372,7 +13323,6 @@ static void SetToZenburn_highcontrastThemePhp(t4p::CodeControlOptionsClass& opti
 }
 
 static void SetToZenburn_highcontrastThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#DCDCCC"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#7F9F7F"));
@@ -13712,7 +13662,6 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -13902,7 +13851,6 @@ static void SetToFrontenddevThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToFrontenddevThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#FFFFFF"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#666666"));
@@ -14242,7 +14190,6 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -14432,7 +14379,6 @@ static void SetToRoboticketThemePhp(t4p::CodeControlOptionsClass& options) {
 }
 
 static void SetToRoboticketThemeJs(t4p::CodeControlOptionsClass& options) {
-
 	// javascript (in its own file) scintilla c lexer is used of c,c++, java, and javascript
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_DEFAULT).Color = wxColour(wxT("#585858"));
 	options.FindByStcStyle(options.JsStyles, wxSTC_C_COMMENT).Color = wxColour(wxT("#AD95AF"));

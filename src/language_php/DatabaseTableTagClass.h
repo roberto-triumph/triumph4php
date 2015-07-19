@@ -29,14 +29,12 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * This class represents a database table that exists in one of the
  * configured SQL connections
  */
 class DatabaseTableTagClass {
 	public:
-
 	/**
 	 * The name of the table.  Note that this is case sensitive
 	 * on some platforms (ie MySQL on MSW)
@@ -53,9 +51,7 @@ class DatabaseTableTagClass {
 	DatabaseTableTagClass(const t4p::DatabaseTableTagClass& src);
 
 	void Copy(const t4p::DatabaseTableTagClass& src);
-
 };
-
 }
 
 #endif // T4P_DATABASETABLETAGCLASS_H

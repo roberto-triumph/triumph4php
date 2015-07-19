@@ -32,7 +32,6 @@
 t4p::TemplateFileTagClass::TemplateFileTagClass()
 	:  FullPath()
 	, Variables() {
-
 }
 
 t4p::TemplateFileTagClass::TemplateFileTagClass(const t4p::TemplateFileTagClass& src)
@@ -42,7 +41,6 @@ t4p::TemplateFileTagClass::TemplateFileTagClass(const t4p::TemplateFileTagClass&
 }
 
 void t4p::TemplateFileTagClass::Copy(const t4p::TemplateFileTagClass& src) {
-
 	// copy is thread-safe, wxString needs to be cloned
 	FullPath = src.FullPath.c_str();
 	Variables.clear();
@@ -64,7 +62,6 @@ void t4p::TemplateFileTagClass::Init(const wxString& fullPath, const std::vector
 t4p::TemplateFileTagFinderClass::TemplateFileTagFinderClass()
 	: Session()
 	, IsInitialized(false) {
-
 }
 
 void t4p::TemplateFileTagFinderClass::Init(const wxFileName& detectorDbFileName) {

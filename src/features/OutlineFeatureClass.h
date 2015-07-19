@@ -33,14 +33,11 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * grouping of a tag and its member tags.
  */
 class OutlineSearchCompleteClass {
-
 	public:
-
 	wxString Label;
 
 	std::map<wxString, std::vector<t4p::PhpTagClass> > Tags;
@@ -59,9 +56,7 @@ class OutlineSearchCompleteClass {
  * contains the results of the search.
  */
 class OutlineSearchCompleteEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * Will contain all of the resulting tags.
 	 */
@@ -70,7 +65,6 @@ class OutlineSearchCompleteEventClass : public wxEvent {
 	OutlineSearchCompleteEventClass(int eventId, const std::vector<t4p::OutlineSearchCompleteClass>& tags);
 
 	wxEvent* Clone() const;
-
 };
 
 extern const wxEventType EVENT_OUTLINE_SEARCH_COMPLETE;
@@ -87,9 +81,7 @@ typedef void (wxEvtHandler::*OutlineSearchCompleteEventClassFunction)(OutlineSea
  * the results will be posted in an event.
  */
 class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
-
 	public:
-
 	OutlineTagCacheSearchActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -104,11 +96,9 @@ class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	t4p::TagCacheClass TagCache;
 
 	std::vector<UnicodeString> SearchStrings;
@@ -126,14 +116,11 @@ class OutlineTagCacheSearchActionClass : public t4p::ActionClass {
  */
 class OutlineFeatureClass : public FeatureClass {
 	public:
-
 	/**
 	 * Creates a new OutlineViewFeature.
 	 */
 	OutlineFeatureClass(t4p::AppClass& app);
-
 };
-
 }
 
 #endif

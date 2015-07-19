@@ -51,7 +51,6 @@ t4p::SequenceClass::~SequenceClass() {
 
 void t4p::SequenceClass::Stop() {
 	if (!Steps.empty()) {
-
 		// remove the step that just finished
 		// note that async steps automatically delete themselves since they
 		// are run using wxThread::run so we take care to not double-delete those
@@ -62,7 +61,6 @@ void t4p::SequenceClass::Stop() {
 	}
 
 	while (!Steps.empty()) {
-
 		// the remaining steps will not delete themselves since they
 		// will never be run.
 		// do this so that mem checkers don't complain
@@ -241,7 +239,6 @@ void t4p::SequenceClass::Run() {
 
 void t4p::SequenceClass::OnActionComplete(t4p::ActionEventClass& event) {
 	if (!Steps.empty()) {
-
 		// remove the step that just finished
 		// note that async steps automatically delete themselves since they
 		// are run using wxThread::run so we take care to not double-delete those
@@ -279,7 +276,6 @@ void t4p::SequenceClass::RunNextStep() {
 			// need us to start a new thread
 			isInit = Steps.front()->Init(Globals);
 			if (!isInit) {
-
 				// if the step is not initialized, move on to the next step.
 				// we need to delete the step since OnActionComplete will not
 				// get called for this action
@@ -314,7 +310,6 @@ void t4p::SequenceClass::RunNextStep() {
 				break;
 			}
 			else {
-
 				// no need to start a background thread since Init failed
 				// lets move on to the next step
 				delete Steps.front();
@@ -326,7 +321,6 @@ void t4p::SequenceClass::RunNextStep() {
 		}
 	}
 	if (isSequenceDone) {
-
 		// this can happen when the last step could not be
 		// initialized; then no EVT_WORK_COMPLETE will be generated
 		wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
@@ -340,7 +334,6 @@ bool t4p::SequenceClass::Running() const {
 }
 
 void t4p::SequenceClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
-
 	// if there is an action that is running then send an in-progress event
 	// for it
 	t4p::SequenceProgressEventClass sequenceEvt(wxID_ANY, event.Mode, event.PercentComplete, event.Message);

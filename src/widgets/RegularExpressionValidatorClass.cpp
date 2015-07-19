@@ -176,7 +176,6 @@ bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 		ret = true;
 	}
 	else {
-
 		// need to validate the reg ex
 		wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 		wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
@@ -248,7 +247,6 @@ void t4p::PopulateRegExFindMenu(wxMenu& regExMenu, int menuStart) {
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_VARIABLE, _("...    Matches a PHP variable"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_NUMBER, _("...    Matches a PHP number"));
 	regExMenu.Append(menuStart + ID_MENU_REG_EX_PHP_WHITESPACE, _("\\s+    Matches PHP whitespace"));
-
 }
 
 void t4p::PopulateRegExReplaceMenu(wxMenu& regExMenu, int menuStart) {
@@ -316,7 +314,6 @@ void t4p::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInse
 		symbols = wxT("\\s+");
 	}
 	if (!symbols.IsEmpty()) {
-
 		// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
 		// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
 		// also; on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -365,7 +362,6 @@ void t4p::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int curr
 		symbols = wxT("$5");
 	}
 	if (!symbols.IsEmpty()) {
-
 		// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
 		// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
 		// also; on Win32 GetInsertionPoint() returns 0 when the combo box is no
@@ -389,7 +385,6 @@ void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) 
 		if (afterMetasPos > 0) {
 			wxString flags = value.SubString(0, afterMetasPos);
 			if (wxNOT_FOUND == flags.Find(flag)) {
-
 				// would love to use wxComboBox::Replace() here, but on Win32 a error occurs
 				// "Failed To Set Clipboard Data". Will need to do the replacement ourselves
 				wxString val = text->GetValue();

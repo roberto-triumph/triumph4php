@@ -26,19 +26,15 @@
 #define T4P_PHPLINTERRORCLASS__
 
 namespace t4p {
-
 /**
  * The PhpLintErrorClass
  */
 class PhpLintErrorClass {
-
 	public:
 	PhpLintErrorClass();
 
 	private:
-
 };
-
 }
 
 #endif // T4P_PHPLINTERRORCLASS__

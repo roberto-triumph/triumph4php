@@ -29,7 +29,6 @@
 t4p::FilePickerValidatorClass::FilePickerValidatorClass(wxFileName* data)
 : wxValidator()
 , Data(data) {
-
 }
 
 bool t4p::FilePickerValidatorClass::TransferToWindow() {

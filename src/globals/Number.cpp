@@ -25,13 +25,11 @@
 #include <globals/Number.h>
 
 bool t4p::NumberLessThan(int a, unsigned int b) {
-
 	// if a is not negative then we can safely cast
 	return a >= 0 && (unsigned int)a < b;
 }
 
 bool t4p::NumberEqualTo(int a, unsigned int b) {
-
 	// if a is not negative then we can safely cast
 	return a >= 0 && (unsigned int)a == b;
 }

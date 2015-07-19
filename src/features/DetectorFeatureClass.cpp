@@ -36,15 +36,12 @@
 #include <wx/file.h>
 
 t4p::DetectorClass::DetectorClass() {
-
 }
 
 t4p::DetectorClass::~DetectorClass() {
-
 }
 
 t4p::UrlTagDetectorClass::UrlTagDetectorClass()  {
-
 }
 
 bool t4p::UrlTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
@@ -94,7 +91,6 @@ wxString t4p::UrlTagDetectorClass::Label() {
 
 t4p::TemplateFileTagsDetectorClass::TemplateFileTagsDetectorClass()
 	: DetectorClass() {
-
 }
 
 bool  t4p::TemplateFileTagsDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
@@ -134,7 +130,6 @@ wxString t4p::TemplateFileTagsDetectorClass::Label() {
 }
 
 t4p::TagDetectorClass::TagDetectorClass()  {
-
 }
 
 bool t4p::TagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
@@ -175,7 +170,6 @@ wxString t4p::TagDetectorClass::Label() {
 }
 
 t4p::DatabaseTagDetectorClass::DatabaseTagDetectorClass()  {
-
 }
 
 bool t4p::DatabaseTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
@@ -214,7 +208,6 @@ wxString t4p::DatabaseTagDetectorClass::Label() {
 }
 
 t4p::ConfigTagDetectorClass::ConfigTagDetectorClass()  {
-
 }
 
 bool t4p::ConfigTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, const t4p::ProjectClass& project) {
@@ -224,7 +217,6 @@ bool t4p::ConfigTagDetectorClass::CanTest(const t4p::GlobalsClass& globals, cons
 wxString t4p::ConfigTagDetectorClass::TestCommandLine(const t4p::GlobalsClass& globals,
 													  const t4p::ProjectClass& project,
 													  const wxString& detectorScriptFullPath) {
-
 	t4p::SourceClass source = project.Sources[0];
 
 	t4p::ConfigTagDetectorParamsClass params;
@@ -255,7 +247,6 @@ wxString t4p::ConfigTagDetectorClass::Label() {
 
 t4p::DetectorFeatureClass::DetectorFeatureClass(t4p::AppClass &app)
 	: FeatureClass(app) {
-
 }
 
 void t4p::DetectorFeatureClass::RunUrlDetectors() {

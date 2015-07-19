@@ -31,7 +31,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * This is the class that will listen to, and notify, of any 'interesting'
  * editor events.  This will allow for communication between various
@@ -66,9 +65,7 @@ namespace t4p {
  * for communication among theads
  */
 class EventSinkClass {
-
 	public:
-
 	EventSinkClass();
 
 	/**
@@ -107,7 +104,6 @@ class EventSinkClass {
 	void Post(wxEvent& event);
 
 	private:
-
 	/**
 	 * the list of handlers to send events to. this class will NOT
 	 * own these pointers.
@@ -123,9 +119,7 @@ class EventSinkClass {
  * The event sink is suitable for inter-thread communication.
  */
 class EventSinkLockerClass {
-
 	public:
-
 	EventSinkLockerClass();
 
 	/**
@@ -155,7 +149,6 @@ class EventSinkLockerClass {
 	void Post(wxEvent& event);
 
 	private:
-
 	/**
 	 * holds the list of event handlers
 	 */
@@ -223,9 +216,7 @@ extern const wxEventType EVENT_APP_FILE_NOTEBOOK_CHANGED;
  * then it would result in an infine loop.
  */
 class CodeControlEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * @param codeControl caller will still own the pointer
 	 */
@@ -243,7 +234,6 @@ class CodeControlEventClass : public wxEvent {
     wxEvent* Clone() const;
 
 	private:
-
 	CodeControlClass* CodeControl;
 };
 
@@ -253,9 +243,7 @@ class CodeControlEventClass : public wxEvent {
  * The event type determines whether paths are files or directories.
  */
 class RenameEventClass : public wxEvent {
-
 	public:
-
 	wxFileName OldPath;
 
 	wxFileName NewPath;
@@ -263,7 +251,6 @@ class RenameEventClass : public wxEvent {
 	RenameEventClass(wxEventType type, const wxString& oldPath, const wxString& newPath);
 
 	wxEvent* Clone() const;
-
 };
 
 /**
@@ -271,9 +258,7 @@ class RenameEventClass : public wxEvent {
  * open a file. A file can be opened to a specific line number.
  */
 class OpenFileCommandEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * the full path of the file to open
 	 */
@@ -300,13 +285,10 @@ class OpenFileCommandEventClass : public wxEvent {
 	OpenFileCommandEventClass(const wxString& fullPath, int startingPos = -1, int length = -1, int lineNumber = -1);
 
 	wxEvent* Clone() const;
-
 };
 
 class OpenDbTableCommandEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * The name of the table to open
 	 */
@@ -576,9 +558,7 @@ extern const wxEventType EVENT_APP_PROJECTS_UPDATED;
  * added, removed, or updated
  */
 class ProjectEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * the projects that were removed or updated. If this is a
 	 * remove event, the these are the projects that were removed
@@ -591,7 +571,6 @@ class ProjectEventClass : public wxEvent {
 	ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects);
 
 	wxEvent* Clone() const;
-
 };
 
 typedef void (wxEvtHandler::*ProjectEventClassFunction)(ProjectEventClass&);
@@ -658,7 +637,6 @@ extern const long ID_TOOLS_NOTEBOOK;
  * events for the outline notebook
  */
 extern const long ID_OUTLINE_NOTEBOOK;
-
 }
 
 #endif

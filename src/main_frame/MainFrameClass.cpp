@@ -153,7 +153,6 @@ t4p::StatusBarWithGaugeClass* t4p::MainFrameClass::GetStatusBarWithGauge() {
 void t4p::MainFrameClass::OnClose(wxCloseEvent& event) {
 	bool destroy = true;
 	if (event.CanVeto()) {
-
 		wxNotifyEvent evtFrame(t4p::EVENT_APP_FRAME_CLOSE);
 		App.EventSink.Publish(evtFrame);
 		destroy = evtFrame.IsAllowed();
@@ -205,7 +204,6 @@ void t4p::MainFrameClass::CreateNewCodeCtrl() {
 
 void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 	if (Close()) {
-
 		// on mac, we don't close the app when the user closes the
 		// main frame. *But* this handler is for the exit menu item,
 		// this means that the user really wants to stop the app.
@@ -214,7 +212,6 @@ void t4p::MainFrameClass::OnFileExit(wxCommandEvent& event) {
 }
 
 void t4p::MainFrameClass::OnEditPreferences(wxCommandEvent& event) {
-
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
 	// the project sources
@@ -290,7 +287,6 @@ void t4p::MainFrameClass::PreferencesSaved() {
 }
 
 void t4p::MainFrameClass::SetApplicationFont() {
-
 	// ATTN: this method will only work on startup (before the
 	// main frame is drawn. have not found a way to have the font
 	// changes apply to all windows /panels that are already
@@ -364,7 +360,6 @@ void t4p::MainFrameClass::AuiManagerUpdate() {
 }
 
 void t4p::MainFrameClass::LoadFeatureView(t4p::FeatureViewClass& view) {
-
 	// propagate GUI events to features, so that they can handle menu events themselves
 	// feature menus
 	view.InitWindow(GetStatusBarWithGauge(), ToolsNotebook, OutlineNotebook,
@@ -443,7 +438,6 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 	// only show the user if and only if
 	// user clicked inside of the code control
 	if (codeWindow != NULL && event.GetEventObject() == codeWindow) {
-
 		// make sure to turn off any call tips; they hide the popup menu
 		codeWindow->SetAsHidden(true);
 		wxMenu contextMenu;
@@ -454,14 +448,12 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		codeWindow->SetAsHidden(false);
 	}
 	else {
-
 		// if a sub panel has its own handler, use it
 		event.Skip();
 	}
 }
 
 void t4p::MainFrameClass::DefaultKeyboardShortcuts() {
-
 	// ATTN: when a new menu item is added to the form builder
 	// we will need to add an entry here so that shortcuts
 	// work properly
@@ -518,7 +510,6 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 }
 
 void t4p::MainFrameClass::UpdateNotebooks() {
-
 	// this is a code notebook
 	// for code notebooks; we want to keep 1, but if the user
 	// removes pages from the 2-N notebook, then we kill the
@@ -555,7 +546,6 @@ void t4p::MainFrameClass::UpdateNotebooks() {
 		if (notebook->GetPageCount() == 0 && notebooks.size() > 1) {
 			wxAuiPaneInfo& info = AuiManager.GetPane(notebook);
 			if (info.IsOk() && info.dock_direction == wxAUI_DOCK_CENTER) {
-
 				// get another notebook
 				t4p::NotebookClass* src = i > 0 ? notebooks[i - 1] : notebooks[i + 1];
 				while (src->GetPageCount() > 0) {
@@ -590,7 +580,6 @@ void t4p::MainFrameClass::UpdateTitleBar() {
 	}
 	wxString fileName = codeControl->GetFileName();
 	if (fileName.IsEmpty()) {
-
 		// file name empty means this is a new file, use the tab text
 		fileName = notebook->GetPageText(notebook->GetPageIndex(codeControl));
 	}
@@ -617,7 +606,6 @@ void t4p::MainFrameClass::OnDeterminateProgress(t4p::SequenceProgressEventClass&
 	}
 	else {
 		if (event.PercentComplete == 0) {
-
 			// the start, turn the gauge into determinate mode
 			gauge->SwitchMode(ID_SEQUENCE_GAUGE, t4p::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);
 		}
@@ -644,7 +632,6 @@ void t4p::MainFrameClass::OnStcSavedPointLeft(wxStyledTextEvent& event) {
 t4p::AppEventListenerForFrameClass::AppEventListenerForFrameClass(t4p::MainFrameClass* mainFrame)
 	: wxEvtHandler()
 	, MainFrame(mainFrame) {
-
 }
 
 void t4p::AppEventListenerForFrameClass::OnPreferencesSaved(wxCommandEvent& event) {

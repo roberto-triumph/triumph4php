@@ -83,7 +83,6 @@ static void SetMargin(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& opti
  * set the colors for all lexer styles
  */
 static void SetLexerStyles(wxStyledTextCtrl* ctrl, std::vector<t4p::StylePreferenceClass>& styles, t4p::CodeControlOptionsClass& options) {
-
 	t4p::StylePreferenceClass pref = options.FindByStcStyle(
         options.PhpStyles,
         wxSTC_HPHP_DEFAULT);
@@ -122,7 +121,6 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
 						   t4p::CodeControlOptionsClass& options, wxBitmap& searchHitGoodBitmap,
 						   wxBitmap& searchHitBadBitmap, wxBitmap& bookmarkBitmap,
 						   wxBitmap& executionLineBitmap, wxBitmap& breakpointBitmap) {
-
 	// caret, line, selection, margin colors
 	for (size_t i = 0; i < styles.size(); ++i) {
 		t4p::StylePreferenceClass pref = styles[i];
@@ -181,7 +179,6 @@ static void SetCodeControlOptions(wxStyledTextCtrl* ctrl, std::vector<t4p::Style
  * HTML and Javascript editing as well.
  */
 static void SetPhpOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options, t4p::GlobalsClass& globals) {
-
 	// set the lexer before setting the keywords
 	ctrl->SetLexer(wxSTC_LEX_HTML);
 
@@ -269,7 +266,6 @@ static void SetCssOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& 
  * Set the JS highlight options of the source control
  */
 static void SetJsOptions(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& options) {
-
 	// the CPP lexer is used to handle javascript
 	ctrl->SetLexer(wxSTC_LEX_CPP);
 
@@ -426,7 +422,6 @@ void t4p::SyntaxHighlightViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) 
 }
 
 void t4p::SyntaxHighlightViewClass::OnAppReady(wxCommandEvent& event) {
-
 	// load the images once at startup
 	LoadMarkerBitmaps();
 }
@@ -608,7 +603,6 @@ void t4p::EditColorsPanelClass::AddPreviews() {
 }
 
 bool t4p::EditColorsPanelClass::TransferDataFromWindow() {
-
 	// ATTN: only copy the styles
 	// do not copy the other flags (editor behavior) since
 	// they are being edited in the editor behavtior panel

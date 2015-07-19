@@ -35,7 +35,6 @@ t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 	, ChosenUrl(chosenUrl)
 	, Projects()
 	, FileType(fileType) {
-
 	// get some urls to prepopulate the list
 	std::vector<t4p::UrlTagClass> allUrlTags = GetFilteredUrls(wxT("http://"));
 	FillUrlList(allUrlTags);
@@ -50,7 +49,6 @@ t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 
 	// now put the enabled projects in the choice
 	for (size_t i = 0; i < Projects.size(); ++i) {
-
 		// should be ok to reference this vector since it wont change because this is a
 		// modal dialog
 		ProjectChoice->Append(Projects[i].Label, &Projects[i]);
@@ -90,7 +88,6 @@ void t4p::ChooseUrlDialogClass::OnListItemSelected(wxCommandEvent& event) {
 void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	wxString filter = Filter->GetValue();
 	if (filter.IsEmpty()) {
-
 		// filter string cannot be empty
 		// empty string =  no filter show all
 		filter = wxT("http://");

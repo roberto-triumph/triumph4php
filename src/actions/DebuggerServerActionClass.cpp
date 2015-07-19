@@ -215,7 +215,6 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 			wxThread::Sleep(150);
 		}
 		if (isDebuggerStopped) {
-
 			// remove all commands as they will no longer be run
 			// so that commands don't carry over script runs
 			next = NextCommand();
@@ -356,7 +355,6 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 			PostEvent(evalResponse);
 		}
 		else {
-
 			// most likely an error response
 			t4p::DbgpErrorEventClass errorResponse;
 			if (errorResponse.FromXml(xml, xmlError)) {

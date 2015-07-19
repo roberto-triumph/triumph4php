@@ -33,9 +33,7 @@
  * It seems that the wxGenericValidator or wxTextCtrl do not work for wxSearchCtrl
  */
 class SearchControlValidatorClass : public wxValidator {
-
 	public:
-
 	SearchControlValidatorClass(wxString* data);
 
 	virtual bool TransferToWindow();
@@ -47,7 +45,6 @@ class SearchControlValidatorClass : public wxValidator {
 	virtual wxObject* Clone() const;
 
 	private:
-
 	SearchControlValidatorClass();
 
 	/**

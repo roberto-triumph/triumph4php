@@ -27,11 +27,9 @@
 #include <algorithm>
 
 t4p::ThreadCleanupClass::ThreadCleanupClass() {
-
 }
 
 t4p::ThreadCleanupClass::~ThreadCleanupClass() {
-
 }
 
 t4p::ActionClass::ActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
@@ -45,7 +43,6 @@ t4p::ActionClass::ActionClass(t4p::RunningThreadsClass& runningThreads, int even
 }
 
 t4p::ActionClass::~ActionClass() {
-
 }
 
 void t4p::ActionClass::Cancel() {
@@ -126,7 +123,6 @@ t4p::ThreadActionClass::ThreadActionClass(std::queue<t4p::ActionClass*>& actions
 	, RunningActionMutex()
 	, RunningAction(NULL)
 	, ThreadCleanup(threadCleanup) {
-
 }
 
 void t4p::ThreadActionClass::CancelRunningActionIf(int actionId) {
@@ -156,7 +152,6 @@ void* t4p::ThreadActionClass::Entry() {
 	while (!TestDestroy()) {
 		t4p::ActionClass* action = NextAction();
 		if (action && !TestDestroy()) {
-
 			// signal the start of this action
 			t4p::ActionProgressEventClass evt(action->GetEventId(), action->GetProgressMode(), 0, wxT(""));
 			action->PostEvent(evt);
@@ -169,7 +164,6 @@ void* t4p::ThreadActionClass::Entry() {
 			ActionComplete(action);
 		}
 		else if (action) {
-
 			// we want to exit, don't call action->BackgroundWork
 			// as it can take a while to complete
 			ActionComplete(action);
@@ -314,7 +308,6 @@ int t4p::RunningThreadsClass::Queue(t4p::ActionClass* action) {
 }
 
 void t4p::RunningThreadsClass::CancelAction(int actionId) {
-
 	// this is an important lock because it ensures that
 	// the front action is not deleted while we try to call Cancel on it
 	wxMutexLocker locker(ActionMutex);
@@ -332,12 +325,10 @@ void t4p::RunningThreadsClass::CancelAction(int actionId) {
 	while (!Actions.empty()) {
 		action = Actions.front();
 		if (action->GetActionId() != actionId) {
-
 			// keep this action
 			checked.push(action);
 		}
 		else {
-
 			// this action we need to remove
 			delete action;
 		}
@@ -362,7 +353,6 @@ void t4p::RunningThreadsClass::CancelAction(int actionId) {
 }
 
 void t4p::RunningThreadsClass::StopAll() {
-
 	// stop the timer, the in progress handler will want
 	// to lock the action mutex
 	Timer.Stop();
@@ -438,7 +428,6 @@ void t4p::RunningThreadsClass::PostEvent(wxEvent& event) {
 }
 
 void t4p::RunningThreadsClass::OnTimer(wxTimerEvent& event) {
-
 	// if there is an action that is running then send an in-progress event
 	// for it
 	for (size_t i = 0; i < ThreadActions.size(); ++i) {
@@ -468,7 +457,6 @@ t4p::ActionProgressEventClass::ActionProgressEventClass(int id, t4p::ActionClass
 
 // thread-safe clone of the string
 , Message(msg.c_str()) {
-
 }
 
 wxEvent* t4p::ActionProgressEventClass::Clone() const {

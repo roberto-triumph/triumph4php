@@ -59,7 +59,6 @@ static wxString NiceDocText(const UnicodeString& comment) {
 			line = line.Mid(pos);
 		}
 		else {
-
 			// an empty comment line
 			line = wxT("");
 		}
@@ -133,7 +132,6 @@ static bool CodeControlHasDocComment(wxWindow* parent) {
 t4p::DocCommentViewClass::DocCommentViewClass(t4p::DocCommentFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 
@@ -145,7 +143,6 @@ void t4p::DocCommentViewClass::AddEditMenuItems(wxMenu* editMenu) {
 void t4p::DocCommentViewClass::OnShowDocComment(wxCommandEvent& event) {
 	t4p::CodeControlClass* ctrl = GetCurrentCodeControl();
 	if (ctrl) {
-
 		// only show a DocComment if there isn't another DocComment shown on this code control
 		if (!CodeControlHasDocComment(ctrl)) {
 			ShowDocComment(ctrl, ctrl->GetCurrentPos());
@@ -159,7 +156,6 @@ void t4p::DocCommentViewClass::OnMotionAlt(wxCommandEvent& event) {
 	}
 	t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
 	if (ctrl) {
-
 		// only show a DocComment if there isn't another DocComment shown on this code control
 		if (!CodeControlHasDocComment(ctrl)) {
 			int pos = event.GetInt();
@@ -246,7 +242,6 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No content for %s"), t4p::IcuToWx(tag.Key).c_str()));
 	}
 	else {
-
 		// freeze thaw the code control so that the call tip popup is
 		// not drawn while its being moved into place
 		// in linux, freezing already happens internally so we don't
@@ -306,7 +301,6 @@ void t4p::DocCommentPanelClass::OnPhpSiteDocs(wxHyperlinkEvent& event) {
 }
 
 void t4p::DocCommentPanelClass::OnKeyDown(wxKeyEvent& event) {
-
 	// ESC == close the panel
 	if (event.GetKeyCode() == WXK_ESCAPE) {
 		CallAfter(&t4p::DocCommentPanelClass::DoDestroy);

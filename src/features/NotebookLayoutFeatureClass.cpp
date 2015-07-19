@@ -26,5 +26,4 @@
 
 t4p::NotebookLayoutFeatureClass::NotebookLayoutFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {
-
 }

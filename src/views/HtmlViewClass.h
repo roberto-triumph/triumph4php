@@ -30,30 +30,24 @@
 #include <globals/Events.h>
 
 namespace t4p {
-
 /**
  * The html code completion class implements the code that
  * code completes HTML keywords
  */
 class HtmlCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-
 	public:
-
 	HtmlCodeCompletionProviderClass();
 
 	bool DoesSupport(t4p::FileType type);
 
 	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
-
 };
 
 /**
  * this class highlights matching braces {}, [], and ()
  */
 class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-
 	public:
-
 	CssBraceMatchStylerClass();
 
 	bool DoesSupport(t4p::FileType type);
@@ -66,13 +60,10 @@ class CssBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * coding HTML, code completion, keyword highlighting
  */
 class HtmlViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	HtmlViewClass();
 
 	private:
-
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
@@ -87,7 +78,6 @@ class HtmlViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_HTMLVIEWCLASS__

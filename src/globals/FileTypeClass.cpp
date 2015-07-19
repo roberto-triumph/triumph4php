@@ -102,7 +102,6 @@ t4p::FileTypeClass& t4p::FileTypeClass::operator=(const t4p::FileTypeClass& src)
 }
 
 void t4p::FileTypeClass::Copy(const t4p::FileTypeClass& src) {
-
 	// copy in a thread-safe way
 	CssFileExtensionsString        = CssFileExtensionsString.c_str();
 	PhpFileExtensionsString        = PhpFileExtensionsString.c_str();

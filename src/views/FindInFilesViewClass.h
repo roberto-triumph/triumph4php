@@ -32,7 +32,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration, defined below
 class FindInFilesViewClass;
 
@@ -56,7 +55,6 @@ class FindInFilesResultsPanelClass : public FindInFilesResultsPanelGeneratedClas
 
 
 	public:
-
 	/**
 	 * Construct a new FindInFilesResultsPanelClass
 	 *
@@ -102,7 +100,6 @@ class FindInFilesResultsPanelClass : public FindInFilesResultsPanelGeneratedClas
 	void ShowPreviousMatch();
 
 	private:
-
 	/**
 	 * To find matches in files.
 	 *
@@ -229,9 +226,7 @@ class FindInFilesResultsPanelClass : public FindInFilesResultsPanelGeneratedClas
 };
 
 class FindInFilesViewClass : public FeatureViewClass {
-
 	public:
-
 	/**
 	 * Holds previously entered searches. We need these to persist longer than the dialog so that
 	 * the user's inputs are saved.
@@ -271,7 +266,6 @@ class FindInFilesViewClass : public FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	/**
 	 * show the find dialog
 	 */
@@ -303,14 +297,11 @@ class FindInFilesViewClass : public FeatureViewClass {
 };
 
 class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
-
 	public:
-
 	FindInFilesDialogClass(wxWindow* parent, FindInFilesFeatureClass& feature,
 		FindInFilesViewClass& view);
 
 	protected:
-
 	virtual void OnOkButton(wxCommandEvent& event);
 	virtual void OnCancelButton(wxCommandEvent& event);
 	void OnRegExFindHelpButton(wxCommandEvent& event);
@@ -318,7 +309,6 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 	void OnDirChanged(wxFileDirPickerEvent& event);
 
 	private:
-
 	FindInFilesFeatureClass& Feature;
 	FindInFilesViewClass& View;
 
@@ -355,6 +345,5 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif // __FINDINFFILESFEATURECLASS_H

@@ -123,7 +123,6 @@ std::vector<t4p::PhpTagClass> AllResources(soci::session& session) {
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxString msg = t4p::CharToWx(e.what());
@@ -176,13 +175,11 @@ void t4p::TagParserClass::Close() {
 }
 
 void t4p::TagParserClass::BeginSearch(const wxString& fullPath) {
-
 	// get (or create) the source ID
 	try {
 		CurrentSourceId = PersistSource(fullPath);
 		BeginTransaction();
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -190,7 +187,6 @@ void t4p::TagParserClass::BeginSearch(const wxString& fullPath) {
 }
 
 int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
-
 	// make sure we always insert with the trailing directory separator
 	// to be consistent
 	wxFileName dir;
@@ -202,7 +198,6 @@ int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
 			"SELECT source_id FROM sources WHERE directory = ?",
 			soci::into(sourceId), soci::use(stdFullPath));
 		if (!stmt.execute(true)) {
-
 			// didn't find the source, create a new row
 			soci::statement stmt = (Session->prepare <<
 				"INSERT INTO sources(directory) VALUES(?)",
@@ -212,7 +207,6 @@ int t4p::TagParserClass::PersistSource(const wxString& sourceDir) {
 		}
 	}
 	catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxASSERT_MSG(false, e.what());
@@ -250,7 +244,6 @@ void t4p::TagParserClass::BeginTransaction() {
 			soci::use(ReturnType), soci::use(Comment), soci::use(IsProtected), soci::use(IsPrivate),
 			soci::use(IsStatic), soci::use(IsDynamic), soci::use(IsNative), soci::use(HasVariableArgs));
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxString msg = t4p::CharToWx(e.what());
@@ -267,7 +260,6 @@ void t4p::TagParserClass::EndSearch() {
 	try {
 		Transaction->commit();
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxString msg = t4p::CharToWx(e.what());
@@ -290,7 +282,6 @@ bool t4p::TagParserClass::Walk(const wxString& fileName) {
 	for (size_t i = 0; i < PhpFileExtensions.size(); ++i) {
 		wxString filter = PhpFileExtensions[i];
 		if (!wxIsWild(filter)) {
-
 			// exact match of the name portion of fileName
 			matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
 		}
@@ -309,7 +300,6 @@ bool t4p::TagParserClass::Walk(const wxString& fileName) {
 		for (size_t i = 0; i < MiscFileExtensions.size(); ++i) {
 			wxString filter = MiscFileExtensions[i];
 			if (!wxIsWild(filter)) {
-
 				// exact match of the name portion of fileName
 				matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
 			}
@@ -389,7 +379,6 @@ void t4p::TagParserClass::BuildResourceCache(const wxString& fullPath, bool pars
 	}
 	if (parseClasses) {
 		if (!cached || !fileTag.IsParsed) {
-
 			// no need to look for resources if the file had not yet existed, this will save much time
 			// this optimization was found by using the profiler
 			if (foundFile) {
@@ -423,7 +412,6 @@ void t4p::TagParserClass::BuildResourceCache(const wxString& fullPath, bool pars
 				try {
 					Transaction->commit();
 				} catch (std::exception& e) {
-
 					// ATTN: at some point bubble these exceptions up?
 					// to avoid unreferenced local variable warnings in MSVC
 					wxString msg = t4p::CharToWx(e.what());
@@ -455,7 +443,6 @@ void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const U
 	PersistResources(classItem, CurrentFileTagId);
 
 	if (IsNewNamespace(namespaceName)) {
-
 		// a tag for the namespace itself
 		t4p::PhpTagClass namespaceItem = t4p::PhpTagClass::MakeNamespace(namespaceName);
 		PersistResources(namespaceItem, CurrentFileTagId);
@@ -468,7 +455,6 @@ void t4p::TagParserClass::ClassFound(const UnicodeString& namespaceName, const U
 
 void t4p::TagParserClass::TraitAliasFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 												  const UnicodeString& traitMethodName, const UnicodeString& alias, pelet::TokenClass::TokenIds visibility) {
-
 	// the trait has already been put in the cache; we just need to update it
 	UnicodeString mapKey;
 	mapKey += namespaceName;
@@ -488,7 +474,6 @@ void t4p::TagParserClass::TraitAliasFound(const UnicodeString& namespaceName, co
 
 void t4p::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& traitUsedClassName,
 													   const UnicodeString& traitMethodName, const std::vector<UnicodeString>& insteadOfList) {
-
 	// the trait has already been put in the cache; we just need to update it
 	UnicodeString mapKey;
 
@@ -502,7 +487,6 @@ void t4p::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespaceName
 	std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::iterator it;
 	it = TraitCache.find(mapKey);
 	if (!it->second.empty()) {
-
 		it->second.front().InsteadOfs.insert(it->second.front().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
 		it->second.back().InsteadOfs.insert(it->second.back().InsteadOfs.end(), insteadOfList.begin(), insteadOfList.end());
 	}
@@ -510,7 +494,6 @@ void t4p::TagParserClass::TraitInsteadOfFound(const UnicodeString& namespaceName
 
 void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, const UnicodeString& className,
 												const UnicodeString& fullyQualifiedTraitName) {
-
 	t4p::TraitTagClass newTraitTag;
 	newTraitTag.ClassName = className;
 	newTraitTag.NamespaceName = namespaceName;
@@ -521,13 +504,11 @@ void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, cons
 		newTraitTag.TraitNamespaceName.setTo(fullyQualifiedTraitName, pos + 1);
 	}
 	else if (0 == pos) {
-
 		// root namespace
 		newTraitTag.TraitClassName.setTo(fullyQualifiedTraitName, 1);
 		newTraitTag.TraitNamespaceName.setTo(UNICODE_STRING_SIMPLE("\\"));
 	}
 	else {
-
 		//this should never get here as the parser will always give us
 		// fully qualified trait names
 		newTraitTag.TraitClassName = fullyQualifiedTraitName;
@@ -619,7 +600,6 @@ void t4p::TagParserClass::PropertyFound(const UnicodeString& namespaceName, cons
 										const int lineNumber) {
 	UnicodeString filteredProperty(propertyName);
 	if (!isStatic) {
-
 		// remove the siguil from the property name when the variable is not static;
 		// because when using non-static access ("->") the siguil is not used
 		// this affects the code completion functionality
@@ -694,7 +674,6 @@ bool t4p::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
 		soci::statement stmt = (Session->prepare << sql, soci::use(nm), soci::use(type), soci::into(count));
 		stmt.execute(true);
 		if (count <= 0) {
-
 			// look in the current namespace cache, stuff that has not yet been added to the database
 			if (NamespaceCache.count(namespaceName) <= 0) {
 				isNew = true;
@@ -702,7 +681,6 @@ bool t4p::TagParserClass::IsNewNamespace(const UnicodeString& namespaceName) {
 			}
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -733,7 +711,6 @@ void t4p::TagParserClass::RemovePersistedResources(const std::vector<int>& fileT
 			Session->once << deleteFileItemSql;
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -832,7 +809,6 @@ bool t4p::TagParserClass::FindFileTagByFullPathExact(const wxString& fullPath, t
 			fileTag.IsParsed = isParsed != 0;
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -851,7 +827,6 @@ void t4p::TagParserClass::WipeAll() {
 			Session->once << "DELETE FROM trait_resources;";
 			Session->once << "DELETE FROM sources;";
 		} catch (std::exception& e) {
-
 			// ATTN: at some point bubble these exceptions up?
 			// to avoid unreferenced local variable warnings in MSVC
 			e.what();
@@ -875,7 +850,6 @@ void t4p::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 			soci::statement stmt = (Session->prepare << sql, soci::into(sourceId), soci::use(stdSourceDir));
 
 			if (stmt.execute(true)) {
-
 				sql = "DELETE FROM resources WHERE source_id = ?";
 				Session->once << sql, soci::use(sourceId);
 
@@ -889,7 +863,6 @@ void t4p::TagParserClass::DeleteSource(const wxFileName& sourceDir) {
 				Session->once << sql, soci::use(sourceId);
 			}
 		} catch (std::exception& e) {
-
 			// ATTN: at some point bubble these exceptions up?
 			// to avoid unreferenced local variable warnings in MSVC
 			e.what();
@@ -928,7 +901,6 @@ void t4p::TagParserClass::DeleteDirectories(const std::vector<wxFileName>& dirs)
 				Session->once << sql;
 			}
 		} catch (std::exception& e) {
-
 			// ATTN: at some point bubble these exceptions up?
 			// to avoid unreferenced local variable warnings in MSVC
 			e.what();
@@ -972,7 +944,6 @@ void t4p::TagParserClass::PersistResources(const t4p::PhpTagClass& resource, int
 		InsertStmt->execute(true);
 
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -1032,7 +1003,6 @@ void t4p::TagParserClass::PersistTraits(
 			}
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxString msg = t4p::CharToWx(e.what());
@@ -1099,7 +1069,6 @@ std::vector<t4p::TraitTagClass> t4p::TagParserClass::FindTraitsByClassName(const
 			} while (stmt.fetch());
 		}
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		e.what();
@@ -1117,7 +1086,6 @@ void t4p::TagParserClass::RenameFile(const wxFileName& oldFile, const wxFileName
 			soci::use(stdNewPath), soci::use(stdNewName), soci::use(stdOldPath));
 		stmt.execute(true);
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxASSERT_MSG(false, wxString(e.what()));
@@ -1134,7 +1102,6 @@ void t4p::TagParserClass::RenameDir(const wxFileName& oldDir, const wxFileName& 
 			soci::use(stdOldPath), soci::use(stdNewPath), soci::use(stdOldPathLike));
 		stmt.execute(true);
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxASSERT_MSG(false, wxString(e.what()));

@@ -37,12 +37,10 @@ t4p::FileModifiedCheckViewClass::FileModifiedCheckViewClass(t4p::FileModifiedChe
 : FeatureViewClass()
 , Feature(feature)
 , JustReactivated(false) {
-
 }
 
 
 void t4p::FileModifiedCheckViewClass::OpenedCodeControlCheck() {
-
 	// loop through all of the opened files to get the files to
 	// be checked
 	// be careful to skip new buffers since they are not yet
@@ -95,7 +93,6 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 
 		// find the control for the file and revert the contents
 		if (filesToPrompt.find(fileName) != filesToPrompt.end()) {
-
 			t4p::CodeControlClass* code = filesToPrompt[fileName];
 
 			int currentLine = code->GetCurrentLine();
@@ -103,7 +100,6 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 			code->Revert();
 
 			if (currentLine <= code->GetLineCount()) {
-
 				// stc uses zero-based line numbers, this method
 				// accepts 1-based line numbers
 				code->GotoLineAndEnsureVisible(currentLine + 1);
@@ -161,7 +157,6 @@ void t4p::FileModifiedCheckViewClass::FilesDeletedPrompt(std::map<wxString, t4p:
 }
 
 void t4p::FileModifiedCheckViewClass::FilesRenamedPrompt(std::map<wxString, t4p::CodeControlClass*>& openedFiles, std::map<wxString, wxString>& pathsRenamed) {
-
 	std::map<wxString, wxString>::iterator renamed;
 	std::map<wxString, t4p::CodeControlClass*> openedFilesRenamed;
 	for (renamed = pathsRenamed.begin(); renamed != pathsRenamed.end(); ++renamed) {

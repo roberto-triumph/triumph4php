@@ -39,7 +39,6 @@
 #include <language_php/TagCacheClass.h>
 
 namespace t4p {
-
 // forward declaration, defined below
 class LintFeatureClass;
 
@@ -52,9 +51,7 @@ extern const wxEventType EVENT_LINT_SUMMARY;
  * An event will be generated only on errors; a clean file will not generate any errors.
  */
 class LintResultsEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * The results for a single file. there could be multiple errors, undefined
 	 * functions, uninitialized variables.
@@ -67,9 +64,7 @@ class LintResultsEventClass : public wxEvent {
 };
 
 class LintResultsSummaryEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * the number of files that were parsed
 	 */
@@ -89,7 +84,6 @@ class LintResultsSummaryEventClass : public wxEvent {
 	LintResultsSummaryEventClass(int eventId, int totalFiles, int errorFiles, int skippedFiles);
 
 	wxEvent* Clone() const;
-
 };
 
 typedef void (wxEvtHandler::*LintResultsEventClassFunction)(LintResultsEventClass&);
@@ -110,9 +104,7 @@ typedef void (wxEvtHandler::*LintResultsSummaryEventClassFunction)(LintResultsSu
  * Stores flags that determine how strict linting will be
  */
 class LintFeatureOptionsClass {
-
 	public:
-
 	/**
 	 * If TRUE, then when a file is saved; a lint check on that file
 	 * will be performed.
@@ -160,7 +152,6 @@ class LintFeatureOptionsClass {
  */
 class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 	public:
-
 	ParserDirectoryWalkerClass(const t4p::LintFeatureOptionsClass& options,
 		const wxFileName& suppressionFile);
 
@@ -227,7 +218,6 @@ class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 	int WithSkip;
 
 	private:
-
 	// flags that control which checks to perform
 	t4p::LintFeatureOptionsClass Options;
 
@@ -248,7 +238,6 @@ class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
 	std::vector<t4p::PhpVariableLintResultClass> VariableResults;
 	std::vector<t4p::PhpIdentifierLintResultClass> IdentifierResults;
 	std::vector<t4p::PhpFunctionCallLintResultClass> CallResults;
-
 };
 
 /**
@@ -256,9 +245,7 @@ class ParserDirectoryWalkerClass : public DirectoryWalkerClass {
  * in a background thread.
  */
 class LintActionClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
 	 * 	      as well as WORK_* events
@@ -284,14 +271,12 @@ class LintActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	/**
 	 * Will iterate through each source and parse it for errors
 	 */
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * Will iterate the entire set of files in DirectorySearch.
 	 * Will send events 1) on errors and 2) progress
@@ -330,9 +315,7 @@ class LintActionClass : public t4p::ActionClass {
  * file in a background thread.
  */
 class LintBackgroundSingleFileClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads the object that will receive LINT_ERROR events
 	 * 	      as well as WORK_* events
@@ -357,14 +340,12 @@ class LintBackgroundSingleFileClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	/**
 	 * Will parse the current file.
 	 */
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * the file to parse
 	 */
@@ -382,9 +363,7 @@ class LintBackgroundSingleFileClass : public t4p::ActionClass {
  * for the feature
  */
 class LintFeatureClass : public FeatureClass {
-
 	public:
-
 	t4p::LintFeatureOptionsClass Options;
 
 	/**
@@ -401,7 +380,6 @@ class LintFeatureClass : public FeatureClass {
 	void LoadPreferences(wxConfigBase* config);
 
 	private:
-
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnProjectsUpdated(t4p::ProjectEventClass& event);
@@ -413,7 +391,6 @@ class LintFeatureClass : public FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

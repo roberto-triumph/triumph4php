@@ -29,5 +29,4 @@ t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app)
 }
 
 void t4p::TestFeatureClass::Go() {
-
 }

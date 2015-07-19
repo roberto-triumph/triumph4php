@@ -28,22 +28,17 @@
 #include <main_frame/wxformbuilder/MainFrameForms.h>
 
 namespace t4p {
-
 class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass {
-
 	public:
-
 	SettingsDirectoryPanelClass(wxWindow* parent, int id, wxFileName& settingsDir);
 
 	bool TransferDataFromWindow();
 
 	private:
-
 	void OnUserDataDir(wxCommandEvent& event);
 	void OnAppDir(wxCommandEvent& event);
 	void OnCustomDir(wxCommandEvent& event);
 };
-
 }
 
 #endif

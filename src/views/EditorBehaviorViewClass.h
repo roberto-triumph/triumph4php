@@ -32,11 +32,8 @@
 #include <wx/stc/stc.h>
 
 namespace t4p {
-
 class EditorBehaviorViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	EditorBehaviorViewClass(t4p::EditorBehaviorFeatureClass& feature);
 
 	void AddToolBarItems(wxAuiToolBar* toolBar);
@@ -52,7 +49,6 @@ class EditorBehaviorViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	/**
 	 * adds menu items for each of the scintilla keyboard commands
 	 * to the given menu
@@ -111,19 +107,15 @@ class EditorBehaviorViewClass : public t4p::FeatureViewClass {
  * panel that shows all options regarding editor behavior
  */
 class EditorBehaviorPanelClass : public EditorBehaviorPanelGeneratedClass {
-
 	public:
-
 	EditorBehaviorPanelClass(wxWindow* parent, CodeControlOptionsClass& options);
 	bool TransferDataToWindow();
 	bool TransferDataFromWindow();
 
 	protected:
-
 	// Handlers for EditorBehaviorPanelGeneratedClass events.
 	void OnIndentUsingSpaces(wxCommandEvent& event);
 	void OnCheckRightMargin(wxCommandEvent& event);
-
 };
 
 /**
@@ -136,9 +128,7 @@ class EditorBehaviorPanelClass : public EditorBehaviorPanelGeneratedClass {
  * textbox that has focus.
  */
 class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent the window parent
 	 * @param int id the window ID
@@ -152,7 +142,6 @@ class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
 	bool TransferDataFromWindow();
 
 	private:
-
 	void FillCommands();
 
 	void OnItemActivated(wxListEvent& event);
@@ -171,7 +160,6 @@ class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
 	 * this class will NOT own the keyBinder pointer
 	 */
 	wxKeyBinder* KeyBinder;
-
 };
 
 /**
@@ -179,9 +167,7 @@ class EditorCommandPanelClass : public EditorCommandPanelGeneratedClass {
  * this class will NOT own the keyBinder pointer
  */
 class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent the window parent
 	 * @param commandName to display to the user
@@ -194,7 +180,6 @@ class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGenerated
 		wxKeyBinder* keyBinder);
 
 	private:
-
 	void OnOkButton(wxCommandEvent& event);
 	void OnKey(wxKeyEvent& event);
 	void OnEnter(wxCommandEvent& event);
@@ -217,7 +202,6 @@ class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGenerated
 	 */
 	wxString OriginalShortcut;
 };
-
 }
 
 #endif

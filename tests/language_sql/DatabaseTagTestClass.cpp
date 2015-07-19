@@ -44,7 +44,6 @@ class DatabaseTagTestFixtureClass : public DatabaseTestFixtureClass {
 };
 
 SUITE(DatabaseTagClassTest) {
-
 TEST_FIXTURE(DatabaseTagTestFixtureClass, ConnectQueryAndResults) {
 	Exec("CREATE TABLE names (id INT, name VARCHAR(255));");
 
@@ -122,5 +121,4 @@ TEST_FIXTURE(DatabaseTagTestFixtureClass, MultipleQueries) {
 	CHECK_EQUAL(false, results3.HasRows);
 	results3.Close();
 }
-
 }

@@ -33,9 +33,7 @@
 #include <wx/stdpaths.h>
 
 class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
-
 	public:
-
 	soci::session DetectorTagSession;
 	t4p::DetectorDbClass DetectorDb;
 	wxFileName Source1,
@@ -47,7 +45,6 @@ class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 		, DetectorDb()
 		, Source1()
 		, Source2() {
-
 		DetectorTagSession.open(*soci::factory_sqlite3(), ":memory:");
 		CreateDatabase(DetectorTagSession, t4p::DetectorSqlSchemaAsset());
 
@@ -141,7 +138,6 @@ class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 };
 
 SUITE(DetectorDbTestClass) {
-
 TEST_FIXTURE(DetectorDbTestFixtureClass, WipeAll) {
 	int count;
 	count = RowCount("sources");
@@ -189,5 +185,4 @@ TEST_FIXTURE(DetectorDbTestFixtureClass, DeleteSource) {
 	count = RowCount("url_tags");
 	CHECK_EQUAL(1, count);
 }
-
 }

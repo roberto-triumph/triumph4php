@@ -82,9 +82,7 @@ class SymbolTableTestClass : public FileTestFixtureClass {
 };
 
 class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::SymbolTableClass CompletionSymbolTable;
 	pelet::ScopeClass Scope;
 	pelet::VariableClass ParsedVariable;
@@ -123,7 +121,6 @@ class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 	}
 
 	void ToFunction(const UnicodeString& functionName) {
-
 		// same as ToVariable, but it makes tests easier to read
 		ParsedVariable.Clear();
 		pelet::VariablePropertyClass prop;
@@ -141,7 +138,6 @@ class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 	}
 
 	void ToClass(const UnicodeString& className) {
-
 		// same as ToVariable, but it makes tests easier to read
 		ParsedVariable.Clear();
 		pelet::VariablePropertyClass prop;
@@ -171,9 +167,7 @@ class SymbolTableCompletionTestClass : public SqliteTestFixtureClass {
 };
 
 class ScopeFinderTestClass {
-
 	public:
-
 	t4p::ScopeFinderClass ScopeFinder;
 	pelet::ScopeClass Scope;
 
@@ -184,7 +178,6 @@ class ScopeFinderTestClass {
 };
 
 SUITE(SymbolTableTestClass) {
-
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithFunctionName) {
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -228,7 +221,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithLocalVariableOnl
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ManyVariableAssignments) {
-
 	// completion matches should never return duplicates
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -276,7 +268,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, VariableMatchesWithInvalidSyntax) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithPreviousSymbol) {
-
 	// this rather involved test exercises the code that will use a previous
 	// symbol table's variables to aid in code completion when the code
 	// has a syntax error.
@@ -513,7 +504,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithParentChain) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionChain) {
-
 	// variables created with a function should be resolved
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -531,7 +521,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedFunctionC
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodChain) {
-
 	// variables created with a function should be resolved
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -549,7 +538,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableCreatedMethodCha
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosure) {
-
 	// a closure should be its own scope, without being able to access
 	// the variables in the containing function/method
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -573,7 +561,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosure) {
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosureWithLexicalVars) {
-
 	// a closure should have access to the variables that are passed in via the
 	// use statement
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -597,7 +584,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableInClosureWithLex
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithVariableOutsideClosure) {
-
 	// a closure should be its own scope, without being able to access
 	// the var	iables in the containing function/method
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -633,7 +619,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithClassname) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualifiedNameOnly) {
-
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
@@ -653,7 +638,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithDoFullyQualified
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithSimilarClassAndFunctionName) {
-
 	// function starts with the same name as the class
 	// but since we are asking for full matches only the function should
 	// be ignored
@@ -739,7 +723,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceStatic)
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceImporting) {
-
 	// define namespaces and classes in a separate file
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -930,7 +913,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithNamespaceAndGlob
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
-
 	// only doing light testing on ResourceMatches because the Matches* tests
 	// cover it already
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -952,7 +934,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithMethodCall) {
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndDuckTyping) {
-
 	// there was an overflow error in this scenario and it was causing a crash
 	UnicodeString sourceCode = t4p::CharToIcu(
 		"<?php\n"
@@ -968,7 +949,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressionAndNoDuckTyping) {
-
 	// if we specify to not do duck typing then any variables that cannot be resolved should not
 	// produce matches
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -988,7 +968,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownExpressio
 
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithUnknownVariableAndDuckTyping) {
-
 	// if we specify to not do duck typing then any variables that cannot be resolved should not
 	// produce matches
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -1043,7 +1022,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ResourceMatchesWithTraitInDifferent
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
-
 	// when a method could not be found make sure that the ErrorType
 	// and class name are properly set
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -1062,7 +1040,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillUnknownResourceError) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
-
 	// when a method cannot be resolved make sure that the ErrorType
 	// and class name are properly set
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -1082,7 +1059,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillResolutionError) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
-
 	// when a method is invoked on a primitive type make sure that the ErrorType
 	// and lexeme are properly set
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -1101,7 +1077,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, ShouldFillPrimitveError) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
-
 	// when a method cannot be resolved but DuckTyping flag is set
 	// resource should be found
 	UnicodeString sourceCode = t4p::CharToIcu(
@@ -1121,7 +1096,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, WithDuckTyping) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithClassHierarchyInMultipleResourceFinders) {
-
 	/*
 	 * test scenario:
 	 * user opens a file, writes code for a base class
@@ -1170,7 +1144,6 @@ TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTags) {
 }
 
 TEST_FIXTURE(SymbolTableCompletionTestClass, MatchesWithNativeTagsAndSourceDirs) {
-
 	// native tags should work even when source directories are defined
 	wxFileName sourceDir;
 	sourceDir.Assign(t4p::TagDetectorsGlobalAsset());
@@ -1441,5 +1414,4 @@ TEST_FIXTURE(ScopeFinderTestClass, GetScopeStringShouldHandleUnfinishedClosuresI
 	CHECK(Scope.IsAnonymousScope());
 	CHECK_EQUAL(0, Scope.GetAnonymousFunctionCount());
 }
-
 }

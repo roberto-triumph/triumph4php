@@ -41,7 +41,6 @@ t4p::ProjectFeatureClass::~ProjectFeatureClass() {
 }
 
 void t4p::ProjectFeatureClass::LoadPreferences(wxConfigBase* config) {
-
 	// config will leave the defaults alone if keys are not found in the config
 	config->Read(wxT("/Project/PhpFileExtensions"), &App.Globals.FileTypes.PhpFileExtensionsString);
 	config->Read(wxT("/Project/CssFileExtensions"), &App.Globals.FileTypes.CssFileExtensionsString);
@@ -153,7 +152,6 @@ void t4p::ProjectFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::ProjectFeatureClass::OnPreferencesExternallyUpdated(wxCommandEvent& event) {
-
 	// start the sequence that will update all global data structures
 	// at this point, we dont know which projects need to be reparsed
 	// since another instance of triumph4php added them, it is assumed that

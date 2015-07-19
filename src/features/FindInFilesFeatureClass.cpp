@@ -40,7 +40,6 @@ t4p::FindInFilesHitClass::FindInFilesHitClass()
 	, LineOffset(0)
 	, FileOffset(0)
 	, MatchLength(0) {
-
 }
 
 t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wxString& preview,
@@ -53,7 +52,6 @@ t4p::FindInFilesHitClass::FindInFilesHitClass(const wxString& fileName, const wx
 	, LineOffset(lineOffset)
 	, FileOffset(fileOffset)
 	, MatchLength(matchLength) {
-
 }
 
 t4p::FindInFilesHitClass::FindInFilesHitClass(const t4p::FindInFilesHitClass& hit)
@@ -90,9 +88,7 @@ void t4p::FindInFilesHitClass::Copy(const t4p::FindInFilesHitClass& hit) {
 
 IMPLEMENT_DYNAMIC_CLASS(t4p::FindInFilesHitClass, wxObject)
 namespace t4p {
-
 	IMPLEMENT_VARIANT_OBJECT(FindInFilesHitClass)
-
 }
 
 
@@ -114,13 +110,11 @@ t4p::FindInFilesBackgroundReaderClass::FindInFilesBackgroundReaderClass(t4p::Run
 	: BackgroundFileReaderClass(runningThreads, eventId)
 	, FindInFiles()
 	, SkipFiles() {
-
 }
 
 bool t4p::FindInFilesBackgroundReaderClass::InitForFind(t4p::FindInFilesClass findInFiles,
 															  bool doHiddenFiles,
 															  std::vector<wxString> skipFiles) {
-
 	// find in files needs to be a copy; just to be sure
 	// its thread safe
 	FindInFiles = findInFiles;
@@ -163,11 +157,9 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 					FindInFiles.GetFileOffset(),
 					FindInFiles.GetMatchLength());
 				hits.push_back(hit);
-
 			}
 			while (!destroy && FindInFiles.FindNext()); // NOLINT(whitespace/empty_loop_body)
 			if (!destroy && !hits.empty()) {
-
 				// PostEvent will change the ID of the event to the correct
 				// one
 				t4p::FindInFilesHitEventClass hitEvent(wxID_ANY, hits);

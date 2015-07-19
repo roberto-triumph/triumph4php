@@ -30,21 +30,16 @@
 #include <wx/treectrl.h>
 
 namespace t4p {
-
 /**
  * small class to hold an arbritrary string on each
  * tree item
  */
 class TreeItemDataStringClass : public wxTreeItemData {
-
 	public:
-
 	wxString Str;
 
 	TreeItemDataStringClass(const wxString& str);
-
 };
-
 }
 
 #endif

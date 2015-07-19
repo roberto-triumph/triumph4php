@@ -29,7 +29,6 @@
 #include <wx/bitmap.h>
 
 namespace t4p {
-
 /**
  * @return the file location of the PHP native functions SQLite file. This file contains all of the
  *         classes, methods, functions, that are documented on the php.net site.  The file
@@ -295,7 +294,6 @@ wxFileName ChangeLogFileAsset();
  *         the lint suppressions feature was added after initial release.
  */
 wxFileName LintSuppressionsFileAsset();
-
 }
 
 #endif

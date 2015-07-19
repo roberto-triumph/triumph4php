@@ -30,15 +30,12 @@
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
 /**
  * An action that will perform a find on an entire set of text
  * and POST FinderHitEventClas for each found hit.
  */
 class FinderActionClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * @param utf8buf this class will take ownership of this pointer
 	 */
@@ -46,13 +43,11 @@ class FinderActionClass : public t4p::ActionClass {
 		const UnicodeString& search, char* utf8Buf, int bufLength);
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetLabel() const;
 
 	private:
-
 	/**
 	 * to perform the search
 	 */
@@ -82,9 +77,7 @@ class FinderActionClass : public t4p::ActionClass {
  * background thread.
  */
 class FinderHitEventClass : public wxEvent {
-
 	public:
-
 	/**
 	 * this is the index into the utf8 buffer, not character pos
 	 */
@@ -98,7 +91,6 @@ class FinderHitEventClass : public wxEvent {
 	FinderHitEventClass(int id, int start, int length);
 
 	wxEvent* Clone() const;
-
 };
 
 extern const wxEventType EVENT_FINDER_ACTION;
@@ -113,9 +105,7 @@ typedef void (wxEvtHandler::*FinderHitEventClassFunction)(t4p::FinderHitEventCla
 
 
 class FinderFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * will perform the searching
 	 */
@@ -138,8 +128,6 @@ class FinderFeatureClass : public FeatureClass {
 	 * @param documentLength length of buf
 	 */
 	void StartFinderAction(UnicodeString word, char* buf, int documentLength);
-
 };
-
 }
 #endif /*T4P_FINDERFEATURECLASS_H_*/

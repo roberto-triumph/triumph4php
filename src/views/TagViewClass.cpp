@@ -83,7 +83,6 @@ void t4p::TagViewClass::OnAppExit(wxCommandEvent& event) {
 }
 
 void t4p::TagViewClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
-
 	// stop the working cache timer because we are going to delete the rows from
 	// the database
 	// we want to avoid locking the database
@@ -99,11 +98,9 @@ void t4p::TagViewClass::OnProjectWipeAndIndex(wxCommandEvent& event) {
 }
 
 void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
-
 	// jump to selected resources
 	CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-
 		// if the cursor is in the middle of an identifier, find the end of the
 		// current identifier; that way we can know the full name of the tag we want
 		// to get
@@ -129,7 +126,6 @@ void t4p::TagViewClass::OnJump(wxCommandEvent& event) {
 				LoadPageFromResource(term, matches[0]);
 			}
 			else {
-
 				// if we have more than one match, lets pick the match from the same project
 				// that the currently opened file is in.
 				wxFileName openedFile = codeControl->GetFileName();
@@ -192,7 +188,6 @@ void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const 
 			length;
 		bool found = t4p::ParsedTagFinderClass::GetResourceMatchPosition(tag, codeControl->GetSafeText(), position, length);
 		if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == tagSearch.GetResourceType()) {
-
 			// scintilla line numbers start at zero. use the ensure method so that the line is shown in the
 			// center of the screen
 			int pos = codeControl->PositionFromLine(tagSearch.GetLineNumber() - 1);
@@ -200,7 +195,6 @@ void t4p::TagViewClass::LoadPageFromResource(const wxString& finderQuery, const 
 			codeControl->GotoLineAndEnsureVisible(tagSearch.GetLineNumber());
 		}
 		if (t4p::TagSearchClass::FILE_NAME == tagSearch.GetResourceType()) {
-
 			// nothing; just open the file but don't scroll down to any place
 		}
 		else if (found) {
@@ -218,7 +212,6 @@ void t4p::TagViewClass::OpenFile(wxString fileName) {
 }
 
 void t4p::TagViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-
 	// only index when there is a project open
 	// need to make sure that the file that was closed is in the opened project
 	// as well.
@@ -245,14 +238,12 @@ void t4p::TagViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	Feature.App.Globals.TagCache.RemoveWorking(codeCtrl->GetIdString());
 
 	if (codeCtrl->IsNew()) {
-
 		// if a new file was closed but never saved remove it from the tag cache
 		Feature.App.Globals.TagCache.DeleteFromFile(codeCtrl->GetIdString());
 	}
 }
 
 void t4p::TagViewClass::OnActionComplete(t4p::ActionEventClass& event) {
-
 	 // after the file was parsed re-start the timer.  this gets called always, where as
 	 // OnWorkingCacheComplete does not get called when the file contains invalid syntax (no
 	 // symbol table could be created)
@@ -286,7 +277,6 @@ void t4p::TagViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 		Feature.App.SqliteRunningThreads.Queue(builder);
 	}
 	else if (Feature.App.Globals.IsASourceFile(codeControl->GetFileName())) {
-
 		// for other project files, we still want to "tag" them so that
 		// we record their name, that way total search filename lookups
 		// will include these files
@@ -306,7 +296,6 @@ void t4p::TagViewClass::OnWorkingCacheComplete(t4p::WorkingCacheCompleteEventCla
 	wxString fileIdentifier = event.GetFileIdentifier();
 	bool good = Feature.App.Globals.TagCache.RegisterWorking(fileIdentifier, event.WorkingCache);
 	if (!good) {
-
 		// already there
 		Feature.App.Globals.TagCache.ReplaceWorking(fileIdentifier, event.WorkingCache);
 	}
@@ -424,7 +413,6 @@ t4p::TagSearchDialogClass::TagSearchDialogClass(wxWindow* parent,
 	ProjectChoice->Append(_("All Enabled Projects"), reinterpret_cast<void*>(NULL));
 	for (size_t i = 0; i < Globals.Projects.size(); ++i) {
 		if (Globals.Projects[i].IsEnabled) {
-
 			// should be ok to reference this vector since it wont change because this is a
 			// modal dialog
 			ProjectChoice->Append(Globals.Projects[i].Label, &Globals.Projects[i]);
@@ -450,7 +438,6 @@ void t4p::TagSearchDialogClass::OnSearchText(wxCommandEvent& event) {
 void t4p::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 	wxString text = SearchText->GetValue();
 	if (text == LastInput) {
-
 		// nothing to do, results are already being shown
 		return;
 	}
@@ -460,7 +447,6 @@ void t4p::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
 	}
 	else {
-
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
 			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));
@@ -472,7 +458,6 @@ void t4p::TagSearchDialogClass::OnTimerComplete(wxTimerEvent& event) {
 
 void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	if (MatchedResources.empty()) {
-
 		// dont dismiss the dialog when no tags are shown
 		return;
 	}
@@ -480,7 +465,6 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 	RunningThreads.Shutdown();
 
 	if (MatchedResources.size() == 1) {
-
 		// if there is only match, just take the user to it
 		TransferDataFromWindow();
 		ChosenResources.clear();
@@ -495,7 +479,6 @@ void t4p::TagSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 		}
 	}
 	if (checks.Count() > 1) {
-
 		// open the checked items
 		for (size_t i = 0; i < checks.Count(); ++i) {
 			int matchIndex = checks.Item(i);
@@ -575,7 +558,6 @@ void t4p::TagSearchDialogClass::OnOkButton(wxCommandEvent& event) {
 		}
 	}
 	if (!isChecked) {
-
 		// nothing chosen
 		return;
 	}
@@ -604,7 +586,6 @@ void t4p::TagSearchDialogClass::Prepopulate(const wxString& term, const std::vec
 }
 
 void t4p::TagSearchDialogClass::OnHelpButton(wxCommandEvent& event) {
-
   wxString help = wxString::FromAscii("Type in a file name, file name:page number, "
 		"class name,  or class name::method name. The resulting page will then be opened.\n\nExamples:\n\n"
 		"user.php\n"
@@ -635,7 +616,6 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 			MatchesList->SetSelection(selection + 1);
 		}
 		else if (!MatchesList->IsEmpty()) {
-
 			// cycle back to the beginning
 			MatchesList->SetSelection(0);
 		}
@@ -646,7 +626,6 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 			MatchesList->SetSelection(selection - 1);
 		}
 		else if (!MatchesList->IsEmpty() && selection == 0) {
-
 			// cycle back to the end
 			MatchesList->SetSelection(MatchesList->GetCount() - 1);
 		}
@@ -660,7 +639,6 @@ void t4p::TagSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 void t4p::TagSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event) {
 	int selection = event.GetSelection();
 	if (selection == wxNOT_FOUND) {
-
 		// no item chosen
 		return;
 	}
@@ -693,7 +671,6 @@ void t4p::TagSearchDialogClass::OnProjectChoice(wxCommandEvent& event) {
 		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(event.GetSelection()));
 	}
 	else {
-
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
 			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));

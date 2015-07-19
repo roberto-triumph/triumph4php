@@ -28,7 +28,6 @@
 const int t4p::AUI_MAX_CODE_NOTEBOOKS = 5;
 
 void t4p::AuiAddCodeNotebook(wxAuiManager& auiManager, t4p::NotebookClass* notebook, int notebookNumber) {
-
 	// very important that the name be given, this is how we find the
 	// notebooks when iterating through the frame's children
 	notebook->SetName("NotebookClass");
@@ -88,7 +87,6 @@ void t4p::AuiResetCodeNotebooks(wxAuiManager& auiManager) {
 			t4p::NotebookClass* notebook = notebooks[i];
 			wxAuiPaneInfo& info = auiManager.GetPane(notebook);
 			if (info.dock_direction != wxAUI_DOCK_CENTER) {
-
 				// move the code controls for this notebook to the
 				// first notebook
 				info.Hide();

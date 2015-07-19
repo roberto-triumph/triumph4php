@@ -29,15 +29,12 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 /**
  * Class that can be used to transfer UnicodeString data from wx windows. Currently this validator
  * can handle either wxTextCtrl of wxComboBox only.
  */
 class UnicodeStringValidatorClass : public wxValidator {
-
 	public:
-
 	UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty);
 
 	virtual bool TransferToWindow();
@@ -49,7 +46,6 @@ class UnicodeStringValidatorClass : public wxValidator {
 	virtual wxObject* Clone() const;
 
 	private:
-
 	/**
 	 * The data
 	 */
@@ -60,7 +56,6 @@ class UnicodeStringValidatorClass : public wxValidator {
 	 */
 	bool DoAllowEmpty;
 };
-
 }
 
 #endif

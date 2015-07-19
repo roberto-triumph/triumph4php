@@ -28,19 +28,15 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * The New User feature is a feature that will show the
  * user the welcome wizard the very first time that
  * the user runs the program.
  */
 class NewUserFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	NewUserFeatureClass(t4p::AppClass& app);
 };
-
 }
 
 #endif

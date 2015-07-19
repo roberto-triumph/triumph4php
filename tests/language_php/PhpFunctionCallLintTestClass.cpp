@@ -35,9 +35,7 @@
 
 class PhpFunctionCallLintTestFixtureClass :
 	public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	std::vector<wxString> PhpFileExtensions;
 	std::vector<wxString> MiscFileExtensions;
@@ -60,7 +58,6 @@ class PhpFunctionCallLintTestFixtureClass :
 	}
 
 	void Parse(const UnicodeString& code) {
-
 		// create the file, so that we can index it
 		// and the tags get parsed from it
 		SetupFile(wxT("test.php"), t4p::IcuToWx(code));
@@ -75,7 +72,6 @@ class PhpFunctionCallLintTestFixtureClass :
 	}
 
 	void BuildCache(bool includeNativeFunctions = false) {
-
 		// make the cache consume the source code file; to prime it with the resources because the
 		// function call linter won't work without the cache
 		t4p::TagFinderListClass* tagFinderList = new t4p::TagFinderListClass;
@@ -93,7 +89,6 @@ class PhpFunctionCallLintTestFixtureClass :
 };
 
 SUITE(PhpFunctionCallLintTestClass) {
-
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, FunctionArgumentMatch) {
 	UnicodeString code = t4p::CharToIcu(
 		"<?php\n"
@@ -191,7 +186,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentMatchMul
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariableArgs) {
-
 	// since printf has variable args
 	// and date have default args
 	// then the linter should recognize that
@@ -204,7 +198,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionArgumentVariable
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionOptionalArgumentsArgs) {
-
 	// since gmdate has the timestamp arg is optional
 	// then the linter should recognize that
 	// and not label it as an error
@@ -264,7 +257,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodArgumentMissing) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
-
 	// test that when there is a method name clash
 	// between that we do not attempt to check the arguments
 	// here we will make a method with the same name as a
@@ -290,7 +282,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, MethodNameClash) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionJoin) {
-
 	// the join function is special as it can have
 	// either 1 or 2 args
 	UnicodeString code = t4p::CharToIcu(
@@ -303,7 +294,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionJoin) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionRand) {
-
 	// the rand / mt_rand functions are special as they can have
 	// either 0 or 2 args
 	UnicodeString code = t4p::CharToIcu(
@@ -316,7 +306,6 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionRand) {
 }
 
 TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionStripos) {
-
 	// the stripos functions is special as the last
 	// argument is optional
 	UnicodeString code = t4p::CharToIcu(
@@ -326,5 +315,4 @@ TEST_FIXTURE(PhpFunctionCallLintTestFixtureClass, NativeFunctionStripos) {
 	Parse(code);
 	CHECK_EQUAL(false, HasError);
 }
-
 }

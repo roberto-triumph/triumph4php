@@ -93,14 +93,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class SingleTestsPredicateClass {
-
 	public:
-
 	std::vector<std::string> TestCases;
 
 	SingleTestsPredicateClass(const std::vector<std::string>& testCases)
 		: TestCases(testCases) {
-
 	}
 
 	bool operator()(const UnitTest::Test* test) const {
@@ -144,7 +141,6 @@ void printSuites(const std::vector<std::string>& suites) {
 
 bool matchesSuite(const std::vector<std::string>& suites, const std::string& search) {
 	for (size_t i = 0; i < suites.size(); i++) {
-
 		// lower case suite names so that searches are case insensitive
 		std::string suite(suites[i]);
 		std::transform(suite.begin(), suite.end(), suite.begin(), ::tolower);
@@ -241,7 +237,6 @@ int chooseTests() {
 
 // run all tests
 int main(int argc, char **argv) {
-
 	// our classes use wxWidgets we must initialize the
 	// library
 	wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");

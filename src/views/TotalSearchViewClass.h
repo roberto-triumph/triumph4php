@@ -31,7 +31,6 @@
 #include <wx/timer.h>
 
 namespace t4p {
-
 /**
  * The total search view will show the user a dialog
  * that implements "search as you type" functionality.
@@ -39,9 +38,7 @@ namespace t4p {
  * into the search box does not feel laggy.
  */
 class TotalSearchViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
@@ -49,7 +46,6 @@ class TotalSearchViewClass : public t4p::FeatureViewClass {
 	void AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts);
 
 	private:
-
 	void OnTotalSearch(wxCommandEvent& event);
 
 	t4p::TotalSearchFeatureClass& Feature;
@@ -64,14 +60,11 @@ class TotalSearchViewClass : public t4p::FeatureViewClass {
  * instant feedback
  */
 class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
-
 	public:
-
 	TotalSearchDialogClass(wxWindow* parent, t4p::TotalSearchFeatureClass& feature,
 		std::vector<t4p::TotalTagResultClass>& selectedTags, int& lineNumber);
 
 	private:
-
 	void OnCancelButton(wxCommandEvent& event);
 	void OnHelpButton(wxCommandEvent& event);
 	void OnMatchesListKeyDown(wxKeyEvent& event);
@@ -143,7 +136,6 @@ class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

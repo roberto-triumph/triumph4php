@@ -32,16 +32,13 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 /**
  * This class is used to validate that a finder has a correctly formed regular expression
  * if the finder is in regex mode. Currently this validator
  * can handle either wxTextCtrl of wxComboBox only.
  */
 class RegularExpressionValidatorClass : public wxValidator {
-
 	public:
-
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
 	 * @param the mode radio button. this needs to be
@@ -59,7 +56,6 @@ class RegularExpressionValidatorClass : public wxValidator {
 	virtual wxObject* Clone() const;
 
 	private:
-
 	RegularExpressionValidatorClass();
 
 	/**
@@ -148,7 +144,6 @@ enum RegExMenus {
 	ID_MENU_REG_EX_REPLACE_MATCH_FOUR,
 	ID_MENU_REG_EX_REPLACE_MATCH_FIVE
 };
-
 }
 
 #endif

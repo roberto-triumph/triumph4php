@@ -49,7 +49,6 @@ static void AssignKeyCommands(wxStyledTextCtrl* ctrl, const std::vector<t4p::Edi
 t4p::EditorBehaviorViewClass::EditorBehaviorViewClass(t4p::EditorBehaviorFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::EditorBehaviorViewClass::AddToolBarItems(wxAuiToolBar* toolBar) {
@@ -106,7 +105,6 @@ void t4p::EditorBehaviorViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdCl
 }
 
 void t4p::EditorBehaviorViewClass::AddCodeControlClassContextMenuItems(wxMenu* menu) {
-
 	// no need to delete moreMenu pointer, the contextMenu will delete it for us
 	t4p::CodeControlClass* codeCtrl = GetCurrentCodeControl();
 	bool isTextSelected = false;
@@ -212,7 +210,6 @@ void t4p::EditorBehaviorViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isTextSelected) {
-
 	/*
 	 the transform menu exposes the following scintilla commands
 
@@ -349,7 +346,6 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	codeCtrl->SetAdditionalSelectionTyping(options.EnableMultipleSelection);
 	if (options.EnableMultipleSelection) {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_EACH);
-
 	}
 	else {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_ONCE);
@@ -390,7 +386,6 @@ void t4p::EditorBehaviorViewClass::OnAppFileNew(t4p::CodeControlEventClass& even
 }
 
 void t4p::EditorBehaviorViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-
 	// since this gets called when the code control is ABOUT to be closed
 	// the count of code controls is 1 but it wil soon be zero
 	bool hasEditors = AllCodeControls().size() > 1;
@@ -436,7 +431,6 @@ void t4p::EditorBehaviorViewClass::OnEditCallTip(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnEditCut(wxCommandEvent& event) {
-
 	// need to handle cut in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -461,7 +455,6 @@ void t4p::EditorBehaviorViewClass::OnEditCut(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnEditCopy(wxCommandEvent& event) {
-
 	// need to handle copy in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -486,7 +479,6 @@ void t4p::EditorBehaviorViewClass::OnEditCopy(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnEditPaste(wxCommandEvent& event) {
-
 	// need to handle paste in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -511,7 +503,6 @@ void t4p::EditorBehaviorViewClass::OnEditPaste(wxCommandEvent& event) {
 }
 
 void t4p::EditorBehaviorViewClass::OnEditSelectAll(wxCommandEvent& event) {
-
 	// need to handle select All in all text controls
 	wxWindow* obj = wxWindow::FindFocus();
 	wxTextCtrl* t = wxDynamicCast(obj, wxTextCtrl);
@@ -614,7 +605,6 @@ void t4p::EditorBehaviorPanelClass::OnIndentUsingSpaces(wxCommandEvent& event) {
 
 bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
 	if (wxWindow::TransferDataToWindow()) {
-
 		// CodeControlOptionsClass disables right margin when RightMargin = 0
 		EnableRightMargin->SetValue(RightMargin->GetValue() > 0);
 		RightMargin->Enable(RightMargin->GetValue() > 0);
@@ -624,7 +614,6 @@ bool t4p::EditorBehaviorPanelClass::TransferDataToWindow() {
 }
 
 bool t4p::EditorBehaviorPanelClass::TransferDataFromWindow() {
-
 	// CodeControlOptionsClass disables right margin when RightMargin = 0
 	if (!EnableRightMargin->IsChecked()) {
 		RightMargin->SetValue(0);
@@ -706,7 +695,6 @@ t4p::KeyboardCommandEditDialogClass::KeyboardCommandEditDialogClass(wxWindow* pa
 void t4p::KeyboardCommandEditDialogClass::OnOkButton(wxCommandEvent& event) {
 	wxString newShortcut = Edit->GetValue();
 	if (newShortcut == OriginalShortcut || newShortcut.empty()) {
-
 		// allow the user to "save" the same shortcut
 		// also, allow the user to remove shortcuts (empty
 		// string == no shortcut)
@@ -766,7 +754,6 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 		WXK_ESCAPE == keyCode ||
 		WXK_SPACE == keyCode ||
 		WXK_DELETE  == keyCode)) {
-
 		// shortcuts with special chars ie CTRL+TAB
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
@@ -774,7 +761,6 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	else {
 		Edit->Clear();
 		event.Skip();
-
 	}
 }
 

@@ -33,9 +33,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	/**
 	 * The full path to a file that will contain an SQL script
 	 */
@@ -55,7 +53,6 @@ class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixture
 };
 
 SUITE(SqliteTestClass) {
-
 TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithNewFile) {
 	CreateFixtureFile(wxT("script.sql"), t4p::CharToWx(
 		"CREATE TABLE my_table ( id INT, name VARCHAR(255));"
@@ -95,7 +92,6 @@ TEST_FIXTURE(SqliteFixtureClass, SqlScriptWithExistingFile) {
 	CHECK_EQUAL("others_table", tableNames[0]);
 	CHECK_EQUAL("another_table", tableNames[1]);
 	CHECK_EQUAL("yet_another_table", tableNames[2]);
-
 }
 
 TEST_FIXTURE(SqliteFixtureClass, SchemaVersion) {
@@ -109,5 +105,4 @@ TEST_FIXTURE(SqliteFixtureClass, SchemaVersion) {
 	int versionNumber = t4p::SqliteSchemaVersion(EmptySession);
 	CHECK_EQUAL(2, versionNumber);
 }
-
 }

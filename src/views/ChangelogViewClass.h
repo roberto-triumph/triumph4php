@@ -28,7 +28,6 @@
 #include <views/FeatureViewClass.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class ChangelogFeatureClass;
 
@@ -37,22 +36,18 @@ class ChangelogFeatureClass;
  * triumph's release change log
  */
 class ChangelogViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	ChangelogViewClass(t4p::ChangelogFeatureClass& feature);
 
 	void AddHelpMenuItems(wxMenu* helpMenu);
 
 	private:
-
 	void OnHelpChangelog(wxCommandEvent& event);
 
 	t4p::ChangelogFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

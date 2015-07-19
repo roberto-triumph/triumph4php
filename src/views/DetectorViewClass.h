@@ -34,11 +34,8 @@
 #include <wx/imaglist.h>
 
 namespace t4p {
-
 class DetectorViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	DetectorViewClass(t4p::DetectorFeatureClass& feature);
 
 	void AddViewMenuItems(wxMenu* viewMenu);
@@ -46,7 +43,6 @@ class DetectorViewClass : public t4p::FeatureViewClass {
 	void AddNewMenu(wxMenuBar* menuBar);
 
 	private:
-
 	// menu handlers
 	void OnViewUrlDetectors(wxCommandEvent& event);
 	void OnViewTemplateFileDetectors(wxCommandEvent& event);
@@ -67,9 +63,7 @@ class DetectorViewClass : public t4p::FeatureViewClass {
 };
 
 class DetectorTreeHandlerClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * @param detectorTree the wxTreeCtrl that renders the files. pointer will NOT be
 	 *        owned by this class
@@ -144,13 +138,10 @@ class DetectorTreeHandlerClass : public wxEvtHandler {
 	 * to send app commands to open and run a file
 	 */
 	t4p::EventSinkClass& EventSink;
-
 };
 
 class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent window parent
 	 * @param id window ID
@@ -175,7 +166,6 @@ class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 	void UpdateProjects();
 
 	private:
-
 	t4p::UrlTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
@@ -184,9 +174,7 @@ class UrlTagDetectorPanelClass : public UrlDetectorPanelGeneratedClass {
 };
 
 class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent window parent
 	 * @param id window ID
@@ -212,7 +200,6 @@ class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGene
 	void UpdateProjects();
 
 	private:
-
 	t4p::TemplateFileTagsDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
@@ -241,9 +228,7 @@ class TemplateFileTagsDetectorPanelClass : public TemplateFilesDetectorPanelGene
 };
 
 class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent window parent
 	 * @param id window ID
@@ -268,11 +253,9 @@ class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
 	void UpdateProjects();
 
 	protected:
-
 	void OnChooseUrlButton(wxCommandEvent& event);
 
 	private:
-
 	t4p::TagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
@@ -281,9 +264,7 @@ class TagDetectorPanelClass : public TagDetectorPanelGeneratedClass {
 };
 
 class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent window parent
 	 * @param id window ID
@@ -308,7 +289,6 @@ class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass
 	void UpdateProjects();
 
 	private:
-
 	t4p::DatabaseTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
@@ -317,9 +297,7 @@ class DatabaseTagDetectorPanelClass : public DatabaseDetectorPanelGeneratedClass
 };
 
 class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent window parent
 	 * @param id window ID
@@ -344,14 +322,12 @@ class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
 	void UpdateProjects();
 
 	private:
-
 	t4p::ConfigTagDetectorClass Detector;
 
 	t4p::DetectorTreeHandlerClass Handler;
 
 	void OnHelpButton(wxCommandEvent& event);
 };
-
 }
 
 #endif

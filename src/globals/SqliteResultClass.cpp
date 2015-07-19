@@ -48,7 +48,6 @@ bool t4p::SqliteResultClass::Init(soci::session& session, bool doLimit) {
 		DoBind(*stmt);
 		Stmt->define_and_bind();
 		good = true;
-
 	} catch (std::exception& exception) {
 		wxASSERT_MSG(false, exception.what());
 	}

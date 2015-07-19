@@ -72,7 +72,6 @@ void t4p::NavigationViewClass::OnEditNavigatePane(wxCommandEvent& event) {
 t4p::NavigationChoiceClass::NavigationChoiceClass()
 : Notebook(NULL)
 , PageIndex(wxNOT_FOUND) {
-
 }
 
 t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,

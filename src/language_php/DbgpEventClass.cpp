@@ -131,7 +131,6 @@ static wxXmlNode* GetNodeChild(wxXmlNode* node, const wxString& childName, t4p::
  * @param contents the node's contents will be written to this variable
  */
 static void GetNodeText(wxXmlNode* node, wxString& contents, bool doBase64Decode = true) {
-
 	// dbgp base64 encodes the contents, we must decode it
 	// TODO(roberto): what about when there are NULLs we would like to
 	// show them
@@ -278,7 +277,6 @@ static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t
 }
 
 static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t4p::DbgpXmlErrors& error) {
-
 	// name is optional when we parse properties from an eval response
 	// class name, full name are optional
 	t4p::DbgpXmlErrors ignored;
@@ -334,7 +332,6 @@ t4p::DbgpBreakpointClass::DbgpBreakpointClass()
 , HitCondition()
 , HitCount(0)
 , Expression() {
-
 }
 
 t4p::DbgpBreakpointClass::DbgpBreakpointClass(const t4p::DbgpBreakpointClass& src)
@@ -379,7 +376,6 @@ t4p::DbgpStackClass::DbgpStackClass()
 , Where()
 , CmdBegin()
 , CmdEnd() {
-
 }
 
 t4p::DbgpStackClass::DbgpStackClass(const t4p::DbgpStackClass& src)
@@ -425,7 +421,6 @@ t4p::DbgpPropertyClass::DbgpPropertyClass()
 , NumChildren()
 , Value()
 , ChildProperties() {
-
 }
 
 t4p::DbgpPropertyClass::DbgpPropertyClass(const t4p::DbgpPropertyClass& src)
@@ -507,7 +502,6 @@ t4p::DbgpInitEventClass::DbgpInitEventClass()
 , Language()
 , ProtocolVersion()
 , FileUri() {
-
 }
 
 wxEvent* t4p::DbgpInitEventClass::Clone() const {
@@ -563,7 +557,6 @@ t4p::DbgpErrorEventClass::DbgpErrorEventClass()
 , ErrorCode()
 , AppErrorCode()
 , Message() {
-
 }
 
 wxEvent* t4p::DbgpErrorEventClass::Clone() const {
@@ -617,7 +610,6 @@ t4p::DbgpStatusEventClass::DbgpStatusEventClass()
 , Reason(t4p::DBGP_REASON_UNKNOWN)
 , TransactionId()
 , MessageData() {
-
 }
 
 wxEvent* t4p::DbgpStatusEventClass::Clone() const {
@@ -664,7 +656,6 @@ t4p::DbgpFeatureGetEventClass::DbgpFeatureGetEventClass()
 , Supported()
 , TransactionId()
 , Data() {
-
 }
 
 wxEvent* t4p::DbgpFeatureGetEventClass::Clone() const {
@@ -708,7 +699,6 @@ t4p::DbgpFeatureSetEventClass::DbgpFeatureSetEventClass()
 , Feature(t4p::DBGP_FEATURE_UNKNOWN)
 , Success()
 , TransactionId() {
-
 }
 
 wxEvent* t4p::DbgpFeatureSetEventClass::Clone() const {
@@ -749,7 +739,6 @@ t4p::DbgpContinueEventClass::DbgpContinueEventClass()
 , Status(t4p::DBGP_STATUS_UNKNOWN)
 , Reason(t4p::DBGP_REASON_UNKNOWN)
 , TransactionId() {
-
 }
 
 wxEvent* t4p::DbgpContinueEventClass::Clone() const {
@@ -795,7 +784,6 @@ t4p::DbgpBreakpointSetEventClass::DbgpBreakpointSetEventClass()
 , TransactionId()
 , Enabled()
 , BreakpointId() {
-
 }
 
 wxEvent* t4p::DbgpBreakpointSetEventClass::Clone() const {
@@ -835,7 +823,6 @@ bool t4p::DbgpBreakpointSetEventClass::FromXml(const wxString& xml, t4p::DbgpXml
 t4p::DbgpBreakpointGetEventClass::DbgpBreakpointGetEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_BREAKPOINTGET)
 , Breakpoint() {
-
 }
 
 wxEvent* t4p::DbgpBreakpointGetEventClass::Clone() const {
@@ -866,7 +853,6 @@ t4p::DbgpBreakpointUpdateEventClass::DbgpBreakpointUpdateEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_BREAKPOINTUPDATE)
 , Command()
 , TransactionId() {
-
 }
 
 wxEvent* t4p::DbgpBreakpointUpdateEventClass::Clone() const {
@@ -896,7 +882,6 @@ t4p::DbgpBreakpointRemoveEventClass::DbgpBreakpointRemoveEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_BREAKPOINTREMOVE)
 , Command()
 , TransactionId() {
-
 }
 
 wxEvent* t4p::DbgpBreakpointRemoveEventClass::Clone() const {
@@ -927,7 +912,6 @@ t4p::DbgpBreakpointListEventClass::DbgpBreakpointListEventClass()
 , Command()
 , TransactionId()
 , Breakpoints() {
-
 }
 
 wxEvent* t4p::DbgpBreakpointListEventClass::Clone() const {
@@ -968,7 +952,6 @@ bool t4p::DbgpBreakpointListEventClass::FromXml(const wxString& xml, t4p::DbgpXm
 t4p::DbgpStackDepthEventClass::DbgpStackDepthEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_STACKDEPTH)
 , Depth() {
-
 }
 
 wxEvent* t4p::DbgpStackDepthEventClass::Clone() const {
@@ -991,7 +974,6 @@ bool t4p::DbgpStackDepthEventClass::FromXml(const wxString& xml, t4p::DbgpXmlErr
 t4p::DbgpStackGetEventClass::DbgpStackGetEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_STACKGET)
 , Stack() {
-
 }
 
 wxEvent* t4p::DbgpStackGetEventClass::Clone() const {
@@ -1025,7 +1007,6 @@ t4p::DbgpContextNamesEventClass::DbgpContextNamesEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_CONTEXTNAMES)
 , Names()
 , Ids() {
-
 }
 
 wxEvent* t4p::DbgpContextNamesEventClass::Clone() const {
@@ -1063,7 +1044,6 @@ t4p::DbgpContextGetEventClass::DbgpContextGetEventClass()
 : wxEvent(wxID_ANY, t4p::EVENT_DBGP_CONTEXTGET)
 , Properties()
 , ContextId() {
-
 }
 
 wxEvent* t4p::DbgpContextGetEventClass::Clone() const {
@@ -1103,7 +1083,6 @@ t4p::DbgpPropertyGetEventClass::DbgpPropertyGetEventClass()
 , Command()
 , TransactionId()
 , Property() {
-
 }
 
 wxEvent* t4p::DbgpPropertyGetEventClass::Clone() const {
@@ -1143,7 +1122,6 @@ t4p::DbgpPropertyValueEventClass::DbgpPropertyValueEventClass()
 , Command()
 , TransactionId()
 , Value() {
-
 }
 
 wxEvent* t4p::DbgpPropertyValueEventClass::Clone() const {
@@ -1182,7 +1160,6 @@ t4p::DbgpPropertySetEventClass::DbgpPropertySetEventClass()
 , Command()
 , TransactionId()
 , Success() {
-
 }
 
 wxEvent* t4p::DbgpPropertySetEventClass::Clone() const {
@@ -1215,7 +1192,6 @@ t4p::DbgpBreakEventClass::DbgpBreakEventClass()
 , Command()
 , TransactionId()
 , Success() {
-
 }
 
 wxEvent* t4p::DbgpBreakEventClass::Clone() const {
@@ -1249,7 +1225,6 @@ t4p::DbgpEvalEventClass::DbgpEvalEventClass()
 , TransactionId()
 , Property()
 , Success() {
-
 }
 
 wxEvent* t4p::DbgpEvalEventClass::Clone() const {
@@ -1616,7 +1591,6 @@ std::string t4p::DbgpCommandClass::Eval(const wxString& expression) {
 }
 
 std::string t4p::DbgpCommandClass::Build(const std::string& cmd, const wxString& args, const wxString& data) {
-
 	// command [SPACE] [arguments] [SPACE] -- base64(data) [NULL]
 	// transaction id is always included
 	std::string line = cmd;

@@ -28,7 +28,6 @@
 #include <wx/bmpbuttn.h>
 
 namespace t4p {
-
 	/**
 	 * function to fix inconsistencies with the help among the
 	 * various operating systems

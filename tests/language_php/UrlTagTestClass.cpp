@@ -34,9 +34,7 @@
 #include <string>
 
 class UrlTagFixtureClass : public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::UrlTagFinderClass Finder;
 	soci::session DetectorTagSession;
 	std::vector<wxFileName> SourceDirs;
@@ -66,7 +64,6 @@ class UrlTagFixtureClass : public SqliteTestFixtureClass {
 			"/home/user/welcome.php", "WelcomeController", "index");
 		AddToDb1("http://localhost/frontend.php",
 			"/home/user/frontend.php", "FrontendController", "action");
-
 	}
 
 	~UrlTagFixtureClass() {
@@ -90,7 +87,6 @@ class UrlTagFixtureClass : public SqliteTestFixtureClass {
 };
 
 SUITE(UrlTagTestClass) {
-
 TEST_FIXTURE(UrlTagFixtureClass, FindByUrlMatch) {
 	CHECK_EQUAL(2, DatabaseRecordsNumDb1());
 
@@ -154,5 +150,4 @@ TEST_FIXTURE(UrlTagFixtureClass, Wipe) {
 	Finder.Wipe(SourceDirs);
 	CHECK_EQUAL(0, DatabaseRecordsNumDb1());
 }
-
 }

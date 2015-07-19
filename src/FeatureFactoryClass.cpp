@@ -129,7 +129,6 @@ t4p::FeatureFactoryClass::FeatureFactoryClass(t4p::AppClass& app)
 , PhpCodeCompletion(NULL)
 , NotebookLayout(NULL)
 , Test(NULL) {
-
 }
 
 t4p::FeatureFactoryClass::~FeatureFactoryClass() {

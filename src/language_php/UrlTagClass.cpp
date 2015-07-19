@@ -34,7 +34,6 @@ t4p::UrlTagClass::UrlTagClass()
 , FileName()
 , ClassName()
 , MethodName() {
-
 }
 
 t4p::UrlTagClass::UrlTagClass(wxString uri)
@@ -73,7 +72,6 @@ void t4p::UrlTagClass::Copy(const t4p::UrlTagClass& src) {
 
 t4p::UrlTagFinderClass::UrlTagFinderClass(soci::session& session)
 	: SqliteFinderClass(session) {
-
 }
 
 bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {

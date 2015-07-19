@@ -34,23 +34,19 @@ static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 
 t4p::HtmlCodeCompletionProviderClass::HtmlCodeCompletionProviderClass()
 : CodeCompletionProviderClass() {
-
 }
 
 bool t4p::HtmlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
-
 	// not yet implemented
 	return false;
 }
 
 void t4p::HtmlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
-
 }
 
 
 t4p::CssBraceMatchStylerClass::CssBraceMatchStylerClass()
 : BraceMatchStylerClass() {
-
 }
 
 bool t4p::CssBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
@@ -88,7 +84,6 @@ t4p::HtmlViewClass::HtmlViewClass()
 : FeatureViewClass()
 , HtmlCompletionProvider()
 , CssBraceStyler() {
-
 }
 
 void t4p::HtmlViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {

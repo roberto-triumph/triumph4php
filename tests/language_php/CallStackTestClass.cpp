@@ -35,9 +35,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	t4p::CallStackClass CallStack;
 	std::vector<wxString> PhpFileExtensions;
@@ -72,7 +70,6 @@ class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTest
 	}
 
 	void SetupFile(const wxString& fileName, const wxString& contents) {
-
 		// make the cache consume the file; to prime it with the resources because the
 		// call stack wont work without the cache
 		CreateFixtureFile(wxT("src") + wxFileName::GetPathSeparators() + fileName, contents);
@@ -144,7 +141,6 @@ class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTest
 	CHECK_UNISTR_EQUALS(methodName, CallStack.Variables[i].MethodName);
 
 SUITE(CallStackTestClass) {
-
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 	SetupFile(wxT("news.php"), Simple());
 	BuildCache();
@@ -159,7 +155,6 @@ TEST_FIXTURE(CallStackFixtureTestClass, FailOnUnknownResource) {
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, FailOnParseError) {
-
 	// to populate the cache, that way the call stack does not report a empty cache error
 	wxString goodCode = wxString::FromAscii(
 		"<?php\n"
@@ -280,7 +275,6 @@ TEST_FIXTURE(CallStackFixtureTestClass, SimpleMethodCall) {
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
-
 	// many calls to the view method
 	 wxString code = wxString::FromAscii(
 			"<?php\n"
@@ -330,7 +324,6 @@ TEST_FIXTURE(CallStackFixtureTestClass, MultipleMethodCalls) {
 }
 
 TEST_FIXTURE(CallStackFixtureTestClass, MultiplePropertyCalls) {
-
 	// a property assignment on a long variable
 	 wxString code = wxString::FromAscii(
 			"<?php\n"
@@ -517,7 +510,5 @@ TEST_FIXTURE(CallStackFixtureTestClass, Persist) {
 	CHECK_EQUAL(7, stepNumber);
 	CHECK_EQUAL("METHOD_CALL", type);
 	CHECK_EQUAL("$@tmp4,$@tmp2,view,$@tmp3,$data", expression);
-
 }
-
 }

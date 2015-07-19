@@ -31,7 +31,6 @@
 #include <search/DirectorySearchClass.h>
 
 namespace t4p {
-
 /**
  * These event will be dispatched to the handler. Note that the
  * event won't have a consitent ID; use wxID_ANY when connecting
@@ -67,9 +66,7 @@ extern const wxEventType EVENT_FILE_READ;
  * multiple workers than multiple workers attempting to open/close the same file multiple times.
  */
 class BackgroundFileReaderClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * flags to determine whether to iterate through all files
 	 * or only files that were matched in the previous find
@@ -126,7 +123,6 @@ class BackgroundFileReaderClass : public t4p::ActionClass {
 	bool InitMatched(const std::vector<wxString>& matchedFiles);
 
 	protected:
-
 	/**
 	 * This method will be executed in it's own thread. Most of the time
 	 * this method would be implemented by calling search.Walk() method.
@@ -146,7 +142,6 @@ class BackgroundFileReaderClass : public t4p::ActionClass {
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * The object that will be used to traverse the file system.
 	 */
@@ -163,6 +158,5 @@ class BackgroundFileReaderClass : public t4p::ActionClass {
 	 */
 	Mode Mode;
 };
-
 }
 #endif

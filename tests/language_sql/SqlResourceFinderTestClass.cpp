@@ -37,9 +37,7 @@
 
 class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 	public SqliteTestFixtureClass {
-
 	public:
-
 	MysqlResourceFinderFixtureClass()
 		: DatabaseTestFixtureClass("sql_resource_finder")
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
@@ -63,9 +61,7 @@ class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 };
 
 class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	SqliteResourceFinderFixtureClass()
 		: FileTestFixtureClass("sql_resource_finder")
 		, SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
@@ -74,7 +70,6 @@ class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public Sql
 		, Finder(Session)
 		, SqliteFile()
 		, TestSession() {
-
 		// create a sqlite db file
 		TouchTestDir();
 		SqliteFile.Assign(TestProjectDir, wxT("sqlite.db"));
@@ -108,7 +103,6 @@ class SqliteResourceFinderFixtureClass : public FileTestFixtureClass, public Sql
 };
 
 SUITE(SqlResourceFinderTestClass) {
-
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
 	std::string query = "CREATE TABLE web_users(idUser int);";
 	CHECK(DatabaseTestFixtureClass::Exec(query));
@@ -204,7 +198,6 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindColumnsCaseInsensitive) {
 	CHECK_VECTOR_SIZE(2, columns);
 	CHECK_UNISTR_EQUALS("idIServiceLocation", columns[0]);
 	CHECK_UNISTR_EQUALS("idIServiceName", columns[1]);
-
 }
 
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindDatabaseTagrmationSchemaColumns) {
@@ -256,5 +249,4 @@ TEST_FIXTURE(SqliteResourceFinderFixtureClass, FindColumns) {
 	CHECK_UNISTR_EQUALS_NO_CASE("idIServiceName", columns[2]);
 	CHECK_UNISTR_EQUALS_NO_CASE("idIUser", columns[3]);
 }
-
 }

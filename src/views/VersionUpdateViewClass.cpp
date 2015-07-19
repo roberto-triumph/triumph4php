@@ -46,7 +46,6 @@ t4p::VersionUpdateViewClass::VersionUpdateViewClass(t4p::VersionUpdateFeatureCla
 : FeatureViewClass()
 , Feature(feature)
 , Timer(this, ID_VERSION_FEATURE_TIMER) {
-
 }
 
 void t4p::VersionUpdateViewClass::AddHelpMenuItems(wxMenu* helpMenu) {
@@ -55,7 +54,6 @@ void t4p::VersionUpdateViewClass::AddHelpMenuItems(wxMenu* helpMenu) {
 }
 
 void t4p::VersionUpdateViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
-
 	VersionUpdatePreferencesPanelClass* panel = new t4p::VersionUpdatePreferencesPanelClass(
 		parent, Feature.App.Preferences);
 	parent->AddPage(panel, _("Check for updates"));
@@ -90,7 +88,6 @@ void t4p::VersionUpdateViewClass::OnPreferencesExternallyUpdated(wxCommandEvent&
 }
 
 void t4p::VersionUpdateViewClass::OnTimer(wxTimerEvent& event) {
-
 	// is it time to check for a new version
 	wxDateTime now = wxDateTime::Now();
 	if (Feature.NextCheckTime.IsEarlierThan(now)) {

@@ -27,5 +27,4 @@
 t4p::TreeItemDataStringClass::TreeItemDataStringClass(const wxString& str)
 	: wxTreeItemData()
 	, Str(str) {
-
 }

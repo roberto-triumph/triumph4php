@@ -29,14 +29,11 @@
 #include <wx/filename.h>
 
 namespace t4p {
-
 /**
  * Class to 'wipe' tag databases (empty all of their contents)
  */
 class TagWipeActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -44,17 +41,14 @@ class TagWipeActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * The db files that need to be wiped.
 	 */
 	wxFileName ResourceDbFileName;
 	wxFileName DetectorDbFileName;
-
 };
 
 /**
@@ -62,9 +56,7 @@ class TagWipeActionClass : public t4p::GlobalActionClass {
  * databases
  */
 class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	TagDeleteSourceActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& sourceDirsToDelete);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -72,11 +64,9 @@ class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * The db files that need to be wiped.
 	 */
@@ -87,7 +77,6 @@ class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
 	 * the directories to be removed from the cache.
 	 */
 	std::vector<wxFileName> SourceDirsToDelete;
-
 };
 
 /**
@@ -95,9 +84,7 @@ class TagDeleteSourceActionClass : public t4p::GlobalActionClass {
  * databases
  */
 class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	TagDeleteDirectoryActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& dirsToDelete);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -105,11 +92,9 @@ class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * The db files that need to be wiped.
 	 */
@@ -119,7 +104,6 @@ class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
 	 * the directories to be removed from the cache.
 	 */
 	std::vector<wxFileName> DirsToDelete;
-
 };
 
 
@@ -128,9 +112,7 @@ class TagDeleteDirectoryActionClass : public t4p::GlobalActionClass {
  * databases
  */
 class TagDeleteFileActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	TagDeleteFileActionClass(t4p::RunningThreadsClass& runningThreads, int eventId, const std::vector<wxFileName>& filesToDelete);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -138,11 +120,9 @@ class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * The db files that need to be wiped.
 	 */
@@ -152,7 +132,6 @@ class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 	 * the directories to be removed from the cache.
 	 */
 	std::vector<wxFileName> FilesToDelete;
-
 };
 }
 

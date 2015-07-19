@@ -37,9 +37,7 @@
  * and T4P_DB_USER.
  */
 class DatabaseTestFixtureClass {
-
 	public:
-
 	/**
 	 * Connects to the database and creates a test database
 	 * This method may throw an exception if it could not connect
@@ -85,7 +83,6 @@ class DatabaseTestFixtureClass {
 	std::string Password() const;
 
 	private:
-
 	/**
 	 * The active connection
 	 */

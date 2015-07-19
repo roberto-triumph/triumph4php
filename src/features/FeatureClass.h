@@ -35,7 +35,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration to prevent #include of the AppClass
 class AppClass;
 
@@ -145,10 +144,7 @@ enum MenuIds {
  *
  */
 class FeatureClass : public wxEvtHandler {
-
 	public:
-
-
 	/**
 	 * The application event dispatcher. Also holds all 'global' structures and settings.
 	 */
@@ -175,9 +171,7 @@ class FeatureClass : public wxEvtHandler {
 	virtual void LoadPreferences(wxConfigBase* config);
 
 	private:
-
 };
-
 }
 
 #endif

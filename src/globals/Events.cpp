@@ -46,7 +46,6 @@ void t4p::EventSinkClass::RemoveHandler(wxEvtHandler *handler) {
 
 void t4p::EventSinkClass::Publish(wxEvent& event) {
 	for (size_t i = 0; i < Handlers.size(); ++i) {
-
 		// wont use wxPostEvent for now
 		// using wxPostEvent would cause any Popup menus triggered in the
 		// handlers to not work correctly in linux
@@ -92,7 +91,6 @@ void t4p::EventSinkLockerClass::Post(wxEvent& event) {
 t4p::CodeControlEventClass::CodeControlEventClass(wxEventType type, t4p::CodeControlClass* codeControl)
 	: wxEvent(wxID_ANY, type)
 	, CodeControl(codeControl) {
-
 }
 
 t4p::CodeControlClass* t4p::CodeControlEventClass::GetCodeControl() const {
@@ -132,7 +130,6 @@ t4p::OpenFileCommandEventClass::OpenFileCommandEventClass(const wxString& fullPa
 , StartingPos(startingPos)
 , Length(length)
 , LineNumber(lineNumber) {
-
 }
 
 wxEvent* t4p::OpenFileCommandEventClass::Clone() const {
@@ -156,7 +153,6 @@ wxEvent* t4p::OpenDbTableCommandEventClass::Clone() const {
 t4p::ProjectEventClass::ProjectEventClass(wxEventType type, const std::vector<t4p::ProjectClass>& projects)
 : wxEvent(wxID_ANY, type)
 , Projects(projects) {
-
 }
 
 wxEvent* t4p::ProjectEventClass::Clone() const {

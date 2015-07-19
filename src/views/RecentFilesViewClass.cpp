@@ -37,7 +37,6 @@ t4p::RecentFilesViewClass::~RecentFilesViewClass() {
 }
 
 void t4p::RecentFilesViewClass::AddFileMenuItems(wxMenu* fileMenu) {
-
 	// ATTN: possible problem. according to wxWidgets docs
 	//     Append the submenu to the parent menu after you have added your menu items, or accelerators may
 	//     not be registered properly.

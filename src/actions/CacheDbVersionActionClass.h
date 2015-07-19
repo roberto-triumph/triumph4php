@@ -29,7 +29,6 @@
 #include <soci/soci.h>
 
 namespace t4p {
-
 /**
  * This action will check the tag cache DB for all projects to make sure
  * that they are on the same 'version' as the source code that is running.
@@ -39,9 +38,7 @@ namespace t4p {
  * The action will only check the db files for enabled projects.
  */
 class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	TagCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -51,7 +48,6 @@ class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	/**
 	 * files to check.
 	 */
@@ -72,9 +68,7 @@ class TagCacheDbVersionActionClass : public t4p::GlobalActionClass {
  * The action will only check the db files for enabled projects.
  */
 class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
-
 	public:
-
 	DetectorCacheDbVersionActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	bool Init(t4p::GlobalsClass& globals);
@@ -84,7 +78,6 @@ class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	/**
 	 * files to check.
 	 */
@@ -95,7 +88,6 @@ class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 	 */
 	soci::session Session;
 };
-
 }
 
 #endif

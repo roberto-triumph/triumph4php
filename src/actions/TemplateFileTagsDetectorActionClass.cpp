@@ -36,7 +36,6 @@ t4p::TemplateFileTagsDetectorParamsClass::TemplateFileTagsDetectorParamsClass()
 	, SourceDir()
 	, DetectorDbFileName()
 	, OutputDbFileName() {
-
 }
 
 wxString t4p::TemplateFileTagsDetectorParamsClass::BuildCmdLine() const {
@@ -55,7 +54,6 @@ t4p::TemplateFileTagsDetectorActionClass::TemplateFileTagsDetectorActionClass(t4
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
-
 }
 
 bool t4p::TemplateFileTagsDetectorActionClass::Init(t4p::GlobalsClass& globals) {
@@ -96,7 +94,6 @@ bool t4p::TemplateFileTagsDetectorActionClass::Init(t4p::GlobalsClass& globals) 
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-
 		// start the first external process
 		started = NextDetection();
 	}

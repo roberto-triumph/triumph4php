@@ -33,9 +33,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public FileTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheDbVersionActionClass Action;
 	t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;
 
@@ -44,16 +42,13 @@ class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public F
 		, FileTestFixtureClass(wxT("cache_db_version"))
 		, Action(RunningThreads, wxID_ANY)
 		, DetectorCacheAction(RunningThreads, wxID_ANY) {
-
 		// need to make sure the directory exists
 		TouchTestDir();
 		InitTagCache(TestProjectDir);
 	}
-
 };
 
 SUITE(CacheDbVersionActionTestClass) {
-
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
 	CreateProject(AbsoluteDir(wxT("project_1")));
 
@@ -151,6 +146,5 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
 	CHECK(t4p::SqliteSchemaVersion(session) > 0);
 }
-
 }
 

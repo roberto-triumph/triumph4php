@@ -32,7 +32,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declarations; defined in other files
 class PreferencesClass;
 class GlobalsClass;
@@ -43,9 +42,7 @@ class EventSinkClass;
  * notebook (source code editor tabs).
  */
 class NotebookClass : public wxAuiNotebook {
-
 	public:
-
 	/**
 	 * Fonts, colors, and other code control settings
 	 * Initially NULL, should get set by container (frame)
@@ -293,7 +290,6 @@ class NotebookClass : public wxAuiNotebook {
 	void SplitVertically();
 
 	protected:
-
 	/**
 	 * Handle the Close Page event.  Will save the contents of the
 	 * window being closed. If the window was not loaded from a file,
@@ -330,7 +326,6 @@ class NotebookClass : public wxAuiNotebook {
 	void OnPageChanged(wxAuiNotebookEvent& event);
 
 	private:
-
 	/**
 	 * Find out all the open files that have changes that have not been saved.
 	 *
@@ -388,7 +383,6 @@ class NotebookClass : public wxAuiNotebook {
 	int TabIndexRightClickEvent;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 /**
@@ -396,9 +390,7 @@ class NotebookClass : public wxAuiNotebook {
  * This class will open the dragged files.
  */
 class FileDropTargetClass : public wxFileDropTarget {
-
 	public:
-
 	/**
 	 * constructor
 	 * @var NotebookClass* pointer to the notebook. The pointer will NOT be managed (deleted) by this class.
@@ -412,9 +404,7 @@ class FileDropTargetClass : public wxFileDropTarget {
 	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
 
 	private:
-
 	NotebookClass* Notebook;
 };
-
 }
 #endif /*T4P_NOTEBOOKCLASS_H_*/

@@ -29,7 +29,6 @@
 #include <wx/log.h>
 
 namespace t4p {
-
 /**
  * event that gets generated whenever we get a log message from the
  * wxWidgets logging system. when we get a log message from the wxWidgets
@@ -40,9 +39,7 @@ namespace t4p {
 extern const wxEventType EVENT_APP_LOG;
 
 class EditorLogEventClass : public wxEvent {
-
 	public:
-
 	wxString Message;
 	wxLogLevel Level;
 	time_t Timestamp;
@@ -65,13 +62,10 @@ typedef void (wxEvtHandler::*EditorLogEventClassFunction)(EditorLogEventClass&);
  * This class is the handler for the editor message menu items.
  */
 class EditorMessagesFeatureClass : public FeatureClass {
-
 	public:
-
 	EditorMessagesFeatureClass(t4p::AppClass& app);
 
 	private:
-
 	void OnAppReady(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
@@ -85,17 +79,13 @@ class EditorMessagesFeatureClass : public FeatureClass {
  * give it a pointer that is managed by wxWidgets
  */
 class EditorMessagesLoggerClass : public wxLog {
-
 	public:
-
 	EditorMessagesLoggerClass(EditorMessagesFeatureClass& feature);
 
 	void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info);
 
 	private:
-
 	EditorMessagesFeatureClass& Feature;
 };
-
 }
 #endif

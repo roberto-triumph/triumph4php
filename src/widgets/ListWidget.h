@@ -30,7 +30,6 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * A helper function to add a row into a list control. list control must have 2 columns
  *
@@ -64,7 +63,6 @@ void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Valu
  *         if no row is selected.
  */
 int ListCtrlSelected(wxListCtrl* ctrl);
-
 }
 
 #endif

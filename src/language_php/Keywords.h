@@ -30,7 +30,6 @@
 #include <pelet/TokenClass.h>
 
 namespace t4p {
-
 /**
  * keywords for PHP 5.3
  */
@@ -104,7 +103,6 @@ wxString KeywordsPhpAll(pelet::Versions version);
  * @return string list of all HTML keywords, tag names plus tag attributes
  */
 wxString KeywordsHtmlAll();
-
 
 }
 

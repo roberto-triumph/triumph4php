@@ -29,14 +29,12 @@ NonEmptyTextValidatorClass::NonEmptyTextValidatorClass(wxString* data, wxStaticT
 	: wxValidator()
 	, Data(data)
 	, Label(label) {
-
 }
 
 NonEmptyTextValidatorClass::NonEmptyTextValidatorClass()
 	: wxValidator()
 	, Data(NULL)
 	, Label(NULL) {
-
 }
 
 wxObject* NonEmptyTextValidatorClass::Clone() const {
@@ -81,5 +79,4 @@ bool NonEmptyTextValidatorClass::Validate(wxWindow* parent) {
 		wxMessageBox(msg, _("Error"), wxOK, parent);
 	}
 	return !isEmpty;
-
 }

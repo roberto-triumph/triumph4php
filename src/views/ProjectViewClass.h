@@ -31,11 +31,8 @@
 #include <wx/filepicker.h>
 
 namespace t4p {
-
 class ProjectViewClass : public FeatureViewClass {
-
 	public:
-
 	/**
 	 * Create a new instance of ProjectViewClass.
 	 */
@@ -52,8 +49,6 @@ class ProjectViewClass : public FeatureViewClass {
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
-
 	/**
 	 * close all projects and all resources that depend on it
 	 */
@@ -72,39 +67,32 @@ class ProjectViewClass : public FeatureViewClass {
 	t4p::ProjectFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 class ProjectPreferencesPanelClass : public ProjectPreferencesGeneratedPanelClass {
-
 	public:
-
 	/**
 	 * Construct a new instance
 	 */
 	ProjectPreferencesPanelClass(wxWindow* parent, ProjectFeatureClass& projectFeature);
-
 };
 
 /**
  * Dialog to edit a single project (add multiple sources to a project)
  */
 class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClass {
-
 	protected:
-
 	void OnAddSource(wxCommandEvent& event);
 	void OnEditSource(wxCommandEvent& event);
 	void OnRemoveSource(wxCommandEvent& event);
 	void OnOkButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
 	void OnSourcesListDoubleClick(wxCommandEvent& event);
-	public:
 
+	public:
 	ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project);
 
 	private:
-
 	/**
 	 * Reference that gets updated only when the user clicks OK
 	 */
@@ -125,18 +113,14 @@ class ProjectDefinitionDialogClass : public ProjectDefinitionDialogGeneratedClas
  * Dialog to add a source directory to a project
  */
 class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
-
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 	void OnCancelButton(wxCommandEvent& event);
 
 	public:
-
 	ProjectSourceDialogClass(wxWindow* parent, t4p::SourceClass& source);
 
 	private:
-
 	/**
 	 * The source that will get updated when the user clicks OK
 	 */
@@ -152,9 +136,7 @@ class ProjectSourceDialogClass : public ProjectSourceDialogGeneratedClass {
  * Dialog to add, remove, edit, or enable/disable projects.
  */
 class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
-
 	protected:
-
 	void OnSelectAllButton(wxCommandEvent& event);
 	void OnProjectsListDoubleClick(wxCommandEvent& event);
 	void OnProjectsListCheckbox(wxCommandEvent& event);
@@ -167,7 +149,6 @@ class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
 	void OnHelpButton(wxCommandEvent& event);
 
 	public:
-
 	/**
 	 * @param project the list of projects the user will edit / remove / add to
 	 * @param removedProjects the list of projects that the user has removed. This list will
@@ -184,7 +165,6 @@ class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
 		std::vector<t4p::ProjectClass>& touchedProjects);
 
 	private:
-
 	/**
 	 * The list that will get updated once the user clicks OK
 	 */
@@ -213,21 +193,17 @@ class ProjectListDialogClass : public ProjectListDialogGeneratedClass {
 	void Populate();
 
 	private:
-
 	/**
 	 * @param project to add to both the edited data structure and the GUI list
 	 */
 	void AddProject(const t4p::ProjectClass& project);
-
 };
 
 /**
  * class to show a checklist of choices and allow to user to select one or more.
  */
 class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
-
 	public:
-
 	/**
 	 * @param parent the parent window
 	 * @param title the title of the dialog
@@ -238,16 +214,13 @@ class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
 	MultipleSelectDialogClass(wxWindow* parent, const wxString& title, const wxString& caption, std::vector<wxString>& choices, std::vector<int>& selections);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	void OnCancelButton(wxCommandEvent& event);
 
 	private:
-
 	std::vector<int>& Selections;
 };
-
 }
 
 #endif

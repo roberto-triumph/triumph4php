@@ -31,14 +31,11 @@
 #include <wx/config.h>
 
 namespace t4p {
-
 /**
  * Holds the PHP binary location
  */
 class PhpEnvironmentClass {
-
 	public:
-
 	/**
 	 * Full path to the PHP executable
 	 */
@@ -105,9 +102,7 @@ class PhpEnvironmentClass {
  * and a 'friendly' name that the user can change.
  */
 class WebBrowserClass {
-
 	public:
-
 	/**
 	 * should be unique, but that is not enforced here
 	 */
@@ -144,7 +139,6 @@ class WebBrowserClass {
  *
  */
 class EnvironmentClass {
-
 	public:
 	EnvironmentClass();
 	~EnvironmentClass();
@@ -204,9 +198,7 @@ class EnvironmentClass {
 	bool FindBrowserByName(const wxString& name, wxFileName& fileName) const;
 
 	private:
-
 	void AddDefaults();
 };
-
 }
 #endif // __environmentclass__

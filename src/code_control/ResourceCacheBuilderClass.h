@@ -29,7 +29,6 @@
 #include <language_php/TagCacheClass.h>
 
 namespace t4p {
-
 // forward declaration
 class GlobalsClass;
 
@@ -45,9 +44,7 @@ class GlobalsClass;
  *
  */
 class WorkingCacheBuilderClass : public t4p::ActionClass {
-
 	public:
-
 	/**
 	 * @param runningThreads the object will get notified to EVENT_WORK* events with the given ID
 	 *        and the EVENT_WORKING_CACHE_COMPLETE.
@@ -74,14 +71,12 @@ class WorkingCacheBuilderClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	protected:
-
 	/**
 	 * In the background thread we will parse the code for resources
 	 */
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * the location of the tag cache; the sqlite file where the tags are stored
 	 */
@@ -131,8 +126,6 @@ class WorkingCacheBuilderClass : public t4p::ActionClass {
 	 * if TRUE then tags will be parsed out of the code
 	 */
 	bool DoParseTags;
-
 };
-
 }
 #endif

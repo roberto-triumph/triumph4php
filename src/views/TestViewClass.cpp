@@ -51,7 +51,6 @@ void t4p::TestViewClass::Go(wxCommandEvent& event) {
 t4p::TestViewClass::TestViewClass(t4p::TestFeatureClass& feature)
 	: FeatureViewClass()
 	, Feature(feature) {
-
 }
 
 BEGIN_EVENT_TABLE(t4p::TestViewClass, t4p::FeatureViewClass)

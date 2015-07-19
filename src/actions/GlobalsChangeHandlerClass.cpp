@@ -42,7 +42,6 @@ void t4p::GlobalsChangeHandlerClass::OnSqlMetaDataComplete(t4p::SqlMetaDataEvent
 }
 
 void t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(t4p::ActionEventClass& event) {
-
 	// first remove all detected connections that were previously detected
 	std::vector<t4p::DatabaseTagClass>::iterator info;
 	info = Globals.DatabaseTags.begin();

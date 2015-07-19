@@ -42,9 +42,7 @@ static int ID_EVENT = wxNewId();
 
 
 class ProjectTagActionTestClass : public ActionTestFixtureClass, public FileTestFixtureClass {
-
 	public:
-
 	/**
 	 * the object under test. we will assert that the object generates
 	 * events.
@@ -79,7 +77,6 @@ class ProjectTagActionTestClass : public ActionTestFixtureClass, public FileTest
 
 
 SUITE(ProjectTagActionTestClass) {
-
 TEST_FIXTURE(ProjectTagActionTestClass, InitProject) {
 	// test that when we intialize 1 project it gets parsed
 
@@ -137,5 +134,4 @@ TEST_FIXTURE(ProjectTagActionTestClass, InitMultipleProjects) {
 	CHECK_UNISTR_EQUALS("Role", results->Tag.ClassName);
 	delete results;
 }
-
 }

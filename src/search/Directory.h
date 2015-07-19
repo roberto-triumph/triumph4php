@@ -28,7 +28,6 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * Delete a directory and all of its sub-directories
  *

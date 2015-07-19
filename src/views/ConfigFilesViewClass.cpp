@@ -41,7 +41,6 @@ void t4p::ConfigFilesViewClass::AddNewMenu(wxMenuBar* menuBar) {
 
 void t4p::ConfigFilesViewClass::RebuildMenu() {
 	while (ConfigMenu->GetMenuItemCount() > 0) {
-
 		// use destroy because these are all submenus
 		ConfigMenu->Destroy(ConfigMenu->FindItemByPosition(0)->GetId());
 	}

@@ -28,7 +28,6 @@
 t4p::FileModifiedTimeClass::FileModifiedTimeClass()
 : FileName()
 , ModifiedTime() {
-
 }
 
 t4p::FileModifiedTimeClass::FileModifiedTimeClass(const t4p::FileModifiedTimeClass& src)
@@ -38,7 +37,6 @@ t4p::FileModifiedTimeClass::FileModifiedTimeClass(const t4p::FileModifiedTimeCla
 }
 
 void t4p::FileModifiedTimeClass::Copy(const t4p::FileModifiedTimeClass& src) {
-
 	// make these copies thread-safe
 	FileName = t4p::FileNameCopy(src.FileName);
 	ModifiedTime = src.ModifiedTime;
@@ -63,7 +61,6 @@ wxEvent* t4p::FilesModifiedEventClass::Clone() const {
 t4p::FileModifiedCheckActionClass::FileModifiedCheckActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 : ActionClass(runningThreads, eventId)
 , FilesToCheck() {
-
 }
 
 void t4p::FileModifiedCheckActionClass::SetFiles(const std::vector<t4p::FileModifiedTimeClass>& files) {
@@ -81,7 +78,6 @@ void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 		if (exists) {
 			modifiedDateTime = file->FileName.GetModificationTime();
 			if (modifiedDateTime.IsValid()) {
-
 				// use time span, to compare in seconds and not milli/micro
 				// seconds precision
 				// also, consider files modified in the past as having changed.
@@ -97,7 +93,6 @@ void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 		}
 	}
 	if (!IsCancelled()) {
-
 		// PostEvent() will set the correct id
 		t4p::FilesModifiedEventClass evt(wxID_ANY, filesModified, modifiedTimes, filesDeleted);
 		PostEvent(evt);

@@ -45,7 +45,6 @@ t4p::PhpTagClass::PhpTagClass()
 	, FullPath()
 	, FileTagId(-1)
 	, SourceId(-1) {
-
 }
 
 t4p::PhpTagClass::PhpTagClass(const t4p::PhpTagClass& src)
@@ -156,7 +155,6 @@ void t4p::PhpTagClass::SetFullPath(const wxString& fullPath) {
 }
 
 bool t4p::PhpTagClass::HasParameters() const {
-
 	// watch out for default argument of "array()"
 	// look for the function name followed by parentheses
 	return Signature.indexOf(Identifier + UNICODE_STRING_SIMPLE("()")) < 0;
@@ -176,7 +174,6 @@ t4p::TraitTagClass::TraitTagClass()
 	, Aliased()
 	, InsteadOfs()
 	, FileTagId(0) {
-
 }
 
 t4p::FileTagClass::FileTagClass()
@@ -186,7 +183,6 @@ t4p::FileTagClass::FileTagClass()
 	, SourceId(0)
 	, IsParsed(false)
 	, IsNew(true) {
-
 }
 
 bool t4p::FileTagClass::NeedsToBeParsed(const wxDateTime& fileLastModifiedDateTime) const {

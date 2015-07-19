@@ -31,7 +31,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * this event will be generated when a sequence has begun
  */
@@ -53,9 +52,7 @@ extern const wxEventType EVENT_SEQUENCE_COMPLETE;
  * after another.
  */
 class SequenceClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * The global data structures; each action will read these as their
 	 * input
@@ -150,7 +147,6 @@ class SequenceClass : public wxEvtHandler {
 	void Stop();
 
 	protected:
-
 	/**
 	 * @param step to be run.  Steps are run in the order they are given. This class
 	 *        will own the pointer and will be deleted when the action completes.
@@ -165,7 +161,6 @@ class SequenceClass : public wxEvtHandler {
 	void Run();
 
 	private:
-
 	void OnActionComplete(t4p::ActionEventClass& event);
 
 	void OnActionProgress(t4p::ActionProgressEventClass& event);
@@ -207,9 +202,7 @@ class SequenceClass : public wxEvtHandler {
 };
 
 class SequenceProgressEventClass : public t4p::ActionProgressEventClass {
-
 	public:
-
 	SequenceProgressEventClass(int id, t4p::ActionClass::ProgressMode mode, int percentComplete, const wxString& msg);
 
 	wxEvent* Clone() const;
@@ -221,7 +214,6 @@ typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(t4p::SequencePr
         DECLARE_EVENT_TABLE_ENTRY(t4p::EVENT_SEQUENCE_PROGRESS, wxID_ANY, -1, \
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(SequenceProgressEventClassFunction, & fn), (wxObject *) NULL),
-
 
 }
 

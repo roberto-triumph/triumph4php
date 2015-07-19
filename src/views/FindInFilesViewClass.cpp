@@ -53,14 +53,11 @@ static const size_t MAX_HITS = 1000;
 
 
 class FindInFilesPreviewRenderer : public wxDataViewCustomRenderer {
-
 	public:
-
 	t4p::FindInFilesHitClass Hit;
 
 	FindInFilesPreviewRenderer()
 	: wxDataViewCustomRenderer(wxT("t4p::FindInFilesHitClass")) {
-
 	}
 
 	bool SetValue(const wxVariant& value) {
@@ -178,7 +175,6 @@ t4p::FindInFilesResultsPanelClass::FindInFilesResultsPanelClass(wxWindow* parent
 }
 
 t4p::FindInFilesResultsPanelClass::~FindInFilesResultsPanelClass() {
-
 	// make sure we kill any running searches
 	if (RunningActionId > 0) {
 		RunningThreads.CancelAction(RunningActionId);
@@ -223,7 +219,6 @@ void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 	FinderClass finder;
 	FindInFiles.CopyFinder(finder);
 	if (FindInFiles.Prepare() && finder.Prepare()) {
-
 		// search the opened files
 		std::vector<t4p::CodeControlClass*> codeCtrls = View.AllCodeControls();
 		for (size_t i = 0; i < codeCtrls.size(); ++i) {
@@ -286,7 +281,6 @@ void t4p::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 		next = selected - 1;
 	}
 	else {
-
 		// loop back to the end
 		next = ResultsList->GetItemCount() - 1;
 	}
@@ -311,7 +305,6 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceButton(wxCommandEvent& event) {
 		wxString replaceWithText = t4p::IcuToWx(FindInFiles.ReplaceExpression);
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
-
 			// only replace when the cursor is at the hit (which would be the case when and only when the use
 			// double clicked on the result list (and focused on the hit).
 			if (finder.FindNext(text, position) && finder.GetLastMatch(position, length) &&
@@ -349,7 +342,6 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceAllInFileButton(wxCommandEvent&
 }
 
 void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent& event) {
-
 	// for now disallow another replace when one is already active
 	if (RunningActionId > 0) {
 		wxMessageBox(_("Find in files is already running. Please wait for it to finish."), _("Find In Files"));
@@ -363,7 +355,6 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 		FinderClass finder;
 		FindInFiles.CopyFinder(finder);
 		if (finder.Prepare()) {
-
 			// replace the open files
 			std::vector<t4p::CodeControlClass*> codeCtrls = View.AllCodeControls();
 			for (size_t i = 0; i < codeCtrls.size(); ++i) {
@@ -422,7 +413,6 @@ void t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& ev
 
 void t4p::FindInFilesResultsPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
-
 		// event from another, concurrent find in files panel. let the other panel
 		// handle it
 		event.Skip();
@@ -437,7 +427,6 @@ void t4p::FindInFilesResultsPanelClass::OnFileHit(t4p::FindInFilesHitEventClass&
 		return;
 	}
 	if (event.GetId() != FindInFilesGaugeId) {
-
 		// event from another, concurrent find in files panel. let the other panel
 		// handle it
 		event.Skip();
@@ -500,7 +489,6 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 	View.LoadCodeControl(fileName);
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-
 		// search for the expression and highlight it. search from the start of the line.
 		int32_t startPos = AllHits[i].FileOffset;
 		int32_t length = 0;
@@ -512,7 +500,6 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 				codeControl->SetFocus();
 			}
 			else {
-
 				// hit is no longer there, still go to the
 				// line
 				// it seems pretty weird for the editor to open the file
@@ -608,7 +595,6 @@ void t4p::FindInFilesResultsPanelClass::EnableButtons(bool enableStopButton, boo
 }
 
 void t4p::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
-
 	// label might grow/shrink according to new text, must
 	// tell the sizer to re-position the label correctly
 	// we need this for the label to be right-aligned after
@@ -639,7 +625,6 @@ int t4p::FindInFilesResultsPanelClass::GetNumberOfMatchedFiles() {
 
 void t4p::FindInFilesResultsPanelClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	if (event.GetId() != FindInFilesGaugeId) {
-
 		// event from another, concurrent find in files panel. let the other panel
 		// handle it
 		event.Skip();
@@ -728,7 +713,6 @@ void t4p::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 }
 
 void t4p::FindInFilesDialogClass::OnCancelButton(wxCommandEvent& event) {
-
 	// need to do this to prevent crash on app exit
 	View.FindHistory.Detach();
 	View.ReplaceHistory.Detach();
@@ -752,7 +736,6 @@ void t4p::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event) {
 }
 
 void t4p::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
-
 	// the event object is the control that has focus
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
 		reinterpret_cast<wxWindow*>(event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsBackward);
@@ -803,7 +786,6 @@ void t4p::FindInFilesViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass
 }
 
 void t4p::FindInFilesViewClass::OnEditFindInFiles(wxCommandEvent& event) {
-
 	// prime finder with selected text
 	wxString selectedText = GetSelectedText();
 	if (!selectedText.empty()) {

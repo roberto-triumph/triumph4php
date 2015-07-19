@@ -29,7 +29,6 @@
 #include <actions/FileModifiedCheckActionClass.h>
 
 namespace t4p {
-
 extern const int ID_FILE_MODIFIED_ACTION;
 
 /**
@@ -49,9 +48,7 @@ extern const int ID_FILE_MODIFIED_ACTION;
  * feel lag.
  */
 class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	FileModifiedCheckFeatureClass(t4p::AppClass& app);
 
 	/**
@@ -61,9 +58,7 @@ class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
 	 * by the FileModifiedCheckActionClass.
 	 */
 	void StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll);
-
 };
-
 }
 
 #endif

@@ -91,7 +91,6 @@ t4p::SuppressionRuleClass::SuppressionRuleClass()
 : Type(SKIP_ALL)
 , Target()
 , Location() {
-
 }
 
 t4p::SuppressionRuleClass::SuppressionRuleClass(const t4p::SuppressionRuleClass& src)
@@ -191,7 +190,6 @@ bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vec
 	wxTextInputStream txt(fstream);
 	wxStringTokenizer tok;
 	while (!fstream.Eof()) {
-
 		// each supression is in its own line, in comma-separated form
 		//
 		// type,target, location
@@ -372,7 +370,6 @@ bool t4p::LintSuppressionClass::RemoveRulesForDirectory(const wxFileName& dir) {
 	while (rule != Rules.end()) {
 		bool isRemoved = false;
 		if (rule->Location.IsDir()) {
-
 			// what should happen to rules that the user manually created
 			// that are in sub-drectories of the given dir? should we
 			// remove those too? for now, we are not

@@ -33,18 +33,14 @@
 #include <globals/Sqlite.h>
 
 namespace t4p {
-
 class FileCabinetViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	FileCabinetViewClass(t4p::FileCabinetFeatureClass& feature);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 	void AddViewMenuItems(wxMenu* viewMenu);
 
 	private:
-
 	void OnViewFileCabinet(wxCommandEvent& event);
 	void OnEditAddCurrentFileToCabinet(wxCommandEvent& event);
 
@@ -59,9 +55,7 @@ class FileCabinetViewClass : public t4p::FeatureViewClass {
  * and allows the user to add a file/dir to the cabinet.
  */
 class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
-
 	public:
-
 	FileCabinetPanelClass(wxWindow* parent, int id, t4p::FileCabinetFeatureClass& feature, wxWindow* mainWindow);
 
 	/**
@@ -70,7 +64,6 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 	void AddItemToList(const t4p::FileCabinetItemClass& item);
 
 	private:
-
 	// event handlers
 	void OnAddFileClick(wxCommandEvent& event);
 	void OnAddDirectoryClick(wxCommandEvent& event);
@@ -131,7 +124,6 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_FILECABINETVIEWCLASS_H

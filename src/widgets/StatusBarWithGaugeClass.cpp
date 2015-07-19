@@ -66,7 +66,6 @@ void t4p::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int r
 			gauge->Pulse();
 		}
 		else {
-
 			// must set range first, otherwise value could be "invalid" (outside the
 			// previous range)
 			gauge->SetRange(range);
@@ -127,7 +126,6 @@ void t4p::StatusBarWithGaugeClass::OnSize(wxSizeEvent& event) {
 }
 
 void t4p::StatusBarWithGaugeClass::RedrawGauges() {
-
 	// Each gauge takes it 2 columns (one for the gauge title and one for the gauge itself),
 	// plus the leftmost default status bar columns (for the menu help and other messages)
 	const int DEFAULT_COLUMNS = 2;
@@ -159,7 +157,6 @@ void t4p::StatusBarWithGaugeClass::RedrawGauges() {
 }
 
 void t4p::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
-
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(0);
 	if (oldText == text) {
@@ -171,7 +168,6 @@ void t4p::StatusBarWithGaugeClass::SetColumn0Text(const wxString &text) {
 }
 
 void t4p::StatusBarWithGaugeClass::SetColumn1Text(const wxString &text) {
-
 	// don't redraw unless necessary
 	wxString oldText = GetStatusText(1);
 	if (oldText == text) {

@@ -92,7 +92,6 @@ bool t4p::FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag) {
 		fileTag.FileId = t4p::SqliteInsertId(stmt);
 		success = true;
 	} catch (std::exception& e) {
-
 		// ATTN: at some point bubble these exceptions up?
 		// to avoid unreferenced local variable warnings in MSVC
 		wxString msg = wxString::FromAscii(e.what());

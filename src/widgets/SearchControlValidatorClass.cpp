@@ -28,13 +28,11 @@
 SearchControlValidatorClass::SearchControlValidatorClass(wxString* data)
 	: wxValidator()
 	, Data(data) {
-
 }
 
 SearchControlValidatorClass::SearchControlValidatorClass()
 	: wxValidator()
 	, Data(NULL) {
-
 }
 
 wxObject* SearchControlValidatorClass::Clone() const {

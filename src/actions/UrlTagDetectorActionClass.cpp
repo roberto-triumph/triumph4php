@@ -38,7 +38,6 @@ t4p::UrlTagDetectorParamsClass::UrlTagDetectorParamsClass()
 	, ResourceDbFileName()
 	, RootUrl()
 	, OutputDbFileName() {
-
 }
 
 wxString t4p::UrlTagDetectorParamsClass::BuildCmdLine() const {
@@ -58,7 +57,6 @@ t4p::UrlTagDetectorActionClass::UrlTagDetectorActionClass(t4p::RunningThreadsCla
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
-
 }
 
 bool t4p::UrlTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
@@ -100,7 +98,6 @@ bool t4p::UrlTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-
 		// start the first external process
 		started = NextDetection();
 	}

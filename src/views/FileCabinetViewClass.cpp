@@ -168,7 +168,6 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 	result.SetId(fileCabinetItemId);
 	bool found = SqliteFinder.Exec(&result);
 	if (found) {
-
 		// we create the proper event to tell the app to
 		// open the file/dir
 		result.Next();
@@ -202,7 +201,6 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 }
 
 void t4p::FileCabinetPanelClass::DeleteItemAt(int index) {
-
 	// delete from the database AND the list control
 	long dbId = List->GetItemData(index);
 	if (dbId <= 0) {
@@ -216,7 +214,6 @@ void t4p::FileCabinetPanelClass::DeleteItemAt(int index) {
 }
 
 void t4p::FileCabinetPanelClass::OnListItemActivated(wxListEvent& event) {
-
 	// need to get the file/dir to open. to get the filename, we get
 	// the file_cabinet_item_id from the list, then query the
 	// db

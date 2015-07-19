@@ -34,11 +34,8 @@
 #include <memory>
 
 namespace t4p {
-
 class RunBrowserFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * The most recent URLs that have been run. New URLs are added after the
 	 * user picks one from the "Search For URLs..." button, and they are deleted
@@ -53,9 +50,7 @@ class RunBrowserFeatureClass : public FeatureClass {
 	void ExternalBrowser(const wxString& browserName, const wxURI& url);
 
 	private:
-
 };
-
 }
 
 #endif

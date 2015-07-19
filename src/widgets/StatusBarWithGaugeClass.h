@@ -29,7 +29,6 @@
 #include <map>
 
 namespace t4p {
-
 /**
  * This class allows the status bar to be populated with a gauge (progress bar).
  */
@@ -138,7 +137,6 @@ class StatusBarWithGaugeClass : public wxStatusBar {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // __statusbarwithgaugeclass__

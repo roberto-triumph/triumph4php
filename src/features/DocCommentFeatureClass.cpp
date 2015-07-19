@@ -27,7 +27,6 @@
 
 t4p::DocCommentFeatureClass::DocCommentFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {
-
 }
 
 bool t4p::DocCommentFeatureClass::IsEnabled() const {

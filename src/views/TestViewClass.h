@@ -29,14 +29,12 @@
 #include <features/TestFeatureClass.h>
 
 namespace t4p {
-
 /**
  * This is a feature that is designed to test the feature mechanism.
  * This is also useful for prototyping of a feature or debugging.
  */
 class TestViewClass : public FeatureViewClass {
 	public:
-
 	TestViewClass(t4p::TestFeatureClass& feature);
 
 	/**
@@ -60,7 +58,6 @@ class TestViewClass : public FeatureViewClass {
 	void AddCodeControlClassContextMenuItems(wxMenu* menu);
 
 	private:
-
 	/**
 	 * the actual code that will get executed when the "GO" button is clicked
 	 */
@@ -73,7 +70,6 @@ class TestViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

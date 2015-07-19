@@ -31,9 +31,7 @@
 #include <TriumphChecks.h>
 
 class JsTagResultFixtureClass : SqliteTestFixtureClass {
-
 	public:
-
 	/**
 	 * The tags that we will insert, then expect to be
 	 * found in the results
@@ -54,7 +52,6 @@ class JsTagResultFixtureClass : SqliteTestFixtureClass {
 	, Tag2()
 	, File1Tag()
 	, File2Tag() {
-
 		wxFileName file1;
 		file1.AssignDir(wxFileName::GetTempDir());
 		file1.SetName(wxT("name.js"));
@@ -126,7 +123,6 @@ class JsTagResultFixtureClass : SqliteTestFixtureClass {
 };
 
 SUITE(JsTagResultTestClass) {
-
 TEST_FIXTURE(JsTagResultFixtureClass, ExactMatch) {
 	t4p::ExactMatchJsTagResultClass result;
 	result.SetSearch(UNICODE_STRING_SIMPLE("dateFormat"), SourceDirs);
@@ -166,5 +162,4 @@ TEST_FIXTURE(JsTagResultFixtureClass, NearMatch) {
 
 	CHECK(!result.More());
 }
-
 }

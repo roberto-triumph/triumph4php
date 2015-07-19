@@ -28,7 +28,6 @@
 #include <wx/dataview.h>
 
 namespace t4p {
-
 	/**
 	 * Resizes all of the columns of the given data view control so that
 	 * all columns are visible and take up only the space that they need.

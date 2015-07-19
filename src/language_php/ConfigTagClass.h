@@ -31,7 +31,6 @@
 #include <globals/SqliteFinderClass.h>
 
 namespace t4p {
-
 /**
  * A config tag is a recognized config file for a php framework.
  * All config tags will be placed as menu items that are
@@ -40,9 +39,7 @@ namespace t4p {
  * files.
  */
 class ConfigTagClass {
-
 	public:
-
 	/**
 	 * The label that will be showns as the menu item.
 	 * Note that this should not be used to populate the label as
@@ -75,18 +72,14 @@ class ConfigTagClass {
  * into the db and this class will SELECT from the db.
  */
 class ConfigTagFinderClass : public t4p::SqliteFinderClass {
-
 	public:
-
 	ConfigTagFinderClass(soci::session& session);
 
 	/**
 	 * @return all of the configs tags in all attached sqlite dbs
 	 */
 	std::vector<t4p::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
-
 };
-
 }
 
 #endif

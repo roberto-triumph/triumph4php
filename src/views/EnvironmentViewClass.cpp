@@ -85,7 +85,6 @@ void t4p::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 		}
 	}
 	else {
-
 		// act like a stop button
 		Gauge->SetValue(0);
 
@@ -116,7 +115,6 @@ void t4p::ApacheEnvironmentPanelClass::Populate() {
 }
 
 void t4p::ApacheEnvironmentPanelClass::OnApacheFileReadComplete(t4p::ApacheFileReadCompleteEventClass& event) {
-
 	// copy the result apache object to overwrite what is shown in the dialog
 	EditedApache.Copy(event.Apache);
 	Populate();
@@ -357,7 +355,6 @@ void t4p::WebBrowserEditPanelClass::OnAddWebBrowser(wxCommandEvent& event) {
 }
 
 void t4p::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& event) {
-
 	// could not get the list selection function to work on windows
 	// when the "edit" button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -378,7 +375,6 @@ void t4p::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& e
 }
 
 void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& event) {
-
 	// could not get the list selection function to work on windows
 	// when the "edit" button is clicked
 	long selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
@@ -401,12 +397,10 @@ void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& eve
 }
 
 void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
-
 	// could not get the list selection function to work on windows
 	// when the button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection > 0 && selection < BrowserList->GetItemCount()) {
-
 		// the 'top' row will moved down one and the row at the selection will be moved up one
 		t4p::WebBrowserClass top =  EditedWebBrowsers[selection - 1];
 		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];
@@ -426,12 +420,10 @@ void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 }
 
 void t4p::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
-
 	// could not get the list selection function to work on windows
 	// when the button is clicked
 	int selection = BrowserList->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (selection >= 0 && selection < (BrowserList->GetItemCount() - 1)) {
-
 		// the 'bottom' row will moved up one and the row at the selection will be moved down one
 		t4p::WebBrowserClass bottom =  EditedWebBrowsers[selection + 1];
 		t4p::WebBrowserClass selected =  EditedWebBrowsers[selection];

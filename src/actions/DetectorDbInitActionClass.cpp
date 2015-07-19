@@ -28,7 +28,6 @@
 
 t4p::DetectorDbInitActionClass::DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerGlobalActionClass(runningThreads, eventId) {
-
 }
 
 void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {

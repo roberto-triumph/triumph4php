@@ -31,16 +31,13 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * This class represents a single "view" (template) file  that was detected by the
  * template files detectors. It holds the full path of the template file as well
  * as the names of the variables that the controller assigned to this template file.
  */
 class TemplateFileTagClass {
-
 	public:
-
 	/**
 	 * the full path of the template file
 	 */
@@ -60,16 +57,13 @@ class TemplateFileTagClass {
 	t4p::TemplateFileTagClass& operator=(const t4p::TemplateFileTagClass& src);
 
 	void Init(const wxString& fullPath, const std::vector<wxString>& variables);
-
 };
 
 /**
  * This class will load template file rows from the detector DB into memeory
  */
 class TemplateFileTagFinderClass {
-
 	public:
-
 	TemplateFileTagFinderClass();
 
 	/**
@@ -86,12 +80,10 @@ class TemplateFileTagFinderClass {
 	std::vector<t4p::TemplateFileTagClass> All();
 
 	private:
-
 	soci::session Session;
 
 	bool IsInitialized;
 };
-
 }
 
 #endif

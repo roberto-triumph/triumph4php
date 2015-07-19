@@ -34,7 +34,6 @@
 #include <wx/filename.h>
 
 namespace t4p {
-
 //defined below
 class SqlQueryClass;
 class ConnectionIdentifierClass;
@@ -46,9 +45,7 @@ class ConnectionIdentifierClass;
  * can extend / modifify the code for different frameworks.
  */
 class DatabaseTagClass {
-
 	public:
-
 	/**
 	 * The RDBMS systems that both the frameworks and Triumph supports.
 	 */
@@ -142,9 +139,7 @@ class DatabaseTagClass {
  * and the foreground thread will delete it once it has been read.
  */
 class SqlResultClass {
-
 	public:
-
 	/**
 	 * results are tied to a session. when reusing result objects you will need to call Init() method
 	 * to allocate a new result.
@@ -232,7 +227,6 @@ class SqlResultClass {
 	 * zero results.
 	 */
 	bool HasRows;
-
 };
 
 /**
@@ -241,9 +235,7 @@ class SqlResultClass {
  * use exceptions.
  */
 class SqlQueryClass {
-
 	public:
-
 	/**
 	 * The database info to use when connecting
 	 */
@@ -378,7 +370,6 @@ class SqlQueryClass {
 	long long GetAffectedRows(soci::statement& stmt);
 
 	private:
-
 	/**
 	 * establish a connection to mysql.
 	 * @param session the connection handle
@@ -394,7 +385,6 @@ class SqlQueryClass {
 	 * @return bool TRUE if connection was successfuly
 	 */
 	bool ConnectSqlite(soci::session& session, UnicodeString& error);
-
 };
 
 /**
@@ -404,9 +394,7 @@ class SqlQueryClass {
  * app exits or the panel is closed.
  */
 class ConnectionIdentifierClass {
-
 	public:
-
 	ConnectionIdentifierClass();
 
 	/**
@@ -421,7 +409,6 @@ class ConnectionIdentifierClass {
 	unsigned long Get();
 
 	private:
-
 	/**
 	 * for shared access protection
 	 */
@@ -431,18 +418,14 @@ class ConnectionIdentifierClass {
 };
 
 class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
-
 	public:
-
 	DatabaseTagFinderClass(soci::session& session);
 
 	/**
 	 * @return all of the database tags in all of the attached databases
 	 */
 	std::vector<t4p::DatabaseTagClass> All(const std::vector<wxFileName>& sourceDirectories);
-
 };
-
 }
 
 #endif

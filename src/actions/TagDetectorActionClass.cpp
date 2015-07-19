@@ -36,7 +36,6 @@ t4p::TagDetectorParamsClass::TagDetectorParamsClass()
 	, SourceDir()
 	, ResourceDbFileName()
 	, OutputDbFileName() {
-
 }
 
 wxString t4p::TagDetectorParamsClass::BuildCmdLine() const {
@@ -55,7 +54,6 @@ t4p::TagDetectorActionClass::TagDetectorActionClass(t4p::RunningThreadsClass& ru
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
-
 }
 
 bool t4p::TagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
@@ -94,7 +92,6 @@ bool t4p::TagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-
 		// start the first external process
 		started = NextDetection();
 	}

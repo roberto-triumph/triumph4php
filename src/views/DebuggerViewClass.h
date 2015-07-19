@@ -31,11 +31,8 @@
 #include <language_php/DbgpEventClass.h>
 
 namespace t4p {
-
 class DebuggerViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	DebuggerViewClass(t4p::DebuggerFeatureClass& feature);
 
 	~DebuggerViewClass();
@@ -94,7 +91,6 @@ class DebuggerViewClass : public t4p::FeatureViewClass {
 	void BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle);
 
 	private:
-
 	t4p::DebuggerFeatureClass& Feature;
 
 	/**
@@ -196,13 +192,11 @@ class DebuggerViewClass : public t4p::FeatureViewClass {
 
 class DebuggerLogPanelClass : public DebuggerLogPanelGeneratedClass {
 	public:
-
 	DebuggerLogPanelClass(wxWindow* parent);
 
 	void Append(const wxString& text);
 
 	private:
-
 	void OnClearButton(wxCommandEvent& event);
 };
 
@@ -211,9 +205,7 @@ class DebuggerLogPanelClass : public DebuggerLogPanelGeneratedClass {
  * run along with all of the functions/methods that called it).
  */
 class DebuggerStackPanelClass : public DebuggerStackPanelGeneratedClass {
-
 	public:
-
 	DebuggerStackPanelClass(wxWindow* parent, int id);
 
 	void ShowStack(const std::vector<t4p::DbgpStackClass>& stack);
@@ -227,13 +219,10 @@ class DebuggerStackPanelClass : public DebuggerStackPanelGeneratedClass {
 	void ResetStatus(bool active);
 
 	private:
-
 };
 
 class DebuggerVariablePanelClass : public DebuggerVariablePanelGeneratedClass {
-
 	public:
-
 	DebuggerVariablePanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
 	void SetLocalVariables(const std::vector<t4p::DbgpPropertyClass>& variables);
@@ -253,7 +242,6 @@ class DebuggerVariablePanelClass : public DebuggerVariablePanelGeneratedClass {
 	void ResetStatus(bool active);
 
 	private:
-
 	void OnVariableExpanding(wxTreeListEvent& event);
 	void OnVariableActivated(wxTreeListEvent& event);
 
@@ -276,9 +264,7 @@ class DebuggerVariablePanelClass : public DebuggerVariablePanelGeneratedClass {
  * bulk disable the breakpoints by using this panel.
  */
 class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClass {
-
 	public:
-
 	DebuggerBreakpointPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature,
 		t4p::DebuggerViewClass& view);
 
@@ -288,7 +274,6 @@ class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClas
 	void RefreshList();
 
 	private:
-
 	// button click handlers
 	void OnDeleteBreakpoint(wxCommandEvent& event);
 	void OnToggleAllBreakpoints(wxCommandEvent& event);
@@ -320,9 +305,7 @@ class DebuggerBreakpointPanelClass : public DebuggerBreakpointPanelGeneratedClas
  *
  */
 class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
-
 	public:
-
 	DebuggerEvalPanelClass(wxWindow* parent, int id, t4p::DebuggerFeatureClass& feature);
 
 	~DebuggerEvalPanelClass();
@@ -346,7 +329,6 @@ class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
 	void ResetStatus(bool active);
 
 	private:
-
 	void OnEvalClick(wxCommandEvent& event);
 	void OnClearClick(wxCommandEvent& event);
 	void OnCode(wxStyledTextEvent& event);
@@ -362,16 +344,13 @@ class DebuggerEvalPanelClass : public DebuggerEvalPanelGeneratedClass {
 	wxString InitialCode;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 /**
  * shows the bulk of the debug information
  */
 class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
-
 	public:
-
 	// this class will own these 3 panel pointers
 	t4p::DebuggerLogPanelClass* LogPanel;
 	t4p::DebuggerVariablePanelClass* VariablePanel;
@@ -401,15 +380,12 @@ class DebuggerPanelClass : public DebuggerPanelGeneratedClass {
  * debugger settings
  */
 class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
-
 	public:
-
 	DebuggerOptionsPanelClass(wxWindow* parent, t4p::DebuggerOptionsClass& options, bool& wasDebuggerPortChanged);
 
 	bool TransferDataFromWindow();
 
 	private:
-
 	// handlers for source code mapping CRUD
 	void OnAddMapping(wxCommandEvent& event);
 	void OnEditMapping(wxCommandEvent& event);
@@ -445,9 +421,7 @@ class DebuggerOptionsPanelClass : public DebuggerOptionsPanelGeneratedClass {
  * It is big to accomodate variables with lots of content
  */
 class DebuggerFullViewDialogClass : public DebuggerFullViewDialogGeneratedClass {
-
 	public:
-
 	DebuggerFullViewDialogClass(wxWindow* parent, const wxString& value);
 };
 
@@ -456,13 +430,10 @@ class DebuggerFullViewDialogClass : public DebuggerFullViewDialogGeneratedClass 
  * mapping.
  */
 class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
-
 	public:
-
 	DebuggerMappingDialogClass(wxWindow* parent, wxString& localPath, wxString& remotePath);
 
 	private:
-
 	void OnCancelButton(wxCommandEvent& event);
 
 	void OnOkButton(wxCommandEvent& event);
@@ -471,7 +442,6 @@ class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
 
 	wxString& LocalPathString;
 };
-
 }
 
 #endif

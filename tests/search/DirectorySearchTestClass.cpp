@@ -74,10 +74,8 @@ class DirectorySearchTestClass : public FileTestFixtureClass {
 
 class SourceFixtureClass {
 	public:
-
 	SourceFixtureClass()
 		: Source() {
-
 	}
 
 	/**
@@ -92,14 +90,10 @@ class SourceFixtureClass {
 	}
 
 	t4p::SourceClass Source;
-
 };
 
 class FileTestDirectoryWalker : public t4p::DirectoryWalkerClass {
-
 	public:
-
-
 	bool IsBeginCalled;
 
 	bool IsEndCalled;
@@ -111,7 +105,6 @@ class FileTestDirectoryWalker : public t4p::DirectoryWalkerClass {
 		, IsBeginCalled(false)
 		, IsEndCalled(false)
 		, SourcesCalled() {
-
 	}
 
 	void BeginSearch(const wxString& fullPath) {
@@ -129,7 +122,6 @@ class FileTestDirectoryWalker : public t4p::DirectoryWalkerClass {
 };
 
 SUITE(DirectorySearchTestClass) {
-
 TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
 	CreateTestFiles();
 	FileTestDirectoryWalker walker;
@@ -156,7 +148,6 @@ TEST_FIXTURE(DirectorySearchTestClass, WalkShouldRecurseThroughSubDirectories) {
 }
 
 TEST_FIXTURE(DirectorySearchTestClass, WalkWithMultipleSources) {
-
 	/*
 	 * folder_one/file_one.php
 	 * folder_one/file_two.php
@@ -445,5 +436,4 @@ TEST_FIXTURE(SourceFixtureClass, IncludeWildcardsShouldBeResetToEmpty) {
 	Make(root, wxT(""), wxT(""));
 	CHECK_EQUAL(wxT(""), Source.IncludeWildcardsString());
 }
-
 }

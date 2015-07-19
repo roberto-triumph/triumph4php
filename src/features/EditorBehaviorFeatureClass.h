@@ -29,7 +29,6 @@
 #include <globals/CodeControlOptionsClass.h>
 
 namespace t4p {
-
 /**
  * An EditorKeyboardCommandClass is a key binding that we can tell
  * scintilla to listen for.  Note that the Cmd, KeyCode and Modifiers
@@ -40,9 +39,7 @@ namespace t4p {
  * under "Key bindings"
  */
 class EditorKeyboardCommandClass {
-
 	public:
-
 	/**
 	 * human-friendly name of the command
 	 */
@@ -96,9 +93,7 @@ class EditorKeyboardCommandClass {
  * virtual space, multiple selection, and zoom
  */
 class EditorBehaviorFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	/**
 	 * The keyboard commands (shortcuts) assigned to the Scintilla
 	 * control.
@@ -123,7 +118,6 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 	int MenuIdToSciCommand(int menuId);
 
 	private:
-
 	/**
 	 * Handler to save the editor feature preferences.
 	 */
@@ -131,7 +125,6 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_EDITORFEATURECLASS_H

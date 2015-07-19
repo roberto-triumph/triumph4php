@@ -37,7 +37,6 @@ void t4p::ChangelogFeatureClass::LoadPreferences(wxConfigBase* config) {
 }
 
 void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
-
 	// version info is stored in a file
 	// for releases, the distribution script will properly fill in the
 	// version number using git describe
@@ -51,7 +50,6 @@ void t4p::ChangelogFeatureClass::OnAppReady(wxCommandEvent& event) {
 	LastVersion.Trim(false).Trim(true);
 
 	if (version.CmpNoCase(LastVersion) != 0) {
-
 		// version changed, show the changelog
 		ShowChangeLog();
 

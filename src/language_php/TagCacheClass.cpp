@@ -129,7 +129,6 @@ t4p::WorkingCacheCompleteEventClass::WorkingCacheCompleteEventClass(int eventId,
 	, WorkingCache(cache)
 	, FileName(fileName.c_str())
 	, FileIdentifier(fileIdentifier.c_str()) {
-
 }
 
 wxEvent* t4p::WorkingCacheCompleteEventClass::Clone() const {
@@ -148,7 +147,6 @@ wxString t4p::WorkingCacheCompleteEventClass::GetFileName() const {
 
 t4p::TagFinderListCompleteEventClass::TagFinderListCompleteEventClass(int eventId)
 	: wxEvent(eventId, t4p::EVENT_TAG_FINDER_LIST_COMPLETE) {
-
 }
 
 wxEvent* t4p::TagFinderListCompleteEventClass::Clone() const {
@@ -163,7 +161,6 @@ t4p::WorkingCacheClass::WorkingCacheClass()
 	: SymbolTable()
 	, FileName()
 	, IsNew(true) {
-
 }
 
 bool t4p::WorkingCacheClass::Update(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable) {
@@ -197,7 +194,6 @@ void t4p::WorkingCacheClass::Init(const wxString& fileName,
 t4p::TagCacheClass::TagCacheClass()
 	: TagFinderList(NULL)
 	, WorkingCaches() {
-
 }
 
 t4p::TagCacheClass::~TagCacheClass() {
@@ -524,7 +520,6 @@ void t4p::TagCacheClass::Print() {
 }
 
 bool t4p::TagCacheClass::IsFileCacheEmpty() {
-
 	// if at least one tag finder is not empty, return false
 	// no need to check native tag cache, as that is always not empty
 	if (TagFinderList && TagFinderList->IsTagFinderInit && !TagFinderList->TagFinder.IsFileCacheEmpty()) {
@@ -534,7 +529,6 @@ bool t4p::TagCacheClass::IsFileCacheEmpty() {
 }
 
 bool t4p::TagCacheClass::IsResourceCacheEmpty() {
-
 	// if at least one tag finder is not empty, return false
 	if (TagFinderList && TagFinderList->IsNativeTagFinderInit && !TagFinderList->NativeTagFinder.IsResourceCacheEmpty()) {
 		return false;
@@ -553,7 +547,6 @@ bool t4p::TagCacheClass::IsResourceCacheEmpty() {
 }
 
 void t4p::TagCacheClass::Clear() {
-
 	// ATTN: do NOT wipe finders, Clear() is meant for memory
 	// cleanup only
 	if (TagFinderList) {
@@ -606,7 +599,6 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllClassesFunctionsDefines(con
 		t4p::ParsedTagFinderClass* finder = allTagFinders[j];
 		allMatches = finder->ClassesFunctionsDefines(fullPath);
 		if (!allMatches.empty()) {
-
 			// even if the file tag is is multiple finders, they should both be the
 			// same. stop when we find anything
 			break;
@@ -685,7 +677,6 @@ std::vector<t4p::PhpTagClass> t4p::TagCacheClass::GetTagsAtPosition(
 		if (lastExpression.indexOf(UNICODE_STRING_SIMPLE("\\")) > 0 &&
 			variableScope.ClassName.isEmpty() &&
 			variableScope.MethodName.isEmpty()) {
-
 			// the expression is a namespace name outside a class or method.  this is
 			// most likely a namespace in the "use" statement
 			// namespace in a use statement is always fully qualified, even if it does

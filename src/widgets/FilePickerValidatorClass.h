@@ -29,15 +29,12 @@
 #include <wx/filename.h>
 
 namespace t4p {
-
 /**
  * This class is used to transfer a value from a file picker control. Currently this validator
  * can handle either wxFilePickerCtrl only.
  */
 class FilePickerValidatorClass : public wxValidator {
-
 	public:
-
 	/**
 	 * @param The string to validate / transfer. This class will not own this pointer.
 	 */
@@ -52,13 +49,11 @@ class FilePickerValidatorClass : public wxValidator {
 	virtual wxObject* Clone() const;
 
 	private:
-
 	/**
 	 * The object to validate. This class will not own this pointer.
 	 */
 	wxFileName* Data;
 };
-
 }
 
 #endif

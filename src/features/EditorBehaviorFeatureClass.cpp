@@ -30,7 +30,6 @@
 #include <wx/stc/stc.h>
 
 static int SciCommands[][2] = {
-
 { t4p::MENU_BEHAVIOR + 20, wxSTC_CMD_LINECUT },
 { t4p::MENU_BEHAVIOR + 21, wxSTC_CMD_LINEDUPLICATE },
 { t4p::MENU_BEHAVIOR + 22, wxSTC_CMD_LINEDELETE },
@@ -60,7 +59,6 @@ static int SciCommands[][2] = {
 { t4p::MENU_BEHAVIOR + 46, wxSTC_CMD_WORDPARTLEFT },
 { t4p::MENU_BEHAVIOR + 47, wxSTC_CMD_WORDPARTRIGHT },
 { 0, 0 }
-
 };
 
 // key codes > 300 have different values in wxWidgets and
@@ -245,7 +243,6 @@ void t4p::EditorKeyboardCommandClass::InitFromString(const wxString& shortcut) {
 }
 
 wxString t4p::EditorKeyboardCommandClass::ToString() const {
-
 	// turn stc keys, modifiers into wx counterparts
 	// to feed into the keybinder function
 	int wxKeyCode = SciKeyCodeToWxKeyCode(KeyCode);
@@ -259,7 +256,6 @@ wxString t4p::EditorKeyboardCommandClass::ToString() const {
 t4p::EditorBehaviorFeatureClass::EditorBehaviorFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)
 , KeyboardCommands() {
-
 }
 
 void t4p::EditorBehaviorFeatureClass::LoadPreferences(wxConfigBase* config) {
@@ -330,7 +326,6 @@ void t4p::EditorBehaviorFeatureClass::ZoomReset() {
 }
 
 void t4p::EditorBehaviorFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
-
 	// write the shortcuts to the config
 	wxConfigBase* config = wxConfig::Get();
 	for (size_t i = 0; i < KeyboardCommands.size(); ++i) {

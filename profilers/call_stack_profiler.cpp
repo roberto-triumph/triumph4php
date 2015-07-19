@@ -163,7 +163,6 @@ void CacheLargeProject(t4p::TagCacheClass& tagCache, wxString sourceDir) {
 }
 
 void CreateCacheDb(const wxString& cacheDbFullPath, const wxFileName& sqlScript) {
-
 	// if file exists delete it; it may have an old schema
 	if (wxFileName::FileExists(cacheDbFullPath)) {
 		wxRemoveFile(cacheDbFullPath);

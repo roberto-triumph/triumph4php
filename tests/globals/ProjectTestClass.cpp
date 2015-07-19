@@ -28,9 +28,7 @@
 #include <globals/ProjectClass.h>
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
-
 	public:
-
 	t4p::ProjectClass Project;
 	t4p::FileTypeClass FileType;
 
@@ -54,11 +52,9 @@ class ProjectFixtureClass :  public FileTestFixtureClass {
 		src.SetExcludeWildcards(excludeWildcards);
 		Project.AddSource(src);
 	}
-
 };
 
 SUITE(ProjectTestClass) {
-
 TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
 	AddSrc(wxT("controllers"));
 	AddSrc(wxT("models"));
@@ -123,5 +119,4 @@ TEST_FIXTURE(ProjectFixtureClass, GetNonPhpExtesions) {
 
 	CHECK_VECTOR_SIZE(expected.size(), exts);
 }
-
 }

@@ -26,7 +26,6 @@
 
 t4p::GlobalActionClass::GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) {
-
 }
 
 bool t4p::GlobalActionClass::DoAsync() {
@@ -35,7 +34,6 @@ bool t4p::GlobalActionClass::DoAsync() {
 
 t4p::InitializerGlobalActionClass::InitializerGlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId) {
-
 }
 
 bool t4p::InitializerGlobalActionClass::Init(t4p::GlobalsClass& globals) {
@@ -52,5 +50,4 @@ bool t4p::InitializerGlobalActionClass::DoAsync() {
 }
 
 void t4p::InitializerGlobalActionClass::BackgroundWork() {
-
 }

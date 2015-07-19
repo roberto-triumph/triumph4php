@@ -31,7 +31,6 @@
 #include <wx/menu.h>
 
 namespace t4p {
-
 /**
  * The NotebookLayoutViewClass view allows the user to create multiple
  * notebooks.  This allows for the user to view files side-by-side in
@@ -41,9 +40,7 @@ namespace t4p {
  *
  */
 class NotebookLayoutViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	NotebookLayoutViewClass(t4p::NotebookLayoutFeatureClass& feature);
 
 	void AddViewMenuItems(wxMenu* viewMenu);
@@ -51,7 +48,6 @@ class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 	void AddToolBarItems(wxAuiToolBar* toolBar);
 
 	private:
-
 	/**
 	 * handler for the notebook menu event
 	 */
@@ -84,7 +80,6 @@ class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

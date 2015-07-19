@@ -31,15 +31,12 @@
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
 // forward declaration, declared in another file
 class ApacheFileReadCompleteEventClass;
 class EnvironmentFeatureClass;
 
 class EnvironmentViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	EnvironmentViewClass(t4p::EnvironmentFeatureClass& feature);
 
 	/**
@@ -48,7 +45,6 @@ class EnvironmentViewClass : public t4p::FeatureViewClass {
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
 	t4p::EnvironmentFeatureClass& Feature;
 };
 
@@ -56,22 +52,17 @@ class EnvironmentViewClass : public t4p::FeatureViewClass {
  * A dialog that edits a virtual host mapping.
  */
 class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClass {
-
 	public:
-
 	VirtualHostCreateDialogClass(wxWindow* parent, std::map<wxString, wxString> existingVirtualHosts,
 			wxString& hostname, wxFileName& rootDirectory);
 
 	protected:
-
 	/**
 	 * here we will do duplicate checks; the same directory may not be entered twice
 	 */
 	void OnOkButton(wxCommandEvent& event);
 
 	private:
-
-
 	/**
 	 * This is used to check that the same directory is not entered twice
 	 */
@@ -81,7 +72,6 @@ class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClas
 	 * Used because there is to validator for wxDirPickerCtrl
 	 */
 	wxFileName& RootDirectoryFileName;
-
 };
 
 /**
@@ -89,9 +79,7 @@ class VirtualHostCreateDialogClass : public VirtualHostCreateDialogGeneratedClas
  * have functionality to scan a directory for apache config files
  */
 class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass {
-
 	protected:
-
 	void OnScanButton(wxCommandEvent& event);
 	void OnAddButton(wxCommandEvent& event);
 	void OnEditButton(wxCommandEvent& event);
@@ -109,7 +97,6 @@ class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass 
 	bool TransferDataFromWindow();
 
 	private:
-
 	/**
 	 * The configuration class
 	 *
@@ -175,9 +162,7 @@ class ApacheEnvironmentPanelClass : public ApacheEnvironmentPanelGeneratedClass 
  * Panel that displays the configured web browser executable paths
  */
 class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
-
 	public:
-
 	WebBrowserEditPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
 	/**
@@ -187,7 +172,6 @@ class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
 	bool TransferDataFromWindow();
 
 	protected:
-
 	/**
 	 * When this panel is resized automatically re-adjust the wrapping the label
 	 */
@@ -204,7 +188,6 @@ class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
 	void OnMoveDown(wxCommandEvent& event);
 
 	private:
-
 	/**
 	 * The configuration class
 	 *
@@ -224,15 +207,12 @@ class WebBrowserEditPanelClass : public WebBrowserEditPanelGeneratedClass {
  * Panel that shows the PHP binary path locations
  */
 class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
-
 	public:
-
 	PhpEnvironmentPanelClass(wxWindow* parent, EnvironmentClass& environment);
 
 	bool TransferDataFromWindow();
 
 	protected:
-
 	/**
 	 * Handle the file picker changed event.
 	 */
@@ -249,14 +229,12 @@ class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
 	void OnResize(wxSizeEvent& event);
 
 	private:
-
 	/**
 	 * The configuration class
 	 *
 	 * @var EnvironmentClass
 	 */
 	EnvironmentClass& Environment;
-
 };
 
 /**
@@ -264,14 +242,11 @@ class PhpEnvironmentPanelClass : public PhpEnvironmentPanelGeneratedClass {
  * location
  */
 class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass {
-
 	public:
-
 	WebBrowserCreateDialogClass(wxWindow* parent, std::vector<WebBrowserClass> existingBrowsers,
 		WebBrowserClass& newBrowser);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	/**
@@ -290,9 +265,7 @@ class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass 
 	 * path only).
 	 */
 	wxString OriginalName;
-
 };
-
 }
 
 #endif

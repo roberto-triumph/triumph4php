@@ -29,18 +29,14 @@
 #include <actions/FileModifiedCheckActionClass.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class FileModifiedCheckFeatureClass;
 
 class FileModifiedCheckViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature);
 
 	private:
-
 	/**
 	 * when the user puts this app in the foreground, check for
 	 * file modifications.  maybe the user went to another editor
@@ -94,7 +90,6 @@ class FileModifiedCheckViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

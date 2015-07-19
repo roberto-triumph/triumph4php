@@ -28,7 +28,6 @@
 t4p::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
 : SqliteResultClass()
 , TotalCount(0) {
-
 }
 
 bool t4p::DetectedTagTotalCountResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
@@ -172,7 +171,6 @@ bool t4p::DetectedTagExactMemberResultClass::DoPrepare(soci::statement& stmt, bo
 t4p::DetectedTagNearMatchMemberResultClass::DetectedTagNearMatchMemberResultClass()
 : DetectedTagExactMemberResultClass()
 , KeyUpper() {
-
 }
 
 void t4p::DetectedTagNearMatchMemberResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,

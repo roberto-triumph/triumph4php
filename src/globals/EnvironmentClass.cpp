@@ -30,7 +30,6 @@
 t4p::WebBrowserClass::WebBrowserClass()
 	: Name()
 	, FullPath() {
-
 }
 
 t4p::WebBrowserClass::WebBrowserClass(const t4p::WebBrowserClass& src)
@@ -42,7 +41,6 @@ t4p::WebBrowserClass::WebBrowserClass(const t4p::WebBrowserClass& src)
 t4p::WebBrowserClass::WebBrowserClass(wxString name, wxFileName fullPath)
 	: Name(name.c_str())
 	, FullPath(fullPath) {
-
 }
 
 t4p::WebBrowserClass& t4p::WebBrowserClass::operator=(const t4p::WebBrowserClass& src) {
@@ -51,7 +49,6 @@ t4p::WebBrowserClass& t4p::WebBrowserClass::operator=(const t4p::WebBrowserClass
 }
 
 void t4p::WebBrowserClass::Copy(const t4p::WebBrowserClass& src) {
-
 	// using c_str() to completely clone a wxString, as by default
 	// the assignment operator is a shallow copy
 	// this makes the copies thread-safe
@@ -97,7 +94,6 @@ void t4p::PhpEnvironmentClass::Init() {
 }
 
 void t4p::PhpEnvironmentClass::Copy(const t4p::PhpEnvironmentClass &src) {
-
 	// using c_str() to completely clone a wxString, as by default
 	// the assignment operator is a shallow copy
 	// this makes the copies thread-safe
@@ -109,12 +105,10 @@ void t4p::PhpEnvironmentClass::Copy(const t4p::PhpEnvironmentClass &src) {
 
 void t4p::PhpEnvironmentClass::AutoDetermine() {
 	if (!IsAuto) {
-
 		// stick with the configured version
 		return;
 	}
 	if (NotInstalled()) {
-
 		// default to the first version
 		Version = pelet::PHP_53;
 		return;
@@ -141,7 +135,6 @@ void t4p::PhpEnvironmentClass::AutoDetermine() {
 		Version = pelet::PHP_53;
 	}
 	else {
-
 		// if version string changes
 		Version = pelet::PHP_53;
 	}
@@ -155,7 +148,6 @@ t4p::EnvironmentClass::EnvironmentClass()
 	: Apache()
 	, Php()
 	, WebBrowsers() {
-
 }
 
 void t4p::EnvironmentClass::Init() {
@@ -216,7 +208,6 @@ void t4p::EnvironmentClass::AddDefaults() {
 }
 
 void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
-
 	int version = 0;
 	config->Read(wxT("Environment/PhpExecutablePath"), &Php.PhpExecutablePath);
 	config->Read(wxT("Environment/PhpVersionIsAuto"), &Php.IsAuto);
@@ -246,12 +237,10 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 	config->SetPath(wxT("Environment"));
 	bool found = config->GetFirstGroup(groupName, index);
 	if (found) {
-
 		// only remove the defaults when the config file has something
 		WebBrowsers.clear();
 	}
 	while (found) {
-
 		// the web browsers; there are many groups; each group is named "WebBrowser_#"
 		if (groupName.Find(wxT("WebBrowser_")) >= 0) {
 			wxString key = groupName + wxT("/Name");
@@ -262,7 +251,6 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 			WebBrowsers.push_back(t4p::WebBrowserClass(browserName, browserFileName));
 		}
 		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
-
 			// the manual virtual host entries there are many groups; each group is named "VirtualHost_#"
 			// only fill in when Manual flag is off (otherwise we want to parse from the file
 			// in case settings have changed)

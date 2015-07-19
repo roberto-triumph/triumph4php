@@ -26,7 +26,6 @@
 #define T4P_NUMBER__
 
 namespace t4p {
-
 /**
  * Check to see if a is less than b; ie if
  * 0 <= a < b
@@ -54,7 +53,6 @@ bool NumberLessThan(int a, unsigned int b);
  * @return bool TRUE i  a == b and a >= 0
  */
 bool NumberEqualTo(int a, unsigned int b);
-
 }
 
 #endif

@@ -46,7 +46,6 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 												 const wxString& fileIdentifier,
 												 const UnicodeString& code, bool isNew, pelet::Versions version,
 												 bool doParseTags) {
-
 	// make sure these is are deep copies since we access the variables in a separate thread
 	TagCacheDbFileName.Assign(globals.TagCacheDbFileName.GetFullPath());
 	Code = code;
@@ -80,7 +79,6 @@ void t4p::WorkingCacheBuilderClass::Update(t4p::GlobalsClass& globals,
 }
 
 void t4p::WorkingCacheBuilderClass::BackgroundWork() {
-
 	// tag caches may not exist if the user screwed up and pointed their settings
 	// dir to a non-existing location.
 	if (!TagCacheDbFileName.FileExists()) {
@@ -89,7 +87,6 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 
 	if (!FileIdentifier.IsEmpty()) {
 		if (FileIsNew) {
-
 			// new files will not have a name, use the identifier as the name
 			FileName = FileIdentifier;
 		}
@@ -109,7 +106,6 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 		workingCache->Init(FileName, FileIdentifier, FileIsNew, Version, true, PreviousSymbolTable);
 		bool good = workingCache->Update(Code, PreviousSymbolTable);
 		if (good && !IsCancelled()) {
-
 			// parse any tags from the source code
 			// note that we only parse the file if it is valid syntax
 			// since BuildResourceCacheForFile kills existing tags in the file

@@ -83,7 +83,6 @@ t4p::LintResultsSummaryEventClass::LintResultsSummaryEventClass(int eventId, int
 	, TotalFiles(totalFiles)
 	, ErrorFiles(errorFiles)
 	, SkippedFiles(skippedFiles) {
-
 }
 
 wxEvent* t4p::LintResultsSummaryEventClass::Clone() const {
@@ -163,7 +162,6 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 		HasLoadedSuppressions = true;
 	}
 	else if (!HasLoadedSuppressions) {
-
 		// no file== don't bother trying to load the suppression file
 		// (so that we don't generate file not found errors)
 		HasLoadedSuppressions = true;
@@ -210,7 +208,6 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 }
 
 std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErrors() {
-
 	// did the file have syntax errors? these are not
 	// suppressable
 	std::vector<pelet::LintResultsClass> allResults;
@@ -225,7 +222,6 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		wxFileName wxf(t4p::IcuToWx(variableResult.File));
 		if (!Suppressions.ShouldIgnore(wxf, variableResult.VariableName,
 			t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR)) {
-
 			pelet::LintResultsClass lintResult;
 			lintResult.Error = UNICODE_STRING_SIMPLE("Uninitialized variable ") + variableResult.VariableName;
 			lintResult.File = t4p::IcuToChar(variableResult.File);
@@ -236,7 +232,6 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		}
 	}
 	for (size_t i = 0; i < IdentifierResults.size(); ++i) {
-
 		t4p::PhpIdentifierLintResultClass identifierResult = IdentifierResults[i];
 
 		// did the user supress unkown class/method/function results?
@@ -285,7 +280,6 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		wxFileName wxf(t4p::IcuToWx(callResult.File));
 		if (!Suppressions.ShouldIgnore(wxf, callResult.Identifier,
 			t4p::SuppressionRuleClass::SKIP_FUNCTION_ARGUMENT_MISMATCH)) {
-
 			pelet::LintResultsClass lintResult;
 			lintResult.File = t4p::IcuToChar(callResult.File);
 			lintResult.UnicodeFilename = callResult.File;
@@ -328,7 +322,6 @@ t4p::LintActionClass::LintActionClass(t4p::RunningThreadsClass& runningThreads,
 	, Search()
 	, FilesCompleted(0)
 	, FilesTotal(0) {
-
 }
 
 bool t4p::LintActionClass::InitDirectoryLint(std::vector<t4p::SourceClass> sources,
@@ -347,7 +340,6 @@ bool t4p::LintActionClass::InitDirectoryLint(std::vector<t4p::SourceClass> sourc
 }
 
 void t4p::LintActionClass::BackgroundWork() {
-
 	if (Search.Init(Sources, t4p::DirectorySearchClass::PRECISE)) {
 		FilesCompleted = 0;
 		FilesTotal = Search.GetTotalFileCount();
@@ -356,7 +348,6 @@ void t4p::LintActionClass::BackgroundWork() {
 	}
 
 	if (!IsCancelled()) {
-
 		// send an event with summary of errors totals
 		int totalFiles = ParserDirectoryWalker.WithErrors + ParserDirectoryWalker.WithNoErrors;
 		int errorFiles = ParserDirectoryWalker.WithErrors;
@@ -388,7 +379,6 @@ void t4p::LintActionClass::IterateDirectory() {
 		}
 		SetPercentComplete(newProgressWhole);
 		if (ParserDirectoryWalker.WithErrors > MAX_LINT_ERROR_FILES) {
-
 			// too many files with errors, something is not
 			// right, just exit so that we don't
 			// attempt to show the user thousands of errors
@@ -409,14 +399,11 @@ t4p::LintBackgroundSingleFileClass::LintBackgroundSingleFileClass(t4p::RunningTh
 	, FileName()
 	, TagCache()
 	, ParserDirectoryWalker(options, suppressionFile) {
-
 }
 
 bool t4p::LintBackgroundSingleFileClass::Init(const wxFileName& fileName, t4p::GlobalsClass& globals) {
-
 	bool good = false;
 	if (globals.FileTypes.HasAPhpExtension(fileName.GetFullPath())) {
-
 		// need to be thread safe and deep clone
 		FileName.Assign(fileName.GetFullPath());
 		TagCache.RegisterDefault(globals);
@@ -425,7 +412,6 @@ bool t4p::LintBackgroundSingleFileClass::Init(const wxFileName& fileName, t4p::G
 		ParserDirectoryWalker.Init(TagCache);
 
 		if (!globals.IsAPhpSourceFile(fileName.GetFullPath())) {
-
 			// when a file is not inside of a project, it will probably contain
 			// functions and classes that are not in the tag cache; in this case
 			// don't bother doing class/method/function identifier checks.
@@ -475,7 +461,6 @@ void t4p::LintFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::LintFeatureClass::OnProjectsRemoved(t4p::ProjectEventClass& event) {
-
 	// when a project is removed then remove any suppression rules
 	// that mention the projects' sources
 	// question: what do we do when two different projects have the same
@@ -507,7 +492,6 @@ void t4p::LintFeatureClass::OnProjectsRemoved(t4p::ProjectEventClass& event) {
 
 	std::map<wxString, int>::const_iterator remove;
 	for (remove = toRemove.begin(); remove != toRemove.end(); ++remove) {
-
 		// remove the skip-all rules for the vendor dir (they were added
 		// when the project was created)
 		wxFileName fn;
@@ -519,11 +503,9 @@ void t4p::LintFeatureClass::OnProjectsRemoved(t4p::ProjectEventClass& event) {
 	if (!suppressions.Save(suppressionFile)) {
 		t4p::EditorLogWarning(t4p::ERR_INVALID_FILE, suppressionFile.GetFullPath());
 	}
-
 }
 
 void t4p::LintFeatureClass::OnProjectsUpdated(t4p::ProjectEventClass& event) {
-
 	// when a project is added/updated then add any suppression rules
 	// that mention the projects' vendor directories.
 	// we add automatic suppression to the vendor directories because
@@ -571,14 +553,12 @@ void t4p::LintFeatureClass::OnProjectsUpdated(t4p::ProjectEventClass& event) {
 }
 
 void t4p::LintFeatureClass::OnProjectCreated(wxCommandEvent& event) {
-
 	// same as when projects are updated; add the vendor dir
 	// to the suppression list
 	wxFileName fn;
 	fn.AssignDir(event.GetString());
 	fn.AppendDir(wxT("vendor"));
 	if (fn.DirExists()) {
-
 		// don't care about rule loading errors
 		t4p::LintSuppressionClass suppressions;
 		std::vector<UnicodeString> errors;
@@ -597,7 +577,6 @@ t4p::LintFeatureOptionsClass::LintFeatureOptionsClass()
 , CheckUninitializedVariables(true)
 , CheckUnknownIdentifiers(false)
 , CheckGlobalScopeVariables(false) {
-
 }
 
 t4p::LintFeatureOptionsClass::LintFeatureOptionsClass(const t4p::LintFeatureOptionsClass& src)

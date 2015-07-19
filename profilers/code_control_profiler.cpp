@@ -42,7 +42,6 @@
  */
 class CodeControlProfilerAppClass : public wxApp {
 	public:
-
 	CodeControlProfilerAppClass();
 
 	virtual bool OnInit();
@@ -59,9 +58,7 @@ class CodeControlProfilerAppClass : public wxApp {
  * When a file is dropped into the control it will be opened.
  */
 class FileDropTargetClass : public wxFileDropTarget {
-
 	public:
-
 	/**
 	 * This class will NOT own the codeControl or the globals pointer
 	 */
@@ -74,7 +71,6 @@ class FileDropTargetClass : public wxFileDropTarget {
 	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
 
 	private:
-
 	t4p::CodeControlClass* CodeControl;
 	t4p::GlobalsClass* Globals;
 };
@@ -82,7 +78,6 @@ class FileDropTargetClass : public wxFileDropTarget {
 FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals)
 : CodeControl(codeControl)
 , Globals(globals) {
-
 }
 
 bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files) {
@@ -138,7 +133,6 @@ class CodeControlFrameClass: public wxFrame {
 	CodeControlFrameClass(CodeControlProfilerAppClass& app);
 
 	private:
-
 	/*
 	 * Build the menu and add the event handlers
 	 */
@@ -171,7 +165,6 @@ CodeControlProfilerAppClass::CodeControlProfilerAppClass()
 	, Options()
 	, Globals()
 	, EventSink() {
-
 }
 
 bool CodeControlProfilerAppClass::OnInit() {

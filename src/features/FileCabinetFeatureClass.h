@@ -30,7 +30,6 @@
 #include <globals/Sqlite.h>
 
 namespace t4p {
-
 /**
  * The file cabinet features allows the user to add save any filename
  * or directory name in the user's system to be recalled later.
@@ -42,9 +41,7 @@ namespace t4p {
  * cabinet.
  */
 class FileCabinetFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	FileCabinetFeatureClass(t4p::AppClass& app);
 
 	/**
@@ -63,14 +60,11 @@ class FileCabinetFeatureClass : public t4p::FeatureClass {
 	void DeleteCabinetItem(int id);
 
 	private:
-
 	/**
 	 * to modify the file cabinet
 	 */
 	t4p::FileCabinetStoreClass Store;
-
 };
-
 }
 
 #endif // T4P_FILECABINETFEATURECLASS_H

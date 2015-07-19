@@ -29,7 +29,6 @@
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
 /**
  * This is the feature that check for new versions of Triumph
  * Version checking is done by posting to
@@ -38,7 +37,6 @@ namespace t4p {
  */
 class VersionUpdateFeatureClass : public FeatureClass {
 	public:
-
 	VersionUpdateFeatureClass(t4p::AppClass& app);
 
 	void LoadPreferences(wxConfigBase* config);
@@ -51,8 +49,6 @@ class VersionUpdateFeatureClass : public FeatureClass {
 	wxDateTime NextCheckTime;
 
 	private:
-
-
 	void OnAppReady(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
@@ -67,14 +63,11 @@ class VersionUpdateFeatureClass : public FeatureClass {
  * response is returned from the server.
  */
 class VersionUpdateActionClass : public t4p::ActionClass {
-
 	public:
-
 	VersionUpdateActionClass(t4p::RunningThreadsClass& runningThreads,
 		int eventId, const wxString& currentVersion);
 
 	protected:
-
 	void BackgroundWork();
 
 	wxString GetNewVersion(const wxString& currentVersion, long& statusCode);
@@ -82,14 +75,12 @@ class VersionUpdateActionClass : public t4p::ActionClass {
 	wxString GetLabel() const;
 
 	private:
-
 	wxString CurrentVersion;
 
 	void OnAppReady(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

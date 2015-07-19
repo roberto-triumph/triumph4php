@@ -36,7 +36,6 @@
 #include <wx/event.h>
 
 namespace t4p {
-
 // forward declarations
 class DetectedTagNearMatchMemberResultClass;
 class DetectedTagExactMemberResultClass;
@@ -53,9 +52,7 @@ class GlobalsClass;
  * we don't want to disturb the global cache (which is much bigger).
  */
 class WorkingCacheClass {
-
 	public:
-
 	/**
 	 * The object that keeps track of variable types; we only need
 	 * to keep track of variable types for opened files.
@@ -117,7 +114,6 @@ class WorkingCacheClass {
 	bool Update(const UnicodeString& code, const t4p::SymbolTableClass& previousSymbolTable);
 
 	private:
-
 };
 
 /**
@@ -139,9 +135,7 @@ class WorkingCacheClass {
  * TagCacheClass with both pointing to the same DB files.
  */
 class TagCacheClass {
-
 	public:
-
 	TagCacheClass();
 
 	~TagCacheClass();
@@ -516,7 +510,6 @@ class TagCacheClass {
 	bool HasDir(const wxString& dir);
 
 	private:
-
 	/**
 	 * Returns a list that contains all of the tag finders for the registered files plus
 	 * the global tag finders.
@@ -553,7 +546,6 @@ extern const wxEventType EVENT_TAG_FINDER_LIST_COMPLETE;
 
 class WorkingCacheCompleteEventClass : public wxEvent {
 	public:
-
 	/**
 	 * This will be owned by the event handler
 	 */
@@ -584,7 +576,6 @@ class WorkingCacheCompleteEventClass : public wxEvent {
 	wxString GetFileName() const;
 
 	private:
-
 	wxString FileName;
 
 	wxString FileIdentifier;
@@ -592,12 +583,10 @@ class WorkingCacheCompleteEventClass : public wxEvent {
 
 class TagFinderListCompleteEventClass : public wxEvent {
 	public:
-
 	TagFinderListCompleteEventClass(int id);
 
 	wxEvent* Clone() const;
 };
-
 }
 
 typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(t4p::WorkingCacheCompleteEventClass&);

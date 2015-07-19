@@ -30,7 +30,6 @@
 #include <wx/hyperlink.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class CodeControlClass;
 
@@ -40,18 +39,14 @@ class CodeControlClass;
  * mouse pointer or at the current cursor position.
  */
 class DocCommentFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	DocCommentFeatureClass(t4p::AppClass& app);
 
 	/**
 	 * @return TRUE if this feature is enabled
 	 */
 	bool IsEnabled() const;
-
 };
-
 }
 
 #endif

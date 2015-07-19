@@ -87,11 +87,9 @@ t4p::FileOperationsViewClass::FileOperationsViewClass(t4p::FileOperationsFeature
 : FeatureViewClass()
 , Feature(feature)
 , StatusBarTimer(this, ID_STATUS_BAR_TIMER) {
-
 }
 
 void t4p::FileOperationsViewClass::AddFileMenuItems(wxMenu* fileMenu) {
-
 	// use stock menu IDs so that default shortcuts are enabled on each different OS
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 0, _("New &PHP File\tCTRL+N"), _("Create a new PHP File"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_FILE_OPERATIONS + 1, _("New S&QL File"), _("Create a new SQL File"), wxITEM_NORMAL);
@@ -238,7 +236,6 @@ void t4p::FileOperationsViewClass::OnFileRevert(wxCommandEvent& event) {
 			code->Revert();
 
 			if (currentLine <= code->GetLineCount()) {
-
 				// stc uses zero-based line numbers, this method
 				// accepts 1-based line numbers
 				code->GotoLineAndEnsureVisible(currentLine + 1);
@@ -291,7 +288,6 @@ void t4p::FileOperationsViewClass::OnAppFilePageChanged(t4p::CodeControlEventCla
 	t4p::NotebookClass* notebook = NULL;
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
-
 		int newPage = notebook->GetPageIndex(event.GetCodeControl());
 		bool isPageModified = notebook->IsPageModified(newPage);
 		ToolBar->EnableTool(t4p::MENU_FILE_OPERATIONS + 6, isPageModified);
@@ -314,7 +310,6 @@ void t4p::FileOperationsViewClass::StartStatusBarTimer() {
 }
 
 void t4p::FileOperationsViewClass::OnStatusBarTimer(wxTimerEvent& event) {
-
 	/*
 	 * Update the status bar info (line, column)
 	 * at specific intervals instead of in a EVT_STC_UPDATEUI event.
@@ -327,7 +322,6 @@ void t4p::FileOperationsViewClass::OnStatusBarTimer(wxTimerEvent& event) {
 
 
 void t4p::FileOperationsViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-
 	// in case all notebook tabs have been closed, we need to refresh the cursor position
 	UpdateStatusBar();
 	MenuUpdate(true);
@@ -354,7 +348,6 @@ void t4p::FileOperationsViewClass::UpdateStatusBar() {
 
 		wxString s = wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos);
 		GetStatusBarWithGauge()->SetColumn1Text(s);
-
 	}
 	else {
 		GetStatusBarWithGauge()->SetColumn1Text(wxEmptyString);
@@ -368,7 +361,6 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 	t4p::CodeControlClass* codeControl = NULL;
 	if (GetCurrentCodeControlWithNotebook(&codeControl, &notebook)) {
 		if (isClosingPage) {
-
 			// since we get the close event BEFORE the code control
 			// is removed
 			hasEditors = notebook->GetPageCount() > 1;

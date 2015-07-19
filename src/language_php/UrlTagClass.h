@@ -31,15 +31,12 @@
 #include <globals/SqliteFinderClass.h>
 
 namespace t4p {
-
 /**
  * A small class to hold an application URL. We tie together a URL and its PHP source
  * code entry point so that we can easily jump to it.
  */
 class UrlTagClass {
-
 	public:
-
 	/**
 	 * These are absolute URLs; may contain a query string.
 	 * For example, "http://localhost.codeigniter/index.php/news/index?val=123"
@@ -101,9 +98,7 @@ class UrlTagClass {
  * For a big application, there may be hundreds or thousands of these.
  */
 class UrlTagFinderClass : public t4p::SqliteFinderClass {
-
 	public:
-
 	UrlTagFinderClass(soci::session& session);
 
 	/**
@@ -171,8 +166,6 @@ class UrlTagFinderClass : public t4p::SqliteFinderClass {
 	 * methods from the detected URLs.
 	 */
 	std::vector<wxString> AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs);
-
 };
-
 }
 #endif

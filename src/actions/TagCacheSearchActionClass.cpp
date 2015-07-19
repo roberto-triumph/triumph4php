@@ -46,11 +46,9 @@ t4p::TagCacheSearchActionClass::TagCacheSearchActionClass(t4p::RunningThreadsCla
 	, TagCache()
 	, SearchString()
 	, SearchDirs() {
-
 }
 
 void t4p::TagCacheSearchActionClass::SetSearch(t4p::GlobalsClass& globals, const wxString& search, const std::vector<wxFileName>& dirs) {
-
 	// deep copy the string, wxString not thread safe
 	SearchString = t4p::WxToIcu(search);
 	SearchDirs = t4p::DeepCopyFileNames(dirs);
@@ -92,7 +90,6 @@ void t4p::TagCacheSearchActionClass::BackgroundWork() {
 	}
 	delete results;
 	if (!IsCancelled()) {
-
 		// PostEvent will set the correct event ID
 		t4p::TagCacheSearchCompleteEventClass evt(wxID_ANY, SearchString, matches);
 		PostEvent(evt);

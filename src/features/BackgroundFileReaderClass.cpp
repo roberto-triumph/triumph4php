@@ -54,7 +54,6 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 	bool isDestroy = IsCancelled();
 	int counter = 0;
 	if (Mode == WALK) {
-
 		// careful to test for destroy first
 		while (!isDestroy && DirectorySearch.More()) {
 			bool res = BackgroundFileRead(DirectorySearch);

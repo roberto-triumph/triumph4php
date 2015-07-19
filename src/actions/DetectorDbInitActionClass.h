@@ -30,7 +30,6 @@
 
 namespace t4p {
 
-
 /**
  * This class will prime the detectors sqlite db file.
  * enabled projects. The Config cache will be primed; although
@@ -38,16 +37,13 @@ namespace t4p {
  * stale.
  */
 class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
-
 	public:
-
 	DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	void Work(t4p::GlobalsClass& globals);
 
 	wxString GetLabel() const;
 };
-
 }
 
 #endif

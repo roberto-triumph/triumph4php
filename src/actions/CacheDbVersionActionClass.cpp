@@ -43,7 +43,6 @@ t4p::TagCacheDbVersionActionClass::TagCacheDbVersionActionClass(t4p::RunningThre
 	: GlobalActionClass(runningThreads, eventId)
 	, TagDbs()
 	, Session() {
-
 }
 
 bool t4p::TagCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
@@ -60,7 +59,6 @@ void t4p::TagCacheDbVersionActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator filename;
 	for (filename = TagDbs.begin(); filename != TagDbs.end() && !IsCancelled(); ++filename) {
 		try {
-
 			// if file does not exist create it
 			// if the directory that the sqlite file should be in does not exist
 			// then dont create the dirs.
@@ -93,7 +91,6 @@ t4p::DetectorCacheDbVersionActionClass::DetectorCacheDbVersionActionClass(t4p::R
 	: GlobalActionClass(runningThreads, eventId)
 	, DetectorDbs()
 	, Session() {
-
 }
 
 bool t4p::DetectorCacheDbVersionActionClass::Init(t4p::GlobalsClass& globals) {
@@ -110,7 +107,6 @@ void t4p::DetectorCacheDbVersionActionClass::BackgroundWork() {
 	std::vector<wxFileName>::iterator filename;
 	for (filename = DetectorDbs.begin(); filename != DetectorDbs.end() && !IsCancelled(); ++filename) {
 		try {
-
 			// if file does not exist create it
 			// if the directory that the sqlite file should be in does not exist
 			// then dont create the dirs.

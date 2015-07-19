@@ -31,7 +31,6 @@
 #include <pelet/LanguageDiscoveryClass.h>
 
 namespace t4p {
-
 /**
  * The PhpCodeCompletion feature provides the user with
  * code suggestions. This feature only handles code
@@ -39,12 +38,9 @@ namespace t4p {
  * <?php tags.
  */
 class PhpCodeCompletionFeatureClass : public t4p::FeatureClass {
-
 	public:
 	PhpCodeCompletionFeatureClass(t4p::AppClass& app);
-
 };
-
 }
 
 #endif // T4P_PHPCODECOMPLETIONFEATURECLASS_H

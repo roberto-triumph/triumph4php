@@ -69,7 +69,6 @@ t4p::FileListingClass::FileListingClass(wxEvtHandler& handler)
 , RunningThreads()
 , Handler(handler)
 , Watcher(NULL) {
-
 	RunningThreads.SetMaxThreads(1);
 	RunningThreads.AddEventHandler(this);
 }
@@ -85,12 +84,10 @@ t4p::FileListingClass::~FileListingClass() {
 void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 	wxFileName modFile = event.GetNewPath();
 	if (modFile.GetPathWithSep() != WorkingDir.GetPathWithSep()) {
-
 		// event from directory we are not showing
 		return;
 	}
 	if (event.GetChangeType() == wxFSW_EVENT_WARNING && event.GetWarningType() == wxFSW_WARNING_OVERFLOW) {
-
 		// restart the watch
 		delete Watcher;
 		Watcher = new wxFileSystemWatcher();
@@ -98,7 +95,6 @@ void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 		Watcher->Add(WorkingDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
 	}
 	else if (event.GetChangeType() == wxFSW_EVENT_ERROR) {
-
 		// restart the watch
 		delete Watcher;
 		Watcher = new wxFileSystemWatcher();
@@ -231,7 +227,6 @@ t4p::ExplorerEventClass::ExplorerEventClass(int eventId, const wxFileName& dir, 
 , Error()
 , TotalFiles(totalFiles)
 , TotalSubDirs(totalSubDirs) {
-
 	// clone filenames they contain wxStrings; no thread-safe
 	Dir = t4p::FileNameCopy(dir);
 	Files = t4p::DeepCopyFileNames(files);
@@ -249,7 +244,6 @@ t4p::ExplorerFileSystemActionClass::ExplorerFileSystemActionClass(t4p::RunningTh
 , Dir()
 , Extensions()
 , DoHidden(false) {
-
 }
 
 wxString t4p::ExplorerFileSystemActionClass::GetLabel() const {
@@ -427,7 +421,6 @@ t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId, const wxFil
 , FilesNotDeleted()
 , Action(t4p::ExplorerModifyActionClass::RENAME_FILE)
 , Success(success) {
-
 }
 
 t4p::ExplorerModifyEventClass::ExplorerModifyEventClass(int eventId,

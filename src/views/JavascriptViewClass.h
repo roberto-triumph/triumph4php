@@ -31,7 +31,6 @@
 #include <language_js/JsTagResultClass.h>
 
 namespace t4p {
-
 // forward declaration, defined in other files
 class GlobalsClass;
 class AppClass;
@@ -41,9 +40,7 @@ class AppClass;
  * code completes javascript function names
  */
 class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-
 	public:
-
 	/**
 	 * @param finder connection to SQLite file that contains the parsed
 	 *        javascript function names
@@ -61,7 +58,6 @@ class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProvider
 	void Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus);
 
 	private:
-
 	/**
 	 * The globals; used to get connection handle
 	 * to the js sqlite file and the current project
@@ -84,9 +80,7 @@ class JavascriptCodeCompletionProviderClass : public t4p::CodeCompletionProvider
  * this class highlights matching braces {}, [], and ()
  */
 class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-
 	public:
-
 	JavascriptBraceMatchStylerClass();
 
 	bool DoesSupport(t4p::FileType type);
@@ -100,13 +94,10 @@ class JavascriptBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * coding Javascript, code completion, keyword highlighting
  */
 class JavascriptViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	JavascriptViewClass(t4p::AppClass& app);
 
 	private:
-
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 
 	/**
@@ -121,7 +112,6 @@ class JavascriptViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_JAVASCRIPTVIEWCLASS__

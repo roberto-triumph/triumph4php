@@ -37,7 +37,6 @@
 #include <map>
 
 namespace t4p {
-
 /**
  * The TagParser is used to store parsed tags(classes, functions, methods, properties) into a
  * SQLite database. This class is used in conjunction with the DirectorySearchClass; the
@@ -56,9 +55,7 @@ class TagParserClass : public pelet::ClassObserverClass,
 	public pelet::ClassMemberObserverClass,
 	public pelet::FunctionObserverClass,
 	public t4p::DirectoryWalkerClass {
-
 	public:
-
 	/**
 	 * The files to be parsed; these are php source code file
 	 * extensions
@@ -243,7 +240,6 @@ class TagParserClass : public pelet::ClassObserverClass,
 	void RenameDir(const wxFileName& oldDir, const wxFileName& newDir);
 
 	private:
-
 	/**
 	 * cache of namespaces, used because the same namespace may be declared in multiple
 	 * files and we don't want to insert multiple rows of the same namespace name. Since
@@ -403,6 +399,5 @@ class TagParserClass : public pelet::ClassObserverClass,
 	 */
 	void BeginTransaction();
 };
-
 }
 #endif

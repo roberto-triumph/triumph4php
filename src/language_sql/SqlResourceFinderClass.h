@@ -31,15 +31,12 @@
 #include <map>
 
 namespace t4p {
-
 /**
  * class that will open a connection to a database, get all of the tables
  * and columns, and store them in the Triumph resources schema.
  */
 class SqlResourceFetchClass {
-
 	public:
-
 	/**
 	 *  @param soci::session the session that holds the connection
 	 *         to the Triumph tag cache
@@ -61,7 +58,6 @@ class SqlResourceFetchClass {
 	bool Wipe();
 
 	private:
-
 	/**
 	 * Connects to the given mysql database and queries the table meta data
 	 * for the connection.
@@ -95,7 +91,6 @@ class SqlResourceFetchClass {
  */
 class SqlResourceTableResultClass : public t4p::SqliteResultClass {
 	public:
-
 	/**
 	 * The matched table name
 	 */
@@ -120,7 +115,6 @@ class SqlResourceTableResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * build the SQL to query for tables and bind the input
 	 * parameters.
@@ -139,7 +133,6 @@ class SqlResourceTableResultClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	std::string Lookup;
 
 	std::string LookupEnd;
@@ -152,7 +145,6 @@ class SqlResourceTableResultClass : public t4p::SqliteResultClass {
  */
 class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
 	public:
-
 	/**
 	 * The matched table name
 	 */
@@ -177,7 +169,6 @@ class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * build the SQL to query for tables and bind the input
 	 * parameters.
@@ -196,7 +187,6 @@ class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	std::string Lookup;
 
 	std::string ConnectionHash;
@@ -207,7 +197,6 @@ class ExactSqlResourceTableResultClass : public t4p::SqliteResultClass {
  */
 class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
 	public:
-
 	/**
 	 * The matched column name
 	 */
@@ -227,7 +216,6 @@ class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	/**
 	 * prepares and binds the query
 	 */
@@ -240,7 +228,6 @@ class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	std::string Lookup;
 
 	std::string LookupEnd;
@@ -254,9 +241,7 @@ class SqlResourceColumnResultClass : public t4p::SqliteResultClass {
  * for the database connections that the user configured
  */
 class SqlResourceFinderClass : public t4p::SqliteFinderClass {
-
 	public:
-
 	SqlResourceFinderClass(soci::session& session);
 
 	/**
@@ -276,9 +261,7 @@ class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 	 * returned column names will be sorted in ascending order
 	 */
 	std::vector<UnicodeString> FindColumns(const DatabaseTagClass& info, const UnicodeString& partialColumnName);
-
 };
-
 }
 
 #endif

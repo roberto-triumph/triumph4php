@@ -36,7 +36,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * The tag feature will parse PHP files that have been
  * edited and will record the files' classes, methods, and
@@ -55,9 +54,7 @@ namespace t4p {
  * acutally re-parse the new directory.
  */
 class TagFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * when a 'jump to tag' is done and we need to index a project, we
 	 * need to keep the search string so that after indexing we can
@@ -73,7 +70,6 @@ class TagFeatureClass : public FeatureClass {
 	wxString CacheStatus();
 
 	private:
-
 	void OnAppStartSequenceComplete(wxCommandEvent& event);
 
 	/**
@@ -137,6 +133,5 @@ class TagFeatureClass : public FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif // __RESOURCEFEATURECLASS_H

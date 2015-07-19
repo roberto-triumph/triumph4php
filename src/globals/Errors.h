@@ -28,7 +28,6 @@
 #include <wx/string.h>
 
 namespace t4p {
-
 /**
  * These are errors from the editor itself; not the app that the editor is
  * modifying.
@@ -110,7 +109,6 @@ wxString MessageWithFix(wxString message, wxString fix);
  * the fix string is determined by comparing logged text vs. what the string an Errors enum would generate.
  */
 void EditorErrorFix(const wxString& errorString, wxString& error, wxString& fix);
-
 };
 
 #endif

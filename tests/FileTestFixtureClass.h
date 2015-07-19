@@ -33,9 +33,7 @@
  * This test fixture is useful for testing classes that read from files.
  */
 class FileTestFixtureClass {
-
 	public:
-
 	/**
 	 * Construct a new test fixture that will use subdirectory tempDirectory within the OS temp
 	 * @param wxString tempDirectory directory where files will be created.

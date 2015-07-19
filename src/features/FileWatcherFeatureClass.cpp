@@ -62,7 +62,6 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 
 	std::vector<wxString>::iterator path;
 	for (path = sortedPaths.begin(); path != sortedPaths.end(); ++path) {
-
 		// we want to know if the path is a file or a directory
 		// in the case of deletes, we can't query the file system as the file/dir no
 		// longer exists
@@ -86,7 +85,6 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 			}
 		}
 		else if (wxFileName::FileExists(*path) || tagCache.HasFullPath(*path)) {
-
 			// if the file's dir parent dir has been labeled as created, we want to skip it
 			wxFileName fileCreated(*path);
 			wxFileName fileDir;
@@ -224,13 +222,11 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 	wxDateTime now = wxDateTime::Now();
 	wxTimeSpan span = now.Subtract(LastWatcherEventTime);
 	if (span.GetSeconds() <= 2) {
-
 		// we are still getting file change events. let's wait until all
 		// of the changes are done
 		return;
 	}
 	if (PathsExternallyCreated.empty() && PathsExternallyModified.empty() && PathsExternallyDeleted.empty() && PathsExternallyRenamed.empty()) {
-
 		// nothing to do
 		return;
 	}
@@ -271,7 +267,6 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 
 	std::map<wxString, wxString>::iterator rename = pathsRenamed.begin();
 	while (rename != pathsRenamed.end()) {
-
 		// make sure renamed files are actually renamed. sometime editors will swap files
 		// instead of overwriting them, and this results in RENAME events
 		wxFileName fileName(rename->first);
@@ -343,7 +338,6 @@ void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(const std::vector<wxStri
 		wxString fullPath = f->first;
 		bool isOpened = std::find(openedFiles.begin(), openedFiles.end(), fullPath) != openedFiles.end();
 		if (!isOpened) {
-
 			// file is not open. notify the app that a file was externally deleted
 			wxCommandEvent modifiedEvt(t4p::EVENT_APP_FILE_DELETED);
 			modifiedEvt.SetString(fullPath);
@@ -362,7 +356,6 @@ void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(const std::vector<wxStri
 	}
 	std::map<wxString, wxString>::iterator pair;
 	for (pair = pathsRenamed.begin(); pair != pathsRenamed.end(); ++pair) {
-
 		// figure out if we renamed a file or a dir
 		if (wxFileName::DirExists(pair->second)) {
 			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
@@ -392,13 +385,11 @@ void t4p::FileWatcherFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 		PathsExternallyRenamed[path] = event.GetNewPath().GetFullPath();
 	}
 	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
-
 		// too many files being added/removed
 		// this is probably a big directory being added / removed
 		// hopefully the root directory is caught
 	}
 	else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
-
 		// in MSW, an error event could be due to the watched directoty being deleted / renamed.
 		// in this case, we need to restart the watch
 		IsWatchError = true;

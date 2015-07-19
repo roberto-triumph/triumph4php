@@ -33,9 +33,7 @@
 #include <iostream>
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
-
 	public:
-
 	FileCabinetFixtureClass()
 	: SqliteTestFixtureClass(t4p::ResourceSqlSchemaAsset())
 	, SqliteFinder(Session)
@@ -44,13 +42,10 @@ class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 
 	t4p::SqliteFinderClass SqliteFinder;
 	t4p::AllFileCabinetResultClass AllResults;
-
 };
 
 SUITE(FileCabinet) {
-
 TEST_FIXTURE(FileCabinetFixtureClass, FindAll) {
-
 	// verify that we can load files and directories
 	// from the file cabinet items table
 	// user wxFileName so that tests work on all OSes
@@ -86,7 +81,6 @@ TEST_FIXTURE(FileCabinetFixtureClass, FindAll) {
 }
 
 TEST_FIXTURE(FileCabinetFixtureClass, StoreFile) {
-
 	// test that a file can be stored in the file cabinet
 	// properly
 	t4p::FileCabinetStoreClass store;
@@ -119,7 +113,6 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreFile) {
 }
 
 TEST_FIXTURE(FileCabinetFixtureClass, StoreDirectory) {
-
 	// test that a directory can be stored in the file cabinet
 	// properly
 	t4p::FileCabinetStoreClass store;
@@ -152,7 +145,6 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreDirectory) {
 }
 
 TEST_FIXTURE(FileCabinetFixtureClass, DeleteItem) {
-
 	// verify that we can delete items
 	// from the file cabinet items table
 	Exec("BEGIN;");
@@ -173,7 +165,5 @@ TEST_FIXTURE(FileCabinetFixtureClass, DeleteItem) {
 	Session.once << "SELECT COUNT(*) FROM file_cabinet_items WHERE file_cabinet_item_id = 4",
 		soci::into(count);
 	CHECK_EQUAL(0, count);
-
 }
-
 }

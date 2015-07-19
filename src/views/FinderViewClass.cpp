@@ -50,7 +50,6 @@ static const int ID_REGEX_REPLACE_MENU_START = 13000;
 t4p::FinderViewClass::FinderViewClass(t4p::FinderFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::FinderViewClass::AddEditMenuItems(wxMenu* editMenu) {
@@ -121,7 +120,6 @@ void t4p::FinderViewClass::OnEditFind(wxCommandEvent& event) {
 void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 	t4p::CodeControlClass* codeControl = GetCurrentCodeControl();
 	if (codeControl) {
-
 		// a couple of situations may be possible here
 		// 1. the replace panel is shown
 		// 2. the find panel is shown
@@ -238,7 +236,6 @@ void t4p::FinderViewClass::OnDoubleClick(wxStyledTextEvent& event) {
 	}
 	UnicodeString word = ctrl->WordAtCurrentPos();
 	if (!word.isEmpty()) {
-
 		int documentLength = ctrl->GetTextLength();
 
 		// the action will delete it
@@ -322,11 +319,9 @@ void t4p::FinderPanelClass::FindPrevious() {
 }
 
 void t4p::FinderPanelClass::Find(bool findNext) {
-
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
 		// we searching backwards, start from 2 positions before because the selection
@@ -415,7 +410,6 @@ void t4p::FinderPanelClass::InsertRegExSymbol(wxCommandEvent& event) {
 }
 
 void t4p::FinderPanelClass::OnFindKillFocus(wxFocusEvent& event) {
-
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
 	// in focus; we must receive the position via an outside mechanism
@@ -514,11 +508,9 @@ void t4p::ReplacePanelClass::FindPrevious() {
 }
 
 void t4p::ReplacePanelClass::Find(bool findNext) {
-
 	// only search when notebook has a current tab
 	CodeControlClass* codeControl = View.GetCurrentCodeControl();
 	if (codeControl) {
-
 		// pick up from last found spot if possible. increment/decrement so that
 		// we dont find the same hit again
 		// we searching backwards, start from 2 positions before because the selection
@@ -616,7 +608,6 @@ void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 
 void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 	if (Validate() && TransferDataFromWindow() && Finder.Prepare()) {
-
 		// if user changed tabs, GetLastReplacementText will return false
 		CodeControlClass* codeControl = View.GetCurrentCodeControl();
 		 if (codeControl) {
@@ -658,7 +649,6 @@ void t4p::ReplacePanelClass::OnReplaceEnter(wxCommandEvent& event) {
 }
 
 void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
-
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
@@ -684,7 +674,6 @@ void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 }
 
 void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
-
 	// since this panel handles EVT_TEXT_ENTER, we need to handle the
 	// tab traversal ourselves otherwise tab travesal wont work
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
@@ -742,7 +731,6 @@ void t4p::ReplacePanelClass::EnableReplaceButtons(bool enable) {
 }
 
 void t4p::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
-
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
 	// in focus; we must receive the position via an outside mechanism
@@ -751,7 +739,6 @@ void t4p::ReplacePanelClass::OnFindKillFocus(wxFocusEvent& event) {
 }
 
 void t4p::ReplacePanelClass::OnReplaceKillFocus(wxFocusEvent& event) {
-
 	// connect to the KILL_FOCUS events so that we can capture the insertion point
 	// on Win32 GetInsertionPoint() returns 0 when the combo box is no
 	// in focus; we must receive the position via an outside mechanism

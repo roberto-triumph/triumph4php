@@ -28,18 +28,14 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * The NotebookLayoutFeatureClass gives a view access to
  * the application.
  */
 class NotebookLayoutFeatureClass : public t4p::FeatureClass {
-
 	public:
-
     NotebookLayoutFeatureClass(t4p::AppClass& app);
 };
-
 }
 
 #endif

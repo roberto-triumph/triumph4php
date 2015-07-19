@@ -67,7 +67,6 @@ std::vector<t4p::SourceClass> t4p::ProjectClass::AllPhpSources(const t4p::FileTy
 }
 
 std::vector<t4p::SourceClass> t4p::ProjectClass::AllSources(const t4p::FileTypeClass& fileType) const {
-
 	// get all extensions we know about
 	wxString allExtensionsString = fileType.GetAllSourceFileExtensionsString();
 

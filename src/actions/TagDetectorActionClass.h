@@ -30,7 +30,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * the set of parameters that will be used for each
  * external tag detector PHP script call. All of
@@ -38,9 +37,7 @@ namespace t4p {
  * OutputDbFileName.
  */
 class TagDetectorParamsClass {
-
 	public:
-
 	/**
 	 * location to the php executable (php.exe / php)
 	 * this is usually retrieved from t4p::EnvironmentClass
@@ -96,9 +93,7 @@ class TagDetectorParamsClass {
  * one external process execution for each project source directory / tag detector combination
  */
 class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
-
 	public:
-
 	TagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -113,7 +108,6 @@ class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClas
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * used to run the external tag detector PHP script
 	 */
@@ -143,9 +137,7 @@ class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClas
 	void OnProcessFailed(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

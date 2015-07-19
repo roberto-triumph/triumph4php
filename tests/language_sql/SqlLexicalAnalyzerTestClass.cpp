@@ -27,7 +27,6 @@
 #include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
 
 SUITE(SqlLexicalAnalyzerTestClass) {
-
 TEST(SingleQuery) {
 	t4p::SqlLexicalAnalyzerClass lexer;
 	UnicodeString query = UNICODE_STRING_SIMPLE("SELECT * FROM users;");
@@ -81,5 +80,4 @@ TEST(StringWithSemicolons) {
 	CHECK(ret);
 	CHECK_EQUAL(expectedQuery1, extracted);
 }
-
 }

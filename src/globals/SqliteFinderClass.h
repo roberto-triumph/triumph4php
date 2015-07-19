@@ -30,7 +30,6 @@
 #include <soci/soci.h>
 
 namespace t4p {
-
 /**
  * A SqliteFinderClass holds a reference of a soci database connection
  * and run many SqliteResultClass instances.
@@ -42,9 +41,7 @@ namespace t4p {
  * class for more info.
  */
 class SqliteFinderClass {
-
 	public:
-
 	/**
 	 * use an existing connection for this finder.
 	 * This method can used to have the the finder query either  a file-backed db or a memory db.
@@ -82,14 +79,11 @@ class SqliteFinderClass {
 	bool Exec(t4p::SqliteResultClass* result);
 
 	protected:
-
 	/**
 	 * the opened connection to the detector databases.
 	 */
 	soci::session& Session;
-
 };
-
 }
 
 #endif

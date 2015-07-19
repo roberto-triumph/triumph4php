@@ -46,7 +46,6 @@ t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 void t4p::ProjectViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(t4p::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
 	fileMenu->Append(t4p::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
-
 }
 
 void t4p::ProjectViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
@@ -55,7 +54,6 @@ void t4p::ProjectViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {
 }
 
 void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
-
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
 	// the project sources
@@ -121,18 +119,15 @@ void t4p::ProjectViewClass::OnProjectDefine(wxCommandEvent& event) {
 			msg = wxGetTranslation(msg);
 			int ret = wxMessageBox(msg, _("Tag projects"), wxICON_QUESTION | wxYES_NO, GetMainWindow());
 			if (wxNO == ret) {
-
 				// user does not want to re-tag newly enabled projects
 				touchedProjects.clear();
 			}
 		}
 		Feature.App.Sequences.ProjectDefinitionsUpdated(touchedProjects, removedProjects);
-
 	}
 }
 
 void t4p::ProjectViewClass::OnCreateNewProject(wxCommandEvent& event) {
-
 	// make sure that no existing project index or wipe action is running
 	// as we will re-trigger an index if the user makes any modifications to
 	// the project sources
@@ -221,7 +216,6 @@ t4p::ProjectPreferencesPanelClass::ProjectPreferencesPanelClass(wxWindow *parent
 
 	NonEmptyTextValidatorClass miscFileExtensionsValidator(&projectFeature.App.Globals.FileTypes.MiscFileExtensionsString, MiscLabel);
 	MiscFileExtensions->SetValidator(miscFileExtensionsValidator);
-
 }
 
 t4p::ProjectDefinitionDialogClass::ProjectDefinitionDialogClass(wxWindow* parent, t4p::ProjectClass& project)
@@ -359,7 +353,6 @@ t4p::ProjectListDialogClass::ProjectListDialogClass(wxWindow* parent, std::vecto
 }
 
 void t4p::ProjectListDialogClass::OnSelectAllButton(wxCommandEvent& event) {
-
 	// this will be a toggle button; if all items are checked then
 	// this button should de-check them
 	bool isAllChecked = true;
@@ -454,13 +447,11 @@ void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 		wxString caption = _("Remove Projects");
 		int response = wxMessageBox(msg, caption, wxYES_NO);
 		if (wxYES == response) {
-
 			// copy all the items that are NOT to be removed into a new vector
 			std::vector<t4p::ProjectClass> remainingProjects;
 			wxArrayString remainingLabels;
 
 			for (size_t i = 0; i < EditedProjects.size(); ++i) {
-
 				// we dont find the index in the selected list means that the
 				// user does NOT want to remove it
 				if (selections.Index(i) == wxNOT_FOUND) {
@@ -512,14 +503,12 @@ void t4p::ProjectListDialogClass::OnEditButton(wxCommandEvent& event) {
 }
 
 void t4p::ProjectListDialogClass::OnOkButton(wxCommandEvent& event) {
-
 	// go thorough the edited projects and see which ones actually changed
 	// here, Projects is the original list and EditedProjects is the list that the
 	// user modified
 	std::vector<t4p::ProjectClass>::const_iterator project;
 	std::vector<t4p::ProjectClass>::iterator editedProject;
 	for (editedProject = EditedProjects.begin(); editedProject != EditedProjects.end(); ++editedProject) {
-
 		// if a project is disabled then we wont need to update the cache so we can
 		// leave it as not touched.
 		// short circuiting the loop since comparing source lists was shown to be expensive

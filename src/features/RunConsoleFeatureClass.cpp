@@ -138,6 +138,5 @@ void t4p::RunConsoleFeatureClass::AddCommand(const t4p::CliCommandClass& command
 t4p::FileNameHitClass::FileNameHitClass()
 	: StartIndex(0)
 	, Length(0) {
-
 }
 

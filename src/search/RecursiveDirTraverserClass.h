@@ -29,7 +29,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * Implement a traverser stores each file name that is traversed. Stores full paths.
  *
@@ -38,7 +37,6 @@ namespace t4p {
  */
 class RecursiveDirTraverserClass : public wxDirTraverser {
 	public:
-
     RecursiveDirTraverserClass(std::vector<wxString>& fullPaths);
 
     wxDirTraverseResult OnFile(const wxString& filename);
@@ -46,7 +44,6 @@ class RecursiveDirTraverserClass : public wxDirTraverser {
     wxDirTraverseResult OnDir(const wxString& dirname);
 
 	private:
-
     std::vector<wxString>& FullPaths;
 };
 }

@@ -31,7 +31,6 @@
 #include <wx/timer.h>
 
 namespace t4p {
-
 /**
  * This feature allows the user to search for any PHP class,
  * function, file, or database table.
@@ -39,9 +38,7 @@ namespace t4p {
  * schema.
  */
 class TotalSearchFeatureClass : public t4p::FeatureClass {
-
 	public:
-
 	TotalSearchFeatureClass(t4p::AppClass& app);
 
 	void OpenFileTag(const t4p::FileTagClass& fileTag, int lineNumber);
@@ -51,9 +48,7 @@ class TotalSearchFeatureClass : public t4p::FeatureClass {
 	void OpenDbTable(const t4p::DatabaseTableTagClass& tableTag);
 
 	void OpenDbData(const t4p::DatabaseTableTagClass& tableTag);
-
 };
-
 }
 
 #endif

@@ -28,18 +28,14 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * The FileOperations Feature Class handles "macro" operations on files:
  * Opening, closing, checking for dirty, reverting.
  */
 class FileOperationsFeatureClass : public t4p::FeatureClass {
-
 	public:
-
     FileOperationsFeatureClass(t4p::AppClass& app);
 };
-
 }
 
 #endif

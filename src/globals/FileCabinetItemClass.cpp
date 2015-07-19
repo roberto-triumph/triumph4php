@@ -117,7 +117,6 @@ t4p::FileCabinetBaseResultClass::FileCabinetBaseResultClass()
 , Item()
 , Id(0)
 , FullPath() {
-
 }
 
 void t4p::FileCabinetBaseResultClass::DoBind(soci::statement& stmt) {
@@ -150,7 +149,6 @@ void t4p::FileCabinetBaseResultClass::Next() {
 
 t4p::AllFileCabinetResultClass::AllFileCabinetResultClass()
 : FileCabinetBaseResultClass() {
-
 }
 
 bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
@@ -174,7 +172,6 @@ bool t4p::AllFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool doLim
 t4p::SingleFileCabinetResultClass::SingleFileCabinetResultClass()
 : FileCabinetBaseResultClass()
 , QueryId(0) {
-
 }
 
 void t4p::SingleFileCabinetResultClass::SetId(int id) {
@@ -200,7 +197,6 @@ bool t4p::SingleFileCabinetResultClass::DoPrepare(soci::statement& stmt, bool do
 t4p::FileCabinetExactSearchResultClass::FileCabinetExactSearchResultClass()
 : FileCabinetBaseResultClass()
 , Name() {
-
 }
 
 void t4p::FileCabinetExactSearchResultClass::SetName(const std::string& name) {
@@ -229,7 +225,6 @@ bool t4p::FileCabinetExactSearchResultClass::DoPrepare(soci::statement& stmt, bo
 t4p::FileCabinetNearMatchResultClass::FileCabinetNearMatchResultClass()
 : FileCabinetBaseResultClass()
 , Name() {
-
 }
 
 void t4p::FileCabinetNearMatchResultClass::SetName(const std::string& name) {

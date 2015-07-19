@@ -34,11 +34,8 @@
 #include <globals/Events.h>
 
 namespace t4p {
-
 class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
-
 	public:
-
 	PhpCodeCompletionProviderClass(t4p::GlobalsClass& globals);
 
 	/**
@@ -56,7 +53,6 @@ class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
 	void OnAutoCompletionSelected(wxStyledTextEvent& evt);
 
 	private:
-
 	/**
 	 * handles auto completion for PHP.
 	 *
@@ -157,9 +153,7 @@ class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {
  * is currently on.
  */
 class PhpCallTipProviderClass : public t4p::CallTipProviderClass {
-
 	public:
-
 	PhpCallTipProviderClass(t4p::GlobalsClass& globals);
 
 	/**
@@ -184,7 +178,6 @@ class PhpCallTipProviderClass : public t4p::CallTipProviderClass {
 	void OnCallTipClick(wxStyledTextEvent& evt);
 
 	private:
-
 	/**
 	 * To access any global structures: the tag cache, template variables
 	 */
@@ -200,16 +193,13 @@ class PhpCallTipProviderClass : public t4p::CallTipProviderClass {
 	 * index into CurrentCallTipResources
 	 */
 	size_t CurrentCallTipIndex;
-
 };
 
 /**
  * this class highlights matching braces {}, [], and ()
  */
 class PhpBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
-
 	public:
-
 	PhpBraceMatchStylerClass();
 
 	/**
@@ -227,12 +217,10 @@ class PhpBraceMatchStylerClass : public t4p::BraceMatchStylerClass {
  * <?php tags.
  */
 class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
-
 	public:
 	PhpCodeCompletionViewClass(t4p::PhpCodeCompletionFeatureClass& feature);
 
 	private:
-
 	void OnAppFileOpened(t4p::CodeControlEventClass& event);
 	void OnAutoCompletionSelected(wxStyledTextEvent& event);
 	void OnCallTipClick(wxStyledTextEvent& event);
@@ -243,7 +231,6 @@ class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_PHPCODECOMPLETIONVIEWCLASS_H

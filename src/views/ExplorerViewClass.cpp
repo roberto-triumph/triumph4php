@@ -59,7 +59,6 @@ static int ID_FILTER_JS = wxNewId();
 t4p::ExplorerViewClass::ExplorerViewClass(t4p::ExplorerFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::ExplorerViewClass::AddViewMenuItems(wxMenu* viewMenu) {
@@ -110,7 +109,6 @@ void t4p::ExplorerViewClass::OnProjectExplore(wxCommandEvent& event) {
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
 	wxCommandEvent cmdEvt;
 	if (sourceDirs.size() == 1) {
-
 		// only 1 source dir, just open it now
 		cmdEvt.SetId(t4p::MENU_EXPLORER + 3);
 	}
@@ -137,7 +135,6 @@ void t4p::ExplorerViewClass::OnProjectOutline(wxCommandEvent& event) {
 		panel->RefreshDir(sourceDirs[0].RootDirectory);
 	}
 	else {
-
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
@@ -227,7 +224,6 @@ void t4p::ExplorerViewClass::OnAppProjectCreated(wxCommandEvent& event) {
 }
 
 void t4p::ExplorerViewClass::OnCmdDirOpen(wxCommandEvent& event) {
-
 	// the same for as when an app project is created, for now
 	OnAppProjectCreated(event);
 }
@@ -255,7 +251,6 @@ void t4p::ExplorerViewClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 		panel->FocusOnSourcesList();
 	}
 	else {
-
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
@@ -396,7 +391,6 @@ void t4p::FileListingWidgetClass::OnListItemRightClick(wxListEvent& event) {
 }
 
 void t4p::FileListingWidgetClass::OnListRightDown(wxMouseEvent& event) {
-
 	// if the right mouse button was clicked on an item let the context menu handler
 	// handle this event
 	wxPoint point = event.GetPosition();
@@ -446,7 +440,6 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 	std::vector<wxFileName> dirs;
 	std::vector<wxFileName> files;
 	while (index != wxNOT_FOUND) {
-
 		// dont allow the parent dir to be deleted
 		if (index > 0) {
 			wxString name = List->GetItemText(index);
@@ -455,7 +448,6 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 				files.push_back(wxFileName(fullPath));
 			}
 			else if (wxFileName::DirExists(fullPath)) {
-
 				// need to recursively delete a directory
 				wxFileName dirToDelete;
 				dirToDelete.AssignDir(fullPath);
@@ -483,7 +475,6 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 		doDelete = wxYES == res;
 	}
 	if (doDelete) {
-
 		// perform the deletion in the background
 		FileListing->StartDelete(dirs, files);
 	}
@@ -549,7 +540,6 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		wxFileName newFileName(FileListing->WorkingDir.GetPath(), newName);
 		wxFile file;
 		if (file.Create(newFileName.GetFullPath())) {
-
 			// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
 			int newRowNumber = List->GetItemCount();
 			wxListItem column1;
@@ -588,7 +578,6 @@ void t4p::FileListingWidgetClass::OnListMenuCreateDirectory(wxCommandEvent& even
 		return;
 	}
 	if (wxMkdir(newDir.GetPath())) {
-
 		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
 		int newRowNumber = List->GetItemCount();
 		wxListItem column1;
@@ -623,7 +612,6 @@ void t4p::FileListingWidgetClass::OnListMenuFileManager(wxCommandEvent& event) {
 }
 
 void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
-
 	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString newName = event.GetLabel();
@@ -640,7 +628,6 @@ void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
 
 	// dont attempt rename if they are new and old name are the same
 	else if (newName != name && !newName.IsEmpty()) {
-
 		wxFileName sourceFile(FileListing->WorkingDir.GetPath(), name);
 		wxFileName destFile(FileListing->WorkingDir.GetPath(), newName);
 
@@ -750,7 +737,6 @@ void t4p::ModalExplorerPanelClass::ShowDir() {
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
-
 }
 
 void t4p::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
@@ -792,7 +778,6 @@ void t4p::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
 		return;
 	}
 	else {
-
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -805,7 +790,6 @@ void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	wxCommandEvent cmdEvt;
 	switch (keyCode) {
-
 		// note that F2 does not really work; since it is the
 		// default shortcut for 'go to next bookmark'
 		// It could be overwritten by using a wxAcceleratorTable
@@ -835,7 +819,6 @@ void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 }
 
 bool t4p::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
-
 	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + text;
@@ -849,7 +832,6 @@ bool t4p::ModalExplorerPanelClass::OpenIfListFile(const wxString& text) {
 
 void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyEventClass &event) {
 	if (FileListing->WorkingDir.GetPath() != event.GetParentDir().GetPath()) {
-
 		// user is looking at another dir. no need to update the list items
 		return;
 	}
@@ -860,7 +842,6 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
-
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
@@ -869,7 +850,6 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			}
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
-
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
@@ -898,7 +878,6 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
-
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -907,7 +886,6 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
 		}
 		else if (!event.Success) {
-
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -1006,7 +984,6 @@ void t4p::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName>
 	SourcesList->DeleteAllItems();
 	std::vector<wxFileName>::const_iterator dir;
 	for (dir = sourceDirs.begin(); dir != sourceDirs.end(); ++dir) {
-
 		// list ctrl is tricky, for columns we must insertItem() then setItem() for the next columns
 		int newRowNumber = SourcesList->GetItemCount();
 		wxString newName = dir->GetDirs().Last();
@@ -1034,7 +1011,6 @@ void t4p::ModalExplorerPanelClass::FocusOnSourcesList() {
 }
 
 void t4p::ModalExplorerPanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
-
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
 	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
@@ -1171,7 +1147,6 @@ void t4p::ExplorerOutlinePanelClass::OnListKeyDown(wxKeyEvent& event) {
 	int keyCode = event.GetKeyCode();
 	wxCommandEvent cmdEvt;
 	switch (keyCode) {
-
 		// note that F2 does not really work; since it is the
 		// default shortcut for 'go to next bookmark'
 		// It could be overwritten by using a wxAcceleratorTable
@@ -1217,7 +1192,6 @@ void t4p::ExplorerOutlinePanelClass::ShowDir() {
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
-
 }
 
 void t4p::ExplorerOutlinePanelClass::OnListMenuOpen(wxCommandEvent& event) {
@@ -1259,7 +1233,6 @@ void t4p::ExplorerOutlinePanelClass::OnListItemActivated(wxListEvent& event) {
 		return;
 	}
 	else {
-
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -1269,7 +1242,6 @@ void t4p::ExplorerOutlinePanelClass::OnListItemActivated(wxListEvent& event) {
 }
 
 bool t4p::ExplorerOutlinePanelClass::OpenIfListFile(const wxString& text) {
-
 	// ideally we dont need to query the file system, but cant seem to get the
 	// item image to tell if selected item is a dir or not
 	wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + text;
@@ -1283,7 +1255,6 @@ bool t4p::ExplorerOutlinePanelClass::OpenIfListFile(const wxString& text) {
 
 void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyEventClass &event) {
 	if (FileListing->WorkingDir.GetPath() != event.GetParentDir().GetPath()) {
-
 		// user is looking at another dir. no need to update the list items
 		return;
 	}
@@ -1294,7 +1265,6 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 
 		// find the directories that were deleted and remove them from the list control
 		for (f = event.DirsDeleted.begin(); f != event.DirsDeleted.end(); ++f) {
-
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetDirs().Last());
@@ -1303,7 +1273,6 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 			}
 		}
 		for (f = event.FilesDeleted.begin(); f != event.FilesDeleted.end(); ++f) {
-
 			// TODO(roberto): FindItem is case insensitive but the file system may be case sensitive
 			// not sure how to solve this (removing the item with the 'wrong' case)
 			long index = List->FindItem(-1, f->GetFullName());
@@ -1332,7 +1301,6 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
-
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -1341,7 +1309,6 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
 		}
 		else if (!event.Success) {
-
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
@@ -1429,7 +1396,6 @@ void t4p::ExplorerOutlinePanelClass::OnFilterMenuCheck(wxCommandEvent& event) {
 }
 
 void t4p::ExplorerOutlinePanelClass::RenamePrompt(const wxFileName& oldFile, const wxString& newName) {
-
 	// get the code control for the file that was renamed
 	// if the old file is not opened don't bother the user
 	t4p::CodeControlClass* ctrl = View.FindCodeControl(oldFile.GetFullPath());
@@ -1479,7 +1445,6 @@ t4p::ExplorerNewFileDialogClass::ExplorerNewFileDialogClass(wxWindow* parent, co
 : ExplorerNewFileGeneratedDialogClass(parent, wxID_ANY, title)
 , CurrentDir(currentDir)
 , FileName(fileName) {
-
 	FileNameText->SetValue(fileName);
 	size_t index = FileName.find_last_of(wxT('.'));
 	FileNameText->SetFocus();

@@ -31,7 +31,6 @@
 #include <actions/ActionClass.h>
 
 namespace t4p {
-
 /**
  * This is the feature that check for new versions of Triumph
  * Version checking is done by posting to
@@ -40,7 +39,6 @@ namespace t4p {
  */
 class VersionUpdateViewClass : public FeatureViewClass {
 	public:
-
 	VersionUpdateViewClass(t4p::VersionUpdateFeatureClass& feature);
 
 	void AddHelpMenuItems(wxMenu* helpMenu);
@@ -48,7 +46,6 @@ class VersionUpdateViewClass : public FeatureViewClass {
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
 	/**
 	 * when the app starts, start the update check timer
 	 */
@@ -96,9 +93,7 @@ class VersionUpdateViewClass : public FeatureViewClass {
 };
 
 class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
-
 	public:
-
 	VersionUpdateDialogClass(wxWindow* parent, int id,
 		t4p::RunningThreadsClass& runningThreads,
 		const wxString& currentVersion,
@@ -106,11 +101,9 @@ class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
 		wxString newVersion);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	private:
-
 	void OnTimer(wxTimerEvent& event);
 
 	void OnUpdateCheckComplete(wxCommandEvent& event);
@@ -124,17 +117,12 @@ class VersionUpdateDialogClass : public VersionUpdateGeneratedDialogClass {
 	bool StartedCheck;
 
 	DECLARE_EVENT_TABLE()
-
 };
 
 class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGeneratedPanelClass {
-
 	public:
-
 	VersionUpdatePreferencesPanelClass(wxWindow* parent, t4p::PreferencesClass& preferences);
-
 };
-
 }
 
 #endif

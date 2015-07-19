@@ -31,15 +31,12 @@
 #include <map>
 
 namespace t4p {
-
 /**
  * Case-sensitive string comparator for use as STL Predicate
  */
 class UnicodeStringComparatorClass {
-
 	public:
 	bool operator()(const UnicodeString& str1, const UnicodeString& str2) const;
-
 };
 
 /**
@@ -150,7 +147,6 @@ void DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src);
  * @param src map to copy from
  */
 void DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src);
-
 
 }
 

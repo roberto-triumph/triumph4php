@@ -35,7 +35,6 @@
 #include <unicode/ustdio.h>
 
 namespace t4p {
-
 /**
  * This class can be used to search for a subset of text in multiple files of a given directory.  The find logic
  * is identical to that of FinderClass in regards to the different modes (EXACT vs. REGULAR_EXPRESSION). Searching
@@ -105,9 +104,7 @@ namespace t4p {
  * @see FinderClass.h
  */
 class FindInFilesClass : public DirectoryWalkerClass {
-
 	public:
-
 	/**
 	 * Reasons why a file could not be opened.
 	 */
@@ -274,7 +271,6 @@ class FindInFilesClass : public DirectoryWalkerClass {
 		wxString& charset, bool& hasSignature);
 
 	private:
-
 	/**
 	 * To find text
 	 * @var FinderClass
@@ -339,8 +335,6 @@ class FindInFilesClass : public DirectoryWalkerClass {
 	 * Close the associated input streams.
 	 */
 	void CleanupStreams();
-
 };
-
 }
 #endif // __findinfilesclass__

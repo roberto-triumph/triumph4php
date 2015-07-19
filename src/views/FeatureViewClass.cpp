@@ -156,7 +156,6 @@ bool t4p::FeatureViewClass::IsToolsWindowSelected(int windowId) const {
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetToolsNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
-
 		// if the notebook itself is not shown, it means that the window
 		// is hidden because its parent is hidden
 		return false;
@@ -168,7 +167,6 @@ bool t4p::FeatureViewClass::IsToolsWindowSelected(int windowId) const {
 bool t4p::FeatureViewClass::IsToolsWindowSelectedByName(const wxString& name) const {
 	wxAuiPaneInfo info = AuiManager->GetPane(ToolsNotebook);
 	if (!info.IsShown()) {
-
 		// if the notebook itself is not shown, it means that the outline window
 		// is hidden because its parent is hidden
 		return false;
@@ -181,11 +179,9 @@ bool t4p::FeatureViewClass::IsToolsWindowSelectedByName(const wxString& name) co
 }
 
 bool t4p::FeatureViewClass::IsOutlineWindowSelected(int windowId) const {
-
 	wxWindow* window = wxWindow::FindWindowById(windowId, GetOutlineNotebook());
 	wxAuiPaneInfo info = AuiManager->GetPane(OutlineNotebook);
 	if (!info.IsShown()) {
-
 		// if the notebook itself is not shown, it means that the window
 		// is hidden because its parent is hidden
 		return false;
@@ -286,7 +282,6 @@ t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& 
 	t4p::CodeControlClass* codeCtrl = NULL;
 	t4p::CodeControlClass* newCtrl = NULL;
 	if (!GetCurrentCodeControlWithNotebook(&codeCtrl, &notebook)) {
-
 		// as a last resort, add to the first notebook
 		std::vector<t4p::NotebookClass*> notebooks = t4p::AuiVisibleCodeNotebooks(*AuiManager);
 		if (!notebooks.empty()) {
@@ -305,7 +300,6 @@ t4p::CodeControlClass* t4p::FeatureViewClass::CreateCodeControl(const wxString& 
 }
 
 void t4p::FeatureViewClass::LoadCodeControl(const wxString& fileName) {
-
 	// is this file already loaded? if so, just set focus to it. need to look
 	// at all of the notebooks
 	t4p::CodeControlClass* existing = FindCodeControlAndSelect(fileName);

@@ -75,7 +75,6 @@ t4p::ExactMatchJsTagResultClass::ExactMatchJsTagResultClass()
 : JsTagResultClass()
 , Search()
 , SourceDirs() {
-
 }
 
 void t4p::ExactMatchJsTagResultClass::SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
@@ -89,7 +88,6 @@ void t4p::ExactMatchJsTagResultClass::SetSearch(const UnicodeString& search, con
 }
 
 bool t4p::ExactMatchJsTagResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-
 	// case sensitive issues are taken care of by SQLite collation capabilities
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, r.key, r.identifier, r.signature, r.comment, r.line_number, r.column_position, f.full_path, ";
@@ -120,7 +118,6 @@ t4p::NearMatchJsTagResultClass::NearMatchJsTagResultClass()
 , Search()
 , SearchUpper()
 , SourceDirs() {
-
 }
 
 void t4p::NearMatchJsTagResultClass::SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs) {
@@ -135,7 +132,6 @@ void t4p::NearMatchJsTagResultClass::SetSearch(const UnicodeString& search, cons
 }
 
 bool t4p::NearMatchJsTagResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
-
 	// case sensitive issues are taken care of by SQLite collation capabilities (so that pdo = PDO)
 	std::string sql;
 	sql += "SELECT r.id, r.file_item_id, r.source_id, r.key, r.identifier, r.signature, r.comment, r.line_number, r.column_position, f.full_path, ";

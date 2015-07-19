@@ -32,14 +32,11 @@
 #define __CODECONTROLLASS_H_
 
 namespace t4p {
-
 /**
  * A class that holds the editor styles for syntax highlighting
  */
 class StylePreferenceClass {
-
 	public:
-
 	wxFont Font;
 	wxColor Color;
 	wxColor BackgroundColor;
@@ -92,9 +89,7 @@ class StylePreferenceClass {
  * contain logic to simplify the font selection.
  */
 class CodeControlOptionsClass {
-
 	public:
-
 	/**
 	 * Stores the preferences for each style; for syntax highlighting
 	 */
@@ -317,9 +312,7 @@ class CodeControlOptionsClass {
 	 * @return int the index of the style in the preferences array.
 	 */
 	StylePreferenceClass& FindByStcStyle(std::vector<StylePreferenceClass>& styles, int style) const;
-
 };
-
 }
 
 #endif

@@ -29,9 +29,7 @@
 #include <wx/log.h>
 
 SUITE(DbgpEventClassTest) {
-
 TEST(BreakpointResponse) {
-
 	// 5 breakpoints
 	// 1 line breakpoint
 	// 1 call breakpoint
@@ -128,7 +126,6 @@ TEST(BreakpointResponse) {
 }
 
 TEST(Stack) {
-
 	wxString xml = wxString::FromAscii(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<response command=\"stack_get\" \n"
@@ -177,7 +174,6 @@ TEST(Stack) {
 }
 
 TEST(DebugEngineErrorResponse) {
-
 	wxString xml = wxString::FromAscii(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<response command=\"stack_get\" \n"
@@ -202,7 +198,6 @@ TEST(DebugEngineErrorResponse) {
 }
 
 TEST(InvalidXml) {
-
 	wxString xml = wxString::FromAscii(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		"<response command=\"stack_get\" ><> \n"  // <-- bad xml here
@@ -265,6 +260,4 @@ TEST(CommandGenerationWithData) {
 	expected +=  " -- L3Zhci93d3cvc2l0ZS9pbmRleC5waHA="; // base64 encode of expression
 	CHECK_EQUAL(expected, line);
 }
-
-
 }

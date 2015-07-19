@@ -33,7 +33,6 @@
 
 
 namespace t4p {
-
 /**
  * A tag list contains all 3 tags db files used by Triumph.  All projects' tags
  * are stored in a SQLite file that persisted and then loaded when Triumph starts; this way
@@ -43,9 +42,7 @@ namespace t4p {
  * TagDetectors database. This class is given to the TagCacheClass.
  */
 class TagFinderListClass {
-
 	public:
-
 	/**
 	 * The connections to all sqlite db files
 	 * These need to be declared first because the
@@ -92,7 +89,6 @@ class TagFinderListClass {
 	bool IsDetectedTagFinderInit;
 
 	public:
-
 	TagFinderListClass();
 
 	~TagFinderListClass();
@@ -215,9 +211,7 @@ class TagFinderListClass {
 	void NearMatchTraitAliasesFromAll(t4p::TagSearchClass& tagSearch, std::vector<t4p::PhpTagClass>& matches);
 
 	private:
-
 };
-
 }
 
 #endif

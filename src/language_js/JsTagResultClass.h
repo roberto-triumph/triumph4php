@@ -31,14 +31,11 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * A SQLite result set of JsTag rows.
  */
 class JsTagResultClass : public t4p::SqliteResultClass {
-
 	public:
-
 	t4p::JsTagClass JsTag;
 
 	JsTagResultClass();
@@ -46,11 +43,9 @@ class JsTagResultClass : public t4p::SqliteResultClass {
 	void Next();
 
 	protected:
-
 	void DoBind(soci::statement& stmt);
 
 	private:
-
 	// the variables bound to the sqlite result set
 	int Id;
 	int FileItemId;
@@ -71,9 +66,7 @@ class JsTagResultClass : public t4p::SqliteResultClass {
  * is exactly equal to the Key column, in a case insensitive manner).
  */
 class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
-
 	public:
-
 	ExactMatchJsTagResultClass();
 
 	/**
@@ -83,11 +76,9 @@ class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
 	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	private:
-
 	std::string Search;
 	std::vector<std::string> SourceDirs;
 };
@@ -98,9 +89,7 @@ class ExactMatchJsTagResultClass : public t4p::JsTagResultClass {
  * starts with the input, in a case insensitive manner).
  */
 class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
-
 	public:
-
 	NearMatchJsTagResultClass();
 
 	/**
@@ -110,16 +99,13 @@ class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
 	void SetSearch(const UnicodeString& search, const std::vector<wxFileName>& sourceDirs);
 
 	protected:
-
 	bool DoPrepare(soci::statement& stmt, bool doLimit);
 
 	private:
-
 	std::string Search;
 	std::string SearchUpper;
 	std::vector<std::string> SourceDirs;
 };
-
 }
 
 #endif

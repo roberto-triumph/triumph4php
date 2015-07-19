@@ -29,7 +29,6 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 /**
  * Class that helps in breaking a long SQL string into tokens (and individual queries). Note that this is NOT a
  * SQL validator / parser; it just tokenizes a SQL string.  Currently the only functionality available is
@@ -39,9 +38,7 @@ namespace t4p {
  * @example SQLAnalyzerExample.cpp
  */
 class SqlLexicalAnalyzerClass {
-
 	public:
-
 	SqlLexicalAnalyzerClass();
 
 	/**
@@ -83,7 +80,6 @@ class SqlLexicalAnalyzerClass {
 	int GetLineNumber() const;
 
 	private:
-
 	/**
 	 * the different conditions that the lexer can be in
 	 */
@@ -143,9 +139,7 @@ class SqlLexicalAnalyzerClass {
 	 * Keeps track of the current lexer state
 	 */
 	Conditions CurrentCondition;
-
 };
-
 }
 
 #endif

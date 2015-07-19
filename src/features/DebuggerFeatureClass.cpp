@@ -54,7 +54,6 @@ static int ID_ACTION_DEBUGGER = wxNewId();
 static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxString, wxString>& localToRemoteMappings) {
 	wxString remoteFile = xdebugFile.Mid(8); // 8  = size of "file:///"
 	if (!remoteFile.Contains(":")) {
-
 		// in linux, filename comes back as "file:///"
 		// we want to keep the last slash
 		remoteFile = xdebugFile.Mid(7);
@@ -67,7 +66,6 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
 	remoteLower.MakeLower();
 	bool foundMapping = false;
 	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
-
 		// lets make comparison case-insensitive
 		wxString remoteMappingLower(mapping->second);
 		remoteMappingLower.MakeLower();
@@ -76,7 +74,6 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
 		// well
 		remoteMappingLower.Replace(wxT("\\"), wxT("/"));
 		if (remoteLower.Find(remoteMappingLower) == 0) {
-
 			// lets perform the mapping. replace the remote
 			// path with the local path
 			localFile = remoteFile;
@@ -84,7 +81,6 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
 			foundMapping = true;
 			break;
 		}
-
 	}
 
 	if (!foundMapping) {
@@ -109,7 +105,6 @@ static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxS
  *
  */
 static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxString, wxString>& localToRemoteMappings) {
-
 	// check to see if the local path is inside one of the mappings
 	std::map<wxString, wxString>::const_iterator mapping;
 	wxString remoteFile;
@@ -117,12 +112,10 @@ static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxStr
 	localLower.MakeLower();
 	bool foundMapping = false;
 	for (mapping = localToRemoteMappings.begin(); mapping != localToRemoteMappings.end(); ++mapping) {
-
 		// lets make comparison case-insensitive
 		wxString localMappingLower(mapping->first);
 		localMappingLower.MakeLower();
 		if (localLower.Find(localMappingLower) == 0) {
-
 			// lets perform the mapping. replace the local
 			// path with the remote path
 			remoteFile = localFile;
@@ -134,7 +127,6 @@ static wxString ToRemoteFilename(const wxString& localFile, const std::map<wxStr
 			foundMapping = true;
 			break;
 		}
-
 	}
 	return foundMapping ? remoteFile : localFile;
 }
@@ -214,7 +206,6 @@ static void ConfigLoad(wxConfigBase* config,
 static void ConfigStore(wxConfigBase* config,
 	const t4p::DebuggerOptionsClass& options,
 	const std::vector<t4p::BreakpointWithHandleClass>& breakpoints) {
-
 	config->Write(wxT("Debugger/Port"), options.Port);
 	config->Write(wxT("Debugger/MaxChildren"), options.MaxChildren);
 	config->Write(wxT("Debugger/MaxDepth"), options.MaxDepth);
@@ -256,7 +247,6 @@ t4p::BreakpointWithHandleClass::BreakpointWithHandleClass()
 : Breakpoint()
 , Handle(0)
 , DbgpTransactionId() {
-
 }
 
 t4p::BreakpointWithHandleClass::BreakpointWithHandleClass(const t4p::BreakpointWithHandleClass& src)
@@ -284,7 +274,6 @@ t4p::DebuggerOptionsClass::DebuggerOptionsClass()
 , DoListenOnAppReady(false)
 , DoBreakOnStart(false)
 , SourceCodeMappings() {
-
 }
 
 t4p::DebuggerOptionsClass::DebuggerOptionsClass(const t4p::DebuggerOptionsClass& src)
@@ -352,7 +341,6 @@ void t4p::DebuggerFeatureClass::OnPreferencesSaved(wxCommandEvent& event) {
 }
 
 void t4p::DebuggerFeatureClass::RestartDebugger(int oldPort) {
-
 	// need to shutdown the server and listen on the new port
 	StopDebugger(oldPort);
 	if (Options.DoListenOnAppReady) {
@@ -364,7 +352,6 @@ void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlF
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it;
 	for (it = Breakpoints.begin(); it != Breakpoints.end(); ++it) {
 		if (it->Breakpoint.Filename == ctrlFileName && it->Handle) {
-
 			// only update when line >= 1.  if line == 0 then it means
 			// that the entire text has been deleted. this is most likely
 			// scenario when the user reloads the file.
@@ -374,7 +361,6 @@ void t4p::DebuggerFeatureClass::UpdateBreakpointLineNumber(const wxString& ctrlF
 }
 
 void t4p::DebuggerFeatureClass::StopDebugger(int port) {
-
 	// this is our (triumph's) message telling the listener that we should no longer accept
 	// connections. we do it this way because we use synchronous sockets
 	// which we cannot stop from another thread.
@@ -406,7 +392,6 @@ void t4p::DebuggerFeatureClass::StopDebugger(int port) {
 }
 
 bool t4p::DebuggerFeatureClass::RemoveBreakpointAtLine(const wxString& fileName, int lineNumber) {
-
 	// if the user clicked on a line that already has a breakpoint, then
 	// the user wants to remove the breakpoint
 	bool found = false;
@@ -542,7 +527,6 @@ void t4p::DebuggerFeatureClass::Continue() {
 }
 
 void t4p::DebuggerFeatureClass::Finish() {
-
 	// finish is a special command
 	// 1. disable all breakpoints
 	// 2. run to completion
@@ -564,7 +548,6 @@ void t4p::DebuggerFeatureClass::Finish() {
 }
 
 void t4p::DebuggerFeatureClass::GoToExecutingLine() {
-
 	// post the stack get command so that the debugger tells us which
 	// line is being executed next
 	PostCmd(
@@ -593,7 +576,6 @@ void t4p::DebuggerFeatureClass::BreakpointGoToSource(const t4p::BreakpointWithHa
 }
 
 void t4p::DebuggerFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-
 	// here we want to add the breakpoint marker if there is a breakpoint
 	// in the opened file
 	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
@@ -607,7 +589,6 @@ void t4p::DebuggerFeatureClass::OnAppFileOpened(t4p::CodeControlEventClass& even
 }
 
 void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
-
 	// here we want to remove the handles to the breakpoints that
 	// belong to the file being closed.
 	std::vector<t4p::BreakpointWithHandleClass>::iterator br;
@@ -627,14 +608,12 @@ void t4p::DebuggerFeatureClass::OnAppFileClosed(t4p::CodeControlEventClass& even
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
-
 	// when starting a debugging session, set the breakpoints that the user
 	// has added and tell the debugger to run the program
 	// there is no "current" breakppoint at the start of the debug session
 	t4p::DbgpBreakpointClass breakpoint;
 	std::vector<t4p::BreakpointWithHandleClass>::iterator it = Breakpoints.begin();
 	for (; it != Breakpoints.end(); ++it) {
-
 		// save the transaction Id, we will need it so that we can match up
 		// the breakpoint to the breakpoint Id that xdebug returns in the
 		// breakpoint_set response
@@ -662,7 +641,6 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 	// if the user wants to break at the first line, we
 	// want to step into the first line.
 	if (Options.DoBreakOnStart) {
-
 		// run stack command first, ContextGet handler needs
 		// to differentiate when scope function has changed
 		PostCmd(Cmd.StepInto());
@@ -670,10 +648,8 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 		PostCmd(Cmd.ContextNames(0));
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-
 	}
 	else {
-
 		// we want the script to run until a breakpoint is
 		// hit
 		PostCmd(Cmd.Run());
@@ -688,15 +664,12 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpStatus(t4p::DbgpStatusEventClass& event) {
-
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureGet(t4p::DbgpFeatureGetEventClass& event) {
-
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpFeatureSet(t4p::DbgpFeatureSetEventClass& event) {
-
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& event) {
@@ -720,7 +693,6 @@ void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& even
 }
 
 void t4p::DebuggerFeatureClass::OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventClass& event) {
-
 	// when the debug engine signals that a breakpoint was set, we need to store
 	// the debug engine's breakpoint ID because the ID is needed in case the user
 	// wants to remove the breakpoint.
@@ -732,7 +704,6 @@ void t4p::DebuggerFeatureClass::OnDbgpBreakpointSet(t4p::DbgpBreakpointSetEventC
 }
 
 void t4p::DebuggerFeatureClass::LocalizeStackFilePaths(std::vector<t4p::DbgpStackClass>& stack) {
-
 	// turn the filename that Xdebug returns into a local filesystem filename
 	// lets convert remote paths to local paths
 	for (size_t i = 0; i < stack.size(); ++i) {
@@ -766,7 +737,6 @@ void t4p::DebuggerFeatureClass::PostCmd(std::string cmd) {
 }
 
 void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
-
 	// the command string contains the property full name
 	// the int contains the context ID
 	wxString fullName = event.GetString();

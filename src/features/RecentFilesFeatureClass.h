@@ -29,7 +29,6 @@
 #include <wx/docview.h>
 
 namespace t4p {
-
 extern const int MAX_RECENT_FILES;
 
 /**
@@ -37,9 +36,7 @@ extern const int MAX_RECENT_FILES;
  * recent files that the user has opened in Triumph.
  */
 class RecentFilesFeatureClass : public FeatureClass {
-
 	public:
-
 	/**
 	 * class that encapsulates the logic
 	 */
@@ -52,9 +49,7 @@ class RecentFilesFeatureClass : public FeatureClass {
 	void SavePreferences();
 
 	private:
-
 };
-
 }
 
 #endif

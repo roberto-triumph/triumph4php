@@ -31,16 +31,13 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * The Project class represents a single project.
  *
  * This project can hold files from multiple, separate directories.
  */
 class ProjectClass {
-
 	public:
-
 	/**
 	 * A friendly label for this project. This is usually set by a user.
 	 */
@@ -143,8 +140,6 @@ class ProjectClass {
 	std::vector<wxString> GetNonPhpExtensions(const t4p::FileTypeClass& fileType) const;
 
 	private:
-
 };
-
 }
 #endif /*PROJECTCLASS_H_*/

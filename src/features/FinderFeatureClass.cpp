@@ -87,7 +87,6 @@ void t4p::FinderActionClass::BackgroundWork() {
 		found = Finder.FindNext(Code, nextIndex);
 	}
 	delete[] Utf8Buf;
-
 }
 
 wxString t4p::FinderActionClass::GetLabel() const {
@@ -98,7 +97,6 @@ t4p::FinderHitEventClass::FinderHitEventClass(int id, int start, int length)
 : wxEvent(id, t4p::EVENT_FINDER_ACTION)
 , Start(start)
 , Length(length) {
-
 }
 
 wxEvent* t4p::FinderHitEventClass::Clone() const {

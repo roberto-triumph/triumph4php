@@ -56,12 +56,10 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 		bool isStaticCall, bool isThisCall, bool isParentCall) {
 	bool passesStaticCheck = true;
 	if (isStaticCall) {
-
 		// only static methods can be accessed with the '::' operator
 		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
 	}
 	else {
-
 		// static methods can be accessed via the -> operator
 		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT != tag.Type;
 	}
@@ -71,14 +69,12 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 	// neither => can only access public
 	bool passesVisibilityCheck = !tag.IsPrivate && !tag.IsProtected;
 	if (!passesVisibilityCheck && isParentCall) {
-
 		// this check assumes that the tag finder has traversed the inheritance chain
 		// properly. then, by a process of elimination, if the tag class is not
 		// the symbol then we only show protected/public resources
 		passesVisibilityCheck = tag.IsProtected;
 	}
 	else if (!passesVisibilityCheck) {
-
 		//not checking isThisCalled
 		passesVisibilityCheck = isThisCall;
 	}
@@ -90,7 +86,6 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 	UnicodeString name = VariableName(originalParsedVariable);
 	if (!name.startsWith(UNICODE_STRING_SIMPLE("$")) && !name.startsWith(UNICODE_STRING_SIMPLE("\\"))
 		&& t4p::PhpTagClass::CLASS == tag.Type) {
-
 		// if the tag is a global class and the current namespace is NOT the global namespace,
 		// then the class cannot be accessed
 		// this assumes that tag finder was successful
@@ -106,7 +101,6 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 			std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 			for (it = aliases.begin(); it != aliases.end(); ++it) {
-
 				// map key is the alias
 				// check to see if the expression begins with the alias
 				// need to watch out for the namespace operator
@@ -118,7 +112,6 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 				}
 			}
 			if (!passesNamespaceCheck) {
-
 				// check to see if tag is from the declared namespace
 				// when comparing namespaces make sure both end with slash so that we compare
 				// full namespace names
@@ -137,7 +130,6 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
  * @return bool TRUE if the given parsed expression uses static access ("::")
  */
 static bool IsStaticVariable(const pelet::VariableClass& parsedVariable) {
-
 	// "parent" is not static; "parent" could be used to call
 	// methods that are overidden
 	if (VariableName(parsedVariable).caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
@@ -192,12 +184,10 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				type = "array";
 			}
 			else if (!symbol.PhpDocType.isEmpty()) {
-
 				// user declares a type (in a PHPDoc comment  @var $dog Dog
 				type = symbol.PhpDocType;
 			}
 			else if (symbol.ChainList.size() == 1) {
-
 				// variable was created with a 'new' or single function call
 				// the  ResolveResourceType will get the function return type
 				// if the variable was created from a function.
@@ -205,7 +195,6 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				type = tagFinderList.ResolveResourceType(resourceToLookup, sourceDirs);
 			}
 			else if (!symbol.ChainList.empty()) {
-
 
 				// go through the chain list; the first item in the list may be a variable
 				pelet::ScopeClass peletScope;
@@ -253,13 +242,11 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 	UnicodeString start = VariableName(parsedVariable);
 	UnicodeString typeToLookup;
 	if (start.startsWith(UNICODE_STRING_SIMPLE("$"))) {
-
 		// a variable. look at the type from the symbol table
 		typeToLookup = ResolveVariableType(variableScope, sourceDirs, tagFinderList, doDuckTyping, error,
 				start, scopeSymbols, symbolTable);
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0) {
-
 		// self is the static version of $this, need to look at the pseudo variable $this
 		// that is put into the symbol table during parsing
 		// and get the type from there
@@ -270,7 +257,6 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 		}
 	}
 	else if (start.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
-
 		// look at the class signature of the current class that is in scope; that will tell us
 		// what class is the parent
 		// this code assumes that the tag finders have parsed the same exact code as the code that the
@@ -286,7 +272,6 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 		}
 	}
 	else if (parsedVariable.ChainList.size() > 1) {
-
 		// a function or a class. need to get the type from the tag finders
 		// when ChainList has only one item, the item may be a partial function/class name
 		// so we may not find it.
@@ -298,7 +283,6 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 		}
 	}
 	else {
-
 		// when symbol's chain list has one item, it is from an expression that
 		// contains a partial function.  In this case, there is not need to catenate
 		// ChainList items; doing so will result in a bad lookup
@@ -361,7 +345,6 @@ void t4p::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableClass& p
 }
 
 void t4p::SymbolTableMatchErrorClass::ToTypeResolution(const UnicodeString& className, const UnicodeString& methodName) {
-
 	// an error resolving one of the types in the ChainList (not necessarily the last item)
 	Type = t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR;
 	ErrorLexeme = methodName;
@@ -417,7 +400,6 @@ void t4p::SymbolTableClass::DefineDeclarationFound(const UnicodeString& namespac
 
 void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature,
 		const UnicodeString& returnType, const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
-
 	// this call will automatically create the predefined variables
 	GetScope(UNICODE_STRING_SIMPLE(""), functionName);
 }
@@ -425,7 +407,6 @@ void t4p::SymbolTableClass::FunctionFound(const UnicodeString& namespaceName, co
 void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 	const UnicodeString& signature, const UnicodeString& returnType, const UnicodeString& comment,
 	pelet::TokenClass::TokenIds visibility, bool isStatic, const int lineNumber, bool hasVariableArguments) {
-
 	std::vector<t4p::SymbolClass>& methodScope = GetScope(className, methodName);
 
 	// create the $this variable
@@ -447,7 +428,6 @@ void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, cons
 
 void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName,
 	const pelet::VariableClass& variable, pelet::ExpressionClass* expression, const UnicodeString& comment) {
-
 	UnicodeString variableArrayAccessKey;
 	if (!variable.ChainList.empty() && variable.ChainList[0].IsArrayAccess && variable.ChainList[0].ArrayAccess) {
 		variableArrayAccessKey = ((pelet::ScalarExpressionClass*)variable.ChainList[0].ArrayAccess)->Value;
@@ -461,7 +441,6 @@ void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, co
 		if (!variable.ChainList.empty() && symbols[i].Variable == variable.ChainList[0].Name) {
 			found = true;
 			if (!variableArrayAccessKey.isEmpty()) {
-
 				// update any new Array keys used in the variable assignment
 				// make sure not to have duplicates in case the same key is assigned
 				// multiple times
@@ -511,7 +490,6 @@ void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, co
 			}
 		}
 		else {
-
 			// in  PHP an array may be created by assigning
 			// an array key-value to a non-existant variable
 			arrayKeys.push_back(variableArrayAccessKey);
@@ -684,7 +662,6 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 															  bool doDuckTyping,
 															  t4p::SymbolTableMatchErrorClass& error) const {
 		if (parsedVariable.ChainList.size() == 1 && VariableName(parsedVariable).startsWith(UNICODE_STRING_SIMPLE("$"))) {
-
 		// if expression does not have more than one chained called AND it starts with a '$' then we want to match (local)
 		// variables. This is just a SymbolTable search.
 		std::vector<t4p::SymbolClass> scopeSymbols;
@@ -708,7 +685,6 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 		}
 	}
 	else {
-
 		// some kind of function call / method chain call
 		ResourceMatches(parsedVariable, variableScope, sourceDirs, tagFinderList,
 			autoCompleteResourceList, doDuckTyping, false, error);
@@ -754,7 +730,6 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 		error.ToArrayError(UNICODE_STRING_SIMPLE(""), VariableName(parsedVariable));
 	}
 	else if (!parsedVariable.ChainList.empty()) {
-
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t
 		for (size_t i = 1;  i < (parsedVariable.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {
 			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList[i].Name;
@@ -778,12 +753,10 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList.back().Name;
 	}
 	else if (!typeToLookup.isEmpty() && !error.HasError()) {
-
 		// in this case; chain list is of size 1 (looking for a function / class name)
 		resourceToLookup = typeToLookup;
 	}
 	else if (!error.HasError() && parsedVariable.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
-
 		// here, even if the type of previous items in the chain could not be resolved
 		// but were also known NOT to be errors
 		// perform "duck typing" lookups; just look for methods in any class
@@ -897,7 +870,6 @@ void t4p::SymbolTableClass::CreatePredefinedVariables(std::vector<t4p::SymbolCla
 }
 
 void t4p::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVariable, const pelet::ScopeClass& scope) const {
-
 	// aliases are only in the beginning of the expression
 	// for example, for the expression
 	// \Class::func()
@@ -909,7 +881,6 @@ void t4p::SymbolTableClass::ResolveNamespaceAlias(pelet::VariableClass& parsedVa
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 		for (it = aliases.begin(); it != aliases.end(); ++it) {
-
 			// map key is the alias
 			// check to see if the expression begins with the alias
 			// need to watch out for the namespace operator
@@ -935,11 +906,9 @@ void t4p::SymbolTableClass::UnresolveNamespaceAlias(const pelet::VariableClass& 
 	// leave variables and fully qualified names alone
 	UnicodeString originalName = VariableName(originalVariable);
 	if (!originalName.startsWith(UNICODE_STRING_SIMPLE("$")) && !originalName.startsWith(UNICODE_STRING_SIMPLE("\\"))) {
-
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass> aliases = scope.GetNamespaceAliases();
 		std::map<UnicodeString, UnicodeString, pelet::UnicodeStringComparatorClass>::const_iterator it;
 		for (it = aliases.begin(); it != aliases.end(); ++it) {
-
 			// map value is the fully qualified name
 			// check to see if the tag begins with the fully qualified aliased name
 			// need to watch out for the namespace operator
@@ -1039,7 +1008,6 @@ void t4p::ScopeFinderClass::GetScopeString(const UnicodeString& code, int pos, p
 
 void t4p::ScopeFinderClass::CheckLastNamespace(const UnicodeString& namespaceName) {
 	if (LastNamespace.caseCompare(namespaceName, 0) != 0) {
-
 		// cannot Clear() the scope result because it would delete the aliases, and the aliases
 		// are created outside of any method/function scope
 		Scope.NamespaceName = namespaceName;
@@ -1053,5 +1021,4 @@ t4p::SymbolClass::SymbolClass(const UnicodeString& variable, t4p::SymbolClass::T
 	, ChainList()
 	, ArrayKeys()
 	, Type(type) {
-
 }

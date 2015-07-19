@@ -32,7 +32,6 @@
 #include <map>
 
 namespace t4p {
-
 	/**
 	 * This event will be generated when the external process has completed its job
 	 * **successfully** A process that has been killed will NOT generate this event.
@@ -66,9 +65,7 @@ namespace t4p {
  * completion by generating an EVENT_PROCESS_COMPLETE event.
  */
 class ProcessWithHeartbeatClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * @param handler will receive the EVENT_PROCESS_* events
 	 */
@@ -111,7 +108,6 @@ class ProcessWithHeartbeatClass : public wxEvtHandler {
 	wxString GetProcessOutput(long pid) const;
 
 	private:
-
 	/**
 	 * On process termination clean up any process data structures.
 	 */
@@ -156,7 +152,6 @@ class ProcessWithHeartbeatClass : public wxEvtHandler {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

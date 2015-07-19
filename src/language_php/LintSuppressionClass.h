@@ -30,7 +30,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * A suppression rule represents a single item that will be ignored
  * during lint checks. Each rule has a type, a target, and a
@@ -51,9 +50,7 @@ namespace t4p {
  * to all sub-directories.
  */
 class SuppressionRuleClass {
-
 	public:
-
 	enum Types {
 		SKIP_UNKNOWN_CLASS,
 		SKIP_UNKNOWN_METHOD,
@@ -144,9 +141,7 @@ class SuppressionRuleClass {
  *   will tag them as unknown classes.
  */
 class LintSuppressionClass {
-
 	public:
-
 	/**
 	 * the items to supress
 	 */
@@ -213,7 +208,6 @@ class LintSuppressionClass {
 	 */
 	bool AddSkipAllRuleForDirectory(const wxFileName& dir);
 };
-
 }
 
 #endif // T4P_LINTSUPRESSIONCLASS_H

@@ -31,11 +31,8 @@
 #include <wx/docview.h>
 
 namespace t4p {
-
 class RecentFilesViewClass : public FeatureViewClass {
-
 	public:
-
 	RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature);
 
 	~RecentFilesViewClass();
@@ -45,7 +42,6 @@ class RecentFilesViewClass : public FeatureViewClass {
 	void SavePreferences();
 
 	private:
-
 	/**
 	 * sub-menu to hold the recent files
 	 */
@@ -75,7 +71,6 @@ class RecentFilesViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif

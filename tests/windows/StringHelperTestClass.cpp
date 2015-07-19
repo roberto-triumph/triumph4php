@@ -27,7 +27,6 @@
 #include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
 
 SUITE(StringHelperTestClass) {
-
 TEST(FindPreviousShouldReturnLastIndex) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("test");
@@ -93,6 +92,4 @@ TEST(IcuToCharConversions) {
 		t4p::IcuToChar(uniStr).c_str());
 	CHECK_EQUAL(uniStr, test);
 }
-
-
 }

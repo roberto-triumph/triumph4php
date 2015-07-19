@@ -31,17 +31,13 @@
 #include <globals/Events.h>
 
 namespace t4p {
-
 class FileWatcherViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature);
 
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
 	t4p::FileWatcherFeatureClass& Feature;
 
 	// to track opened files, since the watcher needs to
@@ -53,16 +49,12 @@ class FileWatcherViewClass : public t4p::FeatureViewClass {
 };
 
 class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGeneratedClass {
-
 	public:
-
 	FileWatcherPreferencesPanelClass(wxWindow* parent, t4p::FileWatcherFeatureClass& feature);
 
 	private:
-
 	t4p::FileWatcherFeatureClass& Feature;
 };
-
 }
 
 #endif

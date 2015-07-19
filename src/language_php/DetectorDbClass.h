@@ -30,15 +30,12 @@
 #include <wx/filename.h>
 
 namespace t4p {
-
 /**
  * This class performs write operations on the detector tags
  * cache database.
  */
 class DetectorDbClass {
-
 	public:
-
 	DetectorDbClass();
 
 	/**
@@ -58,13 +55,11 @@ class DetectorDbClass {
 	void Wipe();
 
 	private:
-
 	/**
 	 * This class will not own the pointer.
 	 */
 	soci::session* Session;
 };
-
 }
 
 #endif

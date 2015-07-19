@@ -30,7 +30,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * the set of parameters that will be used for each
  * external url detector PHP script call. All of
@@ -38,9 +37,7 @@ namespace t4p {
  * OutputDbFileName.
  */
 class UrlTagDetectorParamsClass {
-
 	public:
-
 	/**
 	 * location to the php executable (php.exe / php)
 	 * this is usually retrieved from t4p::EnvironmentClass
@@ -103,9 +100,7 @@ class UrlTagDetectorParamsClass {
  * one external process execution for each project source directory / url detector combination
  */
 class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
-
 	public:
-
 	UrlTagDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -120,7 +115,6 @@ class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionC
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * used to run the external url detector PHP script
 	 */
@@ -150,9 +144,7 @@ class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionC
 	void OnProcessFailed(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

@@ -27,7 +27,6 @@
 t4p::MacCommonMenuBarClass::MacCommonMenuBarClass(wxApp& app)
 : App(app)
 , CommonMenuBar() {
-
 	// on mac, let the app stay running when the main frame is
 	// closed.  this is the correct behavior (like most mac apps)
 	#ifdef __WXMAC__

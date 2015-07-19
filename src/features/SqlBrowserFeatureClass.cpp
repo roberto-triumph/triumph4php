@@ -37,7 +37,6 @@
 t4p::QueryCompleteEventClass::QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId)
 : wxEvent(eventId, t4p::QUERY_COMPLETE_EVENT)
 , Results(results) {
-
 }
 
 wxEvent* t4p::QueryCompleteEventClass::Clone() const {
@@ -88,7 +87,6 @@ void t4p::MultipleSqlExecuteClass::BackgroundWork() {
 		SqlLexer.Close();
 	}
 	else {
-
 		// signal a failed connection
 		t4p::SqlResultClass* results = new t4p::SqlResultClass;
 		results->LineNumber = SqlLexer.GetLineNumber();
@@ -146,7 +144,6 @@ t4p::SqlBrowserFeatureClass::~SqlBrowserFeatureClass() {
 }
 
 void t4p::SqlBrowserFeatureClass::DetectMetadata() {
-
 	// thread will be owned by SequenceClass
 	t4p::SqlMetaDataActionClass* thread = new t4p::SqlMetaDataActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA);
 	std::vector<t4p::GlobalActionClass*> actions;
@@ -383,7 +380,6 @@ UnicodeString t4p::RowToSqlInsertClass::CreateStatement(t4p::DatabaseTagClass::D
 		if (i < (CheckedColumns.size() - 1)) {
 			query += UNICODE_STRING_SIMPLE(",");
 		}
-
 	}
 	if (doMultiLine) {
 		query += UNICODE_STRING_SIMPLE("\n");
@@ -406,7 +402,6 @@ UnicodeString t4p::RowToSqlInsertClass::CreateStatement(t4p::DatabaseTagClass::D
 		if (i < (CheckedValues.size() - 1)) {
 			query += UNICODE_STRING_SIMPLE(", ");
 		}
-
 	}
 	query += UNICODE_STRING_SIMPLE(");");
 	return query;
@@ -475,7 +470,6 @@ UnicodeString t4p::RowToPhpClass::CreatePhpArray() {
 				code += val;
 				code += UNICODE_STRING_SIMPLE("'");
 			}
-
 		}
 		else {
 			code += UNICODE_STRING_SIMPLE("''");

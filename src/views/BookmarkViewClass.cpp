@@ -78,7 +78,6 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 	std::vector<t4p::BookmarkClass>::iterator it;
 	it = std::find(Feature.Bookmarks.begin(), Feature.Bookmarks.end(), toFind);
 	if (it == Feature.Bookmarks.end()) {
-
 		// line has not been bookmarked, lets add it
 		wxFileName fileName(ctrl->GetFileName());
 		int lineNumber = 0;
@@ -90,7 +89,6 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 		}
 	}
 	else {
-
 		// need to remove the bookmark from the list AND from
 		// the code control
 		ctrl->BookmarkClearAt(it->LineNumber);
@@ -138,7 +136,6 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 		bookmarkCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
 	}
 	else {
-
 		// need to open the file first
 		LoadCodeControl(bookmark.FileName.GetFullPath());
 		t4p::CodeControlClass* newlyOpenedCtrl = GetCurrentCodeControl();
@@ -157,7 +154,6 @@ void t4p::BookmarkViewClass::AddBookmarks(const wxFileName& fileName, t4p::CodeC
 			int handle = -1;
 			bool added = ctrl->BookmarkMarkAt(it->LineNumber, handle);
 			if (!added) {
-
 				// file does not contain this line number, this is a bad bookmark
 				it = Feature.Bookmarks.erase(it);
 			}
@@ -175,7 +171,6 @@ void t4p::BookmarkViewClass::AddBookmarks(const wxFileName& fileName, t4p::CodeC
 void t4p::BookmarkViewClass::OnStyledTextModified(wxStyledTextEvent& event) {
 	int mask = wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT;
 	if (event.GetModificationType() & mask) {
-
 		// lets update the location of the bookmarks in this file
 		t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
 		if (!ctrl->IsNew()) {
@@ -183,7 +178,6 @@ void t4p::BookmarkViewClass::OnStyledTextModified(wxStyledTextEvent& event) {
 			std::vector<t4p::BookmarkClass>::iterator it;
 			for (it = Feature.Bookmarks.begin(); it != Feature.Bookmarks.end(); ++it) {
 				if (it->FileName == ctrlFileName) {
-
 					// only update when line >= 1.  if line == 0 then it means
 					// that the entire text has been deleted. this is most likely
 					// scenario when the user reloads the file.

@@ -40,9 +40,7 @@
  * the resource collection tests
  */
 class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
@@ -110,9 +108,7 @@ class RegisterTestFixtureClass : public FileTestFixtureClass, public SqliteTestF
  * completion matches tests
  */
 class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass, SqliteTestFixtureClass  {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	wxString GlobalFile;
 	wxString File1;
@@ -199,9 +195,7 @@ class ExpressionCompletionMatchesFixtureClass : public FileTestFixtureClass, Sql
 };
 
 class TagCacheSearchFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
-
 	public:
-
 	t4p::TagCacheClass TagCache;
 	t4p::DirectorySearchClass Search;
 	std::vector<wxString> PhpFileExtensions;
@@ -236,9 +230,7 @@ class TagCacheSearchFixtureClass : public FileTestFixtureClass, public SqliteTes
 };
 
 SUITE(TagCacheTestClass) {
-
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFinderList) {
-
 	// in this test we will create a class in file1; file2 will use that class
 	// the TagCache object should be able to detect the variable type of
 	// the variable in file2
@@ -260,7 +252,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, CompletionMatchesWithTagFi
 }
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderList) {
-
 	// in this test we will create a class in file2; file1 will use that class
 	// the ResourceUpdate object should be able to detect the variable type of
 	// the variable in file1
@@ -283,7 +274,6 @@ TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithTagFinderLis
 }
 
 TEST_FIXTURE(ExpressionCompletionMatchesFixtureClass, TagMatchesWithStaleMatches) {
-
 	// create a class in global file with methodA
 	// file2 will use the class from global file; file2 will be registered
 	// then global file will be registered with file2 (invalidating methodA)
@@ -344,5 +334,4 @@ TEST_FIXTURE(TagCacheSearchFixtureClass, ExactTags) {
 	// do this now so that we dont use the inherited Session
 	delete result;
 }
-
 }

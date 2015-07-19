@@ -78,7 +78,6 @@ void ProfileTagSearch();
  */
 class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
 	public:
-
 	ParserDirectoryWalkerClass();
 
 	virtual bool Walk(const wxString& file);
@@ -88,7 +87,6 @@ class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
 	int WithNoErrors;
 
 	private:
-
 	pelet::ParserClass Parser;
 };
 
@@ -98,7 +96,6 @@ class ParserDirectoryWalkerClass : public t4p::DirectoryWalkerClass {
  */
 class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
 	public:
-
 	VariableLinterWalkerClass(t4p::TagCacheClass& tagCache);
 
 	virtual bool Walk(const wxString& file);
@@ -108,7 +105,6 @@ class VariableLinterWalkerClass : public t4p::DirectoryWalkerClass {
 	int WithNoErrors;
 
 	private:
-
 	t4p::PhpVariableLintOptionsClass Options;
 	t4p::PhpVariableLintClass Linter;
 	t4p::PhpIdentifierLintClass IdentifierLinter;
@@ -397,7 +393,6 @@ VariableLinterWalkerClass::VariableLinterWalkerClass(t4p::TagCacheClass& tagCach
 	, Linter()
 	, IdentifierLinter()
 	, CallLinter() {
-
 	Options.CheckGlobalScope = false;
 	Options.Version = pelet::PHP_54;
 	Linter.SetOptions(Options);
@@ -421,7 +416,6 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 					results[i].VariableName.getTerminatedBuffer(),
 					results[i].File.getTerminatedBuffer(),
 					results[i].LineNumber);
-
 			}
 		}
 		if (IdentifierLinter.ParseFile(wxFileName(file), identifierResults)) {

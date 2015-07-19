@@ -31,7 +31,6 @@
 #include <wx/event.h>
 
 namespace t4p {
-
 /**
  * Class responsible for capturing all events that modify the global
  * structures and performs the updates.
@@ -39,13 +38,10 @@ namespace t4p {
  * to this handler.
  */
 class GlobalsChangeHandlerClass : public wxEvtHandler {
-
 	public:
-
 	GlobalsChangeHandlerClass(t4p::GlobalsClass& globals);
 
 	private:
-
 	t4p::GlobalsClass& Globals;
 
 	void OnSqlMetaDataComplete(t4p::SqlMetaDataEventClass& event);
@@ -57,9 +53,7 @@ class GlobalsChangeHandlerClass : public wxEvtHandler {
 	void OnDatabaseTagsComplete(t4p::ActionEventClass& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

@@ -33,7 +33,6 @@
 #include <globals/GlobalsClass.h>
 
 namespace t4p {
-
 // forward declaration - defined below
 class SyntaxHighlightViewClass;
 
@@ -58,8 +57,8 @@ class EditColorsPanelClass : public SyntaxHighlightPanelGeneratedClass {
 	                     t4p::SyntaxHighlightViewClass& view);
 
 	bool TransferDataFromWindow();
-	private:
 
+	private:
 	t4p::CodeControlOptionsClass& CodeControlOptions;
 
 	t4p::CodeControlOptionsClass EditedCodeControlOptions;
@@ -88,7 +87,6 @@ class EditColorsPanelClass : public SyntaxHighlightPanelGeneratedClass {
  * also set colors for the code control margins
  */
 class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
-
 	public:
 	SyntaxHighlightViewClass(t4p::SyntaxHighlightFeatureClass& feature);
 
@@ -101,7 +99,6 @@ class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 	void AddPreferenceWindow(wxBookCtrlBase* parent);
 
 	private:
-
 	/*
 	 * when a file is opened or created, we will
 	 * set the colors on the Scintilla code control
@@ -140,7 +137,6 @@ class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 
 #endif // T4P_SYNTAXHIGHLIGHTVIEWCLASS_H

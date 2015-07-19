@@ -33,15 +33,12 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * Classes that need to recurse through directories and search for files need to implement this interface. The walker
  * will be given a file name and the walker will respond with a yay or nay
  */
 class DirectoryWalkerClass {
-
 	public:
-
 	/**
 	 * This method will be called right before the first file is iterated through. Walkers will
 	 * perform any initialization here.
@@ -89,9 +86,7 @@ class DirectoryWalkerClass {
  *
  */
 class SourceClass {
-
 	public:
-
 	/**
 	 * The location where to start looking files from.
 	 */
@@ -179,7 +174,6 @@ class SourceClass {
 	bool Exists() const;
 
 	private:
-
 	/**
 	 * Create the regular expression from the a wildcard string. returned regular expression may or may not be valid,
 	 * use the IsValid() method of the wxRegEx object to test.
@@ -218,7 +212,6 @@ class SourceClass {
 	 * The given eclude wildcards
 	 */
 	wxString ExcludeWildcards;
-
 };
 
 /**
@@ -235,11 +228,8 @@ bool CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::vecto
  * a time).
  */
 class DirectorySearchClass {
-
 	public:
-
 	enum Modes {
-
 		/**
 		 * In RECURSIVE mode, sub-directories are recursed one at a time.  This method is more memory efficient, at the cost
 		 * of not knowing how many files still need to be walked over.
@@ -314,7 +304,6 @@ class DirectorySearchClass {
 	const std::vector<wxString>& GetMatchedFiles();
 
 	private:
-
 	/**
 	 * Populate CurrentFiles with all files in the given path (will recurse through sub-directories as well.)
 	 *
@@ -405,6 +394,5 @@ class DirectorySearchClass {
 	 */
 	bool HasCalledEnd;
 };
-
 }
 #endif // __directorysearchclass__

@@ -37,16 +37,13 @@
 #include <wx/bookctrl.h>
 
 namespace t4p {
-
 // forward declaration
 class FeatureClass;
 class FeatureViewClass;
 class FeatureFactoryClass;
 
 class AppClass {
-
 	public:
-
 	/**
 	 * Important source code program structures, like resources (tags)
 	 * URLs, templates.
@@ -146,7 +143,6 @@ class AppClass {
 	};
 
 	private:
-
 	/**
 	 * Parses any command line arguments.
 	 * @param [out] filenames the files given as arguments
@@ -176,9 +172,7 @@ class AppClass {
 	t4p::FeatureFactoryClass FeatureFactory;
 
 	private:
-
 	// config modified timer
 	wxTimer& Timer;
 };
-
 }

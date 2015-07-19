@@ -36,7 +36,6 @@ t4p::DatabaseTagDetectorParamsClass::DatabaseTagDetectorParamsClass()
 	, ScriptName()
 	, SourceDir()
 	, OutputDbFileName() {
-
 }
 
 wxString t4p::DatabaseTagDetectorParamsClass::BuildCmdLine() const {
@@ -54,7 +53,6 @@ t4p::DatabaseTagDetectorActionClass::DatabaseTagDetectorActionClass(t4p::Running
 	, GlobalActionClass(runningThreads, eventId)
 	, Process(*this)
 	, ParamsQueue() {
-
 }
 
 bool t4p::DatabaseTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
@@ -92,7 +90,6 @@ bool t4p::DatabaseTagDetectorActionClass::Init(t4p::GlobalsClass& globals) {
 	}
 	bool started = false;
 	if (!ParamsQueue.empty()) {
-
 		// start the first external process
 		started = NextDetection();
 	}

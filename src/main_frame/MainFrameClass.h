@@ -37,7 +37,6 @@
 #include <wx/stc/stc.h>
 
 namespace t4p {
-
 // forward declaration to prevent recursive dependencies
 class AppClass;
 
@@ -56,16 +55,13 @@ class FeatureViewClass;
  * to the sink, and get notified of the new event).
  */
 class AppEventListenerForFrameClass : public wxEvtHandler {
-
 	public:
-
 	/**
 	 * @param frame this class will not own the pointer
 	*/
 	AppEventListenerForFrameClass(MainFrameClass* frame);
 
 	private:
-
 	void OnPreferencesSaved(wxCommandEvent& event);
 
 	void OnPreferencesExternallyUpdated(wxCommandEvent& event);
@@ -95,9 +91,7 @@ class AppEventListenerForFrameClass : public wxEvtHandler {
  * instance of a main frame per app.
  */
 class MainFrameClass : public MainFrameGeneratedClass {
-
 	public:
-
 	/**
 	 * @brief
 	 * @param featureViews the views (to get menu bars, toolbars). This class
@@ -157,7 +151,6 @@ class MainFrameClass : public MainFrameGeneratedClass {
 	void UpdateNotebooks();
 
 	protected:
-
 	// Handlers for MainFrameGeneratedClass events.
 	void OnClose(wxCloseEvent& event);
 
@@ -179,7 +172,6 @@ class MainFrameClass : public MainFrameGeneratedClass {
 	void OnContextMenu(wxContextMenuEvent& event);
 
 	private:
-
 	/**
 	 * Status bar accessor.  This status bar allows features to easily add gauges to the status bar.
 	 *
@@ -302,6 +294,5 @@ class MainFrameClass : public MainFrameGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif // T4P_MAINFRAMECLASS_H_

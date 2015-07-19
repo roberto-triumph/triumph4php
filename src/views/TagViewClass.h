@@ -35,11 +35,8 @@
 
 namespace t4p {
 
-
 class TagViewClass : public FeatureViewClass {
-
 	public:
-
 	TagViewClass(t4p::TagFeatureClass& feature);
 
 	void AddSearchMenuItems(wxMenu* searchMenu);
@@ -56,7 +53,6 @@ class TagViewClass : public FeatureViewClass {
 	void OpenFile(wxString fileName);
 
 	private:
-
 	/**
 	 * Toggle various widgets on or off based on the application state.
 	 */
@@ -185,7 +181,6 @@ class TagViewClass : public FeatureViewClass {
  */
 class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 	public:
-
 	/**
 	 * @param parent the parent window
 	 * @param globals to get the project list
@@ -206,7 +201,6 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 	void Prepopulate(const wxString& text, const std::vector<t4p::PhpTagClass>& matches);
 
 	protected:
-
 	/**
 	 * When user types in text perform searched
 	 */
@@ -238,7 +232,6 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 	void OnProjectChoice(wxCommandEvent& event);
 
 	private:
-
 	/**
 	 * Handle the results of the tag lookups.
 	 */
@@ -310,6 +303,5 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-
 }
 #endif // __RESOURCEFEATURECLASS_H

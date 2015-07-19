@@ -41,7 +41,6 @@ static bool AllSourcesExist(const std::vector<t4p::SourceClass>& sources) {
 		}
 	}
 	return !sources.empty();
-
 }
 
 t4p::SourceClass::SourceClass()
@@ -154,7 +153,6 @@ wxString t4p::SourceClass::ExcludeWildcardsString() const {
 }
 
 bool t4p::SourceClass::Contains(const wxString& fullPath) {
-
 	// validations:
 	// 1. fullPath must be in RootDirectory
 	// 2. fullPath must NOT match the exclude wildcards if set
@@ -178,7 +176,6 @@ bool t4p::SourceClass::Contains(const wxString& fullPath) {
 }
 
 bool t4p::SourceClass::IsInRootDirectory(const wxString& fullPath) const {
-
 	// make sure to normalize so that the search can be case sensitive depending on the OS
 	// note: we first compare without normalizing, as normalize() involves file
 	// system calls.  we do this as an optimization, since DirectorySearchClass
@@ -247,7 +244,6 @@ bool t4p::CompareSourceLists(const std::vector<t4p::SourceClass>& a, const std::
 			}
 		}
 		if (!found) {
-
 			// as soon as 1 item in list a is not found in list b, the lists are not the same
 			return false;
 		}

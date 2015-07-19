@@ -36,7 +36,6 @@ t4p::TemplateFilesFeatureClass::TemplateFilesFeatureClass(t4p::AppClass& app)
 }
 
 void t4p::TemplateFilesFeatureClass::StartDetection() {
-
 	// start the chain reaction
 	if (App.Sequences.Running()) {
 		wxMessageBox(_("Please wait for the current background task to finish"));

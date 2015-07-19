@@ -28,7 +28,6 @@
 
 t4p::DetectorDbClass::DetectorDbClass()
 : Session(NULL) {
-
 }
 
 void t4p::DetectorDbClass::Init(soci::session* session) {

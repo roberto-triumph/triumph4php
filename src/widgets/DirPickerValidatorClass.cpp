@@ -29,7 +29,6 @@
 t4p::DirPickerValidatorClass::DirPickerValidatorClass(wxFileName* data)
 : wxValidator()
 , Data(data) {
-
 }
 
 bool t4p::DirPickerValidatorClass::TransferToWindow() {

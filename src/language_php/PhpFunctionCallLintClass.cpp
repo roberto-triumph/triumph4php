@@ -92,7 +92,6 @@ static int VariableEnd(const UnicodeString& signature, int32_t start) {
 			break;
 		}
 		if (signature[i] == ')' && braceDepth < 0) {
-
 			// the end of the signature
 			break;
 		}
@@ -112,10 +111,8 @@ static void CountArgs(const UnicodeString& signature, int& required, int& total)
 	int32_t start = signature.indexOf('(');
 	int32_t next = VariableEnd(signature, start + 1);
 	if (next > (start + 1)) {
-
 		// here means we have at least 1 argument watch out for "string function doIt()"
 		while (start >= 0 && start < signature.length()) {
-
 			// this is the argument that we want to
 			// check for default arguments (they will have an '='
 			// in the signature)
@@ -179,7 +176,6 @@ static bool LookupFunction(const UnicodeString& name, int& signatureRequiredArgC
 		}
 	}
 	else if (nativeFunctionLookup.ReExec(error) && nativeFunctionLookup.Found()) {
-
 		// some native functions have more than 1 signature we look at
 		// all of the signatures.
 		// since we are looking ar multiple signature, the required
@@ -267,7 +263,6 @@ static bool LookupMethod(const UnicodeString& name, bool isStatic, int& signatur
 	}
 
 	if (matchCount > 1) {
-
 		// we found the same method name in the global tag and the native
 		// tags.  we don't know which signature to choose, so lets ignore
 		// for now.
@@ -276,7 +271,6 @@ static bool LookupMethod(const UnicodeString& name, bool isStatic, int& signatur
 		signatureTotalArgCount = 0;
 	}
 	return found;
-
 }
 
 t4p::PhpFunctionCallLintResultClass::PhpFunctionCallLintResultClass()
@@ -341,7 +335,6 @@ void t4p::PhpFunctionCallLintClass::SetVersion(pelet::Versions version) {
 
 bool t4p::PhpFunctionCallLintClass::ParseFile(const wxFileName& fileName,
 	std::vector<t4p::PhpFunctionCallLintResultClass>& errors) {
-
 	Errors.clear();
 	File.remove();
 
@@ -358,7 +351,6 @@ bool t4p::PhpFunctionCallLintClass::ParseFile(const wxFileName& fileName,
 
 bool t4p::PhpFunctionCallLintClass::ParseString(const UnicodeString& code,
 	std::vector<t4p::PhpFunctionCallLintResultClass>& errors) {
-
 	Errors.clear();
 	File.remove();
 
@@ -396,14 +388,12 @@ void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr
 			UnicodeString functionName = var->ChainList[i].Name;
 			bool isStatic = var->ChainList[i].IsStatic;
 			if (0 == i) {
-
 				// this is a function call
 				found = LookupFunction(functionName,
 					signatureRequiredArgCount, signatureTotalArgCount,
 					FunctionSignatureLookup, NativeFunctionSignatureLookup);
 			}
 			else {
-
 				// a long variable calls, ie $this->user->getName()
 				// note that calls like parent::method() and self::method()
 				// are not static method calls

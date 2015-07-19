@@ -30,7 +30,6 @@
 #include <unicode/unistr.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class TagCacheClass;
 
@@ -39,9 +38,7 @@ class TagCacheClass;
  * in error because of too many / too few arguments
  */
 class PhpFunctionCallLintResultClass {
-
 	public:
-
 	enum Types {
 		NONE,
 		TOO_MANY_ARGS,
@@ -89,7 +86,6 @@ class PhpFunctionCallLintResultClass {
 	t4p::PhpFunctionCallLintResultClass& operator=(const t4p::PhpFunctionCallLintResultClass& src);
 
 	void Copy(const t4p::PhpFunctionCallLintResultClass& src);
-
 };
 
 /**
@@ -107,9 +103,7 @@ class PhpFunctionCallLintResultClass {
  *    unique) then the check is skipped.
  */
 class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
-
 	public:
-
 	PhpFunctionCallLintClass();
 
 	/**
@@ -162,7 +156,6 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 	void OnAnyExpression(pelet::ExpressionClass* expr);
 
 	private:
-
 	/**
 	 * the parser will parse the PHP code and call the *Found() methods
 	 * when a variable, expression, etc.. is found
@@ -192,7 +185,6 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 	t4p::FunctionSignatureLookupClass NativeFunctionSignatureLookup;
 	t4p::MethodSignatureLookupClass NativeMethodSignatureLookup;
 };
-
 }
 
 #endif // T4P_PHPFUNCTINOCALLLINTCLASS__

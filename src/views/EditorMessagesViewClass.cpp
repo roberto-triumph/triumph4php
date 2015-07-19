@@ -51,7 +51,6 @@ void t4p::EditorMessagesPanelClass::OnClearButton(wxCommandEvent& event) {
 }
 
 void t4p::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
-
 	// put a bound on the number of messages to display
 	int maxRows = 1000;
 	if (Grid->GetNumberRows() > maxRows) {
@@ -102,7 +101,6 @@ void t4p::EditorMessagesPanelClass::AddMessage(wxLogLevel level, const wxChar* m
 }
 t4p::EditorMessagesViewClass::EditorMessagesViewClass()
 : FeatureViewClass() {
-
 }
 
 void t4p::EditorMessagesViewClass::AddViewMenuItems(wxMenu *viewMenu) {
@@ -127,7 +125,6 @@ void t4p::EditorMessagesViewClass::OnAppLog(t4p::EditorLogEventClass& evt) {
 }
 
 void t4p::EditorMessagesViewClass::AddMessage(wxLogLevel level, const wxChar* msg, time_t timestamp) {
-
 	// in MSW ignore log messages dealting with SetFocus()
 	// If we don't ignore this, the app will stack overflow when the app is minized
 	// and later restored.

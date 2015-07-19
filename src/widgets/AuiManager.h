@@ -29,7 +29,6 @@
 #include <vector>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class NotebookClass;
 
@@ -152,7 +151,6 @@ t4p::NotebookClass* AuiNextHiddenCodeNotebook(wxAuiManager& auiManager);
  * @return the highest row number
  */
 int AuiRowCount(wxAuiManager& auiManager, int dock);
-
 }
 
 #endif

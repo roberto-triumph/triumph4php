@@ -30,21 +30,17 @@
 #include <wx/hyperlink.h>
 
 namespace t4p {
-
 // forward declaration, defined in another file
 class DocCommentFeatureClass;
 class CodeControlClass;
 
 class DocCommentViewClass : public t4p::FeatureViewClass {
-
 	public:
-
 	DocCommentViewClass(t4p::DocCommentFeatureClass& feature);
 
 	void AddEditMenuItems(wxMenu* editMenu);
 
 	private:
-
 	void OnShowDocComment(wxCommandEvent& event);
 
 	void OnMotionAlt(wxCommandEvent& event);
@@ -62,9 +58,7 @@ class DocCommentViewClass : public t4p::FeatureViewClass {
  * the panel that shows a PHP doc comment.
  */
 class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
-
 	public:
-
 	DocCommentPanelClass(wxWindow* parent, t4p::DocCommentViewClass& featureView);
 
 	void SetText(const wxString& text);
@@ -72,7 +66,6 @@ class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
 	void EnablePhpSiteLink(const wxString& functionName);
 
 	protected:
-
 	void OnClose(wxHyperlinkEvent& event);
 	void OnKeyDown(wxKeyEvent& event);
 	void OnPhpSiteDocs(wxHyperlinkEvent& event);
@@ -80,7 +73,6 @@ class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
 
 	t4p::DocCommentViewClass& FeatureView;
 };
-
 
 }
 

@@ -36,7 +36,6 @@ static int ID_TAG_SEARCH = wxNewId();
 t4p::TotalSearchViewClass::TotalSearchViewClass(t4p::TotalSearchFeatureClass& feature)
 	: FeatureViewClass()
 	, Feature(feature) {
-
 }
 
 
@@ -139,7 +138,6 @@ void t4p::TotalSearchDialogClass::OnMatchesListDoubleClick(wxCommandEvent& event
 }
 
 void t4p::TotalSearchDialogClass::OnOkButton(wxCommandEvent& event) {
-
 	// open all checked tags
 	for (unsigned int i = 0; i < MatchesList->GetCount(); ++i) {
 		if (MatchesList->IsChecked(i)) {
@@ -303,7 +301,6 @@ void t4p::TotalSearchDialogClass::ChooseSelectedAndEnd(size_t selected) {
 
 void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 	if (Feature.App.Sequences.Running()) {
-
 		// only update the label when there is a change in
 		// indexing status, that way we eliminate flicker
 		if (!IsCacheBeingBuilt) {
@@ -325,7 +322,6 @@ void t4p::TotalSearchDialogClass::UpdateCacheStatus() {
 		return;
 	}
 	if (IsCacheBeingBuilt && !Feature.App.Sequences.Running()) {
-
 		// here the tag parsing has finished
 		IsCacheBeingBuilt = false;
 		wxWindowUpdateLocker locker(this);

@@ -88,12 +88,10 @@ void t4p::JavascriptCodeCompletionProviderClass::Provide(t4p::CodeControlClass* 
 		completeStatus = "Error: ";
 		completeStatus += error;
 	}
-
 }
 
 t4p::JavascriptBraceMatchStylerClass::JavascriptBraceMatchStylerClass()
 : BraceMatchStylerClass() {
-
 }
 
 bool t4p::JavascriptBraceMatchStylerClass::DoesSupport(t4p::FileType type) {
@@ -131,7 +129,6 @@ t4p::JavascriptViewClass::JavascriptViewClass(t4p::AppClass& app)
 : FeatureViewClass()
 , JavascriptCompletionProvider(app.Globals)
 , BraceStyler() {
-
 }
 
 void t4p::JavascriptViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {

@@ -28,7 +28,6 @@
 t4p::ChangelogViewClass::ChangelogViewClass(t4p::ChangelogFeatureClass& feature)
 : FeatureViewClass()
 , Feature(feature) {
-
 }
 
 void t4p::ChangelogViewClass::AddHelpMenuItems(wxMenu* helpMenu) {

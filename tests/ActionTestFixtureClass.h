@@ -36,9 +36,7 @@
  * must be the first class in the inheritance chain.
  */
 class ActionTestFixtureClass : public wxEvtHandler {
-
 	public:
-
 	t4p::RunningThreadsClass RunningThreads;
 
 	/**

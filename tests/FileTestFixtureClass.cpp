@@ -63,7 +63,6 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 	bool good;
 	wxUnusedVar(good);
 	while (next) {
-
 		// wxRmDir does not handle symlinks
 		if (wxT("sfPropelPlugin") == filename) {
 			wxExecute(wxT("rm ") + path + wxT("sfPropelPlugin"));
@@ -100,7 +99,6 @@ void FileTestFixtureClass::CreateFixtureFile(const wxString& fileName, const wxS
 }
 
 wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
-
 	// since tests are not wxApps we cannot use wxExecute
 	// must do it the hard way
 
@@ -116,7 +114,6 @@ wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 		system(cmd);
 	}
 	else if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX || info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
-
 		//hide the file when running tests on a linux / unix box by renaming to a dot file
 		wxString hiddenName;
 		wxFileName wxf(fileName);

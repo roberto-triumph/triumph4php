@@ -28,7 +28,6 @@
 #include <features/FeatureClass.h>
 
 namespace t4p {
-
 /**
  * This is a feature that is designed to test the feature mechanism.
  * This is also useful for prototyping of a feature or debugging (instead of
@@ -36,16 +35,13 @@ namespace t4p {
  */
 class TestFeatureClass : public FeatureClass {
 	public:
-
 	TestFeatureClass(t4p::AppClass& app);
 
 	/**
 	 * the actual code that will get executed when the "GO" button is clicked
 	 */
 	void Go();
-
 };
-
 }
 
 #endif

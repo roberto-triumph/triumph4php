@@ -56,7 +56,6 @@ void t4p::ListCtrlEdit(wxListCtrl* list, const wxString& column1Value, const wxS
 }
 
 void t4p::ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Value, int rowIndex) {
-
 	// need to set the mask flag; otherwise in MSW the text will not be set
 	// this assumes the given list is set to LC_REPORT mode
 	wxListItem column1,

@@ -178,14 +178,11 @@ class ParsedTagFinderMemoryTestClass : public SqliteTestFixtureClass {
 };
 
 class TagSearchTestClass {
-
 	public:
-
 	t4p::TagSearchClass* TagSearch;
 
 	TagSearchTestClass()
 		: TagSearch(NULL) {
-
 	}
 
 	~TagSearchTestClass() {
@@ -197,7 +194,6 @@ class TagSearchTestClass {
 	void Make(const char* query) {
 		TagSearch = new t4p::TagSearchClass(t4p::CharToIcu(query));
 	}
-
 };
 
 #define CHECK_MEMBER_RESOURCE(className, identifier, tag) \
@@ -213,7 +209,6 @@ class TagSearchTestClass {
 
 
 SUITE(ParsedTagFinderTestClass) {
-
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchFileTagsShouldFindFileWhenFileNameMatches) {
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -276,7 +271,6 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldNotFindFileWhenFil
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchFileTagsShouldFindFileWhenFileNameMatchesAndFileHasDifferentLineEndings) {
-
 	// should count unix, windows & mac line endings
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -665,7 +659,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForDe
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCorrectClassMethod) {
-
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -690,7 +683,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForCo
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindPartialMatchesForCorrectClassMethod) {
-
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -774,7 +766,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldFindMatchesForNa
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldFindMatchesWhenUsingBuildResourceCacheForFile) {
-
 	// write a file, "modify" the file in memory by adding a method, we should find the new method
 	wxString code  = wxString::FromAscii(
 		"<?php\n"
@@ -881,7 +872,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchTagsShouldCollectAllMethod
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchTagsShouldCollectTagsFromSpecifiedFiles) {
-
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("model"));
@@ -988,7 +978,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, NearMatchClassesOrFilesShouldCollec
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, NearMatchClassesOrFilesFromSpecifiedFiles) {
-
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("admin"));
@@ -1052,7 +1041,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassNam
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAndPropertyNameAreTheSame) {
-
 	// the name of the class and the name of the property are the same
 	// the method under test should know the difference and only return the class tag
 	Prep(t4p::CharToIcu(
@@ -1081,7 +1069,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindFileWhenClassAnd
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldFindMatchesForCorrectClassMethod) {
-
 	// adding 2 classes to the file because we want to test that the code can differentiate the two classes and
 	// match only on the class given
 	Prep(t4p::CharToIcu(
@@ -1121,7 +1108,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagsShouldNotFindFileWhenClass
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenModified) {
-
 	// this method is testing the scenario where the tag cache is modified and when the ExactTags
 	// method is checked that the cache is re-sorted and searched correctly
 	Prep(wxString::FromAscii(
@@ -1169,7 +1155,6 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBe
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldFindClassWhenFileHasBeenDeleted) {
-
 	// this method is testing the scenario where the tag cache invalidates matches when files have been deleted
 	Prep(wxString::FromAscii(
 		"<?php\n"
@@ -1256,7 +1241,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactTagshouldReturnInheritedMember
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactTagsShouldCollectTagsFromSpecifiedFiles) {
-
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("model"));
@@ -1327,7 +1311,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ExactClassOrFile) {
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, ExactClassOrFileWithSpecifiedFiles) {
-
 	// create 2 files with the same class; files in separate directories
 	CreateSubDirectory(wxT("user"));
 	CreateSubDirectory(wxT("admin"));
@@ -1721,7 +1704,6 @@ TEST_FIXTURE(ParsedTagFinderMemoryTestClass, IsFileCacheEmptyWithNativeFunctions
 }
 
 TEST_FIXTURE(ParsedTagFinderMemoryTestClass, ClassesFunctionsDefinesShouldReturnTags) {
-
 	// create 2 files that way we can test that each file will only get its own
 	// tags
 	TestFile = wxT("test.php");
@@ -1783,7 +1765,6 @@ TEST_FIXTURE(ParsedTagFinderFileTestClass, IsFileCacheEmptyWithAnotherFile) {
 }
 
 TEST_FIXTURE(ParsedTagFinderFileTestClass, PhpFileExtensionsShouldWorkWithNoWildcards) {
-
 	// create two files, a good.php and a bad.php. Set the filter to only
 	// look for good.php.  When waliking over bad.php, it should be skipped
 	wxString goodFile = wxT("good.php");
@@ -1886,5 +1867,4 @@ TEST_FIXTURE(TagSearchTestClass, ShouldParseNamespaceAndClassAndMethod) {
 	CHECK_UNISTR_EQUALS("Client", TagSearch->GetClassName());
 	CHECK_UNISTR_EQUALS("getResponse", TagSearch->GetMethodName());
 }
-
 }

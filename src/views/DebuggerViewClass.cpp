@@ -54,7 +54,6 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 		isArrayOrObject = true;
 		enclosingStart = wxT("[");
 		enclosingEnd = wxT("]");
-
 	}
 	else if (prop.DataType == wxT("object")) {
 		isArrayOrObject = true;
@@ -71,7 +70,6 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 		}
 		preview += enclosingStart;
 		for (size_t i = 0; i < prop.ChildProperties.size(); ++i) {
-
 			// a child could be a key-value pairs, key => objects.
 			// or key => arrays
 			if (prop.ChildProperties[i].DataType == wxT("array")) {
@@ -81,7 +79,6 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 				preview += prop.ChildProperties[i].Name + wxT(" => { ... }");
 			}
 			else if (prop.ChildProperties[i].Name.empty()) {
-
 				// special case for the nodes that have not been retrieved from
 				// the debug engine yet
 				preview += wxT(" ... ");
@@ -123,7 +120,6 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
  * @return int the context id
  */
 static int ContextIdFromItem(wxTreeListCtrl* ctrl, wxTreeListItem item, wxTreeListItem& localRoot, wxTreeListItem& globalRoot) {
-
 	// recurse up the parent chain and look for local
 	// or global root
 	if (!item.IsOk()) {
@@ -157,7 +153,6 @@ static void AppendTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& parent, con
 		}
 	}
 	else if (prop.HasChildren) {
-
 		// insert a temporary child so that the item has an expand icon
 		// in the tree.
 		// we add an empty node because we know that the property that has children
@@ -186,7 +181,6 @@ static void ReplaceTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& item, cons
 		}
 	}
 	else if (prop.HasChildren) {
-
 		// insert a temporary child so that the item has an expand icon
 		// in the tree.
 		// we add an empty node because we know that the property that has children
@@ -309,7 +303,6 @@ void t4p::DebuggerViewClass::OnDebuggerLog(wxThreadEvent& event) {
 
 void t4p::DebuggerViewClass::OnPreferencesSaved(wxCommandEvent& event) {
 	if (WasDebuggerPortChanged) {
-
 		// need to shutdown the server and listen on the new port
 		Feature.RestartDebugger(WasDebuggerPort);
 	}
@@ -341,11 +334,9 @@ void t4p::DebuggerViewClass::OnDebuggerOpenPanel(wxCommandEvent& event) {
 
 void t4p::DebuggerViewClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
 	if (event.Command == "eval") {
-
 		// errors in eval do not kill the entire debug session
 		wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
 		if (!window) {
-
 			// not sure if we should create the panel again.
 			// if the panel is not here it means that the user closed it
 			// and wants it closed?
@@ -416,7 +407,6 @@ void t4p::DebuggerViewClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& event) 
 void t4p::DebuggerViewClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& event) {
 	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
 	if (!window) {
-
 		// not sure if we should create the panel again.
 		// if the panel is not here it means that the user closed it
 		// and wants it closed?
@@ -446,7 +436,6 @@ void t4p::DebuggerViewClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& eve
 void t4p::DebuggerViewClass::OnDbgpPropertyGet(t4p::DbgpPropertyGetEventClass& event) {
 	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
 	if (!window) {
-
 		// not sure if we should create the panel again.
 		// if the panel is not here it means that the user closed it
 		// and wants it closed?
@@ -473,7 +462,6 @@ void t4p::DebuggerViewClass::OnDebuggerListenError(wxThreadEvent& event) {
 void t4p::DebuggerViewClass::OnDbgpEval(t4p::DbgpEvalEventClass& event) {
 	wxWindow* window = FindToolsWindow(ID_PANEL_DEBUGGER);
 	if (!window) {
-
 		// not sure if we should create the panel again.
 		// if the panel is not here it means that the user closed it
 		// and wants it closed?
@@ -584,7 +572,6 @@ void t4p::DebuggerViewClass::OnContinueToCursor(wxCommandEvent& event) {
 }
 
 void t4p::DebuggerViewClass::BreakpointRemove(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-
 	// if the breakpoint is located in an opened file and has a marker
 	// lets remove the marker.  note that the file may not be open and that's
 	// not unexpected.
@@ -615,7 +602,6 @@ void t4p::DebuggerViewClass::BreakpointRemove(const t4p::BreakpointWithHandleCla
 }
 
 void t4p::DebuggerViewClass::BreakpointDisable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-
 	// if the breakpoint is located in an opened file and has a marker
 	// lets remove the marker.  note that the file may not be open and that's
 	// not unexpected.
@@ -645,7 +631,6 @@ void t4p::DebuggerViewClass::BreakpointDisable(const t4p::BreakpointWithHandleCl
 }
 
 void t4p::DebuggerViewClass::BreakpointEnable(const t4p::BreakpointWithHandleClass& breakpointWithHandle) {
-
 	// if the breakpoint is located in an opened file and does not have a marker
 	// lets add the marker.  note that the file may not be open and that's
 	// not unexpected.
@@ -683,7 +668,6 @@ void t4p::DebuggerViewClass::OnMarginClick(wxStyledTextEvent& event) {
 		return;
 	}
 	if (t4p::CodeControlOptionsClass::MARGIN_MARKERS != event.GetMargin()) {
-
 		// user did not click on the breakpoint margin
 		return;
 	}
@@ -714,7 +698,6 @@ void t4p::DebuggerViewClass::OnMarginClick(wxStyledTextEvent& event) {
 void t4p::DebuggerViewClass::OnStyledTextModified(wxStyledTextEvent& event) {
 	int mask = wxSTC_MOD_INSERTTEXT | wxSTC_MOD_DELETETEXT;
 	if (event.GetModificationType() & mask) {
-
 		// lets update the location of all of the breakpoints in this file
 		t4p::CodeControlClass* ctrl = (t4p::CodeControlClass*)event.GetEventObject();
 		if (!ctrl->IsNew()) {
@@ -1020,7 +1003,6 @@ void t4p::DebuggerVariablePanelClass::OnVariableExpanding(wxTreeListEvent& event
 		}
 	}
 	if (doFetch) {
-
 		// when we fill the data view ctrl, we add an empty node when we get
 		// a property that has children but the debug engine has not returned it
 		// due to hitting the depth limit
@@ -1053,7 +1035,6 @@ void t4p::DebuggerVariablePanelClass::OnVariableActivated(wxTreeListEvent& event
 }
 
 void t4p::DebuggerVariablePanelClass::VariableAddChildren(const t4p::DbgpPropertyClass& variable) {
-
 	// iterate through all variables, lookup by full name
 	wxTreeListItem itemToReplace = FindTreeListItemByFullName(VariablesList, variable.FullName);
 
@@ -1086,7 +1067,6 @@ t4p::DebuggerBreakpointPanelClass::DebuggerBreakpointPanelClass(wxWindow* parent
 , Feature(feature)
 , View(view)
 , AreAllEnabled(false) {
-
 	DeleteBreakpointButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("breakpoint-delete")));
 	ToggleAllBreakpointsButton->SetBitmap(t4p::BitmapImageButtonPrepAsset(wxT("breakpoint-toggle")));
 
@@ -1164,11 +1144,9 @@ void t4p::DebuggerBreakpointPanelClass::OnItemActivated(wxDataViewEvent& event) 
 		return;
 	}
 	Feature.BreakpointGoToSource(Feature.Breakpoints[row]);
-
 }
 
 void t4p::DebuggerBreakpointPanelClass::OnItemValueChanged(wxDataViewEvent& event) {
-
 	// only want to see changes to enabled flag
 	if (event.GetColumn() != 0) {
 		return;
@@ -1192,7 +1170,6 @@ t4p::DebuggerOptionsPanelClass::DebuggerOptionsPanelClass(wxWindow* parent, t4p:
 , Options(options)
 , EditedOptions(options)
 , WasDebuggerPortChanged(wasDebuggerPortChanged) {
-
 	wxGenericValidator portValidator(&EditedOptions.Port);
 	Port->SetValidator(portValidator);
 	wxGenericValidator maxChildrenValidator(&EditedOptions.MaxChildren);
@@ -1406,7 +1383,6 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 		fontSize = 10;
 	}
 	else if (os == wxOS_UNIX_LINUX) {
-
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
@@ -1420,7 +1396,6 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 }
 
 t4p::DebuggerEvalPanelClass::~DebuggerEvalPanelClass() {
-
 }
 
 void t4p::DebuggerEvalPanelClass::ResetStatus(bool active) {

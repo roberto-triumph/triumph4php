@@ -229,7 +229,6 @@ void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 	int selected = evt.GetSelection();
 	wxAuiNotebook* ctrl = reinterpret_cast<wxAuiNotebook*>(evt.GetEventObject());
 	if (ctrl->GetPage(selected) == this) {
-
 		// make sure we kill any running processes
 		if (CurrentPid > 0) {
 			ProcessWithHeartbeat.Stop(CurrentPid);
@@ -243,7 +242,6 @@ void t4p::RunConsolePanelClass::OnPageClose(wxAuiNotebookEvent& evt) {
 
 void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const wxFileName& workingDirectory,
 		bool waitForArguments) {
-
 	// cannot run new files that have not been saved yet
 	if (!cmdLine.empty()) {
 		CommandString = cmdLine;
@@ -267,7 +265,6 @@ void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const
 }
 
 void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
-
 	// do not run a process if one is already running. the 'Run' button
 	// converts to a 'stop' button when a process is running.
 	if (!CurrentPid && TransferDataFromWindow() && !CommandString.IsEmpty()) {
@@ -284,7 +281,6 @@ void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 	else if (CurrentPid > 0) {
 		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);
 		if (!stopped) {
-
 			// stale PID??
 			t4p::EditorLogError(t4p::ERR_ROGUE_PROCESS,
 				wxString::Format(wxT("Process ID: %ld."), CurrentPid));
@@ -355,7 +351,6 @@ void t4p::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 			size_t pos = newCommand.Executable.Length() - 1;
 			for (; pos > 0; pos--) {
 				if (newCommand.Executable[pos] == wxT('/') || newCommand.Executable[pos] == wxT('\\')) {
-
 					// don't include the slash
 					pos++;
 					break;
@@ -408,7 +403,6 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 		t4p::FileNameHitClass hit;
 		if (finder.FindNext(uniText, index) && finder.GetLastMatch(hit.StartIndex, hit.Length)) {
 			if (hit.StartIndex > index) {
-
 				// render the text prior to the hit as normal
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString beforeHit(uniText, index, hit.StartIndex - index);
@@ -433,7 +427,6 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 			index = hit.StartIndex + hit.Length + 1;
 
 			if ((hit.StartIndex + hit.Length) < totalLength) {
-
 				// render the ending boundary that was taken by the regular expression
 				OutputWindow->SetDefaultStyle(normalAttr);
 				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
@@ -455,7 +448,6 @@ UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 
 	wxString extensionsRegEx;
 	for (size_t i = 0; i < allExtensions.size(); ++i) {
-
 		// turn wilcards into proper regular expression syntax
 		wxString ext = allExtensions[i];
 		ext.Replace(wxT("."), wxT("\\."));
@@ -470,14 +462,12 @@ UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 
 	UnicodeString uniRegEx = UNICODE_STRING_SIMPLE("(?mi)");
 	if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
-
 		// pattern C:\\folder1\\folder2
 		// we need to escape backslashes so 1 escaped literal backslash=4 backslashes
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)");
 		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
 		uniRegEx += t4p::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)");
-
 	}
 	else {
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
@@ -593,7 +583,6 @@ void t4p::RunConsoleViewClass::OnRunFileAsCli(wxCommandEvent& event) {
 	}
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
-
 		// cannot run new files that have not been saved yet
 		if (!code->IsNew()) {
 			t4p::CliCommandClass cmd;
@@ -626,7 +615,6 @@ void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) 
 	}
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (code) {
-
 		// cannot run new files that have not been saved yet
 		if (!code->IsNew()) {
 			t4p::CliCommandClass cmd;
@@ -653,7 +641,6 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFile
 		}
 	}
 	else {
-
 		// if theres a window already opened, just re-run the selected window.
 		int selection = GetToolsNotebook()->GetSelection();
 		RunConsolePanelClass* runConsolePanel = NULL;
@@ -672,7 +659,6 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFile
 			AddToolsWindow(runConsolePanel, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap);
 		}
 		if (runConsolePanel) {
-
 			// window already created, will just re-run the command that's already there
 			runConsolePanel->SetToRunCommand(cmdLine, wxFileName(), waitForArguments);
 		}
@@ -694,7 +680,6 @@ void t4p::RunConsoleViewClass::OnAppFileClosed(t4p::CodeControlEventClass& ctrl)
 void t4p::RunConsoleViewClass::MenuUpdate(bool isClosingPage) {
 	bool hasEditors = false;
 	if (isClosingPage) {
-
 		// we get notified of the page closing before the page is actually
 		// removed
 		hasEditors = AllCodeControls().size() > 1;

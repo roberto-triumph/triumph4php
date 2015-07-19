@@ -30,7 +30,6 @@ t4p::EditorMessagesFeatureClass::EditorMessagesFeatureClass(t4p::AppClass& app)
 }
 
 void t4p::EditorMessagesFeatureClass::OnAppReady(wxCommandEvent& event) {
-
 	// this line is needed so that we get all the wxLogXXX messages
 	// pointer will be managed by wxWidgets
 	// need to put this here because the logger needs an initialized window state
@@ -55,7 +54,6 @@ t4p::EditorLogEventClass::EditorLogEventClass(const wxString& msg, wxLogLevel le
 , Message(msg.c_str())
 , Level(level)
 , Timestamp(timestamp) {
-
 }
 
 wxEvent* t4p::EditorLogEventClass::Clone() const {

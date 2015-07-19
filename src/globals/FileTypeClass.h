@@ -30,7 +30,6 @@
 #include <vector>
 
 namespace t4p {
-
 /**
  * This mode flag controls what settings are used for syntax highlighting, margins,
  * and code folding.  It also controls how Auto code completion should be handled
@@ -39,7 +38,6 @@ namespace t4p {
  * can be changed via the SetDocumentMode() method.
  */
 enum FileType {
-
 	/**
 	 * No code completion, ever. No syntax highlight, ever.  This is the default mode
 	 * for anything that's not one of the types below.
@@ -86,9 +84,7 @@ enum FileType {
  * file type.
  */
 class FileTypeClass {
-
 	public:
-
 	/**
 	 * Serialized file filters strings from the config
 	 * these strings contain multitple wildcards, use
@@ -192,7 +188,6 @@ class FileTypeClass {
 	 */
 	bool HasAnyExtension(const wxString& fullPath) const;
 };
-
 }
 
 #endif // T4P_FILETYPECLASS_H

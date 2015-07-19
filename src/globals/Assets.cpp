@@ -41,7 +41,6 @@
  *         the asset directory is relative or absolute.
  */
 static wxFileName AssetRootDir() {
-
 	std::string stdRoot;
 	#ifdef T4P_ASSET_DIR
 		stdRoot = T4P_STR(T4P_ASSET_DIR);
@@ -53,7 +52,6 @@ static wxFileName AssetRootDir() {
         assetRoot.AssignDir(assetDir);
     }
     else {
-
         // assume that the path is relative to the executable
 		wxStandardPaths paths = wxStandardPaths::Get();
 		wxFileName pathExecutableFileName(paths.GetExecutablePath());
@@ -279,7 +277,6 @@ wxFileName t4p::TempDirAsset() {
 }
 
 wxFileName t4p::ConfigDirAsset() {
-
 	// the config dir is in the bootstrap file
 	// the bootstrap file could be located in the same dir as the executable
 	// or in the user data directory
@@ -288,7 +285,6 @@ wxFileName t4p::ConfigDirAsset() {
 		bootstrapConfigFile.GetFullPath(), wxEmptyString, wxCONFIG_USE_LOCAL_FILE);
 	wxString configDirString;
 	if (!config.Read("SettingsDirectory", &configDirString)) {
-
 		// the first time the program runs there is no bootstrap config,
 		// use the bootstrap dir as the config dir
 		configDirString = bootstrapConfigFile.GetPath();
@@ -306,7 +302,6 @@ wxFileName t4p::BootstrapConfigFileAsset() {
 	bootstrapConfigFile.Assign(paths.GetExecutablePath());
 	bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	if (!bootstrapConfigFile.FileExists()) {
-
 		// look at the global config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
@@ -316,7 +311,6 @@ wxFileName t4p::BootstrapConfigFileAsset() {
 
 
 wxFileName t4p::SettingsDirAsset() {
-
 	// get the location of the settings dir from the bootstrap file
 	wxFileName bootstrapConfigFile = t4p::BootstrapConfigFileAsset();
 	wxString bootstrapFullPath = bootstrapConfigFile.GetFullPath();
@@ -341,7 +335,6 @@ void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
 	}
 	else {
-
 		// save settings dire in the global bootstrap config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));

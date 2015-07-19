@@ -175,7 +175,6 @@ void t4p::ShortcutStringToKeyCode(const wxString& str, int& modifiers, int& keyC
 }
 
 wxString t4p::KeyCodeToShortcutString(int modifiers, int keyCode) {
-
 	// there is a bug with wxKeyBind::KeyCodeToString
 	// it does not handle non-alphanumerics like [ or /
 	// we check here
@@ -303,7 +302,6 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
     bool next = config->GetFirstGroup(configName, configIterator);
     while (next) {
         if (configName.StartsWith(wxKEYPROFILE_CONFIG_PREFIX)) {
-
 			// wxKeyProfileArray will cleanup this pointer in wxKeyProfileArray::Cleanup()
 			wxKeyProfile* profile = new wxKeyProfile();
 			std::vector<t4p::DynamicCmdClass> cmds(defaultShortcuts);
@@ -331,7 +329,6 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 		profiles.SetSelProfile(0);
 	}
 	else if (profiles.IsEmpty()) {
-
 		// no profiles were stored; use the defaults
 		wxKeyProfile* profile = new wxKeyProfile(wxT("Triumph keyboard shortcuts"), wxT("Triumph keyboard shortcuts"));
 		for (size_t i = 0; i < defaultShortcuts.size(); ++i) {
@@ -352,7 +349,6 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
  * @param configKey the shortcuts will be stored to the given config group
  */
 static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
-
 	// Example config file will look like this
 	//
 	//  ... other top-level confg items ...
@@ -408,11 +404,9 @@ static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 t4p::DynamicCmdClass::DynamicCmdClass(wxMenuItem* item, const wxString& identifier)
 	: MenuCmd(item, identifier, item->GetHelp())
 	, Identifier(identifier) {
-
 	// check for the default shortcuts
 	wxAcceleratorEntry *acc = item->GetAccel();
 	if (acc) {
-
 		// this menuitem has an associated accelerator... add an entry
 		// to the array of bindings for the relative command...
 		MenuCmd.AddShortcut(acc->GetFlags(), acc->GetKeyCode());
@@ -448,7 +442,6 @@ t4p::PreferencesClass::PreferencesClass()
 	, KeyProfiles()
 	, ApplicationFont()
 	, CheckForUpdates(true) {
-
 }
 
 void t4p::PreferencesClass::Init() {
@@ -548,7 +541,6 @@ bool t4p::PreferencesClass::InitConfig() {
 }
 
 void t4p::PreferencesClass::SetSettingsDir(const wxFileName& settingsDir) {
-
 	// save the settings dir in the bootstrap file
 	t4p::SetSettingsDirLocation(settingsDir);
 

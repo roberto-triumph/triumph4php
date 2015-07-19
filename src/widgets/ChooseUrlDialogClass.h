@@ -31,13 +31,11 @@
 #include <wx/wx.h>
 
 namespace t4p {
-
 /**
  * Small dialog that allows the user to choose a URL to run. Url list
  * is populated from the URL detector cache (UrlTagFinder).
  */
 class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
-
 	public:
 	ChooseUrlDialogClass(wxWindow* parent, UrlTagFinderClass& urls,
 		const std::vector<t4p::ProjectClass>& projects,
@@ -45,7 +43,6 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 		UrlTagClass& chosenUrl);
 
 	protected:
-
 	void OnOkButton(wxCommandEvent& event);
 
 	/**
@@ -81,7 +78,6 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	void OnProjectChoice(wxCommandEvent& event);
 
 	private:
-
 	/**
 	 * Get the matching urls. a matching url is one that starts with the
 	 * filter string (case insensitive).
@@ -135,7 +131,6 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	 */
 	const t4p::FileTypeClass& FileType;
 };
-
 }
 
 #endif

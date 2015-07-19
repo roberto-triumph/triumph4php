@@ -30,7 +30,6 @@
 #include <queue>
 
 namespace t4p {
-
 /**
  * the set of parameters that will be used for each
  * external template files detector PHP script call. All of
@@ -38,9 +37,7 @@ namespace t4p {
  * OutputDbFileName.
  */
 class TemplateFileTagsDetectorParamsClass {
-
 	public:
-
 	/**
 	 * location to the php executable (php.exe / php)
 	 * this is usually retrieved from t4p::EnvironmentClass
@@ -102,9 +99,7 @@ class TemplateFileTagsDetectorParamsClass {
  * this action.
  */
 class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClass {
-
 	public:
-
 	TemplateFileTagsDetectorActionClass(t4p::RunningThreadsClass& runningThreads, int eventId);
 
 	/**
@@ -119,7 +114,6 @@ class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public t4p::Glo
 	void BackgroundWork();
 
 	private:
-
 	/**
 	 * used to run the external url detector PHP script
 	 */
@@ -149,9 +143,7 @@ class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public t4p::Glo
 	void OnProcessFailed(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
-
 };
-
 }
 
 #endif

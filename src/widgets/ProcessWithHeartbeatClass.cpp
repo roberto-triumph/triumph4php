@@ -68,7 +68,6 @@ bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& wo
 	if (pid != 0) {
 		std::map<long, wxProcess*>::iterator it = RunningProcesses.find(pid);
 		if (it != RunningProcesses.end()) {
-
 			// not sure the new process will get the same PID if another one is running
 			// let's cleanup just to be sure
 			Stop(pid);
@@ -127,7 +126,6 @@ void t4p::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event) {
 		wxPostEvent(&Handler, completeEvent);
 	}
 	if (it != RunningProcesses.end()) {
-
 		// since we don't call event.Skip() we are the "parent" and we must delete the process pointer
 		// ourselves. See the wxProcess documentation
 		delete it->second;

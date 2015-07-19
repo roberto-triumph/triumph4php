@@ -31,7 +31,6 @@
 #include <string>
 
 namespace t4p {
-
 /**
  * escape a value so that it is suitable for using in a LIKE SQL clause
  * ie. so that underscores, percents are treated literally
