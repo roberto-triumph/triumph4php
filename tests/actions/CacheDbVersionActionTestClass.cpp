@@ -57,7 +57,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
 	CHECK(Globals.TagCacheDbFileName.FileExists());
 
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
@@ -72,7 +73,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
 	Action.BackgroundWork();
 	CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
@@ -86,7 +88,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";
 	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK(t4p::SqliteSchemaVersion(session) == 0);
+	CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
 
 	CHECK(Action.Init(Globals));
 	Action.BackgroundWork();
@@ -95,7 +97,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
 	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
@@ -106,7 +109,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
 	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
 	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
@@ -121,7 +125,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
 	DetectorCacheAction.BackgroundWork();
 	CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 
 TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
@@ -135,7 +140,7 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 	// set the version to be an old one
 	session.once << "DELETE FROM schema_version;";
 	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK(t4p::SqliteSchemaVersion(session) == 0);
+	CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
 
 	CHECK(DetectorCacheAction.Init(Globals));
 	DetectorCacheAction.BackgroundWork();
@@ -144,7 +149,8 @@ TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
 	// not sure why I have to close the connection in order for the test to work
 	session.close();
 	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	CHECK(t4p::SqliteSchemaVersion(session) > 0);
+	bool greater = t4p::SqliteSchemaVersion(session) > 0;
+	CHECK(greater);
 }
 }
 

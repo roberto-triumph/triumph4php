@@ -133,10 +133,10 @@ TEST_FIXTURE(JsTagResultFixtureClass, ExactMatch) {
 
 	CHECK_EQUAL(Tag2.FileTagId, result.JsTag.FileTagId);
 	CHECK_EQUAL(Tag2.SourceId, result.JsTag.SourceId);
-	CHECK(0 == Tag2.Key.compare(result.JsTag.Key));
-	CHECK(0 == Tag2.Signature.compare(result.JsTag.Signature));
-	CHECK(0 == Tag2.Identifier.compare(result.JsTag.Identifier));
-	CHECK(0 == Tag2.Comment.compare(result.JsTag.Comment));
+	CHECK_EQUAL(0, Tag2.Key.compare(result.JsTag.Key));
+	CHECK_EQUAL(0, Tag2.Signature.compare(result.JsTag.Signature));
+	CHECK_EQUAL(0, Tag2.Identifier.compare(result.JsTag.Identifier));
+	CHECK_EQUAL(0, Tag2.Comment.compare(result.JsTag.Comment));
 	CHECK_EQUAL(Tag2.LineNumber, result.JsTag.LineNumber);
 	CHECK_EQUAL(Tag2.ColumnPosition, result.JsTag.ColumnPosition);
 
@@ -153,10 +153,10 @@ TEST_FIXTURE(JsTagResultFixtureClass, NearMatch) {
 
 	CHECK_EQUAL(Tag1.FileTagId, result.JsTag.FileTagId);
 	CHECK_EQUAL(Tag1.SourceId, result.JsTag.SourceId);
-	CHECK(0 == Tag1.Key.compare(result.JsTag.Key));
-	CHECK(0 == Tag1.Signature.compare(result.JsTag.Signature));
-	CHECK(0 == Tag1.Identifier.compare(result.JsTag.Identifier));
-	CHECK(0 == Tag1.Comment.compare(result.JsTag.Comment));
+	CHECK_EQUAL(0, Tag1.Key.compare(result.JsTag.Key));
+	CHECK_EQUAL(0, Tag1.Signature.compare(result.JsTag.Signature));
+	CHECK_EQUAL(0, Tag1.Identifier.compare(result.JsTag.Identifier));
+	CHECK_EQUAL(0, Tag1.Comment.compare(result.JsTag.Comment));
 	CHECK_EQUAL(Tag1.LineNumber, result.JsTag.LineNumber);
 	CHECK_EQUAL(Tag1.ColumnPosition, result.JsTag.ColumnPosition);
 
