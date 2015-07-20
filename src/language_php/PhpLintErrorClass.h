@@ -37,5 +37,5 @@ class PhpLintErrorClass {
 };
 }
 
-#endif // T4P_PHPLINTERRORCLASS__
+#endif  // T4P_PHPLINTERRORCLASS__
 

@@ -103,8 +103,8 @@ void t4p::FileOperationsViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 
 	fileMenu->Enable(wxID_SAVE, false);
 	fileMenu->Enable(wxID_SAVEAS, false);
-	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 4, false); // save all
-	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 5, false); // revert
+	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 4, false);  // save all
+	fileMenu->Enable(t4p::MENU_FILE_OPERATIONS + 5, false);  // revert
 	fileMenu->Enable(wxID_CLOSE, false);
 }
 
@@ -379,11 +379,11 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 	MenuBar->Enable(wxID_SAVE, hasEditors && notebook && notebook->IsPageModified(currentPage));
 	MenuBar->Enable(wxID_SAVEAS, hasEditors && NULL != codeControl);
 	MenuBar->Enable(wxID_CLOSE, hasEditors);
-	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 4, someModified); // save all
+	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 4, someModified);  // save all
 	MenuBar->Enable(t4p::MENU_FILE_OPERATIONS + 5,
 		hasEditors && notebook && notebook->IsPageModified(currentPage) &&
 		NULL != codeControl && !codeControl->IsNew()
-	); // revert
+	);  // revert
 }
 
 void t4p::FileOperationsViewClass::OnAppFrameClose(wxNotifyEvent& event) {

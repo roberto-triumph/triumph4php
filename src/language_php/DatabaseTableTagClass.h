@@ -54,4 +54,4 @@ class DatabaseTableTagClass {
 };
 }
 
-#endif // T4P_DATABASETABLETAGCLASS_H
+#endif  // T4P_DATABASETABLETAGCLASS_H

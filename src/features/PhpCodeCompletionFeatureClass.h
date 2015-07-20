@@ -43,4 +43,4 @@ class PhpCodeCompletionFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P_PHPCODECOMPLETIONFEATURECLASS_H
+#endif  // T4P_PHPCODECOMPLETIONFEATURECLASS_H

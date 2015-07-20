@@ -31,7 +31,7 @@
 #include <TriumphChecks.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
-#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 

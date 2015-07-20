@@ -94,4 +94,4 @@ class FileTestFixtureClass {
 	wxString TestProjectDir;
 };
 
-#endif // __filetestfixtureclass__
+#endif  // __filetestfixtureclass__

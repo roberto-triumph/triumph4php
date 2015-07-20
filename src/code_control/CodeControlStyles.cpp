@@ -76,8 +76,8 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 	NewStyle(options.PhpStyles, wxSTC_H_COMMENT, "HTML Comment");
 	NewStyle(options.PhpStyles, wxSTC_H_ENTITY, "HTML Entity");
 	NewStyle(options.PhpStyles, wxSTC_H_VALUE, "HTML Value");
-	NewStyle(options.PhpStyles, wxSTC_H_QUESTION,  "HTML Embedded Script Start"); // <?php start tag
-	NewStyle(options.PhpStyles, wxSTC_H_TAGEND, "HTML Embedded Script End"); // script end tag ?>
+	NewStyle(options.PhpStyles, wxSTC_H_QUESTION,  "HTML Embedded Script Start");  // <?php start tag
+	NewStyle(options.PhpStyles, wxSTC_H_TAGEND, "HTML Embedded Script End");  // script end tag ?>
 
 	NewStyle(options.PhpStyles, wxSTC_HJ_DEFAULT, "Embedded Javascript Default");
 	NewStyle(options.PhpStyles, wxSTC_HJ_COMMENT, "Embedded Javascript Multi Line Comment");
@@ -139,18 +139,18 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 	NewStyle(options.SqlStyles, wxSTC_SQL_DEFAULT, "SQL Default");
 	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENT, "SQL Comment");  // starts with "/*"
-	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE, "SQL Single Line Comment"); // starts with "--"
-	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC, "SQL Doc Comment"); // starts with or '/**' or '/*!' (doxygen)
+	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINE, "SQL Single Line Comment");  // starts with "--"
+	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOC, "SQL Doc Comment");  // starts with or '/**' or '/*!' (doxygen)
 	NewStyle(options.SqlStyles, wxSTC_SQL_NUMBER, "SQL Number");
 	NewStyle(options.SqlStyles, wxSTC_SQL_WORD, "SQL Keyword");
 	NewStyle(options.SqlStyles, wxSTC_SQL_STRING, "SQL String");
 	NewStyle(options.SqlStyles, wxSTC_SQL_CHARACTER, "SQL Character");
 	NewStyle(options.SqlStyles, wxSTC_SQL_OPERATOR, "SQL Operator");
 	NewStyle(options.SqlStyles, wxSTC_SQL_IDENTIFIER, "SQL Identifier");
-	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINEDOC, "SQL Single Line Doc Comment"); // starts with '#'
-	NewStyle(options.SqlStyles, wxSTC_SQL_WORD2, "SQL Database Objects"); //table, column names that match the DB
-	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOCKEYWORD, "SQL Stored Procedure Keyword"); // keyword on stored procedure
-	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOCKEYWORDERROR, "SQL Doxygen Comment Error"); // doxygen error
+	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTLINEDOC, "SQL Single Line Doc Comment");  // starts with '#'
+	NewStyle(options.SqlStyles, wxSTC_SQL_WORD2, "SQL Database Objects");  // table, column names that match the DB
+	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOCKEYWORD, "SQL Stored Procedure Keyword");  // keyword on stored procedure
+	NewStyle(options.SqlStyles, wxSTC_SQL_COMMENTDOCKEYWORDERROR, "SQL Doxygen Comment Error");  // doxygen error
 	NewStyle(options.SqlStyles, wxSTC_SQL_USER1, "SQL User Keywords 1");
 	NewStyle(options.SqlStyles, wxSTC_SQL_USER2, "SQL User Keywords 2");
 	NewStyle(options.SqlStyles, wxSTC_SQL_USER3, "SQL User Keywords 3");
@@ -454,7 +454,7 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -980,7 +980,7 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -1506,7 +1506,7 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -2032,7 +2032,7 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -2558,7 +2558,7 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -3084,7 +3084,7 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -3610,7 +3610,7 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -4136,7 +4136,7 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -4662,7 +4662,7 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -5188,7 +5188,7 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -5714,7 +5714,7 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -6240,7 +6240,7 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -6766,7 +6766,7 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -7292,7 +7292,7 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -7818,7 +7818,7 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -8344,7 +8344,7 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -8870,7 +8870,7 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -9396,7 +9396,7 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -9922,7 +9922,7 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -10448,7 +10448,7 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -10974,7 +10974,7 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -11500,7 +11500,7 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -12026,7 +12026,7 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -12552,7 +12552,7 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -13078,7 +13078,7 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -13604,7 +13604,7 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
@@ -14130,7 +14130,7 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	int os = platform.GetOperatingSystemId();
 	int fontSize = 10;
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;

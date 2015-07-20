@@ -231,7 +231,7 @@ static int LoadKeyProfileBindings(std::vector<t4p::DynamicCmdClass>& dynamicCmds
 	bool next = config->GetFirstEntry(configName, configIterator);
 	while (next) {
 		if (configName.StartsWith(wxT("Shortcut-"))) {
-			wxString shortcutIdentifier = configName.Mid(9); // 9 = length of prefix
+			wxString shortcutIdentifier = configName.Mid(9);  // 9 = length of prefix
 			for (size_t i = 0; i < dynamicCmds.size(); ++i) {
 				if (shortcutIdentifier == dynamicCmds[i].GetIdentifier()) {
 					wxString value = config->Read(configName);
@@ -457,7 +457,7 @@ void t4p::PreferencesClass::Init() {
 }
 
 t4p::PreferencesClass::~PreferencesClass() {
-	//KeyProfileArray destructor deletes the pointers
+	// KeyProfileArray destructor deletes the pointers
 }
 
 void t4p::PreferencesClass::ClearAllShortcuts() {

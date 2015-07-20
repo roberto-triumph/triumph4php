@@ -346,4 +346,4 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // __FINDINFFILESFEATURECLASS_H
+#endif  // __FINDINFFILESFEATURECLASS_H

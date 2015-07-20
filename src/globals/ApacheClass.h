@@ -221,4 +221,4 @@ class ApacheClass : public DirectoryWalkerClass {
 	 int Port;
 };
 }
-#endif // __apacheclass__
+#endif  // __apacheclass__

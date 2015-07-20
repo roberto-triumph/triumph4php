@@ -127,4 +127,4 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P_EDITORFEATURECLASS_H
+#endif  // T4P_EDITORFEATURECLASS_H

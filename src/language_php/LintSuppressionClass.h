@@ -210,4 +210,4 @@ class LintSuppressionClass {
 };
 }
 
-#endif // T4P_LINTSUPRESSIONCLASS_H
+#endif  // T4P_LINTSUPRESSIONCLASS_H

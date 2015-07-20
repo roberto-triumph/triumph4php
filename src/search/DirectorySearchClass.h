@@ -395,4 +395,4 @@ class DirectorySearchClass {
 	bool HasCalledEnd;
 };
 }
-#endif // __directorysearchclass__
+#endif  // __directorysearchclass__

@@ -344,4 +344,4 @@ class RunConsoleViewClass : public FeatureViewClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // __RUNCONSOLEFEATURECLASS_H
+#endif  // __RUNCONSOLEFEATURECLASS_H

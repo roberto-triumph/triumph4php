@@ -78,8 +78,7 @@
 //  {
 //    TEST(YourTestName)
 //    {
-//    }
-//
+//    }  //
 //    TEST(YourOtherTestName)
 //    {
 //    }

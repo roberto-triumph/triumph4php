@@ -264,7 +264,7 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpre
 	// if an assigned variable is an indirect or variable variable
 	// like so " $$name = '123'; "
 	// we turn off uninitialized varaible checks
-	//because we don't want to label false positives.
+	// because we don't want to label false positives.
 	if (expression->Destination.IsIndirect) {
 		HasIndirectVariable = true;
 	}

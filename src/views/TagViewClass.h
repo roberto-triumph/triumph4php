@@ -304,4 +304,4 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // __RESOURCEFEATURECLASS_H
+#endif  // __RESOURCEFEATURECLASS_H

@@ -113,4 +113,4 @@ class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 };
 }
 
-#endif // T4P_NAVIGATIONVIEWCLASS_H
+#endif  // T4P_NAVIGATIONVIEWCLASS_H

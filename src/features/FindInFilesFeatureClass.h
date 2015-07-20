@@ -261,4 +261,4 @@ class FindInFilesFeatureClass : public FeatureClass {
 	private:
 };
 }
-#endif // __FINDINFFILESFEATURECLASS_H
+#endif  // __FINDINFFILESFEATURECLASS_H

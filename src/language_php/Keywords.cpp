@@ -133,7 +133,7 @@ const wxString t4p::KEYWORDS_HTML_ATTRIBUTE_NAMES = wxString::FromAscii(
 const wxString t4p::KEYWORDS_MYSQL = wxString::FromAscii(
 
 	// MySQL version 5.6 keywords from
-	//http://dev.mysql.com/doc/mysqld-version-reference/en/mysqld-version-reference-reservedwords-5-6.html
+	// http://dev.mysql.com/doc/mysqld-version-reference/en/mysqld-version-reference-reservedwords-5-6.html
 	"accessible add all alter analyze and as asc asensitive before between bigint binary blob both by call cascade "
 	"case change char character check collate column condition constraint continue convert create cross current_date "
 	"current_time current_timestamp current_user cursor database databases day_hour day_microsecond day_minute "

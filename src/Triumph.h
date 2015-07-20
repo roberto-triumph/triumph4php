@@ -156,13 +156,13 @@ class AppClass {
 	 */
 	void CreateFeatures();
 
-	public: // temp public, should be private
+	public:  // temp public, should be private
 	/**
 	 * asks features for any windows they want to create
 	 */
 	void FeatureWindows();
 
-	public: // temp public, should be private
+	public:  // temp public, should be private
 	/**
 	 * Almost all functionality is encapsulated in features; the
 	 * app just creates them and hangs on to them until the end.

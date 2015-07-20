@@ -106,4 +106,4 @@ class EnvironmentFeatureClass : public FeatureClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // __ENVIRONMENTFEATURECLASS_H
+#endif  // __ENVIRONMENTFEATURECLASS_H

@@ -269,25 +269,25 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	SCI_WORDPARTLEFT
 	SCI_WORDPARTRIGHT
 	*/
-	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARADOWNEXTEND), _("Expand selection to the end of paragraph")); //\tCTRL+SHIFT+]
-	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARAUPEXTEND), _("Expand selection to the beginning of paragraph")); // \tCTRL+SHIFT+[
+	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARADOWNEXTEND), _("Expand selection to the end of paragraph"));  // \tCTRL+SHIFT+]
+	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARAUPEXTEND), _("Expand selection to the beginning of paragraph"));  // \tCTRL+SHIFT+[
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDLEFTEXTEND), _("Expand selection to the beginning of previous word\tCTRL+SHIFT+LEFT"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHTEXTEND), _("Expand selection to the beginning of next word\tCTRL+SHIFT+RIGHT"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDLEFTENDEXTEND), _("Expand selection to the end of previous word"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHTENDEXTEND), _("Expand selection to the end of next word"));
-	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment")); // \tCTRL+SHIFT+/
-	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment")); // \tCTRL+SHIFT+backslash
+	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment"));  // \tCTRL+SHIFT+/
+	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment"));  // \tCTRL+SHIFT+backslash
 
 	//?? not sure what these do
-	//SCI_WORDLEFTEND
-	//SCI_WORDRIGHTEND
+	// SCI_WORDLEFTEND
+	// SCI_WORDRIGHTEND
 	wxMenu* caretMenu = new wxMenu();
-	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARADOWN), _("Move to next paragraph")); // \tCTRL+]
-	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARAUP), _("Move to previous paragraph")); // \tCTRL+[
+	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARADOWN), _("Move to next paragraph"));  // \tCTRL+]
+	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_PARAUP), _("Move to previous paragraph"));  // \tCTRL+[
 	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDLEFT), _("Move to previous word\tCTRL+LEFT"));
 	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHT), _("Move to next word\tCTRL+RIGHT"));
-	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFT), _("Move to previous word segment")); // \tCTRL+/
-	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHT), _("Move to next word segment")); // \tCTRL+backslash
+	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFT), _("Move to previous word segment"));  // \tCTRL+/
+	caretMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHT), _("Move to next word segment"));  // \tCTRL+backslash
 
 	menu->Append(ID_SUBMENU_TRANSFORM, _("Transform text"), transformMenu);
 	menu->Append(ID_SUBMENU_SELECTION, _("Selection"), selectionMenu);

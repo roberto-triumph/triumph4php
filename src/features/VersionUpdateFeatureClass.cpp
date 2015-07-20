@@ -31,9 +31,9 @@
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
 
-// these macros will expand a macro into its
+// these macros will expand a pre-processor define into the code
 // these are needed to expand the update host which
-// are given as macros by the premake script
+// are given as pre-processor define by the premake script
 #define T4P_STR_EXPAND(s) #s
 #define T4P_STR(s) T4P_STR_EXPAND(s)
 

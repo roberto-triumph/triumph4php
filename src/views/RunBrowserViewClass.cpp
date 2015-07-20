@@ -165,9 +165,9 @@ void t4p::RunBrowserViewClass::AddWindows() {
 }
 
 void t4p::RunBrowserViewClass::AddKeyboardShortcuts(std::vector<DynamicCmdClass>& shortcuts) {
-	//std::map<int, wxString> menuItemIds;
-	//menuItemIds[t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
-	//AddDynamicCmd(menuItemIds, shortcuts);
+	// std::map<int, wxString> menuItemIds;
+	// menuItemIds[t4p::MENU_RUN_BROWSER + MAX_BROWSERS + MAX_URLS + 1] = wxT("Run-In Web Browser");
+	// AddDynamicCmd(menuItemIds, shortcuts);
 }
 
 void t4p::RunBrowserViewClass::OnRunInWebBrowser(wxCommandEvent& event) {

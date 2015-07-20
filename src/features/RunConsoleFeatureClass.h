@@ -142,4 +142,4 @@ class RunConsoleFeatureClass : public FeatureClass {
 	void OnCommandButtonClick(wxCommandEvent& evt);
 };
 }
-#endif // __RUNCONSOLEFEATURECLASS_H
+#endif  // __RUNCONSOLEFEATURECLASS_H

@@ -69,7 +69,7 @@ TEST_FIXTURE(FileOperationsViewTestClass, SaveMenuShouldBeEnabledWhenSavepoint) 
 	View->AddFileMenuItems(fileMenu);
 	TestApp->MenuBar->Append(fileMenu, _("File"));
 
-	//open a new code control
+	// open a new code control
 	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(TestApp->Frame);
 	newNotebook->InitApp(
 

@@ -190,4 +190,4 @@ class FileTypeClass {
 };
 }
 
-#endif // T4P_FILETYPECLASS_H
+#endif  // T4P_FILETYPECLASS_H

@@ -28,7 +28,7 @@
 #include <globals/String.h>
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
-#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <TriumphChecks.h>
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>

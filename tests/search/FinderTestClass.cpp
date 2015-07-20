@@ -26,7 +26,7 @@
 #include <search/FinderClass.h>
 #include <globals/String.h>
 #include <unicode/unistr.h>
-#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 
 UnicodeString CODE = t4p::CharToIcu(
 	"<?php\n"
@@ -35,7 +35,7 @@ UnicodeString CODE = t4p::CharToIcu(
 	" * @copyright 2009\n"
 	" */\n"
 	"function computeAreaOfCircle($radius) {\n"
-    "  $PI = 3.14; //constant \n"
+    "  $PI = 3.14;  // constant \n"
     "  $MESSAGE = 'area of circle is: %2f';\n"
 	"  if (0 === $radius || 0 >= $radius) {\n"
 	"    return \"Invalid radius. \" . sprintf($MESSAGE, $PI*$radius*2);\n"
@@ -133,7 +133,7 @@ TEST(FindNextUsingRegularExpressionModeShouldReturnInvalidIndexWhenNotFound) {
 }
 
 TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^  \\$PI = 3\\.14; //constant $"));
+	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^  \\$PI = 3\\.14;  // constant $"));
 	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
 	CHECK(finder.Prepare());
 	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("  $PI"));
@@ -141,7 +141,7 @@ TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
 	int32_t position, length;
 	CHECK(finder.GetLastMatch(position, length));
 	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("  $PI = 3.14; //constant ")));
+	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("  $PI = 3.14;  // constant ")));
 }
 
 TEST(FindPreviousShouldSkipToFirstInstance) {
@@ -189,7 +189,7 @@ TEST(GetLastReplacementTextShouldReturnMatchedTextInRegularExpressionMode) {
 	CHECK(finder.FindNext(CODE));
 	UnicodeString match;
 	CHECK(finder.GetLastReplacementText(CODE, match));
-	UnicodeString expected = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /* constant  */");
+	UnicodeString expected = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /*  constant  */");
 	CHECK_EQUAL(expected, match);
 }
 

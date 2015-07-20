@@ -864,7 +864,7 @@ BEGIN_EVENT_TABLE(t4p::FindInFilesResultsPanelClass, FindInFilesResultsPanelGene
 
 	// remove this handler; when searching many files the GUI is redrawn constantly and doesn't
 	// look smooth
-	//EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, t4p::FindInFilesResultsPanelClass::OnFileSearched)
+	// EVT_COMMAND(wxID_ANY, EVENT_FILE_READ, t4p::FindInFilesResultsPanelClass::OnFileSearched)
 	EVT_FIND_IN_FILES_HITS(wxID_ANY, t4p::FindInFilesResultsPanelClass::OnFileHit)
 	EVT_COMMAND(wxID_ANY, t4p::EVENT_FILE_READ_COMPLETE, t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete)
 	EVT_ACTION_PROGRESS(wxID_ANY, t4p::FindInFilesResultsPanelClass::OnActionProgress)

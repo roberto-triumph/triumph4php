@@ -147,7 +147,7 @@ int32_t t4p::FindPrevious(const UnicodeString& text, const UnicodeString& expres
 			}
 		}
 		if (expressionIndex == -1) {
-			textIndex = textIndex - j + 1; // +1 because j is 1 past the beginning of the match(for loop)
+			textIndex = textIndex - j + 1;  // +1 because j is 1 past the beginning of the match(for loop)
 			break;
 		}
 		--textIndex;

@@ -80,4 +80,4 @@ class HtmlViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif // T4P_HTMLVIEWCLASS__
+#endif  // T4P_HTMLVIEWCLASS__

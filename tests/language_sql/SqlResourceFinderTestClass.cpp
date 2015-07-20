@@ -123,7 +123,7 @@ TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTable) {
 TEST_FIXTURE(MysqlResourceFinderFixtureClass, FindTableCaseInsensitive) {
 	std::string query = "SHOW VARIABLES WHERE Variable_name='version_compile_os' AND Value IN('Win64', 'Win32');";
 	if (DatabaseTestFixtureClass::Exec(query)) {
-		//skip this test on windows, MySQL always creates tables with lowercase names
+		// skip this test on windows, MySQL always creates tables with lowercase names
 		return;
 	}
 	query = "CREATE TABLE WebUsers(idUser int);";

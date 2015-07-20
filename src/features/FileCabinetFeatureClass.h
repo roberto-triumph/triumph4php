@@ -67,4 +67,4 @@ class FileCabinetFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P_FILECABINETFEATURECLASS_H
+#endif  // T4P_FILECABINETFEATURECLASS_H

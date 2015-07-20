@@ -154,29 +154,16 @@ TEST_FIXTURE(FindInFilesTestFixtureClass, ReplaceAllMatchesInFileShouldReplaceAl
 	 expectedContents.Replace(wxT("UserClass"), wxT("GuestUserClass"));
 	 CHECK_EQUAL(expectedContents, fileContents);
 
-	 //check file #2
+	 // check file #2
 	 fileContents = GetFileContents(wxT("admin.inc"));
 	 expectedContents = FILE_2;
 	 expectedContents.Replace(wxT("UserClass"), wxT("GuestUserClass"));
 	 CHECK_EQUAL(expectedContents, fileContents);
 
-	 //check file #3
+	 // check file #3
 	 fileContents = GetFileContents(wxT("admin.php_bak"));
 	 expectedContents = FILE_2;
 	 expectedContents.Replace(wxT("UserClass"), wxT("GuestUserClass"));
 	 CHECK_EQUAL(expectedContents, fileContents);
 }
-
-
-//TEST_FIXTURE(FindInFilesTestFixtureClass, FindInCurrentFileShouldFindExpressionWhenFileHasHighAsciiCharacters) {
-//	FindInFiles.Expression = UNICODE_STRING_SIMPLE("ExtendedRecordSetForUnitTestAddGetLeftJoin");
-//	DirectorySearchClass search;
-//	FindInFiles.FilesFilter = UNICODE_STRING_SIMPLE("*RecordSet.php");
-//	search.Init(wxT("/home/roberto/workspace/sample_php_project/developer_tests/library/db/"));
-//	CHECK(FindInFiles.Prepare());
-//	while (search.More()) {
-//		search.Walk(FindInFiles);
-//	}
-//	printf("matches found:%d\n", search.GetMatchedFiles().size());
-//}
 }

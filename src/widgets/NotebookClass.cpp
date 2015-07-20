@@ -610,7 +610,7 @@ void t4p::NotebookClass::ClosePage(int index) {
 			wxCANCEL | wxICON_QUESTION, this);
 		if (wxCANCEL != response) {
 			if (wxYES == response && !SavePage(index, true)) {
-				//something drastic. dont know how to handle it
+				// something drastic. dont know how to handle it
 			}
 			doDeletePage = true;
 		}

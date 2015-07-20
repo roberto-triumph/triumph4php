@@ -201,4 +201,4 @@ class EnvironmentClass {
 	void AddDefaults();
 };
 }
-#endif // __environmentclass__
+#endif  // __environmentclass__

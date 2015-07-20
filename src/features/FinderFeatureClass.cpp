@@ -79,7 +79,7 @@ void t4p::FinderActionClass::BackgroundWork() {
 
 			t4p::FinderHitEventClass hit(GetEventId(), utf8Start, utf8End - utf8Start);
 			PostEvent(hit);
-			nextIndex = matchStart + matchLength + 1; // prevent infinite find next's
+			nextIndex = matchStart + matchLength + 1;  // prevent infinite find next's
 		} else {
 			break;
 		}

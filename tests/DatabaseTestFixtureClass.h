@@ -27,7 +27,7 @@
 
 #include <soci.h>
 #include <string>
-#include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
+#include "unicode/ustream.h"  // get the << overloaded operator, needed by UnitTest++
 
 /**
  * This is a fxture class that can be used for unit tests that need to have database

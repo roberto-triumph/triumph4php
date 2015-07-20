@@ -295,4 +295,4 @@ class MainFrameClass : public MainFrameGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // T4P_MAINFRAMECLASS_H_
+#endif  // T4P_MAINFRAMECLASS_H_

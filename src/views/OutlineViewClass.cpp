@@ -177,7 +177,7 @@ void t4p::OutlineViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 }
 
 void t4p::OutlineViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
-	//if the outline window is open, update the file that was parsed
+	// if the outline window is open, update the file that was parsed
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	if (window != NULL) {
 		wxString fileName = event.GetCodeControl()->GetFileName();
@@ -188,7 +188,7 @@ void t4p::OutlineViewClass::OnAppFileOpened(t4p::CodeControlEventClass& event) {
 }
 
 void t4p::OutlineViewClass::OnTagSearchComplete(t4p::OutlineSearchCompleteEventClass& event) {
-	//if the outline window is open, update the tree
+	// if the outline window is open, update the tree
 	wxWindow* window = FindOutlineWindow(ID_WINDOW_OUTLINE);
 	OutlineViewPanelClass* outlineViewPanel = NULL;
 	if (window != NULL) {
@@ -470,7 +470,7 @@ void t4p::OutlineViewPanelClass::OnTreeItemActivated(wxTreeEvent& event) {
 
 void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::PhpTagClass>& tags) {
 	// each tag could be a file or a class tag.
-	//if its a class tag, get all of members for the class
+	// if its a class tag, get all of members for the class
 	std::vector<t4p::PhpTagClass>::const_iterator chosenTag;
 	std::vector<UnicodeString> searchStrings;
 
@@ -641,7 +641,7 @@ void t4p::OutlineViewPanelClass::OnTreeMenuExpandAll(wxCommandEvent& event) {
 
 void t4p::OutlineViewPanelClass::RedrawOutline() {
 	std::vector<t4p::OutlineSearchCompleteClass> tags = OutlinedTags;
-	OutlinedTags.clear(); // AddFileToOutline will add the given tags to this list
+	OutlinedTags.clear();  // AddFileToOutline will add the given tags to this list
 	AddTagsToOutline(tags);
 }
 

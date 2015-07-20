@@ -139,4 +139,4 @@ class StatusBarWithGaugeClass : public wxStatusBar {
 };
 }
 
-#endif // __statusbarwithgaugeclass__
+#endif  // __statusbarwithgaugeclass__

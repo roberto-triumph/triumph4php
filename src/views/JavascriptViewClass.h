@@ -114,4 +114,4 @@ class JavascriptViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif // T4P_JAVASCRIPTVIEWCLASS__
+#endif  // T4P_JAVASCRIPTVIEWCLASS__

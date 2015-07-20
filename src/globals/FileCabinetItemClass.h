@@ -277,4 +277,4 @@ class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
 };
 }
 
-#endif // T4P_FILECABINETCLASS_H
+#endif  // T4P_FILECABINETCLASS_H

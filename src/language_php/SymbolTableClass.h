@@ -566,4 +566,4 @@ class ScopeFinderClass :
 }
 
 
-#endif // __symboltable__
+#endif  // __symboltable__

@@ -405,7 +405,7 @@ void t4p::CallStackClass::ExpressionAssignmentFound(pelet::AssignmentExpressionC
 	FoundScope = true;
 	SymbolsFromVariable(expression->Destination, expression->Expression);
 
-	//SymbolFromExpression(expression->Expression, Variables);
+	// SymbolFromExpression(expression->Expression, Variables);
 }
 
 void t4p::CallStackClass::ExpressionAssignmentCompoundFound(pelet::AssignmentCompoundExpressionClass* expression) {

@@ -120,4 +120,4 @@ class PreferencesDialogClass : public wxPropertySheetDialog {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif // __PreferencesDialogClass__
+#endif  // __PreferencesDialogClass__

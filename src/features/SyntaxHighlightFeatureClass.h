@@ -45,4 +45,4 @@ class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P_SYNTAXHIGHLIGHTFEATURECLASS_H
+#endif  // T4P_SYNTAXHIGHLIGHTFEATURECLASS_H

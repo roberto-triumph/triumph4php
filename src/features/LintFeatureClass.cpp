@@ -39,7 +39,7 @@
  * linted.  This is because linters build ASTs
  * and those can get really big for big files
  */
-const static int MAX_PARSE_FILESIZE = 5 * 1024 * 1024; // 5 MB
+const static int MAX_PARSE_FILESIZE = 5 * 1024 * 1024;  // 5 MB
 
 /**
  * the maximum amount of errored files to tolerate.
@@ -157,7 +157,7 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	// load suppressions if we have not done so
 	// doing it here to prevent file reads in the foreground thread
 	if (!HasLoadedSuppressions && SuppressionFile.FileExists()) {
-		std::vector<UnicodeString> loadErrors; // not sure how to propagate these errors
+		std::vector<UnicodeString> loadErrors;  // not sure how to propagate these errors
 		Suppressions.Init(SuppressionFile, loadErrors);
 		HasLoadedSuppressions = true;
 	} else if (!HasLoadedSuppressions) {
@@ -169,7 +169,7 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 	// check to see if the all suppressions for a file are
 	// suppressed. if so, then no need to parse the file
 
-	UnicodeString target; // for the "all" suppression, target is not needed
+	UnicodeString target;  // for the "all" suppression, target is not needed
 	if (Suppressions.ShouldIgnore(fileToCheck, target, t4p::SuppressionRuleClass::SKIP_ALL)) {
 		return ret;
 	}

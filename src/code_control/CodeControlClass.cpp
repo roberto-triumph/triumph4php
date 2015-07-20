@@ -44,8 +44,10 @@
 #endif
 
 // IMPLEMENTATION NOTE:
-// Take care when using positions given by Scintilla.  Scintilla gives positions in bytes while wxString and UnicodeString
-// use character positions. Take caution when using methods like GetCurrentPos(), WordStartPosition(), WordEndPosition()
+// Take care when using positions given by Scintilla.  Scintilla gives positions
+// in bytes while wxString and UnicodeString
+// use character positions. Take caution when using methods like GetCurrentPos(),
+// WordStartPosition(), WordEndPosition()
 // This causes problems when Scintilla is handling UTF-8 documents.
 // There is a method called GetSafeSubString() that will help you in this regard.
 

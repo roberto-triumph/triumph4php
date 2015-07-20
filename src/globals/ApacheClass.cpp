@@ -279,32 +279,32 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					inVirtualHost = false;
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("serverroot"))) {
-					ServerRoot = line.Mid(10).Trim(false).Trim(true); //10= length of 'ServerRoot'
+					ServerRoot = line.Mid(10).Trim(false).Trim(true);  // 10= length of 'ServerRoot'
 
 					// trim any quotes that the path may have
 					ServerRoot.Replace(wxT("\""), wxT(""));
 					ServerRoot.Replace(wxT("'"), wxT(""));
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("include "))) {
-					wxString nextFile = line.Mid(8).Trim(false).Trim(true); //8= length of 'Include'
+					wxString nextFile = line.Mid(8).Trim(false).Trim(true);  // 8= length of 'Include'
 					nextFile = MakeAbsolute(nextFile);
 					ParseApacheConfigFile(nextFile);
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("servername"))) {
 					// must get the line that has not been modified to lowercase
-					currentServerName = line.Mid(10).Trim(false).Trim(true); //10=length of "ServerName"
+					currentServerName = line.Mid(10).Trim(false).Trim(true);  // 10=length of "ServerName"
 					if (inVirtualHost && !currentPort.IsEmpty()) {
 						// append the port information; sometimes virtual hosts have their own port
 						currentServerName.Append(wxT(":")).Append(currentPort);
 					}
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("documentroot"))) {
-					currentDocumentRoot = line.Mid(12).Trim(false).Trim(true); //12=length of "DocumentRoot"
+					currentDocumentRoot = line.Mid(12).Trim(false).Trim(true);  // 12=length of "DocumentRoot"
 					currentDocumentRoot.Replace(wxT("\""), wxT(""));
 					currentDocumentRoot.Replace(wxT("'"), wxT(""));
 				}
 				if (!skipParsing && 0 == lineLower.Find(wxT("listen"))) {
-					currentPort = line.Mid(6).Trim(false).Trim(true); //6=length of "listen"
+					currentPort = line.Mid(6).Trim(false).Trim(true);  // 6=length of "listen"
 
 					// handle listen 127.0.0.1:8080
 					// hadle listen 8080

@@ -24,7 +24,7 @@
  */
 #include <UnitTest++.h>
 #include <globals/String.h>
-#include <unicode/ustream.h> //get the << overloaded operator, needed by UnitTest++
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 
 SUITE(StringHelperTestClass) {
 TEST(FindPreviousShouldReturnLastIndex) {
@@ -56,7 +56,7 @@ TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtStart) {
 
 TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotFound) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("dackwards"); //1 char off d vs. b
+	UnicodeString expression = UNICODE_STRING_SIMPLE("dackwards");  // 1 char off d vs. b
 	CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, -1));
 }
 
@@ -64,7 +64,7 @@ TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotFound) {
 TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotBeforeStart) {
 	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
 	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
-	CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, 29)); // 29 = index of 'd' of "backward"
+	CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, 29));  // 29 = index of 'd' of "backward"
 }
 
 TEST(WxToIcuConversions) {

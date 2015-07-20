@@ -73,7 +73,7 @@ TEST(BreakpointResponse) {
 		"        hit_value=\"1\" \n"
 		"        hit_condition=\">=\" \n"
 		"        hit_count=\"1\"> \n"
-		"<expression>Y291bnQoJG5hbWVzKSA9PSAw</expression> \n" // base64 encoded count($names) == 0
+		"<expression>Y291bnQoJG5hbWVzKSA9PSAw</expression> \n"  // base64 encoded count($names) == 0
 		"</breakpoint>\n"
 		"<breakpoint id=\"BREAKPOINT_127\" \n"
 		"        type=\"watch\" \n"
@@ -81,7 +81,7 @@ TEST(BreakpointResponse) {
 		"        hit_value=\"1\" \n"
 		"        hit_condition=\">=\" \n"
 		"        hit_count=\"1\"> \n"
-		"<expression>JG5hbWVz</expression> \n" // base64 encoded $names
+		"<expression>JG5hbWVz</expression> \n"  // base64 encoded $names
 		"</breakpoint>\n"
 		"</response>\n"
 	);
@@ -180,7 +180,7 @@ TEST(DebugEngineErrorResponse) {
 		"          transaction_id=\"transaction_id\"> \n"
 		"    <error code=\"3\" \n"
 		"           apperr=\"app specific error code\"> \n"
-		"       <message>invalid context name</message>" // error messages are not base64 encoded
+		"       <message>invalid context name</message>"  // error messages are not base64 encoded
 		"    </error> \n"
 		"</response>\n"
 	);
@@ -204,7 +204,7 @@ TEST(InvalidXml) {
 		"          transaction_id=\"transaction_id\"> \n"
 		"    <error code=\"3\" \n"
 		"           apperr=\"app specific error code\"> \n"
-		"       <message>aW52YWxpZCBjb250ZXh0IG5hbWU=</message>" // base64 encoded "invalid context name"
+		"       <message>aW52YWxpZCBjb250ZXh0IG5hbWU=</message>"  // base64 encoded "invalid context name"
 		"    </error> \n"
 		"</response>\n"
 	);
@@ -257,7 +257,7 @@ TEST(CommandGenerationWithData) {
 	expected +=  wxString::Format(" -d %d", stackDepth);
 	expected +=  wxString::Format(" -c %d", contextId);
 	expected +=  " -t " + dataType;
-	expected +=  " -- L3Zhci93d3cvc2l0ZS9pbmRleC5waHA="; // base64 encode of expression
+	expected +=  " -- L3Zhci93d3cvc2l0ZS9pbmRleC5waHA=";  // base64 encode of expression
 	CHECK_EQUAL(expected, line);
 }
 }

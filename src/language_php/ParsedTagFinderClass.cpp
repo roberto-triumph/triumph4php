@@ -1796,7 +1796,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			break;
 		case t4p::PhpTagClass::METHOD:
-			//advance past the class header so that if  a function with the same name exists we will skip it
+			// advance past the class header so that if  a function with the same name exists we will skip it
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
@@ -1812,7 +1812,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sfunction\\s*(&\\s*)?") + className + UNICODE_STRING_SIMPLE("\\s*\\(");
 			break;
 		case t4p::PhpTagClass::MEMBER:
-			//advance past the class header so that if  a variable with the same name exists we will skip it				:
+			// advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
@@ -1824,7 +1824,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sdefine\\(\\s*('|\")") + className + UNICODE_STRING_SIMPLE("('|\")");
 			break;
 		case t4p::PhpTagClass::CLASS_CONSTANT:
-			//advance past the class header so that if  a variable with the same name exists we will skip it				:
+			// advance past the class header so that if  a variable with the same name exists we will skip it				:
 			finder.Expression = UNICODE_STRING_SIMPLE("\\sclass\\s+") + className + UNICODE_STRING_SIMPLE("\\s");
 			if (finder.Prepare() && finder.FindNext(text, start)) {
 				finder.GetLastMatch(pos, length);
@@ -1835,7 +1835,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 			break;
 	}
 	if (finder.Prepare() && finder.FindNext(text, start) && finder.GetLastMatch(pos, length)) {
-		++pos; //eat the first space
+		++pos;  // eat the first space
 		--length;
 		return true;
 	}

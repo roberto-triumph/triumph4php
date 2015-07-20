@@ -212,7 +212,7 @@ TEST_FIXTURE(ApacheTestClass, GetUrlShouldWorkHostRoot) {
 	CHECK_EQUAL(8080, Apache.GetListenPort());
 
 
-	//remove the trailing slash, make sure it still works
+	// remove the trailing slash, make sure it still works
 	wxString test = TestProjectDir;
 	test = test.Mid(0, test.Len() - 1);
 	wxString url = Apache.GetUrl(test);

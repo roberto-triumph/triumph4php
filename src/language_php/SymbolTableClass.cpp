@@ -73,7 +73,7 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 		// the symbol then we only show protected/public resources
 		passesVisibilityCheck = tag.IsProtected;
 	} else if (!passesVisibilityCheck) {
-		//not checking isThisCalled
+		// not checking isThisCalled
 		passesVisibilityCheck = isThisCall;
 	}
 

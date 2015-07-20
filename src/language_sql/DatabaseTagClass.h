@@ -34,7 +34,7 @@
 #include <wx/filename.h>
 
 namespace t4p {
-//defined below
+// defined below
 class SqlQueryClass;
 class ConnectionIdentifierClass;
 

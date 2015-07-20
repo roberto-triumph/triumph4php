@@ -501,7 +501,7 @@ void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, cons
 		newTraitTag.TraitClassName.setTo(fullyQualifiedTraitName, 1);
 		newTraitTag.TraitNamespaceName.setTo(UNICODE_STRING_SIMPLE("\\"));
 	} else {
-		//this should never get here as the parser will always give us
+		// this should never get here as the parser will always give us
 		// fully qualified trait names
 		newTraitTag.TraitClassName = fullyQualifiedTraitName;
 		newTraitTag.TraitNamespaceName = UNICODE_STRING_SIMPLE("\\");

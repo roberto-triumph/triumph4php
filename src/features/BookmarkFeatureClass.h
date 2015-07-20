@@ -99,4 +99,4 @@ class BookmarkFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P__BOOKMARKFEATURECLASS_H
+#endif  // T4P__BOOKMARKFEATURECLASS_H

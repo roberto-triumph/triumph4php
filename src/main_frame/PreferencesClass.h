@@ -244,4 +244,4 @@ class PreferencesClass {
 	bool CheckForUpdates;
 };
 }
-#endif // __preferencesclass__
+#endif  // __preferencesclass__

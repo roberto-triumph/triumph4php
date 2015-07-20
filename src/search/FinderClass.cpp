@@ -293,7 +293,7 @@ bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int3
 				if (U_SUCCESS(error) && U_SUCCESS(error)) {
 					IsFound = true;
 
-					length = endPos - foundPos; // end is the index after the match
+					length = endPos - foundPos;  // end is the index after the match
 
 					// if search was started from the middle of a string,
 					// need to correct the found position

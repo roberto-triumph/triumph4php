@@ -73,7 +73,7 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 	// look to see if the line is already bookmarked
 	t4p::BookmarkClass toFind;
 	toFind.FileName.Assign(ctrl->GetFileName());
-	toFind.LineNumber = ctrl->GetCurrentLine() + 1; // scintilla lines start at 0
+	toFind.LineNumber = ctrl->GetCurrentLine() + 1;  // scintilla lines start at 0
 
 	std::vector<t4p::BookmarkClass>::iterator it;
 	it = std::find(Feature.Bookmarks.begin(), Feature.Bookmarks.end(), toFind);

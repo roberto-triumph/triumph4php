@@ -76,7 +76,7 @@ class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 	/**
 	 * To get access to the globals; needed by the notebook.
 	 */
-	////t4p::NotebookLayoutFeatureClass& Feature;
+	// t4p::NotebookLayoutFeatureClass& Feature;
 
 	DECLARE_EVENT_TABLE()
 };

@@ -366,7 +366,7 @@ void t4p::AddSymbolToReplaceRegularExpression(wxComboBox* text, int id, int curr
 void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) {
 	wxString value = text->GetValue();
 
-	//meta syntax (?i) at the start of the regex. we need to put the new flag, but only if it is not already there
+	// meta syntax (?i) at the start of the regex. we need to put the new flag, but only if it is not already there
 	wxString startFlag(wxT("(?"));
 	if (0 == value.Find(startFlag)) {
 		int afterMetasPos = value.Find(wxT(")"));

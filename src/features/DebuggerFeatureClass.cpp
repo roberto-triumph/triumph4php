@@ -33,8 +33,8 @@
 #include <algorithm>
 
 // TODO(roberto): not sure how breakpoints react when
-//       file is edited (and breakpoints moves lines)
-//       but file is then reloaded/discarded
+// file is edited (and breakpoints moves lines)
+// but file is then reloaded/discarded
 static int ID_ACTION_DEBUGGER = wxNewId();
 
 /**
@@ -52,7 +52,7 @@ static int ID_ACTION_DEBUGGER = wxNewId();
  *
  */
 static wxFileName ToLocalFilename(const wxString& xdebugFile, const std::map<wxString, wxString>& localToRemoteMappings) {
-	wxString remoteFile = xdebugFile.Mid(8); // 8  = size of "file:///"
+	wxString remoteFile = xdebugFile.Mid(8);  // 8  = size of "file:///"
 	if (!remoteFile.Contains(":")) {
 		// in linux, filename comes back as "file:///"
 		// we want to keep the last slash
@@ -739,7 +739,7 @@ void t4p::DebuggerFeatureClass::OnDebuggerShowFull(wxCommandEvent& event) {
 	wxString fullName = event.GetString();
 	int contextId = event.GetInt();
 	PostCmd(
-		Cmd.PropertyValue(0, contextId, fullName, wxT("")) // xdebug does not return key property
+		Cmd.PropertyValue(0, contextId, fullName, wxT(""))  // xdebug does not return key property
 	);
 }
 

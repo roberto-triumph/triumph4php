@@ -28,9 +28,9 @@
 #include <wx/icon.h>
 #include <wx/fileconf.h>
 
-// these macros will expand a macro into its
+// these macros will expand a pre-processor define into code
 // these are needed to expand the asset root location
-// which is given as a macro by the premake script
+// which is given as a pre-processor define by the premake script
 #define T4P_STR_EXPAND(s) #s
 #define T4P_STR(s) T4P_STR_EXPAND(s)
 

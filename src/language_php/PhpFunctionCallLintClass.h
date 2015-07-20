@@ -187,4 +187,4 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 };
 }
 
-#endif // T4P_PHPFUNCTINOCALLLINTCLASS__
+#endif  // T4P_PHPFUNCTINOCALLLINTCLASS__

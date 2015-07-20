@@ -59,4 +59,4 @@ class ChangelogFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif // T4P_CHANGELOGFEATURECLASS_H
+#endif  // T4P_CHANGELOGFEATURECLASS_H

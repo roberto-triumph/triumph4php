@@ -23,10 +23,8 @@
  * @license    http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 
-// include boost asio before any other file to prevent
-//
-// fatal error C1189: #error :  WinSock.h has already been included
-//
+// include boost asio before any other file to prevent  //
+// fatal error C1189: #error :  WinSock.h has already been included  //
 // in MSW
 #include <boost/asio.hpp>
 

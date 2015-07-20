@@ -45,11 +45,11 @@ class FileTagResultClass;
  * A tag string can be one of: class name, file name, method name, file name with line number
  * Examples:
  *
- * user.php //looks for the file named user.php
- * user.php:891 //looks for the file named user.php that has line 891
- * User //looks for a class named User
- * User::login //looks for a class named User that has a method called login
- * User:: //looks for all methods and properties for the user class
+ * user.php  // looks for the file named user.php
+ * user.php:891 // looks for the file named user.php that has line 891
+ * User  // looks for a class named User
+ * User::login  // looks for a class named User that has a method called login
+ * User:: // looks for all methods and properties for the user class
  *
  */
 class TagSearchClass {
@@ -1286,4 +1286,4 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	bool IsNewNamespace(const UnicodeString& namespaceName);
 };
 }
-#endif // T4P_RESOURCEFINDER_H
+#endif  // T4P_RESOURCEFINDER_H

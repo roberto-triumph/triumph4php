@@ -158,7 +158,7 @@ bool t4p::FindInFilesBackgroundReaderClass::BackgroundFileRead(DirectorySearchCl
 					FindInFiles.GetMatchLength());
 				hits.push_back(hit);
 			}
-			while (!destroy && FindInFiles.FindNext()); // NOLINT(whitespace/empty_loop_body)
+			while (!destroy && FindInFiles.FindNext());  // NOLINT(whitespace/empty_loop_body)
 			if (!destroy && !hits.empty()) {
 				// PostEvent will change the ID of the event to the correct
 				// one

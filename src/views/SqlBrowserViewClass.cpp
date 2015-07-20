@@ -613,7 +613,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 
 		// if only one query was executed: render the results in this panel
 		// if more than one query was executed: render any messages for
-		//	in this panel, each new resultset in a new panel
+		// in this panel, each new resultset in a new panel
 		if (results->Success && results->HasRows && !outputSummary) {
 			Fill(results);
 		} else if (results->Success && results->HasRows && outputSummary) {

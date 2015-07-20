@@ -137,7 +137,7 @@ void t4p::StatusBarWithGaugeClass::RedrawGauges() {
     SetFieldsCount(newColumnCount);
     SetStatusWidths(newColumnCount, widths);
 
-	//ATTN: in MSW this line results in a crash why??
+	// ATTN: in MSW this line results in a crash why??
 	wxPlatformInfo platform;
 	if (!(wxOS_WINDOWS | platform.GetOperatingSystemId())) {
 		SetMinHeight(BITMAP_SIZE_Y);

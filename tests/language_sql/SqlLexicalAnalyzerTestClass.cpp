@@ -24,7 +24,7 @@
  */
 #include <language_sql/SqlLexicalAnalyzerClass.h>
 #include <UnitTest++.h>
-#include "unicode/ustream.h" //get the << overloaded operator, needed by UnitTest++
+#include "unicode/ustream.h"  // get the << overloaded operator, needed by UnitTest++
 
 SUITE(SqlLexicalAnalyzerTestClass) {
 TEST(SingleQuery) {

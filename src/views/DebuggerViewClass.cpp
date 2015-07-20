@@ -1345,7 +1345,7 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 	wxPlatformInfo platform;
 	int os = platform.GetOperatingSystemId();
 
-	//ATTN: different OSs have different fonts
+	// ATTN: different OSs have different fonts
 	wxString fontName;
 	int fontSize = 10;
 	if (os == wxOS_WINDOWS_NT) {

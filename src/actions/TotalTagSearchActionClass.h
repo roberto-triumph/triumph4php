@@ -181,4 +181,4 @@ class TotalTagSearchActionClass : public t4p::ActionClass {
 };
 }
 
-#endif // T4P_TOTALTAGSEARCHACTIONCLASS_H
+#endif  // T4P_TOTALTAGSEARCHACTIONCLASS_H

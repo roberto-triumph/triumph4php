@@ -126,4 +126,4 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 };
 }
 
-#endif // T4P_FILECABINETVIEWCLASS_H
+#endif  // T4P_FILECABINETVIEWCLASS_H

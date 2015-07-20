@@ -233,4 +233,4 @@ class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif // T4P_PHPCODECOMPLETIONVIEWCLASS_H
+#endif  // T4P_PHPCODECOMPLETIONVIEWCLASS_H

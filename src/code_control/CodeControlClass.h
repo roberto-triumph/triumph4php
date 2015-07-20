@@ -57,8 +57,10 @@ class CodeControlClass;
  */
 extern const wxEventType EVT_MOTION_ALT;
 
-// margin 0 is taken up by line numbers, margin 1 is taken up by code folding. use
-// margin 2 for lint error markers, margin 3 got search hits
+// margin 0 is taken up by line numbers
+// margin 1 is taken up by code folding.
+// margin 2 for lint error markers
+// margin 3 for search hits
 extern const int CODE_CONTROL_LINT_RESULT_MARKER;
 extern const int CODE_CONTROL_SEARCH_HIT_GOOD_MARKER;
 extern const int CODE_CONTROL_SEARCH_HIT_BAD_MARKER;
@@ -254,7 +256,7 @@ class CodeControlClass : public wxStyledTextCtrl {
 	/**
 	 * lets avoid calls like this
 	 *
-	 * UnicodeString contents //....
+	 * UnicodeString contents  //....
 	 * wxStyledTextCtrl::SetText(t4p::IcuToWx(contents))
 	 *
 	 * This method prevents going from

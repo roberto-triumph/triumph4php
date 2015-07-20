@@ -139,4 +139,4 @@ class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif // T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
+#endif  // T4P_SYNTAXHIGHLIGHTVIEWCLASS_H

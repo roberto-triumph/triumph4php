@@ -26,9 +26,7 @@
 #include <soci/mysql/soci-mysql.h>
 #include <stdio.h>
 
-// these macros will expand a macro into its
-// these are needed to expand the DB user/pwd which
-// are given as macros by the premake script
+// these macros will expand a macro into its  // these are needed to expand the DB user/pwd which  // are given as macros by the premake script
 #define T4P_STR_EXPAND(s) #s
 #define T4P_STR(s) T4P_STR_EXPAND(s)
 

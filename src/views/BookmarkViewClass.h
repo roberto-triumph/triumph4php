@@ -116,4 +116,4 @@ class BookmarkViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif // T4P__BOOKMARKFEATURECLASS_H
+#endif  // T4P__BOOKMARKFEATURECLASS_H

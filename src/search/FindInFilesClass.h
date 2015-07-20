@@ -337,4 +337,4 @@ class FindInFilesClass : public DirectoryWalkerClass {
 	void CleanupStreams();
 };
 }
-#endif // __findinfilesclass__
+#endif  // __findinfilesclass__
