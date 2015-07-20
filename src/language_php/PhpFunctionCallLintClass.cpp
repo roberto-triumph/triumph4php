@@ -32,7 +32,7 @@
  * many.  The user cannot possibly go through all
  * of them
  */
-const static size_t MAX_ERRORS = 100;
+static const size_t MAX_ERRORS = 100;
 
 /**
  * @return int the index to the start of the next variable in the signature

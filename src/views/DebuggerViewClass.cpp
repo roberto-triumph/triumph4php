@@ -38,10 +38,10 @@
 #include <map>
 #include <vector>
 
-const static int ID_PANEL_DEBUGGER = wxNewId();
-const static int ID_PANEL_DEBUGGER_STACK = wxNewId();
-const static int ID_EVAL_PANEL_RUN = wxNewId();
-const static int ID_EVAL_PANEL_CODE_COMPLETE = wxNewId();
+static const int ID_PANEL_DEBUGGER = wxNewId();
+static const int ID_PANEL_DEBUGGER_STACK = wxNewId();
+static const int ID_EVAL_PANEL_RUN = wxNewId();
+static const int ID_EVAL_PANEL_CODE_COMPLETE = wxNewId();
 
 /**
  * @param node the node to read and turn into a string.

@@ -147,7 +147,7 @@ class ProcessWithHeartbeatClass : public wxEvtHandler {
 	/**
 	 * how often we check the process for new output
 	 */
-	const static int POLL_INTERVAL = 300;
+	static const int POLL_INTERVAL = 300;
 
 
 	DECLARE_EVENT_TABLE()

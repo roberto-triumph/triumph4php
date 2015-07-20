@@ -40,7 +40,7 @@
  * linted.  This is because linters build ASTs
  * and those can get really big for big files
  */
-const static int MAX_PARSE_FILESIZE = 5 * 1024 * 1024;  // 5 MB
+static const int MAX_PARSE_FILESIZE = 5 * 1024 * 1024;  // 5 MB
 
 /**
  * the maximum amount of errored files to tolerate.
@@ -48,7 +48,7 @@ const static int MAX_PARSE_FILESIZE = 5 * 1024 * 1024;  // 5 MB
  * many error instances in memory. Also, there is
  * way the user is going through every single file
  */
-const static int MAX_LINT_ERROR_FILES = 100;
+static const int MAX_LINT_ERROR_FILES = 100;
 
 
 /**

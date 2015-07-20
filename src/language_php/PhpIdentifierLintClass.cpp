@@ -37,7 +37,7 @@
  * many.  The user cannot possibly go through all
  * of them
  */
-const static size_t MAX_ERRORS = 100;
+static const size_t MAX_ERRORS = 100;
 
 static void AddMagicMethods(std::map<UnicodeString, int, t4p::UnicodeStringComparatorClass>& methods) {
 	// magic methods, never unknown

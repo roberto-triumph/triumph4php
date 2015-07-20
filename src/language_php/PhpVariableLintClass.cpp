@@ -36,7 +36,7 @@
  * many.  The user cannot possibly go through all
  * of them
  */
-const static size_t MAX_ERRORS = 100;
+static const size_t MAX_ERRORS = 100;
 
 /**
  * this function will check to see if an argument is passed by reference. The

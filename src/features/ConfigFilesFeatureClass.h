@@ -71,7 +71,7 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 	 * the 100 is due to the menu ids allocated to each feature in
 	 * the FeatureClass MenuIds enum
 	 */
-	const static size_t MAX_CONFIG_MENU_ITEMS = 100;
+	static const size_t MAX_CONFIG_MENU_ITEMS = 100;
 
 	ConfigFilesFeatureClass(t4p::AppClass& app);
 

@@ -24,7 +24,7 @@
  */
 #include <widgets/GaugeDialogClass.h>
 
-const static int ID_GAUGE_DIALOG_TIMER = wxNewId();
+static const int ID_GAUGE_DIALOG_TIMER = wxNewId();
 
 t4p::GaugeDialogClass::GaugeDialogClass(wxWindow* parent, const wxString& title, const wxString& label)
 	: GaugeDialogGeneratedClass(parent, wxID_ANY, title)

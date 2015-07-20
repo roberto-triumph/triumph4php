@@ -47,14 +47,14 @@
  * of the panes
  */
 
-const static int ID_MENU_ADJUST_1 = wxNewId();
-const static int ID_MENU_ADJUST_2 = wxNewId();
-const static int ID_MENU_ADJUST_3 = wxNewId();
-const static int ID_MENU_ADJUST_4 = wxNewId();
-const static int ID_MENU_ADJUST_5 = wxNewId();
-const static int ID_MENU_ADJUST_6 = wxNewId();
-const static int ID_MENU_ADJUST_7 = wxNewId();
-const static int ID_MENU_MOVE_7 = wxNewId();
+static const int ID_MENU_ADJUST_1 = wxNewId();
+static const int ID_MENU_ADJUST_2 = wxNewId();
+static const int ID_MENU_ADJUST_3 = wxNewId();
+static const int ID_MENU_ADJUST_4 = wxNewId();
+static const int ID_MENU_ADJUST_5 = wxNewId();
+static const int ID_MENU_ADJUST_6 = wxNewId();
+static const int ID_MENU_ADJUST_7 = wxNewId();
+static const int ID_MENU_MOVE_7 = wxNewId();
 
 class ChangeDialogGeneratedClass : public wxDialog {
 	private:
