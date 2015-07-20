@@ -181,8 +181,7 @@ int runMatchingSuites(const std::string& search) {
 		std::cout << "FAILURE: " << results.GetFailedTestCount()
 			<< " out of " << results.GetTotalTestCount()
 			<< " failed (" << results.GetFailureCount() << ")." << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "Success: " << results.GetTotalTestCount()
 			<< " tests passed." << std::endl;
 	}
@@ -209,8 +208,7 @@ int chooseTests() {
 		if (choice == "1") {
 			std::cout << "Running all tests\n\n";
 			ret = UnitTest::RunAllTests();
-		}
-		else  if (choice == "2") {
+		} else if (choice == "2") {
 			std::cout << "Enter suite string:" << std::endl;
 			std::cin >> suiteToRun;
 
@@ -218,15 +216,12 @@ int chooseTests() {
 			std::transform(suiteToRun.begin(), suiteToRun.end(), suiteToRun.begin(), ::tolower);
 			if (matchesSuite(suites, suiteToRun)) {
 				ret = runMatchingSuites(suiteToRun);
-			}
-			else {
+			} else {
 				std::cout << "No suites matched" << std::endl;
 			}
-		}
-		else if (choice == "3") {
+		} else if (choice == "3") {
 			printSuites(suites);
-		}
-		else {
+		} else {
 			std::cout << "invalid choice." << std::endl;
 		}
 		std::cout << prompt;
@@ -249,8 +244,7 @@ int main(int argc, char **argv) {
 	int ret = 0;
 	if (argc > 1 && strcmp("--all", argv[1]) == 0) {
 		ret = UnitTest::RunAllTests();
-	}
-	else {
+	} else {
 		ret = chooseTests();
 	}
 

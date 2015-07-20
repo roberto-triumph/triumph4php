@@ -133,8 +133,7 @@ void t4p::PhpEnvironmentClass::AutoDetermine() {
 	}
 	if (is53) {
 		Version = pelet::PHP_53;
-	}
-	else {
+	} else {
 		// if version string changes
 		Version = pelet::PHP_53;
 	}
@@ -216,8 +215,7 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 
 	if (1 == version) {
 		Php.Version = pelet::PHP_53;
-	}
-	else if (2 == version) {
+	} else if (2 == version) {
 		Php.Version = pelet::PHP_54;
 	}
 
@@ -249,8 +247,7 @@ void t4p::EnvironmentClass::LoadFromConfig(wxConfigBase* config) {
 			wxString browserPath = config->Read(key);
 			wxFileName browserFileName(browserPath);
 			WebBrowsers.push_back(t4p::WebBrowserClass(browserName, browserFileName));
-		}
-		else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
+		} else if (groupName.Find(wxT("VirtualHost_")) >= 0 && Apache.ManualConfiguration) {
 			// the manual virtual host entries there are many groups; each group is named "VirtualHost_#"
 			// only fill in when Manual flag is off (otherwise we want to parse from the file
 			// in case settings have changed)
@@ -269,8 +266,7 @@ void t4p::EnvironmentClass::SaveToConfig(wxConfigBase* config) const {
 	int version = 0;
 	if (pelet::PHP_53 == Php.Version) {
 		version = 1;
-	}
-	else if (pelet::PHP_54) {
+	} else if (pelet::PHP_54) {
 		version = 2;
 	}
 	config->Write(wxT("Environment/PhpExecutablePath"), Php.PhpExecutablePath);

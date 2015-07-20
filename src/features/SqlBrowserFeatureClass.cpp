@@ -79,14 +79,12 @@ void t4p::MultipleSqlExecuteClass::BackgroundWork() {
 			if (!IsCancelled()) {
 				t4p::QueryCompleteEventClass evt(results, QueryId);
 				PostEvent(evt);
-			}
-			else {
+			} else {
 				delete results;
 			}
 		}
 		SqlLexer.Close();
-	}
-	else {
+	} else {
 		// signal a failed connection
 		t4p::SqlResultClass* results = new t4p::SqlResultClass;
 		results->LineNumber = SqlLexer.GetLineNumber();
@@ -119,8 +117,7 @@ void t4p::MultipleSqlExecuteClass::DoCancel() {
 			if (!good) {
 				wxMessageBox(_("could not kill connection:") + t4p::IcuToWx(error));
 			}
-		}
-		else {
+		} else {
 			wxMessageBox(_("could not connect:") + t4p::IcuToWx(error));
 		}
 	}
@@ -173,8 +170,7 @@ void t4p::SqlBrowserFeatureClass::LoadPreferences(wxConfigBase* config) {
 				if (driverString.CmpNoCase(wxT("MYSQL")) == 0) {
 					info.Driver = t4p::DatabaseTagClass::MYSQL;
 					App.Globals.DatabaseTags.push_back(info);
-				}
-				else if (driverString.CmpNoCase(wxT("SQLITE")) == 0) {
+				} else if (driverString.CmpNoCase(wxT("SQLITE")) == 0) {
 					info.Driver = t4p::DatabaseTagClass::SQLITE;
 					App.Globals.DatabaseTags.push_back(info);
 				}
@@ -210,8 +206,7 @@ void t4p::SqlBrowserFeatureClass::SavePreferences() {
 			wxString driverString;
 			if (t4p::DatabaseTagClass::MYSQL == App.Globals.DatabaseTags[i].Driver) {
 				driverString = wxT("MYSQL");
-			}
-			else if (t4p::DatabaseTagClass::SQLITE == App.Globals.DatabaseTags[i].Driver) {
+			} else if (t4p::DatabaseTagClass::SQLITE == App.Globals.DatabaseTags[i].Driver) {
 				driverString = wxT("SQLITE");
 			}
 			config->Write(wxT("Driver"), driverString);
@@ -264,14 +259,11 @@ void t4p::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutput
 	wxString trueColumnDelim;
 	if (ColumnDelim == wxT("\\t")) {
 		trueColumnDelim = wxT("\t");
-	}
-	else if (ColumnDelim == wxT("\\n")) {
+	} else if (ColumnDelim == wxT("\\n")) {
 		trueColumnDelim = wxT("\n");
-	}
-	else if (ColumnDelim == wxT("\\f")) {
+	} else if (ColumnDelim == wxT("\\f")) {
 		trueColumnDelim = wxT("\f");
-	}
-	else {
+	} else {
 		trueColumnDelim = ColumnDelim;
 	}
 
@@ -285,14 +277,12 @@ void t4p::SqlCopyOptionsClass::Export(std::vector<wxString> values, wxTextOutput
 		// write the cell value
 		if (val == wxT("<NULL>")) {
 			stream.WriteString(NullFiller);
-		}
-		else {
+		} else {
 			for (size_t j = 0; j < val.length(); ++j) {
 				if (val[j] == ColumnEnclosure) {
 					stream.PutChar(wxT('\\'));
 					stream.WriteString(ColumnEnclosure);
-				}
-				else {
+				} else {
 					stream.PutChar(val[j]);
 				}
 			}
@@ -309,14 +299,11 @@ void t4p::SqlCopyOptionsClass::EndRow(wxTextOutputStream& stream) {
 	wxString trueRowDelim;
 	if (RowDelim == wxT("\\t")) {
 		trueRowDelim = wxT("\t");
-	}
-	else if (RowDelim == wxT("\\n")) {
+	} else if (RowDelim == wxT("\\n")) {
 		trueRowDelim = wxT("\n");
-	}
-	else if (RowDelim == wxT("\\f")) {
+	} else if (RowDelim == wxT("\\f")) {
 		trueRowDelim = wxT("\f");
-	}
-	else {
+	} else {
 		trueRowDelim = RowDelim;
 	}
 	stream.WriteString(trueRowDelim);
@@ -393,8 +380,7 @@ UnicodeString t4p::RowToSqlInsertClass::CreateStatement(t4p::DatabaseTagClass::D
 		UnicodeString val = CheckedValues[i];
 		if (val.compare(UNICODE_STRING_SIMPLE("<NULL>")) == 0) {
 			val = UNICODE_STRING_SIMPLE("NULL");
-		}
-		else {
+		} else {
 			val = UNICODE_STRING_SIMPLE("'") + val + UNICODE_STRING_SIMPLE("'");
 		}
 
@@ -447,8 +433,7 @@ UnicodeString t4p::RowToPhpClass::CreatePhpArray() {
 	if (SYNTAX_KEYWORD == ArraySyntax) {
 		code += UNICODE_STRING_SIMPLE("array (\n");
 		endCode =  UNICODE_STRING_SIMPLE(")\n");
-	}
-	else {
+	} else {
 		code += UNICODE_STRING_SIMPLE("[\n");
 		endCode =  UNICODE_STRING_SIMPLE("]\n");
 	}
@@ -464,14 +449,12 @@ UnicodeString t4p::RowToPhpClass::CreatePhpArray() {
 			val = CheckedValues[i];
 			if (val.compare(UNICODE_STRING_SIMPLE("<NULL>")) == 0) {
 				code += UNICODE_STRING_SIMPLE("NULL");
-			}
-			else {
+			} else {
 				code += UNICODE_STRING_SIMPLE("'");
 				code += val;
 				code += UNICODE_STRING_SIMPLE("'");
 			}
-		}
-		else {
+		} else {
 			code += UNICODE_STRING_SIMPLE("''");
 		}
 

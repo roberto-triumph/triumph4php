@@ -70,17 +70,14 @@ int main(int argc, char **argv) {
 				if(U_SUCCESS(status)) {
 					int32_t cc = ucsdet_getConfidence(ucm, &status);
 					printf("File encoding=%s confidence=%d\n", name, cc);
-				}
-				else {
+				} else {
 					puts("could not get detected charset name\n");
 				}
-			}
-			else {
+			} else {
 				puts("could not detect charset\n");
 			}
 			ucsdet_close(csd);
-		}
-		else {
+		} else {
 			puts("could init detector\n");
 		}
 
@@ -113,8 +110,7 @@ int main(int argc, char **argv) {
 		printf("error:%s\n", u_errorName(status));
 		printf("***********\nUTF-8 FILE\n***************\n%s\n", utf8Buf);
 		delete[] utf8Buf;
-	}
-	else {
+	} else {
 		printf("Could not open file %s\n", fileName);
 	}
 	return 0;

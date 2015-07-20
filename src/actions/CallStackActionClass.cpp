@@ -58,8 +58,7 @@ void t4p::CallStackActionClass::BackgroundWork() {
 	if (CallStack.Build(StartFileName, StartClassName, StartMethodName, Version, lastError)) {
 		if (!DetectorDbFileName.IsOk()) {
 			t4p::EditorLogWarning(t4p::ERR_TAG_READ, _("Could not create call stack file in ") + DetectorDbFileName.GetFullPath());
-		}
-		else {
+		} else {
 			std::string stdDbName = t4p::WxToChar(DetectorDbFileName.GetFullPath());
 
 			// we should be able to open this since it has been created by

@@ -50,8 +50,7 @@ void t4p::DetectorDbInitActionClass::Work(t4p::GlobalsClass &globals) {
 	while(info != globals.DatabaseTags.end()) {
 		if (info->IsDetected) {
 			info = globals.DatabaseTags.erase(info);
-		}
-		else {
+		} else {
 			info++;
 		}
 	}

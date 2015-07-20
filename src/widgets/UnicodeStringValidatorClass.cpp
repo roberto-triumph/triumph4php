@@ -47,8 +47,7 @@ bool t4p::UnicodeStringValidatorClass::TransferFromWindow() {
 		wxString val = t->GetValue();
 		*Data = t4p::WxToIcu(val);
 		ret = true;
-	}
-	else if (combo) {
+	} else if (combo) {
 		wxString val = combo->GetValue();
 		*Data = t4p::WxToIcu(val);
 		ret = true;
@@ -79,8 +78,7 @@ bool t4p::UnicodeStringValidatorClass::Validate(wxWindow* parent) {
 	wxString val;
 	if (t) {
 		val = t->GetValue();
-	}
-	else if (combo) {
+	} else if (combo) {
 		val = combo->GetValue();
 	}
 

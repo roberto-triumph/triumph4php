@@ -209,8 +209,7 @@ void t4p::DetectorTreeHandlerClass::OnAddButton(wxCommandEvent& event) {
 		DetectorTree->AppendItem(localLabelTreeItemId, name, IMAGE_SCRIPT, IMAGE_SCRIPT, treeItemData);
 		DetectorTree->SortChildren(localLabelTreeItemId);
 		DetectorTree->ExpandAllChildren(localLabelTreeItemId);
-	}
-	else {
+	} else {
 		wxMessageBox(_("File could not be created:") + localDetectorScript.GetFullPath());
 	}
 }
@@ -339,8 +338,7 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemBeginLabelEdit(wxTreeEvent& event)
 	}
 	if (isLocalDetector) {
 		event.Skip();
-	}
-	else {
+	} else {
 		event.Veto();
 	}
 }
@@ -351,12 +349,10 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
 		wxMessageBox(_("Filename contains invalid characters."));
 		event.Veto();
-	}
-	else if (newName.IsEmpty()) {
+	} else if (newName.IsEmpty()) {
 		wxMessageBox(_("Filename cannot be empty."));
 		event.Veto();
-	}
-	else {
+	} else {
 		// rename the file and set the tree item data; the label itself will be set
 		// by the next event handler
 		TreeItemDataStringClass* data = reinterpret_cast<TreeItemDataStringClass*>(DetectorTree->GetItemData(treeItemId));
@@ -366,13 +362,11 @@ void t4p::DetectorTreeHandlerClass::OnTreeItemEndLabelEdit(wxTreeEvent& event) {
 		if (oldFileName == newFileName) {
 			// no name change== dont try to move files
 			return;
-		}
-		else if (!newFileName.FileExists()) {
+		} else if (!newFileName.FileExists()) {
 			data->Str = newFileName.GetFullPath();
 			wxRenameFile(oldFileName.GetFullPath(), newFileName.GetFullPath());
 			event.Skip();
-		}
-		else {
+		} else {
 			wxMessageBox(_("File name already exists. Please choose a different name."));
 			event.Veto();
 		}
@@ -710,8 +704,7 @@ void t4p::DetectorViewClass::OnViewUrlDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_URL_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
-	}
-	else {
+	} else {
 		t4p::UrlTagDetectorPanelClass* panel = new t4p::UrlTagDetectorPanelClass(GetOutlineNotebook(), ID_URL_DETECTOR_PANEL,
 			Feature.App.Globals, Feature.App.EventSink);
 		wxBitmap urlBitmap = t4p::BitmapImageAsset(wxT("url-detectors"));
@@ -726,8 +719,7 @@ void t4p::DetectorViewClass::OnViewTemplateFileDetectors(wxCommandEvent& event) 
 	wxWindow* window = FindOutlineWindow(ID_TEMPLATE_FILES_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
-	}
-	else {
+	} else {
 		t4p::TemplateFileTagsDetectorPanelClass* panel = new t4p::TemplateFileTagsDetectorPanelClass(
 			GetOutlineNotebook(), ID_TEMPLATE_FILES_DETECTOR_PANEL,
 			Feature.App.Globals, Feature.App.EventSink, Feature.App.RunningThreads);
@@ -743,8 +735,7 @@ void t4p::DetectorViewClass::OnViewTagDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_TAG_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
-	}
-	else {
+	} else {
 		t4p::TagDetectorPanelClass* panel = new t4p::TagDetectorPanelClass(GetOutlineNotebook(), ID_TAG_DETECTOR_PANEL,
 			Feature.App.Globals, Feature.App.EventSink);
 		wxBitmap tagBitmap = t4p::BitmapImageAsset(wxT("tag-detectors"));
@@ -759,8 +750,7 @@ void t4p::DetectorViewClass::OnViewDatabaseDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_DATABASE_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
-	}
-	else {
+	} else {
 		t4p::DatabaseTagDetectorPanelClass* panel = new t4p::DatabaseTagDetectorPanelClass(GetOutlineNotebook(), ID_DATABASE_DETECTOR_PANEL,
 			Feature.App.Globals, Feature.App.EventSink);
 		wxBitmap databaseBitmap = t4p::BitmapImageAsset(wxT("database-detectors"));
@@ -775,8 +765,7 @@ void t4p::DetectorViewClass::OnViewConfigDetectors(wxCommandEvent& event) {
 	wxWindow* window = FindOutlineWindow(ID_CONFIG_DETECTOR_PANEL);
 	if (window) {
 		SetFocusToOutlineWindow(window);
-	}
-	else {
+	} else {
 		t4p::ConfigTagDetectorPanelClass* panel = new t4p::ConfigTagDetectorPanelClass(GetOutlineNotebook(), ID_CONFIG_DETECTOR_PANEL,
 			Feature.App.Globals, Feature.App.EventSink);
 		wxBitmap configBitmap = t4p::BitmapImageAsset(wxT("config-detectors"));

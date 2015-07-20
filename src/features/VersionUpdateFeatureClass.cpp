@@ -150,8 +150,7 @@ wxString t4p::VersionUpdateActionClass::GetNewVersion(const wxString& currentVer
 					newVersion = tok.NextToken();
 				}
 			}
-		}
-		else {
+		} else {
 			newVersion = t4p::CharToWx(curl_easy_strerror(ret));
 		}
 	}

@@ -120,8 +120,7 @@ void t4p::WorkingCacheBuilderClass::BackgroundWork() {
 			// PostEvent will set the correct event Id
 			t4p::WorkingCacheCompleteEventClass evt(wxID_ANY, FileName, FileIdentifier, workingCache);
 			PostEvent(evt);
-		}
-		else {
+		} else {
 			// we still own the pointer since we did not send the event
 			delete workingCache;
 		}

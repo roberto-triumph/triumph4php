@@ -93,22 +93,19 @@ void t4p::FileListingClass::OnFsWatcher(wxFileSystemWatcherEvent& event) {
 		Watcher = new wxFileSystemWatcher();
 		Watcher->SetOwner(this);
 		Watcher->Add(WorkingDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
-	}
-	else if (event.GetChangeType() == wxFSW_EVENT_ERROR) {
+	} else if (event.GetChangeType() == wxFSW_EVENT_ERROR) {
 		// restart the watch
 		delete Watcher;
 		Watcher = new wxFileSystemWatcher();
 		Watcher->SetOwner(this);
 		Watcher->Add(WorkingDir, wxFSW_EVENT_CREATE | wxFSW_EVENT_DELETE | wxFSW_EVENT_RENAME | wxFSW_EVENT_WARNING | wxFSW_EVENT_ERROR);
-	}
-
-	// naive implementation for now, just refresh the entire dir
-	// this is because we have labels to update, and the
-	// items must be kept sorted (first dirs, then files)
-	// each sorted, AND taking the filters into account
-	else if (event.GetChangeType() == wxFSW_EVENT_CREATE
+	} else if (event.GetChangeType() == wxFSW_EVENT_CREATE
 		|| event.GetChangeType() == wxFSW_EVENT_DELETE
 		|| event.GetChangeType() == wxFSW_EVENT_RENAME) {
+		// naive implementation for now, just refresh the entire dir
+		// this is because we have labels to update, and the
+		// items must be kept sorted (first dirs, then files)
+		// each sorted, AND taking the filters into account
 		wxPostEvent(&Handler, event);
 	}
 }
@@ -281,8 +278,7 @@ void t4p::ExplorerFileSystemActionClass::BackgroundWork() {
 				}
 			}
 		}
-	}
-	else {
+	} else {
 		error = _("Could not open directory:") + Dir.GetFullPath();
 	}
 
@@ -303,8 +299,7 @@ void t4p::ExplorerFileSystemActionClass::BackgroundWork() {
 					subDirs.push_back(nextDir);
 				}
 			}
-		}
-		else {
+		} else {
 			error = _("Could not open directory:") + Dir.GetFullPath();
 		}
 	}
@@ -372,8 +367,7 @@ void t4p::ExplorerModifyActionClass::BackgroundWork() {
 				wxFileName wxFileName;
 				wxFileName.AssignDir(d->GetPath());
 				dirsDeleted.push_back(wxFileName);
-			}
-			else {
+			} else {
 				wxFileName wxFileName;
 				wxFileName.AssignDir(d->GetPath());
 				dirsNotDeleted.push_back(wxFileName);
@@ -386,8 +380,7 @@ void t4p::ExplorerModifyActionClass::BackgroundWork() {
 			if (success) {
 				wxFileName deletedFile(f->GetFullPath());
 				filesDeleted.push_back(deletedFile);
-			}
-			else {
+			} else {
 				wxFileName deletedFile(f->GetFullPath());
 				filesNotDeleted.push_back(deletedFile);
 			}
@@ -396,8 +389,7 @@ void t4p::ExplorerModifyActionClass::BackgroundWork() {
 		t4p::ExplorerModifyEventClass modEvent(GetEventId(),
 			dirsDeleted, filesDeleted, dirsNotDeleted, filesNotDeleted, totalSuccess);
 		PostEvent(modEvent);
-	}
-	else if (t4p::ExplorerModifyActionClass::RENAME_FILE == Action) {
+	} else if (t4p::ExplorerModifyActionClass::RENAME_FILE == Action) {
 		wxFileName destFile(OldFile.GetPath(), NewName);
 		bool success = wxRenameFile(OldFile.GetFullPath(), destFile.GetFullPath(), false);
 
@@ -447,22 +439,18 @@ wxFileName t4p::ExplorerModifyEventClass::GetParentDir() const {
 	if (Action == t4p::ExplorerModifyActionClass::RENAME_FILE) {
 		parentDir.AssignDir(OldFile.GetPath());
 		return parentDir;
-	}
-	else if (!DirsDeleted.empty()) {
+	} else if (!DirsDeleted.empty()) {
 		parentDir.AssignDir(DirsDeleted[0].GetPath());
 		parentDir.RemoveLastDir();
 		return parentDir;
-	}
-	else if (!DirsNotDeleted.empty()) {
+	} else if (!DirsNotDeleted.empty()) {
 		parentDir.AssignDir(DirsNotDeleted[0].GetPath());
 		parentDir.RemoveLastDir();
 		return parentDir;
-	}
-	else if (!FilesDeleted.empty()) {
+	} else if (!FilesDeleted.empty()) {
 		parentDir.AssignDir(FilesDeleted[0].GetPath());
 		return parentDir;
-	}
-	else if (!FilesNotDeleted.empty()) {
+	} else if (!FilesNotDeleted.empty()) {
 		parentDir.AssignDir(FilesNotDeleted[0].GetPath());
 		return parentDir;
 	}

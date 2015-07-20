@@ -111,8 +111,7 @@ bool t4p::SqlResourceFetchClass::FetchMysql(const DatabaseTagClass& info, Unicod
 			hasError = true;
 			error = t4p::CharToIcu(e.what());
 		}
-	}
-	else {
+	} else {
 		hasError = true;
 	}
 	return !hasError;
@@ -181,8 +180,7 @@ bool t4p::SqlResourceFetchClass::FetchSqlite(const DatabaseTagClass& info, Unico
 			error = t4p::CharToIcu(e.what());
 			puts(e.what());
 		}
-	}
-	else {
+	} else {
 		hasError = true;
 	}
 	return !hasError;

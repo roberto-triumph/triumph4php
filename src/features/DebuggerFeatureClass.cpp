@@ -410,8 +410,7 @@ bool t4p::DebuggerFeatureClass::RemoveBreakpointAtLine(const wxString& fileName,
 					Cmd.BreakpointRemove(breakpointToRemove.BreakpointId));
 			}
 			it = Breakpoints.erase(it);
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -648,8 +647,7 @@ void t4p::DebuggerFeatureClass::OnDbgpInit(t4p::DbgpInitEventClass& event) {
 		PostCmd(Cmd.ContextNames(0));
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
-	}
-	else {
+	} else {
 		// we want the script to run until a breakpoint is
 		// hit
 		PostCmd(Cmd.Run());
@@ -678,8 +676,7 @@ void t4p::DebuggerFeatureClass::OnDbgpContinue(t4p::DbgpContinueEventClass& even
 		|| t4p::DBGP_STATUS_BREAK == event.Status;
 	if (!IsDebuggerSessionActive) {
 		ResetDebugger();
-	}
-	else {
+	} else {
 		PostCmd(Cmd.ContextGet(0, 0));
 		PostCmd(Cmd.ContextGet(0, 1));
 

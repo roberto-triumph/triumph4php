@@ -348,8 +348,7 @@ bool GuiAppClass::CommandLine(std::vector<wxString>& filenames) {
 		if (parser.Found(wxT("file"), &filename)) {
 			filenames.push_back(filename);
 		}
-	}
-	else if (-1 == result) {
+	} else if (-1 == result) {
 		ret = false;
 	}
 	return ret;
@@ -406,8 +405,7 @@ void t4p::AppTimerClass::Notify() {
 		if (configFileName.FileExists()) {
 			GuiApp.App.ConfigLastModified = configFileName.GetModificationTime();
 		}
-	}
-	else {
+	} else {
 		wxFileName configFileName(t4p::ConfigDirAsset().GetPath(), wxT("triumph4php.ini"));
 		if (configFileName.FileExists()) {
 			t4p::FileModifiedCheckActionClass* action =
@@ -452,8 +450,7 @@ void t4p::AppTimerClass::OnConfigFileModified(t4p::FilesModifiedEventClass& even
 		GuiApp.LoadPreferences(frame);
 
 		GuiApp.App.ConfigLastModified = event.ModifiedTimes[0];
-	}
-	else {
+	} else {
 		// update the time so that we don't continually ask the user the prompt
 		GuiApp.App.ConfigLastModified = event.ModifiedTimes[0];
 	}

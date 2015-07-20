@@ -174,8 +174,7 @@ static bool LookupFunction(const UnicodeString& name, int& signatureRequiredArgC
 			CountArgs(signature, signatureRequiredArgCount, signatureTotalArgCount);
 			found = true;
 		}
-	}
-	else if (nativeFunctionLookup.ReExec(error) && nativeFunctionLookup.Found()) {
+	} else if (nativeFunctionLookup.ReExec(error) && nativeFunctionLookup.Found()) {
 		// some native functions have more than 1 signature we look at
 		// all of the signatures.
 		// since we are looking ar multiple signature, the required
@@ -391,8 +390,7 @@ void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr
 				found = LookupFunction(functionName,
 					signatureRequiredArgCount, signatureTotalArgCount,
 					FunctionSignatureLookup, NativeFunctionSignatureLookup);
-			}
-			else {
+			} else {
 				// a long variable calls, ie $this->user->getName()
 				// note that calls like parent::method() and self::method()
 				// are not static method calls
@@ -416,8 +414,7 @@ void t4p::PhpFunctionCallLintClass::OnAnyExpression(pelet::ExpressionClass* expr
 				error.Identifier = functionName;
 				if (signatureTotalArgCount > callArgCount) {
 					error.Type = t4p::PhpFunctionCallLintResultClass::TOO_FEW_ARGS;
-				}
-				else {
+				} else {
 					error.Type = t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS;
 				}
 

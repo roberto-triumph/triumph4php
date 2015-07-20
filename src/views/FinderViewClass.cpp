@@ -138,15 +138,13 @@ void t4p::FinderViewClass::OnEditFindNext(wxCommandEvent& event) {
 
 			// give focus back to code control this is just better user experience
 			codeControl->SetFocus();
-		}
-		else if (findWindow && AuiManager->GetPane(findWindow).IsShown()) {
+		} else if (findWindow && AuiManager->GetPane(findWindow).IsShown()) {
 			FinderPanelClass* panel = reinterpret_cast<FinderPanelClass*>(findWindow);
 			panel->FindNext();
 
 			// give focus back to code control this is just better user experience
 			codeControl->SetFocus();
-		}
-		else {
+		} else {
 			OnEditFind(event);
 		}
 	}
@@ -296,8 +294,7 @@ void t4p::FinderPanelClass::FindNext() {
 			wxConfigBase* config = wxConfigBase::Get();
 			config->Write(wxT("/Finder/Wrap"), Finder.Wrap);
 			config->Write(wxT("/Finder/Mode"), Finder.Mode);
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Invalid Expression"));
 		}
 	}
@@ -311,8 +308,7 @@ void t4p::FinderPanelClass::FindPrevious() {
 			wxConfigBase* config = wxConfigBase::Get();
 			config->Write(wxT("/Finder/Wrap"), Finder.Wrap);
 			config->Write(wxT("/Finder/Mode"), Finder.Mode);
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Invalid Expression"));
 		}
 	}
@@ -339,8 +335,7 @@ void t4p::FinderPanelClass::Find(bool findNext) {
 				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -428,8 +423,7 @@ void t4p::FinderPanelClass::OnFindKeyDown(wxKeyEvent& event) {
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -485,8 +479,7 @@ void t4p::ReplacePanelClass::FindNext() {
 			wxConfigBase* config = wxConfigBase::Get();
 			config->Write(wxT("/Finder/ReplaceWrap"), Finder.Wrap);
 			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Invalid Expression"));
 		}
 	}
@@ -500,8 +493,7 @@ void t4p::ReplacePanelClass::FindPrevious() {
 			wxConfigBase* config = wxConfigBase::Get();
 			config->Write(wxT("/Finder/ReplaceWrap"), Finder.Wrap);
 			config->Write(wxT("/Finder/ReplaceMode"), Finder.Mode);
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Invalid Expression"));
 		}
 	}
@@ -528,8 +520,7 @@ void t4p::ReplacePanelClass::Find(bool findNext) {
 				codeControl->MarkSearchHitAndGoto(lineNumber, position, position + length, true);
 				SetStatus(wxString::Format(RESULT_MESSAGE, lineNumber));
 			}
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Not Found"));
 		}
 		EnableReplaceButtons(found);
@@ -599,8 +590,7 @@ void t4p::ReplacePanelClass::OnReplaceButton(wxCommandEvent& event) {
 			codeControl->SetSelectionByCharacterPosition(position, position + replaceText.length(), false);
 			Find(true);
 			ReplaceHistory.Save();
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -616,8 +606,7 @@ void t4p::ReplacePanelClass::OnReplaceAllButton(wxCommandEvent& event) {
 			 codeControl->SetUnicodeText(text);
 			 SetStatus(wxString::Format(wxT("Status: Replaced %d matches"), matches));
 			 ReplaceHistory.Save();
-		}
-		else {
+		} else {
 			SetStatus(_("Status: Not Found"));
 		}
 	}
@@ -653,11 +642,9 @@ void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 	// tab traversal ourselves otherwise tab travesal wont work
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
 		FindText->Navigate(wxNavigationKeyEvent::IsBackward);
-	}
-	else if (event.GetKeyCode() == WXK_TAB) {
+	} else if (event.GetKeyCode() == WXK_TAB) {
 		FindText->Navigate(wxNavigationKeyEvent::IsForward);
-	}
-	else  if (event.GetKeyCode() == WXK_ESCAPE) {
+	} else if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
 
@@ -667,8 +654,7 @@ void t4p::ReplacePanelClass::OnFindKeyDown(wxKeyEvent& event) {
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -679,12 +665,10 @@ void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
 		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsBackward);
 		event.Skip();
-	}
-	else if (event.GetKeyCode() == WXK_TAB) {
+	} else if (event.GetKeyCode() == WXK_TAB) {
 		ReplaceWithText->Navigate(wxNavigationKeyEvent::IsForward);
 		event.Skip();
-	}
-	else if (event.GetKeyCode() == WXK_ESCAPE) {
+	} else if (event.GetKeyCode() == WXK_ESCAPE) {
 		AuiManager->GetPane(this).Hide();
 		AuiManager->Update();
 
@@ -694,8 +678,7 @@ void t4p::ReplacePanelClass::OnReplaceKeyDown(wxKeyEvent& event) {
 		if (codeControl) {
 			codeControl->SetFocus();
 		}
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }

@@ -45,8 +45,7 @@ static void SetMargin(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& opti
 		ctrl->SetMarginType(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, wxSTC_MARGIN_NUMBER);
 		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, ctrl->TextWidth(wxSTC_STYLE_LINENUMBER, wxT("_99999")));
 		ctrl->SetMarginMask(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, 0);
-	}
-	else {
+	} else {
 		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_LINE_NUMBER, 0);
 	}
 	if (options.EnableCodeFolding) {
@@ -58,8 +57,7 @@ static void SetMargin(wxStyledTextCtrl* ctrl, t4p::CodeControlOptionsClass& opti
 		ctrl->SetMarginWidth(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, 16);
 		ctrl->SetMarginSensitive(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, true);
 		ctrl->SetMarginMask(t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING, wxSTC_MASK_FOLDERS);
-	}
-	else {
+	} else {
 		ctrl->SetProperty(wxT("fold"), wxT("0"));
 		ctrl->SetProperty(wxT("fold.comment"), wxT("0"));
 		ctrl->SetProperty(wxT("fold.html"), wxT("0"));
@@ -328,35 +326,29 @@ void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl
 		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPhpOptions(ctrl, options, Feature.App.Globals);
-	}
-	else if (t4p::FILE_TYPE_CSS == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_CSS == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.CssStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetCssOptions(ctrl, options);
-	}
-	else if (t4p::FILE_TYPE_SQL == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_SQL == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.SqlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetSqlOptions(ctrl, options, Feature.App.Globals);
-	}
-	else if (t4p::FILE_TYPE_JS == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_JS == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.JsStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetJsOptions(ctrl, options);
-	}
-	else if (t4p::FILE_TYPE_CONFIG == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_CONFIG == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.ConfigStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_CONF);
-	}
-	else if (t4p::FILE_TYPE_CRONTAB == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_CRONTAB == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.CrontabStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_NNCRONTAB);
-	}
-	else if (t4p::FILE_TYPE_YAML == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_YAML == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.YamlStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
@@ -364,44 +356,37 @@ void t4p::SyntaxHighlightViewClass::ApplyPreferences(t4p::CodeControlClass* ctrl
 		// yaml override; never use tabs for yaml editing since yaml requires spaces
 		ctrl->SetUseTabs(false);
 		ctrl->SetLexer(wxSTC_LEX_YAML);
-	}
-	else if (t4p::FILE_TYPE_XML == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_XML == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.PhpStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_HTML);
-	}
-	else if (t4p::FILE_TYPE_RUBY == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_RUBY == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.RubyStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_RUBY);
-	}
-	else if (t4p::FILE_TYPE_LUA == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_LUA == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.LuaStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_LUA);
-	}
-	else if (t4p::FILE_TYPE_MARKDOWN == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_MARKDOWN == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.MarkdownStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_MARKDOWN);
-	}
-	else if (t4p::FILE_TYPE_BASH == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_BASH == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.BashStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_BASH);
-	}
-	else if (t4p::FILE_TYPE_DIFF == ctrl->GetFileType()) {
+	} else if (t4p::FILE_TYPE_DIFF == ctrl->GetFileType()) {
 		SetCodeControlOptions(ctrl, options.DiffStyles, options, SearchHitGoodBitmap, SearchHitBadBitmap,
 			BookmarkBitmap, ExecutionLineBitmap, BreakpointBitmap);
 		SetPlainTextOptions(ctrl, options);
 		ctrl->SetLexer(wxSTC_LEX_DIFF);
-	}
-	else {
+	} else {
 		SetPlainTextOptions(ctrl, options);
 
 		// plain text files don't have a lexer, but we still want to

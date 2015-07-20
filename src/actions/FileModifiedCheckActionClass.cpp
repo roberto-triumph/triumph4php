@@ -87,8 +87,7 @@ void t4p::FileModifiedCheckActionClass::BackgroundWork() {
 					modifiedTimes.push_back(modifiedDateTime);
 				}
 			}
-		}
-		else {
+		} else {
 			filesDeleted.push_back(file->FileName);
 		}
 	}

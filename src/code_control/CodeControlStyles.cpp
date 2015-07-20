@@ -36,11 +36,9 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 	wxOperatingSystemId os = wxGetOsVersion();
 	if (wxOS_WINDOWS == os) {
 		options.LineEndingMode = wxSTC_EOL_CRLF;
-	}
-	else if (wxOS_MAC == os) {
+	} else if (wxOS_MAC == os) {
 		options.LineEndingMode = wxSTC_EOL_CR;
-	}
-	else {
+	} else {
 		options.LineEndingMode = wxSTC_EOL_LF;
 	}
 
@@ -460,13 +458,11 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -988,13 +984,11 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -1516,13 +1510,11 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -2044,13 +2036,11 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -2572,13 +2562,11 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -3100,13 +3088,11 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -3628,13 +3614,11 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -4156,13 +4140,11 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -4684,13 +4666,11 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -5212,13 +5192,11 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -5740,13 +5718,11 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -6268,13 +6244,11 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -6796,13 +6770,11 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -7324,13 +7296,11 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -7852,13 +7822,11 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -8380,13 +8348,11 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -8908,13 +8874,11 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -9436,13 +9400,11 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -9964,13 +9926,11 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -10492,13 +10452,11 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -11020,13 +10978,11 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -11548,13 +11504,11 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -12076,13 +12030,11 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -12604,13 +12556,11 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -13132,13 +13082,11 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -13660,13 +13608,11 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -14188,13 +14134,11 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -14696,83 +14640,57 @@ static void SetToRoboticketThemeDiff(t4p::CodeControlOptionsClass& options) {
 void t4p::CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxString& theme) {
 	if (theme == wxT("Oblivion")) {
 		SetToOblivionTheme(options);
-	}
-	else if (theme == wxT("Retta")) {
+	} else if (theme == wxT("Retta")) {
 		SetToRettaTheme(options);
-	}
-	else if (theme == wxT("Solarized light")) {
+	} else if (theme == wxT("Solarized light")) {
 		SetToSolarized_lightTheme(options);
-	}
-	else if (theme == wxT("Solarized dark.")) {
+	} else if (theme == wxT("Solarized dark.")) {
 		SetToSolarized_darkTheme(options);
-	}
-	else if (theme == wxT("Gedit original oblivion")) {
+	} else if (theme == wxT("Gedit original oblivion")) {
 		SetToGedit_original_oblivionTheme(options);
-	}
-	else if (theme == wxT("Wombat")) {
+	} else if (theme == wxT("Wombat")) {
 		SetToWombatTheme(options);
-	}
-	else if (theme == wxT("Black pastel")) {
+	} else if (theme == wxT("Black pastel")) {
 		SetToBlack_pastelTheme(options);
-	}
-	else if (theme == wxT("Visual studio")) {
+	} else if (theme == wxT("Visual studio")) {
 		SetToVisual_studioTheme(options);
-	}
-	else if (theme == wxT("Obsidian")) {
+	} else if (theme == wxT("Obsidian")) {
 		SetToObsidianTheme(options);
-	}
-	else if (theme == wxT("As visual studio 2010")) {
+	} else if (theme == wxT("As visual studio 2010")) {
 		SetToAs_visual_studio_2010Theme(options);
-	}
-	else if (theme == wxT("Havenjark")) {
+	} else if (theme == wxT("Havenjark")) {
 		SetToHavenjarkTheme(options);
-	}
-	else if (theme == wxT("Tango")) {
+	} else if (theme == wxT("Tango")) {
 		SetToTangoTheme(options);
-	}
-	else if (theme == wxT("Schuss")) {
+	} else if (theme == wxT("Schuss")) {
 		SetToSchussTheme(options);
-	}
-	else if (theme == wxT("Notepad++ default")) {
+	} else if (theme == wxT("Notepad++ default")) {
 		SetToNotepad_defaultTheme(options);
-	}
-	else if (theme == wxT("Vibrant ink")) {
+	} else if (theme == wxT("Vibrant ink")) {
 		SetToVibrant_inkTheme(options);
-	}
-	else if (theme == wxT("Recogneyes")) {
+	} else if (theme == wxT("Recogneyes")) {
 		SetToRecogneyesTheme(options);
-	}
-	else if (theme == wxT("Mr")) {
+	} else if (theme == wxT("Mr")) {
 		SetToMrTheme(options);
-	}
-	else if (theme == wxT("Sunburst")) {
+	} else if (theme == wxT("Sunburst")) {
 		SetToSunburstTheme(options);
-	}
-	else if (theme == wxT("Inkpot")) {
+	} else if (theme == wxT("Inkpot")) {
 		SetToInkpotTheme(options);
-	}
-	else if (theme == wxT("Minimal")) {
+	} else if (theme == wxT("Minimal")) {
 		SetToMinimalTheme(options);
-	}
-	else if (theme == wxT("Nightlion aptana theme")) {
+	} else if (theme == wxT("Nightlion aptana theme")) {
 		SetToNightlion_aptana_themeTheme(options);
-	}
-	else if (theme == wxT("Monokai")) {
+	} else if (theme == wxT("Monokai")) {
 		SetToMonokaiTheme(options);
-	}
-	else if (theme == wxT("Sublime text 2")) {
+	} else if (theme == wxT("Sublime text 2")) {
 		SetToSublime_text_2Theme(options);
-	}
-	else if (theme == wxT("Pastel")) {
+	} else if (theme == wxT("Pastel")) {
 		SetToPastelTheme(options);
-	}
-	else if (theme == wxT("Zenburn high-contrast")) {
+	} else if (theme == wxT("Zenburn high-contrast")) {
 		SetToZenburn_highcontrastTheme(options);
-	}
-	else if (theme == wxT("Frontenddev")) {
+	} else if (theme == wxT("Frontenddev")) {
 		SetToFrontenddevTheme(options);
-	}
-	else if (theme == wxT("Roboticket")) {
+	} else if (theme == wxT("Roboticket")) {
 		SetToRoboticketTheme(options);
 	}
 }

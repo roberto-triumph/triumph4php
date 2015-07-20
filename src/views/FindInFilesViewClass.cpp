@@ -208,8 +208,7 @@ void t4p::FindInFilesResultsPanelClass::Find(const FindInFilesClass& findInFiles
 
 		// lets do the find in the opened files ourselves so that the hits are not stale
 		FindInOpenedFiles();
-	}
-	else {
+	} else {
 		wxMessageBox(_("Please enter a valid expression and path."));
 		delete reader;
 	}
@@ -247,8 +246,7 @@ void t4p::FindInFilesResultsPanelClass::FindInOpenedFiles() {
 							charPos - start, next, length);
 						hits.push_back(hit);
 						next = charPos + length;
-					}
-					else {
+					} else {
 						break;
 					}
 				}
@@ -266,8 +264,7 @@ void t4p::FindInFilesResultsPanelClass::ShowNextMatch() {
 	int next = 0;
 	if (selected >= 0 && t4p::NumberLessThan(selected, ResultsList->GetItemCount() - 1)) {
 		next = selected + 1;
-	}
-	else {
+	} else {
 		// loop back to the beginning
 		next = 0;
 	}
@@ -279,8 +276,7 @@ void t4p::FindInFilesResultsPanelClass::ShowPreviousMatch() {
 	int next = 0;
 	if (selected > 0) {
 		next = selected - 1;
-	}
-	else {
+	} else {
 		// loop back to the end
 		next = ResultsList->GetItemCount() - 1;
 	}
@@ -378,8 +374,7 @@ void t4p::FindInFilesResultsPanelClass::OnReplaceInAllFilesButton(wxCommandEvent
 			wxGA_HORIZONTAL);
 		EnableButtons(true, false, false);
 		SetStatus(_("Replacing"));
-	}
-	else {
+	} else {
 		wxMessageBox(_("Please enter a valid expression and path."));
 	}
 }
@@ -393,19 +388,16 @@ void t4p::FindInFilesResultsPanelClass::OnFindInFilesComplete(wxCommandEvent& ev
 	if (event.GetInt() == BackgroundFileReaderClass::WALK) {
 		if (matchedFilesSize > 0) {
 			SetStatus(wxString::Format(wxT("Found Matches in %d files"), matchedFilesSize));
-		}
-		else {
+		} else {
 			SetStatus(_("Did not Find any Matches"));
 		}
 
 		// now resize the columns so that the hits can be seen
 		t4p::DataViewGridAutoSizeAllColumns(ResultsList);
-	}
-	else if (event.GetInt() == BackgroundFileReaderClass::MATCHED) {
+	} else if (event.GetInt() == BackgroundFileReaderClass::MATCHED) {
 		if (matchedFilesSize > 0) {
 			SetStatus(wxString::Format(wxT("Replaced Matches in %d files"), matchedFilesSize));
-		}
-		else {
+		} else {
 			SetStatus(_("Did not Replace. No Matches Were Found"));
 		}
 	}
@@ -452,8 +444,7 @@ void t4p::FindInFilesResultsPanelClass::OnFileHit(t4p::FindInFilesHitEventClass&
 			ResultsList->AppendItem(data);
 		}
 		AllHits.insert(AllHits.end(), hits.begin(), hits.end());
-	}
-	else {
+	} else {
 		Stop();
 	}
 }
@@ -467,8 +458,7 @@ void t4p::FindInFilesResultsPanelClass::Stop() {
 	Gauge->StopGauge(FindInFilesGaugeId);
 	if (AllHits.size() >= MAX_HITS) {
 		SetStatus(_("Too many hits, Search stopped"));
-	}
-	else {
+	} else {
 		SetStatus(_("Search stopped"));
 	}
 	bool enableIterators = MatchedFiles > 0;
@@ -498,8 +488,7 @@ void t4p::FindInFilesResultsPanelClass::ShowMatch(int i) {
 			if (finder.FindNext(codeControl->GetSafeText(), startPos) && finder.GetLastMatch(startPos, length)) {
 				codeControl->MarkSearchHitAndGoto(line, startPos, startPos + length, true);
 				codeControl->SetFocus();
-			}
-			else {
+			} else {
 				// hit is no longer there, still go to the
 				// line
 				// it seems pretty weird for the editor to open the file
@@ -604,11 +593,9 @@ void t4p::FindInFilesResultsPanelClass::SetStatus(const wxString& text) {
 	msg += t4p::IcuToWx(FindInFiles.Expression);
 	if (t4p::FinderClass::REGULAR_EXPRESSION == FindInFiles.Mode) {
 		msg += _(" (regex)");
-	}
-	else if (t4p::FinderClass::CASE_INSENSITIVE == FindInFiles.Mode) {
+	} else if (t4p::FinderClass::CASE_INSENSITIVE == FindInFiles.Mode) {
 		msg += _(" (case)");
-	}
-	else if (t4p::FinderClass::EXACT == FindInFiles.Mode) {
+	} else if (t4p::FinderClass::EXACT == FindInFiles.Mode) {
 		msg += _(" (exact)");
 	}
 
@@ -670,8 +657,7 @@ t4p::FindInFilesDialogClass::FindInFilesDialogClass(wxWindow* parent, t4p::FindI
 	}
 	if (isUsed && foundIndex >= 0) {
 		Directory->SetSelection(foundIndex);
-	}
-	else if (Directory->GetCount() > 0) {
+	} else if (Directory->GetCount() > 0) {
 		Directory->SetSelection(0);
 	}
 	t4p::RegularExpressionValidatorClass regExValidator(&Feature.PreviousFindInFiles.Expression, FinderMode);
@@ -692,11 +678,9 @@ void t4p::FindInFilesDialogClass::OnOkButton(wxCommandEvent& event) {
 		Feature.PreviousFindInFiles.Source.SetIncludeWildcards(FilesFilter->GetValue());
 		if (!Feature.PreviousFindInFiles.Prepare()) {
 			wxMessageBox(_("Expression is not valid."), _("Find In Files"), wxOK | wxCENTER, this);
-		}
-		else if (Directory->GetValue().IsEmpty()) {
+		} else if (Directory->GetValue().IsEmpty()) {
 			wxMessageBox(_("Find path must not be empty."), _("Find In Files"), wxOK | wxCENTER, this);
-		}
-		else {
+		} else {
 			Feature.PreviousFindInFiles.Source.RootDirectory.AssignDir(Directory->GetValue());
 			View.FindHistory.Save();
 			View.ReplaceHistory.Save();
@@ -728,8 +712,7 @@ void t4p::FindInFilesDialogClass::OnDirChanged(wxFileDirPickerEvent& event) {
 	int index = Directory->FindString(path);
 	if (wxNOT_FOUND != index && !path.IsEmpty()) {
 		Directory->SetSelection(index);
-	}
-	else {
+	} else {
 		int newIndex = Directory->Append(path);
 		Directory->SetSelection(newIndex);
 	}
@@ -739,11 +722,9 @@ void t4p::FindInFilesDialogClass::OnKeyDown(wxKeyEvent& event) {
 	// the event object is the control that has focus
 	if (event.GetKeyCode() == WXK_TAB && event.ShiftDown()) {
 		reinterpret_cast<wxWindow*>(event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsBackward);
-	}
-	else if (event.GetKeyCode() == WXK_TAB) {
+	} else if (event.GetKeyCode() == WXK_TAB) {
 		reinterpret_cast<wxWindow*>(event.GetEventObject())->Navigate(wxNavigationKeyEvent::IsForward);
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -798,8 +779,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFiles(wxCommandEvent& event) {
 		wxBitmap findBitmap = wxNullBitmap;
 		if (Feature.PreviousFindInFiles.ReplaceExpression.isEmpty()) {
 			findBitmap = t4p::BitmapImageAsset(wxT("find-in-files"));
-		}
-		else {
+		} else {
 			findBitmap = t4p::BitmapImageAsset(wxT("replace-in-files"));
 		}
 
@@ -819,8 +799,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFilesNext(wxCommandEvent& event) {
 		if (*it == window) {
 			(*it)->ShowNextMatch();
 			break;
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -835,8 +814,7 @@ void t4p::FindInFilesViewClass::OnEditFindInFilesPrevious(wxCommandEvent& event)
 		if (*it == window) {
 			(*it)->ShowPreviousMatch();
 			break;
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -851,8 +829,7 @@ void t4p::FindInFilesViewClass::OnToolsNotebookPageClosed(wxAuiNotebookEvent& ev
 		if (*it == window) {
 			(*it)->Stop();
 			it = ResultsPanels.erase(it);
-		}
-		else {
+		} else {
 			++it;
 		}
 	}

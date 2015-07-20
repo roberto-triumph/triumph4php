@@ -74,8 +74,7 @@ bool t4p::ProcessWithHeartbeatClass::Init(wxString command, const wxFileName& wo
 		}
 		RunningProcesses[pid] = newProcess;
 		Timer.Start(POLL_INTERVAL, wxTIMER_CONTINUOUS);
-	}
-	else {
+	} else {
 		delete newProcess;
 	}
 	return 0 != pid;
@@ -116,8 +115,7 @@ void t4p::ProcessWithHeartbeatClass::OnProcessEnded(wxProcessEvent& event) {
 		completeEvent.SetId(event.GetId());
 		completeEvent.SetString(output);
 		wxPostEvent(&Handler, completeEvent);
-	}
-	else if (it != RunningProcesses.end() && it->second) {
+	} else if (it != RunningProcesses.end() && it->second) {
 		wxProcess* proc = it->second;
 		wxString output = GetProcessOutput(proc);
 		wxCommandEvent completeEvent(t4p::EVENT_PROCESS_FAILED);

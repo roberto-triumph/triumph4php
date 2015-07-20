@@ -326,11 +326,9 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 				return Recurse(version, error);
 			}
 		}
-	}
-	else if (!ret) {
+	} else if (!ret) {
 		error = PARSE_ERR0R;
-	}
-	else if (!FoundScope) {
+	} else if (!FoundScope) {
 		ret = false;
 		error = RESOURCE_NOT_FOUND;
 	}
@@ -338,8 +336,7 @@ bool t4p::CallStackClass::Recurse(pelet::Versions version, t4p::CallStackClass::
 		// clean up, but only if this method created the symbols
 		// this call will delete the WorkingCache pointer for us
 		TagCache.RemoveWorking(fileName.GetFullPath());
-	}
-	else {
+	} else {
 		// tag cache did not use the cache, delete it ourselves
 		delete workingCache;
 	}
@@ -524,8 +521,7 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 			arrayVariableKeySymbol.ToArrayKey(variable.ChainList[0].Name, arrayKey);
 			Variables.push_back(arrayVariableKeySymbol);
 		}
-	}
-	else if (!variable.ChainList.empty()) {
+	} else if (!variable.ChainList.empty()) {
 		UnicodeString destinationVariable = variable.ChainList[0].Name;
 		if (variable.ChainList.size() > 1) {
 			std::vector<pelet::VariablePropertyClass>::const_iterator prop = variable.ChainList.begin();
@@ -559,8 +555,7 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 			SymbolFromExpression(*expr, symbols);
 			if (symbols.size() > oldSize) {
 				argumentVariables.push_back(symbols.back().DestinationVariable);
-			}
-			else if (pelet::ExpressionClass::VARIABLE == (*expr)->ExpressionType) {
+			} else if (pelet::ExpressionClass::VARIABLE == (*expr)->ExpressionType) {
 				pelet::VariableClass* varExpr = (pelet::VariableClass*)(*expr);
 				if (!varExpr->ChainList.empty()) {
 					// a new variable symbol was not created because the argument already exists in the symbols list
@@ -576,8 +571,7 @@ void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& object
 	if (property.IsFunction) {
 		symbol.ToMethodCall(tempVarName, objectName, property.Name, argumentVariables);
 		symbols.push_back(symbol);
-	}
-	else if (!property.IsArrayAccess) {
+	} else if (!property.IsArrayAccess) {
 		symbol.ToProperty(tempVarName, objectName, property.Name);
 		symbols.push_back(symbol);
 	}
@@ -608,8 +602,7 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 		t4p::VariableSymbolClass scalarSymbol;
 		scalarSymbol.ToScalar(tempVarName, ((pelet::ScalarExpressionClass*)expression)->Value);
 		symbols.push_back(scalarSymbol);
-	}
-	else if (pelet::ExpressionClass::ARRAY == expression->ExpressionType) {
+	} else if (pelet::ExpressionClass::ARRAY == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		t4p::VariableSymbolClass arraySymbol;
 		arraySymbol.ToArray(tempVarName);
@@ -630,14 +623,12 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 			keySymbol.ToArrayKey(tempVarName, *key);
 			symbols.push_back(keySymbol);
 		}
-	}
-	else if (pelet::ExpressionClass::NEW_CALL == expression->ExpressionType) {
+	} else if (pelet::ExpressionClass::NEW_CALL == expression->ExpressionType) {
 		UnicodeString tempVarName = NewTempVariable();
 		t4p::VariableSymbolClass newSymbol;
 		newSymbol.ToNewObject(tempVarName, ((pelet::NewInstanceExpressionClass*)expression)->ClassName);
 		symbols.push_back(newSymbol);
-	}
-	else if (pelet::ExpressionClass::VARIABLE == expression->ExpressionType) {
+	} else if (pelet::ExpressionClass::VARIABLE == expression->ExpressionType) {
 		pelet::VariableClass* varExpression = (pelet::VariableClass*) expression;
 
 		// do the function calls first
@@ -658,8 +649,7 @@ void t4p::CallStackClass::SymbolFromExpression(pelet::ExpressionClass* expressio
 			UnicodeString tempVarName = NewTempVariable();
 			t4p::VariableSymbolClass functionSymbol;
 			functionSymbol.ToFunctionCall(tempVarName, varExpression->ChainList[0].Name, argumentVariables);
-		}
-		else if (!varExpression->ChainList.empty()) {
+		} else if (!varExpression->ChainList.empty()) {
 			// add the variable to the list only if we have not added it yet
 			std::vector<t4p::VariableSymbolClass>::iterator var;
 			bool found = false;

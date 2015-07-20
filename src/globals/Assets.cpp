@@ -50,8 +50,7 @@ static wxFileName AssetRootDir() {
     wxString assetDir = wxString::FromAscii(stdRoot.c_str());
     if (assetDir.StartsWith(wxT("/"))) {
         assetRoot.AssignDir(assetDir);
-    }
-    else {
+    } else {
         // assume that the path is relative to the executable
 		wxStandardPaths paths = wxStandardPaths::Get();
 		wxFileName pathExecutableFileName(paths.GetExecutablePath());
@@ -333,8 +332,7 @@ void t4p::SetSettingsDirLocation(const wxFileName& settingsDir) {
 	if (settingsDir.GetPathWithSep().Find(executableDir.GetPathWithSep()) != wxNOT_FOUND) {
 		bootstrapConfigFile.Assign(paths.GetExecutablePath());
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));
-	}
-	else {
+	} else {
 		// save settings dire in the global bootstrap config file
 		bootstrapConfigFile.AssignDir(paths.GetUserConfigDir());
 		bootstrapConfigFile.SetFullName(wxT(".triumph4php-bootstrap.ini"));

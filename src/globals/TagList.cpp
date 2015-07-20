@@ -31,8 +31,7 @@ void t4p::TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches) {
 	while (it != matches.end()) {
 		if (it->IsNative) {
 			it = matches.erase(it);
-		}
-		else {
+		} else {
 			it++;
 		}
 	}
@@ -52,8 +51,7 @@ void t4p::TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
 		}
 		if (!isInProjects) {
 			tag = matches.erase(tag);
-		}
-		else {
+		} else {
 			tag++;
 		}
 	}

@@ -74,8 +74,7 @@ std::vector<t4p::ConfigTagClass> t4p::ConfigTagFinderClass::All(const std::vecto
 		stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}

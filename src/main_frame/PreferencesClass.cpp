@@ -310,8 +310,7 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 					profile->AddCmd(cmds[i].CloneCommand());
 				}
 				profiles.Add(profile);
-			}
-			else {
+			} else {
 				delete profile;
 				break;
 			}
@@ -323,11 +322,9 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
 	}
 	if (profileSelected < profiles.GetCount()) {
 		profiles.SetSelProfile(profileSelected);
-	}
-	else if (!profiles.IsEmpty()) {
+	} else if (!profiles.IsEmpty()) {
 		profiles.SetSelProfile(0);
-	}
-	else if (profiles.IsEmpty()) {
+	} else if (profiles.IsEmpty()) {
 		// no profiles were stored; use the defaults
 		wxKeyProfile* profile = new wxKeyProfile(wxT("Triumph keyboard shortcuts"), wxT("Triumph keyboard shortcuts"));
 		for (size_t i = 0; i < defaultShortcuts.size(); ++i) {
@@ -451,11 +448,9 @@ void t4p::PreferencesClass::Init() {
 	// ATTN: on linux, default fonts are too big
 	if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX) {
 		ApplicationFont.SetPointSize(8);
-	}
-	else if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
+	} else if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 		ApplicationFont.SetPointSize(8);
-	}
-	else if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+	} else if (info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
 		ApplicationFont.SetPointSize(12);
 	}
 	t4p::CodeControlStylesInit(CodeControlOptions);

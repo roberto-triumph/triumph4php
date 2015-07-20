@@ -446,8 +446,7 @@ void t4p::MainFrameClass::OnContextMenu(wxContextMenuEvent& event) {
 		}
 		PopupMenu(&contextMenu);
 		codeWindow->SetAsHidden(false);
-	}
-	else {
+	} else {
 		// if a sub panel has its own handler, use it
 		event.Skip();
 	}
@@ -491,8 +490,7 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 				AuiManager.GetPane(ToolsNotebook).Hide();
 				AuiManager.Update();
 			}
-		}
-		else if (t4p::ID_OUTLINE_NOTEBOOK == event.GetId()) {
+		} else if (t4p::ID_OUTLINE_NOTEBOOK == event.GetId()) {
 			size_t count = OutlineNotebook->GetPageCount();
 
 			// this event is received AFTER the page is removed
@@ -500,8 +498,7 @@ void t4p::MainFrameClass::OnAnyAuiNotebookEvent(wxAuiNotebookEvent& event) {
 				AuiManager.GetPane(OutlineNotebook).Hide();
 				AuiManager.Update();
 			}
-		}
-		else {
+		} else {
 			UpdateNotebooks();
 		}
 	}
@@ -599,12 +596,10 @@ void t4p::MainFrameClass::OnDeterminateProgress(t4p::SequenceProgressEventClass&
 		gauge->SwitchMode(ID_SEQUENCE_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, 0, 0);
 		if (!event.Message.IsEmpty()) {
 			gauge->IncrementAndRenameGauge(ID_SEQUENCE_GAUGE, event.Message, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-		}
-		else {
+		} else {
 			gauge->IncrementGauge(ID_SEQUENCE_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE);
 		}
-	}
-	else {
+	} else {
 		if (event.PercentComplete == 0) {
 			// the start, turn the gauge into determinate mode
 			gauge->SwitchMode(ID_SEQUENCE_GAUGE, t4p::StatusBarWithGaugeClass::DETERMINATE_MODE, 0, 100);

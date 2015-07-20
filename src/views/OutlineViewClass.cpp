@@ -65,8 +65,7 @@ static bool SortTagsByName(const t4p::PhpTagClass& a, const t4p::PhpTagClass& b)
 static bool SortTagsByTypeAndName(const t4p::PhpTagClass& a, const t4p::PhpTagClass& b) {
 	if (a.Type < b.Type) {
 		return true;
-	}
-	else if (a.Type > b.Type) {
+	} else if (a.Type > b.Type) {
 		return false;
 	}
 	return a.Identifier.caseCompare(b.Identifier, 0) < 0;
@@ -133,8 +132,7 @@ void t4p::OutlineViewClass::OnOutlineMenu(wxCommandEvent& event) {
 	if (window != NULL) {
 		outlineViewPanel = reinterpret_cast<OutlineViewPanelClass*>(window);
 		SetFocusToOutlineWindow(outlineViewPanel);
-	}
-	else {
+	} else {
 		outlineViewPanel = new OutlineViewPanelClass(GetOutlineNotebook(), ID_WINDOW_OUTLINE, Feature, *this);
 		wxBitmap outlineBitmap = t4p::BitmapImageAsset(wxT("outline"));
 		AddOutlineWindow(outlineViewPanel, wxT("Outline"), outlineBitmap);
@@ -275,15 +273,12 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 		if (fileId.IsOk() && searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
 			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label));
-		}
-		else if (searchTag->IsLabelFileName()) {
+		} else if (searchTag->IsLabelFileName()) {
 			fileId = Tree->PrependItem(rootId, wxFileName(label).GetFullName(), IMAGE_OUTLINE_FILE, -1, new t4p::TreeItemDataStringClass(label));
-		}
-		else if (fileId.IsOk() && !searchTag->IsLabelFileName()) {
+		} else if (fileId.IsOk() && !searchTag->IsLabelFileName()) {
 			Tree->Delete(fileId);
 			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0);
-		}
-		else {
+		} else {
 			fileId = Tree->PrependItem(rootId, label, IMAGE_OUTLINE_CLASS, -1, 0);
 		}
 
@@ -293,14 +288,12 @@ void t4p::OutlineViewPanelClass::AddTagsToOutline(const std::vector<t4p::Outline
 			wxTreeItemId parent;
 			if (mapTag->first.IsEmpty()) {
 				parent = fileId;
-			}
-			else {
+			} else {
 				parent = Tree->AppendItem(fileId, mapTag->first, IMAGE_OUTLINE_CLASS);
 			}
 			if (SortByName) {
 				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByName);
-			}
-			else if (SortByType) {
+			} else if (SortByType) {
 				std::sort(mapTag->second.begin(), mapTag->second.end(),  SortTagsByTypeAndName);
 			}
 
@@ -336,8 +329,7 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 	}
 	if (t4p::PhpTagClass::DEFINE == type && !tag.IsDynamic) {
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_DEFINE, -1, new t4p::IdTreeItemDataClass(tag.Id));
-	}
-	else if (t4p::PhpTagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
+	} else if (t4p::PhpTagClass::MEMBER == tag.Type && ShowProperties && passesAccessCheck) {
 		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
@@ -349,16 +341,13 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 		int image = IMAGE_OUTLINE_PROPERTY_PUBLIC;
 		if (isInheritedTag) {
 			image = IMAGE_OUTLINE_PROPERTY_INHERITED;
-		}
-		else if (tag.IsProtected) {
+		} else if (tag.IsProtected) {
 			image = IMAGE_OUTLINE_PROPERTY_PROTECTED;
-		}
-		else if (tag.IsPrivate) {
+		} else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_PROPERTY_PRIVATE;
 		}
 		Tree->AppendItem(treeId, label, image, -1, new t4p::IdTreeItemDataClass(tag.Id));
-	}
-	else if (t4p::PhpTagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
+	} else if (t4p::PhpTagClass::METHOD == tag.Type && ShowMethods && passesAccessCheck) {
 		label = t4p::IcuToWx(tag.Identifier);
 		if (isInheritedTag) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
@@ -368,8 +357,7 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 		// that can be seen
 		if (tag.Signature.indexOf(UNICODE_STRING_SIMPLE("()")) > 0) {
 			label += wxT("()");
-		}
-		else {
+		} else {
 			label += wxT("(...)");
 		}
 		if (!tag.ReturnType.isEmpty()) {
@@ -379,11 +367,9 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 		int image = IMAGE_OUTLINE_METHOD_PUBLIC;
 		if (isInheritedTag) {
 			image = IMAGE_OUTLINE_METHOD_INHERITED;
-		}
-		else if (tag.IsProtected) {
+		} else if (tag.IsProtected) {
 			image = IMAGE_OUTLINE_METHOD_PROTECTED;
-		}
-		else if (tag.IsPrivate) {
+		} else if (tag.IsPrivate) {
 			image = IMAGE_OUTLINE_METHOD_PRIVATE;
 		}
 		wxTreeItemId funcId = Tree->AppendItem(treeId, label, image, -1, new t4p::IdTreeItemDataClass(tag.Id));
@@ -400,14 +386,12 @@ void t4p::OutlineViewPanelClass::TagToNode(const t4p::PhpTagClass& tag, wxTreeIt
 				}
 			}
 		}
-	}
-	else if (t4p::PhpTagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
+	} else if (t4p::PhpTagClass::CLASS_CONSTANT == tag.Type && ShowConstants && passesAccessCheck) {
 		if (tag.ClassName != className) {
 			label = t4p::IcuToWx(tag.ClassName) + wxT("::") + label;
 		}
 		Tree->AppendItem(treeId, label, IMAGE_OUTLINE_CLASS_CONSTANT, -1, new t4p::IdTreeItemDataClass(tag.Id));
-	}
-	else if (t4p::PhpTagClass::FUNCTION == type && !tag.IsDynamic) {
+	} else if (t4p::PhpTagClass::FUNCTION == type && !tag.IsDynamic) {
 		UnicodeString res = tag.Identifier;
 		wxString label = t4p::IcuToWx(res);
 
@@ -494,8 +478,7 @@ void t4p::OutlineViewPanelClass::SearchTagsToOutline(const std::vector<t4p::PhpT
 		if (chosenTag->Identifier.indexOf(UNICODE_STRING_SIMPLE(".")) >= 0) {
 			// user chose a file: get all classes / functions for that file
 			searchStrings.push_back(t4p::WxToIcu(chosenTag->FullPath));
-		}
-		else {
+		} else {
 			// user chose a class; add the class member to the outline
 			searchStrings.push_back(chosenTag->FullyQualifiedClassName());
 		}
@@ -625,8 +608,7 @@ void t4p::OutlineViewPanelClass::OnTreeMenuDelete(wxCommandEvent& event) {
 			while(it != OutlinedTags.end()) {
 				if (it->Label == label)  {
 					it = OutlinedTags.erase(it);
-				}
-				else {
+				} else {
 					it++;
 				}
 			}
@@ -739,8 +721,7 @@ void t4p::FileSearchDialogClass::Search() {
 	bool showAllProjects = ProjectChoice->GetSelection() == 0;
 	if (!showAllProjects) {
 		projects.push_back((t4p::ProjectClass*)ProjectChoice->GetClientData(ProjectChoice->GetSelection()));
-	}
-	else {
+	} else {
 		// the first item in the wxChoice will not have client data; the "all" option
 		for (size_t i = 1; i < ProjectChoice->GetCount(); ++i) {
 			projects.push_back((t4p::ProjectClass*) ProjectChoice->GetClientData(i));
@@ -748,8 +729,7 @@ void t4p::FileSearchDialogClass::Search() {
 	}
 	if (search.Length() == 2) {
 		MatchingTags = Feature.App.Globals.TagCache.ExactClassOrFile(t4p::WxToIcu(search));
-	}
-	else {
+	} else {
 		MatchingTags = Feature.App.Globals.TagCache.NearMatchClassesOrFiles(t4p::WxToIcu(search));
 	}
 
@@ -773,24 +753,20 @@ void t4p::FileSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 	if (keyCode == WXK_DOWN) {
 		if (!MatchesList->IsEmpty() && t4p::NumberLessThan(selection, (MatchesList->GetCount() - 1))) {
 			MatchesList->SetSelection(selection + 1);
-		}
-		else if (!MatchesList->IsEmpty()) {
+		} else if (!MatchesList->IsEmpty()) {
 			// cycle back to the beginning
 			MatchesList->SetSelection(0);
 		}
 		SearchText->SetFocus();
-	}
-	else if (keyCode == WXK_UP) {
+	} else if (keyCode == WXK_UP) {
 		if (!MatchesList->IsEmpty() && selection > 0 && t4p::NumberLessThan(selection, MatchesList->GetCount())) {
 			MatchesList->SetSelection(selection - 1);
-		}
-		else if (!MatchesList->IsEmpty() && selection == 0) {
+		} else if (!MatchesList->IsEmpty() && selection == 0) {
 			// cycle back to the end
 			MatchesList->SetSelection(MatchesList->GetCount() - 1);
 		}
 		SearchText->SetFocus();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -812,8 +788,7 @@ void t4p::FileSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	if (event.GetKeyCode() == WXK_RETURN) {
 		wxCommandEvent cmdEvt;
 		OnSearchEnter(cmdEvt);
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -830,8 +805,7 @@ void t4p::OutlineViewPanelClass::RemoveFileFromOutline(const wxString& fullPath)
 		while(it != OutlinedTags.end()) {
 			if (it->Label == label)  {
 				it = OutlinedTags.erase(it);
-			}
-			else {
+			} else {
 				it++;
 			}
 		}
@@ -874,8 +848,7 @@ void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std
 		wxString relativeName;
 		if (showAllProjects) {
 			relativeName = Feature.App.Globals.RelativeFileName(files[i], projectLabel);
-		}
-		else {
+		} else {
 			relativeName = selectedProject->RelativeFileName(files[i]);
 			projectLabel = selectedProject->Label;
 		}
@@ -886,12 +859,10 @@ void t4p::FileSearchDialogClass::ShowTags(const wxString& finderQuery, const std
 			matchLabel += t4p::IcuToWx(match.ClassName);
 			matchLabel += wxT("::");
 			matchLabel += t4p::IcuToWx(match.Identifier);
-		}
-		else if (t4p::PhpTagClass::CLASS == match.Type || t4p::PhpTagClass::FUNCTION == match.Type
+		} else if (t4p::PhpTagClass::CLASS == match.Type || t4p::PhpTagClass::FUNCTION == match.Type
 			|| t4p::PhpTagClass::DEFINE == match.Type) {
 			matchLabel += t4p::IcuToWx(match.Identifier);
-		}
-		else {
+		} else {
 			matchLabel += t4p::IcuToWx(match.Identifier);
 		}
 		matchLabel += wxT(" - ");
@@ -912,8 +883,7 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 		ChosenTags.clear();
 		ChosenTags.push_back(MatchingTags[0]);
 		EndModal(wxOK);
-	}
-	else {
+	} else {
 		wxArrayInt checks;
 		for (size_t i = 0; i < MatchesList->GetCount(); ++i) {
 			if (MatchesList->IsChecked(i)) {
@@ -929,8 +899,7 @@ void t4p::FileSearchDialogClass::OnSearchEnter(wxCommandEvent& event) {
 				}
 			}
 			EndModal(wxOK);
-		}
-		else {
+		} else {
 			// no checked items, take the user to the
 			// selected item
 			int selection = MatchesList->GetSelection();

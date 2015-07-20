@@ -284,8 +284,7 @@ void t4p::PhpVariableLintClass::ExpressionAssignmentFound(pelet::AssignmentExpre
 	if (expression->Destination.ChainList.size() == 1 &&
 		!expression->Destination.ChainList[0].IsFunction) {
 		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
-	}
-	else if (expression->Destination.ChainList.size() > 1 &&
+	} else if (expression->Destination.ChainList.size() > 1 &&
 		expression->Destination.ChainList[1].IsArrayAccess) {
 		ScopeVariables[expression->Destination.ChainList[0].Name] = 1;
 	}
@@ -421,11 +420,9 @@ void t4p::PhpVariableLintClass::ExpressionClosureFound(pelet::ClosureExpressionC
 		pelet::StatementClass::Types stmtType = expr->Statements.TypeAt(i);
 		if (pelet::StatementClass::EXPRESSION == stmtType) {
 			CheckExpression((pelet::ExpressionClass*)expr->Statements.At(i));
-		}
-		else if (pelet::StatementClass::STATIC_VARIABLE_DECLARATION == stmtType) {
+		} else if (pelet::StatementClass::STATIC_VARIABLE_DECLARATION == stmtType) {
 			StatementStaticVariablesFound((pelet::StaticVariableStatementClass*)expr->Statements.At(i));
-		}
-		else if (pelet::StatementClass::GLOBAL_VARIABLE_DECLARATION == stmtType) {
+		} else if (pelet::StatementClass::GLOBAL_VARIABLE_DECLARATION == stmtType) {
 			StatementGlobalVariablesFound((pelet::GlobalVariableStatementClass*)expr->Statements.At(i));
 		}
 	}
@@ -525,8 +522,7 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 				found = true;
 			}
 		}
-	}
-	else if (MethodSignatureLookup.IsOk()) {
+	} else if (MethodSignatureLookup.IsOk()) {
 		MethodSignatureLookup.Set(functionName, isStatic);
 		MethodSignatureLookup.ReExec(error);
 		if (MethodSignatureLookup.Found()) {
@@ -548,8 +544,7 @@ bool t4p::PhpVariableLintClass::LookupSignature(UnicodeString& signature, const 
 			functionName.extract(pos + 1, functionName.length() - pos - 1, unqualifiedName);
 			NativeFunctionSignatureLookup.Set(unqualifiedName);
 			hasSet = true;
-		}
-		else {
+		} else {
 			NativeFunctionSignatureLookup.Set(functionName);
 			hasSet = true;
 		}

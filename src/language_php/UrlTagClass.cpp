@@ -92,8 +92,7 @@ bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFil
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -144,8 +143,7 @@ bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const 
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -193,8 +191,7 @@ bool t4p::UrlTagFinderClass::FilterByFullPath(const wxString& fullPath, const st
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -240,8 +237,7 @@ void t4p::UrlTagFinderClass::DeleteUrl(const wxURI& url, const std::vector<wxFil
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";
-			}
-			else {
+			} else {
 				sql += ",?";
 			}
 		}
@@ -278,8 +274,7 @@ void t4p::UrlTagFinderClass::FilterUrls(const wxString& filter, const std::vecto
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -324,8 +319,7 @@ void t4p::UrlTagFinderClass::Wipe(const std::vector<wxFileName>& sourceDirs) {
 			stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 			if (0 == i) {
 				sql += "?";
-			}
-			else {
+			} else {
 				sql += ",?";
 			}
 		}
@@ -357,8 +351,7 @@ int t4p::UrlTagFinderClass::Count(const std::vector<wxFileName>& sourceDirs) {
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -395,8 +388,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllControllerNames(const std::vect
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}
@@ -437,8 +429,7 @@ std::vector<wxString> t4p::UrlTagFinderClass::AllMethodNames(const wxString& con
 		stdSourceDirs.push_back(t4p::WxToChar(sourceDirs[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}

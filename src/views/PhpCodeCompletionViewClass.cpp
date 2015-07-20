@@ -58,8 +58,7 @@ static wxString PhpCallTipSignature(size_t index, const std::vector<t4p::PhpTagC
 	wxString sig = t4p::IcuToWx(resources[index].Signature);
 	if (size == 1) {
 		callTip = sig;
-	}
-	else {
+	} else {
 		callTip = wxString::Format(wxT("\001 %ld of %ld \002 "), index + 1, size) + sig;
 	}
 	return callTip;
@@ -214,8 +213,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const Unicode
 	wxString symbol = t4p::IcuToWx(word);
 	if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
 		t4p::KeywordsTokenizeMatch(t4p::KEYWORDS_HTML_ATTRIBUTE_NAMES, symbol, autoCompleteList);
-	}
-	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+	} else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
 		t4p::KeywordsTokenizeMatch(t4p::KEYWORDS_HTML_TAG_NAMES, symbol, autoCompleteList);
 	}
 	if (!autoCompleteList.empty()) {
@@ -233,12 +231,10 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionHtml(const Unicode
 		int startPos = ctrl->WordStartPosition(currentPos, true);
 		int wordLength = currentPos - startPos;
 		ctrl->AutoCompShow(wordLength, list);
-	}
-	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
+	} else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_ATTRIBUTE == syntax) {
 		completeStatus = _("Unknown HTML Attribute: ");
 		completeStatus += symbol;
-	}
-	else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
+	} else if (pelet::LanguageDiscoveryClass::SYNTAX_HTML_TAG == syntax) {
 		completeStatus = _("Unknown HTML Tag: ");
 		completeStatus += symbol;
 	}
@@ -272,19 +268,16 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_VARIABLE);
 				autoCompleteList.push_back(t4p::IcuToWx(variableMatches[i]) + postFix);
 			}
-		}
-		else if (parsedVariable.ChainList.size() == 1) {
+		} else if (parsedVariable.ChainList.size() == 1) {
 			// a bunch of function, define, or class names
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
 				wxString postFix;
 				if (t4p::PhpTagClass::DEFINE == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_DEFINE);
-				}
-				else if (t4p::PhpTagClass::FUNCTION == res.Type) {
+				} else if (t4p::PhpTagClass::FUNCTION == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_FUNCTION);
-				}
-				else if (t4p::PhpTagClass::CLASS == res.Type) {
+				} else if (t4p::PhpTagClass::CLASS == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS);
 				}
 				autoCompleteList.push_back(t4p::IcuToWx(res.Identifier) + postFix);
@@ -296,8 +289,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 				wxString postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_KEYWORD);
 				autoCompleteList.push_back(keywordMatches[i] + postFix);
 			}
-		}
-		else if (!AutoCompletionResourceMatches.empty()) {
+		} else if (!AutoCompletionResourceMatches.empty()) {
 			// an object / function "chain"
 			for (size_t i = 0; i < AutoCompletionResourceMatches.size(); ++i) {
 				t4p::PhpTagClass res = AutoCompletionResourceMatches[i];
@@ -305,23 +297,17 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 				wxString postFix;
 				if (t4p::PhpTagClass::MEMBER == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_MEMBER);
-				}
-				else if (t4p::PhpTagClass::MEMBER == res.Type && res.IsProtected) {
+				} else if (t4p::PhpTagClass::MEMBER == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_MEMBER);
-				}
-				else if (t4p::PhpTagClass::MEMBER == res.Type) {
+				} else if (t4p::PhpTagClass::MEMBER == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_MEMBER);
-				}
-				else if (t4p::PhpTagClass::METHOD == res.Type && res.IsPrivate) {
+				} else if (t4p::PhpTagClass::METHOD == res.Type && res.IsPrivate) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PRIVATE_METHOD);
-				}
-				else if (t4p::PhpTagClass::METHOD == res.Type && res.IsProtected) {
+				} else if (t4p::PhpTagClass::METHOD == res.Type && res.IsProtected) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PROTECTED_METHOD);
-				}
-				else if (t4p::PhpTagClass::METHOD == res.Type) {
+				} else if (t4p::PhpTagClass::METHOD == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_PUBLIC_METHOD);
-				}
-				else if (t4p::PhpTagClass::CLASS_CONSTANT == res.Type) {
+				} else if (t4p::PhpTagClass::CLASS_CONSTANT == res.Type) {
 					postFix = wxString::Format(wxT("?%d"), AUTOCOMP_IMAGE_CLASS_CONSTANT);
 				}
 				autoCompleteList.push_back(comp + postFix);
@@ -367,8 +353,7 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhp(const UnicodeS
 		int startPos = ctrl->WordStartPosition(currentPos, true);
 		int wordLength = currentPos - startPos;
 		ctrl->AutoCompShow(wordLength, list);
-	}
-	else {
+	} else {
 		HandleAutoCompletionPhpStatus(error, lastExpression, parsedVariable,
 			variableScope, completeStatus);
 	}
@@ -382,79 +367,66 @@ void t4p::PhpCodeCompletionProviderClass::HandleAutoCompletionPhpStatus(
 		wxString& completeStatus) {
 	if (lastExpression.isEmpty()) {
 		completeStatus = _("Nothing to complete");
-	}
-	else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedVariable.ChainList.size() <= 1) {
+	} else if (lastExpression.startsWith(UNICODE_STRING_SIMPLE("$")) && parsedVariable.ChainList.size() <= 1) {
 		completeStatus = _("No matching variables for: ");
 		completeStatus += t4p::IcuToWx(lastExpression);
 		completeStatus +=  _(" in scope: ");
 		completeStatus += t4p::IcuToWx(variableScope.ClassName);
 		completeStatus += _("::");
 		completeStatus += t4p::IcuToWx(variableScope.MethodName);
-	}
-	else if (parsedVariable.ChainList.size() == 1) {
+	} else if (parsedVariable.ChainList.size() == 1) {
 		completeStatus = _("No matching class, function, define, or keyword for: \"");
 		completeStatus += t4p::IcuToWx(lastExpression);
 		completeStatus += wxT("\"");
-	}
-	else if (AutoCompletionResourceMatches.empty()) {
+	} else if (AutoCompletionResourceMatches.empty()) {
 		if (t4p::SymbolTableMatchErrorClass::PARENT_ERROR == error.Type) {
 			completeStatus = _("parent not valid for scope: ");
 			completeStatus += t4p::IcuToWx(variableScope.ClassName);
 			completeStatus += _("::");
 			completeStatus += t4p::IcuToWx(variableScope.MethodName);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::STATIC_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private static member \"");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::TYPE_RESOLUTION_ERROR == error.Type) {
 			completeStatus = _("Could not resolve type for \"");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 			completeStatus += wxT("\"");
-		}
-		else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE == error.Type) {
 			if (!parsedVariable.ChainList.empty() &&
 				parsedVariable.ChainList[0].Name == UNICODE_STRING_SIMPLE("$this")) {
 				completeStatus = _("No public, protected, or private member matches for \"");
-			}
-			else {
+			} else {
 				completeStatus = _("No public member matches for \"");
 			}
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE == error.Type) {
 			completeStatus = _("No static member matches for \"");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::VISIBILITY_ERROR == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::VISIBILITY_ERROR == error.Type) {
 			completeStatus = _("Cannot access protected or private member \"");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 			completeStatus += _("\" in class: ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+		} else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
 			completeStatus = _("Cannot use object operator for array returned by ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::ARRAY_ERROR == error.Type) {
 			completeStatus = _("Cannot use object operator for array variable ");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
+		} else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type && !error.ErrorClass.isEmpty()) {
 			completeStatus = _("Cannot use object operator for primitive returned by ");
 			completeStatus += t4p::IcuToWx(error.ErrorClass);
 			completeStatus += _("::");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
-		}
-		else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
+		} else if (t4p::SymbolTableMatchErrorClass::PRIMITIVE_ERROR == error.Type) {
 			completeStatus = _("Cannot use object operator for primitive variable ");
 			completeStatus += t4p::IcuToWx(error.ErrorLexeme);
 		}
@@ -516,12 +488,10 @@ void t4p::PhpCodeCompletionProviderClass::OnAutoCompletionSelected(wxStyledTextE
 				if ((t4p::PhpTagClass::FUNCTION == res.Type || t4p::PhpTagClass::METHOD == res.Type) && !res.HasParameters()) {
 					ctrl->ReplaceSelection(selected + wxT("()"));
 					ctrl->HandleCallTip(0, true);
-				}
-				else if (t4p::PhpTagClass::FUNCTION == res.Type || t4p::PhpTagClass::METHOD == res.Type) {
+				} else if (t4p::PhpTagClass::FUNCTION == res.Type || t4p::PhpTagClass::METHOD == res.Type) {
 					ctrl->ReplaceSelection(selected + wxT("("));
 					ctrl->HandleCallTip(0, true);
-				}
-				else {
+				} else {
 					ctrl->ReplaceSelection(selected);
 				}
 				handled = true;
@@ -588,15 +558,12 @@ void t4p::PhpCallTipProviderClass::ProvideTip(t4p::CodeControlClass* ctrl, wxCha
 			if (!InCommentOrStringStyle(ctrl, currentPos)) {
 				if (')' == c && startingPos != currentPos) {
 					matchingParens++;
-				}
-				else if ('(' == c && matchingParens <= 0) {
+				} else if ('(' == c && matchingParens <= 0) {
 					hasMethodCall = true;
 					break;
-				}
-				else if ('(' == c) {
+				} else if ('(' == c) {
 					matchingParens--;
-				}
-				else if (';' == c) {
+				} else if (';' == c) {
 					currentPos = -1;
 					break;
 				}
@@ -717,8 +684,7 @@ void t4p::PhpCallTipProviderClass::OnCallTipClick(wxStyledTextEvent& evt) {
 		if (1 == position) {
 			CurrentCallTipIndex = ((CurrentCallTipIndex >= 1) && (CurrentCallTipIndex - 1) < resourcesSize) ? CurrentCallTipIndex - 1 : resourcesSize - 1;
 			callTip =  PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
-		}
-		else if (2 == position) {
+		} else if (2 == position) {
 			// down arrow
 			CurrentCallTipIndex = ((CurrentCallTipIndex + 1) < resourcesSize) ? CurrentCallTipIndex + 1 : 0;
 			callTip = PhpCallTipSignature(CurrentCallTipIndex, CurrentCallTipResources);
@@ -744,24 +710,20 @@ void t4p::PhpBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
 		if (wxT('{') == c2 || wxT('}') == c2 || wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2) {
 			posToCheck = posToCheck - 1;
-		}
-		else  {
+		} else {
 			posToCheck = -1;
 		}
 		if (posToCheck >= 0) {
 			int pos = ctrl->BraceMatch(posToCheck);
 			if (wxSTC_INVALID_POSITION == pos) {
 				ctrl->BraceBadLight(posToCheck);
-			}
-			else {
+			} else {
 				ctrl->BraceHighlight(posToCheck, pos);
 			}
-		}
-		else {
+		} else {
 			ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 		}
-	}
-	else {
+	} else {
 		ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 	}
 }

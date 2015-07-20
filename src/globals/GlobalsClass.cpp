@@ -150,8 +150,7 @@ void t4p::GlobalsClass::ClearDetectedInfos() {
 	while(it != DatabaseTags.end()) {
 		if (it->IsDetected) {
 			it = DatabaseTags.erase(it);
-		}
-		else {
+		} else {
 			++it;
 		}
 	}

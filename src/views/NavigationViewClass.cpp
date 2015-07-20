@@ -145,8 +145,7 @@ t4p::NavigationViewDialogClass::NavigationViewDialogClass(wxWindow* parent,
 	if (FilesList->GetItemCount() > 0) {
 		FilesList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		FilesList->SetFocus();
-	}
-	else if (PanelsList->GetItemCount() > 0) {
+	} else if (PanelsList->GetItemCount() > 0) {
 		PanelsList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		PanelsList->SetFocus();
 	}
@@ -166,8 +165,7 @@ void t4p::NavigationViewDialogClass::OnFilesListKeyDown(wxKeyEvent& event) {
 			FilesList->SetItemState(selected, 0, wxLIST_STATE_SELECTED);
 			PanelsList->SetItemState(selected, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 			PanelsList->SetFocus();
-		}
-		else if (PanelsList->GetItemCount() > 0) {
+		} else if (PanelsList->GetItemCount() > 0) {
 			FilesList->SetItemState(0, 0, wxLIST_STATE_SELECTED);
 			PanelsList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 			PanelsList->SetFocus();
@@ -188,8 +186,7 @@ void t4p::NavigationViewDialogClass::OnPanelsListKeyDown(wxKeyEvent& event) {
 			PanelsList->SetItemState(selected, 0, wxLIST_STATE_SELECTED);
 			FilesList->SetItemState(selected, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 			FilesList->SetFocus();
-		}
-		else if (FilesList->GetItemCount() > 0) {
+		} else if (FilesList->GetItemCount() > 0) {
 			PanelsList->SetItemState(0, 0, wxLIST_STATE_SELECTED);
 			FilesList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 			FilesList->SetFocus();

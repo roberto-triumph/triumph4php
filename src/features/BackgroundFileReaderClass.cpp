@@ -73,8 +73,7 @@ void t4p::BackgroundFileReaderClass::BackgroundWork() {
 				PostEvent(singleEvent);
 			}
 		}
-	}
-	else if (Mode == MATCHED) {
+	} else if (Mode == MATCHED) {
 		int count = MatchedFiles.size();
 		for (int i = 0; i < count && !isDestroy; i++) {
 			BackgroundFileMatch(MatchedFiles[i]);

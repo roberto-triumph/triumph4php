@@ -49,8 +49,7 @@ int main() {
 	wxOperatingSystemId os = wxGetOsVersion(&major, &minor);
 	if (os == wxOS_WINDOWS_NT) {
 		DirName = wxT("C:\\Users\\Roberto\\sample_php_project");
-	}
-	else {
+	} else {
 		DirName = wxT("/home/roberto/workspace/sample_php_project");
 	}
 	ProfileFindInFilesExactMode();
@@ -80,12 +79,10 @@ void ProfileFindInFilesExactMode() {
 			}
 			time = wxGetLocalTimeMillis() - time;
 			printf("time for findInFiles Exact Mode:%ld ms \n", time.ToLong());
-		}
-		else {
+		} else {
 			puts("Invalid expression: class Db\n");
 		}
-	}
-	else {
+	} else {
 		printf("Could not open Directory: %s\n", (const char*)DirName.ToAscii());
 	}
 }
@@ -113,12 +110,10 @@ void ProfileFindInFilesCodeMode() {
 			}
 			time = wxGetLocalTimeMillis() - time;
 			printf("time for findInFiles Code Mode:%ld ms\n", time.ToLong());
-		}
-		else {
+		} else {
 			puts("Invalid expression: class Db\n");
 		}
-	}
-	else {
+	} else {
 		printf("Could not open Directory: %s\n", (const char*)DirName.ToAscii());
 	}
 }

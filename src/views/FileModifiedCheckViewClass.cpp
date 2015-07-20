@@ -76,8 +76,7 @@ void t4p::FileModifiedCheckViewClass::FilesModifiedPrompt(std::map<wxString, t4p
 	if (filesToPrompt.size() == 1) {
 		msg = _("1 File has been modified externally. Reload file and lose any changes?\n");
 		msg += _("If checked, the file will be reloaded. If left unchecked, the file will not be reloaded, allowing you to overwrite the file.");
-	}
-	else {
+	} else {
 		msg = _("Files have been modified externally. Reload files and lose any changes?\n");
 		msg += _("The checked files will be reloaded. Unchecked files will not be reloaded, allowing you to overwrite the files.");
 	}
@@ -228,8 +227,7 @@ void t4p::FileModifiedCheckViewClass::OnFileModifiedPollComplete(t4p::FilesModif
 		wxFileName ctrlFileName(ctrl->GetFileName());
 		if (std::find(event.Modified.begin(), event.Modified.end(), ctrl->GetFileName()) != event.Modified.end()) {
 			filesModifiedToPrompt[ctrl->GetFileName()] = ctrl;
-		}
-		else if (std::find(event.Deleted.begin(), event.Deleted.end(), ctrl->GetFileName()) != event.Deleted.end()) {
+		} else if (std::find(event.Deleted.begin(), event.Deleted.end(), ctrl->GetFileName()) != event.Deleted.end()) {
 			filesDeletedToPrompt[ctrl->GetFileName()] = ctrl;
 			filesDeleted[ctrl->GetFileName()] = 1;
 		}

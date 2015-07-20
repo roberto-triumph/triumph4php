@@ -86,8 +86,7 @@ int main() {
 		PhpTagDectectorFullPath = wxT("C:\\Users\\roberto\\Documents\\triumph4php\\php_detectors\\tag_detectors\\CodeIgniterTagDetector.php");
 		TagCacheDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\tags.db");
 		DetectorDbFullPath = wxT("C:\\Users\\roberto\\Desktop\\detectors.db");
-	}
-	else {
+	} else {
 		SourceDir = wxT("/home/roberto/public_html/ember");
 		StartingFile = SourceDir + wxT("/application/controllers/news.php");
 		PhpExecutableFullPath = wxT("php");

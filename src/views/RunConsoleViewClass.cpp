@@ -152,8 +152,7 @@ void t4p::CliCommandListDialogClass::OnDeleteButton(wxCommandEvent& event) {
 
 		if (!t4p::NumberLessThan(selection, EditedCommands.size()) && !EditedCommands.empty()) {
 			CommandsList->SetSelection(EditedCommands.size() - 1);
-		}
-		else if (selection >= 0 && !EditedCommands.empty()) {
+		} else if (selection >= 0 && !EditedCommands.empty()) {
 			CommandsList->SetSelection(selection);
 		}
 	}
@@ -252,13 +251,11 @@ void  t4p::RunConsolePanelClass::SetToRunCommand(const wxString& cmdLine,  const
 		if (waitForArguments) {
 			Command->SetInsertionPointEnd();
 			Command->SetFocus();
-		}
-		else {
+		} else {
 			wxCommandEvent evt;
 			RunCommand(evt);
 		}
-	}
-	else {
+	} else {
 		CommandString = wxT("");
 		wxMessageBox(_("PHP script needs to be saved in order to run it."));
 	}
@@ -272,13 +269,11 @@ void  t4p::RunConsolePanelClass::RunCommand(wxCommandEvent& event) {
 		RunButton->SetLabel(_("Stop"));
 		if (ProcessWithHeartbeat.Init(CommandString, WorkingDirectory, ID_PROCESS, CurrentPid)) {
 			Gauge->AddGauge(_("Running Process"), IdProcessGauge, StatusBarWithGaugeClass::INDETERMINATE_MODE, 0);
-		}
-		else {
+		} else {
 			Command->Enable(true);
 			RunButton->SetLabel(_("Start"));
 		}
-	}
-	else if (CurrentPid > 0) {
+	} else if (CurrentPid > 0) {
 		bool stopped = ProcessWithHeartbeat.Stop(CurrentPid);
 		if (!stopped) {
 			// stale PID??
@@ -357,8 +352,7 @@ void t4p::RunConsolePanelClass::OnStoreButton(wxCommandEvent& event) {
 				}
 			}
 			newCommand.Description = newCommand.Executable.Mid(pos);
-		}
-		else {
+		} else {
 			newCommand.Executable = fullLine;
 		}
 
@@ -419,8 +413,7 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 
 				// store it so that we can use it during mouse hover
 				FileNameHits.push_back(hit);
-			}
-			else {
+			} else {
 				OutputWindow->SetDefaultStyle(normalAttr);
 			}
 			OutputWindow->AppendText(hitContents);
@@ -432,8 +425,7 @@ void t4p::RunConsolePanelClass::AppendText(const wxString& text) {
 				UnicodeString afterHit(uniText, hit.StartIndex + hit.Length, 1);
 				OutputWindow->AppendText(t4p::IcuToWx(afterHit));
 			}
-		}
-		else {
+		} else {
 			OutputWindow->SetDefaultStyle(normalAttr);
 			UnicodeString noHit(uniText, index);
 			OutputWindow->AppendText(t4p::IcuToWx(noHit));
@@ -468,8 +460,7 @@ UnicodeString t4p::RunConsolePanelClass::FileNameRegularExpression() {
 		uniRegEx += UNICODE_STRING_SIMPLE("([A-Za-z]\\:[\\\\\\w_. ]+)\\\\");
 		uniRegEx += t4p::WxToIcu(extensionsRegEx);
 		uniRegEx += UNICODE_STRING_SIMPLE("($|\\s)");
-	}
-	else {
+	} else {
 		uniRegEx += UNICODE_STRING_SIMPLE("(^|\\s)/");
 		uniRegEx += UNICODE_STRING_SIMPLE("([\\w_. /]+)");
 		uniRegEx += t4p::WxToIcu(extensionsRegEx);
@@ -484,8 +475,7 @@ void t4p::RunConsolePanelClass::OnMouseMotion(wxMouseEvent& event) {
 	if (isCursorHand) {
 		wxCursor cursor(wxCURSOR_HAND);
 		OutputWindow->SetCursor(cursor);
-	}
-	else {
+	} else {
 		OutputWindow->SetCursor(wxNullCursor);
 		event.Skip();
 	}
@@ -601,8 +591,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCli(wxCommandEvent& event) {
 				inNewWindow = cmd.CmdLine() != runConsolePanel->GetCommand();
 			}
 			RunCommand(cmd.CmdLine(), cmd.WorkingDirectory, cmd.WaitForArguments, inNewWindow);
-		}
-		else {
+		} else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
 		}
 	}
@@ -622,8 +611,7 @@ void t4p::RunConsoleViewClass::OnRunFileAsCliInNewWindow(wxCommandEvent& event) 
 			cmd.Arguments = code->GetFileName();
 			cmd.WaitForArguments = (t4p::MENU_RUN_PHP + 3) == event.GetId();
 			RunCommand(cmd.CmdLine(), cmd.WorkingDirectory, cmd.WaitForArguments, true);
-		}
-		else {
+		} else {
 			wxMessageBox(_("PHP script needs to be saved in order to run it."));
 		}
 	}
@@ -639,8 +627,7 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFile
 		if (AddToolsWindow(window, _("Run"), wxT("t4p::RunConsolePanelClass"), runBitmap)) {
 			window->SetToRunCommand(cmdLine, workingDirectory, waitForArguments);
 		}
-	}
-	else {
+	} else {
 		// if theres a window already opened, just re-run the selected window.
 		int selection = GetToolsNotebook()->GetSelection();
 		RunConsolePanelClass* runConsolePanel = NULL;
@@ -649,8 +636,7 @@ void t4p::RunConsoleViewClass::RunCommand(const wxString& cmdLine,  const wxFile
 		// check the name, the program will crash.
 		if (IsToolsWindowSelectedByName(wxT("t4p::RunConsolePanelClass"))) {
 			runConsolePanel = (t4p::RunConsolePanelClass*)GetToolsNotebook()->GetPage(selection);
-		}
-		else {
+		} else {
 			runConsolePanel = new RunConsolePanelClass(GetToolsNotebook(), ID_WINDOW_CONSOLE,
 				GetStatusBarWithGauge(), Feature, *this);
 
@@ -683,8 +669,7 @@ void t4p::RunConsoleViewClass::MenuUpdate(bool isClosingPage) {
 		// we get notified of the page closing before the page is actually
 		// removed
 		hasEditors = AllCodeControls().size() > 1;
-	}
-	else {
+	} else {
 		hasEditors = !AllCodeControls().empty();
 	}
 	RunCliMenuItem->Enable(hasEditors);
@@ -713,8 +698,7 @@ void t4p::RunConsoleViewClass::FillCommandPanel() {
 			  wxAUI_TB_DEFAULT_STYLE | wxAUI_TB_OVERFLOW | wxAUI_TB_TEXT | wxAUI_TB_HORZ_TEXT);
 		CommandToolbar->SetToolBitmapSize(wxSize(16, 16));
 		CommandToolbar->SetOverflowVisible(false);
-	}
-	else {
+	} else {
 		AuiManager->DetachPane(CommandToolbar);
 	}
 	CommandToolbar->Clear();

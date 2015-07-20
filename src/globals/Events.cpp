@@ -109,8 +109,7 @@ t4p::RenameEventClass::RenameEventClass(wxEventType type, const wxString& oldPat
 	if (t4p::EVENT_APP_FILE_RENAMED == type) {
 		OldPath.Assign(oldPath);
 		NewPath.Assign(newPath);
-	}
-	else if (t4p::EVENT_APP_DIR_RENAMED == type) {
+	} else if (t4p::EVENT_APP_DIR_RENAMED == type) {
 		OldPath.AssignDir(oldPath);
 		NewPath.AssignDir(newPath);
 	}

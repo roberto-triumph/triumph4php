@@ -74,8 +74,7 @@ void t4p::NewUserViewClass::OnTimer(wxTimerEvent& event) {
 		// re trigger the app start sequence, that way the tag dbs get created
 		// in the new location
 		Feature.App.SavePreferences(settingsDir, true);
-	}
-	else {
+	} else {
 		// use default settings
 		// use the user data directory
 		// create our subDir if it does not exist
@@ -179,11 +178,9 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 			return false;
 		}
 		ConfigFileDir = tempDir;
-	}
-	else if (CustomDirectory->GetValue()) {
+	} else if (CustomDirectory->GetValue()) {
 		ConfigFileDir.AssignDir(SettingsDirectory->GetPath());
-	}
-	else {
+	} else {
 		// use the user data directory
 		// create our subDir if it does not exist
 		wxFileName tempDir;
@@ -195,8 +192,7 @@ bool t4p::NewUserSettingsPanelClass::TransferDataFromWindow() {
 				wxMessageBox(wxT("Could not create directory: ") + tempDir.GetPath(), wxT("Error"));
 				return false;
 			}
-		}
-		else if (!tempDir.IsDirWritable()) {
+		} else if (!tempDir.IsDirWritable()) {
 			wxMessageBox(wxT("Settings directory is not writable: ") + tempDir.GetPath(), wxT("Error"));
 			return false;
 		}
@@ -265,18 +261,15 @@ bool t4p::NewUserPhpSettingsPanelClass::TransferDataFromWindow() {
 			wxMessageBox(wxT("PHP Executable must exist."), wxT("Error"));
 			return false;
 		}
-	}
-	else if (Version->GetSelection() == 0) {
+	} else if (Version->GetSelection() == 0) {
 		// no PHP then dont try to detect version
 		// but the user must have not have chosen auto
 		wxMessageBox(wxT("Since PHP is not available you must provide the PHP version to use during parsing."), wxT("Error"));
 		return false;
-	}
-	else if (Version->GetSelection() == 1) {
+	} else if (Version->GetSelection() == 1) {
 		Globals.Environment.Php.IsAuto = 0;
 		Globals.Environment.Php.Version = pelet::PHP_53;
-	}
-	else {
+	} else {
 		Globals.Environment.Php.IsAuto = 0;
 		Globals.Environment.Php.Version = pelet::PHP_54;
 	}

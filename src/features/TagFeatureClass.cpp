@@ -80,8 +80,7 @@ void t4p::TagFeatureClass::OnAppFileExternallyModified(wxCommandEvent& event) {
 	tagAction->SetFileToParse(fileName);
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
-	}
-	else {
+	} else {
 		delete tagAction;
 	}
 }
@@ -91,8 +90,7 @@ void t4p::TagFeatureClass::OnAppDirCreated(wxCommandEvent& event) {
 	tagAction->SetDirToParse(event.GetString());
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
-	}
-	else {
+	} else {
 		delete tagAction;
 	}
 }
@@ -105,8 +103,7 @@ void t4p::TagFeatureClass::OnAppDirDeleted(wxCommandEvent& event) {
 	t4p::TagDeleteDirectoryActionClass* tagAction =  new t4p::TagDeleteDirectoryActionClass(App.SqliteRunningThreads, wxID_ANY, dirsToDelete);
 	if (tagAction->Init(App.Globals)) {
 		App.SqliteRunningThreads.Queue(tagAction);
-	}
-	else {
+	} else {
 		delete tagAction;
 	}
 }

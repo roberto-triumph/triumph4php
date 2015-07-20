@@ -51,8 +51,7 @@ void t4p::TemplateFilesViewClass::OnTemplateFilesMenu(wxCommandEvent& event) {
 	std::vector<wxFileName> sourceDirs = Feature.App.Globals.AllEnabledSourceDirectories();
 	if (Feature.App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
 		ShowPanel();
-	}
-	else {
+	} else {
 		t4p::EditorLogWarningFix("Template Feature",
 			_("Could not determine template files because no URLs were detected. Template files feature depends on the URL detectors feature."));
 	}
@@ -64,8 +63,7 @@ void t4p::TemplateFilesViewClass::ShowPanel() {
 	if (window) {
 		templateFilesPanel = wxDynamicCast(window, t4p::TemplateFilesPanelClass);
 		SetFocusToOutlineWindow(templateFilesPanel);
-	}
-	else {
+	} else {
 		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL,
 			Feature, *this);
 		wxBitmap templateFileBitmap = t4p::BitmapImageAsset(wxT("template-files"));
@@ -97,8 +95,7 @@ void t4p::TemplateFilesViewClass::OnTemplateDetectionComplete(t4p::ActionEventCl
 	t4p::TemplateFilesPanelClass* templateFilesPanel = NULL;
 	if (window) {
 		templateFilesPanel = (t4p::TemplateFilesPanelClass*) window;
-	}
-	else {
+	} else {
 		templateFilesPanel = new t4p::TemplateFilesPanelClass(GetOutlineNotebook(), ID_TEMPLATE_FILES_PANEL,
 			Feature, *this);
 		AddOutlineWindow(templateFilesPanel, _("Templates"));

@@ -113,8 +113,7 @@ std::vector<t4p::PhpTagClass> AllResources(soci::session& session) {
 				tag.HasVariableArgs = hasVariableArgs != 0;
 				if (soci::i_ok == fileIsNewIndicator) {
 					tag.FileIsNew = fileIsNew != 0;
-				}
-				else {
+				} else {
 					tag.FileIsNew = true;
 				}
 				tag.SourceId = sourceId;
@@ -284,8 +283,7 @@ bool t4p::TagParserClass::Walk(const wxString& fileName) {
 		if (!wxIsWild(filter)) {
 			// exact match of the name portion of fileName
 			matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
-		}
-		else {
+		} else {
 			matchedFilter =  wxMatchWild(filter, fileName);
 		}
 		if (matchedFilter) {
@@ -294,16 +292,14 @@ bool t4p::TagParserClass::Walk(const wxString& fileName) {
 	}
 	if (matchedFilter) {
 		BuildResourceCache(fileName, true);
-	}
-	else {
+	} else {
 		// check the misc file filters
 		for (size_t i = 0; i < MiscFileExtensions.size(); ++i) {
 			wxString filter = MiscFileExtensions[i];
 			if (!wxIsWild(filter)) {
 				// exact match of the name portion of fileName
 				matchedFilter = file.GetFullName().CmpNoCase(filter) == 0;
-			}
-			else {
+			} else {
 				matchedFilter = wxMatchWild(filter, fileName);
 			}
 			if (matchedFilter) {
@@ -334,8 +330,7 @@ void t4p::TagParserClass::BuildResourceCacheForFile(const wxString& sourceDir, c
 		// we also want the new tags to have the file's proper source ID
 		CurrentSourceId = fileTag.SourceId;
 		RemovePersistedResources(fileTagIdsToRemove, false);
-	}
-	else {
+	} else {
 		// if caller just calls this method without calling Walk(); then file cache will be empty
 		// need to add an entry so that GetResourceMatchFullPathFromResource works correctly
 		fileTag.FullPath = fullPath;
@@ -372,8 +367,7 @@ void t4p::TagParserClass::BuildResourceCache(const wxString& fullPath, bool pars
 	if (foundFile) {
 		bool needsToBeParsed = fileTag.NeedsToBeParsed(fileLastModifiedDateTime);
 		cached = !needsToBeParsed;
-	}
-	else {
+	} else {
 		fileTag.MakeNew(fileName, fileLastModifiedDateTime, parseClasses);
 		PersistFileTag(fileTag);
 	}
@@ -502,13 +496,11 @@ void t4p::TagParserClass::TraitUseFound(const UnicodeString& namespaceName, cons
 	if (pos > 0) {
 		newTraitTag.TraitClassName.setTo(fullyQualifiedTraitName, 0, pos);
 		newTraitTag.TraitNamespaceName.setTo(fullyQualifiedTraitName, pos + 1);
-	}
-	else if (0 == pos) {
+	} else if (0 == pos) {
 		// root namespace
 		newTraitTag.TraitClassName.setTo(fullyQualifiedTraitName, 1);
 		newTraitTag.TraitNamespaceName.setTo(UNICODE_STRING_SIMPLE("\\"));
-	}
-	else {
+	} else {
 		//this should never get here as the parser will always give us
 		// fully qualified trait names
 		newTraitTag.TraitClassName = fullyQualifiedTraitName;

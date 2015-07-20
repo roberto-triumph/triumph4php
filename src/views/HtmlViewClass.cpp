@@ -58,24 +58,20 @@ void t4p::CssBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
 		if (wxT('(') == c2 || wxT(')') == c2 || wxT('[') == c2 || wxT(']') == c2 || wxT('{') == c2 || wxT('}') == c2) {
 			posToCheck = posToCheck - 1;
-		}
-		else  {
+		} else {
 			posToCheck = -1;
 		}
 		if (posToCheck >= 0) {
 			int pos = ctrl->BraceMatch(posToCheck);
 			if (wxSTC_INVALID_POSITION == pos) {
 				ctrl->BraceBadLight(posToCheck);
-			}
-			else {
+			} else {
 				ctrl->BraceHighlight(posToCheck, pos);
 			}
-		}
-		else {
+		} else {
 			ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 		}
-	}
-	else {
+	} else {
 		ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 	}
 }

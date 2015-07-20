@@ -54,8 +54,7 @@ void t4p::FileCabinetViewClass::OnViewFileCabinet(wxCommandEvent& event) {
 	if (window) {
 		panel = (t4p::FileCabinetPanelClass*)window;
 		SetFocusToToolsWindow(panel);
-	}
-	else {
+	} else {
 		panel = new t4p::FileCabinetPanelClass(GetToolsNotebook(), ID_FILE_CABINET_PANEL, Feature, GetMainWindow());
 		AddToolsWindow(panel, _("File Cabinet"), wxT("File cabinet"), t4p::BitmapImageAsset(wxT("file-cabinet")));
 	}
@@ -71,8 +70,7 @@ void t4p::FileCabinetViewClass::OnEditAddCurrentFileToCabinet(wxCommandEvent& ev
 	if (window) {
 		panel = (t4p::FileCabinetPanelClass*)window;
 		SetFocusToToolsWindow(panel);
-	}
-	else {
+	} else {
 		panel = new t4p::FileCabinetPanelClass(GetToolsNotebook(), ID_FILE_CABINET_PANEL, Feature, GetMainWindow());
 		AddToolsWindow(panel, _("File Cabinet"), wxT("File cabinet"), t4p::BitmapImageAsset(wxT("file-cabinet")));
 	}
@@ -128,8 +126,7 @@ void t4p::FileCabinetPanelClass::AddItemToList(const t4p::FileCabinetItemClass& 
 		listItem.SetId(List->GetItemCount());
 		listItem.SetData(fileItem.Id);
 		List->InsertItem(listItem);
-	}
-	else {
+	} else {
 		wxListItem listItem;
 		listItem.SetText(fileItem.FileName.GetFullName());
 		listItem.SetImage(t4p::FileTypeImageId(Feature.App.Globals.FileTypes, fileItem.FileName));
@@ -174,18 +171,15 @@ void t4p::FileCabinetPanelClass::OpenItemAt(int index) {
 		if (result.Item.IsFile()) {
 			t4p::OpenFileCommandEventClass openFileCmd(result.Item.FileName.GetFullPath());
 			Feature.App.EventSink.Publish(openFileCmd);
-		}
-		else if (result.Item.IsDir()) {
+		} else if (result.Item.IsDir()) {
 			wxCommandEvent openDirEvt(t4p::EVENT_CMD_DIR_OPEN);
 			openDirEvt.SetString(result.Item.FileName.GetPath());
 			Feature.App.EventSink.Publish(openDirEvt);
-		}
-		else {
+		} else {
 			wxString path;
 			if (result.Item.FileName.IsDir()) {
 				path = result.Item.FileName.GetPath();
-			}
-			else {
+			} else {
 				path = result.Item.FileName.GetFullPath();
 			}
 

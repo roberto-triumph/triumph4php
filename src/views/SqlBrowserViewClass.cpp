@@ -106,8 +106,7 @@ static void FillGridWithResults(wxGrid* grid, t4p::SqlResultClass* results) {
 		if (autoSizeColumns[i]) {
 			grid->AutoSizeColumn(i);
 			grid->SetColMinimalWidth(i, grid->GetColSize(i));
-		}
-		else {
+		} else {
 			grid->SetColSize(i, 50);
 			grid->SetColMinimalWidth(i, 50);
 		}
@@ -362,8 +361,7 @@ void t4p::SqlConnectionListDialogClass::OnListDoubleClick(wxCommandEvent& event)
 		if (t4p::DatabaseTagClass::MYSQL == editTag.Driver) {
 			t4p::MysqlConnectionDialogClass dialog(this, editTag, RunningThreads);
 			res = dialog.ShowModal();
-		}
-		else if (t4p::DatabaseTagClass::SQLITE == editTag.Driver) {
+		} else if (t4p::DatabaseTagClass::SQLITE == editTag.Driver) {
 			t4p::SqliteConnectionDialogClass dialog(this, editTag);
 			res = dialog.ShowModal();
 		}
@@ -439,8 +437,7 @@ void t4p::SqlConnectionListDialogClass::ShowTestResults(t4p::QueryCompleteEventC
 	wxString creds;
 	if (TestQuery.DatabaseTag.FileName.IsOk()) {
 		creds = TestQuery.DatabaseTag.FileName.GetFullPath();
-	}
-	else {
+	} else {
 		creds = t4p::IcuToWx(TestQuery.DatabaseTag.User +
 			UNICODE_STRING_SIMPLE("@") +
 			TestQuery.DatabaseTag.Host);
@@ -507,8 +504,7 @@ bool t4p::SqlBrowserPanelClass::Check() {
 		std::vector<t4p::DatabaseTagClass> dbTags = Feature.App.Globals.AllEnabledDatabaseTags();
 		if (t4p::NumberLessThan(sel, dbTags.size())) {
 			Query.DatabaseTag.Copy(dbTags[sel]);
-		}
-		else {
+		} else {
 			ret = false;
 		}
 	}
@@ -522,19 +518,15 @@ void t4p::SqlBrowserPanelClass::ExecuteCodeControl() {
 		if (thread->Init(LastQuery, Query)) {
 			RunningActionId = Feature.App.RunningThreads.Queue(thread);
 			Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-		}
-		else {
+		} else {
 			delete thread;
 			RunningActionId = 0;
 		}
-	}
-	else if (LastQuery.isEmpty()) {
+	} else if (LastQuery.isEmpty()) {
 		wxMessageBox(_("Please enter a query into the code control."), _("Error"), wxOK | wxCENTRE, this);
-	}
-	else if (Connections->IsEmpty()) {
+	} else if (Connections->IsEmpty()) {
 		wxMessageBox(_("Please create a database connection."), _("Error"), wxOK | wxCENTRE, this);
-	}
-	else {
+	} else {
 		wxMessageBox(_("Please wait until the current queries completes."), _("Error"), wxOK | wxCENTRE, this);
 	}
 }
@@ -555,8 +547,7 @@ void t4p::SqlBrowserPanelClass::ExecuteQuery(const wxString& sql, const t4p::Dat
 	if (thread->Init(LastQuery, Query)) {
 		RunningActionId = Feature.App.RunningThreads.Queue(thread);
 		Gauge->AddGauge(_("Running SQL queries"), ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE, wxGA_HORIZONTAL);
-	}
-	else {
+	} else {
 		delete thread;
 		RunningActionId = 0;
 	}
@@ -593,8 +584,7 @@ void t4p::SqlBrowserPanelClass::OnQueryComplete(t4p::QueryCompleteEventClass& ev
 
 		RowToPhp.Columns = result->ColumnNames;
 		RowToPhp.CheckedColumns = result->ColumnNames;
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -626,8 +616,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 		//	in this panel, each new resultset in a new panel
 		if (results->Success && results->HasRows && !outputSummary) {
 			Fill(results);
-		}
-		else if (results->Success && results->HasRows && outputSummary) {
+		} else if (results->Success && results->HasRows && outputSummary) {
 			t4p::SqlBrowserPanelClass* newPanel = View.CreateResultsPanel(CodeControl);
 			newPanel->Fill(results);
 		}
@@ -637,8 +626,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 			if (results->Success) {
 				msg = wxString::Format(_("%d rows affected in %.3f sec"), results->AffectedRows,
 					(results->QueryTime.ToLong() / 1000.00));
-			}
-			else {
+			} else {
 				msg = t4p::IcuToWx(results->Error);
 			}
 			int rowNumber = ResultsGrid->GetNumberRows();
@@ -651,8 +639,7 @@ void t4p::SqlBrowserPanelClass::RenderAllResults() {
 		if (!outputSummary && !results->Error.isEmpty()) {
 			// put error in the summary LABEL
 			UpdateLabels(t4p::IcuToWx(results->Error));
-		}
-		else if (!outputSummary) {
+		} else if (!outputSummary) {
 			// put summary in the summary LABEL
 			wxDateTime now = wxDateTime::Now();
 			wxString msg = wxString::Format(_("%d rows affected in %.3f sec [%s]"), results->AffectedRows,
@@ -672,8 +659,7 @@ void t4p::SqlBrowserPanelClass::Fill(t4p::SqlResultClass* results) {
 
 	if (!results->Success) {
 		UpdateLabels(t4p::IcuToWx(results->Error));
-	}
-	else {
+	} else {
 		UpdateLabels(wxString::Format(_("%d rows returned in %.3f sec"),
 			results->AffectedRows, (results->QueryTime.ToLong() / 1000.00)));
 	}
@@ -687,8 +673,7 @@ void t4p::SqlBrowserPanelClass::UpdateLabels(const wxString& result) {
 void t4p::SqlBrowserPanelClass::OnActionProgress(t4p::ActionProgressEventClass& event) {
 	if (event.GetId() == QueryId) {
 		Gauge->IncrementGauge(ID_SQL_GAUGE, t4p::StatusBarWithGaugeClass::INDETERMINATE_MODE);
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -713,8 +698,7 @@ void t4p::SqlBrowserPanelClass::OnActionComplete(t4p::ActionEventClass& event) {
 			// write another one without having to use the mouse
 			CodeControl->SetFocus();
 		}
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -1040,8 +1024,7 @@ void t4p::SqlBrowserViewClass::OnSqlConnectionMenu(wxCommandEvent& event) {
 		t4p::SqlMetaDataActionClass* thread = new t4p::SqlMetaDataActionClass(Feature.App.RunningThreads, t4p::ID_EVENT_ACTION_SQL_METADATA);
 		if (thread->Init(Feature.App.Globals)) {
 			Feature.App.RunningThreads.Queue(thread);
-		}
-		else {
+		} else {
 			delete thread;
 		}
 	}
@@ -1193,8 +1176,7 @@ void t4p::SqlBrowserViewClass::OnCmdTableDefinitionOpen(t4p::OpenDbTableCommandE
 		if (win) {
 			sqlPanel = (t4p::TableDefinitionPanelClass*)win;
 			SetFocusToToolsWindow(win);
-		}
-		else {
+		} else {
 			sqlPanel = new TableDefinitionPanelClass(GetMainWindow(), ID_PANEL_TABLE_DEFINITION,
 				Feature, *this);
 			wxString tabText = wxT("Table Definition");
@@ -1264,8 +1246,7 @@ void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag,
 	UnicodeString columnSql;
 	if (t4p::DatabaseTagClass::MYSQL == tag.Driver) {
 		columnSql = t4p::WxToIcu("DESC " + tableName);
-	}
-	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
+	} else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
 		columnSql = t4p::WxToIcu("PRAGMA table_info('" + tableName + "')");
 	}
 	t4p::MultipleSqlExecuteClass* sqlDefExecute =
@@ -1277,8 +1258,7 @@ void t4p::TableDefinitionPanelClass::ShowTable(const t4p::DatabaseTagClass& tag,
 	UnicodeString indexSql;
 	if (t4p::DatabaseTagClass::MYSQL == tag.Driver) {
 		indexSql = t4p::WxToIcu("SHOW INDEX FROM " + tableName);
-	}
-	else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
+	} else if (t4p::DatabaseTagClass::SQLITE == tag.Driver) {
 		indexSql = t4p::WxToIcu("PRAGMA index_list('" + tableName + "')");
 	}
 	t4p::MultipleSqlExecuteClass* sqlIndexExecute =
@@ -1332,8 +1312,7 @@ void t4p::TableDefinitionPanelClass::OnSqlButton(wxCommandEvent& event) {
 	wxString tableName = TableName->GetValue();
 	if (t4p::DatabaseTagClass::MYSQL == selectedTag.Driver) {
 		createSql = t4p::WxToIcu("SHOW CREATE TABLE " + tableName);
-	}
-	else if (t4p::DatabaseTagClass::SQLITE == selectedTag.Driver) {
+	} else if (t4p::DatabaseTagClass::SQLITE == selectedTag.Driver) {
 		createSql = t4p::WxToIcu("SELECT sql FROM sqlite_master WHERE type='table' AND name= '" + tableName + "'");
 	}
 	t4p::SqlQueryClass query;
@@ -1352,14 +1331,12 @@ void t4p::TableDefinitionPanelClass::OnCreateSqlComplete(t4p::QueryCompleteEvent
 	}
 	if (!result->Error.isEmpty()) {
 		DefinitionColumnsPanel->Fill(result);
-	}
-	else if (!result->StringResults.empty() && result->StringResults[0].size() == 2) {
+	} else if (!result->StringResults.empty() && result->StringResults[0].size() == 2) {
 		// mysql results
 		UnicodeString table = result->StringResults[0][1];
 		wxString sqlText = t4p::IcuToWx(table);
 		View.NewSqlBuffer(sqlText);
-	}
-	else if (!result->StringResults.empty() && result->StringResults[0].size() == 1) {
+	} else if (!result->StringResults.empty() && result->StringResults[0].size() == 1) {
 		// sqlite results
 		UnicodeString table = result->StringResults[0][0];
 		wxString sqlText = t4p::IcuToWx(table);
@@ -1435,8 +1412,7 @@ t4p::SqlCopyAsInsertDialogClass::SqlCopyAsInsertDialogClass(wxWindow* parent, in
 
 	if (EditedRowToSql.LineMode == t4p::RowToSqlInsertClass::SINGLE_LINE) {
 		LineModeRadio->SetSelection(0);
-	}
-	else {
+	} else {
 		LineModeRadio->SetSelection(1);
 	}
 }
@@ -1468,8 +1444,7 @@ void t4p::SqlCopyAsInsertDialogClass::OnOkButton(wxCommandEvent& event) {
 
 	if (LineModeRadio->GetSelection() == 0) {
 		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::SINGLE_LINE;
-	}
-	else {
+	} else {
 		EditedRowToSql.LineMode = t4p::RowToSqlInsertClass::MULTI_LINE;
 	}
 
@@ -1485,14 +1460,12 @@ t4p::SqlCopyAsPhpDialogClass::SqlCopyAsPhpDialogClass(wxWindow* parent, int id, 
 , HasCheckedAll(false) {
 	if (t4p::RowToPhpClass::SYNTAX_KEYWORD == rowToPhp.ArraySyntax) {
 		ArraySyntaxRadio->SetSelection(0);
-	}
-	else {
+	} else {
 		ArraySyntaxRadio->SetSelection(1);
 	}
 	if (t4p::RowToPhpClass::VALUES_ROW == rowToPhp.CopyValues) {
 		CopyValues->SetSelection(0);
-	}
-	else {
+	} else {
 		CopyValues->SetSelection(1);
 	}
 	for(size_t i = 0; i < rowToPhp.Columns.size(); ++i) {
@@ -1515,14 +1488,12 @@ void t4p::SqlCopyAsPhpDialogClass::OnCancelButton(wxCommandEvent& event) {
 void t4p::SqlCopyAsPhpDialogClass::OnOkButton(wxCommandEvent& event) {
 	if (t4p::RowToPhpClass::SYNTAX_KEYWORD == ArraySyntaxRadio->GetSelection()) {
 		EditedRowToPhp.ArraySyntax = t4p::RowToPhpClass::SYNTAX_KEYWORD;
-	}
-	else {
+	} else {
 		EditedRowToPhp.ArraySyntax = t4p::RowToPhpClass::SYNTAX_OPERATOR;
 	}
 	if (t4p::RowToPhpClass::VALUES_ROW == CopyValues->GetSelection()) {
 		EditedRowToPhp.CopyValues = t4p::RowToPhpClass::VALUES_ROW;
-	}
-	else {
+	} else {
 		EditedRowToPhp.CopyValues = t4p::RowToPhpClass::VALUES_EMPTY;
 	}
 
@@ -1623,24 +1594,20 @@ void t4p::SqlBraceMatchStylerClass::Style(t4p::CodeControlClass* ctrl, int posTo
 		wxChar c2 = ctrl->GetCharAt(posToCheck - 1);
 		if (wxT('(') == c2 || wxT(')') == c2) {
 			posToCheck = posToCheck - 1;
-		}
-		else  {
+		} else {
 			posToCheck = -1;
 		}
 		if (posToCheck >= 0) {
 			int pos = ctrl->BraceMatch(posToCheck);
 			if (wxSTC_INVALID_POSITION == pos) {
 				ctrl->BraceBadLight(posToCheck);
-			}
-			else {
+			} else {
 				ctrl->BraceHighlight(posToCheck, pos);
 			}
-		}
-		else {
+		} else {
 			ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 		}
-	}
-	else {
+	} else {
 		ctrl->BraceHighlight(wxSTC_INVALID_POSITION, wxSTC_INVALID_POSITION);
 	}
 }

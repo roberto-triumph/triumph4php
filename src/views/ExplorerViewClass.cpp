@@ -121,8 +121,7 @@ void t4p::ExplorerViewClass::OnProjectOutline(wxCommandEvent& event) {
 	if (!window) {
 		panel =  new t4p::ExplorerOutlinePanelClass(GetOutlineNotebook(), ID_EXPLORER_OUTLINE, Feature, *this);
 		AddOutlineWindow(panel, _("Explorer"));
-	}
-	else {
+	} else {
 		panel = (t4p::ExplorerOutlinePanelClass*)window;
 		SetFocusToOutlineWindow(panel);
 	}
@@ -133,8 +132,7 @@ void t4p::ExplorerViewClass::OnProjectOutline(wxCommandEvent& event) {
 	std::vector<t4p::SourceClass> sourceDirs = Feature.EnabledSources();
 	if (!sourceDirs.empty()) {
 		panel->RefreshDir(sourceDirs[0].RootDirectory);
-	}
-	else {
+	} else {
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
@@ -184,8 +182,7 @@ void t4p::ExplorerViewClass::OnProjectExploreOpenFile(wxCommandEvent& event) {
 	if (!window) {
 		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
-	}
-	else {
+	} else {
 		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
@@ -212,8 +209,7 @@ void t4p::ExplorerViewClass::OnAppProjectCreated(wxCommandEvent& event) {
 	if (!window) {
 		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
-	}
-	else {
+	} else {
 		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
@@ -234,8 +230,7 @@ void t4p::ExplorerViewClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 	if (!window) {
 		panel =  new t4p::ModalExplorerPanelClass(GetToolsNotebook(), ID_EXPLORER_PANEL, Feature, *this);
 		AddToolsWindow(panel, _("Explorer"));
-	}
-	else {
+	} else {
 		panel = (t4p::ModalExplorerPanelClass*)window;
 		SetFocusToToolsWindow(panel);
 	}
@@ -246,11 +241,9 @@ void t4p::ExplorerViewClass::OnExplorerProjectMenu(wxCommandEvent& event) {
 
 	if (index < sourceDirs.size()) {
 		panel->RefreshDir(sourceDirs[index].RootDirectory);
-	}
-	else if (!sourceDirs.empty()) {
+	} else if (!sourceDirs.empty()) {
 		panel->FocusOnSourcesList();
-	}
-	else {
+	} else {
 		// as a fallback if the user has not created any projects
 		// just go to the user's home dir
 		wxStandardPaths paths = wxStandardPaths::Get();
@@ -361,8 +354,7 @@ void t4p::FileListingWidgetClass::ShowDir() {
 	// except if the dir is empty
 	if (List->GetItemCount() >= 2) {
 		List->SetItemState(1, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
-	}
-	else if (List->GetItemCount() >= 1) {
+	} else if (List->GetItemCount() >= 1) {
 		List->SetItemState(0, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED, wxLIST_STATE_SELECTED | wxLIST_STATE_FOCUSED);
 	}
 	if (List->GetWindowStyle() & wxLC_REPORT) {
@@ -446,8 +438,7 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 			wxString fullPath = FileListing->WorkingDir.GetPathWithSep() + name;
 			if (wxFileName::FileExists(fullPath)) {
 				files.push_back(wxFileName(fullPath));
-			}
-			else if (wxFileName::DirExists(fullPath)) {
+			} else if (wxFileName::DirExists(fullPath)) {
 				// need to recursively delete a directory
 				wxFileName dirToDelete;
 				dirToDelete.AssignDir(fullPath);
@@ -461,8 +452,7 @@ void t4p::FileListingWidgetClass::OnListMenuDelete(wxCommandEvent& event) {
 	bool doDelete = false;
 	if ((dirs.size() + files.size()) == 1) {
 		doDelete = true;
-	}
-	else if (!dirs.empty() || !files.empty()) {
+	} else if (!dirs.empty() || !files.empty()) {
 		wxString msg = _("Are you sure you want to delete the following?\n\n");
 		std::vector<wxFileName>::const_iterator f;
 		for (f = dirs.begin(); f != dirs.end(); ++f) {
@@ -488,47 +478,38 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 		extensions = Feature->App.Globals.FileTypes.GetPhpFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.php");
-		}
-		else {
+		} else {
 			ext = extensions[0];
 		}
 		dialogTitle = _("Create a new PHP file");
-	}
-	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
+	} else if (event.GetId() == ID_EXPLORER_LIST_CREATE_SQL) {
 		extensions = Feature->App.Globals.FileTypes.GetSqlFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.sql");
-		}
-		else {
+		} else {
 			ext = extensions[0];
 		}
 		dialogTitle = _("Create a new SQL file");
-	}
-	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
+	} else if (event.GetId() == ID_EXPLORER_LIST_CREATE_CSS) {
 		extensions = Feature->App.Globals.FileTypes.GetCssFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.css");
-		}
-		else {
+		} else {
 			ext = extensions[0];
 		}
 		dialogTitle = _("Create a new CSS file");
-	}
-	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_JS) {
+	} else if (event.GetId() == ID_EXPLORER_LIST_CREATE_JS) {
 		extensions = Feature->App.Globals.FileTypes.GetJsFileExtensions();
 		if (extensions.empty()) {
 			ext = wxT("*.js");
-		}
-		else {
+		} else {
 			ext = extensions[0];
 		}
 		dialogTitle = _("Create a new JS file");
-	}
-	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_TEXT) {
+	} else if (event.GetId() == ID_EXPLORER_LIST_CREATE_TEXT) {
 		ext = wxT("*.txt");
 		dialogTitle = _("Create a new text file");
-	}
-	else if (event.GetId() == ID_EXPLORER_LIST_CREATE_DIRECTORY) {
+	} else if (event.GetId() == ID_EXPLORER_LIST_CREATE_DIRECTORY) {
 		ext = wxT("");
 		dialogTitle = _("Create a directory");
 	}
@@ -553,8 +534,7 @@ void t4p::FileListingWidgetClass::OnListMenuCreateNew(wxCommandEvent& event) {
 			// open the new file
 			t4p::OpenFileCommandEventClass evt(newFileName.GetFullPath());
 			Feature->App.EventSink.Publish(evt);
-		}
-		else {
+		} else {
 			wxMessageBox(_("Could not create file: ") + newName);
 		}
 	}
@@ -587,8 +567,7 @@ void t4p::FileListingWidgetClass::OnListMenuCreateDirectory(wxCommandEvent& even
 		column1.SetMask(wxLIST_MASK_IMAGE | wxLIST_MASK_TEXT);
 		column1.SetText(newName);
 		List->InsertItem(column1);
-	}
-	else {
+	} else {
 		wxMessageBox(_("Could not create directory: ") + newName);
 	}
 }
@@ -598,8 +577,7 @@ void t4p::FileListingWidgetClass::OnListMenuShell(wxCommandEvent& event) {
 	wxPlatformInfo info;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		cmd += wxT(" /k cd \"") + FileListing->WorkingDir.GetPath() + wxT("\"");
-	}
-	else {
+	} else {
 		cmd += wxT(" \"") + FileListing->WorkingDir.GetPath() + wxT("\"");
 	}
 	wxExecute(cmd, wxEXEC_ASYNC);
@@ -620,20 +598,16 @@ void t4p::FileListingWidgetClass::OnListEndLabelEdit(wxListEvent& event) {
 	if (newName.find_first_of(wxFileName::GetForbiddenChars(), 0) != std::string::npos) {
 		event.Veto();
 		return;
-	}
-	else if (newName.IsEmpty()) {
+	} else if (newName.IsEmpty()) {
 		event.Veto();
 		return;
-	}
-
-	// dont attempt rename if they are new and old name are the same
-	else if (newName != name && !newName.IsEmpty()) {
+	} else if (newName != name && !newName.IsEmpty()) {
+		// dont attempt rename if they are new and old name are the same
 		wxFileName sourceFile(FileListing->WorkingDir.GetPath(), name);
 		wxFileName destFile(FileListing->WorkingDir.GetPath(), newName);
 
 		FileListing->StartRename(sourceFile, newName);
-	}
-	else {
+	} else {
 		event.Veto();
 	}
 }
@@ -732,8 +706,7 @@ void t4p::ModalExplorerPanelClass::ShowDir() {
 	wxString label;
 	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
-	}
-	else {
+	} else {
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
@@ -751,14 +724,12 @@ void t4p::ModalExplorerPanelClass::OnListMenuOpen(wxCommandEvent& event) {
 		if (wxFileName::FileExists(fullPath)) {
 			t4p::OpenFileCommandEventClass evt(fullPath);
 			Feature.App.EventSink.Publish(evt);
-		}
-		else if (wxFileName::DirExists(fullPath)) {
+		} else if (wxFileName::DirExists(fullPath)) {
 			wxFileName nextDir;
 			nextDir.AssignDir(FileListing->WorkingDir.GetPath());
 			if (name == wxT("..")) {
 				nextDir.RemoveLastDir();
-			}
-			else {
+			} else {
 				nextDir.AppendDir(name);
 			}
 			RefreshDir(nextDir);
@@ -776,8 +747,7 @@ void t4p::ModalExplorerPanelClass::OnListItemActivated(wxListEvent& event) {
 		// parent dir click
 		RefreshDir(nextDir);
 		return;
-	}
-	else {
+	} else {
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -808,8 +778,7 @@ void t4p::ModalExplorerPanelClass::OnListKeyDown(wxKeyEvent& event) {
 		case WXK_LEFT:
 			if (event.GetModifiers() & WXK_ALT) {
 				OnParentButtonClick(cmdEvt);
-			}
-			else {
+			} else {
 				event.Skip();
 			}
 			break;
@@ -873,8 +842,7 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 			}
 			wxMessageBox(msg, _("Delete"));
 		}
-	}
-	else if (t4p::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
+	} else if (t4p::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
 		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
@@ -884,16 +852,14 @@ void t4p::ModalExplorerPanelClass::OnExplorerModifyComplete(t4p::ExplorerModifyE
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
-		}
-		else if (!event.Success) {
+		} else if (!event.Success) {
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
 			wxMessageBox(_("A file with that name already exists"), _("Rename"));
-		}
-		else if (event.Success) {
+		} else if (event.Success) {
 			RenamePrompt(event.OldFile, event.NewName);
 		}
 	}
@@ -947,17 +913,13 @@ std::vector<wxString> t4p::ModalExplorerPanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
-	}
-	else if (ID_FILTER_PHP == FilterChoice) {
+	} else if (ID_FILTER_PHP == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
-	}
-	else if (ID_FILTER_CSS == FilterChoice) {
+	} else if (ID_FILTER_CSS == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
-	}
-	else if (ID_FILTER_SQL == FilterChoice) {
+	} else if (ID_FILTER_SQL == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
-	}
-	else if (ID_FILTER_JS == FilterChoice) {
+	} else if (ID_FILTER_JS == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
 	}
 
@@ -997,8 +959,7 @@ void t4p::ModalExplorerPanelClass::FillSourcesList(const std::vector<wxFileName>
 	}
 	if (sourceDirs.size() == 1) {
 		SourcesLabel->SetLabel(wxString::Format(wxT("%ld Source Directory"), sourceDirs.size()));
-	}
-	else {
+	} else {
 		SourcesLabel->SetLabel(wxString::Format(wxT("%ld Source Directories"), sourceDirs.size()));
 	}
 }
@@ -1165,8 +1126,7 @@ void t4p::ExplorerOutlinePanelClass::OnListKeyDown(wxKeyEvent& event) {
 		case WXK_LEFT:
 			if (event.GetModifiers() & WXK_ALT) {
 				OnParentButtonClick(cmdEvt);
-			}
-			else {
+			} else {
 				event.Skip();
 			}
 			break;
@@ -1187,8 +1147,7 @@ void t4p::ExplorerOutlinePanelClass::ShowDir() {
 	wxString label;
 	if (t4p::NumberEqualTo(totalFiles, files.size())) {
 		label = wxString::Format(wxT("%ld Files, %ld Directories"), files.size(), dirs.size());
-	}
-	else {
+	} else {
 		label = wxString::Format(wxT("%ld Files, %ld Directories (%ld not shown)"), files.size(), dirs.size(), totalFiles - files.size());
 	}
 	ListLabel->SetLabel(label);
@@ -1206,14 +1165,12 @@ void t4p::ExplorerOutlinePanelClass::OnListMenuOpen(wxCommandEvent& event) {
 		if (wxFileName::FileExists(fullPath)) {
 			t4p::OpenFileCommandEventClass evt(fullPath);
 			Feature.App.EventSink.Publish(evt);
-		}
-		else if (wxFileName::DirExists(fullPath)) {
+		} else if (wxFileName::DirExists(fullPath)) {
 			wxFileName nextDir;
 			nextDir.AssignDir(FileListing->WorkingDir.GetPath());
 			if (name == wxT("..")) {
 				nextDir.RemoveLastDir();
-			}
-			else {
+			} else {
 				nextDir.AppendDir(name);
 			}
 			RefreshDir(nextDir);
@@ -1231,8 +1188,7 @@ void t4p::ExplorerOutlinePanelClass::OnListItemActivated(wxListEvent& event) {
 		// parent dir click
 		RefreshDir(nextDir);
 		return;
-	}
-	else {
+	} else {
 	}
 	if (!OpenIfListFile(text)) {
 		nextDir.AssignDir(FileListing->WorkingDir.GetPath());
@@ -1296,8 +1252,7 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 			}
 			wxMessageBox(msg, _("Delete"));
 		}
-	}
-	else if (t4p::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
+	} else if (t4p::ExplorerModifyActionClass::RENAME_FILE == event.Action) {
 		wxFileName destFile(event.OldFile.GetPath(), event.NewName);
 
 		if (!event.Success && wxFileName::DirExists(destFile.GetFullPath())) {
@@ -1307,16 +1262,14 @@ void t4p::ExplorerOutlinePanelClass::OnExplorerModifyComplete(t4p::ExplorerModif
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
 			wxMessageBox(_("A directory with that name already exists"), _("Rename"));
-		}
-		else if (!event.Success) {
+		} else if (!event.Success) {
 			// revert the item back to the original name
 			long index = List->FindItem(-1, event.NewName);
 			if (index != wxNOT_FOUND) {
 				List->SetItemText(index, event.OldFile.GetFullName());
 			}
 			wxMessageBox(_("A file with that name already exists"), _("Rename"));
-		}
-		else if (event.Success) {
+		} else if (event.Success) {
 			RenamePrompt(event.OldFile, event.NewName);
 		}
 	}
@@ -1370,17 +1323,13 @@ std::vector<wxString> t4p::ExplorerOutlinePanelClass::FilterFileExtensions() {
 	std::vector<wxString> extensions;
 	if (ID_FILTER_ALL_SOURCE == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetAllSourceFileExtensions();
-	}
-	else if (ID_FILTER_PHP == FilterChoice) {
+	} else if (ID_FILTER_PHP == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetPhpFileExtensions();
-	}
-	else if (ID_FILTER_CSS == FilterChoice) {
+	} else if (ID_FILTER_CSS == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetCssFileExtensions();
-	}
-	else if (ID_FILTER_SQL == FilterChoice) {
+	} else if (ID_FILTER_SQL == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetSqlFileExtensions();
-	}
-	else if (ID_FILTER_JS == FilterChoice) {
+	} else if (ID_FILTER_JS == FilterChoice) {
 		extensions = Feature.App.Globals.FileTypes.GetJsFileExtensions();
 	}
 
@@ -1451,8 +1400,7 @@ t4p::ExplorerNewFileDialogClass::ExplorerNewFileDialogClass(wxWindow* parent, co
 	FileNameText->SetSelection(0, 0);
 	if (index > 0 && index != std::string::npos) {
 		FileNameText->SetSelection(0, index);
-	}
-	else {
+	} else {
 		FileNameText->SetSelection(0, FileName.Length() - 1);
 	}
 }

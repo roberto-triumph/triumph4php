@@ -48,11 +48,9 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() t4p::JsTagsSqlSchemaAsset() from Assets.h"));
 	if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
 		schemaSql = ResourceSchemaSql;
-	}
-	else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
+	} else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
 		schemaSql = DetectorSchemaSql;
-	}
-	else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+	} else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
 		schemaSql = JsTagsSchemaSql;
 	}
 
@@ -66,12 +64,10 @@ void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFile
 		if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
 			ResourceSchemaSql = t4p::WxToChar(sql);
 			schemaSql = ResourceSchemaSql;
-		}
-		else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
+		} else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
 			DetectorSchemaSql = t4p::WxToChar(sql);
 			schemaSql = DetectorSchemaSql;
-		}
-		else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+		} else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
 			JsTagsSchemaSql = t4p::WxToChar(sql);
 			schemaSql = JsTagsSchemaSql;
 		}

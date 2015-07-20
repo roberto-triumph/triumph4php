@@ -123,13 +123,11 @@ void t4p::OutlineTagCacheSearchActionClass::BackgroundWork() {
 							classLabel += wxT(": ") + t4p::IcuToWx(tag->NamespaceName);
 						}
 						tagSearchComplete.Tags[classLabel] = TagCache.AllMemberTags(tag->FullyQualifiedClassName(), tag->FileTagId, EnabledSourceDirs);
-					}
-					else {
+					} else {
 						tagSearchComplete.Tags[wxT("")].push_back(*tag);
 					}
 				}
-			}
-			else {
+			} else {
 				// searching for all members in a class name
 				t4p::TagResultClass* results = TagCache.ExactTags(*search, EnabledSourceDirs);
 				if (results) {

@@ -252,8 +252,7 @@ void t4p::SequenceClass::OnActionComplete(t4p::ActionEventClass& event) {
 	IsRunning = !Steps.empty();
 	if (IsRunning) {
 		RunNextStep();
-	}
-	else {
+	} else {
 		wxCommandEvent sequenceEvent(t4p::EVENT_SEQUENCE_COMPLETE);
 		sequenceEvent.SetId(wxID_ANY);
 		RunningThreads.PostEvent(sequenceEvent);
@@ -284,8 +283,7 @@ void t4p::SequenceClass::RunNextStep() {
 				if (Steps.empty()) {
 					isSequenceDone = true;
 				}
-			}
-			else {
+			} else {
 				// step does not involve async; we are done with this step
 				// even though we dont start a background thread, the
 				// sync actions still generate EVT_WORK_COMPLETE events. let's
@@ -293,8 +291,7 @@ void t4p::SequenceClass::RunNextStep() {
 				IsRunning = true;
 				break;
 			}
-		}
-		else {
+		} else {
 			IsCurrentStepAsync = true;
 
 			// if the step is to be performed in a background thread, then check the
@@ -308,8 +305,7 @@ void t4p::SequenceClass::RunNextStep() {
 				// now wait for the background thread to finish
 				IsRunning = true;
 				break;
-			}
-			else {
+			} else {
 				// no need to start a background thread since Init failed
 				// lets move on to the next step
 				delete Steps.front();

@@ -284,8 +284,7 @@ void t4p::DetectorFeatureClass::RunTemplateFileDetectors() {
 		actions.push_back(
 			new t4p::TemplateFileTagsDetectorActionClass(App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TEMPLATE_FILE_TAG_DETECTOR));
 		App.Sequences.Build(actions);
-	}
-	else {
+	} else {
 		t4p::EditorLogWarningFix("Template Error",
 			_("Need to choose a URL to detect templates for. Template files feature depends on the URL detectors feature."));
 	}

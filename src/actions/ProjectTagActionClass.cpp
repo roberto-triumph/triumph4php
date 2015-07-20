@@ -326,8 +326,7 @@ void t4p::ProjectTagSingleFileRenameActionClass::BackgroundWork() {
 	// if the original file was previosuly parsed, just rename the file (no need to retag the file)
 	if (!oldFileExists && TagFinderList.TagFinder.HasFullPath(OldFileName.GetFullPath())) {
 		TagFinderList.TagParser.RenameFile(OldFileName, NewFileName);
-	}
-	else if (!oldFileExists) {
+	} else if (!oldFileExists) {
 		// tag the file since we have never seen it. this could be the same
 		// for example, when file with a non-php extension is renamed to have a
 		// php extension

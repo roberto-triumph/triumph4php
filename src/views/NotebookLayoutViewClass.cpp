@@ -60,8 +60,7 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 			t4p::CodeControlClass* code = notebook->GetCodeControl(0);
 			if (!visible.empty()) {
 				visible[0]->Adopt(code, notebook);
-			}
-			else {
+			} else {
 				notebook->ClosePage(0);
 			}
 		}
@@ -81,8 +80,7 @@ static void RedistributeCodeControls(wxAuiManager& auiManager, std::vector<t4p::
 					visible[i]->Adopt(ctrl, ctrlNotebook);
 					moved = true;
 					break;
-				}
-				else if (visible[i] == ctrlNotebook) {
+				} else if (visible[i] == ctrlNotebook) {
 					// the code control is already at a visible notebook.
 					// move on to the next code control
 					moved = true;
@@ -143,8 +141,7 @@ void t4p::NotebookLayoutViewClass::OnNotebookMenu(wxCommandEvent& event) {
 		if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 0)) {
 			// splitting horizontally
 			currentNotebook->SplitHorizontally();
-		}
-		else if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 1)) {
+		} else if (event.GetId() == (t4p::MENU_NOTEBOOK_PANE + 1)) {
 			// splitting vertically
 			currentNotebook->SplitVertically();
 		}

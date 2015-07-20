@@ -205,11 +205,9 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 			UnicodeString fullyQualifiedClass;
 			if (tagResults->Tag.NamespaceName == UNICODE_STRING_SIMPLE("\\")) {
 				fullyQualifiedClass = tagResults->Tag.NamespaceName + tagResults->Tag.ClassName;
-			}
-			else if (!tagResults->Tag.NamespaceName.isEmpty()) {
+			} else if (!tagResults->Tag.NamespaceName.isEmpty()) {
 				fullyQualifiedClass = tagResults->Tag.NamespaceName + UNICODE_STRING_SIMPLE("\\") + tagResults->Tag.ClassName;
-			}
-			else {
+			} else {
 				fullyQualifiedClass = tagResults->Tag.ClassName;
 			}
 
@@ -217,8 +215,7 @@ UnicodeString t4p::TagFinderListClass::ResolveResourceType(UnicodeString resourc
 			// if the given string was a method, return the method's return type
 			if (t4p::PhpTagClass::CLASS == tagResults->Tag.Type) {
 				type = fullyQualifiedClass;
-			}
-			else {
+			} else {
 				// the parser will always return fully qualified class name for return type that is
 				// based on the namespace aliases
 				type = tagResults->Tag.ReturnType;

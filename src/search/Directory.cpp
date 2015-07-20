@@ -40,8 +40,7 @@ bool t4p::RecursiveRmDir(wxString path) {
 		wxString nextFile = dirName.GetPathWithSep() + name;
 		if (wxDirExists(nextFile)) {
 			RecursiveRmDir(nextFile);
-		}
-		else {
+		} else {
 			good = wxRemoveFile(nextFile);
 			wxASSERT_MSG(good, wxT("could not remove file:") + nextFile);
 		}

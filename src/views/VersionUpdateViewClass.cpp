@@ -70,8 +70,7 @@ void t4p::VersionUpdateViewClass::OnPreferencesSaved(wxCommandEvent& event) {
 		if (!Timer.IsRunning()) {
 			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
 		}
-	}
-	else {
+	} else {
 		Timer.Stop();
 	}
 }
@@ -81,8 +80,7 @@ void t4p::VersionUpdateViewClass::OnPreferencesExternallyUpdated(wxCommandEvent&
 		if (!Timer.IsRunning()) {
 			Timer.Start(1000 * 1, wxTIMER_CONTINUOUS);
 		}
-	}
-	else {
+	} else {
 		Timer.Stop();
 	}
 }
@@ -167,8 +165,7 @@ t4p::VersionUpdateDialogClass::VersionUpdateDialogClass(wxWindow* parent, int id
 		Gauge->Show(false);
 		NewVersion->SetLabel(newVersion);
 		Result->SetLabel(wxT("New version available: ") + newVersion);
-	}
-	else {
+	} else {
 		Timer.Start(200, wxTIMER_CONTINUOUS);
 	}
 }
@@ -178,8 +175,7 @@ void t4p::VersionUpdateDialogClass::OnTimer(wxTimerEvent& event) {
 		Result->SetLabel(wxT("Checking for new version"));
 		ConnectToUpdateServer();
 		StartedCheck = true;
-	}
-	else {
+	} else {
 		Gauge->Pulse();
 	}
 }
@@ -192,12 +188,10 @@ void t4p::VersionUpdateDialogClass::OnUpdateCheckComplete(wxCommandEvent& event)
 	bool foundNew = 200 == statusCode && !newVersion.empty();
 	if (foundNew) {
 		Result->SetLabel(wxT("New version available: ") + newVersion);
-	}
-	else if (statusCode == 200) {
+	} else if (statusCode == 200) {
 		Result->SetLabel(wxT("Your version is up-to-date"));
 		NewVersion->SetLabel(CurrentVersion->GetLabel());
-	}
-	else {
+	} else {
 		Result->SetLabel(wxString::Format(wxT("Connection error: (%d) %s"), statusCode, newVersion));
 	}
 	Timer.Stop();

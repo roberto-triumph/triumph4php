@@ -337,8 +337,7 @@ bool t4p::SqlQueryClass::TableNames(soci::session& session, soci::statement& stm
 					tableNames.push_back(uniTable);
 				}
 			}
-		}
-		else if (backendName.compare("sqlite3") == 0) {
+		} else if (backendName.compare("sqlite3") == 0) {
 			soci::sqlite3_statement_backend* backend = static_cast<soci::sqlite3_statement_backend*>(stmt.get_backend());
 			for (int i = 0; i < columnCount; ++i) {
 				const char* tbl = sqlite3_column_table_name(backend->stmt_, i);
@@ -394,8 +393,7 @@ bool t4p::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& col
 					if (tm.tm_year != 0 && tm.tm_mday != 0) {
 						wxDateTime date(tm);
 						out << date.Format(wxT("%Y-%m-%d %H:%M:%S")).ToAscii();
-					}
-					else {
+					} else {
 						// mysql allows dates of 0000-00-00
 						out << "0000-00-00 00:00:00";
 					}
@@ -478,8 +476,7 @@ std::vector<t4p::DatabaseTagClass> t4p::DatabaseTagFinderClass::All(const std::v
 		stdSourceDirectories.push_back(t4p::WxToChar(sourceDirectories[i].GetPathWithSep()));
 		if (0 == i) {
 			sql += "?";
-		}
-		else {
+		} else {
 			sql += ",?";
 		}
 	}

@@ -76,8 +76,7 @@ bool t4p::SqliteSqlScript(const wxFileName& sqlScriptFileName, soci::session& se
 		if (errorMessage) {
 			error = t4p::CharToWx(errorMessage);
 			sqlite_api::sqlite3_free(errorMessage);
-		}
-		else {
+		} else {
 			ret = true;
 		}
 	} catch (std::exception& e) {

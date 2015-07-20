@@ -189,11 +189,9 @@ void t4p::EditorBehaviorViewClass::OnEditConvertEols(wxCommandEvent& event) {
 	}
 	if (event.GetId() == (t4p::MENU_BEHAVIOR + 7)) {
 		codeCtrl->ConvertEOLs(wxSTC_EOL_LF);
-	}
-	else if (event.GetId() == (t4p::MENU_BEHAVIOR + 8)) {
+	} else if (event.GetId() == (t4p::MENU_BEHAVIOR + 8)) {
 		codeCtrl->ConvertEOLs(wxSTC_EOL_CRLF);
-	}
-	else if (event.GetId() == (t4p::MENU_BEHAVIOR + 9)) {
+	} else if (event.GetId() == (t4p::MENU_BEHAVIOR + 9)) {
 		codeCtrl->ConvertEOLs(wxSTC_EOL_CR);
 	}
 }
@@ -315,8 +313,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 		codeCtrl->SetIndent(0);
 		codeCtrl->SetTabIndents(true);
 		codeCtrl->SetBackSpaceUnIndents(true);
-	}
-	else {
+	} else {
 		codeCtrl->SetUseTabs(false);
 		codeCtrl->SetTabWidth(options.SpacesPerIndent);
 		codeCtrl->SetIndent(options.SpacesPerIndent);
@@ -326,8 +323,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	if (options.RightMargin > 0) {
 		codeCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
 		codeCtrl->SetEdgeColumn(options.RightMargin);
-	}
-	else {
+	} else {
 		codeCtrl->SetEdgeMode(wxSTC_EDGE_NONE);
 	}
 	codeCtrl->SetIndentationGuides(options.EnableIndentationGuides);
@@ -337,8 +333,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	if (options.EnableWordWrap) {
 		codeCtrl->SetWrapMode(wxSTC_WRAP_WORD);
 		codeCtrl->SetWrapVisualFlags(wxSTC_WRAPVISUALFLAG_START);
-	}
-	else {
+	} else {
 		codeCtrl->SetWrapMode(wxSTC_WRAP_NONE);
 	}
 
@@ -346,8 +341,7 @@ void t4p::EditorBehaviorViewClass::SetFeatures(const t4p::CodeControlOptionsClas
 	codeCtrl->SetAdditionalSelectionTyping(options.EnableMultipleSelection);
 	if (options.EnableMultipleSelection) {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_EACH);
-	}
-	else {
+	} else {
 		codeCtrl->SetMultiPaste(wxSTC_MULTIPASTE_ONCE);
 	}
 
@@ -439,17 +433,13 @@ void t4p::EditorBehaviorViewClass::OnEditCut(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (t != NULL) {
 		t->Cut();
-	}
-	else if (combo != NULL) {
+	} else if (combo != NULL) {
 		combo->Cut();
-	}
-	else if (stc != NULL) {
+	} else if (stc != NULL) {
 		stc->Cut();
-	}
-	else if (code != NULL) {
+	} else if (code != NULL) {
 		code->Cut();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -463,17 +453,13 @@ void t4p::EditorBehaviorViewClass::OnEditCopy(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (t != NULL) {
 		t->Copy();
-	}
-	else if (combo != NULL) {
+	} else if (combo != NULL) {
 		combo->Copy();
-	}
-	else if (stc != NULL) {
+	} else if (stc != NULL) {
 		stc->Copy();
-	}
-	else if (code != NULL) {
+	} else if (code != NULL) {
 		code->Copy();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -487,17 +473,13 @@ void t4p::EditorBehaviorViewClass::OnEditPaste(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (t != NULL) {
 		t->Paste();
-	}
-	else if (combo != NULL) {
+	} else if (combo != NULL) {
 		combo->Paste();
-	}
-	else if (stc != NULL) {
+	} else if (stc != NULL) {
 		stc->Paste();
-	}
-	else if (code != NULL) {
+	} else if (code != NULL) {
 		code->Paste();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -511,17 +493,13 @@ void t4p::EditorBehaviorViewClass::OnEditSelectAll(wxCommandEvent& event) {
 	CodeControlClass* code = GetCurrentCodeControl();
 	if (t != NULL) {
 		t->SelectAll();
-	}
-	else if (combo != NULL) {
+	} else if (combo != NULL) {
 		combo->SelectAll();
-	}
-	else if (stc != NULL) {
+	} else if (stc != NULL) {
 		stc->SelectAll();
-	}
-	else if (code != NULL) {
+	} else if (code != NULL) {
 		code->SelectAll();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -742,12 +720,10 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 	if (hasModifiers && keyCode > 0) {
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
-	}
-	else if (keyCode > WXK_START && keyCode <=  WXK_SPECIAL20) {
+	} else if (keyCode > WXK_START && keyCode <=  WXK_SPECIAL20) {
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
-	}
-	else if (hasModifiers && (
+	} else if (hasModifiers && (
 		WXK_BACK == keyCode ||
 		WXK_TAB == keyCode ||
 		WXK_RETURN == keyCode ||
@@ -757,8 +733,7 @@ void t4p::KeyboardCommandEditDialogClass::OnKey(wxKeyEvent& event) {
 		// shortcuts with special chars ie CTRL+TAB
 		Edit->SetValue(t4p::KeyCodeToShortcutString(event.GetModifiers(), keyCode));
 		Edit->SetInsertionPointEnd();
-	}
-	else {
+	} else {
 		Edit->Clear();
 		event.Skip();
 	}

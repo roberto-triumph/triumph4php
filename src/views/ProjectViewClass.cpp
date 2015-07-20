@@ -457,8 +457,7 @@ void t4p::ProjectListDialogClass::OnRemoveButton(wxCommandEvent& event) {
 				if (selections.Index(i) == wxNOT_FOUND) {
 					remainingProjects.push_back(EditedProjects[i]);
 					remainingLabels.Add(EditedProjects[i].Label);
-				}
-				else {
+				} else {
 					RemovedProjects.push_back(EditedProjects[i]);
 				}
 			}
@@ -605,8 +604,7 @@ void t4p::ProjectListDialogClass::OnAddFromDirectoryButton(wxCommandEvent& event
 
 					AddProject(project);
 				}
-			}
-			else if (subDirs.empty()) {
+			} else if (subDirs.empty()) {
 				wxMessageBox(_("Directory does not contain any sub-directories"),
 					_("Add Projects From Directory"), wxCENTRE, this);
 			}

@@ -50,8 +50,7 @@ void t4p::TotalSearchFeatureClass::OpenPhpTag(const t4p::PhpTagClass& tag) {
 	if (found) {
 		t4p::OpenFileCommandEventClass cmd(tag.FullPath, position, length);
 		App.EventSink.Publish(cmd);
-	}
-	else {
+	} else {
 		t4p::OpenFileCommandEventClass cmd(tag.FullPath);
 		App.EventSink.Publish(cmd);
 	}

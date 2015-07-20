@@ -130,8 +130,7 @@ void t4p::LintResultsPanelClass::RemoveErrorsFor(const wxString& fileName) {
 			}
 			i--;
 			found = true;
-		}
-		else {
+		} else {
 			i++;
 			it++;
 		}
@@ -155,17 +154,14 @@ void t4p::LintResultsPanelClass::UpdateSummary() {
 	if (0 == ErrorFiles) {
 		this->Label->SetLabel(
 			wxString::Format(_("No errors found; checked %d files"), TotalFiles));
-	}
-	else if (ErrorFiles > MAX_LINT_ERROR_FILES) {
+	} else if (ErrorFiles > MAX_LINT_ERROR_FILES) {
 		this->Label->SetLabel(
 			wxString::Format(_("Found more than %d files with errors; stopping lint check"), MAX_LINT_ERROR_FILES));
-	}
-	else if (SkippedFiles > 0) {
+	} else if (SkippedFiles > 0) {
 		this->Label->SetLabel(
 			wxString::Format(_("Found %d files with errors; checked %d files; skipped %d files"),
 			ErrorFiles, TotalFiles, SkippedFiles));
-	}
-	else {
+	} else {
 		this->Label->SetLabel(
 			wxString::Format(_("Found %d files with errors; checked %d files"), ErrorFiles, TotalFiles));
 	}
@@ -292,8 +288,7 @@ void t4p::LintResultsPanelClass::OnAddSuppression(wxCommandEvent& event) {
 					}
 				}
 			}
-		}
-		else {
+		} else {
 			rule.Location.Assign(results.File);
 		}
 
@@ -329,8 +324,7 @@ void t4p::LintResultsPanelClass::SelectNextError() {
 	if (selected != wxNOT_FOUND && (selected  + 1) < ErrorsList->GetItemCount()) {
 		ErrorsList->SelectRow(selected + 1);
 		GoToAndDisplayLintError(selected + 1);
-	}
-	else if (ErrorsList->GetItemCount() > 0) {
+	} else if (ErrorsList->GetItemCount() > 0) {
 		ErrorsList->SelectRow(0);
 		GoToAndDisplayLintError(0);
 	}
@@ -341,8 +335,7 @@ void t4p::LintResultsPanelClass::SelectPreviousError() {
 	if (selected != wxNOT_FOUND && (selected  - 1) >= 0) {
 		ErrorsList->SelectRow(selected - 1);
 		GoToAndDisplayLintError(selected - 1);
-	}
-	else if (ErrorsList->GetItemCount() > 0) {
+	} else if (ErrorsList->GetItemCount() > 0) {
 		ErrorsList->SelectRow(ErrorsList->GetItemCount() - 1);
 		GoToAndDisplayLintError(ErrorsList->GetItemCount() - 1);
 	}
@@ -442,8 +435,7 @@ void t4p::LintViewClass::StartLint() {
 				resultsPanel->ClearErrors();
 				resultsPanel->EnableRunButton(false);
 				SetFocusToToolsWindow(resultsPanel);
-			}
-			else {
+			} else {
 				t4p::LintResultsPanelClass* resultsPanel = new LintResultsPanelClass(GetToolsNotebook(), ID_LINT_RESULTS_PANEL,
 						Feature, *this, GetMainWindow());
 				wxBitmap lintBitmap = t4p::BitmapImageAsset(wxT("lint-check"));
@@ -451,12 +443,10 @@ void t4p::LintViewClass::StartLint() {
 				SetFocusToToolsWindow(resultsPanel);
 				resultsPanel->EnableRunButton(false);
 			}
-		}
-		else {
+		} else {
 			delete reader;
 		}
-	}
-	else {
+	} else {
 		wxMessageBox(_("You must have an open project."), _("Lint Check"));
 	}
 }
@@ -469,8 +459,7 @@ void t4p::LintViewClass::ShowSuppressionPanel() {
 	wxWindow* window = FindToolsWindow(ID_LINT_SUPPRESSIONS_PANEL);
 	if (window) {
 		SetFocusToToolsWindow(window);
-	}
-	else {
+	} else {
 		t4p::LintSuppressionsPanelClass* panel = new t4p::LintSuppressionsPanelClass(
 			GetToolsNotebook(), ID_LINT_SUPPRESSIONS_PANEL, t4p::LintSuppressionsFileAsset(),
 			GetMainWindow());
@@ -518,12 +507,10 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
         resultsPanel->AddErrors(results);
 		resultsPanel->IncrementErrorFileCount();
 		resultsPanel->ShowLintError(i);
-	}
-	else if (codeControl && results.empty()) {
+	} else if (codeControl && results.empty()) {
 		// no errors!
 		codeControl->ClearLintErrors();
-	}
-	else if (codeControl && !results.empty()) {
+	} else if (codeControl && !results.empty()) {
 		// if the lint results panel is not open, just show
 		// a small panel instead of creating the tools window,
 		// which will startle the user
@@ -559,8 +546,7 @@ void t4p::LintViewClass::OnLintErrorAfterSave(t4p::LintResultsEventClass& event)
 			if (info.GetOperatingSystemId() == wxOS_WINDOWS_NT) {
 				codeControl->Thaw();
 			}
-		}
-		else {
+		} else {
 			// the error is in view, just show an annotation
 			codeControl->MarkLintError(results[0]);
 		}
@@ -615,8 +601,7 @@ void t4p::LintViewClass::OnFileSaved(t4p::CodeControlEventClass& event) {
 		}
 		if (good) {
 			Feature.App.RunningThreads.Queue(thread);
-		}
-		else {
+		} else {
 			delete thread;
 		}
 	}
@@ -941,8 +926,7 @@ t4p::LintSuppressionRuleDialogClass::LintSuppressionRuleDialogClass(wxWindow* pa
 		File->Enable(false);
 		DirectoryRadio->SetValue(true);
 		Directory->SetPath(EditRule.Location.GetPath());
-	}
-	else {
+	} else {
 		Directory->Enable(false);
 		File->Enable(true);
 		FileRadio->SetValue(true);
@@ -1005,8 +989,7 @@ void t4p::LintSuppressionRuleDialogClass::OnOkButton(wxCommandEvent& event) {
 	TransferDataFromWindow();
 	if (DirectoryRadio->GetValue()) {
 		EditRule.Location.SetPath(Directory->GetPath());
-	}
-	else if (FileRadio->GetValue()) {
+	} else if (FileRadio->GetValue()) {
 		EditRule.Location.Assign(File->GetPath());
 	}
 

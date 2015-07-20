@@ -87,8 +87,7 @@ void t4p::BookmarkViewClass::OnEditToggleBookmark(wxCommandEvent& event) {
 			t4p::BookmarkClass newBookmark(fileName, lineNumber, handle);
 			Feature.Bookmarks.push_back(newBookmark);
 		}
-	}
-	else {
+	} else {
 		// need to remove the bookmark from the list AND from
 		// the code control
 		ctrl->BookmarkClearAt(it->LineNumber);
@@ -134,8 +133,7 @@ void t4p::BookmarkViewClass::ShowBookmark(const t4p::BookmarkClass& bookmark) {
 	t4p::CodeControlClass* bookmarkCtrl = FindCodeControlAndSelect(bookmark.FileName.GetFullPath());
 	if (bookmarkCtrl) {
 		bookmarkCtrl->GotoLineAndEnsureVisible(bookmark.LineNumber);
-	}
-	else {
+	} else {
 		// need to open the file first
 		LoadCodeControl(bookmark.FileName.GetFullPath());
 		t4p::CodeControlClass* newlyOpenedCtrl = GetCurrentCodeControl();
@@ -156,13 +154,11 @@ void t4p::BookmarkViewClass::AddBookmarks(const wxFileName& fileName, t4p::CodeC
 			if (!added) {
 				// file does not contain this line number, this is a bad bookmark
 				it = Feature.Bookmarks.erase(it);
-			}
-			else {
+			} else {
 				it->Handle = handle;
 				++it;
 			}
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -200,8 +196,7 @@ void t4p::BookmarkViewClass::OnAppFileReverted(t4p::CodeControlEventClass& event
 		while (it != Feature.Bookmarks.end()) {
 			if (it->FileName == ctrlFileName) {
 				it = Feature.Bookmarks.erase(it);
-			}
-			else {
+			} else {
 				++it;
 			}
 		}

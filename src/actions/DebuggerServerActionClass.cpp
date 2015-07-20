@@ -210,8 +210,7 @@ void t4p::DebuggerServerActionClass::SessionWork(boost::asio::ip::tcp::socket& s
 			// xdebug xml
 			Log("response", response);
 			ParseAndPost(response, next, isDebuggerStopped);
-		}
-		else {
+		} else {
 			wxThread::Sleep(150);
 		}
 		if (isDebuggerStopped) {
@@ -235,112 +234,94 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 		if (initResponse.FromXml(xml, xmlError)) {
 			PostEvent(initResponse);
 		}
-	}
-	else if ("status" == cmdOnly) {
+	} else if ("status" == cmdOnly) {
 		t4p::DbgpStatusEventClass statusResponse;
 		if (statusResponse.FromXml(xml, xmlError)) {
 			PostEvent(statusResponse);
 		}
-	}
-	else if ("feature_get" == cmdOnly) {
+	} else if ("feature_get" == cmdOnly) {
 		t4p::DbgpFeatureGetEventClass featureGetResponse;
 		if (featureGetResponse.FromXml(xml, xmlError)) {
 			PostEvent(featureGetResponse);
 		}
-	}
-	else if ("feature_set" == cmdOnly) {
+	} else if ("feature_set" == cmdOnly) {
 		t4p::DbgpFeatureSetEventClass featureSetResponse;
 		if (featureSetResponse.FromXml(xml, xmlError)) {
 			PostEvent(featureSetResponse);
 		}
-	}
-	else if ("run" == cmdOnly || "step_into" == cmdOnly ||
+	} else if ("run" == cmdOnly || "step_into" == cmdOnly ||
 			"step_over" == cmdOnly || "step_out" == cmdOnly || "stop" == cmdOnly) {
 		t4p::DbgpContinueEventClass continueResponse;
 		if (continueResponse.FromXml(xml, xmlError)) {
 			PostEvent(continueResponse);
 			isDebuggerStopped = t4p::DBGP_STATUS_STOPPING == continueResponse.Status;
 		}
-	}
-	else if ("breakpoint_set" == cmdOnly) {
+	} else if ("breakpoint_set" == cmdOnly) {
 		t4p::DbgpBreakpointSetEventClass breakpointSetResponse;
 		if (breakpointSetResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakpointSetResponse);
 		}
-	}
-	else if ("breakpoint_get" == cmdOnly) {
+	} else if ("breakpoint_get" == cmdOnly) {
 		t4p::DbgpBreakpointGetEventClass breakpointGetResponse;
 		if (breakpointGetResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakpointGetResponse);
 		}
-	}
-	else if ("breakpoint_update" == cmdOnly) {
+	} else if ("breakpoint_update" == cmdOnly) {
 		t4p::DbgpBreakpointUpdateEventClass breakpointUpdateResponse;
 		if (breakpointUpdateResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakpointUpdateResponse);
 		}
-	}
-	else if ("breakpoint_remove" == cmdOnly) {
+	} else if ("breakpoint_remove" == cmdOnly) {
 		t4p::DbgpBreakpointRemoveEventClass breakpointRemoveResponse;
 		if (breakpointRemoveResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakpointRemoveResponse);
 		}
-	}
-	else if ("breakpoint_list" == cmdOnly) {
+	} else if ("breakpoint_list" == cmdOnly) {
 		t4p::DbgpBreakpointListEventClass breakpointListResponse;
 		if (breakpointListResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakpointListResponse);
 		}
-	}
-	else if ("stack_depth" == cmdOnly) {
+	} else if ("stack_depth" == cmdOnly) {
 		t4p::DbgpStackDepthEventClass stackDepthResponse;
 		if (stackDepthResponse.FromXml(xml, xmlError)) {
 			PostEvent(stackDepthResponse);
 		}
-	}
-	else if ("stack_get" == cmdOnly) {
+	} else if ("stack_get" == cmdOnly) {
 		t4p::DbgpStackGetEventClass stackGetResponse;
 		if (stackGetResponse.FromXml(xml, xmlError)) {
 			PostEvent(stackGetResponse);
 		}
-	}
-	else if ("context_names" == cmdOnly) {
+	} else if ("context_names" == cmdOnly) {
 		t4p::DbgpContextNamesEventClass contextNamesResponse;
 		if (contextNamesResponse.FromXml(xml, xmlError)) {
 			PostEvent(contextNamesResponse);
 		}
-	}
-	else if ("context_get" == cmdOnly) {
+	} else if ("context_get" == cmdOnly) {
 		t4p::DbgpContextGetEventClass contextGetResponse;
 		if (contextGetResponse.FromXml(xml, xmlError)) {
 			PostEvent(contextGetResponse);
 		}
-	}
-	else if ("property_get" == cmdOnly) {
+	} else if ("property_get" == cmdOnly) {
 		t4p::DbgpPropertyGetEventClass propertyGetResponse;
 		if (propertyGetResponse.FromXml(xml, xmlError)) {
 			PostEvent(propertyGetResponse);
 		}
-	}
-	else if ("property_value" == cmdOnly) {
+	} else if ("property_value" == cmdOnly) {
 		t4p::DbgpPropertyValueEventClass propertyValueResponse;
 		if (propertyValueResponse.FromXml(xml, xmlError)) {
 			PostEvent(propertyValueResponse);
 		}
-	}
-	else if ("property_set" == cmdOnly) {
+	} else if ("property_set" == cmdOnly) {
 		t4p::DbgpPropertySetEventClass propertySetResponse;
 		if (propertySetResponse.FromXml(xml, xmlError)) {
 			PostEvent(propertySetResponse);
 		}
-	}
-	else if ("break" == cmdOnly) {
+	} else if ("break" == cmdOnly) {
 		t4p::DbgpBreakEventClass breakResponse;
 		if (breakResponse.FromXml(xml, xmlError)) {
 			PostEvent(breakResponse);
 		}
-	}
-	else if ("eval" == cmdOnly) {
+	} else if ("eval" == cmdOnly) {
 		t4p::DbgpEvalEventClass evalResponse;
 		if (evalResponse.FromXml(xml, xmlError)
 
@@ -353,8 +334,7 @@ void t4p::DebuggerServerActionClass::ParseAndPost(const wxString& xml, const std
 				|| !evalResponse.Property.DataType.empty()
 				|| evalResponse.Property.NumChildren)) {
 			PostEvent(evalResponse);
-		}
-		else {
+		} else {
 			// most likely an error response
 			t4p::DbgpErrorEventClass errorResponse;
 			if (errorResponse.FromXml(xml, xmlError)) {

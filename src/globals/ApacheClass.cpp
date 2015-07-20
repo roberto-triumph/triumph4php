@@ -204,8 +204,7 @@ wxString t4p::ApacheClass::GetUri(const wxString& fileSystemPath, const wxString
 			}
 			if (!uriPath.IsEmpty() && uriPath[0] == wxT('/')) {
 				url = baseUrl + uriPath.Mid(1);
-			}
-			else {
+			} else {
 				url = baseUrl + uriPath;
 			}
 			break;
@@ -326,8 +325,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
 					currentPort = wxT("");
-				}
-				else if (inVirtualHost && !currentDocumentRoot.IsEmpty() && !currentServerName.IsEmpty()) {
+				} else if (inVirtualHost && !currentDocumentRoot.IsEmpty() && !currentServerName.IsEmpty()) {
 					SetVirtualHostMapping(currentDocumentRoot, currentServerName);
 					currentServerName = wxT("");
 					currentDocumentRoot = wxT("");
@@ -335,10 +333,8 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 				}
 			}
 		}
-	}
-
-	// wxIsWild(wxT("C:\\*.conf")) returns false, maybe it doesn't do wilcards in windows??
-	else if (includedFile.Contains(wxT("*"))) {
+	} else if (includedFile.Contains(wxT("*"))) {
+		// wxIsWild(wxT("C:\\*.conf")) returns false, maybe it doesn't do wilcards in windows??
 		wxFileName fileName(includedFile);
 		if (fileName.IsOk()) {
 			// ATTN: careful, in windows we need the volume in case the executable
@@ -356,8 +352,7 @@ void t4p::ApacheClass::ParseApacheConfigFile(const wxString& includedFile) {
 				}
 			}
 		}
-	}
-	else if (wxDirExists(includedFile)) {
+	} else if (wxDirExists(includedFile)) {
 		wxDir dir;
 		if (wxFileName::IsDirReadable(includedFile) && dir.Open(includedFile)) {
 			wxString file;

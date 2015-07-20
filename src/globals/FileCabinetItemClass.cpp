@@ -75,8 +75,7 @@ bool t4p::FileCabinetStoreClass::Store(soci::session& session, t4p::FileCabinetI
 		if (item.FileName.GetFullName().empty()) {
 			name = t4p::WxToChar(item.FileName.GetDirs().Last());
 			fullPath = item.FileName.GetPathWithSep();
-		}
-		else {
+		} else {
 			name = t4p::WxToChar(item.FileName.GetFullName());
 			fullPath = t4p::WxToChar(item.FileName.GetFullPath());
 		}
@@ -129,8 +128,7 @@ void t4p::FileCabinetBaseResultClass::Next() {
 	if (FullPath.empty()) {
 		Item.Id = 0;
 		Item.FileName.Assign(wxT(""));
-	}
-	else if (FullPath[FullPath.length() - 1] == '\\' ||
+	} else if (FullPath[FullPath.length() - 1] == '\\' ||
 			FullPath[FullPath.length() - 1] == '/') {
 		// check of the full path is a directory
 		// check the string ending instead of actually hitting the
@@ -139,8 +137,7 @@ void t4p::FileCabinetBaseResultClass::Next() {
 
 		Item.Id = Id;
 		Item.FileName.AssignDir(FullPath);
-	}
-	else {
+	} else {
 		Item.Id = Id;
 		Item.FileName.Assign(FullPath);
 	}

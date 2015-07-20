@@ -54,8 +54,7 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 		isArrayOrObject = true;
 		enclosingStart = wxT("[");
 		enclosingEnd = wxT("]");
-	}
-	else if (prop.DataType == wxT("object")) {
+	} else if (prop.DataType == wxT("object")) {
 		isArrayOrObject = true;
 		enclosingStart = wxT("{");
 		enclosingEnd = wxT("}");
@@ -64,8 +63,7 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 	if (isArrayOrObject) {
 		if (prop.DataType == wxT("array")) {
 			preview += wxString::Format("array(%d) ", prop.NumChildren);
-		}
-		else if (prop.DataType == wxT("object")) {
+		} else if (prop.DataType == wxT("object")) {
 			preview += prop.ClassName + wxT(" ");
 		}
 		preview += enclosingStart;
@@ -74,16 +72,13 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 			// or key => arrays
 			if (prop.ChildProperties[i].DataType == wxT("array")) {
 				preview += prop.ChildProperties[i].Name + wxT(" => array[ ... ]");
-			}
-			else if (prop.ChildProperties[i].DataType == wxT("object")) {
+			} else if (prop.ChildProperties[i].DataType == wxT("object")) {
 				preview += prop.ChildProperties[i].Name + wxT(" => { ... }");
-			}
-			else if (prop.ChildProperties[i].Name.empty()) {
+			} else if (prop.ChildProperties[i].Name.empty()) {
 				// special case for the nodes that have not been retrieved from
 				// the debug engine yet
 				preview += wxT(" ... ");
-			}
-			else {
+			} else {
 				preview += prop.ChildProperties[i].Name;
 				preview += wxT(" => ");
 				preview += prop.ChildProperties[i].Value;
@@ -93,8 +88,7 @@ static wxString VariablePreview(const t4p::DbgpPropertyClass& prop, int maxPrevi
 			}
 		}
 		preview += enclosingEnd;
-	}
-	else {
+	} else {
 		preview = prop.Value;
 	}
 
@@ -151,8 +145,7 @@ static void AppendTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& parent, con
 		for (child = prop.ChildProperties.begin(); child != prop.ChildProperties.end(); ++child) {
 			AppendTreeListItem(ctrl, newItem, *child);
 		}
-	}
-	else if (prop.HasChildren) {
+	} else if (prop.HasChildren) {
 		// insert a temporary child so that the item has an expand icon
 		// in the tree.
 		// we add an empty node because we know that the property that has children
@@ -179,8 +172,7 @@ static void ReplaceTreeListItem(wxTreeListCtrl* ctrl, wxTreeListItem& item, cons
 		for (child = prop.ChildProperties.begin(); child != prop.ChildProperties.end(); ++child) {
 			AppendTreeListItem(ctrl, item, *child);
 		}
-	}
-	else if (prop.HasChildren) {
+	} else if (prop.HasChildren) {
 		// insert a temporary child so that the item has an expand icon
 		// in the tree.
 		// we add an empty node because we know that the property that has children
@@ -325,8 +317,7 @@ void t4p::DebuggerViewClass::OnDebuggerOpenPanel(wxCommandEvent& event) {
 		panel = new t4p::DebuggerPanelClass(
 			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
-	}
-	else {
+	} else {
 		panel = (t4p::DebuggerPanelClass*)window;
 	}
 	panel->ResetStatus(Feature.IsDebuggerSessionActive);
@@ -345,8 +336,7 @@ void t4p::DebuggerViewClass::OnDbgpError(t4p::DbgpErrorEventClass& event) {
 
 		t4p::DebuggerPanelClass* panel = (t4p::DebuggerPanelClass*) window;
 		panel->EvalPanel->AppendError(event.Message);
-	}
-	else {
+	} else {
 		Feature.ResetDebugger();
 		std::vector<t4p::CodeControlClass*> codeCtrls = AllCodeControls();
 		for (size_t i = 0; i < codeCtrls.size(); ++i) {
@@ -395,8 +385,7 @@ void t4p::DebuggerViewClass::OnDbgpStackGet(t4p::DbgpStackGetEventClass& event) 
 	t4p::DebuggerStackPanelClass* stackPanel = NULL;
 	if (window) {
 		stackPanel = (t4p::DebuggerStackPanelClass*) window;
-	}
-	else {
+	} else {
 		stackPanel = new t4p::DebuggerStackPanelClass(GetOutlineNotebook(), ID_PANEL_DEBUGGER_STACK);
 		AddOutlineWindow(stackPanel, _("Stack"));
 	}
@@ -420,15 +409,12 @@ void t4p::DebuggerViewClass::OnDbgpContextGet(t4p::DbgpContextGetEventClass& eve
 	if (Feature.HasScopeChanged() && event.ContextId == 0) {
 		panel->VariablePanel->ClearLocalVariables();
 		panel->VariablePanel->SetLocalVariables(event.Properties);
-	}
-	else if (Feature.HasScopeChanged() && event.ContextId == 1) {
+	} else if (Feature.HasScopeChanged() && event.ContextId == 1) {
 		panel->VariablePanel->ClearGlobalVariables();
 		panel->VariablePanel->SetGlobalVariables(event.Properties);
-	}
-	else if (event.ContextId == 0) {
+	} else if (event.ContextId == 0) {
 		panel->VariablePanel->UpdateLocalVariables(event.Properties);
-	}
-	else if (event.ContextId == 1) {
+	} else if (event.ContextId == 1) {
 		panel->VariablePanel->UpdateGlobalVariables(event.Properties);
 	}
 }
@@ -476,8 +462,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerVariables(wxCommandEvent& event) {
 	t4p::DebuggerPanelClass* panel;
 	if (panelWindow) {
 		panel = (t4p::DebuggerPanelClass*) panelWindow;
-	}
-	else {
+	} else {
 		panel = new t4p::DebuggerPanelClass(
 			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
@@ -491,8 +476,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerLog(wxCommandEvent& event) {
 	t4p::DebuggerPanelClass* panel;
 	if (panelWindow) {
 		panel = (t4p::DebuggerPanelClass*) panelWindow;
-	}
-	else {
+	} else {
 		panel = new t4p::DebuggerPanelClass(
 			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
@@ -506,8 +490,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerBreakpoints(wxCommandEvent& event) {
 	t4p::DebuggerPanelClass* panel;
 	if (panelWindow) {
 		panel = (t4p::DebuggerPanelClass*) panelWindow;
-	}
-	else {
+	} else {
 		panel = new t4p::DebuggerPanelClass(
 			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
@@ -521,8 +504,7 @@ void t4p::DebuggerViewClass::OnViewDebuggerEval(wxCommandEvent& event) {
 	t4p::DebuggerPanelClass* panel;
 	if (panelWindow) {
 		panel = (t4p::DebuggerPanelClass*) panelWindow;
-	}
-	else {
+	} else {
 		panel = new t4p::DebuggerPanelClass(
 			GetToolsNotebook(), ID_PANEL_DEBUGGER, Feature, *this);
 		AddToolsWindow(panel, _("Debugger"));
@@ -587,8 +569,7 @@ void t4p::DebuggerViewClass::BreakpointRemove(const t4p::BreakpointWithHandleCla
 			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
 			it = Feature.Breakpoints.erase(it);
 			break;
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -617,8 +598,7 @@ void t4p::DebuggerViewClass::BreakpointDisable(const t4p::BreakpointWithHandleCl
 			it->Breakpoint.LineNumber == breakpointWithHandle.Breakpoint.LineNumber) {
 			it->Breakpoint.IsEnabled = false;
 			break;
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -648,8 +628,7 @@ void t4p::DebuggerViewClass::BreakpointEnable(const t4p::BreakpointWithHandleCla
 			it->Breakpoint.IsEnabled = true;
 			it->Handle = newHandle;
 			break;
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -681,8 +660,7 @@ void t4p::DebuggerViewClass::OnMarginClick(wxStyledTextEvent& event) {
 	bool removed = Feature.RemoveBreakpointAtLine(codeCtrl->GetFileName(), lineNumber);
 	if (removed) {
 		codeCtrl->BreakpointRemove(lineNumber);
-	}
-	else {
+	} else {
 		int handle = 0;
 		codeCtrl->BreakpointMarkAt(lineNumber, handle);
 		Feature.AddBreakpointAtLine(codeCtrl->GetFileName(), handle, lineNumber);
@@ -731,8 +709,7 @@ void t4p::DebuggerViewClass::OnToggleBreakpoint(wxCommandEvent& event) {
 	bool removed = Feature.RemoveBreakpointAtLine(codeCtrl->GetFileName(), lineNumber);
 	if (removed) {
 		codeCtrl->BreakpointRemove(lineNumber);
-	}
-	else {
+	} else {
 		int handle = 0;
 		codeCtrl->BreakpointMarkAt(lineNumber, handle);
 		Feature.AddBreakpointAtLine(codeCtrl->GetFileName(), handle, lineNumber);
@@ -841,8 +818,7 @@ t4p::DebuggerStackPanelClass::DebuggerStackPanelClass(wxWindow* parent, int id)
 void t4p::DebuggerStackPanelClass::ResetStatus(bool active) {
 	if (active) {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session active"));
-	}
-	else {
+	} else {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session inactive"));
 	}
 	this->Layout();
@@ -908,8 +884,7 @@ t4p::DebuggerVariablePanelClass::DebuggerVariablePanelClass(wxWindow* parent, in
 void t4p::DebuggerVariablePanelClass::ResetStatus(bool active) {
 	if (active) {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session active"));
-	}
-	else {
+	} else {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session inactive"));
 	}
 	this->Layout();
@@ -933,8 +908,7 @@ void t4p::DebuggerVariablePanelClass::UpdateLocalVariables(const std::vector<t4p
 		if (item.IsOk()) {
 			DeleteChildrenTreeListItems(VariablesList, item);
 			ReplaceTreeListItem(VariablesList, item, *it);
-		}
-		else {
+		} else {
 			AppendTreeListItem(VariablesList, LocalVariablesRoot, *it);
 		}
 	}
@@ -967,8 +941,7 @@ void t4p::DebuggerVariablePanelClass::UpdateGlobalVariables(const std::vector<t4
 		if (item.IsOk()) {
 			DeleteChildrenTreeListItems(VariablesList, item);
 			ReplaceTreeListItem(VariablesList, item, *it);
-		}
-		else {
+		} else {
 			AppendTreeListItem(VariablesList, GlobalVariablesRoot, *it);
 		}
 	}
@@ -1050,8 +1023,7 @@ void t4p::DebuggerVariablePanelClass::VariableAddChildren(const t4p::DbgpPropert
 	for (child = variable.ChildProperties.begin(); child != variable.ChildProperties.end(); ++child) {
 		if (child == variable.ChildProperties.begin()) {
 			ReplaceTreeListItem(VariablesList, firstChildItem, *child);
-		}
-		else {
+		} else {
 			AppendTreeListItem(VariablesList, itemToReplace, *child);
 		}
 	}
@@ -1125,8 +1097,7 @@ void t4p::DebuggerBreakpointPanelClass::OnToggleAllBreakpoints(wxCommandEvent& e
 	for (it = Feature.Breakpoints.begin(); it != Feature.Breakpoints.end(); ++it) {
 		if (newValue) {
 			View.BreakpointEnable(*it);
-		}
-		else {
+		} else {
 			View.BreakpointDisable(*it);
 		}
 
@@ -1158,8 +1129,7 @@ void t4p::DebuggerBreakpointPanelClass::OnItemValueChanged(wxDataViewEvent& even
 	bool isEnabled = BreakpointsList->GetToggleValue(row, 0);
 	if (isEnabled) {
 		View.BreakpointEnable(Feature.Breakpoints[row]);
-	}
-	else {
+	} else {
 		View.BreakpointDisable(Feature.Breakpoints[row]);
 	}
 }
@@ -1381,13 +1351,11 @@ t4p::DebuggerEvalPanelClass::DebuggerEvalPanelClass(wxWindow* parent, int id, t4
 	if (os == wxOS_WINDOWS_NT) {
 		fontName = wxT("Courier New");
 		fontSize = 10;
-	}
-	else if (os == wxOS_UNIX_LINUX) {
+	} else if (os == wxOS_UNIX_LINUX) {
 		// default font: some websites say Monospace is a good programming font
 		fontName = wxT("Monospace");
 		fontSize = 10;
-	}
-	else if (os == wxOS_MAC_OSX_DARWIN) {
+	} else if (os == wxOS_MAC_OSX_DARWIN) {
 		fontName = wxT("Monaco");
 		fontSize = 12;
 	}
@@ -1401,8 +1369,7 @@ t4p::DebuggerEvalPanelClass::~DebuggerEvalPanelClass() {
 void t4p::DebuggerEvalPanelClass::ResetStatus(bool active) {
 	if (active) {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session active"));
-	}
-	else {
+	} else {
 		this->StatusLabel->SetLabel(_("Status: Debugging Session inactive"));
 	}
 	this->Layout();
@@ -1432,30 +1399,26 @@ void t4p::DebuggerEvalPanelClass::PrettyPrint(const t4p::DbgpPropertyClass& prop
 	bool isArray = prop.DataType == wxT("array");
 	if (isArray) {
 		ExprResult->AppendText(wxString::Format(wxT("   => (array[%d]) ["), prop.NumChildren));
-	}
-	else {
+	} else {
 		ExprResult->AppendText(wxT("   => (") + prop.ClassName + wxT(") {"));
 	}
 	for (size_t i = 0; i < prop.ChildProperties.size(); ++i) {
 		wxString childValue = prop.ChildProperties[i].Value;
 		if (prop.ChildProperties[i].DataType == "object") {
 			childValue = prop.ChildProperties[i].ClassName + wxT(" { ... }");
-		}
-		else if (prop.ChildProperties[i].DataType == "array") {
+		} else if (prop.ChildProperties[i].DataType == "array") {
 			childValue = wxString::Format(wxT("(array[%d])"), prop.ChildProperties[i].NumChildren) + wxT(" [ ... ]");
 		}
 		if (i == 0) {
 			ExprResult->AppendText(wxT("\n        ") + prop.ChildProperties[i].Name + wxT(" => ") + childValue);
-		}
-		else {
+		} else {
 			ExprResult->AppendText(wxT("\n      , ") + prop.ChildProperties[i].Name + wxT(" => ") + childValue);
 		}
 	}
 
 	if (isArray) {
 		ExprResult->AppendText(wxT("\n   ]\n\n"));
-	}
-	else {
+	} else {
 		ExprResult->AppendText(wxT("\n   }\n\n"));
 	}
 }

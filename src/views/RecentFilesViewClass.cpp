@@ -61,13 +61,11 @@ void t4p::RecentFilesViewClass::OnRecentFileMenu(wxCommandEvent &event) {
 			int ret = wxMessageBox(_("File no longer exists. Remove from Recent list?\n") + fileName, _("Warning"),
 				wxCENTER | wxICON_ERROR | wxYES_NO);
 			remove = wxYES == ret;
-		}
-		else if (wxFileName::DirExists(fileName)) {
+		} else if (wxFileName::DirExists(fileName)) {
 			int ret = wxMessageBox(_("File is a directory. Remove from Recent list?\n") + fileName, _("Warning"),
 				wxCENTER | wxICON_ERROR | wxYES_NO);
 			remove = wxYES == ret;
-		}
-		else {
+		} else {
 			LoadCodeControl(fileName);
 		}
 		if (remove) {

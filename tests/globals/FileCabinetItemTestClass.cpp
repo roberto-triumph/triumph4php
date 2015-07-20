@@ -90,8 +90,7 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreFile) {
 	std::string fileToSave;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		fileToSave = "C:\\home\\user\\www\\test.php";
-	}
-	else {
+	} else {
 		fileToSave = "/home/user/www/test.php";
 	}
 
@@ -122,8 +121,7 @@ TEST_FIXTURE(FileCabinetFixtureClass, StoreDirectory) {
 	std::string fileToSave;
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		fileToSave = "C:\\home\\user\\www\\config\\";
-	}
-	else {
+	} else {
 		fileToSave = "/home/user/www/config/";
 	}
 

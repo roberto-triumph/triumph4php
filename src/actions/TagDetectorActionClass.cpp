@@ -143,8 +143,7 @@ std::vector<wxString> t4p::TagDetectorActionClass::DetectorScripts() {
 void t4p::TagDetectorActionClass::OnProcessComplete(wxCommandEvent &event) {
 	if (ParamsQueue.empty()) {
 		SignalEnd();
-	}
-	else {
+	} else {
 		NextDetection();
 	}
 }
@@ -154,14 +153,12 @@ void t4p::TagDetectorActionClass::OnProcessFailed(wxCommandEvent &event) {
 	wxString extensionMissingErr = wxT("requires the PDO and pdo_sqlite PHP extensions.");
 	if (msg.Find(extensionMissingErr) != wxNOT_FOUND) {
 		t4p::EditorLogError(t4p::ERR_MISSING_PHP_EXTENSIONS, msg);
-	}
-	else {
+	} else {
 		t4p::EditorLogErrorFix(event.GetString(), _("There is an unexpected error in the detector. Was it modified?"));
 	}
 	if (ParamsQueue.empty()) {
 		SignalEnd();
-	}
-	else {
+	} else {
 		NextDetection();
 	}
 }

@@ -76,17 +76,13 @@ static int BrowserIconsIndex(std::vector<wxBitmap>&  browserIcons, const wxStrin
 	lowerCaseBrowserName.LowerCase();
 	if (lowerCaseBrowserName.Contains(wxT("chrome"))) {
 		return 0;
-	}
-	else if (lowerCaseBrowserName.Contains(wxT("firefox"))) {
+	} else if (lowerCaseBrowserName.Contains(wxT("firefox"))) {
 		return 1;
-	}
-	else if (lowerCaseBrowserName.Contains(wxT("explorer"))) {
+	} else if (lowerCaseBrowserName.Contains(wxT("explorer"))) {
 		return 2;
-	}
-	else if (lowerCaseBrowserName.Contains(wxT("opera"))) {
+	} else if (lowerCaseBrowserName.Contains(wxT("opera"))) {
 		return 3;
-	}
-	else if (lowerCaseBrowserName.Contains(wxT("safari"))) {
+	} else if (lowerCaseBrowserName.Contains(wxT("safari"))) {
 		return 4;
 	}
 	return 5;
@@ -271,8 +267,7 @@ void t4p::RunBrowserViewClass::OnUrlToolDropDown(wxAuiToolBarEvent& event) {
 
 		// make sure the button is "un-stuck"
 		BrowserToolbar->SetToolSticky(event.GetId(), false);
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -292,11 +287,9 @@ void t4p::RunBrowserViewClass::OnUrlSearchTool(wxCommandEvent& event) {
 			GaugeDialog = NULL;
 		}
 		GaugeDialog = new t4p::GaugeDialogClass(GetMainWindow(), _("URL Detection"), _("Running URL Detection"));
-	}
-	else if (Feature.App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
+	} else if (Feature.App.Globals.UrlTagFinder.Count(sourceDirs) > 0) {
 		ShowUrlDialog();
-	}
-	else {
+	} else {
 		t4p::EditorLogWarningFix(
 			_("Could not determine URL routes."),
 			_("URL detector is not working. Are you using an unsupported framework?"));

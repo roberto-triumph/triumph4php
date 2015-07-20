@@ -339,8 +339,7 @@ void t4p::DirectorySearchClass::EnumerateNextDir(t4p::DirectoryWalkerClass& walk
 				walker.BeginSearch(*it);
 				HasCalledBegin = true;
 				HasCalledEnd = false;
-			}
-			else {
+			} else {
 				walker.EndSearch();
 				walker.BeginSearch(*it);
 				HasCalledBegin = true;
@@ -385,8 +384,7 @@ bool t4p::DirectorySearchClass::Walk(t4p::DirectoryWalkerClass& walker) {
 				walker.BeginSearch(*it);
 				HasCalledBegin = true;
 				HasCalledEnd = false;
-			}
-			else {
+			} else {
 				walker.EndSearch();
 				walker.BeginSearch(*it);
 				HasCalledBegin = true;
@@ -400,8 +398,7 @@ bool t4p::DirectorySearchClass::Walk(t4p::DirectoryWalkerClass& walker) {
 					MatchedFiles.push_back(filename);
 				}
 			}
-		}
-		else {
+		} else {
 			hit = walker.Walk(filename);
 			if (hit) {
 				MatchedFiles.push_back(filename);

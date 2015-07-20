@@ -100,8 +100,7 @@ void t4p::ChooseUrlDialogClass::OnFilterText(wxCommandEvent& event) {
 	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
 		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
-	}
-	else {
+	} else {
 		filteredUrls = GetFilteredUrls(filter);
 	}
 	FillUrlList(filteredUrls);
@@ -121,15 +120,13 @@ void t4p::ChooseUrlDialogClass::OnFilterKeyDown(wxKeyEvent& event) {
 			UrlList->SetSelection(selection  + 1);
 		}
 		Filter->SetFocus();
-	}
-	else if (event.GetKeyCode() == WXK_UP && event.GetModifiers() == wxMOD_NONE) {
+	} else if (event.GetKeyCode() == WXK_UP && event.GetModifiers() == wxMOD_NONE) {
 		int selection = UrlList->GetSelection();
 		if (selection > 0 && t4p::NumberLessThan(selection, UrlList->GetCount())) {
 			UrlList->SetSelection(selection  - 1);
 		}
 		Filter->SetFocus();
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -156,8 +153,7 @@ void t4p::ChooseUrlDialogClass::OnProjectChoice(wxCommandEvent& event) {
 	if (sel >= 1 && t4p::NumberLessThan(sel, ProjectChoice->GetCount())) {
 		t4p::ProjectClass* project = (t4p::ProjectClass*)ProjectChoice->GetClientData(sel);
 		filteredUrls = GetFilteredUrlsByProject(filter, *project);
-	}
-	else {
+	} else {
 		filteredUrls = GetFilteredUrls(filter);
 	}
 	FillUrlList(filteredUrls);
@@ -192,8 +188,7 @@ std::vector<t4p::UrlTagClass> t4p::ChooseUrlDialogClass::GetFilteredUrlsByProjec
 		wxString fullPath = fileName.GetFullPath();
 		if (!project.IsAPhpSourceFile(fullPath, FileType)) {
 			url =  filteredUrls.erase(url);
-		}
-		else {
+		} else {
 			url++;
 		}
 	}
@@ -224,8 +219,7 @@ std::vector<wxFileName> t4p::ChooseUrlDialogClass::ActiveSourceDirectories() {
 		for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
 			dirs.push_back(src->RootDirectory);
 		}
-	}
-	else {
+	} else {
 		for (project = Projects.begin(); project != Projects.end(); ++project) {
 			for (src = project->Sources.begin(); src != project->Sources.end(); ++src) {
 				dirs.push_back(src->RootDirectory);

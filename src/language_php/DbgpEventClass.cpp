@@ -50,8 +50,7 @@ static bool EnsureXmlRoot(wxXmlDocument& document, const wxString& xmlString, co
 		if (!valid) {
 			error = t4p::DBGP_XML_ERROR_TAG;
 		}
-	}
-	else {
+	} else {
 		error = t4p::DBGP_XML_ERROR_PARSE;
 	}
 	return valid;
@@ -146,17 +145,13 @@ static t4p::DbgpStatus StatusFromString(const wxString& str) {
 	wxString lower = str.Lower();
 	if (str == wxT("starting")) {
 		return t4p::DBGP_STATUS_STARTING;
-	}
-	else if (str == wxT("stopping")) {
+	} else if (str == wxT("stopping")) {
 		return t4p::DBGP_STATUS_STOPPING;
-	}
-	else if (str == wxT("stopped")) {
+	} else if (str == wxT("stopped")) {
 		return t4p::DBGP_STATUS_STOPPED;
-	}
-	else if (str == wxT("running")) {
+	} else if (str == wxT("running")) {
 		return t4p::DBGP_STATUS_RUNNING;
-	}
-	else if (str == wxT("break")) {
+	} else if (str == wxT("break")) {
 		return t4p::DBGP_STATUS_BREAK;
 	}
 	return t4p::DBGP_STATUS_UNKNOWN;
@@ -166,14 +161,11 @@ static t4p::DbgpReason ReasonFromString(const wxString& str) {
 	wxString lower = str.Lower();
 	if (str == wxT("ok")) {
 		return t4p::DBGP_REASON_OK;
-	}
-	else if (str == wxT("aborted")) {
+	} else if (str == wxT("aborted")) {
 		return t4p::DBGP_REASON_ABORTED;
-	}
-	else if (str == wxT("error")) {
+	} else if (str == wxT("error")) {
 		return t4p::DBGP_REASON_ERROR;
-	}
-	else if (str == wxT("exception")) {
+	} else if (str == wxT("exception")) {
 		return t4p::DBGP_REASON_EXCEPTION;
 	}
 	return t4p::DBGP_REASON_UNKNOWN;
@@ -183,39 +175,27 @@ static t4p::DbgpFeatures FeatureFromString(const wxString& str) {
 	wxString lower = str.Lower();
 	if (str == wxT("language_supports_threads")) {
 		return t4p::DBGP_FEATURE_LANGUAGE_SUPPORTS_THREADS;
-	}
-	else if (str == wxT("language_name")) {
+	} else if (str == wxT("language_name")) {
 		return t4p::DBGP_FEATURE_LANGUAGE_NAME;
-	}
-	else if (str == wxT("language_version")) {
+	} else if (str == wxT("language_version")) {
 		return t4p::DBGP_FEATURE_LANGUAGE_VERSION;
-	}
-	else if (str == wxT("encoding")) {
+	} else if (str == wxT("encoding")) {
 		return t4p::DBGP_FEATURE_ENCODING;
-	}
-	else if (str == wxT("protcol_version")) {
+	} else if (str == wxT("protcol_version")) {
 		return t4p::DBGP_FEATURE_PROTOCOL_VERSION;
-	}
-	else if (str == wxT("data_encoding")) {
+	} else if (str == wxT("data_encoding")) {
 		return t4p::DBGP_FEATURE_DATA_ENCODING;
-	}
-	else if (str == wxT("breakpoint_languages")) {
+	} else if (str == wxT("breakpoint_languages")) {
 		return t4p::DBGP_FEATURE_BREAKPOINT_LANGUAGES;
-	}
-	else if (str == wxT("breakpoint_types")) {
+	} else if (str == wxT("breakpoint_types")) {
 		return t4p::DBGP_FEATURE_BREAKPOINT_TYPES;
-	}
-	else if (str == wxT("multiple_sessions")) {
+	} else if (str == wxT("multiple_sessions")) {
 		return t4p::DBGP_FEATURE_MULTIPLE_SESSIONS;
-	}
-	else if (str == wxT("max_children")) {
+	} else if (str == wxT("max_children")) {
 		return t4p::DBGP_FEATURE_MAX_CHILDREN;
-	}
-	else if (str == wxT("max_data")) {
+	} else if (str == wxT("max_data")) {
 		return t4p::DBGP_FEATURE_MAX_DATA;
-	}
-
-	else if (str == wxT("max_depth")) {
+	} else if (str == wxT("max_depth")) {
 		return t4p::DBGP_FEATURE_MAX_DEPTH;
 	}
 	return t4p::DBGP_FEATURE_UNKNOWN;
@@ -1332,8 +1312,7 @@ std::string t4p::DbgpCommandClass::BreakpointFile(const wxString& filename, int 
 	args += wxString::Format(" -n %d", lineNumber);
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 	if (hitValue) {
@@ -1354,8 +1333,7 @@ std::string t4p::DbgpCommandClass::BreakpointCall(const wxString& function, bool
 	args += wxT(" -m ") + EscapeArg(function);
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 	if (hitValue) {
@@ -1377,8 +1355,7 @@ std::string t4p::DbgpCommandClass::BreakpointReturn(const wxString& function, bo
 	args += wxT(" -m ") + EscapeArg(function);
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 	if (hitValue) {
@@ -1400,8 +1377,7 @@ std::string t4p::DbgpCommandClass::BreakpointException(const wxString& exception
 	args += wxT(" -x ") + EscapeArg(exception);
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 
@@ -1418,8 +1394,7 @@ std::string t4p::DbgpCommandClass::BreakpointConditional(const wxString& filenam
 	args += wxString::Format(" -n %d", lineNumber);
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 
@@ -1435,8 +1410,7 @@ std::string t4p::DbgpCommandClass::BreakpointWatch(const wxString& expression, b
 	args += wxT("-t watch");
 	if (enabled) {
 		args += wxT(" -s enabled");
-	}
-	else {
+	} else {
 		args += wxT(" -s disabled");
 	}
 	return Build(

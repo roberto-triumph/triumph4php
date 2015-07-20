@@ -115,11 +115,9 @@ void t4p::TotalSearchDialogClass::OnMatchesListKeyDown(wxKeyEvent& event) {
 	bool skip = true;
 	if (event.GetKeyCode() == WXK_RETURN) {
 		skip = false;
-	}
-	else if (event.GetKeyCode() == WXK_UP) {
+	} else if (event.GetKeyCode() == WXK_UP) {
 		skip = true;
-	}
-	else if (event.GetKeyCode() == WXK_DOWN) {
+	} else if (event.GetKeyCode() == WXK_DOWN) {
 		skip = true;
 	}
 	if (!skip && t4p::NumberLessThan(nextIndex, MatchesList->GetCount())) {
@@ -173,12 +171,10 @@ void t4p::TotalSearchDialogClass::OnSearchKeyDown(wxKeyEvent& event) {
 			nextIndex = 0;
 		}
 		skip = false;
-	}
-	else if (event.GetKeyCode() == WXK_UP) {
+	} else if (event.GetKeyCode() == WXK_UP) {
 		if (nextIndex == 0) {
 			nextIndex = MatchesList->GetCount() - 1;
-		}
-		else {
+		} else {
 			nextIndex--;
 		}
 		skip = false;
@@ -237,21 +233,17 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 		if (t4p::TotalTagResultClass::CLASS_TAG == tag->Type) {
 			value = t4p::IcuToWx(tag->PhpTag.ClassName);
 			desc = tag->PhpTag.FullPath;
-		}
-		else if (t4p::TotalTagResultClass::FILE_TAG == tag->Type) {
+		} else if (t4p::TotalTagResultClass::FILE_TAG == tag->Type) {
 			value = tag->FileTag.Name();
 			desc = tag->FileTag.FullPath;
-		}
-		else if (t4p::TotalTagResultClass::FUNCTION_TAG == tag->Type) {
+		} else if (t4p::TotalTagResultClass::FUNCTION_TAG == tag->Type) {
 			value = t4p::IcuToWx(tag->PhpTag.Identifier);
 			desc = tag->PhpTag.FullPath;
-		}
-		else if (t4p::TotalTagResultClass::METHOD_TAG == tag->Type) {
+		} else if (t4p::TotalTagResultClass::METHOD_TAG == tag->Type) {
 			value = t4p::IcuToWx(tag->PhpTag.ClassName) +
 				wxT("::") + t4p::IcuToWx(tag->PhpTag.Identifier);
 			desc = tag->PhpTag.FullPath;
-		}
-		else if (t4p::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
+		} else if (t4p::TotalTagResultClass::TABLE_DATA_TAG == tag->Type) {
 			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
@@ -259,8 +251,7 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 				+ tag->TableTag.TableName
 				+ _(" in connection ")
 				+ t4p::IcuToWx(dbTag.Label);
-		}
-		else if (t4p::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
+		} else if (t4p::TotalTagResultClass::TABLE_DEFINITION_TAG == tag->Type) {
 			t4p::DatabaseTagClass dbTag;
 			Feature.App.Globals.FindDatabaseTagByHash(tag->TableTag.ConnectionHash, dbTag);
 			value = tag->TableTag.TableName;
@@ -277,11 +268,9 @@ void t4p::TotalSearchDialogClass::OnSearchComplete(t4p::TotalTagSearchCompleteEv
 	}
 	if (MatchesList->GetCount() == 0) {
 		MatchesLabel->SetLabel(_("No matches found"));
-	}
-	else if (MatchesList->GetCount() == 1) {
+	} else if (MatchesList->GetCount() == 1) {
 		MatchesLabel->SetLabel(_("1 match found"));
-	}
-	else {
+	} else {
 		MatchesLabel->SetLabel(wxString::Format("%ld matches found", event.Tags.size()));
 	}
 	Timer.Start(300, wxTIMER_CONTINUOUS);

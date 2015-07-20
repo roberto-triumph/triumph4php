@@ -95,12 +95,10 @@ bool t4p::FinderClass::FindPrevious(const UnicodeString& text, int32_t start) {
 	if (t4p::FinderClass::EXACT == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, true);
-	}
-	else if (t4p::FinderClass::CASE_INSENSITIVE == Mode) {
+	} else if (t4p::FinderClass::CASE_INSENSITIVE == Mode) {
 		ResetLastHit();
 		found = FindPreviousExact(text, start, false);
-	}
-	else {
+	} else {
 		// lazy way of backwards searching, search from the beginning until
 		// we find the last hit before start
 		int32_t position = 0,
@@ -187,8 +185,7 @@ int t4p::FinderClass::ReplaceAllMatches(UnicodeString& text) const {
 				pos = text.indexOf(Expression, pos + replacement.length());
 				++matches;
 			}
-		}
-		else {
+		} else {
 			matcher = Pattern->matcher(text, error);
 			if (U_SUCCESS(error) && matcher) {
 				while (matcher->find()) {
@@ -246,8 +243,7 @@ bool t4p::FinderClass::FindNextExact(const UnicodeString& text, int32_t start, b
 		UnicodeString expressionLower(Expression);
 		expressionLower.toLower();
 		foundIndex = textLower.indexOf(expressionLower, start);
-	}
-	else {
+	} else {
 		foundIndex = text.indexOf(Expression, start);
 	}
 	IsFound = -1 != foundIndex;
@@ -266,8 +262,7 @@ bool t4p::FinderClass::FindPreviousExact(const UnicodeString& text, int32_t star
 		UnicodeString expressionLower(Expression);
 		expressionLower.toLower();
 		foundIndex = t4p::FindPrevious(textLower, expressionLower, start);
-	}
-	else {
+	} else {
 		foundIndex = t4p::FindPrevious(text, Expression, start);
 	}
 	IsFound = -1 != foundIndex;
@@ -283,8 +278,7 @@ bool t4p::FinderClass::FindNextRegularExpression(const UnicodeString& text, int3
 		UnicodeString findText(text);
 		if (start > 0 && start < text.length()) {
 			findText.setTo(text, start);
-		}
-		else if (start > 0) {
+		} else if (start > 0) {
 			findText = UNICODE_STRING_SIMPLE("");
 		}
 		int32_t foundPos = 0,

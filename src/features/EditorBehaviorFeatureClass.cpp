@@ -234,8 +234,7 @@ void t4p::EditorKeyboardCommandClass::InitFromString(const wxString& shortcut) {
 		// turn wx keys, modifiers into stc counterparts
 		KeyCode = WxKeyCodeToSciKeyCode(wxKeyCode);
 		Modifiers = WxModifiersToSciModifiers(wxModifiers);
-	}
-	else {
+	} else {
 		// empty string == no shortcut
 		KeyCode = 0;
 		Modifiers = 0;

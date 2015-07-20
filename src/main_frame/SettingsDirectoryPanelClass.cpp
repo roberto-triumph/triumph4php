@@ -71,14 +71,12 @@ t4p::SettingsDirectoryPanelClass::SettingsDirectoryPanelClass(wxWindow* parent, 
 		UserDataDirectory->SetValue(0);
 		CustomDirectory->SetValue(0);
 		SettingsDirectory->Enable(false);
-	}
-	else if (settingsDir == userDir) {
+	} else if (settingsDir == userDir) {
 		ApplicationDirectory->SetValue(0);
 		UserDataDirectory->SetValue(1);
 		CustomDirectory->SetValue(0);
 		SettingsDirectory->Enable(false);
-	}
-	else {
+	} else {
 		ApplicationDirectory->SetValue(0);
 		UserDataDirectory->SetValue(0);
 		CustomDirectory->SetValue(1);
@@ -96,8 +94,7 @@ void t4p::SettingsDirectoryPanelClass::OnUserDataDir(wxCommandEvent& event) {
 			wxMessageBox(wxT("Could not create directory: ") + userDir.GetPath(), wxT("Error"));
 			return;
 		}
-	}
-	else if (!userDir.IsDirWritable()) {
+	} else if (!userDir.IsDirWritable()) {
 		wxMessageBox(wxT("Directory is not writable: ") + userDir.GetPath(), wxT("Error"));
 		return;
 	}
@@ -113,8 +110,7 @@ void t4p::SettingsDirectoryPanelClass::OnAppDir(wxCommandEvent& event) {
 			wxMessageBox(wxT("Could not create directory: ") + appDir.GetPath(), wxT("Error"));
 			return;
 		}
-	}
-	else if (!appDir.IsDirWritable()) {
+	} else if (!appDir.IsDirWritable()) {
 		wxMessageBox(wxT("Directory is not writable: ") + appDir.GetPath(), wxT("Error"));
 		return;
 	}

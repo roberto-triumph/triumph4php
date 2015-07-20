@@ -90,8 +90,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	if (name.IsDir()) {
 		wxMessageBox(_("You can only drop files (not directories) into this control"));
 		return false;
-	}
-	else if (!name.IsOk()) {
+	} else if (!name.IsOk()) {
 		wxMessageBox(_("Invalid file:") + fileNameString);
 		return false;
 	}
@@ -116,8 +115,7 @@ bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString&
 	if (good) {
 		tagFinderlist->TagParser.BuildResourceCacheForFile(wxT(""), fileNameString, contents, false);
 		Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
-	}
-	else {
+	} else {
 		delete workingCache;
 	}
 

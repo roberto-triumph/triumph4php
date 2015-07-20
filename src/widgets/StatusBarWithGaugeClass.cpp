@@ -52,8 +52,7 @@ void t4p::StatusBarWithGaugeClass::UpdateGauge(int id, int update) {
 		wxGauge* gauge = Gauges[id];
 		if (update != INDETERMINATE_MODE) {
 			gauge->SetValue(update);
-		}
-		else {
+		} else {
 			gauge->Pulse();
 		}
 	}
@@ -64,8 +63,7 @@ void t4p::StatusBarWithGaugeClass::SwitchMode(int id, int mode, int value, int r
 		wxGauge* gauge = Gauges[id];
 		if (INDETERMINATE_MODE == mode) {
 			gauge->Pulse();
-		}
-		else {
+		} else {
 			// must set range first, otherwise value could be "invalid" (outside the
 			// previous range)
 			gauge->SetRange(range);
@@ -79,8 +77,7 @@ void t4p::StatusBarWithGaugeClass::IncrementGauge(int id, int increment) {
 		wxGauge* gauge = Gauges[id];
 		if (increment != INDETERMINATE_MODE) {
 			gauge->SetValue(gauge->GetValue() + increment);
-		}
-		else {
+		} else {
 			gauge->Pulse();
 		}
 	}
@@ -94,8 +91,7 @@ void t4p::StatusBarWithGaugeClass::IncrementAndRenameGauge(int id, const wxStrin
 		wxGauge* gauge = Gauges[id];
 		if (increment != INDETERMINATE_MODE) {
 			gauge->SetValue(gauge->GetValue() + increment);
-		}
-		else {
+		} else {
 			gauge->Pulse();
 		}
 	}

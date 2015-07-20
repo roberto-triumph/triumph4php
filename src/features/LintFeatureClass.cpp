@@ -160,8 +160,7 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 		std::vector<UnicodeString> loadErrors; // not sure how to propagate these errors
 		Suppressions.Init(SuppressionFile, loadErrors);
 		HasLoadedSuppressions = true;
-	}
-	else if (!HasLoadedSuppressions) {
+	} else if (!HasLoadedSuppressions) {
 		// no file== don't bother trying to load the suppression file
 		// (so that we don't generate file not found errors)
 		HasLoadedSuppressions = true;
@@ -199,8 +198,7 @@ bool t4p::ParserDirectoryWalkerClass::Walk(const wxString& fileName) {
 
 	if (!hasErrors) {
 		WithNoErrors++;
-	}
-	else {
+	} else {
 		WithErrors++;
 		ret = true;
 	}
@@ -250,16 +248,13 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 		if (t4p::PhpIdentifierLintResultClass::UNKNOWN_CLASS == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown class ") + identifierResult.Identifier;
 			isSuppressed = suppressedClass;
-		}
-		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_METHOD == identifierResult.Type) {
+		} else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_METHOD == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown method ") + identifierResult.Identifier;
 			isSuppressed = suppressedMethod;
-		}
-		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
+		} else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_FUNCTION == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown function ") + identifierResult.Identifier;
 			isSuppressed = suppressedFunction;
-		}
-		else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
+		} else if (t4p::PhpIdentifierLintResultClass::UNKNOWN_PROPERTY == identifierResult.Type) {
 			lintResult.Error = UNICODE_STRING_SIMPLE("Unknown property ") + identifierResult.Identifier;
 			isSuppressed = suppressedProperty;
 		}
@@ -295,8 +290,7 @@ std::vector<pelet::LintResultsClass> t4p::ParserDirectoryWalkerClass::GetLastErr
 					callResult.Identifier.getTerminatedBuffer(),
 					callResult.ExpectedCount,
 					callResult.ActualCount);
-			}
-			else if (callResult.Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
+			} else if (callResult.Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
 				written = u_sprintf(buf,
 					"Too many arguments to function `%S`: expected %d but calling with %d arguments",
 					callResult.Identifier.getTerminatedBuffer(),

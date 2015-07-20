@@ -162,14 +162,12 @@ void* t4p::ThreadActionClass::Entry() {
 				wxASSERT_MSG(true, e.what());
 			}
 			ActionComplete(action);
-		}
-		else if (action) {
+		} else if (action) {
 			// we want to exit, don't call action->BackgroundWork
 			// as it can take a while to complete
 			ActionComplete(action);
 			break;
-		}
-		else if (!TestDestroy()) {
+		} else if (!TestDestroy()) {
 			// no action to work on, wait a bit
 			// 100 milliseconds = 100 microseconds * 1000
 			wxMicroSleep(100 * 1000);
@@ -327,8 +325,7 @@ void t4p::RunningThreadsClass::CancelAction(int actionId) {
 		if (action->GetActionId() != actionId) {
 			// keep this action
 			checked.push(action);
-		}
-		else {
+		} else {
 			// this action we need to remove
 			delete action;
 		}
@@ -420,8 +417,7 @@ void t4p::RunningThreadsClass::PostEvent(wxEvent& event) {
 	for (it = Handlers.begin(); it != Handlers.end(); ++it) {
 		if (DoPostEvents) {
 			wxPostEvent(*it, event);
-		}
-		else {
+		} else {
 			(*it)->ProcessEvent(event);
 		}
 	}

@@ -141,8 +141,7 @@ int main(int argc, char** argv) {
 		FileName = wxT("C:\\Users\\roberto\\Documents\\triumph4php\\php_detectors\\lib\\Zend\\Config.php");
 		DirName = wxT("C:\\Users\\roberto\\sample_php_project");
 		DbFileName = wxT("resource.db");
-	}
-	else {
+	} else {
 		FileName = wxT("/home/roberto/workspace/triumph4php/php_detectors/lib/Zend/Config.php");
 		DirName = wxT("/home/roberto/public_html/wordpress");
 		DbFileName = wxT("resource.db");
@@ -158,30 +157,23 @@ int main(int argc, char** argv) {
 			<< "6. Variable Linter (On Project)" << std::endl;
 		std::string in;
 		std::cin >> test;
-	}
-	else {
+	} else {
 		test = argv[1];
 	}
 
 	if (test == "1") {
 		ProfileLexer();
-	}
-	else if (test == "2") {
+	} else if (test == "2") {
 		ProfileParser();
-	}
-	else if (test == "3") {
+	} else if (test == "3") {
 		ProfileParserOnLargeProject();
-	}
-	else if (test == "4") {
+	} else if (test == "4") {
 		ProfileTagParserOnLargeProject();
-	}
-	else if (test == "5") {
+	} else if (test == "5") {
 		ProfileTagSearch();
-	}
-	else if (test == "6") {
+	} else if (test == "6") {
 		ProfileVariableLintOnLargeProject();
-	}
-	else if (test == "--help" || test == "-h") {
+	} else if (test == "--help" || test == "-h") {
 		std::cout << "this is a program that is used to profile PHP parsing ang tag cache" << std::endl
 			<< "usage: tag_finder_profiler [test]" << std::endl
 			 << "[test] can be one of:" << std::endl
@@ -191,8 +183,7 @@ int main(int argc, char** argv) {
 			<< "4 (for tagparser On Project)" << std::endl
 			<< "5 (for tagfinder On Project)" << std::endl
 			<< "6 (for variable linter On Project)" << std::endl;
-	}
-	else {
+	} else {
 		std::cout << "unknown test:" << test << std::endl;
 	}
 
@@ -265,8 +256,7 @@ void ProfileParser() {
 	std::string stdFile(FileName.ToAscii());
 	if (parser.LintFile(stdFile, error)) {
 		printf("No syntax errors on %s\n", (const char *)FileName.ToAscii());
-	}
-	else {
+	} else {
 		UFILE *out = u_finit(stdout, NULL, NULL);
 		u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
 			(const char*)FileName.ToAscii(), error.LineNumber);
@@ -353,8 +343,7 @@ bool ParserDirectoryWalkerClass::Walk(const wxString& file) {
 		UnicodeString uniFile = t4p::WxToIcu(file);
 		if (Parser.LintFile(ffile.fp(), uniFile, error)) {
 			WithNoErrors++;
-		}
-		else {
+		} else {
 			UFILE *out = u_finit(stdout, NULL, NULL);
 			u_fprintf(out, "%S on file %s around line %d\n", error.Error.getTerminatedBuffer(),
 				(const char*)file.ToAscii(), error.LineNumber);
@@ -437,8 +426,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 						callResults[i].ActualCount,
 						callResults[i].File.getTerminatedBuffer(),
 						callResults[i].LineNumber);
-				}
-				else if (callResults[i].Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
+				} else if (callResults[i].Type == t4p::PhpFunctionCallLintResultClass::TOO_MANY_ARGS) {
 					u_fprintf(out,
 						"too many arguments to function `%S`: expected %d but calling with %d arguments on file %S around line %d\n",
 						callResults[i].Identifier.getTerminatedBuffer(),
@@ -454,8 +442,7 @@ bool VariableLinterWalkerClass::Walk(const wxString& file) {
 
 		if (results.empty() && identifierResults.empty() && callResults.empty()) {
 			WithNoErrors++;
-		}
-		else {
+		} else {
 			WithErrors++;
 		}
 		return true;

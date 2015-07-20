@@ -74,20 +74,15 @@ t4p::TotalTagResultClass::TotalTagResultClass(const t4p::PhpTagClass& phpTag)
 , Type(t4p::TotalTagResultClass::CLASS_TAG) {
 	if (t4p::PhpTagClass::CLASS == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::CLASS_TAG;
-	}
-	else if (t4p::PhpTagClass::FUNCTION == PhpTag.Type) {
+	} else if (t4p::PhpTagClass::FUNCTION == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
-	}
-	else if (t4p::PhpTagClass::MEMBER == PhpTag.Type) {
+	} else if (t4p::PhpTagClass::MEMBER == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
-	}
-	else if (t4p::PhpTagClass::METHOD == PhpTag.Type) {
+	} else if (t4p::PhpTagClass::METHOD == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
-	}
-	else if (t4p::PhpTagClass::CLASS_CONSTANT == PhpTag.Type) {
+	} else if (t4p::PhpTagClass::CLASS_CONSTANT == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::METHOD_TAG;
-	}
-	else if (t4p::PhpTagClass::DEFINE == PhpTag.Type) {
+	} else if (t4p::PhpTagClass::DEFINE == PhpTag.Type) {
 		Type = t4p::TotalTagResultClass::FUNCTION_TAG;
 	}
 }

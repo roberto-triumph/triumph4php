@@ -203,8 +203,7 @@ bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 			wxString newFullPath = fileDialog.GetPath();
 			if (!phpSourceCodeCtrl->SaveAndTrackFile(newFullPath, willDestroy)) {
 				wxMessageBox(wxT("Could Not Save File."));
-			}
-			else {
+			} else {
 				wxString newFilename, extension;
 				bool hasExtension = false;
 				wxFileName::SplitPath(newFullPath, NULL, NULL, &newFilename,
@@ -219,12 +218,10 @@ bool t4p::NotebookClass::SavePage(int pageIndex, bool willDestroy) {
 				EventSink->Publish(createdEvt);
 			}
 		}
-	}
-	else {
+	} else {
 		if (phpSourceCodeCtrl && !phpSourceCodeCtrl->SaveAndTrackFile(wxT(""), willDestroy)) {
 			wxMessageBox(wxT("Could Not Save File."));
-		}
-		else {
+		} else {
 			saved = true;
 		}
 	}
@@ -384,14 +381,11 @@ void t4p::NotebookClass::LoadPage(const wxString& filename, bool doFreeze) {
 			// tell the app that a file has been opened
 			t4p::CodeControlEventClass openEvent(t4p::EVENT_APP_FILE_OPENED, newCode);
 			EventSink->Publish(openEvent);
-		}
-		else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
+		} else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
 			t4p::EditorLogError(t4p::ERR_INVALID_FILE, filename);
-		}
-		else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+		} else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
 			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, filename);
-		}
-		else if (t4p::FindInFilesClass::FILE_TOO_LARGE == error) {
+		} else if (t4p::FindInFilesClass::FILE_TOO_LARGE == error) {
 			t4p::EditorLogError(t4p::ERR_FILE_TOO_LARGE, filename);
 		}
 	}
@@ -439,8 +433,7 @@ bool t4p::NotebookClass::SaveCurrentPageAsNew() {
 	if (codeCtrl) {
 		if (codeCtrl->IsNew()) {
 			SaveCurrentPage();
-		}
-		else {
+		} else {
 	 		wxString fileFilter = CreateWildcardString();
 			int filterIndex = WilcardIndex(codeCtrl->GetFileType());
 			wxFileDialog fileDialog(this, wxT("Save to a new PHP File"), wxT(""), wxT(""),
@@ -484,8 +477,7 @@ bool t4p::NotebookClass::SaveAllModifiedPages() {
 		dialog.Center();
 		if (wxID_CANCEL == dialog.ShowModal()) {
 			changed = false;
-		}
-		else {
+		} else {
 			wxArrayInt selections = dialog.GetSelections();
 			for (size_t i = 0; i < selections.size(); ++i) {
 				SavePage(modifiedPageIndexes[selections[i]], false);
@@ -538,8 +530,7 @@ void t4p::NotebookClass::ShowContextMenu(wxAuiNotebookEvent& event) {
 	}
 	if (notebooks.size() == 2) {
 		menu.Append(ID_MOVE_TAB_TO_NOTEBOOK_1, wxT("Move This Tab To Other Notebook"));
-	}
-	else if (notebooks.size() > 2) {
+	} else if (notebooks.size() > 2) {
 		for (size_t i = 0; i < notebooks.size(); i++) {
 			if (notebooks[i] != this) {
 				wxAuiPaneInfo info = AuiManager->GetPane(notebooks[i]);
@@ -570,12 +561,10 @@ void t4p::NotebookClass::OnMovePage(wxCommandEvent& event) {
 	if (notebooks.size() == 2) {
 		if (notebooks[0] == this) {
 			notebooks[1]->Adopt(ctrl, this);
-		}
-		else if (notebooks[1] == this) {
+		} else if (notebooks[1] == this) {
 			notebooks[0]->Adopt(ctrl, this);
 		}
-	}
-	else {
+	} else {
 		int index = event.GetId() - ID_MOVE_TAB_TO_NOTEBOOK_1;
 		if (index >= 0 && t4p::NumberLessThan(index, notebooks.size())) {
 			t4p::NotebookClass* destNotebook = notebooks[index];
@@ -625,8 +614,7 @@ void t4p::NotebookClass::ClosePage(int index) {
 			}
 			doDeletePage = true;
 		}
-	}
-	else {
+	} else {
 		doDeletePage = true;
 	}
 	if (doDeletePage) {
@@ -722,14 +710,11 @@ wxString t4p::NotebookClass::CreateWildcardString() const {
 int t4p::NotebookClass::WilcardIndex(t4p::FileType type) {
 	if (t4p::FILE_TYPE_PHP == type) {
 		return 0;
-	}
-	else if (t4p::FILE_TYPE_CSS == type) {
+	} else if (t4p::FILE_TYPE_CSS == type) {
 		return 1;
-	}
-	else if (t4p::FILE_TYPE_SQL == type) {
+	} else if (t4p::FILE_TYPE_SQL == type) {
 		return 2;
-	}
-	else if (t4p::FILE_TYPE_JS == type) {
+	} else if (t4p::FILE_TYPE_JS == type) {
 		return 3;
 	}
 	return 4;
@@ -793,12 +778,10 @@ void t4p::NotebookClass::SplitHorizontally() {
 		// notebook to be closest to the bottom
 		row = 2;
 		insertLevel = wxAUI_INSERT_ROW;
-	}
-	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
+	} else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
 		position++;
 		insertLevel = wxAUI_INSERT_PANE;
-	}
-	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
+	} else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
 		row++;
 		insertLevel = wxAUI_INSERT_ROW;
 	}
@@ -806,8 +789,7 @@ void t4p::NotebookClass::SplitHorizontally() {
 
 	if (GetPageCount() > 1) {
 		newNotebook->Adopt(GetCurrentCodeControl(), this);
-	}
-	else {
+	} else {
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 	}
 	AuiManager->InsertPane(newNotebook,
@@ -857,20 +839,17 @@ void t4p::NotebookClass::SplitVertically() {
 		direction = wxAUI_DOCK_RIGHT;
 		row = t4p::AuiRowCount(*AuiManager, wxAUI_DOCK_RIGHT);
 		insertLevel = wxAUI_INSERT_ROW;
-	}
-	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
+	} else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_RIGHT) {
 		row--;
 		insertLevel = wxAUI_INSERT_ROW;
-	}
-	else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
+	} else if (currentNotebookInfo.dock_direction == wxAUI_DOCK_BOTTOM) {
 		position++;
 		insertLevel = wxAUI_INSERT_PANE;
 	}
 	newNotebookSize.Scale(0.5, 1);
 	if (GetPageCount() > 1) {
 		newNotebook->Adopt(GetCurrentCodeControl(), this);
-	}
-	else {
+	} else {
 		newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
 	}
 	AuiManager->InsertPane(newNotebook,
@@ -902,8 +881,7 @@ void t4p::NotebookClass::SplitVertically() {
 void t4p::NotebookClass::OnMenuSplit(wxCommandEvent& event) {
 	if (event.GetId() == ID_SPLIT_HORIZONTALLY) {
 		SplitHorizontally();
-	}
-	else if (event.GetId() == ID_SPLIT_VERTICALLY) {
+	} else if (event.GetId() == ID_SPLIT_VERTICALLY) {
 		SplitVertically();
 	}
 }

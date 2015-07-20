@@ -71,8 +71,7 @@ static bool SaveAllModifiedPages(std::vector<t4p::NotebookClass*> notebooks, wxW
 		dialog.Center();
 		if (wxID_CANCEL == dialog.ShowModal()) {
 			changed = false;
-		}
-		else {
+		} else {
 			wxArrayInt selections = dialog.GetSelections();
 			for (size_t i = 0; i < selections.size(); ++i) {
 				t4p::NotebookClass* notebook = notebooks[notebookIndexes[selections[i]]];
@@ -136,8 +135,7 @@ void t4p::FileOperationsViewClass::AddKeyboardShortcuts(std::vector<t4p::Dynamic
 	t4p::DynamicCmdClass cmd(item, wxT("File-Close"));
 	if (info.GetOperatingSystemId() & wxOS_WINDOWS_NT) {
 		cmd.AddShortcut(wxT("CTRL+F4"));
-	}
-	else {
+	} else {
 		cmd.AddShortcut(wxT("CTRL+W"));
 	}
 	shortcuts.push_back(cmd);
@@ -299,8 +297,7 @@ void t4p::FileOperationsViewClass::OnAppFilePageChanged(t4p::CodeControlEventCla
 void t4p::FileOperationsViewClass::OnCmdFileOpen(t4p::OpenFileCommandEventClass& event) {
 	if (event.LineNumber > 0) {
 		FileOpenLine(event.FullPath, event.LineNumber);
-	}
-	else {
+	} else {
 		FileOpenPosition(event.FullPath, event.StartingPos, event.Length);
 	}
 }
@@ -348,8 +345,7 @@ void t4p::FileOperationsViewClass::UpdateStatusBar() {
 
 		wxString s = wxString::Format(wxT("Line:%d Column:%d Offset:%d"), line, column, pos);
 		GetStatusBarWithGauge()->SetColumn1Text(s);
-	}
-	else {
+	} else {
 		GetStatusBarWithGauge()->SetColumn1Text(wxEmptyString);
 	}
 }
@@ -364,8 +360,7 @@ void t4p::FileOperationsViewClass::MenuUpdate(bool isClosingPage) {
 			// since we get the close event BEFORE the code control
 			// is removed
 			hasEditors = notebook->GetPageCount() > 1;
-		}
-		else {
+		} else {
 			hasEditors = notebook->GetPageCount() > 0;
 		}
 

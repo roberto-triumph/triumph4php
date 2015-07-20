@@ -48,8 +48,7 @@ void t4p::GlobalsChangeHandlerClass::OnDatabaseTagsComplete(t4p::ActionEventClas
 	while(info != Globals.DatabaseTags.end()) {
 		if (info->IsDetected) {
 			info = Globals.DatabaseTags.erase(info);
-		}
-		else {
+		} else {
 			info++;
 		}
 	}

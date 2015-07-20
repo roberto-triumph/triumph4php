@@ -58,8 +58,7 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 	if (isStaticCall) {
 		// only static methods can be accessed with the '::' operator
 		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT == tag.Type || tag.IsStatic;
-	}
-	else {
+	} else {
 		// static methods can be accessed via the -> operator
 		passesStaticCheck = t4p::PhpTagClass::CLASS_CONSTANT != tag.Type;
 	}
@@ -73,8 +72,7 @@ static bool IsResourceVisible(const t4p::PhpTagClass& tag, const pelet::Variable
 		// properly. then, by a process of elimination, if the tag class is not
 		// the symbol then we only show protected/public resources
 		passesVisibilityCheck = tag.IsProtected;
-	}
-	else if (!passesVisibilityCheck) {
+	} else if (!passesVisibilityCheck) {
 		//not checking isThisCalled
 		passesVisibilityCheck = isThisCall;
 	}
@@ -179,22 +177,18 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 		if (variable == symbol.Variable) {
 			if (t4p::SymbolClass::SCALAR == symbol.Type) {
 				type = "primitive";
-			}
-			else if (t4p::SymbolClass::ARRAY == symbol.Type) {
+			} else if (t4p::SymbolClass::ARRAY == symbol.Type) {
 				type = "array";
-			}
-			else if (!symbol.PhpDocType.isEmpty()) {
+			} else if (!symbol.PhpDocType.isEmpty()) {
 				// user declares a type (in a PHPDoc comment  @var $dog Dog
 				type = symbol.PhpDocType;
-			}
-			else if (symbol.ChainList.size() == 1) {
+			} else if (symbol.ChainList.size() == 1) {
 				// variable was created with a 'new' or single function call
 				// the  ResolveResourceType will get the function return type
 				// if the variable was created from a function.
 				UnicodeString resourceToLookup = symbol.ChainList[0].Name;
 				type = tagFinderList.ResolveResourceType(resourceToLookup, sourceDirs);
-			}
-			else if (!symbol.ChainList.empty()) {
+			} else if (!symbol.ChainList.empty()) {
 				// go through the chain list; the first item in the list may be a variable
 				pelet::ScopeClass peletScope;
 				pelet::VariableClass parsedVariable(peletScope);
@@ -206,8 +200,7 @@ static UnicodeString ResolveVariableType(const pelet::ScopeClass& variableScope,
 				if (!resourceMatches.empty()) {
 					if (t4p::PhpTagClass::CLASS == resourceMatches[0].Type) {
 						type = resourceMatches[0].ClassName;
-					}
-					else {
+					} else {
 						type =  resourceMatches[0].ReturnType;
 					}
 				}
@@ -244,8 +237,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 		// a variable. look at the type from the symbol table
 		typeToLookup = ResolveVariableType(variableScope, sourceDirs, tagFinderList, doDuckTyping, error,
 				start, scopeSymbols, symbolTable);
-	}
-	else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0) {
+	} else if (start.caseCompare(UNICODE_STRING_SIMPLE("self"), 0) == 0) {
 		// self is the static version of $this, need to look at the pseudo variable $this
 		// that is put into the symbol table during parsing
 		// and get the type from there
@@ -254,8 +246,7 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 				typeToLookup = scopeSymbols[i].ChainList[0].Name;
 			}
 		}
-	}
-	else if (start.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
+	} else if (start.caseCompare(UNICODE_STRING_SIMPLE("parent"), 0) == 0) {
 		// look at the class signature of the current class that is in scope; that will tell us
 		// what class is the parent
 		// this code assumes that the tag finders have parsed the same exact code as the code that the
@@ -269,19 +260,16 @@ static UnicodeString ResolveInitialLexemeType(const pelet::VariableClass& parsed
 			error.Type = t4p::SymbolTableMatchErrorClass::PARENT_ERROR;
 			error.ErrorLexeme = scopeClass;
 		}
-	}
-	else if (parsedVariable.ChainList.size() > 1) {
+	} else if (parsedVariable.ChainList.size() > 1) {
 		// a function or a class. need to get the type from the tag finders
 		// when ChainList has only one item, the item may be a partial function/class name
 		// so we may not find it.
 		if (IsStaticVariable(parsedVariable)) {
 			typeToLookup = start;
-		}
-		else {
+		} else {
 			typeToLookup = tagFinderList.ResolveResourceType(start, sourceDirs);
 		}
-	}
-	else {
+	} else {
 		// when symbol's chain list has one item, it is from an expression that
 		// contains a partial function.  In this case, there is not need to catenate
 		// ChainList items; doing so will result in a bad lookup
@@ -333,8 +321,7 @@ bool t4p::SymbolTableMatchErrorClass::HasError() const {
 void t4p::SymbolTableMatchErrorClass::ToVisibility(const pelet::VariableClass& parsedVariable, const UnicodeString& className) {
 	if (IsStaticVariable(parsedVariable)) {
 		Type = t4p::SymbolTableMatchErrorClass::STATIC_ERROR;
-	}
-	else {
+	} else {
 		Type = t4p::SymbolTableMatchErrorClass::VISIBILITY_ERROR;
 	}
 	if (!parsedVariable.ChainList.empty()) {
@@ -366,8 +353,7 @@ void t4p::SymbolTableMatchErrorClass::ToUnknownResource(const pelet::VariableCla
 	if (!parsedVariable.ChainList.empty()) {
 		if (IsStaticVariable(parsedVariable)) {
 			Type = t4p::SymbolTableMatchErrorClass::UNKNOWN_STATIC_RESOURCE;
-		}
-		else {
+		} else {
 			Type = t4p::SymbolTableMatchErrorClass::UNKNOWN_RESOURCE;
 		}
 		ErrorClass = className;
@@ -416,8 +402,7 @@ void t4p::SymbolTableClass::MethodFound(const UnicodeString& namespaceName, cons
 	UnicodeString qualifiedClassName;
 	if (!namespaceName.isEmpty() && namespaceName != UNICODE_STRING_SIMPLE("\\")) {
 		qualifiedClassName = namespaceName + UNICODE_STRING_SIMPLE("\\") + className;
-	}
-	else {
+	} else {
 		qualifiedClassName = className;
 	}
 	prop.Name = qualifiedClassName;
@@ -487,8 +472,7 @@ void t4p::SymbolTableClass::VariableFound(const UnicodeString& namespaceName, co
 				type = t4p::SymbolClass::UNKNOWN;
 				break;
 			}
-		}
-		else {
+		} else {
 			// in  PHP an array may be created by assigning
 			// an array key-value to a non-existant variable
 			arrayKeys.push_back(variableArrayAccessKey);
@@ -540,8 +524,7 @@ void t4p::SymbolTableClass::OnAnyExpression(pelet::ExpressionClass* expr) {
 				pelet::AssignmentExpressionClass* assignment = (pelet::AssignmentExpressionClass*)closure->Statements.At(i);
 				VariableFound(expr->Scope.NamespaceName, expr->Scope.ClassName, functionName,
 					assignment->Destination, assignment->Expression, assignment->Destination.Comment);
-			}
-			else if (pelet::ExpressionClass::ASSIGNMENT_LIST == closureInnerExpr->ExpressionType) {
+			} else if (pelet::ExpressionClass::ASSIGNMENT_LIST == closureInnerExpr->ExpressionType) {
 				pelet::AssignmentListExpressionClass* assignmentList = (pelet::AssignmentListExpressionClass*)closureInnerExpr;
 				for (size_t i = 0; i < assignmentList->Destinations.size(); ++i) {
 					VariableFound(expr->Scope.NamespaceName, expr->Scope.ClassName, functionName,
@@ -606,13 +589,11 @@ void t4p::SymbolTableClass::CreateSymbolsFromTokens(const t4p::SymbolTableClass&
 			token = Lexer.NextToken();
 			currentClass.remove();
 			Lexer.GetLexeme(currentClass);
-		}
-		else if (pelet::T_FUNCTION == token) {
+		} else if (pelet::T_FUNCTION == token) {
 			token = Lexer.NextToken();
 			currentMethod.remove();
 			Lexer.GetLexeme(currentMethod);
-		}
-		else if (pelet::T_VARIABLE == token) {
+		} else if (pelet::T_VARIABLE == token) {
 			variable.remove();
 			if (Lexer.GetLexeme(variable)) {
 				bool found = false;
@@ -682,8 +663,7 @@ void t4p::SymbolTableClass::ExpressionCompletionMatches(pelet::VariableClass par
 				autoCompleteVariableList.push_back(scopeSymbols[i].Variable);
 			}
 		}
-	}
-	else {
+	} else {
 		// some kind of function call / method chain call
 		ResourceMatches(parsedVariable, variableScope, sourceDirs, tagFinderList,
 			autoCompleteResourceList, doDuckTyping, false, error);
@@ -724,11 +704,9 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 	// if we can't resolve a type then just exit
 	if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
 		error.ToPrimitiveError(UNICODE_STRING_SIMPLE(""), VariableName(parsedVariable));
-	}
-	else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
+	} else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
 		error.ToArrayError(UNICODE_STRING_SIMPLE(""), VariableName(parsedVariable));
-	}
-	else if (!parsedVariable.ChainList.empty()) {
+	} else if (!parsedVariable.ChainList.empty()) {
 		// need the empty check so that we don't overflow when doing 0 - 1 with size_t
 		for (size_t i = 1;  i < (parsedVariable.ChainList.size() - 1) && !typeToLookup.isEmpty() && !error.HasError(); ++i) {
 			UnicodeString nextResource = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList[i].Name;
@@ -736,11 +714,9 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 
 			if (resolvedType.isEmpty()) {
 				error.ToTypeResolution(typeToLookup, parsedVariable.ChainList[i].Name);
-			}
-			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
+			} else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("primitive"), 0) == 0) {
 				error.ToPrimitiveError(typeToLookup, parsedVariable.ChainList[i].Name);
-			}
-			else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
+			} else if (typeToLookup.caseCompare(UNICODE_STRING_SIMPLE("array"), 0) == 0) {
 				error.ToArrayError(typeToLookup, parsedVariable.ChainList[i].Name);
 			}
 			typeToLookup = resolvedType;
@@ -750,12 +726,10 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 	UnicodeString resourceToLookup;
 	if (!typeToLookup.isEmpty() && parsedVariable.ChainList.size() > 1 && !error.HasError()) {
 		resourceToLookup = typeToLookup + UNICODE_STRING_SIMPLE("::") + parsedVariable.ChainList.back().Name;
-	}
-	else if (!typeToLookup.isEmpty() && !error.HasError()) {
+	} else if (!typeToLookup.isEmpty() && !error.HasError()) {
 		// in this case; chain list is of size 1 (looking for a function / class name)
 		resourceToLookup = typeToLookup;
-	}
-	else if (!error.HasError() && parsedVariable.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
+	} else if (!error.HasError() && parsedVariable.ChainList.size() > 1 && typeToLookup.isEmpty() && doDuckTyping) {
 		// here, even if the type of previous items in the chain could not be resolved
 		// but were also known NOT to be errors
 		// perform "duck typing" lookups; just look for methods in any class
@@ -781,8 +755,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 			if (doFullyQualifiedMatchOnly) {
 				tagFinderList.ExactMatchesFromAll(tagSearch, matches, sourceDirs);
 				tagFinderList.ExactTraitAliasesFromAll(tagSearch, matches);
-			}
-			else  {
+			} else {
 				tagFinderList.NearMatchesFromAll(tagSearch, matches, sourceDirs);
 				tagFinderList.NearMatchTraitAliasesFromAll(tagSearch, matches);
 			}
@@ -797,8 +770,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 			if (isVisible) {
 				UnresolveNamespaceAlias(originalVariable, variableScope, tag);
 				resourceMatches.push_back(tag);
-			}
-			else if (!isVisible) {
+			} else if (!isVisible) {
 				visibilityError = true;
 			}
 		}
@@ -807,8 +779,7 @@ void t4p::SymbolTableClass::ResourceMatches(pelet::VariableClass parsedVariable,
 	// don't overwrite a previous error (PRIMITIVE_ERROR, etc...)
 	if (!error.HasError() && visibilityError && resourceMatches.empty()) {
 		error.ToVisibility(parsedVariable, typeToLookup);
-	}
-	else if (!error.HasError() && resourceMatches.empty()) {
+	} else if (!error.HasError() && resourceMatches.empty()) {
 		error.ToUnknownResource(parsedVariable, typeToLookup);
 	}
 }

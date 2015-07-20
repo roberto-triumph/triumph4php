@@ -74,8 +74,7 @@ bool t4p::SqliteResultClass::Exec(soci::session& session, bool doLimit) {
 		bool hasData = Stmt->execute(true);
 		if (hasData) {
 			IsEmpty = false;
-		}
-		else {
+		} else {
 			IsEmpty = true;
 			IsFetched = true;
 		}
@@ -118,8 +117,7 @@ bool t4p::SqliteResultClass::ReExec(wxString& error)  {
 		bool hasData = Stmt->execute(true);
 		if (hasData) {
 			IsEmpty = false;
-		}
-		else {
+		} else {
 			IsEmpty = true;
 		}
 	} catch (std::exception& e) {

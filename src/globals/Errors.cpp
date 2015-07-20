@@ -137,8 +137,7 @@ void t4p::EditorErrorFix(const wxString& errorString, wxString& error, wxString&
 	if (index != wxNOT_FOUND) {
 		error = errorString.Mid(0, index);
 		fix = errorString.Mid(index + FIX_SEPARATOR.Length());
-	}
-	else {
+	} else {
 		error = errorString;
 	}
 }

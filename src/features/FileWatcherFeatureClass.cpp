@@ -83,8 +83,7 @@ static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, i
 			if (!foundSubDir) {
 				collapsedDirs[*path] = 1;
 			}
-		}
-		else if (wxFileName::FileExists(*path) || tagCache.HasFullPath(*path)) {
+		} else if (wxFileName::FileExists(*path) || tagCache.HasFullPath(*path)) {
 			// if the file's dir parent dir has been labeled as created, we want to skip it
 			wxFileName fileCreated(*path);
 			wxFileName fileDir;
@@ -259,8 +258,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 			std::map<wxString, int>::iterator toDelete = it;
 			++it;
 			FilesExternallyDeleted.erase(toDelete);
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -294,8 +292,7 @@ void t4p::FileWatcherFeatureClass::OnTimer(wxTimerEvent& event) {
 			std::map<wxString, wxString>::iterator toErase = rename;
 			rename++;
 			pathsRenamed.erase(toErase->first);
-		}
-		else {
+		} else {
 			++rename;
 		}
 	}
@@ -360,8 +357,7 @@ void t4p::FileWatcherFeatureClass::HandleNonOpenedFiles(const std::vector<wxStri
 		if (wxFileName::DirExists(pair->second)) {
 			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_DIR_RENAMED, pair->first, pair->second);
 			App.EventSink.Publish(renameEvt);
-		}
-		else {
+		} else {
 			t4p::RenameEventClass renameEvt(t4p::EVENT_APP_FILE_RENAMED, pair->first, pair->second);
 			App.EventSink.Publish(renameEvt);
 		}
@@ -374,22 +370,17 @@ void t4p::FileWatcherFeatureClass::OnFsWatcher(wxFileSystemWatcherEvent& event) 
 	wxFileName fileName = event.GetPath();
 	if (wxFSW_EVENT_MODIFY == event.GetChangeType()) {
 		PathsExternallyModified[path] = 1;
-	}
-	else if (wxFSW_EVENT_CREATE == event.GetChangeType()) {
+	} else if (wxFSW_EVENT_CREATE == event.GetChangeType()) {
 		PathsExternallyCreated[path] = 1;
-	}
-	else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
+	} else if (wxFSW_EVENT_DELETE == event.GetChangeType()) {
 		PathsExternallyDeleted[path] = 1;
-	}
-	else if (wxFSW_EVENT_RENAME == event.GetChangeType()) {
+	} else if (wxFSW_EVENT_RENAME == event.GetChangeType()) {
 		PathsExternallyRenamed[path] = event.GetNewPath().GetFullPath();
-	}
-	else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
+	} else if (wxFSW_EVENT_WARNING == event.GetChangeType()) {
 		// too many files being added/removed
 		// this is probably a big directory being added / removed
 		// hopefully the root directory is caught
-	}
-	else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
+	} else if (wxFSW_EVENT_ERROR == event.GetChangeType()) {
 		// in MSW, an error event could be due to the watched directoty being deleted / renamed.
 		// in this case, we need to restart the watch
 		IsWatchError = true;

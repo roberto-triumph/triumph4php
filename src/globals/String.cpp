@@ -69,8 +69,7 @@ UnicodeString t4p::WxToIcu(wxString wx) {
 	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, buf.data(), rawLength, &status);
 	if (U_SUCCESS(status)) {
 		uni.releaseBuffer(actualCount);
-	}
-	else {
+	} else {
 		uni.releaseBuffer(0);
 	}
 	return uni;
@@ -87,8 +86,7 @@ UnicodeString t4p::CharToIcu(const char* source) {
 	u_strFromUTF8(uni.getBuffer(charCount + 1), charCount + 1, &actualCount, source, charCount, &status);
 	if (U_SUCCESS(status)) {
 		uni.releaseBuffer(actualCount);
-	}
-	else {
+	} else {
 		uni.releaseBuffer(0);
 	}
 	return uni;
@@ -125,8 +123,7 @@ int t4p::Utf8PosToChar(const char* bytes, int bytesLength, int bytePos) {
 				break;
 			}
 		}
-	}
-	else {
+	} else {
 		charCount = -1;
 	}
 	return charCount;

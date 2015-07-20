@@ -107,8 +107,7 @@ void t4p::SuppressionRuleClass::SkipAllRule(const wxFileName& location) {
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
-	}
-	else {
+	} else {
 		Location.Assign(location.GetFullPath());
 	}
 }
@@ -121,8 +120,7 @@ void t4p::SuppressionRuleClass::SkipUnknownClassRule(const wxFileName& location,
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
-	}
-	else {
+	} else {
 		Location.Assign(location.GetFullPath());
 	}
 }
@@ -135,8 +133,7 @@ void t4p::SuppressionRuleClass::SkipUnknownMethodRule(const wxFileName& location
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
-	}
-	else {
+	} else {
 		Location.Assign(location.GetFullPath());
 	}
 }
@@ -149,8 +146,7 @@ void t4p::SuppressionRuleClass::SkipUnknownFunctionRule(const wxFileName& locati
 	// make thread safe
 	if (location.IsDir()) {
 		Location.AssignDir(location.GetPath());
-	}
-	else {
+	} else {
 		Location.Assign(location.GetFullPath());
 	}
 }
@@ -167,8 +163,7 @@ void t4p::SuppressionRuleClass::Copy(const t4p::SuppressionRuleClass& src) {
 	// make thread safe
 	if (src.Location.IsDir()) {
 		Location.AssignDir(src.Location.GetPath());
-	}
-	else {
+	} else {
 		Location.Assign(src.Location.GetFullPath());
 	}
 }
@@ -222,23 +217,19 @@ bool t4p::LintSuppressionClass::Init(const wxFileName& suppressionFile, std::vec
 				if (wxFileName::FileExists(locationStr)) {
 					rule.Location.Assign(locationStr);
 					Rules.push_back(rule);
-				}
-				else if (wxFileName::DirExists(locationStr)) {
+				} else if (wxFileName::DirExists(locationStr)) {
 					rule.Location.AssignDir(locationStr);
 					Rules.push_back(rule);
 				}
-			}
-			else if (!typeStr.IsEmpty()) {
+			} else if (!typeStr.IsEmpty()) {
 				wxString wxErr = wxT("suppression rule type cannot be empty in line: ") + line;
 				UnicodeString error = t4p::WxToIcu(wxErr);
 				errors.push_back(error);
-			}
-			else if (!goodType) {
+			} else if (!goodType) {
 				wxString wxErr = wxT("suppression rule type is not valid: ") + typeStr + wxT(" in line: ") + line;
 				UnicodeString error = t4p::WxToIcu(wxErr);
 				errors.push_back(error);
-			}
-			else if (!locationStr.IsEmpty()) {
+			} else if (!locationStr.IsEmpty()) {
 				wxString wxErr = wxT("suppression rule location cannot be empty in line: ") + line;
 				UnicodeString error = t4p::WxToIcu(wxErr);
 				errors.push_back(error);
@@ -276,8 +267,7 @@ bool t4p::LintSuppressionClass::Save(const wxFileName& suppressionFile) {
 		wxString locationStr;
 		if (rule->Location.FileExists()) {
 			locationStr = rule->Location.GetFullPath();
-		}
-		else if (rule->Location.DirExists()) {
+		} else if (rule->Location.DirExists()) {
 			locationStr = rule->Location.GetPathWithSep();
 		}
 
@@ -317,8 +307,7 @@ bool t4p::LintSuppressionClass::ShouldIgnore(const wxFileName& file, const Unico
 			wxString rulePath;
 			if (rule->Location.IsDir()) {
 				rulePath = rule->Location.GetPathWithSep();
-			}
-			else {
+			} else {
 				rulePath = rule->Location.GetFullPath();
 			}
 			matchesLocation = fullPathToCheck.Find(rulePath) == 0;

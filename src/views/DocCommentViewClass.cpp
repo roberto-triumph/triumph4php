@@ -57,8 +57,7 @@ static wxString NiceDocText(const UnicodeString& comment) {
 		}
 		if (pos < line.Len()) {
 			line = line.Mid(pos);
-		}
-		else {
+		} else {
 			// an empty comment line
 			line = wxT("");
 		}
@@ -200,16 +199,14 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 			msg += wxT("\n\n");
 			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
-		}
-		else if (tag.Type == t4p::PhpTagClass::METHOD) {
+		} else if (tag.Type == t4p::PhpTagClass::METHOD) {
 			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
 			msg += t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
 			msg += t4p::IcuToWx(tag.Signature);
 			hasContent = true;
-		}
-		else if (tag.Type == t4p::PhpTagClass::MEMBER || tag.Type == t4p::PhpTagClass::CLASS_CONSTANT) {
+		} else if (tag.Type == t4p::PhpTagClass::MEMBER || tag.Type == t4p::PhpTagClass::CLASS_CONSTANT) {
 			msg = t4p::IcuToWx(tag.ClassName);
 			msg += wxT("::");
 			msg += t4p::IcuToWx(tag.Identifier);
@@ -221,8 +218,7 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 				msg += wxT(" ]");
 			}
 			hasContent = !tag.ReturnType.isEmpty();
-		}
-		else {
+		} else {
 			msg = t4p::IcuToWx(tag.Identifier);
 			msg += wxT("\n\n");
 			msg += t4p::IcuToWx(tag.Signature);
@@ -234,14 +230,11 @@ void t4p::DocCommentViewClass::ShowDocComment(t4p::CodeControlClass* ctrl, int p
 	}
 	if (!hasMatches && !matchError.empty()) {
 		GetStatusBarWithGauge()->SetColumn0Text(matchError);
-	}
-	else if (!hasMatches) {
+	} else if (!hasMatches) {
 		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No match for %s"), ctrl->GetTextRange(pos, endPos).c_str()));
-	}
-	else if (!hasContent) {
+	} else if (!hasContent) {
 		GetStatusBarWithGauge()->SetColumn0Text(wxString::Format(_("No content for %s"), t4p::IcuToWx(tag.Key).c_str()));
-	}
-	else {
+	} else {
 		// freeze thaw the code control so that the call tip popup is
 		// not drawn while its being moved into place
 		// in linux, freezing already happens internally so we don't

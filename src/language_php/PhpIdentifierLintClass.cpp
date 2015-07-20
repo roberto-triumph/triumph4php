@@ -470,8 +470,7 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 		for (it = var->ChainList[0].CallArguments.begin(); it != var->ChainList[0].CallArguments.end(); ++it) {
 			CheckExpression(*it);
 		}
-	}
-	else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
+	} else if (var->ChainList[0].Name.charAt(0) != '$' && var->ChainList.size() > 1) {
 		// a classname in a static method call, ie User::DEFAULT_NAME
 		CheckClassNameAndLog(var->ChainList[0].Name, var->LineNumber, var->Pos);
 	}
@@ -487,12 +486,10 @@ void t4p::PhpIdentifierLintClass::CheckVariable(pelet::VariableClass* var) {
 			for (itArg = prop.CallArguments.begin(); itArg != prop.CallArguments.end(); ++itArg) {
 				CheckExpression(*itArg);
 			}
-		}
-		else if (prop.IsArrayAccess && prop.ArrayAccess) {
+		} else if (prop.IsArrayAccess && prop.ArrayAccess) {
 			// check for array accesees ie $user[$name]
 			CheckExpression(var->ChainList[i].ArrayAccess);
-		}
-		else if (!prop.IsArrayAccess && prop.IsStatic) {
+		} else if (!prop.IsArrayAccess && prop.IsStatic) {
 			// only check for static properties (and constants)
 			// for now
 			// testing for instance properties results in many false
@@ -541,16 +538,13 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 	if (!unqualifiedName.isEmpty() && FoundFunctions.find(unqualifiedName) != FoundFunctions.end()) {
 		isUnknown = false;
 		foundInMap = true;
-	}
-	else if (!unqualifiedName.isEmpty() && NotFoundFunctions.find(unqualifiedName) != NotFoundFunctions.end()) {
+	} else if (!unqualifiedName.isEmpty() && NotFoundFunctions.find(unqualifiedName) != NotFoundFunctions.end()) {
 		isUnknown = true;
 		foundInMap = true;
-	}
-	else if (FoundFunctions.find(functionName) != FoundFunctions.end()) {
+	} else if (FoundFunctions.find(functionName) != FoundFunctions.end()) {
 		isUnknown = false;
 		foundInMap = true;
-	}
-	else if (NotFoundFunctions.find(functionName) != NotFoundFunctions.end()) {
+	} else if (NotFoundFunctions.find(functionName) != NotFoundFunctions.end()) {
 		isUnknown = true;
 		foundInMap = true;
 	}
@@ -566,8 +560,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			FoundFunctions[unqualifiedName] = 1;
 			isUnknown = false;
 			foundInTagCache = true;
-		}
-		else {
+		} else {
 			NotFoundFunctions[unqualifiedName] = 1;
 			isUnknown = true;
 		}
@@ -581,8 +574,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			FoundFunctions[functionName] = 1;
 			isUnknown = false;
 			foundInTagCache = true;
-		}
-		else {
+		} else {
 			NotFoundFunctions[functionName] = 1;
 			isUnknown = true;
 		}
@@ -596,8 +588,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 			FoundFunctions[unqualifiedName] = 1;
 			isUnknown = false;
 			foundInTagCache = true;
-		}
-		else {
+		} else {
 			NotFoundFunctions[unqualifiedName] = 1;
 			isUnknown = true;
 		}
@@ -612,8 +603,7 @@ void t4p::PhpIdentifierLintClass::CheckFunctionName(const pelet::VariablePropert
 		if (isFound) {
 			FoundFunctions[functionName] = 1;
 			isUnknown = false;
-		}
-		else {
+		} else {
 			NotFoundFunctions[functionName] = 1;
 			isUnknown = true;
 		}
@@ -661,8 +651,7 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 		int32_t pos = var->ChainList[0].Name.lastIndexOf(UNICODE_STRING_SIMPLE("\\"));
 		if (pos >= 0) {
 			var->ChainList[0].Name.extract(pos + 1, var->ChainList[0].Name.length() - pos - 1, unqualifiedClassName);
-		}
-		else {
+		} else {
 			unqualifiedClassName = var->ChainList[0].Name;
 		}
 
@@ -676,17 +665,13 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 	// check out little cache, different maps depending on static vs instances methods
 	if (isStaticCall && FoundStaticMethods.find(methodProp.Name) != FoundStaticMethods.end()) {
 		isUnknown = false;
-	}
-	else if (isStaticCall && NotFoundStaticMethods.find(methodProp.Name) != NotFoundStaticMethods.end()) {
+	} else if (isStaticCall && NotFoundStaticMethods.find(methodProp.Name) != NotFoundStaticMethods.end()) {
 		isUnknown = true;
-	}
-	else if (!isStaticCall && FoundMethods.find(methodProp.Name) != FoundMethods.end()) {
+	} else if (!isStaticCall && FoundMethods.find(methodProp.Name) != FoundMethods.end()) {
 		isUnknown = false;
-	}
-	else if (!isStaticCall && NotFoundMethods.find(methodProp.Name) != NotFoundMethods.end()) {
+	} else if (!isStaticCall && NotFoundMethods.find(methodProp.Name) != NotFoundMethods.end()) {
 		isUnknown = true;
-	}
-	else {
+	} else {
 		bool found = false;
 		if (MethodLookup.IsOk()) {
 			MethodLookup.Set(methodProp.Name, isStaticCall);
@@ -701,16 +686,13 @@ void t4p::PhpIdentifierLintClass::CheckMethodName(const pelet::VariablePropertyC
 		if (found && !isStaticCall) {
 			FoundMethods[methodProp.Name] = 1;
 			isUnknown = false;
-		}
-		else if (!found && !isStaticCall) {
+		} else if (!found && !isStaticCall) {
 			NotFoundMethods[methodProp.Name] = 1;
 			isUnknown = true;
-		}
-		else if (found && isStaticCall) {
+		} else if (found && isStaticCall) {
 			FoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = false;
-		}
-		else if (!found && isStaticCall) {
+		} else if (!found && isStaticCall) {
 			NotFoundStaticMethods[methodProp.Name] = 1;
 			isUnknown = true;
 		}
@@ -751,11 +733,9 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 	// then query the tags db and cache the value
 	if (propertyProp.IsStatic && FoundStaticProperties.find(propertyProp.Name) != FoundStaticProperties.end()) {
 		isUnknown = false;
-	}
-	else if (propertyProp.IsStatic && NotFoundStaticProperties.find(propertyProp.Name) != NotFoundStaticProperties.end()) {
+	} else if (propertyProp.IsStatic && NotFoundStaticProperties.find(propertyProp.Name) != NotFoundStaticProperties.end()) {
 		isUnknown = true;
-	}
-	else {
+	} else {
 		bool found = false;
 		if (PropertyLookup.IsOk()) {
 			PropertyLookup.Set(propertyProp.Name, propertyProp.IsStatic);
@@ -770,8 +750,7 @@ void t4p::PhpIdentifierLintClass::CheckPropertyName(const pelet::VariablePropert
 		if (found && propertyProp.IsStatic) {
 			FoundStaticProperties[propertyProp.Name] = 1;
 			isUnknown = false;
-		}
-		else if (!found && propertyProp.IsStatic) {
+		} else if (!found && propertyProp.IsStatic) {
 			NotFoundStaticProperties[propertyProp.Name] = 1;
 			isUnknown = true;
 		}
@@ -824,8 +803,7 @@ bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className)
 	wxString error;
 	if (NotFoundClasses.find(className) != NotFoundClasses.end()) {
 		isUnknown = true;
-	}
-	else {
+	} else {
 		bool found = false;
 		if (ClassLookup.IsOk()) {
 			ClassLookup.Set(className);
@@ -840,8 +818,7 @@ bool t4p::PhpIdentifierLintClass::CheckClassName(const UnicodeString& className)
 		if (!found) {
 			isUnknown = true;
 			NotFoundClasses[className] = 1;
-		}
-		else {
+		} else {
 			FoundClasses[className] = 1;
 		}
 	}

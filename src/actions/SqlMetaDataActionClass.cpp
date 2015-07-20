@@ -87,8 +87,7 @@ bool t4p::SqlMetaDataActionClass::Init(t4p::GlobalsClass& globals) {
 	while(info != DatabaseTags.end()) {
 		if (info->IsDetected) {
 			info = DatabaseTags.erase(info);
-		}
-		else {
+		} else {
 			info++;
 		}
 	}
@@ -128,8 +127,7 @@ void t4p::SqlMetaDataActionClass::BackgroundWork() {
 					errors.push_back(it->Label + UNICODE_STRING_SIMPLE(": ") + error);
 				}
 			}
-		}
-		else {
+		} else {
 			break;
 		}
 	}

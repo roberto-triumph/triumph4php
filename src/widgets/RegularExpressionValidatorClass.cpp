@@ -134,8 +134,7 @@ bool t4p::RegularExpressionValidatorClass::TransferFromWindow() {
 	if (t) {
 		wxString val = t->GetValue();
 		regEx = t4p::WxToIcu(val);
-	}
-	else if (combo) {
+	} else if (combo) {
 		wxString val = combo->GetValue();
 		regEx = t4p::WxToIcu(val);
 	}
@@ -158,8 +157,7 @@ bool t4p::RegularExpressionValidatorClass::TransferToWindow() {
 		wxString val = t4p::IcuToWx(*Data);
 		t->SetValue(val);
 		ret = true;
-	}
-	else if (combo) {
+	} else if (combo) {
 		wxString val = t4p::IcuToWx(*Data);
 		combo->SetValue(val);
 		ret = true;
@@ -174,8 +172,7 @@ bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 	}
 	if (ModeRadio->GetSelection() != t4p::FinderClass::REGULAR_EXPRESSION) {
 		ret = true;
-	}
-	else {
+	} else {
 		// need to validate the reg ex
 		wxTextCtrl* t = wxDynamicCast(GetWindow(), wxTextCtrl);
 		wxComboBox* combo = wxDynamicCast(GetWindow(), wxComboBox);
@@ -183,8 +180,7 @@ bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 		if (t) {
 			wxString val = t->GetValue();
 			regEx = t4p::WxToIcu(val);
-		}
-		else if (combo) {
+		} else if (combo) {
 			wxString val = combo->GetValue();
 			regEx = t4p::WxToIcu(val);
 		}
@@ -198,15 +194,13 @@ bool t4p::RegularExpressionValidatorClass::Validate(wxWindow *parent) {
 				errMsg += wxT("\n");
 				errMsg += statusString;
 				wxMessageBox(errMsg, _(""), wxCENTER, parent);
-			}
-			else {
+			} else {
 				ret = true;
 			}
 			if (pattern) {
 				delete pattern;
 			}
-		}
-		else {
+		} else {
 			wxMessageBox(_("Regular expression cannot be empty."));
 		}
 	}
@@ -324,22 +318,16 @@ void t4p::AddSymbolToRegularExpression(wxComboBox* text, int id, int currentInse
 
 		text->SetFocus();
 		text->SetInsertionPoint(currentInsertionPoint + symbols.Length());
-	}
-
-	// reg ex flags always go at the beginning
-	else if (id == ID_MENU_REG_EX_CASE_SENSITIVE) {
+	} else if (id == ID_MENU_REG_EX_CASE_SENSITIVE) {
+		// reg ex flags always go at the beginning
 		AddFlagToRegEx(text, wxT("i"), currentInsertionPoint);
-	}
-	else if (id == ID_MENU_REG_EX_COMMENT) {
+	} else if (id == ID_MENU_REG_EX_COMMENT) {
 		AddFlagToRegEx(text, wxT("x"), currentInsertionPoint);
-	}
-	else if (id == ID_MENU_REG_EX_DOT_ALL) {
+	} else if (id == ID_MENU_REG_EX_DOT_ALL) {
 		AddFlagToRegEx(text, wxT("s"), currentInsertionPoint);
-	}
-	else if (id == ID_MENU_REG_EX_MULTI_LINE) {
+	} else if (id == ID_MENU_REG_EX_MULTI_LINE) {
 		AddFlagToRegEx(text, wxT("m"), currentInsertionPoint);
-	}
-	else if (id == ID_MENU_REG_EX_UWORD) {
+	} else if (id == ID_MENU_REG_EX_UWORD) {
 		AddFlagToRegEx(text, wxT("w"), currentInsertionPoint);
 	}
 }
@@ -395,8 +383,7 @@ void AddFlagToRegEx(wxComboBox* text, wxString flag, int currentInsertionPoint) 
 				text->SetInsertionPoint(currentInsertionPoint + flag.Length());
 			}
 		}
-	}
-	else {
+	} else {
 		value = startFlag + flag + wxT(")") + value;
 		text->SetValue(value);
 	}

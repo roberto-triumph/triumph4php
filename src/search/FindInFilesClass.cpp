@@ -197,8 +197,7 @@ int t4p::FindInFilesClass::ReplaceAllMatchesInFile(const wxString& fileName) con
 				u_file_write(fileContents.getBuffer(), fileContents.length(), file);
 				u_fclose(file);
 			}
-		}
-		else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+		} else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
 			t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
 		}
 	}
@@ -242,8 +241,7 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 			const char* name = CharsetFromSignature(buffer, bufferSize);
 			if (NULL != name) {
 				hasSignature = true;
-			}
-			else {
+			} else {
 				hasSignature = false;
 				name = CharsetDetection(buffer, bufferSize);
 			}
@@ -268,12 +266,10 @@ t4p::FindInFilesClass::OpenErrors t4p::FindInFilesClass::FileContents(const wxSt
 				}
 			}
 			delete[] buffer;
-		}
-		else {
+		} else {
 			error = FILE_NOT_FOUND;
 		}
-	}
-	else {
+	} else {
 		error = FILE_NOT_FOUND;
 	}
 	return error;

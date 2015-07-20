@@ -77,14 +77,12 @@ void t4p::ApacheEnvironmentPanelClass::OnScanButton(wxCommandEvent& event) {
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
-		}
-		else {
+		} else {
 			delete reader;
 			RunningActionId = 0;
 			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
 		}
-	}
-	else {
+	} else {
 		// act like a stop button
 		Gauge->SetValue(0);
 
@@ -219,13 +217,11 @@ void t4p::ApacheEnvironmentPanelClass::OnDirChanged(wxFileDirPickerEvent& event)
 			VirtualHostList->DeleteAllItems();
 			ScanButton->SetLabel(_("Stop Scan"));
 			Gauge->Show();
-		}
-		else {
+		} else {
 			delete reader;
 			wxMessageBox(_("Path not valid"), _("Configuration Not Found"), wxOK | wxCENTRE, this);
 		}
-	}
-	else {
+	} else {
 		wxMessageBox(_("Scan is already running. Stop and restart the scan so that the new directory can be scanned."));
 	}
 }
@@ -238,11 +234,9 @@ t4p::PhpEnvironmentPanelClass::PhpEnvironmentPanelClass(wxWindow* parent, t4p::E
 	Installed->SetValidator(installedValidator);
 	if (environment.Php.IsAuto) {
 		Version->SetSelection(0);
-	}
-	else if (pelet::PHP_53 == environment.Php.Version) {
+	} else if (pelet::PHP_53 == environment.Php.Version) {
 		Version->SetSelection(1);
-	}
-	else if (pelet::PHP_54 == environment.Php.Version) {
+	} else if (pelet::PHP_54 == environment.Php.Version) {
 		Version->SetSelection(2);
 	}
 	PhpExecutable->Enable(environment.Php.Installed);
@@ -275,11 +269,9 @@ bool t4p::PhpEnvironmentPanelClass::TransferDataFromWindow() {
 		Environment.Php.IsAuto = false;
 		if (2 == sel) {
 			Environment.Php.Version = pelet::PHP_54;
-		}
-		else if (1 == sel) {
+		} else if (1 == sel) {
 			Environment.Php.Version = pelet::PHP_53;
-		}
-		else {
+		} else {
 			Environment.Php.IsAuto = true;
 		}
 		if (Installed->GetValue()) {
@@ -368,8 +360,7 @@ void t4p::WebBrowserEditPanelClass::OnRemoveSelectedWebBrowser(wxCommandEvent& e
 			cur++;
 		}
 		BrowserList->DeleteItem(selection);
-	}
-	else {
+	} else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to remove."));
 	}
 }
@@ -390,8 +381,7 @@ void t4p::WebBrowserEditPanelClass::OnEditSelectedWebBrowser(wxCommandEvent& eve
 			BrowserList->SetColumnWidth(0, wxLIST_AUTOSIZE);
 			BrowserList->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		}
-	}
-	else {
+	} else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to edit."));
 	}
 }
@@ -413,8 +403,7 @@ void t4p::WebBrowserEditPanelClass::OnMoveUp(wxCommandEvent& event) {
 		// toggle selection on modified rows
 		BrowserList->SetItemState(selection - 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		BrowserList->SetFocus();
-	}
-	else {
+	} else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to move."));
 	}
 }
@@ -435,8 +424,7 @@ void t4p::WebBrowserEditPanelClass::OnMoveDown(wxCommandEvent& event) {
 
 		BrowserList->SetItemState(selection + 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 		BrowserList->SetFocus();
-	}
-	else {
+	} else {
 		wxMessageBox(_("No browsers were selected. Please select a web browser to move."));
 	}
 }

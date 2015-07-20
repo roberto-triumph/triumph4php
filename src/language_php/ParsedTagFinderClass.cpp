@@ -757,8 +757,7 @@ bool t4p::FileTagResultClass::DoPrepare(soci::statement& stmt, bool doLimit) {
 		sql += "SELECT f.full_path, file_item_id, is_new ";
 		sql += "FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) ";
 		sql += "WHERE f.full_path = ? OR f.name = ?";
-	}
-	else {
+	} else {
 		query = "'%" + escaped + "%'";
 		sql += "SELECT f.full_path, file_item_id, is_new ";
 		sql += "FROM file_items f LEFT JOIN sources s ON (f.source_id = s.source_id) ";
@@ -845,19 +844,15 @@ int t4p::FileTagResultClass::GetLineCountFromFile(const wxString& fullPath) cons
 			// ATTN: code not unicode safe
 			if ('\r' == ch[0] && '\n' == ch[1] && 2 == read) {
 				++lineCount;
-			}
-			else if ('\r' == ch[0]) {
+			} else if ('\r' == ch[0]) {
 				++lineCount;
 				file.putback(ch[1]);
-			}
-			else if ('\r' == ch[1]) {
+			} else if ('\r' == ch[1]) {
 				++lineCount;
-			}
-			else if ('\n' == ch[0]) {
+			} else if ('\n' == ch[0]) {
 				++lineCount;
 				file.putback(ch[1]);
-			}
-			else if ('\n' == ch[1]) {
+			} else if ('\n' == ch[1]) {
 				++lineCount;
 			}
 			file.read(ch, 2);
@@ -996,8 +991,7 @@ std::vector<t4p::PhpTagClass> t4p::TraitTagResultClass::MatchesAsTags() {
 			bool useAlias = false;
 			if (ExactMatch) {
 				useAlias = lowerMethodName.caseCompare(lowerAlias, 0) == 0;
-			}
-			else {
+			} else {
 				useAlias = MemberName.isEmpty() || lowerMethodName.indexOf(lowerAlias) == 0;
 			}
 			if (useAlias) {
@@ -1150,8 +1144,7 @@ void t4p::MethodLookupClass::Set(const UnicodeString& methodName, bool isStatic)
 	if (isStatic) {
 		IsStaticTrue = 1;
 		IsStaticFalse = 1;
-	}
-	else {
+	} else {
 		IsStaticTrue = 1;
 		IsStaticFalse = 0;
 	}
@@ -1213,8 +1206,7 @@ void t4p::PropertyLookupClass::Set(const UnicodeString& propertyName, bool isSta
 	if (isStatic) {
 		IsStaticTrue = 1;
 		IsStaticFalse = 1;
-	}
-	else {
+	} else {
 		IsStaticTrue = 1;
 		IsStaticFalse = 0;
 	}
@@ -1337,8 +1329,7 @@ void t4p::MethodSignatureLookupClass::Set(const UnicodeString& methodName, bool 
 	if (isStatic) {
 		IsStaticTrue = 1;
 		IsStaticFalse = 1;
-	}
-	else {
+	} else {
 		IsStaticTrue = 1;
 		IsStaticFalse = 0;
 	}
@@ -1422,8 +1413,7 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		// make sure to account for the root namespace ie '\Exception'
 		if (namespacePos > 0) {
 			NamespaceName.setTo(resourceQuery, 0, namespacePos);
-		}
-		else {
+		} else {
 			NamespaceName.setTo(resourceQuery, 0, 1);
 		}
 
@@ -1431,15 +1421,13 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
 		MethodName.setTo(resourceQuery, scopePos + 2);
 		ResourceType = CLASS_NAME_METHOD_NAME;
-	}
-	else if (namespacePos >= 0) {
+	} else if (namespacePos >= 0) {
 		// query has a namespace, parse it out
 		// note that the last identifier after the final backslash is the class name
 		// make sure to account for the root namespace ie '\Exception'
 		if (namespacePos > 0) {
 			NamespaceName.setTo(resourceQuery, 0, namespacePos);
-		}
-		else {
+		} else {
 			NamespaceName.setTo(resourceQuery, 0, 1);
 		}
 
@@ -1447,13 +1435,11 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		ClassName.setTo(resourceQuery, namespacePos + 1, scopePos - namespacePos - 1);
 		ClassName.setTo(resourceQuery, namespacePos + 1);
 		ResourceType = scopePos > 0 ? CLASS_NAME_METHOD_NAME : NAMESPACE_NAME;
-	}
-	else if (scopePos >= 0) {
+	} else if (scopePos >= 0) {
 		ClassName.setTo(resourceQuery, 0, scopePos);
 		MethodName.setTo(resourceQuery, scopePos + 2);
 		ResourceType = CLASS_NAME_METHOD_NAME;
-	}
-	else if (colonPos >= 0) {
+	} else if (colonPos >= 0) {
 		// : => filename : line number
 		UnicodeString after(resourceQuery, colonPos + 1);
 		Formattable fmtable((int32_t)0);
@@ -1468,8 +1454,7 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		delete format;
 		FileName.setTo(resourceQuery, 0, colonPos);
 		ResourceType = FILE_NAME_LINE_NUMBER;
-	}
-	else {
+	} else {
 		// class names can only have alphanumerics or underscores
 		UnicodeString symbols = UNICODE_STRING_SIMPLE("`!@#$%^&*()+={}|\\:;\"',./?");
 
@@ -1485,8 +1470,7 @@ t4p::TagSearchClass::TagSearchClass(UnicodeString resourceQuery)
 		if (hasSymbols) {
 			FileName = resourceQuery;
 			ResourceType = FILE_NAME;
-		}
-		else {
+		} else {
 			ClassName = resourceQuery;
 			ResourceType = CLASS_NAME;
 		}
@@ -1574,21 +1558,18 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateExactResults() const {
 
 		memberResults->Set(classHierarchy, GetMethodName(), GetSourceDirs());
 		results = memberResults;
-	}
-	else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
+	} else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
 		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 
 		std::vector<UnicodeString> classNames;
 		UnicodeString key = QualifyName(GetNamespaceName(), GetClassName());
 		nonMemberResults->Set(key, GetSourceDirs());
 		results = nonMemberResults;
-	}
-	else if (!ClassName.isEmpty()) {
+	} else if (!ClassName.isEmpty()) {
 		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 		nonMemberResults->Set(GetClassName(), GetSourceDirs());
 		results = nonMemberResults;
-	}
-	else {
+	} else {
 		t4p::ExactNonMemberTagResultClass* nonMemberResults = new t4p::ExactNonMemberTagResultClass();
 		nonMemberResults->Set(GetFileName(), GetSourceDirs());
 		results = nonMemberResults;
@@ -1606,22 +1587,19 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
 		std::vector<UnicodeString> classHierarchy = GetParentClasses();
 		if (GetNamespaceName().isEmpty()) {
 			classHierarchy.push_back(GetClassName());
-		}
-		else {
+		} else {
 			classHierarchy.push_back(QualifyName(GetNamespaceName(), GetClassName()));
 		}
 		classHierarchy.insert(classHierarchy.end(), Traits.begin(), Traits.end());
 
 		nearMatchMembersResult->SetNearMatchArgs(classHierarchy, GetMethodName(), GetFileItemId(), GetSourceDirs());
 		results = nearMatchMembersResult;
-	}
-	else if ((t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
+	} else if ((t4p::TagSearchClass::CLASS_NAME_METHOD_NAME == GetResourceType())
 			&& GetClassName().isEmpty()) {
 		t4p::NearMatchMemberOnlyTagResultClass* nearMatchMemberOnlyResult = new t4p::NearMatchMemberOnlyTagResultClass();
 		nearMatchMemberOnlyResult->Set(GetMethodName(), GetSourceDirs());
 		results = nearMatchMemberOnlyResult;
-	}
-	else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
+	} else if (t4p::TagSearchClass::NAMESPACE_NAME == GetResourceType()) {
 		// needle identifier contains a namespace operator; but it may be
 		// a namespace or a fully qualified name
 		UnicodeString namespaceKey;
@@ -1630,21 +1608,18 @@ t4p::TagResultClass* t4p::TagSearchClass::CreateNearMatchResults() const {
 		nearMatchNonMemberNamespaced->Set(namespaceKey, GetSourceDirs());
 		nearMatchNonMemberNamespaced->AddTagType(t4p::PhpTagClass::NAMESPACE);
 		results = nearMatchNonMemberNamespaced;
-	}
-	else if (!ClassName.isEmpty()) {
+	} else if (!ClassName.isEmpty()) {
 		UnicodeString key;
 		// if query does not have a namespace then get the non-namespaced tags
 		if (GetNamespaceName().isEmpty()) {
 			key = GetClassName();
-		}
-		else {
+		} else {
 			key = QualifyName(GetNamespaceName(), GetClassName());
 		}
 		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMembers->Set(key, GetSourceDirs());
 		results = nearMatchNonMembers;
-	}
-	else {
+	} else {
 		UnicodeString key = GetFileName();
 		t4p::NearMatchNonMemberTagResultClass* nearMatchNonMembers = new t4p::NearMatchNonMemberTagResultClass();
 		nearMatchNonMembers->Set(key, GetSourceDirs());
@@ -1658,8 +1633,7 @@ t4p::FileTagResultClass* t4p::TagSearchClass::CreateExactFileResults() const {
 	if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
 		UnicodeString query = GetFileName();
 		result->Set(query, GetLineNumber(), true, GetSourceDirs());
-	}
-	else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
+	} else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
 		UnicodeString query = GetFileName();
 
 		// empty file name = no period, get the query from the class name variable
@@ -1667,14 +1641,12 @@ t4p::FileTagResultClass* t4p::TagSearchClass::CreateExactFileResults() const {
 			query = GetClassName();
 		}
 		result->Set(query, 0, true, GetSourceDirs());
-	}
-	else if (!GetNamespaceName().isEmpty()) {
+	} else if (!GetNamespaceName().isEmpty()) {
 		// backslash (dir separator) ==  PHP namespace separator
 		// if query contains a backslash then the type will be namespace name
 		UnicodeString query = GetNamespaceName() + UNICODE_STRING_SIMPLE("\\") + GetClassName();
 		result->Set(query, 0, true, GetSourceDirs());
-	}
-	else {
+	} else {
 		UnicodeString query = GetClassName();
 		result->Set(query, 0, false, GetSourceDirs());
 	}
@@ -1686,8 +1658,7 @@ t4p::FileTagResultClass* t4p::TagSearchClass::CreateNearMatchFileResults() const
 	if (t4p::TagSearchClass::FILE_NAME_LINE_NUMBER == GetResourceType()) {
 		UnicodeString query = GetFileName();
 		result->Set(query, GetLineNumber(), false, GetSourceDirs());
-	}
-	else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
+	} else if (t4p::TagSearchClass::FILE_NAME == GetResourceType()) {
 		UnicodeString query = GetFileName();
 
 		// empty file name = no period, get the query from the class name variable
@@ -1695,14 +1666,12 @@ t4p::FileTagResultClass* t4p::TagSearchClass::CreateNearMatchFileResults() const
 			query = GetClassName();
 		}
 		result->Set(query, 0, false, GetSourceDirs());
-	}
-	else if (!GetNamespaceName().isEmpty()) {
+	} else if (!GetNamespaceName().isEmpty()) {
 		// backslash (dir separator) ==  PHP namespace separator
 		// if query contains a backslash then the type will be namespace name
 		UnicodeString query = GetNamespaceName() + UNICODE_STRING_SIMPLE("\\") + GetClassName();
 		result->Set(query, 0, false, GetSourceDirs());
-	}
-	else {
+	} else {
 		UnicodeString query = GetClassName();
 		result->Set(query, 0, false, GetSourceDirs());
 	}
@@ -1789,8 +1758,7 @@ void t4p::TagResultClass::Next() {
 	Tag.HasVariableArgs = HasVariableArgs != 0;
 	if (soci::i_ok == FileIsNewIndicator) {
 		Tag.FileIsNew = FileIsNew != 0;
-	}
-	else {
+	} else {
 		Tag.FileIsNew = true;
 	}
 	Fetch();
@@ -1819,8 +1787,7 @@ bool t4p::ParsedTagFinderClass::GetResourceMatchPosition(const t4p::PhpTagClass&
 
 		t4p::FinderClass::EscapeRegEx(className);
 		t4p::FinderClass::EscapeRegEx(methodName);
-	}
-	else {
+	} else {
 		className = tag.Identifier;
 		t4p::FinderClass::EscapeRegEx(className);
 	}
@@ -1931,8 +1898,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 	UnicodeString qualifiedClassName;
 	if (!tagSearch.GetNamespaceName().isEmpty()) {
 		qualifiedClassName = QualifyName(tagSearch.GetNamespaceName(), tagSearch.GetClassName());
-	}
-	else {
+	} else {
 		qualifiedClassName = tagSearch.GetClassName();
 	}
 	classesToSearch.push_back(qualifiedClassName);
@@ -1948,8 +1914,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 		std::vector<t4p::PhpTagClass> memberMatches = allMembersResult.Matches();
 
 		matches.insert(matches.end(), memberMatches.begin(), memberMatches.end());
-	}
-	else if (tagSearch.GetClassName().isEmpty()) {
+	} else if (tagSearch.GetClassName().isEmpty()) {
 		// special case, query across all classes for a method (::getName)
 		// if ClassName is empty, then just check method names This ensures
 		// queries like '::getName' will work as well.
@@ -1966,8 +1931,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::NearMatchMembers(const 
 			// use LIKE to get near matches
 			matches = nearMatchResult.Matches();
 		}
-	}
-	else {
+	} else {
 		std::vector<std::string> keyStarts;
 
 		// now that we found the parent classes, combine the parent class name and the queried method
@@ -2077,8 +2041,7 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::ExactClassOrFile(const 
 		fileTagResult.Set(tagSearch.GetFileName(), tagSearch.GetLineNumber(), true, tagSearch.GetSourceDirs());
 		fileTagResult.Exec(Session, true);
 		allMatches = fileTagResult.MatchesAsTags();
-	}
-	else {
+	} else {
 		t4p::ExactNonMemberTagResultClass exactResult;
 		exactResult.SetTagType(t4p::PhpTagClass::CLASS);
 		exactResult.Set(tagSearch.GetClassName(), tagSearch.GetSourceDirs());
@@ -2152,8 +2115,7 @@ void t4p::ParsedTagFinderClass::EnsureMatchesExist(std::vector<t4p::PhpTagClass>
 		if (remove) {
 			fileTagIdsToRemove.push_back(it->FileTagId);
 			it = matches.erase(it);
-		}
-		else {
+		} else {
 			++it;
 		}
 	}
@@ -2252,11 +2214,9 @@ std::vector<t4p::PhpTagClass> t4p::ParsedTagFinderClass::All() {
 		result.Next();
 		if (result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("::")) > 0) {
 			// fully qualified methods
-		}
-		else if (result.Tag.Type != t4p::PhpTagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
+		} else if (result.Tag.Type != t4p::PhpTagClass::NAMESPACE && result.Tag.Key.indexOf(UNICODE_STRING_SIMPLE("\\")) >= 0) {
 			// fully qualified classes / functions (with namespace)
-		}
-		else {
+		} else {
 			all.push_back(result.Tag);
 		}
 	}

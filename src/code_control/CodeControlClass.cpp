@@ -355,12 +355,10 @@ static bool SavePrivilegedFileWithCharset(const wxString& fullPath, const wxStri
 	if (wxOS_UNIX_LINUX == platform.GetOperatingSystemId()) {
 		return SavePrivilegedFileWithCharsetLinux(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
-	}
-	else if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
+	} else if (wxOS_WINDOWS_NT == platform.GetOperatingSystemId()) {
 		return SavePrivilegedFileWithCharsetWindows(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
-	}
-	else if (wxOS_MAC_OSX_DARWIN == platform.GetOperatingSystemId()) {
+	} else if (wxOS_MAC_OSX_DARWIN == platform.GetOperatingSystemId()) {
 		return SavePrivilegedFileWithCharsetMac(fullPath, contents,
 			charset, hasSignature, codeCtrl, eventSink);
 	}
@@ -489,11 +487,9 @@ void t4p::CodeControlClass::LoadAndTrackFile(const wxString& fileName) {
 		charset, hasSignature);
 	if (error == t4p::FindInFilesClass::NONE) {
 		TrackFile(fileName, contents, charset, hasSignature);
-	}
-	else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
+	} else if (error == t4p::FindInFilesClass::FILE_NOT_FOUND) {
 		t4p::EditorLogError(t4p::ERR_INVALID_FILE, fileName);
-	}
-	else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
+	} else if (t4p::FindInFilesClass::CHARSET_DETECTION == error) {
 		t4p::EditorLogError(t4p::ERR_CHARSET_DETECTION, fileName);
 	}
 }
@@ -529,21 +525,18 @@ bool t4p::CodeControlClass::SaveAndTrackFile(wxString newFilename, bool willDest
 
 		if (!doesExist || isWritable) {
 			saved = SaveFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature);
-		}
-		else {
+		} else {
 			t4p::CodeControlClass* ctrl = willDestroy ? NULL : this;
 			saved = SavePrivilegedFileWithCharset(CurrentFilename, GetValue(), Charset, HasFileSignature,
 				ctrl, EventSink);
 			isAsyncSave = true;
 		}
-	}
-	else {
+	} else {
 		bool isWritable = wxFileName::IsFileWritable(newFilename);
 		bool doesExist = wxFileName::FileExists(newFilename);
 		if (!doesExist || isWritable) {
 			saved = SaveFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature);
-		}
-		else {
+		} else {
 			t4p::CodeControlClass* ctrl = willDestroy ? NULL : this;
 			saved = SavePrivilegedFileWithCharset(newFilename, GetValue(), Charset, HasFileSignature,
 				ctrl, EventSink);
@@ -576,8 +569,7 @@ void t4p::CodeControlClass::MarkAsSaved() {
 	const wxCharBuffer cname = CurrentFilename.c_str();
 	if (stat(cname.data(), &buff) >= 0) {
 		FileOpenedDateTime.Set(buff.st_mtime);
-	}
-	else {
+	} else {
 		FileOpenedDateTime = wxDateTime::Now();
 	}
 }
@@ -752,8 +744,7 @@ void t4p::CodeControlClass::OnMarginClick(wxStyledTextEvent& event) {
 	if (event.GetMargin() == t4p::CodeControlOptionsClass::MARGIN_CODE_FOLDING) {
 		int line = LineFromPosition(event.GetPosition());
 		ToggleFold(line);
-	}
-	else {
+	} else {
 		// features will not be interested in  the margin click of the code
 		// folding markers
 		EventSink.Publish(event);
@@ -764,44 +755,31 @@ void t4p::CodeControlClass::AutoDetectFileType() {
 	wxString fileName = GetFileName();
 	if (Globals->FileTypes.HasAPhpExtension(fileName)) {
 		Type = t4p::FILE_TYPE_PHP;
-	}
-	else if (Globals->FileTypes.HasASqlExtension(fileName)) {
+	} else if (Globals->FileTypes.HasASqlExtension(fileName)) {
 		Type = t4p::FILE_TYPE_SQL;
-	}
-	else if (Globals->FileTypes.HasACssExtension(fileName)) {
+	} else if (Globals->FileTypes.HasACssExtension(fileName)) {
 		Type = t4p::FILE_TYPE_CSS;
-	}
-	else if (Globals->FileTypes.HasAJsExtension(fileName)) {
+	} else if (Globals->FileTypes.HasAJsExtension(fileName)) {
 		Type = t4p::FILE_TYPE_JS;
-	}
-	else if (Globals->FileTypes.HasAConfigExtension(fileName)) {
+	} else if (Globals->FileTypes.HasAConfigExtension(fileName)) {
 		Type = t4p::FILE_TYPE_CONFIG;
-	}
-	else if (Globals->FileTypes.HasACrontabExtension(fileName)) {
+	} else if (Globals->FileTypes.HasACrontabExtension(fileName)) {
 		Type = t4p::FILE_TYPE_CRONTAB;
-	}
-	else if (Globals->FileTypes.HasAYamlExtension(fileName)) {
+	} else if (Globals->FileTypes.HasAYamlExtension(fileName)) {
 		Type = t4p::FILE_TYPE_YAML;
-	}
-	else if (Globals->FileTypes.HasAXmlExtension(fileName)) {
+	} else if (Globals->FileTypes.HasAXmlExtension(fileName)) {
 		Type = t4p::FILE_TYPE_XML;
-	}
-	else if (Globals->FileTypes.HasARubyExtension(fileName)) {
+	} else if (Globals->FileTypes.HasARubyExtension(fileName)) {
 		Type = t4p::FILE_TYPE_RUBY;
-	}
-	else if (Globals->FileTypes.HasALuaExtension(fileName)) {
+	} else if (Globals->FileTypes.HasALuaExtension(fileName)) {
 		Type = t4p::FILE_TYPE_LUA;
-	}
-	else if (Globals->FileTypes.HasAMarkdownExtension(fileName)) {
+	} else if (Globals->FileTypes.HasAMarkdownExtension(fileName)) {
 		Type = t4p::FILE_TYPE_MARKDOWN;
-	}
-	else if (Globals->FileTypes.HasABashExtension(fileName)) {
+	} else if (Globals->FileTypes.HasABashExtension(fileName)) {
 		Type = t4p::FILE_TYPE_BASH;
-	}
-	else if (Globals->FileTypes.HasADiffExtension(fileName)) {
+	} else if (Globals->FileTypes.HasADiffExtension(fileName)) {
 		Type = t4p::FILE_TYPE_DIFF;
-	}
-	else {
+	} else {
 		Type = t4p::FILE_TYPE_TEXT;
 	}
 	ApplyPreferences();
@@ -840,8 +818,7 @@ void t4p::CodeControlClass::OnContextMenu(wxContextMenuEvent& event) {
 	// Let the frame handle it because we want features to have menu items
 	if (frame) {
 		frame->GetEventHandler()->ProcessEvent(event);
-	}
-	else {
+	} else {
 		event.Skip();
 	}
 }
@@ -883,8 +860,7 @@ void t4p::CodeControlClass::OnKeyDown(wxKeyEvent& event) {
 	if (!event.HasModifiers() && key > WXK_SPACE && key < WXK_DELETE) {
 		IsTouched = true;
 		hasChanged = true;
-	}
-	else if (!event.HasModifiers() && WXK_BACK == key) {
+	} else if (!event.HasModifiers() && WXK_BACK == key) {
 		IsTouched = true;
 		hasChanged = true;
 	}
@@ -922,16 +898,13 @@ void t4p::CodeControlClass::OnMotion(wxMouseEvent& event) {
 		altEvt.SetInt(pos);
 		altEvt.SetEventObject(this);
 		EventSink.Publish(altEvt);
-	}
-
-	// enable clickable links on identifiers
-	else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)
+	} else if ((GetStyleAt(pos) & wxSTC_HPHP_DEFAULT) && (event.GetModifiers() & wxMOD_CMD)
 		&& !(event.GetModifiers() & wxMOD_ALT)) {
+		// enable clickable links on identifiers
 		StyleSetHotSpot(style, true);
 		SetHotspotActiveForeground(true, *wxBLUE);
 		SetHotspotActiveUnderline(true);
-	}
-	else {
+	} else {
 		StyleSetHotSpot(style, false);
 	}
 
@@ -1028,8 +1001,7 @@ void t4p::CodeControlClass::MarkSearchHit(int lineNumber, bool goodHit) {
 	// line is 1-based but wxSTC lines start at zero
 	if (goodHit) {
 		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_GOOD_MARKER);
-	}
-	else {
+	} else {
 		MarkerAdd(lineNumber - 1, CODE_CONTROL_SEARCH_HIT_BAD_MARKER);
 	}
 	HasSearchMarkers = true;
@@ -1208,14 +1180,12 @@ void t4p::CodeControlClass::RemoveTrailingBlankLines() {
 
 		if ('>' == c && seenAngleBracket) {
 			done = true;
-		}
-		else if ('>' == c && !seenAngleBracket) {
+		} else if ('>' == c && !seenAngleBracket) {
 			seenAngleBracket = true;
 		}
 		if ('?' == c && seenQuestion) {
 			done = true;
-		}
-		else if ('?' == c && !seenQuestion) {
+		} else if ('?' == c && !seenQuestion) {
 			seenQuestion = true;
 		}
 

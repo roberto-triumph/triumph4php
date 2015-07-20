@@ -112,8 +112,7 @@ void t4p::EditorMessagesViewClass::OnMenu(wxCommandEvent& event) {
 	wxWindow* window = FindToolsWindow(ID_DEBUG_WINDOW);
 	if (window) {
 		SetFocusToToolsWindow(window);
-	}
-	else {
+	} else {
 		wxWindow* panel = new t4p::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
 		wxBitmap msgBitmap = t4p::BitmapImageAsset(wxT("editor-messages"));
 		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);
@@ -150,8 +149,7 @@ void t4p::EditorMessagesViewClass::AddMessage(wxLogLevel level, const wxChar* ms
 	if (window) {
 		panel = (t4p::EditorMessagesPanelClass*)window;
 		SetFocusToToolsWindow(window);
-	}
-	else {
+	} else {
 		panel = new t4p::EditorMessagesPanelClass(GetToolsNotebook(), ID_DEBUG_WINDOW);
 		wxBitmap msgBitmap = t4p::BitmapImageAsset(wxT("editor-messages"));
 		AddToolsWindow(panel, _("Editor Messages"), wxEmptyString, msgBitmap);

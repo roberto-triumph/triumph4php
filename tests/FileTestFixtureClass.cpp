@@ -66,17 +66,14 @@ void FileTestFixtureClass::RecursiveRmDir(wxString path) {
 		// wxRmDir does not handle symlinks
 		if (wxT("sfPropelPlugin") == filename) {
 			wxExecute(wxT("rm ") + path + wxT("sfPropelPlugin"));
-		}
-		else if (wxT("sfProtoculousPlugin") == filename) {
+		} else if (wxT("sfProtoculousPlugin") == filename) {
 			wxExecute(wxT("rm ") + path + wxT("sfProtoculousPlugin"));
-		}
-		else if (wxDirExists(path + filename)) {
+		} else if (wxDirExists(path + filename)) {
 			RecursiveRmDir(path + filename + wxFileName::GetPathSeparator());
 			wxString fullPath = path + filename;
 			good = wxRmdir(fullPath);
 			wxASSERT_MSG(good, wxT("could not remove directory:") + fullPath);
-		}
-		else {
+		} else {
 			good = wxRemoveFile(path + filename);
 			wxASSERT_MSG(good, wxT("could not remove file:") + (path + filename));
 		}
@@ -112,8 +109,7 @@ wxString FileTestFixtureClass::HideFile(const wxString& fileName) {
 		wxCharBuffer buf = wxConvUTF8.cWC2MB(wxHideCmd.c_str(), wxHideCmd.length() + 1, &rawLength);
 		const char *cmd = buf.data();
 		system(cmd);
-	}
-	else if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX || info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
+	} else if (info.GetOperatingSystemId() == wxOS_UNIX_LINUX || info.GetOperatingSystemId() == wxOS_MAC_OSX_DARWIN) {
 		//hide the file when running tests on a linux / unix box by renaming to a dot file
 		wxString hiddenName;
 		wxFileName wxf(fileName);
