@@ -13,3 +13,6 @@
 	path = lib/wxWidgets
 	url = https://github.com/robertop/wxWidgets.git
 	ignore = dirty
+[submodule "lib/googleStyleGuide"]
+	path = lib/googleStyleGuide
+	url = git@github.com:google/styleguide.git
