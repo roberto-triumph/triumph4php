@@ -71,6 +71,6 @@ class RecentFilesViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_RECENTFILESVIEWCLASS_H_

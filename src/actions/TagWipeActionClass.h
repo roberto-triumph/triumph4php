@@ -133,6 +133,6 @@ class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 	 */
 	std::vector<wxFileName> FilesToDelete;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_TAGWIPEACTIONCLASS_H_

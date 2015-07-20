@@ -563,7 +563,6 @@ class ScopeFinderClass :
 	 */
 	int PosToCheck;
 };
-}
-
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_SYMBOLTABLECLASS_H_

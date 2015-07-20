@@ -125,6 +125,6 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_

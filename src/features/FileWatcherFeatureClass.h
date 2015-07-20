@@ -261,6 +261,6 @@ class VolumeListEventClass : public wxEvent {
 
 	wxEvent* Clone() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_FILEWATCHERFEATURECLASS_H_

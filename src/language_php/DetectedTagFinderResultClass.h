@@ -101,6 +101,6 @@ class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMember
 
 	int ClassCount;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_

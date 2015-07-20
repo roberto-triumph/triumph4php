@@ -60,6 +60,6 @@ class TemplateFilesFeatureClass : public t4p::FeatureClass {
 
 	private:
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_

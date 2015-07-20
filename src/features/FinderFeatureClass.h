@@ -129,5 +129,6 @@ class FinderFeatureClass : public FeatureClass {
 	 */
 	void StartFinderAction(UnicodeString word, char* buf, int documentLength);
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_FEATURES_FINDERFEATURECLASS_H_

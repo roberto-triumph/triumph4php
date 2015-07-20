@@ -111,6 +111,6 @@ class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 
 	t4p::NavigationChoiceClass& Choice;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_NAVIGATIONVIEWCLASS_H_

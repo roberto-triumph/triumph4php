@@ -65,6 +65,6 @@ class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 
 	bool DoAsync();
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_GLOBALACTIONCLASS_H_

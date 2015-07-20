@@ -84,6 +84,6 @@ class SqliteFinderClass {
 	 */
 	soci::session& Session;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_SQLITEFINDERCLASS_H_

@@ -35,6 +35,6 @@ namespace t4p {
 	 * @param button button to put the help icon on
 	 */
 	void HelpButtonIcon(wxBitmapButton* button);
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_BUTTONS_H_

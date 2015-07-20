@@ -65,6 +65,6 @@ class FileCabinetFeatureClass : public t4p::FeatureClass {
 	 */
 	t4p::FileCabinetStoreClass Store;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_FILECABINETFEATURECLASS_H_

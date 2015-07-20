@@ -74,6 +74,6 @@ class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
 	t4p::DocCommentViewClass& FeatureView;
 };
 
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_DOCCOMMENTVIEWCLASS_H_

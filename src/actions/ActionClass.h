@@ -634,6 +634,6 @@ typedef void (wxEvtHandler::*ActionProgressEventClassFunction)(t4p::ActionProgre
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(ActionEventClassFunction, & fn), (wxObject *) NULL),
 
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_ACTIONCLASS_H_

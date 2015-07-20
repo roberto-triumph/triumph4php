@@ -397,6 +397,6 @@ class DebuggerFeatureClass : public t4p::FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_DEBUGGERFEATURECLASS_H_

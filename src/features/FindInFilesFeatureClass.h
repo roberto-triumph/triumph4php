@@ -260,5 +260,6 @@ class FindInFilesFeatureClass : public FeatureClass {
 
 	private:
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_FEATURES_FINDINFILESFEATURECLASS_H_

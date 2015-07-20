@@ -50,6 +50,6 @@ class RecentFilesFeatureClass : public FeatureClass {
 
 	private:
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_RECENTFILESFEATURECLASS_H_

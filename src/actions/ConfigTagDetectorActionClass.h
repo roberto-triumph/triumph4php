@@ -131,6 +131,6 @@ class ConfigTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActi
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_CONFIGTAGDETECTORACTIONCLASS_H_

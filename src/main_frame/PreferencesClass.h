@@ -243,5 +243,6 @@ class PreferencesClass {
 	 */
 	bool CheckForUpdates;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_MAIN_FRAME_PREFERENCESCLASS_H_

@@ -46,6 +46,6 @@ class RecursiveDirTraverserClass : public wxDirTraverser {
 	private:
     std::vector<wxString>& FullPaths;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_SEARCH_RECURSIVEDIRTRAVERSERCLASS_H_

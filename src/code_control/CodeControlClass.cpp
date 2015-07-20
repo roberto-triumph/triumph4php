@@ -115,7 +115,7 @@ class ElevatedSaveProcessClass : public wxProcess {
 	 */
 	wxString GetProcessOutput() const;
 };
-}
+}  // namespace t4p
 
 t4p::ElevatedSaveProcessClass::ElevatedSaveProcessClass(t4p::CodeControlClass* ctrl, t4p::EventSinkClass& eventSink)
 : wxProcess(wxPROCESS_REDIRECT)

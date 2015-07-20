@@ -81,6 +81,6 @@ class VersionUpdateActionClass : public t4p::ActionClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_VERSIONUPDATEFEATURECLASS_H_

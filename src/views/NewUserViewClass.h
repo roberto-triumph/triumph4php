@@ -104,6 +104,6 @@ class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClas
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_NEWUSERVIEWCLASS_H_

@@ -188,6 +188,6 @@ class FileTypeClass {
 	 */
 	bool HasAnyExtension(const wxString& fullPath) const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_FILETYPECLASS_H_

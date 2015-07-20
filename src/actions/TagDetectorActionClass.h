@@ -138,6 +138,6 @@ class TagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionClas
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_TAGDETECTORACTIONCLASS_H_

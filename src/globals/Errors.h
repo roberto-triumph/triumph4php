@@ -109,6 +109,6 @@ wxString MessageWithFix(wxString message, wxString fix);
  * the fix string is determined by comparing logged text vs. what the string an Errors enum would generate.
  */
 void EditorErrorFix(const wxString& errorString, wxString& error, wxString& fix);
-};
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_ERRORS_H_

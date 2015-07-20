@@ -212,6 +212,6 @@ class TagFinderListClass {
 
 	private:
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_TAGFINDERLIST_H_

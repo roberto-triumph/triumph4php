@@ -179,6 +179,6 @@ class TotalTagSearchActionClass : public t4p::ActionClass {
 	 */
 	std::vector<wxFileName> SearchDirs;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_

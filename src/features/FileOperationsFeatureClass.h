@@ -36,6 +36,6 @@ class FileOperationsFeatureClass : public t4p::FeatureClass {
 	public:
     FileOperationsFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_FILEOPERATIONSFEATURECLASS_H_

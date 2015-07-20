@@ -176,6 +176,6 @@ class AppClass {
 	// config modified timer
 	wxTimer& Timer;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_TRIUMPH_H_

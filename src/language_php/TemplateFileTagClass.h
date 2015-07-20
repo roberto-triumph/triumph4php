@@ -84,6 +84,6 @@ class TemplateFileTagFinderClass {
 
 	bool IsInitialized;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_

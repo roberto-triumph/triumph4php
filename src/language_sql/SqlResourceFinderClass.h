@@ -262,6 +262,6 @@ class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 	 */
 	std::vector<UnicodeString> FindColumns(const DatabaseTagClass& info, const UnicodeString& partialColumnName);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_

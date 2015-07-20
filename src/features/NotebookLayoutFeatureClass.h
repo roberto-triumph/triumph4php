@@ -36,6 +36,6 @@ class NotebookLayoutFeatureClass : public t4p::FeatureClass {
 	public:
     NotebookLayoutFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_NOTEBOOKLAYOUTFEATURECLASS_H_

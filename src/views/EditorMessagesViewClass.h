@@ -77,6 +77,6 @@ class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
 	 */
 	void OnClearButton(wxCommandEvent& event);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_

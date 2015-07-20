@@ -369,6 +369,6 @@ class ReplacePanelClass : public ReplacePanelGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_FINDERVIEWCLASS_H_

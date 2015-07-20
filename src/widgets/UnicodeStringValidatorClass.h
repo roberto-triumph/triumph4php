@@ -56,6 +56,6 @@ class UnicodeStringValidatorClass : public wxValidator {
 	 */
 	bool DoAllowEmpty;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_UNICODESTRINGVALIDATORCLASS_H_

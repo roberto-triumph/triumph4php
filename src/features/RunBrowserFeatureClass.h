@@ -51,6 +51,6 @@ class RunBrowserFeatureClass : public FeatureClass {
 
 	private:
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_RUNBROWSERFEATURECLASS_H_

@@ -120,6 +120,6 @@ class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 
 	wxImageList ImageList;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_

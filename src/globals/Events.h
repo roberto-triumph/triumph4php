@@ -637,6 +637,6 @@ extern const long ID_TOOLS_NOTEBOOK;
  * events for the outline notebook
  */
 extern const long ID_OUTLINE_NOTEBOOK;
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_EVENTS_H_

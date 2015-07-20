@@ -123,6 +123,6 @@ class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGenera
 	public:
 	VersionUpdatePreferencesPanelClass(wxWindow* parent, t4p::PreferencesClass& preferences);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_

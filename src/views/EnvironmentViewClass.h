@@ -266,6 +266,6 @@ class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass 
 	 */
 	wxString OriginalName;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_

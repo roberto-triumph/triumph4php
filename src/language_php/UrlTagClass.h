@@ -167,5 +167,6 @@ class UrlTagFinderClass : public t4p::SqliteFinderClass {
 	 */
 	std::vector<wxString> AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs);
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_LANGUAGE_PHP_URLTAGCLASS_H_

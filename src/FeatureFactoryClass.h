@@ -150,6 +150,6 @@ class FeatureFactoryClass {
 	t4p::NotebookLayoutFeatureClass*       NotebookLayout;
 	t4p::TestFeatureClass*                 Test;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATUREFACTORYCLASS_H_

@@ -167,7 +167,7 @@ class TagByIdResultClass : public TagResultClass {
 	int Id;
 };
 
-}
+}  // namespace t4p
 
 /**
  * appends name to namespace

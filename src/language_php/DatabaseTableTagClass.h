@@ -52,6 +52,6 @@ class DatabaseTableTagClass {
 
 	void Copy(const t4p::DatabaseTableTagClass& src);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_DATABASETABLETAGCLASS_H_

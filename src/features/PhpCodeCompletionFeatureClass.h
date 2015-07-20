@@ -41,6 +41,6 @@ class PhpCodeCompletionFeatureClass : public t4p::FeatureClass {
 	public:
 	PhpCodeCompletionFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_PHPCODECOMPLETIONFEATURECLASS_H_

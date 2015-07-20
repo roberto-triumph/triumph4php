@@ -141,5 +141,6 @@ class ProjectClass {
 
 	private:
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_GLOBALS_PROJECTCLASS_H_

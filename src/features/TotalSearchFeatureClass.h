@@ -49,6 +49,6 @@ class TotalSearchFeatureClass : public t4p::FeatureClass {
 
 	void OpenDbData(const t4p::DatabaseTableTagClass& tableTag);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_

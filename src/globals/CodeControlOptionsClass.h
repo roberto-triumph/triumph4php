@@ -313,6 +313,6 @@ class CodeControlOptionsClass {
 	 */
 	StylePreferenceClass& FindByStcStyle(std::vector<StylePreferenceClass>& styles, int style) const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_CODECONTROLOPTIONSCLASS_H_

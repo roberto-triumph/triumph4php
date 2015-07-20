@@ -53,6 +53,6 @@ bool NumberLessThan(int a, unsigned int b);
  * @return bool TRUE i  a == b and a >= 0
  */
 bool NumberEqualTo(int a, unsigned int b);
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_NUMBER_H_

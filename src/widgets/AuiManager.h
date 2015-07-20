@@ -151,6 +151,6 @@ t4p::NotebookClass* AuiNextHiddenCodeNotebook(wxAuiManager& auiManager);
  * @return the highest row number
  */
 int AuiRowCount(wxAuiManager& auiManager, int dock);
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_AUIMANAGER_H_

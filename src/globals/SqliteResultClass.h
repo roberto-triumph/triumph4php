@@ -162,6 +162,6 @@ class SqliteResultClass {
 	 */
 	bool IsFetched;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_SQLITERESULTCLASS_H_

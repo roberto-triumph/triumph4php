@@ -60,6 +60,6 @@ class DetectorDbClass {
 	 */
 	soci::session* Session;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_DETECTORDBCLASS_H_

@@ -124,6 +124,6 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_FILECABINETVIEWCLASS_H_

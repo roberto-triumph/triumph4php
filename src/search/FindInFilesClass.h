@@ -336,5 +336,6 @@ class FindInFilesClass : public DirectoryWalkerClass {
 	 */
 	void CleanupStreams();
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_SEARCH_FINDINFILESCLASS_H_

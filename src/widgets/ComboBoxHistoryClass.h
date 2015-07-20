@@ -89,6 +89,6 @@ class ComboBoxHistoryClass : public wxEvtHandler {
 	 */
 	void OnComboSelected(wxCommandEvent& event);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_COMBOBOXHISTORYCLASS_H_

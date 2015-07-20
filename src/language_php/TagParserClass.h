@@ -399,5 +399,6 @@ class TagParserClass : public pelet::ClassObserverClass,
 	 */
 	void BeginTransaction();
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_

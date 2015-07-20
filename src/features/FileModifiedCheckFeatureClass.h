@@ -59,6 +59,6 @@ class FileModifiedCheckFeatureClass : public t4p::FeatureClass {
 	 */
 	void StartFilePoll(std::vector<t4p::FileModifiedTimeClass> filesToPoll);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_FILEMODIFIEDCHECKFEATURECLASS_H_

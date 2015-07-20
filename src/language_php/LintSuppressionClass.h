@@ -208,6 +208,6 @@ class LintSuppressionClass {
 	 */
 	bool AddSkipAllRuleForDirectory(const wxFileName& dir);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_LINTSUPPRESSIONCLASS_H_

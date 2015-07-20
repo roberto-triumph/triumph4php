@@ -221,6 +221,6 @@ class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
 	private:
 	std::vector<int>& Selections;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_PROJECTVIEWCLASS_H_

@@ -320,6 +320,6 @@ class PhpVariableLintClass :
 	 */
 	bool LookupSignature(UnicodeString& signature, const UnicodeString& functionName, bool isMethod, bool isStatic);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_PHPVARIABLELINTCLASS_H_

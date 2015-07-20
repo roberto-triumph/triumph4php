@@ -133,5 +133,6 @@ class TagFeatureClass : public FeatureClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_FEATURES_TAGFEATURECLASS_H_

@@ -77,6 +77,6 @@ int FileTypeImageId(const t4p::FileTypeClass& fileTypes, const wxFileName& fileN
  */
 int FileTypeImageIdFromType(t4p::FileType type);
 
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_FILETYPEIMAGELIST_H_

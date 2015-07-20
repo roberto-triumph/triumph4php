@@ -119,5 +119,6 @@ class PreferencesDialogClass : public wxPropertySheetDialog {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_MAIN_FRAME_PREFERENCESDIALOGCLASS_H_

@@ -42,6 +42,6 @@ class TestFeatureClass : public FeatureClass {
 	 */
 	void Go();
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_TESTFEATURECLASS_H_

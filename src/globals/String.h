@@ -148,6 +148,6 @@ void DeepCopy(std::vector<wxString>& dest, const std::vector<wxString>& src);
  */
 void DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxString>& src);
 
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_STRING_H_

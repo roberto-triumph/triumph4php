@@ -76,7 +76,7 @@ class AppTimerClass : public wxTimer {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 /**
  * The GuiApp is the class that represents to GUI App.
@@ -199,7 +199,7 @@ class MysqlThreadCleanupClass : public t4p::ThreadCleanupClass {
 		return new MysqlThreadCleanupClass();
 	}
 };
-}
+}  // namespace t4p
 
 GuiAppClass::GuiAppClass()
 	: wxApp()

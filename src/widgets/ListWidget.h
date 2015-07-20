@@ -63,6 +63,6 @@ void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Valu
  *         if no row is selected.
  */
 int ListCtrlSelected(wxListCtrl* ctrl);
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_LISTWIDGET_H_

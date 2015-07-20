@@ -87,5 +87,6 @@ class EditorMessagesLoggerClass : public wxLog {
 	private:
 	EditorMessagesFeatureClass& Feature;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_

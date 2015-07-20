@@ -37,6 +37,6 @@ class NewUserFeatureClass : public t4p::FeatureClass {
 	public:
 	NewUserFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_NEWUSERFEATURECLASS_H_

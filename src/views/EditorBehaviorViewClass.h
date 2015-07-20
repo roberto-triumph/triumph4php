@@ -202,6 +202,6 @@ class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGenerated
 	 */
 	wxString OriginalShortcut;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_

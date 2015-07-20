@@ -354,6 +354,6 @@ class PhpIdentifierLintClass :
 	 */
 	void CheckFunctionName(const pelet::VariablePropertyClass& functionProp, pelet::VariableClass* var);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_PHPIDENTIFIERLINTCLASS_H_

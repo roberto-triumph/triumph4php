@@ -121,6 +121,6 @@ class OutlineFeatureClass : public FeatureClass {
 	 */
 	OutlineFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_OUTLINEFEATURECLASS_H_

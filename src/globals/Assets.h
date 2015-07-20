@@ -294,6 +294,6 @@ wxFileName ChangeLogFileAsset();
  *         the lint suppressions feature was added after initial release.
  */
 wxFileName LintSuppressionsFileAsset();
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_ASSETS_H_

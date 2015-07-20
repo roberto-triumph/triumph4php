@@ -54,6 +54,6 @@ class FilePickerValidatorClass : public wxValidator {
 	 */
 	wxFileName* Data;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_FILEPICKERVALIDATORCLASS_H_

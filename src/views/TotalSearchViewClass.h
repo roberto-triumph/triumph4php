@@ -136,6 +136,6 @@ class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_

@@ -44,6 +44,6 @@ class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
 
 	wxString GetLabel() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_

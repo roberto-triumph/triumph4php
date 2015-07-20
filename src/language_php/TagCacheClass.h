@@ -587,7 +587,7 @@ class TagFinderListCompleteEventClass : public wxEvent {
 
 	wxEvent* Clone() const;
 };
-}
+}  // namespace t4p
 
 typedef void (wxEvtHandler::*WorkingCacheCompleteEventClassFunction)(t4p::WorkingCacheCompleteEventClass&);
 

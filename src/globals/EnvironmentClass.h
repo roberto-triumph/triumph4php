@@ -200,5 +200,6 @@ class EnvironmentClass {
 	private:
 	void AddDefaults();
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_GLOBALS_ENVIRONMENTCLASS_H_

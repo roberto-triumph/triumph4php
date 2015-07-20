@@ -345,5 +345,6 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_VIEWS_FINDINFILESVIEWCLASS_H_

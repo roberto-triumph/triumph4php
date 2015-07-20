@@ -94,6 +94,6 @@ class CallStackActionClass : public t4p::GlobalActionClass {
 	 */
 	pelet::Versions Version;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_CALLSTACKACTIONCLASS_H_

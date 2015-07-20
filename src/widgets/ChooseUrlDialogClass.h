@@ -131,6 +131,6 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 	 */
 	const t4p::FileTypeClass& FileType;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_

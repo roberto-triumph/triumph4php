@@ -140,6 +140,6 @@ class SqlLexicalAnalyzerClass {
 	 */
 	Conditions CurrentCondition;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_SQL_SQLLEXICALANALYZERCLASS_H_

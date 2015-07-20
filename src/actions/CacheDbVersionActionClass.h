@@ -88,6 +88,6 @@ class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 	 */
 	soci::session Session;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_

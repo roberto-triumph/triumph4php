@@ -275,6 +275,6 @@ class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
 	 */
 	std::string Name;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_FILECABINETITEMCLASS_H_

@@ -144,6 +144,6 @@ class TemplateFileTagsDetectorActionClass : public wxEvtHandler, public t4p::Glo
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_TEMPLATEFILETAGSDETECTORACTIONCLASS_H_

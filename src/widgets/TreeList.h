@@ -37,6 +37,6 @@ namespace t4p {
 	 * @param ctrl
 	 */
 	void TreeListAutoSizeAllColumns(wxTreeListCtrl* ctrl);
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_TREELIST_H_

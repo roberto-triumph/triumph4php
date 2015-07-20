@@ -80,6 +80,6 @@ class ConfigTagFinderClass : public t4p::SqliteFinderClass {
 	 */
 	std::vector<t4p::ConfigTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_

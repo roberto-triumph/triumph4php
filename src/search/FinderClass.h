@@ -275,5 +275,6 @@ class FinderClass {
 	 */
 	bool FindNextRegularExpression(const UnicodeString& text, int32_t start = 0);
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_SEARCH_FINDERCLASS_H_

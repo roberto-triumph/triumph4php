@@ -84,7 +84,7 @@ class IdTreeItemDataClass  : public wxTreeItemData {
 		, Id(id) {
 	}
 };
-}
+}  // namespace t4p
 
 t4p::OutlineViewClass::OutlineViewClass(t4p::OutlineFeatureClass& feature)
 	: FeatureViewClass()

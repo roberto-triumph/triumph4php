@@ -357,6 +357,6 @@ class ExplorerModifyEventClass : public wxEvent {
 
 	wxEvent* Clone() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_EXPLORERFEATURECLASS_H_

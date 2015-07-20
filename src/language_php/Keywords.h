@@ -104,6 +104,6 @@ wxString KeywordsPhpAll(pelet::Versions version);
  */
 wxString KeywordsHtmlAll();
 
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_KEYWORDS_H_

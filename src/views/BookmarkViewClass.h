@@ -114,6 +114,6 @@ class BookmarkViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_BOOKMARKVIEWCLASS_H_

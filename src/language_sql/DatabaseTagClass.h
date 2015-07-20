@@ -426,6 +426,6 @@ class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
 	 */
 	std::vector<t4p::DatabaseTagClass> All(const std::vector<wxFileName>& sourceDirectories);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_SQL_DATABASETAGCLASS_H_

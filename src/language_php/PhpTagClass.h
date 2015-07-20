@@ -348,6 +348,6 @@ class FileTagClass {
 	 */
 	wxString Name() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_PHPTAGCLASS_H_

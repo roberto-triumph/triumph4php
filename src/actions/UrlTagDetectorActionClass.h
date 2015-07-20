@@ -145,6 +145,6 @@ class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionC
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_URLTAGDETECTORACTIONCLASS_H_

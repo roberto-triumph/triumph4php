@@ -54,6 +54,6 @@ class DirPickerValidatorClass : public wxValidator {
 	 */
 	wxFileName* Data;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_DIRPICKERVALIDATORCLASS_H_

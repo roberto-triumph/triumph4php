@@ -1285,5 +1285,5 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	 */
 	bool IsNewNamespace(const UnicodeString& namespaceName);
 };
-}
+}  // namespace t4p
 #endif  // SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_

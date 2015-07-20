@@ -131,6 +131,6 @@ class DatabaseTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalAc
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_DATABASETAGDETECTORACTIONCLASS_H_

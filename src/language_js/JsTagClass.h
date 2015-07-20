@@ -109,6 +109,6 @@ class JsTagClass {
 
 	void Copy(const t4p::JsTagClass& src);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_JS_JSTAGCLASS_H_

@@ -53,5 +53,5 @@ void TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches);
 void TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
 	std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType);
 
-}
+}  // namespace t4p
 #endif  // SRC_GLOBALS_TAGLIST_H_

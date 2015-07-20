@@ -281,5 +281,6 @@ class GlobalsClass {
 	 */
 	bool IsInLocalVolume(const wxFileName& fileName) const;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_GLOBALS_GLOBALSCLASS_H_

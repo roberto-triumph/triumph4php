@@ -116,7 +116,8 @@ class FileModifiedCheckActionClass : public t4p::ActionClass {
 	private:
 	std::vector<t4p::FileModifiedTimeClass> FilesToCheck;
 };
-}
+
+}  // namespace t4p
 
 typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModifiedEventClass&);
 

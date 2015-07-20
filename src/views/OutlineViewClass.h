@@ -390,6 +390,6 @@ class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 	 */
 	std::vector<t4p::PhpTagClass>& ChosenTags;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_OUTLINEVIEWCLASS_H_

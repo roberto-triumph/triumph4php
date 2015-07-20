@@ -35,6 +35,6 @@ namespace t4p {
  * @return boolean TRUE if the directory was deleted
  */
 bool RecursiveRmDir(wxString path);
-}
+}  // namespace t4p
 
 #endif  // SRC_SEARCH_DIRECTORY_H_

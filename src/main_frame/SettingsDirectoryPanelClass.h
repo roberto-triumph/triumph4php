@@ -39,6 +39,6 @@ class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass 
 	void OnAppDir(wxCommandEvent& event);
 	void OnCustomDir(wxCommandEvent& event);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_

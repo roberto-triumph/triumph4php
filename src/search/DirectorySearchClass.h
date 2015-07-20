@@ -394,5 +394,6 @@ class DirectorySearchClass {
 	 */
 	bool HasCalledEnd;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_SEARCH_DIRECTORYSEARCHCLASS_H_

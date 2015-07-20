@@ -54,6 +54,6 @@ class GlobalsChangeHandlerClass : public wxEvtHandler {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_

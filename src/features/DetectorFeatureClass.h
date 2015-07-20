@@ -148,6 +148,6 @@ class DetectorFeatureClass : public t4p::FeatureClass {
 	void RunDatabaseDetectors();
 	void RunConfigDetectors();
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_DETECTORFEATURECLASS_H_

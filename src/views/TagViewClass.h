@@ -303,5 +303,6 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_VIEWS_TAGVIEWCLASS_H_

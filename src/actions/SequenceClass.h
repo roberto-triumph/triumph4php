@@ -215,6 +215,6 @@ typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(t4p::SequencePr
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(SequenceProgressEventClassFunction, & fn), (wxObject *) NULL),
 
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_SEQUENCECLASS_H_

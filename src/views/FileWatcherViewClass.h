@@ -55,6 +55,6 @@ class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGener
 	private:
 	t4p::FileWatcherFeatureClass& Feature;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_FILEWATCHERVIEWCLASS_H_

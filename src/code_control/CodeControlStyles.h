@@ -43,6 +43,6 @@ void CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxSt
  * @return all of the theme names
  */
 wxArrayString CodeControlStylesGetThemes();
-}
+}  // namespace t4p
 
 #endif  // SRC_CODE_CONTROL_CODECONTROLSTYLES_H_

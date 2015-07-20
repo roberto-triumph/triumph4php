@@ -172,6 +172,6 @@ class FeatureClass : public wxEvtHandler {
 
 	private:
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_FEATURECLASS_H_

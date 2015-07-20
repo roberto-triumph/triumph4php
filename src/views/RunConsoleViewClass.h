@@ -343,5 +343,6 @@ class RunConsoleViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_

@@ -330,6 +330,6 @@ class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialog
 	 */
 	t4p::SuppressionRuleClass EditRule;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_LINTVIEWCLASS_H_

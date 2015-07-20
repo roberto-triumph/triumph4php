@@ -131,6 +131,6 @@ class RunBrowserViewClass : public FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_RUNBROWSERVIEWCLASS_H_

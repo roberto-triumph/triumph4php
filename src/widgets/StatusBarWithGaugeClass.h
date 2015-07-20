@@ -137,6 +137,6 @@ class StatusBarWithGaugeClass : public wxStatusBar {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_STATUSBARWITHGAUGECLASS_H_

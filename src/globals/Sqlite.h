@@ -118,6 +118,6 @@ int SqliteInsertId(soci::statement& stmt);
  * @return bool TRUE if db connection was opened.
  */
 bool SqliteOpen(soci::session& session, const wxString& dbName);
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_SQLITE_H_

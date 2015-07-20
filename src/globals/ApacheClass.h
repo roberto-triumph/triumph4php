@@ -220,5 +220,6 @@ class ApacheClass : public DirectoryWalkerClass {
 	  */
 	 int Port;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_GLOBALS_APACHECLASS_H_

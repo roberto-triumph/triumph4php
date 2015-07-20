@@ -907,6 +907,6 @@ typedef void (wxEvtHandler::*DbgpEvalEventClassFunction)(t4p::DbgpEvalEventClass
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(DbgpEvalEventClassFunction, & fn), (wxObject *) NULL),
 
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_

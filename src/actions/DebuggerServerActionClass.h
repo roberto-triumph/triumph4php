@@ -233,6 +233,6 @@ class DebuggerServerActionClass : public wxEvtHandler, public t4p::ActionClass {
 	 */
 	int Port;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_

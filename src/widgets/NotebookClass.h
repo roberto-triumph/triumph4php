@@ -406,5 +406,6 @@ class FileDropTargetClass : public wxFileDropTarget {
 	private:
 	NotebookClass* Notebook;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_WIDGETS_NOTEBOOKCLASS_H_

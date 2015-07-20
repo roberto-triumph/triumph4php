@@ -479,6 +479,6 @@ class CallStackClass :
 	 */
 	bool InDesiredScope() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_CALLSTACKCLASS_H_

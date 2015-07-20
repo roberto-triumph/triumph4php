@@ -370,6 +370,6 @@ class ExplorerNewFileDialogClass : public ExplorerNewFileGeneratedDialogClass {
 	 */
 	wxString& FileName;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_EXPLORERVIEWCLASS_H_

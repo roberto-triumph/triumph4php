@@ -231,6 +231,6 @@ class PhpCodeCompletionViewClass : public t4p::FeatureViewClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_PHPCODECOMPLETIONVIEWCLASS_H_

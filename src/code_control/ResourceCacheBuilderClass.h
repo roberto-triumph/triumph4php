@@ -127,5 +127,6 @@ class WorkingCacheBuilderClass : public t4p::ActionClass {
 	 */
 	bool DoParseTags;
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_

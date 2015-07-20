@@ -442,6 +442,6 @@ class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
 
 	wxString& LocalPathString;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_DEBUGGERVIEWCLASS_H_

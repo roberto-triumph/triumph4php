@@ -37,6 +37,6 @@ namespace t4p {
 	 * @param ctrl
 	 */
 	void DataViewGridAutoSizeAllColumns(wxDataViewCtrl* ctrl);
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_DATAVIEWGRID_H_

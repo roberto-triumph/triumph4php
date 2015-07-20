@@ -106,6 +106,6 @@ class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
 	std::string SearchUpper;
 	std::vector<std::string> SourceDirs;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_

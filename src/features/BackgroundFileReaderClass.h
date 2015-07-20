@@ -158,5 +158,5 @@ class BackgroundFileReaderClass : public t4p::ActionClass {
 	 */
 	Mode Mode;
 };
-}
+}  // namespace t4p
 #endif  // SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_

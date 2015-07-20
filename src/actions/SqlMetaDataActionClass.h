@@ -97,7 +97,7 @@ class SqlMetaDataInitActionClass : public t4p::InitializerGlobalActionClass {
 	protected:
 	wxString GetLabel() const;
 };
-}
+}  // namespace t4p
 
 typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEventClass&);
 

@@ -884,5 +884,6 @@ class CodeControlClass : public wxStyledTextCtrl {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_CODE_CONTROL_CODECONTROLCLASS_H_

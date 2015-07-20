@@ -40,6 +40,6 @@ class TreeItemDataStringClass : public wxTreeItemData {
 
 	TreeItemDataStringClass(const wxString& str);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_WIDGETS_TREEITEMDATASTRINGCLASS_H_

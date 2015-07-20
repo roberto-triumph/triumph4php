@@ -141,5 +141,6 @@ class RunConsoleFeatureClass : public FeatureClass {
 	 */
 	void OnCommandButtonClick(wxCommandEvent& evt);
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_

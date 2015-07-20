@@ -328,6 +328,6 @@ class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
 
 	void OnHelpButton(wxCommandEvent& event);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_DETECTORVIEWCLASS_H_

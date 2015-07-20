@@ -306,6 +306,6 @@ class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
 	 */
 	t4p::TagFinderListClass TagFinderList;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_

@@ -185,6 +185,6 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 	t4p::FunctionSignatureLookupClass NativeFunctionSignatureLookup;
 	t4p::MethodSignatureLookupClass NativeMethodSignatureLookup;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_

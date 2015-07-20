@@ -48,6 +48,6 @@ wxFileName FileNameCopy(const wxFileName& fileName);
  * @return the cloned filenames
  */
 std::vector<wxFileName> DeepCopyFileNames(const std::vector<wxFileName>& fileNames);
-}
+}  // namespace t4p
 
 #endif  // SRC_GLOBALS_FILENAME_H_

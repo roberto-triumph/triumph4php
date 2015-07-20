@@ -97,6 +97,6 @@ class BookmarkFeatureClass : public t4p::FeatureClass {
 
 	BookmarkFeatureClass(t4p::AppClass& app);
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_BOOKMARKFEATURECLASS_H_

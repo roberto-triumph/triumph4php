@@ -665,6 +665,6 @@ class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
 
 	bool HasCheckedAll;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_VIEWS_SQLBROWSERVIEWCLASS_H_

@@ -47,6 +47,6 @@ class DocCommentFeatureClass : public t4p::FeatureClass {
 	 */
 	bool IsEnabled() const;
 };
-}
+}  // namespace t4p
 
 #endif  // SRC_FEATURES_DOCCOMMENTFEATURECLASS_H_

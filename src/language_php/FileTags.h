@@ -53,5 +53,5 @@ namespace t4p {
 	 * @return bool TRUE if INSERT succeeded
 	 */
 	bool FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag);
-}
+}  // namespace t4p
 #endif  // SRC_LANGUAGE_PHP_FILETAGS_H_

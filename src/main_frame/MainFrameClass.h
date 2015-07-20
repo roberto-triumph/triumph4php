@@ -294,5 +294,6 @@ class MainFrameClass : public MainFrameGeneratedClass {
 
 	DECLARE_EVENT_TABLE()
 };
-}
+}  // namespace t4p
+
 #endif  // SRC_MAIN_FRAME_MAINFRAMECLASS_H_
