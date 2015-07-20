@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DBGPEVENTCLASS_H
-#define T4P_DBGPEVENTCLASS_H
+#ifndef SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_
+#define SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_
 
 #include <wx/string.h>
 #include <wx/event.h>
@@ -909,4 +909,4 @@ typedef void (wxEvtHandler::*DbgpEvalEventClassFunction)(t4p::DbgpEvalEventClass
 
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_

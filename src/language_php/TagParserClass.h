@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TAGPARSERCLASS_H
-#define T4P_TAGPARSERCLASS_H
+#ifndef SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_
+#define SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_
 
 #include <search/DirectorySearchClass.h>
 #include <language_php/PhpTagClass.h>
@@ -400,4 +400,4 @@ class TagParserClass : public pelet::ClassObserverClass,
 	void BeginTransaction();
 };
 }
-#endif
+#endif  // SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_

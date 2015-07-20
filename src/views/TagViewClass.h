@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RESOURCEVIEWCLASS_H
-#define __RESOURCEVIEWCLASS_H
+#ifndef SRC_VIEWS_TAGVIEWCLASS_H_
+#define SRC_VIEWS_TAGVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/TagFeatureClass.h>
@@ -304,4 +304,4 @@ class TagSearchDialogClass : public TagSearchDialogGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // __RESOURCEFEATURECLASS_H
+#endif  // SRC_VIEWS_TAGVIEWCLASS_H_

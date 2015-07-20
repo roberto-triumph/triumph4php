@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_SYNTAXHIGHLIGHTFEATURECLASS_H
-#define T4P_SYNTAXHIGHLIGHTFEATURECLASS_H
+#ifndef SRC_FEATURES_SYNTAXHIGHLIGHTFEATURECLASS_H_
+#define SRC_FEATURES_SYNTAXHIGHLIGHTFEATURECLASS_H_
 
 #include <globals/Events.h>
 #include <features/FeatureClass.h>
@@ -45,4 +45,4 @@ class SyntaxHighlightFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif  // T4P_SYNTAXHIGHLIGHTFEATURECLASS_H
+#endif  // SRC_FEATURES_SYNTAXHIGHLIGHTFEATURECLASS_H_

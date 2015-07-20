@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_LISTWIDGET__
-#define T4P_LISTWIDGET__
+#ifndef SRC_WIDGETS_LISTWIDGET_H_
+#define SRC_WIDGETS_LISTWIDGET_H_
 
 #include <wx/listctrl.h>
 #include <wx/string.h>
@@ -65,4 +65,4 @@ void ListCtrlGet(wxListCtrl* list, wxString& column1Value, wxString& column2Valu
 int ListCtrlSelected(wxListCtrl* ctrl);
 }
 
-#endif
+#endif  // SRC_WIDGETS_LISTWIDGET_H_

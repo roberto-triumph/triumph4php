@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CALLSTACKACTIONCLASS_H
-#define T4P_CALLSTACKACTIONCLASS_H
+#ifndef SRC_ACTIONS_CALLSTACKACTIONCLASS_H_
+#define SRC_ACTIONS_CALLSTACKACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <language_php/CallStackClass.h>
@@ -96,4 +96,4 @@ class CallStackActionClass : public t4p::GlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_CALLSTACKACTIONCLASS_H_

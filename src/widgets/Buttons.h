@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_BUTTONS_H
-#define T4P_BUTTONS_H
+#ifndef SRC_WIDGETS_BUTTONS_H_
+#define SRC_WIDGETS_BUTTONS_H_
 
 #include <wx/bmpbuttn.h>
 
@@ -37,4 +37,4 @@ namespace t4p {
 	void HelpButtonIcon(wxBitmapButton* button);
 }
 
-#endif
+#endif  // SRC_WIDGETS_BUTTONS_H_

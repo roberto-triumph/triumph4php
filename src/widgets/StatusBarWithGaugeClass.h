@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __statusbarwithgaugeclass__
-#define __statusbarwithgaugeclass__
+#ifndef SRC_WIDGETS_STATUSBARWITHGAUGECLASS_H_
+#define SRC_WIDGETS_STATUSBARWITHGAUGECLASS_H_
 
 #include <wx/wx.h>
 #include <map>
@@ -139,4 +139,4 @@ class StatusBarWithGaugeClass : public wxStatusBar {
 };
 }
 
-#endif  // __statusbarwithgaugeclass__
+#endif  // SRC_WIDGETS_STATUSBARWITHGAUGECLASS_H_

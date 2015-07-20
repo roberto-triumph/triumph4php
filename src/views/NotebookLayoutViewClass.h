@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef NOTEBOOKLAYOUTFEATUREVIEWCLASS_H
-#define NOTEBOOKLAYOUTFEATUREVIEWCLASS_H
+#ifndef SRC_VIEWS_NOTEBOOKLAYOUTVIEWCLASS_H_
+#define SRC_VIEWS_NOTEBOOKLAYOUTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/FeatureClass.h>
@@ -82,5 +82,4 @@ class NotebookLayoutViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_NOTEBOOKLAYOUTVIEWCLASS_H_

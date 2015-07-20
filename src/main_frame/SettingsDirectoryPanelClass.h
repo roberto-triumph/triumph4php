@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_SETTINGSDIRECTORYPANEL_H
-#define T4P_SETTINGSDIRECTORYPANEL_H
+#ifndef SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_
+#define SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_
 
 #include <main_frame/wxformbuilder/MainFrameForms.h>
 
@@ -41,4 +41,4 @@ class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass 
 };
 }
 
-#endif
+#endif  // SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_

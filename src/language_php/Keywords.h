@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_KEYWORDS_H
-#define T4P_KEYWORDS_H
+#ifndef SRC_LANGUAGE_PHP_KEYWORDS_H_
+#define SRC_LANGUAGE_PHP_KEYWORDS_H_
 
 #include <wx/string.h>
 #include <vector>
@@ -106,5 +106,4 @@ wxString KeywordsHtmlAll();
 
 }
 
-#endif
-
+#endif  // SRC_LANGUAGE_PHP_KEYWORDS_H_

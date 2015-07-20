@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __apacheclass__
-#define __apacheclass__
+#ifndef SRC_GLOBALS_APACHECLASS_H_
+#define SRC_GLOBALS_APACHECLASS_H_
 
 #include <search/DirectorySearchClass.h>
 #include <wx/filename.h>
@@ -221,4 +221,4 @@ class ApacheClass : public DirectoryWalkerClass {
 	 int Port;
 };
 }
-#endif  // __apacheclass__
+#endif  // SRC_GLOBALS_APACHECLASS_H_

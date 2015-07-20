@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CONFIGDETECTORACTIONCLASS_H
-#define T4P_CONFIGDETECTORACTIONCLASS_H
+#ifndef SRC_ACTIONS_CONFIGTAGDETECTORACTIONCLASS_H_
+#define SRC_ACTIONS_CONFIGTAGDETECTORACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
@@ -133,4 +133,4 @@ class ConfigTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActi
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_CONFIGTAGDETECTORACTIONCLASS_H_

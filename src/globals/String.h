@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_STRING_H
-#define T4P_STRING_H
+#ifndef SRC_GLOBALS_STRING_H_
+#define SRC_GLOBALS_STRING_H_
 
 #include <unicode/unistr.h>
 #include <wx/string.h>
@@ -150,4 +150,4 @@ void DeepCopy(std::map<wxString, wxString>& dest, const std::map<wxString, wxStr
 
 }
 
-#endif
+#endif  // SRC_GLOBALS_STRING_H_

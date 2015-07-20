@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_ENVIRONMENTFEATUREVIEWCLASS_H
-#define T4P_ENVIRONMENTFEATUREVIEWCLASS_H
+#ifndef SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_
+#define SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/EnvironmentFeatureForms.h>
@@ -268,5 +268,4 @@ class WebBrowserCreateDialogClass : public WebBrowserCreateDialogGeneratedClass 
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_

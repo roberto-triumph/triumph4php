@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RUNCONSOLEVIEWCLASS_H
-#define __RUNCONSOLEVIEWCLASS_H
+#ifndef SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_
+#define SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_
 
 #include <views/wxformbuilder/RunConsoleFeatureForms.h>
 #include <views/FeatureViewClass.h>
@@ -344,4 +344,4 @@ class RunConsoleViewClass : public FeatureViewClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // __RUNCONSOLEFEATURECLASS_H
+#endif  // SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_

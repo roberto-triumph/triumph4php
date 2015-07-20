@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_SQLITEFINDERCLASS_H
-#define T4P_SQLITEFINDERCLASS_H
+#ifndef SRC_GLOBALS_SQLITEFINDERCLASS_H_
+#define SRC_GLOBALS_SQLITEFINDERCLASS_H_
 
 #include <globals/SqliteResultClass.h>
 #include <soci/soci.h>
@@ -86,4 +86,4 @@ class SqliteFinderClass {
 };
 }
 
-#endif
+#endif  // SRC_GLOBALS_SQLITEFINDERCLASS_H_

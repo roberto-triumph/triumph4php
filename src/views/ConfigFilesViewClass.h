@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_ConfigFilesFeatureViewClass_H
-#define T4P_ConfigFilesFeatureViewClass_H
+#ifndef SRC_VIEWS_CONFIGFILESVIEWCLASS_H_
+#define SRC_VIEWS_CONFIGFILESVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <actions/ActionClass.h>
@@ -83,4 +83,4 @@ class ConfigFilesViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_CONFIGFILESVIEWCLASS_H_

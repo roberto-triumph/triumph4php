@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_NUMBER__
-#define T4P_NUMBER__
+#ifndef SRC_GLOBALS_NUMBER_H_
+#define SRC_GLOBALS_NUMBER_H_
 
 namespace t4p {
 /**
@@ -55,5 +55,4 @@ bool NumberLessThan(int a, unsigned int b);
 bool NumberEqualTo(int a, unsigned int b);
 }
 
-#endif
-
+#endif  // SRC_GLOBALS_NUMBER_H_

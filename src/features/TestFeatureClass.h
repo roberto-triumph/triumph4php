@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef TEST_FEATURECLASS_H
-#define TEST_FEATURECLASS_H
+#ifndef SRC_FEATURES_TESTFEATURECLASS_H_
+#define SRC_FEATURES_TESTFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 
@@ -44,4 +44,4 @@ class TestFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_TESTFEATURECLASS_H_

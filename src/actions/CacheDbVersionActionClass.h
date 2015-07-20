@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CACHEDBVERSIONACTIONCLASS_H
-#define T4P_CACHEDBVERSIONACTIONCLASS_H
+#ifndef SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_
+#define SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <soci/soci.h>
@@ -90,4 +90,4 @@ class DetectorCacheDbVersionActionClass : public t4p::GlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_

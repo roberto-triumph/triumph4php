@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
-#define T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
+#ifndef SRC_VIEWS_SYNTAXHIGHLIGHTVIEWCLASS_H_
+#define SRC_VIEWS_SYNTAXHIGHLIGHTVIEWCLASS_H_
 
 #include <globals/Events.h>
 #include <views/FeatureViewClass.h>
@@ -139,4 +139,4 @@ class SyntaxHighlightViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif  // T4P_SYNTAXHIGHLIGHTVIEWCLASS_H
+#endif  // SRC_VIEWS_SYNTAXHIGHLIGHTVIEWCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RUNBROWSERFEATURECLASS_H
-#define __RUNBROWSERFEATURECLASS_H
+#ifndef SRC_FEATURES_RUNBROWSERFEATURECLASS_H_
+#define SRC_FEATURES_RUNBROWSERFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <language_php/UrlTagClass.h>
@@ -53,4 +53,4 @@ class RunBrowserFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_RUNBROWSERFEATURECLASS_H_

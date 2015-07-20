@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DOCCOMMENTVIEWCLASS_H
-#define T4P_DOCCOMMENTVIEWCLASS_H
+#ifndef SRC_VIEWS_DOCCOMMENTVIEWCLASS_H_
+#define SRC_VIEWS_DOCCOMMENTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/DocCommentFeatureForms.h>
@@ -76,5 +76,4 @@ class DocCommentPanelClass : public DocCommentPanelGeneratedClass {
 
 }
 
-#endif
-
+#endif  // SRC_VIEWS_DOCCOMMENTVIEWCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __filetestfixtureclass__
-#define __filetestfixtureclass__
+#ifndef TESTS_FILETESTFIXTURECLASS_H_
+#define TESTS_FILETESTFIXTURECLASS_H_
 
 #include <TriumphChecks.h>
 #include <wx/filename.h>
@@ -94,4 +94,4 @@ class FileTestFixtureClass {
 	wxString TestProjectDir;
 };
 
-#endif  // __filetestfixtureclass__
+#endif  // TESTS_FILETESTFIXTURECLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_GAUGEDIALOGCLASS_H
-#define T4P_GAUGEDIALOGCLASS_H
+#ifndef SRC_WIDGETS_GAUGEDIALOGCLASS_H_
+#define SRC_WIDGETS_GAUGEDIALOGCLASS_H_
 
 #include <widgets/wxformbuilder/GaugeDialogWidget.h>
 #include <wx/timer.h>
@@ -57,4 +57,4 @@ class GaugeDialogClass : public GaugeDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_WIDGETS_GAUGEDIALOGCLASS_H_

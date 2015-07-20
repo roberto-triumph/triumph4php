@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef SEARCH_CONTROL_VALIDATOR_CLASS_H
-#define SEARCH_CONTROL_VALIDATOR_CLASS_H
+#ifndef SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_
+#define SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_
 
 #include <wx/validate.h>
 #include <wx/srchctrl.h>
@@ -53,4 +53,4 @@ class SearchControlValidatorClass : public wxValidator {
 	wxString* Data;
 };
 
-#endif
+#endif  // SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_

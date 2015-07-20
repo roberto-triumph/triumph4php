@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DATAVIEWGRID_H
-#define T4P_DATAVIEWGRID_H
+#ifndef SRC_WIDGETS_DATAVIEWGRID_H_
+#define SRC_WIDGETS_DATAVIEWGRID_H_
 
 #include <wx/dataview.h>
 
@@ -39,4 +39,4 @@ namespace t4p {
 	void DataViewGridAutoSizeAllColumns(wxDataViewCtrl* ctrl);
 }
 
-#endif
+#endif  // SRC_WIDGETS_DATAVIEWGRID_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FINDERCLASS_H_
-#define T4P_FINDERCLASS_H_
+#ifndef SRC_SEARCH_FINDERCLASS_H_
+#define SRC_SEARCH_FINDERCLASS_H_
 
 #include <unicode/unistr.h>
 #include <unicode/regex.h>
@@ -276,4 +276,4 @@ class FinderClass {
 	bool FindNextRegularExpression(const UnicodeString& text, int32_t start = 0);
 };
 }
-#endif /*T4P_FINDERCLASS_H_*/
+#endif  // SRC_SEARCH_FINDERCLASS_H_

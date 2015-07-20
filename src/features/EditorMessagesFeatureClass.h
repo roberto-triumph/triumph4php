@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __EDITORMESSAGESFEATURECLASS_H
-#define __EDITORMESSAGESFEATURECLASS_H
+#ifndef SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_
+#define SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <wx/log.h>
@@ -88,4 +88,4 @@ class EditorMessagesLoggerClass : public wxLog {
 	EditorMessagesFeatureClass& Feature;
 };
 }
-#endif
+#endif  // SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_

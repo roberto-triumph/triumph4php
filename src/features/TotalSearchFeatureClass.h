@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TOTALSEARCHFEATURECLASS_H
-#define T4P_TOTALSEARCHFEATURECLASS_H
+#ifndef SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_
+#define SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <actions/TotalTagSearchActionClass.h>
@@ -51,4 +51,4 @@ class TotalSearchFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_

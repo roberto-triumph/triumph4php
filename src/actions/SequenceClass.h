@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_SEQUENCECLASS_H
-#define T4P_SEQUENCECLASS_H
+#ifndef SRC_ACTIONS_SEQUENCECLASS_H_
+#define SRC_ACTIONS_SEQUENCECLASS_H_
 
 #include <globals/GlobalsClass.h>
 #include <actions/GlobalActionClass.h>
@@ -217,4 +217,4 @@ typedef void (wxEvtHandler::*SequenceProgressEventClassFunction)(t4p::SequencePr
 
 }
 
-#endif
+#endif  // SRC_ACTIONS_SEQUENCECLASS_H_

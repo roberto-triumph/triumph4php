@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TAGLIST_H
-#define T4P_TAGLIST_H
+#ifndef SRC_GLOBALS_TAGLIST_H_
+#define SRC_GLOBALS_TAGLIST_H_
 
 #include <language_php/PhpTagClass.h>
 #include <language_php/ParsedTagFinderClass.h>
@@ -54,4 +54,4 @@ void TagListKeepMatchesFromProjects(std::vector<t4p::PhpTagClass>& matches,
 	std::vector<t4p::ProjectClass*> projects, const t4p::FileTypeClass& fileType);
 
 }
-#endif
+#endif  // SRC_GLOBALS_TAGLIST_H_

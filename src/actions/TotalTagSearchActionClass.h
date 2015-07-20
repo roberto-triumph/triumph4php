@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_TOTALTAGSEARCHACTIONCLASS_H
-#define T4P_TOTALTAGSEARCHACTIONCLASS_H
+#ifndef SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_
+#define SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_
 
 #include <wx/event.h>
 #include <actions/ActionClass.h>
@@ -181,4 +181,4 @@ class TotalTagSearchActionClass : public t4p::ActionClass {
 };
 }
 
-#endif  // T4P_TOTALTAGSEARCHACTIONCLASS_H
+#endif  // SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_

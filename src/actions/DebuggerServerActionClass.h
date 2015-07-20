@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DEBUGGERSERVERACTIONCLASS_H
-#define T4P_DEBUGGERSERVERACTIONCLASS_H
+#ifndef SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_
+#define SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_
 
 #include <actions/ActionClass.h>
 #include <language_php/DbgpEventClass.h>
@@ -235,4 +235,4 @@ class DebuggerServerActionClass : public wxEvtHandler, public t4p::ActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_

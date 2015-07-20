@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DETECTORDBCLASS_H
-#define T4P_DETECTORDBCLASS_H
+#ifndef SRC_LANGUAGE_PHP_DETECTORDBCLASS_H_
+#define SRC_LANGUAGE_PHP_DETECTORDBCLASS_H_
 
 #include <soci/soci.h>
 #include <globals/Sqlite.h>
@@ -62,4 +62,4 @@ class DetectorDbClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_DETECTORDBCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef PROJECTCLASS_H_
-#define PROJECTCLASS_H_
+#ifndef SRC_GLOBALS_PROJECTCLASS_H_
+#define SRC_GLOBALS_PROJECTCLASS_H_
 
 #include <search/DirectorySearchClass.h>
 #include <globals/FileTypeClass.h>
@@ -142,4 +142,4 @@ class ProjectClass {
 	private:
 };
 }
-#endif /*PROJECTCLASS_H_*/
+#endif  // SRC_GLOBALS_PROJECTCLASS_H_

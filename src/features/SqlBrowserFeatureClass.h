@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef SQL_EDITOR_FEATURECLASS_H
-#define SQL_EDITOR_FEATURECLASS_H
+#ifndef SRC_FEATURES_SQLBROWSERFEATURECLASS_H_
+#define SRC_FEATURES_SQLBROWSERFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <globals/ProjectClass.h>
@@ -353,4 +353,4 @@ class SqlBrowserFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_SQLBROWSERFEATURECLASS_H_

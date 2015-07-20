@@ -28,8 +28,8 @@
 #include <pelet/TokenClass.h>
 #include <vector>
 
-#ifndef T4P_RESOURCECACHEACTIONCLASS_H
-#define T4P_RESOURCECACHEACTIONCLASS_H
+#ifndef SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_
+#define SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_
 
 namespace t4p {
 /**
@@ -308,4 +308,4 @@ class ProjectTagDirectoryRenameActionClass : public t4p::GlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_

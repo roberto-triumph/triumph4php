@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EDITORFEATURECLASS_H
-#define T4P_EDITORFEATURECLASS_H
+#ifndef SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_
+#define SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <globals/CodeControlOptionsClass.h>
@@ -127,4 +127,4 @@ class EditorBehaviorFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif  // T4P_EDITORFEATURECLASS_H
+#endif  // SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_

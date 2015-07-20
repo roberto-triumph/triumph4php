@@ -28,8 +28,8 @@
 #include <wx/config.h>
 #include <vector>
 
-#ifndef __CODECONTROLLASS_H_
-#define __CODECONTROLLASS_H_
+#ifndef SRC_GLOBALS_CODECONTROLOPTIONSCLASS_H_
+#define SRC_GLOBALS_CODECONTROLOPTIONSCLASS_H_
 
 namespace t4p {
 /**
@@ -315,4 +315,4 @@ class CodeControlOptionsClass {
 };
 }
 
-#endif
+#endif  // SRC_GLOBALS_CODECONTROLOPTIONSCLASS_H_

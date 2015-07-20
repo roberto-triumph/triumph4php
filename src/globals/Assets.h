@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_ASSETS_H
-#define T4P_ASSETS_H
+#ifndef SRC_GLOBALS_ASSETS_H_
+#define SRC_GLOBALS_ASSETS_H_
 
 #include <wx/filename.h>
 #include <wx/bitmap.h>
@@ -296,4 +296,4 @@ wxFileName ChangeLogFileAsset();
 wxFileName LintSuppressionsFileAsset();
 }
 
-#endif
+#endif  // SRC_GLOBALS_ASSETS_H_

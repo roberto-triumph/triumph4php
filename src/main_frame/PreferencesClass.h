@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __preferencesclass__
-#define __preferencesclass__
+#ifndef SRC_MAIN_FRAME_PREFERENCESCLASS_H_
+#define SRC_MAIN_FRAME_PREFERENCESCLASS_H_
 
 #include <wx/keybinder.h>
 #include <wx/menuutils.h>
@@ -244,4 +244,4 @@ class PreferencesClass {
 	bool CheckForUpdates;
 };
 }
-#endif  // __preferencesclass__
+#endif  // SRC_MAIN_FRAME_PREFERENCESCLASS_H_

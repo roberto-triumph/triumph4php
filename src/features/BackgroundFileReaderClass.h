@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __BACKGROUNDFILEREADER_H
-#define __BACKGROUNDFILEREADER_H
+#ifndef SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_
+#define SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_
 
 #include <wx/string.h>
 #include <wx/event.h>
@@ -159,4 +159,4 @@ class BackgroundFileReaderClass : public t4p::ActionClass {
 	Mode Mode;
 };
 }
-#endif
+#endif  // SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_

@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_DETECTORDBINITACTIONCLASS_H
-#define T4P_DETECTORDBINITACTIONCLASS_H
+#ifndef SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_
+#define SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 
@@ -46,4 +46,4 @@ class DetectorDbInitActionClass : public t4p::InitializerGlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_

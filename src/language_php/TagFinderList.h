@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TAGFINDERLIST_H
-#define T4P_TAGFINDERLIST_H
+#ifndef SRC_LANGUAGE_PHP_TAGFINDERLIST_H_
+#define SRC_LANGUAGE_PHP_TAGFINDERLIST_H_
 
 #include <language_php/TagParserClass.h>
 #include <language_php/ParsedTagFinderClass.h>
@@ -214,4 +214,4 @@ class TagFinderListClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_TAGFINDERLIST_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILEMODFIIEDCHECKACTIONCLASS_H
-#define T4P_FILEMODFIIEDCHECKACTIONCLASS_H
+#ifndef SRC_ACTIONS_FILEMODIFIEDCHECKACTIONCLASS_H_
+#define SRC_ACTIONS_FILEMODIFIEDCHECKACTIONCLASS_H_
 
 #include <actions/ActionClass.h>
 #include <wx/filename.h>
@@ -125,4 +125,4 @@ typedef void (wxEvtHandler::*FilesModifiedEventClassFunction)(t4p::FilesModified
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(FilesModifiedEventClassFunction, & fn), (wxObject *) NULL),
 
-#endif
+#endif  // SRC_ACTIONS_FILEMODIFIEDCHECKACTIONCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TESTAPPCLASS_H
-#define T4P_TESTAPPCLASS_H
+#ifndef VIEW_TESTS_TESTAPPCLASS_H_
+#define VIEW_TESTS_TESTAPPCLASS_H_
 
 #include <wx/aui/aui.h>
 #include <wx/frame.h>
@@ -147,4 +147,4 @@ class ViewTestClass {
 	private:
 };
 
-#endif
+#endif  // VIEW_TESTS_TESTAPPCLASS_H_

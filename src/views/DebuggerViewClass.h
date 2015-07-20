@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DEBUGGERVIEWCLASS_H
-#define T4P_DEBUGGERVIEWCLASS_H
+#ifndef SRC_VIEWS_DEBUGGERVIEWCLASS_H_
+#define SRC_VIEWS_DEBUGGERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/DebuggerFeatureForms.h>
@@ -444,5 +444,4 @@ class DebuggerMappingDialogClass : public DebuggerMappingDialogGeneratedClass {
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_DEBUGGERVIEWCLASS_H_

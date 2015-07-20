@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FINDERFEATURECLASS_H_
-#define T4P_FINDERFEATURECLASS_H_
+#ifndef SRC_FEATURES_FINDERFEATURECLASS_H_
+#define SRC_FEATURES_FINDERFEATURECLASS_H_
 
 #include <search/FinderClass.h>
 #include <features/FeatureClass.h>
@@ -130,4 +130,4 @@ class FinderFeatureClass : public FeatureClass {
 	void StartFinderAction(UnicodeString word, char* buf, int documentLength);
 };
 }
-#endif /*T4P_FINDERFEATURECLASS_H_*/
+#endif  // SRC_FEATURES_FINDERFEATURECLASS_H_

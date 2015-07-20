@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef COMBO_BOX_HISTORY_CLASS_H
-#define COMBO_BOX_HISTORY_CLASS_H
+#ifndef SRC_WIDGETS_COMBOBOXHISTORYCLASS_H_
+#define SRC_WIDGETS_COMBOBOXHISTORYCLASS_H_
 
 #include <wx/combobox.h>
 #include <wx/event.h>
@@ -91,4 +91,4 @@ class ComboBoxHistoryClass : public wxEvtHandler {
 };
 }
 
-#endif
+#endif  // SRC_WIDGETS_COMBOBOXHISTORYCLASS_H_

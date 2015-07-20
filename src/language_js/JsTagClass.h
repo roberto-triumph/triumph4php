@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_JSTAGCLASS_H
-#define T4P_JSTAGCLASS_H
+#ifndef SRC_LANGUAGE_JS_JSTAGCLASS_H_
+#define SRC_LANGUAGE_JS_JSTAGCLASS_H_
 
 #include <unicode/unistr.h>
 #include <wx/string.h>
@@ -111,4 +111,4 @@ class JsTagClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_JS_JSTAGCLASS_H_

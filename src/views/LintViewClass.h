@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef __LINTVIEWCLASS_H
-#define __LINTVIEWCLASS_H
+#ifndef SRC_VIEWS_LINTVIEWCLASS_H_
+#define SRC_VIEWS_LINTVIEWCLASS_H_
 
 #include <vector>
 #include <views/FeatureViewClass.h>
@@ -332,4 +332,4 @@ class LintSuppressionRuleDialogClass : public LintSuppressionRuleGeneratedDialog
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_LINTVIEWCLASS_H_

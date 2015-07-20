@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FINDINFFILESVIEWCLASS_H
-#define T4P_FINDINFFILESVIEWCLASS_H
+#ifndef SRC_VIEWS_FINDINFILESVIEWCLASS_H_
+#define SRC_VIEWS_FINDINFILESVIEWCLASS_H_
 
 #include <views/wxformbuilder/FindInFilesFeatureForms.h>
 #include <features/FindInFilesFeatureClass.h>
@@ -346,4 +346,4 @@ class FindInFilesDialogClass: public FindInFilesDialogGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // __FINDINFFILESFEATURECLASS_H
+#endif  // SRC_VIEWS_FINDINFILESVIEWCLASS_H_

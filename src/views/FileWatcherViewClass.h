@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILEWATCHERVIEWCLASS_H
-#define T4P_FILEWATCHERVIEWCLASS_H
+#ifndef SRC_VIEWS_FILEWATCHERVIEWCLASS_H_
+#define SRC_VIEWS_FILEWATCHERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/FileWatcherFeatureForms.h>
@@ -57,5 +57,4 @@ class FileWatcherPreferencesPanelClass : public FileWatcherPreferencesPanelGener
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_FILEWATCHERVIEWCLASS_H_

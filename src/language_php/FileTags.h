@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILETAGS_H
-#define T4P_FILETAGS_H
+#ifndef SRC_LANGUAGE_PHP_FILETAGS_H_
+#define SRC_LANGUAGE_PHP_FILETAGS_H_
 
 #include <language_php/PhpTagClass.h>
 #include <wx/filename.h>
@@ -54,4 +54,4 @@ namespace t4p {
 	 */
 	bool FileTagPersist(soci::session& session, t4p::FileTagClass& fileTag);
 }
-#endif
+#endif  // SRC_LANGUAGE_PHP_FILETAGS_H_

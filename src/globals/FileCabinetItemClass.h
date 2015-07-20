@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILECABINETCLASS_H
-#define T4P_FILECABINETCLASS_H
+#ifndef SRC_GLOBALS_FILECABINETITEMCLASS_H_
+#define SRC_GLOBALS_FILECABINETITEMCLASS_H_
 
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
@@ -277,4 +277,4 @@ class FileCabinetNearMatchResultClass : public t4p::FileCabinetBaseResultClass {
 };
 }
 
-#endif  // T4P_FILECABINETCLASS_H
+#endif  // SRC_GLOBALS_FILECABINETITEMCLASS_H_

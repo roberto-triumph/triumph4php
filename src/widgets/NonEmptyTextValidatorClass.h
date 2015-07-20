@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef NON_EMPTY_TEXT_VALIDATOR_CLASS_H
-#define NON_EMPTY_TEXT_VALIDATOR_CLASS_H
+#ifndef SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_
+#define SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_
 
 #include <wx/validate.h>
 #include <wx/textctrl.h>
@@ -70,4 +70,4 @@ class NonEmptyTextValidatorClass : public wxValidator {
 	wxStaticText* Label;
 };
 
-#endif
+#endif  // SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_

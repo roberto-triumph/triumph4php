@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_SQLITE_H
-#define T4P_SQLITE_H
+#ifndef SRC_GLOBALS_SQLITE_H_
+#define SRC_GLOBALS_SQLITE_H_
 
 #include <soci/soci.h>
 #include <wx/filename.h>
@@ -120,4 +120,4 @@ int SqliteInsertId(soci::statement& stmt);
 bool SqliteOpen(soci::session& session, const wxString& dbName);
 }
 
-#endif
+#endif  // SRC_GLOBALS_SQLITE_H_

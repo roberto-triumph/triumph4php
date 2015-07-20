@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_PARSEDTAGFINDERCLASS_H
-#define T4P_PARSEDTAGFINDERCLASS_H
+#ifndef SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_
+#define SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_
 
 #include <language_php/PhpTagClass.h>
 #include <globals/Sqlite.h>
@@ -1286,4 +1286,4 @@ class ParsedTagFinderClass : public t4p::SqliteFinderClass {
 	bool IsNewNamespace(const UnicodeString& namespaceName);
 };
 }
-#endif  // T4P_RESOURCEFINDER_H
+#endif  // SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_

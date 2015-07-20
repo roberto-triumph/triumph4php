@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RESOURCEFEATURECLASS_H
-#define __RESOURCEFEATURECLASS_H
+#ifndef SRC_FEATURES_TAGFEATURECLASS_H_
+#define SRC_FEATURES_TAGFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <features/BackgroundFileReaderClass.h>
@@ -134,4 +134,4 @@ class TagFeatureClass : public FeatureClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // __RESOURCEFEATURECLASS_H
+#endif  // SRC_FEATURES_TAGFEATURECLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef PROJECTVIEWCLASS_H
-#define PROJECTVIEWCLASS_H
+#ifndef SRC_VIEWS_PROJECTVIEWCLASS_H_
+#define SRC_VIEWS_PROJECTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/ProjectFeatureClass.h>
@@ -223,4 +223,4 @@ class MultipleSelectDialogClass : public MultipleSelectDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_PROJECTVIEWCLASS_H_

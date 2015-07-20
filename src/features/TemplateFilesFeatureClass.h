@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __TEMPLATEFILES_FEATURECLASS_H
-#define __TEMPLATEFILES_FEATURECLASS_H
+#ifndef SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_
+#define SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <language_php/TemplateFileTagClass.h>
@@ -62,4 +62,4 @@ class TemplateFilesFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_

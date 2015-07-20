@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_RESOUCEWIPEACTIONCLASS_H
-#define T4P_RESOUCEWIPEACTIONCLASS_H
+#ifndef SRC_ACTIONS_TAGWIPEACTIONCLASS_H_
+#define SRC_ACTIONS_TAGWIPEACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <wx/filename.h>
@@ -135,4 +135,4 @@ class TagDeleteFileActionClass : public t4p::GlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_TAGWIPEACTIONCLASS_H_

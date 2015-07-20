@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_NEWUSERVIEWCLASS_H_
-#define T4P_NEWUSERVIEWCLASS_H_
+#ifndef SRC_VIEWS_NEWUSERVIEWCLASS_H_
+#define SRC_VIEWS_NEWUSERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/NewUserFeatureClass.h>
@@ -106,4 +106,4 @@ class NewUserPhpSettingsPanelClass : public NewUserPhpSettingsPanelGeneratedClas
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_NEWUSERVIEWCLASS_H_

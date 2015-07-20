@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_URLRESOURCECLASS_H
-#define T4P_URLRESOURCECLASS_H
+#ifndef SRC_LANGUAGE_PHP_URLTAGCLASS_H_
+#define SRC_LANGUAGE_PHP_URLTAGCLASS_H_
 
 #include <globals/EnvironmentClass.h>
 #include <wx/url.h>
@@ -168,4 +168,4 @@ class UrlTagFinderClass : public t4p::SqliteFinderClass {
 	std::vector<wxString> AllMethodNames(const wxString& controllerClassName, const std::vector<wxFileName>& sourceDirs);
 };
 }
-#endif
+#endif  // SRC_LANGUAGE_PHP_URLTAGCLASS_H_

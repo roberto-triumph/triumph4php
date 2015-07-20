@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CODECONTROLCLASS_H_
-#define T4P_CODECONTROLCLASS_H_
+#ifndef SRC_CODE_CONTROL_CODECONTROLCLASS_H_
+#define SRC_CODE_CONTROL_CODECONTROLCLASS_H_
 
 #include <globals/CodeControlOptionsClass.h>
 #include <search/FinderClass.h>
@@ -885,4 +885,4 @@ class CodeControlClass : public wxStyledTextCtrl {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif /*T4P_CODECONTROLCLASS_H_*/
+#endif  // SRC_CODE_CONTROL_CODECONTROLCLASS_H_

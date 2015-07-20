@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RUNCONSOLEFEATURECLASS_H
-#define __RUNCONSOLEFEATURECLASS_H
+#ifndef SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_
+#define SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
@@ -142,4 +142,4 @@ class RunConsoleFeatureClass : public FeatureClass {
 	void OnCommandButtonClick(wxCommandEvent& evt);
 };
 }
-#endif  // __RUNCONSOLEFEATURECLASS_H
+#endif  // SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_

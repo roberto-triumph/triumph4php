@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_GLOBALSCHANGECLASS_H
-#define T4P_GLOBALSCHANGECLASS_H
+#ifndef SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_
+#define SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_
 
 #include <globals/GlobalsClass.h>
 #include <actions/SqlMetaDataActionClass.h>
@@ -56,4 +56,4 @@ class GlobalsChangeHandlerClass : public wxEvtHandler {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_

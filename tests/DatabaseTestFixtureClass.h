@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __DATABASETESTFIXTURECLASS_H
-#define __DATABASETESTFIXTURECLASS_H
+#ifndef TESTS_DATABASETESTFIXTURECLASS_H_
+#define TESTS_DATABASETESTFIXTURECLASS_H_
 
 #include <soci.h>
 #include <string>
@@ -94,4 +94,4 @@ class DatabaseTestFixtureClass {
 	std::string ConnectionString;
 };
 
-#endif
+#endif  // TESTS_DATABASETESTFIXTURECLASS_H_

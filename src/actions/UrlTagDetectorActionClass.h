@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_URLDETECTORACTIONCLASS_H
-#define T4P_URLDETECTORACTIONCLASS_H
+#ifndef SRC_ACTIONS_URLTAGDETECTORACTIONCLASS_H_
+#define SRC_ACTIONS_URLTAGDETECTORACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
@@ -147,4 +147,4 @@ class UrlTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalActionC
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_URLTAGDETECTORACTIONCLASS_H_

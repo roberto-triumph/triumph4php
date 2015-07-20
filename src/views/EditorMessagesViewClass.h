@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EDITORMESSAGESVIEWCLASS_H
-#define T4P_EDITORMESSAGESVIEWCLASS_H
+#ifndef SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_
+#define SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/EditorMessagesFeatureForms.h>
@@ -79,5 +79,4 @@ class EditorMessagesPanelClass : public EditorMessagesGeneratedPanelClass {
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_

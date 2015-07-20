@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FEATURECLASS_H
-#define T4P_FEATURECLASS_H
+#ifndef SRC_FEATURES_FEATURECLASS_H_
+#define SRC_FEATURES_FEATURECLASS_H_
 
 #include <globals/EnvironmentClass.h>
 #include <globals/ProjectClass.h>
@@ -174,4 +174,4 @@ class FeatureClass : public wxEvtHandler {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_FEATURECLASS_H_

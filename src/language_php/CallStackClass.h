@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __CALLSTACKCLASS_H
-#define __CALLSTACKCLASS_H
+#ifndef SRC_LANGUAGE_PHP_CALLSTACKCLASS_H_
+#define SRC_LANGUAGE_PHP_CALLSTACKCLASS_H_
 
 #include <pelet/ParserClass.h>
 #include <language_php/TagCacheClass.h>
@@ -481,4 +481,4 @@ class CallStackClass :
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_CALLSTACKCLASS_H_

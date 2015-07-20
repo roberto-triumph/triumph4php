@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __symboltable__
-#define __symboltable__
+#ifndef SRC_LANGUAGE_PHP_SYMBOLTABLECLASS_H_
+#define SRC_LANGUAGE_PHP_SYMBOLTABLECLASS_H_
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
@@ -566,4 +566,4 @@ class ScopeFinderClass :
 }
 
 
-#endif  // __symboltable__
+#endif  // SRC_LANGUAGE_PHP_SYMBOLTABLECLASS_H_

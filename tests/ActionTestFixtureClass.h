@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef __ACTIONTESTFIXTURECLASS_H
-#define __ACTIONTESTFIXTURECLASS_H
+#ifndef TESTS_ACTIONTESTFIXTURECLASS_H_
+#define TESTS_ACTIONTESTFIXTURECLASS_H_
 
 #include <wx/event.h>
 #include <wx/filename.h>
@@ -64,4 +64,4 @@ class ActionTestFixtureClass : public wxEvtHandler {
 	void CreateProject(const wxFileName& sourceDir);
 };
 
-#endif
+#endif  // TESTS_ACTIONTESTFIXTURECLASS_H_

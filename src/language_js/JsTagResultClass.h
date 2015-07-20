@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_JSTAGFINDERCLASS_H
-#define T4P_JSTAGFINDERCLASS_H
+#ifndef SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_
+#define SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_
 
 #include <globals/SqliteResultClass.h>
 #include <language_js/JsTagClass.h>
@@ -108,4 +108,4 @@ class NearMatchJsTagResultClass : public t4p::JsTagResultClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_

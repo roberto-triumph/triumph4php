@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILENAME_H
-#define T4P_FILENAME_H
+#ifndef SRC_GLOBALS_FILENAME_H_
+#define SRC_GLOBALS_FILENAME_H_
 
 #include <wx/filename.h>
 #include <vector>
@@ -50,4 +50,4 @@ wxFileName FileNameCopy(const wxFileName& fileName);
 std::vector<wxFileName> DeepCopyFileNames(const std::vector<wxFileName>& fileNames);
 }
 
-#endif
+#endif  // SRC_GLOBALS_FILENAME_H_

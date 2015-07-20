@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_TREEITEMDATASTRINGCLASS_H
-#define T4P_TREEITEMDATASTRINGCLASS_H
+#ifndef SRC_WIDGETS_TREEITEMDATASTRINGCLASS_H_
+#define SRC_WIDGETS_TREEITEMDATASTRINGCLASS_H_
 
 #include <wx/string.h>
 #include <wx/treectrl.h>
@@ -42,4 +42,4 @@ class TreeItemDataStringClass : public wxTreeItemData {
 };
 }
 
-#endif
+#endif  // SRC_WIDGETS_TREEITEMDATASTRINGCLASS_H_

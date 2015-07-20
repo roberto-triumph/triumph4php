@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_MAINFRAMECLASS_H_
-#define T4P_MAINFRAMECLASS_H_
+#ifndef SRC_MAIN_FRAME_MAINFRAMECLASS_H_
+#define SRC_MAIN_FRAME_MAINFRAMECLASS_H_
 
 #include <globals/ProjectClass.h>
 #include <main_frame/wxformbuilder/MainFrameForms.h>
@@ -295,4 +295,4 @@ class MainFrameClass : public MainFrameGeneratedClass {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // T4P_MAINFRAMECLASS_H_
+#endif  // SRC_MAIN_FRAME_MAINFRAMECLASS_H_

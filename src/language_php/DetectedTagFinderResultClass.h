@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_DETECTEDTAGFINDERCLASS_H
-#define T4P_DETECTEDTAGFINDERCLASS_H
+#ifndef SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_
+#define SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_
 
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
@@ -103,4 +103,4 @@ class DetectedTagNearMatchMemberResultClass : public t4p::DetectedTagExactMember
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_

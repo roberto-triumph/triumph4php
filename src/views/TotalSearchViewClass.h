@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TOTALSEARCHVIEWCLASS_H
-#define T4P_TOTALSEARCHVIEWCLASS_H
+#ifndef SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_
+#define SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/TotalSearchFeatureClass.h>
@@ -138,4 +138,4 @@ class TotalSearchDialogClass : public TotalSearchDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_

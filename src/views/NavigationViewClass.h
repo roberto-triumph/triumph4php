@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_NAVIGATIONVIEWCLASS_H
-#define T4P_NAVIGATIONVIEWCLASS_H
+#ifndef SRC_VIEWS_NAVIGATIONVIEWCLASS_H_
+#define SRC_VIEWS_NAVIGATIONVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/NavigationViewForms.h>
@@ -113,4 +113,4 @@ class NavigationViewDialogClass : public NavigationViewDialogGeneratedClass {
 };
 }
 
-#endif  // T4P_NAVIGATIONVIEWCLASS_H
+#endif  // SRC_VIEWS_NAVIGATIONVIEWCLASS_H_

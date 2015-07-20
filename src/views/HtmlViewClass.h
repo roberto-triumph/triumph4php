@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_HTMLVIEWCLASS__
-#define T4P_HTMLVIEWCLASS__
+#ifndef SRC_VIEWS_HTMLVIEWCLASS_H_
+#define SRC_VIEWS_HTMLVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <code_control/CodeControlClass.h>
@@ -80,4 +80,4 @@ class HtmlViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif  // T4P_HTMLVIEWCLASS__
+#endif  // SRC_VIEWS_HTMLVIEWCLASS_H_

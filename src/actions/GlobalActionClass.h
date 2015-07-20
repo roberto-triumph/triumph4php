@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_GLOBALACTIONCLASS_H
-#define T4P_GLOBALACTIONCLASS_H
+#ifndef SRC_ACTIONS_GLOBALACTIONCLASS_H_
+#define SRC_ACTIONS_GLOBALACTIONCLASS_H_
 
 #include <actions/ActionClass.h>
 #include <globals/GlobalsClass.h>
@@ -67,4 +67,4 @@ class InitializerGlobalActionClass : public t4p::GlobalActionClass {
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_GLOBALACTIONCLASS_H_

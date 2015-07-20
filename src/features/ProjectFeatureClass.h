@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef PROJECTFEATURECLASS_H
-#define PROJECTFEATURECLASS_H
+#ifndef SRC_FEATURES_PROJECTFEATURECLASS_H_
+#define SRC_FEATURES_PROJECTFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 
@@ -84,4 +84,4 @@ class ProjectFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_PROJECTFEATURECLASS_H_

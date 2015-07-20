@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FEATUREVIEWCLASS_H
-#define T4P_FEATUREVIEWCLASS_H
+#ifndef SRC_VIEWS_FEATUREVIEWCLASS_H_
+#define SRC_VIEWS_FEATUREVIEWCLASS_H_
 
 #include <main_frame/PreferencesClass.h>
 #include <globals/FileTypeClass.h>
@@ -486,4 +486,4 @@ class FeatureViewClass : public wxEvtHandler {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_FEATUREVIEWCLASS_H_

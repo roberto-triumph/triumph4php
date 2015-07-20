@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CONFIGTAGCLASS_H
-#define T4P_CONFIGTAGCLASS_H
+#ifndef SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_
+#define SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_
 
 #include <wx/string.h>
 #include <wx/filename.h>
@@ -82,4 +82,4 @@ class ConfigTagFinderClass : public t4p::SqliteFinderClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_

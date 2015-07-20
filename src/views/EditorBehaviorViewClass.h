@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EDITORBEHAVIORVIEWCLASS_H
-#define T4P_EDITORBEHAVIORVIEWCLASS_H
+#ifndef SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_
+#define SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/EditorBehaviorFeatureForms.h>
@@ -204,5 +204,4 @@ class KeyboardCommandEditDialogClass : public KeyboardCommandEditDialogGenerated
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_

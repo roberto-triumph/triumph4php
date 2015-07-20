@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TREELISTCTRL_H
-#define T4P_TREELISTCTRL_H
+#ifndef SRC_WIDGETS_TREELIST_H_
+#define SRC_WIDGETS_TREELIST_H_
 
 #include <wx/treelist.h>
 
@@ -39,4 +39,4 @@ namespace t4p {
 	void TreeListAutoSizeAllColumns(wxTreeListCtrl* ctrl);
 }
 
-#endif
+#endif  // SRC_WIDGETS_TREELIST_H_

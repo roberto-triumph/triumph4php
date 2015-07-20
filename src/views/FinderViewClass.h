@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FINDERVIEWCLASS_H
-#define T4P_FINDERVIEWCLASS_H
+#ifndef SRC_VIEWS_FINDERVIEWCLASS_H_
+#define SRC_VIEWS_FINDERVIEWCLASS_H_
 
 #include <views/wxformbuilder/FinderFeatureForms.h>
 #include <views/FeatureViewClass.h>
@@ -371,5 +371,4 @@ class ReplacePanelClass : public ReplacePanelGeneratedClass {
 
 }
 
-#endif
-
+#endif  // SRC_VIEWS_FINDERVIEWCLASS_H_

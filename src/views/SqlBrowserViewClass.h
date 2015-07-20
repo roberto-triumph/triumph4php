@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef SQL_EDITOR_VIEWCLASS_H
-#define SQL_EDITOR_VIEWCLASS_H
+#ifndef SRC_VIEWS_SQLBROWSERVIEWCLASS_H_
+#define SRC_VIEWS_SQLBROWSERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/SqlBrowserFeatureClass.h>
@@ -667,4 +667,4 @@ class SqlCopyAsPhpDialogClass : public SqlCopyAsPhpDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_SQLBROWSERVIEWCLASS_H_

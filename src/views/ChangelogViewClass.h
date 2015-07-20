@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CHANGELOGVIEWCLASS_H
-#define T4P_CHANGELOGVIEWCLASS_H
+#ifndef SRC_VIEWS_CHANGELOGVIEWCLASS_H_
+#define SRC_VIEWS_CHANGELOGVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 
@@ -50,5 +50,4 @@ class ChangelogViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_CHANGELOGVIEWCLASS_H_

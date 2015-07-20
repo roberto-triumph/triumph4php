@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_FILETYPECLASS_H
-#define T4P_FILETYPECLASS_H
+#ifndef SRC_GLOBALS_FILETYPECLASS_H_
+#define SRC_GLOBALS_FILETYPECLASS_H_
 
 #include <wx/string.h>
 #include <vector>
@@ -190,4 +190,4 @@ class FileTypeClass {
 };
 }
 
-#endif  // T4P_FILETYPECLASS_H
+#endif  // SRC_GLOBALS_FILETYPECLASS_H_

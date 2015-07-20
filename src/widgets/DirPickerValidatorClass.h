@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DIRPICKERVALIDATORCLASS_H
-#define T4P_DIRPICKERVALIDATORCLASS_H
+#ifndef SRC_WIDGETS_DIRPICKERVALIDATORCLASS_H_
+#define SRC_WIDGETS_DIRPICKERVALIDATORCLASS_H_
 
 #include <wx/validate.h>
 #include <wx/filename.h>
@@ -56,4 +56,4 @@ class DirPickerValidatorClass : public wxValidator {
 };
 }
 
-#endif
+#endif  // SRC_WIDGETS_DIRPICKERVALIDATORCLASS_H_

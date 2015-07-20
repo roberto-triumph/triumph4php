@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __environmentclass__
-#define __environmentclass__
+#ifndef SRC_GLOBALS_ENVIRONMENTCLASS_H_
+#define SRC_GLOBALS_ENVIRONMENTCLASS_H_
 
 #include <globals/ApacheClass.h>
 #include <pelet/TokenClass.h>
@@ -201,4 +201,4 @@ class EnvironmentClass {
 	void AddDefaults();
 };
 }
-#endif  // __environmentclass__
+#endif  // SRC_GLOBALS_ENVIRONMENTCLASS_H_

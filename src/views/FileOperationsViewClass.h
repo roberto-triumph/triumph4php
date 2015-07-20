@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef FILEOPERATIONSVIEWCLASS_H
-#define FILEOPERATIONSVIEWCLASS_H
+#ifndef SRC_VIEWS_FILEOPERATIONSVIEWCLASS_H_
+#define SRC_VIEWS_FILEOPERATIONSVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/FileOperationsFeatureClass.h>
@@ -174,4 +174,4 @@ class FileOperationsViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_FILEOPERATIONSVIEWCLASS_H_

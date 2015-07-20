@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_JAVASCRIPTVIEWCLASS__
-#define T4P_JAVASCRIPTVIEWCLASS__
+#ifndef SRC_VIEWS_JAVASCRIPTVIEWCLASS_H_
+#define SRC_VIEWS_JAVASCRIPTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <code_control/CodeControlClass.h>
@@ -114,4 +114,4 @@ class JavascriptViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif  // T4P_JAVASCRIPTVIEWCLASS__
+#endif  // SRC_VIEWS_JAVASCRIPTVIEWCLASS_H_

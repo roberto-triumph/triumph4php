@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_PHPFUNCTIONCALLLINTCLASS__
-#define T4P_PHPFUNCTIONCALLLINTCLASS__
+#ifndef SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_
+#define SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_
 
 #include <language_php/ParsedTagFinderClass.h>
 #include <pelet/ParserClass.h>
@@ -187,4 +187,4 @@ class PhpFunctionCallLintClass : public pelet::AnyExpressionObserverClass {
 };
 }
 
-#endif  // T4P_PHPFUNCTINOCALLLINTCLASS__
+#endif  // SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_

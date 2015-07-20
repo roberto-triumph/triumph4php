@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_FILECABINETVIEWCLASS_H
-#define T4P_FILECABINETVIEWCLASS_H
+#ifndef SRC_VIEWS_FILECABINETVIEWCLASS_H_
+#define SRC_VIEWS_FILECABINETVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/FileCabinetFeatureClass.h>
@@ -126,4 +126,4 @@ class FileCabinetPanelClass : public FileCabinetPanelGeneratedClass {
 };
 }
 
-#endif  // T4P_FILECABINETVIEWCLASS_H
+#endif  // SRC_VIEWS_FILECABINETVIEWCLASS_H_

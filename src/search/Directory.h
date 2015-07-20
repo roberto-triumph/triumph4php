@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DIRECTORY_H_
-#define T4P_DIRECTORY_H_
+#ifndef SRC_SEARCH_DIRECTORY_H_
+#define SRC_SEARCH_DIRECTORY_H_
 
 #include <wx/string.h>
 
@@ -37,4 +37,4 @@ namespace t4p {
 bool RecursiveRmDir(wxString path);
 }
 
-#endif
+#endif  // SRC_SEARCH_DIRECTORY_H_

@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_SQLITERESULTCLASS_H
-#define T4P_SQLITERESULTCLASS_H
+#ifndef SRC_GLOBALS_SQLITERESULTCLASS_H_
+#define SRC_GLOBALS_SQLITERESULTCLASS_H_
 
 #include <soci/soci.h>
 #include <wx/string.h>
@@ -164,4 +164,4 @@ class SqliteResultClass {
 };
 }
 
-#endif
+#endif  // SRC_GLOBALS_SQLITERESULTCLASS_H_

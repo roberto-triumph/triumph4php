@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef TEST_VIEWCLASS_H
-#define TEST_VIEWCLASS_H
+#ifndef SRC_VIEWS_TESTVIEWCLASS_H_
+#define SRC_VIEWS_TESTVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/TestFeatureClass.h>
@@ -72,4 +72,4 @@ class TestViewClass : public FeatureViewClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_TESTVIEWCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __TEMPLATEFILES_VIEWCLASS_H
-#define __TEMPLATEFILES_VIEWCLASS_H
+#ifndef SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_
+#define SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/TemplateFilesFeatureClass.h>
@@ -122,4 +122,4 @@ class TemplateFilesPanelClass : public TemplateFilesPanelGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_

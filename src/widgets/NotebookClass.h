@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_NOTEBOOKCLASS_H_
-#define T4P_NOTEBOOKCLASS_H_
+#ifndef SRC_WIDGETS_NOTEBOOKCLASS_H_
+#define SRC_WIDGETS_NOTEBOOKCLASS_H_
 
 #include <code_control/CodeControlClass.h>
 #include <wx/wx.h>
@@ -407,4 +407,4 @@ class FileDropTargetClass : public wxFileDropTarget {
 	NotebookClass* Notebook;
 };
 }
-#endif /*T4P_NOTEBOOKCLASS_H_*/
+#endif  // SRC_WIDGETS_NOTEBOOKCLASS_H_

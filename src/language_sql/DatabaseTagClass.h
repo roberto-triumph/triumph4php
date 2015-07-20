@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DATABASETAGCLASS_H
-#define T4P_DATABASETAGCLASS_H
+#ifndef SRC_LANGUAGE_SQL_DATABASETAGCLASS_H_
+#define SRC_LANGUAGE_SQL_DATABASETAGCLASS_H_
 
 #include <unicode/unistr.h>
 #include <globals/Sqlite.h>
@@ -428,4 +428,4 @@ class DatabaseTagFinderClass : public t4p::SqliteFinderClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_SQL_DATABASETAGCLASS_H_

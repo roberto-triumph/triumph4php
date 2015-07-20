@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __directorysearchclass__
-#define __directorysearchclass__
+#ifndef SRC_SEARCH_DIRECTORYSEARCHCLASS_H_
+#define SRC_SEARCH_DIRECTORYSEARCHCLASS_H_
 
 #include <wx/string.h>
 #include <wx/regex.h>
@@ -395,4 +395,4 @@ class DirectorySearchClass {
 	bool HasCalledEnd;
 };
 }
-#endif  // __directorysearchclass__
+#endif  // SRC_SEARCH_DIRECTORYSEARCHCLASS_H_

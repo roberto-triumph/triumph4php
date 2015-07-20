@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EXPLORERFEATURECLASS_H
-#define T4P_EXPLORERFEATURECLASS_H
+#ifndef SRC_FEATURES_EXPLORERFEATURECLASS_H_
+#define SRC_FEATURES_EXPLORERFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
@@ -359,4 +359,4 @@ class ExplorerModifyEventClass : public wxEvent {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_EXPLORERFEATURECLASS_H_

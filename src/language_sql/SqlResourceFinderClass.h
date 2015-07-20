@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef _SQLRESOURCEFINDERCLASS_H
-#define _SQLRESOURCEFINDERCLASS_H
+#ifndef SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_
+#define SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_
 
 #include <language_sql/DatabaseTagClass.h>
 #include <unicode/unistr.h>
@@ -264,4 +264,4 @@ class SqlResourceFinderClass : public t4p::SqliteFinderClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_

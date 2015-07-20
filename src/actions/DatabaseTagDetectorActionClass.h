@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DATABASEDETECTORACTIONCLASS_H
-#define T4P_DATABASEDETECTORACTIONCLASS_H
+#ifndef SRC_ACTIONS_DATABASETAGDETECTORACTIONCLASS_H_
+#define SRC_ACTIONS_DATABASETAGDETECTORACTIONCLASS_H_
 
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
@@ -133,4 +133,4 @@ class DatabaseTagDetectorActionClass : public wxEvtHandler, public t4p::GlobalAc
 };
 }
 
-#endif
+#endif  // SRC_ACTIONS_DATABASETAGDETECTORACTIONCLASS_H_

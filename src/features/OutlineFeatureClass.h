@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef OUTLINE_VIEW_FEATURECLASS_H
-#define OUTLINE_VIEW_FEATURECLASS_H
+#ifndef SRC_FEATURES_OUTLINEFEATURECLASS_H_
+#define SRC_FEATURES_OUTLINEFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <globals/Events.h>
@@ -123,4 +123,4 @@ class OutlineFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_OUTLINEFEATURECLASS_H_

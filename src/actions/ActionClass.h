@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_ACTIONCLASS_H
-#define T4P_ACTIONCLASS_H
+#ifndef SRC_ACTIONS_ACTIONCLASS_H_
+#define SRC_ACTIONS_ACTIONCLASS_H_
 
 #include <wx/thread.h>
 #include <wx/event.h>
@@ -636,4 +636,4 @@ typedef void (wxEvtHandler::*ActionProgressEventClassFunction)(t4p::ActionProgre
 
 }
 
-#endif
+#endif  // SRC_ACTIONS_ACTIONCLASS_H_

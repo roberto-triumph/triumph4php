@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_VERSIONUPDATEVIEWCLASS_H
-#define T4P_VERSIONUPDATEVIEWCLASS_H
+#ifndef SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_
+#define SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/VersionUpdateFeatureClass.h>
@@ -125,4 +125,4 @@ class VersionUpdatePreferencesPanelClass : public VersionUpdatePreferencesGenera
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_

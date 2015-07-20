@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_CHECKS_H
-#define T4P_CHECKS_H
+#ifndef TESTS_TRIUMPHCHECKS_H_
+#define TESTS_TRIUMPHCHECKS_H_
 
 #include <wx/string.h>  // so that UnitTest++ can compare wxStrings by their content
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
@@ -53,4 +53,4 @@
  */
 #define CHECK_UNISTR_EQUALS_NO_CASE(expected, actual) \
 	CHECK_EQUAL((int8_t)0, actual.caseCompare(UNICODE_STRING_SIMPLE(expected), 0));
-#endif
+#endif  // TESTS_TRIUMPHCHECKS_H_

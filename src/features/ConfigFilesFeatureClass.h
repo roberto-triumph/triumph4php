@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CONFIGFILESFEATURECLASS_H
-#define T4P_CONFIGFILESFEATURECLASS_H
+#ifndef SRC_FEATURES_CONFIGFILESFEATURECLASS_H_
+#define SRC_FEATURES_CONFIGFILESFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
 #include <language_php/ConfigTagClass.h>
@@ -109,4 +109,4 @@ class ConfigFilesFeatureClass : public t4p::FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_CONFIGFILESFEATURECLASS_H_

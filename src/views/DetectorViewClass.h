@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_DETECTORVIEWCLASS_H
-#define T4P_DETECTORVIEWCLASS_H
+#ifndef SRC_VIEWS_DETECTORVIEWCLASS_H_
+#define SRC_VIEWS_DETECTORVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <actions/ActionClass.h>
@@ -330,5 +330,4 @@ class ConfigTagDetectorPanelClass : public ConfigDetectorPanelGeneratedClass {
 };
 }
 
-#endif
-
+#endif  // SRC_VIEWS_DETECTORVIEWCLASS_H_

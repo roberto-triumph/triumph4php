@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RUNBROWSERVIEWCLASS_H
-#define __RUNBROWSERVIEWCLASS_H
+#ifndef SRC_VIEWS_RUNBROWSERVIEWCLASS_H_
+#define SRC_VIEWS_RUNBROWSERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/RunBrowserFeatureClass.h>
@@ -133,4 +133,4 @@ class RunBrowserViewClass : public FeatureViewClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_RUNBROWSERVIEWCLASS_H_

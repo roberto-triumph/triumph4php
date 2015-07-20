@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TemplateFileTagClass_H
-#define T4P_TemplateFileTagClass_H
+#ifndef SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_
+#define SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_
 
 #include <wx/string.h>
 #include <wx/filename.h>
@@ -86,4 +86,4 @@ class TemplateFileTagFinderClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CHOOSEURLDIALOGCLASS_H
-#define T4P_CHOOSEURLDIALOGCLASS_H
+#ifndef SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_
+#define SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_
 
 #include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
 #include <language_php/UrlTagClass.h>
@@ -133,4 +133,4 @@ class ChooseUrlDialogClass : public ChooseUrlDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_

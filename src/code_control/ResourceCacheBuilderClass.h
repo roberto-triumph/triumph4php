@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __RESOURCECACHEBUILDERTHREADCLASS_H
-#define __RESOURCECACHEBUILDERTHREADCLASS_H
+#ifndef SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_
+#define SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_
 
 #include <actions/ActionClass.h>
 #include <language_php/TagCacheClass.h>
@@ -128,4 +128,4 @@ class WorkingCacheBuilderClass : public t4p::ActionClass {
 	bool DoParseTags;
 };
 }
-#endif
+#endif  // SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_

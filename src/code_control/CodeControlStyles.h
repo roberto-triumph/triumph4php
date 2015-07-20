@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_CODECONTROLSTYLES_H
-#define T4P_CODECONTROLSTYLES_H
+#ifndef SRC_CODE_CONTROL_CODECONTROLSTYLES_H_
+#define SRC_CODE_CONTROL_CODECONTROLSTYLES_H_
 
 #include <globals/CodeControlOptionsClass.h>
 
@@ -45,4 +45,4 @@ void CodeControlStylesSetTheme(t4p::CodeControlOptionsClass& options, const wxSt
 wxArrayString CodeControlStylesGetThemes();
 }
 
-#endif
+#endif  // SRC_CODE_CONTROL_CODECONTROLSTYLES_H_

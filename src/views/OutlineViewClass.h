@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef OUTLINE_VIEW_CLASS_H
-#define OUTLINE_VIEW_CLASS_H
+#ifndef SRC_VIEWS_OUTLINEVIEWCLASS_H_
+#define SRC_VIEWS_OUTLINEVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/OutlineViewFeatureForms.h>
@@ -392,4 +392,4 @@ class FileSearchDialogClass : public FileSearchDialogGeneratedClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_OUTLINEVIEWCLASS_H_

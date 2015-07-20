@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_TAGCLASS_H
-#define T4P_TAGCLASS_H
+#ifndef SRC_LANGUAGE_PHP_PHPTAGCLASS_H_
+#define SRC_LANGUAGE_PHP_PHPTAGCLASS_H_
 
 #include <globals/String.h>
 #include <unicode/unistr.h>
@@ -350,4 +350,4 @@ class FileTagClass {
 };
 }
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_PHPTAGCLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_SQLMETADATAACTIONCLASS_H
-#define T4P_SQLMETADATAACTIONCLASS_H
+#ifndef SRC_ACTIONS_SQLMETADATAACTIONCLASS_H_
+#define SRC_ACTIONS_SQLMETADATAACTIONCLASS_H_
 
 #include <wx/event.h>
 #include <vector>
@@ -107,4 +107,4 @@ typedef void (wxEvtHandler::*SqlMetaDataEventClassFunction)(t4p::SqlMetaDataEven
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(SqlMetaDataEventClassFunction, & fn), (wxObject *) NULL),
 
-#endif
+#endif  // SRC_ACTIONS_SQLMETADATAACTIONCLASS_H_

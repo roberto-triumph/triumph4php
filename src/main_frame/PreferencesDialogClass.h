@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __PreferencesDialogClass__
-#define __PreferencesDialogClass__
+#ifndef SRC_MAIN_FRAME_PREFERENCESDIALOGCLASS_H_
+#define SRC_MAIN_FRAME_PREFERENCESDIALOGCLASS_H_
 
 /**
 @file
@@ -120,4 +120,4 @@ class PreferencesDialogClass : public wxPropertySheetDialog {
 	DECLARE_EVENT_TABLE()
 };
 }
-#endif  // __PreferencesDialogClass__
+#endif  // SRC_MAIN_FRAME_PREFERENCESDIALOGCLASS_H_

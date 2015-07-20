@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef __LINTFEATURECLASS_H
-#define __LINTFEATURECLASS_H
+#ifndef SRC_FEATURES_LINTFEATURECLASS_H_
+#define SRC_FEATURES_LINTFEATURECLASS_H_
 
 #include <vector>
 #include <features/FeatureClass.h>
@@ -393,4 +393,4 @@ class LintFeatureClass : public FeatureClass {
 };
 }
 
-#endif
+#endif  // SRC_FEATURES_LINTFEATURECLASS_H_

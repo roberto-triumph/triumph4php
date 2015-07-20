@@ -22,6 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef SRC_TRIUMPH_H_
+#define SRC_TRIUMPH_H_
+
 #include <globals/GlobalsClass.h>
 #include <main_frame/PreferencesClass.h>
 #include <globals/Events.h>
@@ -174,3 +177,5 @@ class AppClass {
 	wxTimer& Timer;
 };
 }
+
+#endif  // SRC_TRIUMPH_H_

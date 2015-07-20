@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_STRUCTSCLASS_H
-#define T4P_STRUCTSCLASS_H
+#ifndef SRC_GLOBALS_GLOBALSCLASS_H_
+#define SRC_GLOBALS_GLOBALSCLASS_H_
 
 #include <globals/EnvironmentClass.h>
 #include <language_php/UrlTagClass.h>
@@ -282,4 +282,4 @@ class GlobalsClass {
 	bool IsInLocalVolume(const wxFileName& fileName) const;
 };
 }
-#endif
+#endif  // SRC_GLOBALS_GLOBALSCLASS_H_

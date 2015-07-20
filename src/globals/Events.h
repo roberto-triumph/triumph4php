@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EVENTS_H
-#define T4P_EVENTS_H
+#ifndef SRC_GLOBALS_EVENTS_H_
+#define SRC_GLOBALS_EVENTS_H_
 
 #include <globals/ProjectClass.h>
 #include <wx/event.h>
@@ -639,4 +639,4 @@ extern const long ID_TOOLS_NOTEBOOK;
 extern const long ID_OUTLINE_NOTEBOOK;
 }
 
-#endif
+#endif  // SRC_GLOBALS_EVENTS_H_

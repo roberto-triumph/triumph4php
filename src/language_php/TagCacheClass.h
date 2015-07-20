@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_RESOURCECACHECLASS_H
-#define T4P_RESOURCECACHECLASS_H
+#ifndef SRC_LANGUAGE_PHP_TAGCACHECLASS_H_
+#define SRC_LANGUAGE_PHP_TAGCACHECLASS_H_
 
 #include <search/DirectorySearchClass.h>
 #include <language_php/TagParserClass.h>
@@ -610,4 +610,4 @@ typedef void (wxEvtHandler::*TagFinderListCompleteEventClassFunction)(t4p::TagFi
     (wxObjectEventFunction) (wxEventFunction) \
     wxStaticCastEvent(TagFinderListCompleteEventClassFunction, & fn), (wxObject *) NULL),
 
-#endif
+#endif  // SRC_LANGUAGE_PHP_TAGCACHECLASS_H_

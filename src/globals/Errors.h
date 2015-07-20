@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_ERRORS_H
-#define T4P_ERRORS_H
+#ifndef SRC_GLOBALS_ERRORS_H_
+#define SRC_GLOBALS_ERRORS_H_
 
 #include <wx/string.h>
 
@@ -111,4 +111,4 @@ wxString MessageWithFix(wxString message, wxString fix);
 void EditorErrorFix(const wxString& errorString, wxString& error, wxString& fix);
 };
 
-#endif
+#endif  // SRC_GLOBALS_ERRORS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_AUIMANAGER_H
-#define T4P_AUIMANAGER_H
+#ifndef SRC_WIDGETS_AUIMANAGER_H_
+#define SRC_WIDGETS_AUIMANAGER_H_
 
 #include <wx/aui/aui.h>
 #include <vector>
@@ -153,5 +153,4 @@ t4p::NotebookClass* AuiNextHiddenCodeNotebook(wxAuiManager& auiManager);
 int AuiRowCount(wxAuiManager& auiManager, int dock);
 }
 
-#endif
-
+#endif  // SRC_WIDGETS_AUIMANAGER_H_

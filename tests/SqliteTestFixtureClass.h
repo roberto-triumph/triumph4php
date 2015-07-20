@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __SQLITETESTFIXTURECLASS_H
-#define __SQLITETESTFIXTURECLASS_H
+#ifndef TESTS_SQLITETESTFIXTURECLASS_H_
+#define TESTS_SQLITETESTFIXTURECLASS_H_
 
 #include <soci.h>
 #include <string>
@@ -74,4 +74,4 @@ class SqliteTestFixtureClass {
 	std::string ConnectionString;
 };
 
-#endif
+#endif  // TESTS_SQLITETESTFIXTURECLASS_H_

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P__BOOKMARKFEATUREVIEWCLASS_H
-#define T4P__BOOKMARKFEATUREVIEWCLASS_H
+#ifndef SRC_VIEWS_BOOKMARKVIEWCLASS_H_
+#define SRC_VIEWS_BOOKMARKVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/BookmarkFeatureClass.h>
@@ -116,4 +116,4 @@ class BookmarkViewClass : public t4p::FeatureViewClass {
 };
 }
 
-#endif  // T4P__BOOKMARKFEATURECLASS_H
+#endif  // SRC_VIEWS_BOOKMARKVIEWCLASS_H_

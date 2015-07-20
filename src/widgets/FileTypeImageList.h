@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef T4P_FILETYPEIMAGELIST_H
-#define T4P_FILETYPEIMAGELIST_H
+#ifndef SRC_WIDGETS_FILETYPEIMAGELIST_H_
+#define SRC_WIDGETS_FILETYPEIMAGELIST_H_
 
 #include <wx/imaglist.h>
 #include <wx/filename.h>
@@ -79,4 +79,4 @@ int FileTypeImageIdFromType(t4p::FileType type);
 
 }
 
-#endif
+#endif  // SRC_WIDGETS_FILETYPEIMAGELIST_H_

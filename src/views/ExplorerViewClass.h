@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef T4P_EXPLORERVIEWCLASS_H
-#define T4P_EXPLORERVIEWCLASS_H
+#ifndef SRC_VIEWS_EXPLORERVIEWCLASS_H_
+#define SRC_VIEWS_EXPLORERVIEWCLASS_H_
 
 #include <views/FeatureViewClass.h>
 #include <features/ExplorerFeatureClass.h>
@@ -372,4 +372,4 @@ class ExplorerNewFileDialogClass : public ExplorerNewFileGeneratedDialogClass {
 };
 }
 
-#endif
+#endif  // SRC_VIEWS_EXPLORERVIEWCLASS_H_

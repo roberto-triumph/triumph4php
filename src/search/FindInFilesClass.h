@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef __findinfilesclass__
-#define __findinfilesclass__
+#ifndef SRC_SEARCH_FINDINFILESCLASS_H_
+#define SRC_SEARCH_FINDINFILESCLASS_H_
 
 #include <search/DirectorySearchClass.h>
 #include <search/FinderClass.h>
@@ -337,4 +337,4 @@ class FindInFilesClass : public DirectoryWalkerClass {
 	void CleanupStreams();
 };
 }
-#endif  // __findinfilesclass__
+#endif  // SRC_SEARCH_FINDINFILESCLASS_H_
