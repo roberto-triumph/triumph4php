@@ -500,3 +500,10 @@ void t4p::DirectorySearchClass::AddFiles(wxDir& dir) {
 		next = dir.GetNext(&subFileName);
 	}
 }
+
+
+void t4p::DirectoryWalkerClass::BeginSearch(const wxString& fullPath) {
+}
+
+void t4p::DirectoryWalkerClass::EndSearch() {
+}

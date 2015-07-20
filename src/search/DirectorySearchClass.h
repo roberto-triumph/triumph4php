@@ -46,7 +46,7 @@ class DirectoryWalkerClass {
 	 *
 	 * @param fullPath the full path to the directory being iterated that was given in the DirectorySearch::Init() method
 	 */
-	virtual void BeginSearch(const wxString& fullPath) { };
+	virtual void BeginSearch(const wxString& fullPath);
 
 	/**
 	 * The walker should determine whether it thinks the given file is special and wants to mark it as so.
@@ -61,7 +61,7 @@ class DirectoryWalkerClass {
 	 * perform any cleanup here.
 	 * Note that EndSearch() will NOT be called if the DirectorySearch was given a non-existent or empty directory.
 	 */
-	virtual void EndSearch() { };
+	virtual void EndSearch();
 };
 
 /**

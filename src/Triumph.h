@@ -138,9 +138,7 @@ class AppClass {
 	/**
 	 * @return TRUE if this app is active (in the foreground)
 	 */
-	bool IsActive() {
-		return wxTheApp? wxTheApp->IsActive() : false;
-	};
+	bool IsActive();
 
 	private:
 	/**

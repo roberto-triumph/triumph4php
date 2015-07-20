@@ -178,3 +178,7 @@ void t4p::AppClass::UpdateConfigModifiedTime() {
 	}
 	Timer.Start();
 }
+
+bool t4p::AppClass::IsActive() {
+	return wxTheApp? wxTheApp->IsActive() : false;
+}
