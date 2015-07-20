@@ -27,6 +27,7 @@
 
 #include <views/FeatureViewClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
+#include <map>
 
 namespace t4p {
 // forward declaration, defined in another file

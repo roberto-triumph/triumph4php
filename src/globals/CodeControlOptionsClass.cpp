@@ -25,6 +25,7 @@
 #include <globals/CodeControlOptionsClass.h>
 #include <wx/platinfo.h>
 #include <wx/utils.h>
+#include <vector>
 
 t4p::CodeControlOptionsClass::CodeControlOptionsClass()
 : PhpStyles()

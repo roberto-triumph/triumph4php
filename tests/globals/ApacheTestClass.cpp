@@ -29,6 +29,7 @@
 #include <wx/filename.h>
 #include <wx/platinfo.h>
 #include <wx/utils.h>
+#include <vector>
 
 class ApacheTestClass : public FileTestFixtureClass {
 	public:

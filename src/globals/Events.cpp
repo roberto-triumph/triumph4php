@@ -24,6 +24,7 @@
  */
 #include <globals/Events.h>
 #include <algorithm>
+#include <vector>
 
 t4p::EventSinkClass::EventSinkClass()
 	: Handlers() {

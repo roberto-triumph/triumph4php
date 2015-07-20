@@ -25,6 +25,8 @@
 #include <actions/ActionClass.h>
 #include <wx/intl.h>
 #include <algorithm>
+#include <queue>
+#include <vector>
 
 t4p::ThreadCleanupClass::ThreadCleanupClass() {
 }

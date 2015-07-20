@@ -32,6 +32,7 @@
 #include <Triumph.h>
 #include <wx/file.h>
 #include <algorithm>
+#include <vector>
 
 /**
  * comparator function that compares 2 filenames by using the full name

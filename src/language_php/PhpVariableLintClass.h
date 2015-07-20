@@ -30,6 +30,8 @@
 #include <language_php/ParsedTagFinderClass.h>
 #include <wx/filename.h>
 #include <globals/String.h>
+#include <map>
+#include <vector>
 
 namespace t4p {
 

@@ -28,6 +28,8 @@
 #include <globals/Sqlite.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/ffile.h>
+#include <string>
+#include <vector>
 
 t4p::UrlTagClass::UrlTagClass()
 : Url()

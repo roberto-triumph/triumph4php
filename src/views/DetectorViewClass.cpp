@@ -37,6 +37,8 @@
 #include <actions/ConfigTagDetectorActionClass.h>
 #include <Triumph.h>
 #include <wx/ffile.h>
+#include <string>
+#include <vector>
 
 static const int ID_URL_DETECTOR_PANEL = wxNewId();
 static const int ID_TEMPLATE_FILES_DETECTOR_PANEL = wxNewId();

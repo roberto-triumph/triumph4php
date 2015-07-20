@@ -27,6 +27,7 @@
 #include <wx/filefn.h>
 #include <wx/timer.h>
 #include <unicode/uclean.h>
+#include <vector>
 
 /**
  * Find in files over an entire directory, using an exact search

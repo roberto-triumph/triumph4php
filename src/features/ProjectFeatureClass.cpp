@@ -32,6 +32,7 @@
 #include <wx/fileconf.h>
 #include <wx/dir.h>
 #include <algorithm>
+#include <vector>
 
 t4p::ProjectFeatureClass::ProjectFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

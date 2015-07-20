@@ -29,6 +29,8 @@
 #include <Triumph.h>
 #include <wx/imaglist.h>
 #include <wx/wupdlock.h>
+#include <map>
+#include <vector>
 
 static int ID_DIALOG_TIMER = wxNewId();
 static int ID_TAG_SEARCH = wxNewId();

@@ -24,6 +24,7 @@
  */
 #include <views/HtmlViewClass.h>
 #include <code_control/CodeControlClass.h>
+#include <vector>
 
 static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);

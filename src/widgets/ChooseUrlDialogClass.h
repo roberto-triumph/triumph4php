@@ -29,6 +29,7 @@
 #include <language_php/UrlTagClass.h>
 #include <globals/ProjectClass.h>
 #include <wx/wx.h>
+#include <vector>
 
 namespace t4p {
 /**

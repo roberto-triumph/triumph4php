@@ -26,6 +26,7 @@
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <stdio.h>
+#include <string>
 
 /**
  * This is an example that will query a MySQL and a SQLite3 database using the SOCI library. The example

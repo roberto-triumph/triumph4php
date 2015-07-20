@@ -28,6 +28,7 @@
 #include <language_php/ParsedTagFinderClass.h>
 #include <pelet/ParserClass.h>
 #include <unicode/unistr.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined in another file

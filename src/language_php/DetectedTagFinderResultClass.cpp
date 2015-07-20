@@ -24,6 +24,8 @@
  */
 
 #include <language_php/DetectedTagFinderResultClass.h>
+#include <string>
+#include <vector>
 
 t4p::DetectedTagTotalCountResultClass::DetectedTagTotalCountResultClass()
 : SqliteResultClass()

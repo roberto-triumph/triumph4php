@@ -24,6 +24,7 @@
  */
 #include <widgets/AuiManager.h>
 #include <widgets/NotebookClass.h>
+#include <vector>
 
 const int t4p::AUI_MAX_CODE_NOTEBOOKS = 5;
 

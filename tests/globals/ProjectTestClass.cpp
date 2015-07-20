@@ -26,6 +26,7 @@
 #include <FileTestFixtureClass.h>
 #include <TriumphChecks.h>
 #include <globals/ProjectClass.h>
+#include <vector>
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
 	public:

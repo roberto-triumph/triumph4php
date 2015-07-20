@@ -27,6 +27,7 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/fileconf.h>
+#include <string>
 
 // these macros will expand a pre-processor define into code
 // these are needed to expand the asset root location

@@ -24,6 +24,7 @@
  */
 #include <code_control/CodeControlStyles.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 static void NewStyle(std::vector<t4p::StylePreferenceClass>& styles, int stcId, const char* label) {
 	t4p::StylePreferenceClass pref;

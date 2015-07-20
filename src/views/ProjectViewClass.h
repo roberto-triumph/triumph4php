@@ -29,6 +29,7 @@
 #include <features/ProjectFeatureClass.h>
 #include <views/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
+#include <vector>
 
 namespace t4p {
 class ProjectViewClass : public FeatureViewClass {

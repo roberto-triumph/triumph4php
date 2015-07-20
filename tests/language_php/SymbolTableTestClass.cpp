@@ -33,6 +33,8 @@
 #include <FileTestFixtureClass.h>
 #include <SqliteTestFixtureClass.h>
 #include <TriumphChecks.h>
+#include <string>
+#include <vector>
 #include <UnitTest++.h>
 
 UnicodeString CURSOR = UNICODE_STRING_SIMPLE("{CURSOR}");

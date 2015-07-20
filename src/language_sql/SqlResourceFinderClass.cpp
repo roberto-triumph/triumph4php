@@ -27,6 +27,8 @@
 #include <globals/Sqlite.h>
 #include <soci.h>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 t4p::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {

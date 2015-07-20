@@ -29,6 +29,8 @@
 #include <views/wxformbuilder/EnvironmentFeatureForms.h>
 #include <globals/EnvironmentClass.h>
 #include <actions/ActionClass.h>
+#include <map>
+#include <vector>
 
 namespace t4p {
 // forward declaration, declared in another file

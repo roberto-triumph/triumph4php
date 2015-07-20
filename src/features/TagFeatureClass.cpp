@@ -34,6 +34,7 @@
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
+#include <vector>
 
 t4p::TagFeatureClass::TagFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)

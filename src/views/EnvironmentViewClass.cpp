@@ -29,6 +29,8 @@
 #include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/msgdlg.h>
+#include <map>
+#include <vector>
 
 static int ID_APACHE_FILE_READER = wxNewId();
 

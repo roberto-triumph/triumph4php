@@ -28,6 +28,8 @@
 #include <globals/String.h>
 #include <wx/ffile.h>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 /**
  * we will stop tracking errors after we have reached this

@@ -24,6 +24,8 @@
  */
 #include <actions/DebuggerServerActionClass.h>
 #include <globals/String.h>
+#include <string>
+#include <algorithm>
 
 /**
  * reads a response from the debug engine. engine responses are

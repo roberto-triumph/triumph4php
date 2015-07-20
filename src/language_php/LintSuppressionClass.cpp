@@ -27,6 +27,7 @@
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
 #include <wx/tokenzr.h>
+#include <vector>
 
 /**
  * serialize a SuppressionRuleClass::Types to a string

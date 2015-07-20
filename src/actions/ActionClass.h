@@ -29,6 +29,7 @@
 #include <wx/event.h>
 #include <wx/timer.h>
 #include <queue>
+#include <vector>
 
 namespace t4p {
 // defined below

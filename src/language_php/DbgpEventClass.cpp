@@ -27,6 +27,7 @@
 #include <wx/xml/xml.h>
 #include <wx/sstream.h>
 #include <wx/base64.h>
+#include <string>
 
 /**
  * @param document the parsed xml

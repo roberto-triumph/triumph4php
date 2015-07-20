@@ -29,6 +29,7 @@
 #include <actions/ActionClass.h>
 #include <wx/imaglist.h>
 #include <wx/fswatcher.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined below

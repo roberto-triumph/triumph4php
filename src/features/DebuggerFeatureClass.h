@@ -31,6 +31,8 @@
 #include <globals/Events.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include <map>
+#include <string>
 
 namespace t4p {
 /**

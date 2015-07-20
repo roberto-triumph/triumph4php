@@ -27,6 +27,7 @@
 #include <TriumphChecks.h>
 #include <language_php/LintSuppressionClass.h>
 #include <unicode/unistr.h>
+#include <vector>
 
 class LintSuppressionFixtureClass : public FileTestFixtureClass {
 	public:

@@ -27,6 +27,7 @@
 #include <language_php/DetectedTagFinderResultClass.h>
 #include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 t4p::TagFinderListClass::TagFinderListClass()
 	: TagDbSession()

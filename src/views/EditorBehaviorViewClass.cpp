@@ -32,6 +32,8 @@
 #include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/stc/stc.h>
+#include <map>
+#include <vector>
 
 static int ID_SUBMENU_TRANSFORM = wxNewId();
 static int ID_SUBMENU_SELECTION = wxNewId();

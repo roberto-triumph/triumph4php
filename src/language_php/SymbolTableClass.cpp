@@ -28,6 +28,8 @@
 #include <pelet/TokenClass.h>
 #include <wx/ffile.h>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 static UnicodeString VariableName(const pelet::VariableClass& var) {
 	UnicodeString varName;

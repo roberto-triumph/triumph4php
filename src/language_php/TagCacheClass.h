@@ -34,6 +34,7 @@
 #include <map>
 #include <wx/thread.h>
 #include <wx/event.h>
+#include <vector>
 
 namespace t4p {
 // forward declarations

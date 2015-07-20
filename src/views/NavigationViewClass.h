@@ -28,6 +28,7 @@
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/NavigationViewForms.h>
 #include <wx/aui/auibook.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined in another file

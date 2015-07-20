@@ -32,6 +32,7 @@
 #include <wx/stdpaths.h>
 #include <TriumphChecks.h>
 #include <string>
+#include <vector>
 
 class UrlTagFixtureClass : public SqliteTestFixtureClass {
 	public:

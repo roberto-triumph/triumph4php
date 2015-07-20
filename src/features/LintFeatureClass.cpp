@@ -26,7 +26,8 @@
 #include <globals/String.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
-
+#include <map>
+#include <vector>
 #include <Triumph.h>
 #include <globals/Events.h>
 #include <globals/Number.h>

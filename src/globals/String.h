@@ -29,6 +29,7 @@
 #include <wx/string.h>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace t4p {
 /**

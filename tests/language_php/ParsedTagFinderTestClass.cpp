@@ -38,6 +38,7 @@
 #include <wx/tokenzr.h>
 #include <wx/stdpaths.h>
 #include <algorithm>
+#include <vector>
 
 /**
  * This is a fixture to test that the tag finder works with-

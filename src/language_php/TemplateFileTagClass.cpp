@@ -28,6 +28,8 @@
 #include <globals/Assets.h>
 #include <globals/Sqlite.h>
 #include <wx/tokenzr.h>
+#include <string>
+#include <vector>
 
 t4p::TemplateFileTagClass::TemplateFileTagClass()
 	:  FullPath()

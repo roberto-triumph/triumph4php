@@ -31,6 +31,7 @@
 #include <actions/ActionClass.h>
 #include <language_php/TagCacheClass.h>
 #include <vector>
+#include <map>
 
 namespace t4p {
 /**

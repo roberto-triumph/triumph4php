@@ -27,6 +27,8 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 t4p::CallStackActionClass::CallStackActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)

@@ -24,6 +24,7 @@
  */
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <wx/txtstrm.h>
+#include <map>
 
 extern const wxEventType t4p::EVENT_PROCESS_COMPLETE = wxNewEventType();
 

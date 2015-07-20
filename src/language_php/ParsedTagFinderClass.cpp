@@ -36,6 +36,7 @@
 #include <unicode/numfmt.h>
 #include <soci/soci.h>
 #include <string>
+#include <vector>
 
 namespace t4p {
 class AllMembersTagResultClass : public t4p::ExactMemberTagResultClass {

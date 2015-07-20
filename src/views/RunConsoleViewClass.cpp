@@ -35,6 +35,8 @@
 #include <wx/filename.h>
 #include <wx/sstream.h>
 #include <wx/valgen.h>
+#include <map>
+#include <vector>
 
 
 static const int ID_PROCESS = wxNewId();

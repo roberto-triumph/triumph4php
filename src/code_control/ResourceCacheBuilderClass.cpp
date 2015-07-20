@@ -26,6 +26,7 @@
 #include <language_php/TagFinderList.h>
 #include <globals/Assets.h>
 #include <globals/GlobalsClass.h>
+#include <vector>
 
 t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	t4p::RunningThreadsClass& runningThreads, int eventId)

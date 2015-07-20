@@ -25,6 +25,7 @@
 #include <language_php/DetectorDbClass.h>
 #include <globals/Errors.h>
 #include <globals/String.h>
+#include <string>
 
 t4p::DetectorDbClass::DetectorDbClass()
 : Session(NULL) {

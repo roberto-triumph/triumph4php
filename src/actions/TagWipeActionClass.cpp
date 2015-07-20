@@ -28,6 +28,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/FileName.h>
+#include <vector>
 
 t4p::TagWipeActionClass::TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)

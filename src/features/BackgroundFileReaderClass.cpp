@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <features/BackgroundFileReaderClass.h>
+#include <vector>
 
 
 t4p::BackgroundFileReaderClass::BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)

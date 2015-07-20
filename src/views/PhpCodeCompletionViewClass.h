@@ -32,6 +32,7 @@
 #include <pelet/TokenClass.h>
 #include <language_php/SymbolTableClass.h>
 #include <globals/Events.h>
+#include <vector>
 
 namespace t4p {
 class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {

@@ -29,6 +29,8 @@
 #include <language_php/PhpTagClass.h>
 #include <language_php/FileTags.h>
 #include <TriumphChecks.h>
+#include <string>
+#include <vector>
 
 class JsTagResultFixtureClass : SqliteTestFixtureClass {
 	public:

@@ -24,6 +24,7 @@
  */
 #include <views/ConfigFilesViewClass.h>
 #include <features/ConfigFilesFeatureClass.h>
+#include <vector>
 
 t4p::ConfigFilesViewClass::ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature)
 : Feature(feature)

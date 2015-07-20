@@ -27,6 +27,7 @@
 
 #include <actions/GlobalActionClass.h>
 #include <wx/filename.h>
+#include <vector>
 
 namespace t4p {
 /**

@@ -33,6 +33,7 @@
 #include <actions/ConfigTagDetectorActionClass.h>
 #include <actions/DetectorDbInitActionClass.h>
 #include <globals/Errors.h>
+#include <vector>
 
 t4p::SequenceClass::SequenceClass(t4p::GlobalsClass& globals, t4p::RunningThreadsClass& runningThreads)
 	: wxEvtHandler()

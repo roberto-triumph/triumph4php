@@ -28,6 +28,7 @@
 #include <Triumph.h>
 #include <wx/valgen.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 static int SciCommands[][2] = {
 { t4p::MENU_BEHAVIOR + 20, wxSTC_CMD_LINECUT },

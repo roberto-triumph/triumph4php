@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <globals/CodeControlOptionsClass.h>
+#include <vector>
 
 namespace t4p {
 /**

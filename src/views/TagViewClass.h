@@ -32,6 +32,7 @@
 #include <widgets/GaugeDialogClass.h>
 #include <code_control/CodeControlClass.h>
 #include <wx/string.h>
+#include <vector>
 
 namespace t4p {
 

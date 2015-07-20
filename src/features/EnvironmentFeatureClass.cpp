@@ -26,6 +26,7 @@
 #include <Triumph.h>
 #include <wx/filename.h>
 #include <wx/string.h>
+#include <vector>
 
 const wxEventType t4p::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 

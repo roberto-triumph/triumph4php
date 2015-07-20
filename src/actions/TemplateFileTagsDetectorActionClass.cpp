@@ -26,6 +26,7 @@
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
+#include <vector>
 
 static int ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS = wxNewId();
 

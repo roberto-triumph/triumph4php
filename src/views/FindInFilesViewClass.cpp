@@ -39,6 +39,8 @@
 #include <wx/textfile.h>
 #include <wx/valgen.h>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 // these IDs are needed so that the IDs of the Regular expression help menu
 // do not collide with the menu IDs of the FinderFeature

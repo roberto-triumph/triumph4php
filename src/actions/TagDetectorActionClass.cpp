@@ -26,6 +26,7 @@
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
+#include <vector>
 
 static const int ID_TAG_DETECTOR_PROCESS = wxNewId();
 

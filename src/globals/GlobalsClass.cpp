@@ -25,6 +25,7 @@
 #include <globals/GlobalsClass.h>
 #include <globals/Assets.h>
 #include <algorithm>
+#include <vector>
 
 t4p::GlobalsClass::GlobalsClass()
 	: Environment()

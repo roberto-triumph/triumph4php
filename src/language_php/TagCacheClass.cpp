@@ -30,7 +30,8 @@
 #include <globals/GlobalsClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-
+#include <map>
+#include <vector>
 #include <algorithm>
 
 /**

@@ -29,6 +29,7 @@
 #include <features/ExplorerFeatureClass.h>
 #include <views/wxformbuilder/ExplorerFeatureForms.h>
 #include <widgets/FileTypeImageList.h>
+#include <vector>
 
 namespace t4p {
 class ExplorerViewClass : public t4p::FeatureViewClass {

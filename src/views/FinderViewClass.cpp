@@ -37,6 +37,8 @@
 #include <wx/valtext.h>
 #include <wx/stc/stc.h>
 #include <Triumph.h>
+#include <map>
+#include <vector>
 
 static const int ID_FIND_PANEL = wxNewId();
 static const int ID_REPLACE_PANEL = wxNewId();

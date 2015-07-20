@@ -25,6 +25,7 @@
 #include <features/FileModifiedCheckFeatureClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
 #include <Triumph.h>
+#include <vector>
 
 const int t4p::ID_FILE_MODIFIED_ACTION = wxNewId();
 

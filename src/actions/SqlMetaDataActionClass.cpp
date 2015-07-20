@@ -26,6 +26,7 @@
 #include <globals/Errors.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 const wxEventType t4p::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
 

@@ -33,6 +33,7 @@
 #include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 static int ID_SQL_METADATA_FETCH = wxNewId();
 

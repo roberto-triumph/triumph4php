@@ -41,6 +41,8 @@
 #include <wx/clipbrd.h>
 #include <wx/sstream.h>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();

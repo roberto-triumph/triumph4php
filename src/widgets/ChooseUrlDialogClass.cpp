@@ -24,6 +24,7 @@
  */
 #include <widgets/ChooseUrlDialogClass.h>
 #include <globals/Number.h>
+#include <vector>
 
 t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 													  t4p::UrlTagFinderClass& urls,

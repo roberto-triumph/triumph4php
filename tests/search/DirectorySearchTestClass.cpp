@@ -28,6 +28,7 @@
 #include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <algorithm>
+#include <vector>
 
 class DirectorySearchTestClass : public FileTestFixtureClass {
 	public:

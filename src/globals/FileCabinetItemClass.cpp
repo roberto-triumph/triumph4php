@@ -24,6 +24,7 @@
 */
 #include <globals/FileCabinetItemClass.h>
 #include <globals/String.h>
+#include <string>
 
 t4p::FileCabinetItemClass::FileCabinetItemClass()
 : Id(0)

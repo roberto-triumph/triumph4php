@@ -28,6 +28,8 @@
 #include <widgets/AuiManager.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
+#include <map>
+#include <vector>
 
 
 static const int ID_STATUS_BAR_TIMER = wxNewId();

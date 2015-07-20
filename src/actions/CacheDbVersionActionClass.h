@@ -27,6 +27,7 @@
 
 #include <actions/GlobalActionClass.h>
 #include <soci/soci.h>
+#include <vector>
 
 namespace t4p {
 /**

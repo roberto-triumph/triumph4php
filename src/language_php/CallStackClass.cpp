@@ -30,6 +30,8 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <globals/Sqlite.h>
 #include <wx/ffile.h>
+#include <string>
+#include <vector>
 
 t4p::VariableSymbolClass::VariableSymbolClass()
 	: Type(t4p::VariableSymbolClass::SCALAR)

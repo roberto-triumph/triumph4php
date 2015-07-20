@@ -35,6 +35,7 @@
 #include <SqliteTestFixtureClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 /**
  * fixture for the PHP identifier lint tests. Will create a

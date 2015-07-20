@@ -31,6 +31,8 @@
 #include <globals/String.h>
 #include <globals/Sqlite.h>
 #include <wx/filename.h>
+#include <map>
+#include <vector>
 
 namespace t4p {
 // forward declaration

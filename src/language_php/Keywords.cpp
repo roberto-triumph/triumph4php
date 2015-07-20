@@ -24,6 +24,7 @@
  */
 #include <language_php/Keywords.h>
 #include <wx/tokenzr.h>
+#include <vector>
 
 bool t4p::KeywordsTokenizeMatch(const wxString& keywords, const wxString& matchPrefix, std::vector<wxString>& results) {
 	wxStringTokenizer tokenizer(keywords);

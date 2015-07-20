@@ -35,6 +35,7 @@
 #include <wx/aui/aui.h>
 #include <wx/wizard.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration to prevent recursive dependencies

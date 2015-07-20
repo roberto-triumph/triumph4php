@@ -29,6 +29,7 @@
 #include <wx/menuutils.h>
 #include <wx/filename.h>
 #include <globals/CodeControlOptionsClass.h>
+#include <vector>
 
 namespace t4p {
 /**

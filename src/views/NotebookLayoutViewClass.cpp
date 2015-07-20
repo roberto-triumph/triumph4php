@@ -28,6 +28,7 @@
 #include <globals/Assets.h>
 #include <globals/Number.h>
 #include <widgets/AuiManager.h>
+#include <vector>
 
 /**
  * Moves all of the code notebooks from the hidden notebooks into the

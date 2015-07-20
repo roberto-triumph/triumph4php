@@ -32,6 +32,7 @@
 #include <unicode/ustdio.h>
 #include <string>
 #include <algorithm>
+#include <vector>
 
 t4p::DatabaseTagClass::DatabaseTagClass()
 	: Label()

@@ -29,14 +29,13 @@
 //
 // in MSW
 #include <boost/asio.hpp>
-
+#include <vector>
 #include <Triumph.h>
 #include <wx/cmdline.h>
 #include <wx/fileconf.h>
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-
 #include <main_frame/MainFrameClass.h>
 #include <main_frame/MacCommonMenuBarClass.h>
 #include <features/FeatureClass.h>

@@ -31,6 +31,7 @@
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/stdpaths.h>
+#include <string>
 
 class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 	public:

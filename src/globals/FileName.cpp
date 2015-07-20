@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <globals/FileName.h>
+#include <vector>
 
 wxFileName t4p::FileNameCopy(const wxFileName& fileName) {
 	wxFileName cpy(fileName.GetFullPath());

@@ -29,6 +29,7 @@
 #include <actions/GlobalActionClass.h>
 #include <wx/event.h>
 #include <queue>
+#include <vector>
 
 namespace t4p {
 /**

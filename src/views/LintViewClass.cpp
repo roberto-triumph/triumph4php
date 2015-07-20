@@ -40,6 +40,8 @@
 #include <wx/tokenzr.h>
 #include <wx/ffile.h>
 #include <wx/clipbrd.h>
+#include <map>
+#include <vector>
 
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_SUPPRESSIONS_PANEL = wxNewId();

@@ -34,6 +34,8 @@
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
+#include <map>
+#include <vector>
 
 static int ID_EVENT_TAG_CACHE_SEARCH = wxNewId();
 static int ID_SEARCH_TIMER = wxNewId();

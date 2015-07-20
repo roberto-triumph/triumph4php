@@ -31,6 +31,7 @@
 #include <globals/FileCabinetItemClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 t4p::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int eventId,
 	const UnicodeString& searchString, int lineNumber,

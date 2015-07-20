@@ -30,6 +30,7 @@
 #include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 /**
  * This is a program that tests a single sequence or action in isolation.  This was

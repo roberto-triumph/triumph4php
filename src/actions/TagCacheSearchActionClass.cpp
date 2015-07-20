@@ -27,6 +27,7 @@
 #include <globals/Assets.h>
 #include <language_php/TagFinderList.h>
 #include <globals/TagList.h>
+#include <vector>
 
 t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
 																	const UnicodeString& searchString,

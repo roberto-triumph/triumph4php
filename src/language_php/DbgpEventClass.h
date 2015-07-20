@@ -28,6 +28,7 @@
 #include <wx/string.h>
 #include <wx/event.h>
 #include <vector>
+#include <string>
 
 namespace t4p {
 /**

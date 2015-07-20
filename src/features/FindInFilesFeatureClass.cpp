@@ -31,6 +31,7 @@
 #include <wx/ffile.h>
 #include <wx/textfile.h>
 #include <algorithm>
+#include <vector>
 
 t4p::FindInFilesHitClass::FindInFilesHitClass()
 	: wxObject()

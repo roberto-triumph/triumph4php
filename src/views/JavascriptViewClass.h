@@ -29,6 +29,7 @@
 #include <code_control/CodeControlClass.h>
 #include <globals/Events.h>
 #include <language_js/JsTagResultClass.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined in other files

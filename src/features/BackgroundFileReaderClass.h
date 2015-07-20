@@ -29,6 +29,7 @@
 #include <wx/event.h>
 #include <actions/ActionClass.h>
 #include <search/DirectorySearchClass.h>
+#include <vector>
 
 namespace t4p {
 /**

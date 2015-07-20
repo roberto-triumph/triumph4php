@@ -27,6 +27,7 @@
 #include <language_php/DbgpEventClass.h>
 #include <wx/string.h>
 #include <wx/log.h>
+#include <string>
 
 SUITE(DbgpEventClassTest) {
 TEST(BreakpointResponse) {

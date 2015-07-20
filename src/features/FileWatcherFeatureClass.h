@@ -28,6 +28,8 @@
 #include <features/FeatureClass.h>
 #include <actions/ActionClass.h>
 #include <wx/fswatcher.h>
+#include <map>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined below

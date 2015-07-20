@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <search/RecursiveDirTraverserClass.h>
+#include <vector>
 
 t4p::RecursiveDirTraverserClass::RecursiveDirTraverserClass(std::vector<wxString>& fullPaths)
 	: FullPaths(fullPaths) {

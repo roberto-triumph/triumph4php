@@ -30,6 +30,7 @@
 #include <code_control/CodeControlStyles.h>
 #include <globals/Assets.h>
 #include <language_php/Keywords.h>
+#include <vector>
 
 //------------------------------------------------------------------------
 // setting the various wxStyledTextCtrl options

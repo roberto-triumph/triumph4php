@@ -26,6 +26,8 @@
 #include <wx/platinfo.h>
 #include <wx/confbase.h>
 #include <wx/utils.h>
+#include <map>
+#include <vector>
 
 t4p::WebBrowserClass::WebBrowserClass()
 	: Name()

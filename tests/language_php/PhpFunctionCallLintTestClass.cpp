@@ -32,6 +32,7 @@
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 class PhpFunctionCallLintTestFixtureClass :
 	public FileTestFixtureClass, public SqliteTestFixtureClass {

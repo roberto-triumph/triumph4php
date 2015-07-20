@@ -27,6 +27,8 @@
 #include <widgets/AuiManager.h>
 #include <globals/Events.h>
 #include <wx/wupdlock.h>
+#include <map>
+#include <vector>
 
 /**
  * Checks that the given possible code control is in fact part of

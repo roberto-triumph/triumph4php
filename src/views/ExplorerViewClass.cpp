@@ -33,6 +33,9 @@
 #include <wx/wupdlock.h>
 #include <wx/stdpaths.h>
 #include <wx/artprov.h>
+#include <map>
+#include <string>
+#include <vector>
 
 static int ID_EXPLORER_PANEL = wxNewId();
 static int ID_EXPLORER_OUTLINE = wxNewId();

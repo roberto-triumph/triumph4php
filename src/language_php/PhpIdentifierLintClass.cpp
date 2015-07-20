@@ -29,6 +29,8 @@
 #include <wx/ffile.h>
 #include <unicode/ustring.h>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 /**
  * we will stop tracking errors after we have reached this

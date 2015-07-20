@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <search/RecursiveDirTraverserClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 

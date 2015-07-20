@@ -25,6 +25,7 @@
 #include <UnitTest++.h>
 #include <globals/String.h>
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
+#include <string>
 
 SUITE(StringHelperTestClass) {
 TEST(FindPreviousShouldReturnLastIndex) {

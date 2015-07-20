@@ -32,6 +32,7 @@
 #include <sqlite3.h>
 #include <wx/sstream.h>
 #include <algorithm>
+#include <vector>
 
 
 t4p::QueryCompleteEventClass::QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId)

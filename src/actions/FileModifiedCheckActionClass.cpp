@@ -24,6 +24,7 @@
  */
 #include <actions/FileModifiedCheckActionClass.h>
 #include <globals/FileName.h>
+#include <vector>
 
 t4p::FileModifiedTimeClass::FileModifiedTimeClass()
 : FileName()

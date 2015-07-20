@@ -31,6 +31,8 @@
 #include <TriumphChecks.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 	public:

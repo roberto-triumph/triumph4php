@@ -43,6 +43,8 @@
 #include <wx/utils.h>
 #include <unicode/uclean.h>
 #include <iostream>
+#include <string>
+#include <vector>
 
 /**
  * Profiles the LexicalAnalyzerClass using the native.php file in resources

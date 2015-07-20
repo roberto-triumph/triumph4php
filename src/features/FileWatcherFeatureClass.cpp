@@ -30,6 +30,7 @@
 #include <wx/platinfo.h>
 #include <algorithm>
 #include <map>
+#include <vector>
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
 

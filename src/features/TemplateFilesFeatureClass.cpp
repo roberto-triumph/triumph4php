@@ -30,6 +30,7 @@
 #include <actions/TemplateFileTagsDetectorActionClass.h>
 #include <actions/SequenceClass.h>
 #include <Triumph.h>
+#include <vector>
 
 t4p::TemplateFilesFeatureClass::TemplateFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

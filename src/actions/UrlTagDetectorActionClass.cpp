@@ -27,6 +27,7 @@
 #include <globals/Errors.h>
 #include <globals/Assets.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 

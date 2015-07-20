@@ -30,6 +30,7 @@
 #include <features/FinderFeatureClass.h>
 #include <widgets/ComboBoxHistoryClass.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 namespace t4p {
 class FinderViewClass : public t4p::FeatureViewClass {

@@ -25,6 +25,8 @@
 #include <language_php/ConfigTagClass.h>
 #include <globals/String.h>
 #include <globals/Errors.h>
+#include <string>
+#include <vector>
 
 t4p::ConfigTagClass::ConfigTagClass()
 	: Label()

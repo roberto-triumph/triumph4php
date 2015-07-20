@@ -25,6 +25,8 @@
 #include <views/BookmarkViewClass.h>
 #include <features/BookmarkFeatureClass.h>
 #include <code_control/CodeControlClass.h>
+#include <map>
+#include <vector>
 
 t4p::BookmarkViewClass::BookmarkViewClass(t4p::BookmarkFeatureClass& feature)
 : FeatureViewClass()

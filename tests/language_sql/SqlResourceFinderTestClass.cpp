@@ -34,6 +34,7 @@
 #include <wx/platinfo.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
+#include <vector>
 
 class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 	public SqliteTestFixtureClass {

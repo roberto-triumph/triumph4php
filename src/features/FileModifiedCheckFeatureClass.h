@@ -27,6 +27,7 @@
 
 #include <features/FeatureClass.h>
 #include <actions/FileModifiedCheckActionClass.h>
+#include <vector>
 
 namespace t4p {
 extern const int ID_FILE_MODIFIED_ACTION;

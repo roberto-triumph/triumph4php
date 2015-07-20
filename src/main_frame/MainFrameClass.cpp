@@ -38,6 +38,7 @@
 #include <wx/aboutdlg.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include <map>
 
 static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();

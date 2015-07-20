@@ -31,6 +31,8 @@
 #include <istream>
 #include <string>
 #include <algorithm>
+#include <map>
+#include <vector>
 
 // TODO(roberto): not sure how breakpoints react when
 // file is edited (and breakpoints moves lines)

@@ -29,6 +29,7 @@
 #include <unicode/unistr.h>
 #include <wx/tokenzr.h>
 #include <wx/wupdlock.h>
+#include <vector>
 
 /**
  * Turns a tag PHPDoc comment into a nicer format that is more suitable

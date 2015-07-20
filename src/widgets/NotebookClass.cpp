@@ -39,6 +39,7 @@
 #include <wx/filename.h>
 #include <wx/file.h>
 #include <wx/wupdlock.h>
+#include <vector>
 
 static const int ID_CLOSE_ALL_TABS = wxNewId();
 static const int ID_CLOSE_TAB = wxNewId();

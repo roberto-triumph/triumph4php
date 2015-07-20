@@ -38,6 +38,8 @@
 #include <unicode/numfmt.h>
 #include <soci/soci.h>
 #include <string>
+#include <map>
+#include <vector>
 
 /**
  * appends name to namespace

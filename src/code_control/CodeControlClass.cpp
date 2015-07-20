@@ -38,6 +38,7 @@
 #include <wx/process.h>
 #include <unicode/ustring.h>
 #include <sys/stat.h>
+#include <vector>
 
 #if defined(__WXMSW__)
 	#include <Shellapi.h>

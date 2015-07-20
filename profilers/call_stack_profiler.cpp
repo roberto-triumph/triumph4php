@@ -33,6 +33,8 @@
 #include <wx/string.h>
 #include <wx/stdpaths.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 /**
  * Caches the given directory, putting all resources in the resource cache.

@@ -27,6 +27,7 @@
 #include <wx/tokenzr.h>
 #include <wx/filefn.h>
 #include <wx/filename.h>
+#include <vector>
 
 /**
  * @return exploded list of wildcards, split by semicolon

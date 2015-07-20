@@ -26,6 +26,7 @@
 #include <code_control/ResourceCacheBuilderClass.h>
 #include <search/RecursiveDirTraverserClass.h>
 #include <globals/Assets.h>
+#include <vector>
 
 t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)

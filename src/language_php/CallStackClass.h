@@ -32,6 +32,8 @@
 #include <wx/filename.h>
 #include <vector>
 #include <queue>
+#include <map>
+#include <string>
 
 namespace t4p {
 /**

@@ -27,6 +27,7 @@
 
 #include <views/FeatureViewClass.h>
 #include <views/wxformbuilder/EditorMessagesFeatureForms.h>
+#include <vector>
 
 namespace t4p {
 // forward declaration, defined in another file

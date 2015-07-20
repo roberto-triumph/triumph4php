@@ -29,6 +29,8 @@
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 class TagParserTestFixtureClass : public SqliteTestFixtureClass {
 	public:

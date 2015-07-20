@@ -29,6 +29,8 @@
 #include <algorithm>
 #include <language_php/Keywords.h>
 #include <globals/Assets.h>
+#include <map>
+#include <vector>
 
 enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_VARIABLE = 1,

@@ -29,6 +29,7 @@
 #include <wx/filename.h>
 #include <wx/datetime.h>
 #include <wx/event.h>
+#include <vector>
 
 namespace t4p {
 /**

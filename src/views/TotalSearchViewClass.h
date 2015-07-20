@@ -29,6 +29,7 @@
 #include <features/TotalSearchFeatureClass.h>
 #include <views/wxformbuilder/TotalSearchFeatureForms.h>
 #include <wx/timer.h>
+#include <vector>
 
 namespace t4p {
 /**

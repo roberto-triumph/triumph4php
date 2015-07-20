@@ -27,6 +27,8 @@
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/utils.h>
+#include <map>
+#include <string>
 
 /**
  FROM THE APACHE WEBSITE (http://httpd.apache.org/docs/2.0/mod/core.html#include)

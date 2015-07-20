@@ -28,6 +28,7 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/ffile.h>
 #include <stdio.h>
+#include <string>
 
 static std::string ResourceSchemaSql = "";
 static std::string DetectorSchemaSql = "";

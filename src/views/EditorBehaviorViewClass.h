@@ -30,6 +30,7 @@
 #include <features/EditorBehaviorFeatureClass.h>
 #include <globals/Events.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 namespace t4p {
 class EditorBehaviorViewClass : public t4p::FeatureViewClass {

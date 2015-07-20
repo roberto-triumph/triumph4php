@@ -32,6 +32,7 @@
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <algorithm>
+#include <vector>
 
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;

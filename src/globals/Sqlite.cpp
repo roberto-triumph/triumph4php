@@ -28,6 +28,8 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 
 std::string t4p::SqliteSqlLikeEscape(const std::string& value, char e) {

@@ -37,6 +37,7 @@
 #include <wx/dirdlg.h>
 #include <wx/choicdlg.h>
 #include <algorithm>
+#include <vector>
 
 t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 	: FeatureViewClass()

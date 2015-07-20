@@ -24,6 +24,8 @@
  */
 #include <language_js/JsTagResultClass.h>
 #include <globals/String.h>
+#include <string>
+#include <vector>
 
 t4p::JsTagResultClass::JsTagResultClass()
 : t4p::SqliteResultClass()

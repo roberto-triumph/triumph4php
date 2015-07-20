@@ -35,6 +35,8 @@
 #include <actions/DebuggerServerActionClass.h>
 #include <code_control/CodeControlClass.h>
 #include <wx/valgen.h>
+#include <map>
+#include <vector>
 
 const static int ID_PANEL_DEBUGGER = wxNewId();
 const static int ID_PANEL_DEBUGGER_STACK = wxNewId();

@@ -25,6 +25,7 @@
 #include <views/JavascriptViewClass.h>
 #include <globals/GlobalsClass.h>
 #include <Triumph.h>
+#include <vector>
 
 static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);

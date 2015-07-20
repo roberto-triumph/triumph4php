@@ -27,6 +27,7 @@
 #include <wx/tokenzr.h>
 #include <wx/filename.h>
 #include <algorithm>
+#include <vector>
 
 
 /**

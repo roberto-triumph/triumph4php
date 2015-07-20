@@ -25,6 +25,9 @@
 #include <globals/String.h>
 #include <unicode/ustring.h>
 #include <unicode/ucnv.h>
+#include <map>
+#include <string>
+#include <vector>
 
 bool t4p::UnicodeStringComparatorClass::operator()(const UnicodeString& str1, const UnicodeString& str2) const {
 	return (str1.compare(str2) < (int8_t)0) ? true : false;

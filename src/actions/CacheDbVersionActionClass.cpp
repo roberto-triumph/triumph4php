@@ -26,6 +26,8 @@
 #include <globals/Assets.h>
 #include <globals/Errors.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 /**
  * This number must match the number on the schema_version table

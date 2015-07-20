@@ -27,6 +27,7 @@
 #include <globals/Number.h>
 #include <code_control/CodeControlClass.h>
 #include <Triumph.h>
+#include <vector>
 
 t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass()
 : ProjectLabel()

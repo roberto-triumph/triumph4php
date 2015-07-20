@@ -31,6 +31,7 @@
 #include <globals/String.h>
 #include <wx/platinfo.h>
 #include <iostream>
+#include <string>
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 	public:

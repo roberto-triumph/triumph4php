@@ -27,6 +27,7 @@
 #include <actions/GlobalActionClass.h>
 #include <globals/Errors.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 t4p::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(t4p::GlobalsClass& globals)
 	: wxEvtHandler()

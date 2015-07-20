@@ -27,6 +27,7 @@
 
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
+#include <string>
 
 namespace t4p {
 /**

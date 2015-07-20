@@ -28,6 +28,7 @@
 #include <actions/GlobalActionClass.h>
 #include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
+#include <vector>
 
 namespace t4p {
 /**

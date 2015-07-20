@@ -34,6 +34,7 @@
 #include <wx/frame.h>
 #include <wx/tokenzr.h>
 #include <wx/wx.h>
+#include <vector>
 
 // use our own function to convert string to key codes
 // because the wxKeyBinder function does not handle

@@ -29,6 +29,8 @@
 #include <globals/Sqlite.h>
 #include <globals/SqliteResultClass.h>
 #include <language_php/PhpTagClass.h>
+#include <string>
+#include <vector>
 
 namespace t4p {
 class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {

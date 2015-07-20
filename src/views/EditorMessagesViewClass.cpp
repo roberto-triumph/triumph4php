@@ -26,6 +26,8 @@
 #include <features/EditorMessagesFeatureClass.h>
 #include <globals/Errors.h>
 #include <globals/Assets.h>
+#include <map>
+#include <vector>
 
 static const int ID_DEBUG_WINDOW = wxNewId();
 

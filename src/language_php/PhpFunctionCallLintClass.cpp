@@ -25,6 +25,7 @@
 #include <language_php/PhpFunctionCallLintClass.h>
 #include <language_php/TagCacheClass.h>
 #include <wx/ffile.h>
+#include <vector>
 
 /**
  * we will stop tracking errors after we have reached this

@@ -42,6 +42,7 @@
 #include <wx/tokenzr.h>
 #include <vector>
 #include <algorithm>
+#include <map>
 
 
 static int ID_WINDOW_OUTLINE = wxNewId();

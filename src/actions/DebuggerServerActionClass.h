@@ -31,6 +31,7 @@
 #include <wx/thread.h>
 #include <boost/asio.hpp>
 #include <queue>
+#include <string>
 
 namespace t4p {
 /**

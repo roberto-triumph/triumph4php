@@ -26,6 +26,8 @@
 #include <globals/Sqlite.h>
 #include <globals/String.h>
 #include <algorithm>
+#include <string>
+#include <vector>
 
 std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
 	std::vector<int> fileTagIds;

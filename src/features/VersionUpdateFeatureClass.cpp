@@ -30,6 +30,7 @@
 #include <wx/valgen.h>
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
+#include <string>
 
 // these macros will expand a pre-processor define into the code
 // these are needed to expand the update host which

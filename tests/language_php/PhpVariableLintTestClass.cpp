@@ -34,6 +34,7 @@
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 /**
  * fixture for the PHP lint tests. Will create a

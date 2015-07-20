@@ -33,6 +33,7 @@
 #include <soci/soci.h>
 #include <unicode/unistr.h>
 #include <vector>
+#include <string>
 
 namespace t4p {
 // forward declaration, defined below

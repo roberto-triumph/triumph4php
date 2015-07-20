@@ -29,6 +29,7 @@
 #include <wx/url.h>
 #include <globals/Sqlite.h>
 #include <globals/SqliteFinderClass.h>
+#include <vector>
 
 namespace t4p {
 /**

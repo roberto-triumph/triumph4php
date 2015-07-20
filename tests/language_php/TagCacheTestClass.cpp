@@ -34,6 +34,7 @@
 #include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 /**
  * fixture that holds the object under test for

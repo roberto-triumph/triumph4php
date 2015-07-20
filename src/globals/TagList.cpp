@@ -25,6 +25,7 @@
 #include <globals/TagList.h>
 #include <globals/ProjectClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <vector>
 
 void t4p::TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches) {
 	std::vector<t4p::PhpTagClass>::iterator it = matches.begin();

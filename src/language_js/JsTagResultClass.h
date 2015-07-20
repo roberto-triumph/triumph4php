@@ -29,6 +29,7 @@
 #include <language_js/JsTagClass.h>
 #include <wx/filename.h>
 #include <vector>
+#include <string>
 
 namespace t4p {
 /**

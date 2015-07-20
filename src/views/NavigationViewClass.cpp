@@ -29,6 +29,8 @@
 #include <widgets/ListWidget.h>
 #include <widgets/FileTypeImageList.h>
 #include <globals/Number.h>
+#include <map>
+#include <vector>
 
 t4p::NavigationViewClass::NavigationViewClass()
 : FeatureViewClass() {

@@ -29,6 +29,7 @@
 #include <soci/soci.h>
 #include <wx/filename.h>
 #include <string>
+#include <vector>
 
 namespace t4p {
 /**

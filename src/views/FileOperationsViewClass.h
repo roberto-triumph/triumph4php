@@ -29,6 +29,7 @@
 #include <features/FileOperationsFeatureClass.h>
 #include <globals/Events.h>
 #include <wx/stc/stc.h>
+#include <vector>
 
 namespace t4p {
 /**

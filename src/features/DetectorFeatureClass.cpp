@@ -34,6 +34,7 @@
 #include <Triumph.h>
 #include <wx/artprov.h>
 #include <wx/file.h>
+#include <vector>
 
 t4p::DetectorClass::DetectorClass() {
 }

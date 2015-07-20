@@ -26,6 +26,7 @@
 #define SRC_FEATURES_BOOKMARKFEATURECLASS_H_
 
 #include <features/FeatureClass.h>
+#include <vector>
 
 namespace t4p {
 /**

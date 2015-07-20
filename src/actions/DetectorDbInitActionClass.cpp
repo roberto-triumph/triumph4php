@@ -25,6 +25,8 @@
 
 #include <actions/DetectorDbInitActionClass.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <string>
+#include <vector>
 
 t4p::DetectorDbInitActionClass::DetectorDbInitActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: InitializerGlobalActionClass(runningThreads, eventId) {

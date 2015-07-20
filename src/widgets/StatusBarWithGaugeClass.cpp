@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 #include <widgets/StatusBarWithGaugeClass.h>
+#include <map>
 
 t4p::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, int id)
            : wxStatusBar(parent, id, wxST_SIZEGRIP | wxFULL_REPAINT_ON_RESIZE)

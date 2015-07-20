@@ -34,6 +34,7 @@
 #include <code_control/CodeControlClass.h>
 #include <Triumph.h>
 #include <wx/artprov.h>
+#include <vector>
 
 static const int ID_TEMPLATE_FILES_PANEL = wxNewId();
 
