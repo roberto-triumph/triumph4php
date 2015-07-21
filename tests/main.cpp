@@ -23,13 +23,13 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
+#include <wx/wx.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string.h>
 #include <TestReporterStdout.h>
 #include <TestRunner.h>
 #include <unicode/uclean.h>
-#include <wx/wx.h>
 #include <algorithm>
 #include <cstdarg>
 #include <iostream>
