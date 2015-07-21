@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <globals/String.h>
-#include <wx/textctrl.h>
+#include "widgets/UnicodeStringValidatorClass.h"
 #include <wx/combobox.h>
 #include <wx/msgdlg.h>
+#include <wx/textctrl.h>
+#include "globals/String.h"
 
 t4p::UnicodeStringValidatorClass::UnicodeStringValidatorClass(UnicodeString* data, bool doAllowEmpty)
 	: wxValidator()

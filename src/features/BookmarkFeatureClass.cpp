@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/BookmarkFeatureClass.h>
+#include "features/BookmarkFeatureClass.h"
 #include <algorithm>
 
 t4p::BookmarkClass::BookmarkClass()

@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_php/DetectorDbClass.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
-#include <globals/String.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/stdpaths.h>
 #include <string>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/DetectorDbClass.h"
+#include "SqliteTestFixtureClass.h"
 
 class DetectorDbTestFixtureClass : public SqliteTestFixtureClass {
 	public:

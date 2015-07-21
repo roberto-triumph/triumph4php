@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <search/RecursiveDirTraverserClass.h>
+#include "actions/TemplateFileTagsDetectorActionClass.h"
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "search/RecursiveDirTraverserClass.h"
 
 static int ID_TEMPLATE_FILE_TAGS_DETECTOR_PROCESS = wxNewId();
 

@@ -22,27 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/valgen.h>
-#include <views/SqlBrowserViewClass.h>
-#include <code_control/CodeControlClass.h>
-#include <globals/String.h>
-#include <globals/Number.h>
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/FilePickerValidatorClass.h>
-#include <widgets/Buttons.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <language_php/Keywords.h>
-#include <Triumph.h>
+#include "views/SqlBrowserViewClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
 #include <wx/artprov.h>
-#include <wx/wupdlock.h>
 #include <wx/clipbrd.h>
 #include <wx/sstream.h>
+#include <wx/valgen.h>
+#include <wx/wupdlock.h>
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "language_php/Keywords.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/FilePickerValidatorClass.h"
+#include "widgets/UnicodeStringValidatorClass.h"
 
 static const int ID_SQL_GAUGE = wxNewId();
 static const int ID_SQL_EDIT_TEST = wxNewId();

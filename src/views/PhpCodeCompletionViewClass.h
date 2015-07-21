@@ -25,14 +25,14 @@
 #ifndef SRC_VIEWS_PHPCODECOMPLETIONVIEWCLASS_H_
 #define SRC_VIEWS_PHPCODECOMPLETIONVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/PhpCodeCompletionFeatureClass.h>
-#include <code_control/CodeControlClass.h>
 #include <pelet/LanguageDiscoveryClass.h>
 #include <pelet/TokenClass.h>
-#include <language_php/SymbolTableClass.h>
-#include <globals/Events.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/PhpCodeCompletionFeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/SymbolTableClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 class PhpCodeCompletionProviderClass : public t4p::CodeCompletionProviderClass {

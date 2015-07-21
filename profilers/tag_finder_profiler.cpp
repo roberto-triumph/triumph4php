@@ -23,28 +23,28 @@
  * THE SOFTWARE.
  */
 #include <pelet/LexicalAnalyzerClass.h>
-#include <pelet/TokenClass.h>
 #include <pelet/ParserClass.h>
-#include <language_php/SymbolTableClass.h>
-#include <language_php/TagCacheClass.h>
-#include <language_php/PhpVariableLintClass.h>
-#include <language_php/PhpIdentifierLintClass.h>
-#include <language_php/PhpFunctionCallLintClass.h>
-#include <language_php/TagFinderList.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <search/DirectorySearchClass.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
+#include <pelet/TokenClass.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <wx/filefn.h>
+#include <unicode/uclean.h>
 #include <wx/ffile.h>
+#include <wx/filefn.h>
 #include <wx/timer.h>
 #include <wx/utils.h>
-#include <unicode/uclean.h>
 #include <iostream>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "language_php/ParsedTagFinderClass.h"
+#include "language_php/PhpFunctionCallLintClass.h"
+#include "language_php/PhpIdentifierLintClass.h"
+#include "language_php/PhpVariableLintClass.h"
+#include "language_php/SymbolTableClass.h"
+#include "language_php/TagCacheClass.h"
+#include "language_php/TagFinderList.h"
+#include "search/DirectorySearchClass.h"
 
 /**
  * Profiles the LexicalAnalyzerClass using the native.php file in resources

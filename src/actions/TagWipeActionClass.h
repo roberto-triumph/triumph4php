@@ -25,9 +25,9 @@
 #ifndef SRC_ACTIONS_TAGWIPEACTIONCLASS_H_
 #define SRC_ACTIONS_TAGWIPEACTIONCLASS_H_
 
-#include <actions/GlobalActionClass.h>
 #include <wx/filename.h>
 #include <vector>
+#include "actions/GlobalActionClass.h"
 
 namespace t4p {
 /**

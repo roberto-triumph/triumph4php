@@ -22,16 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FileModifiedCheckViewClass.h>
-#include <features/FileModifiedCheckFeatureClass.h>
-#include <code_control/CodeControlClass.h>
-#include <globals/Errors.h>
-#include <globals/Events.h>
-#include <Triumph.h>
+#include "views/FileModifiedCheckViewClass.h"
 #include <wx/choicdlg.h>
 #include <algorithm>
-#include <vector>
 #include <map>
+#include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/FileModifiedCheckFeatureClass.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "Triumph.h"
 
 t4p::FileModifiedCheckViewClass::FileModifiedCheckViewClass(t4p::FileModifiedCheckFeatureClass& feature)
 : FeatureViewClass()

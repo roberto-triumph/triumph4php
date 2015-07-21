@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/NavigationViewClass.h>
-#include <features/FeatureClass.h>
-#include <widgets/NotebookClass.h>
-#include <widgets/AuiManager.h>
-#include <widgets/ListWidget.h>
-#include <widgets/FileTypeImageList.h>
-#include <globals/Number.h>
+#include "views/NavigationViewClass.h"
 #include <map>
 #include <vector>
+#include "features/FeatureClass.h"
+#include "globals/Number.h"
+#include "widgets/AuiManager.h"
+#include "widgets/FileTypeImageList.h"
+#include "widgets/ListWidget.h"
+#include "widgets/NotebookClass.h"
 
 t4p::NavigationViewClass::NavigationViewClass()
 : FeatureViewClass() {

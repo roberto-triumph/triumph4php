@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/String.h>
-#include <unicode/ustring.h>
+#include "globals/String.h"
 #include <unicode/ucnv.h>
+#include <unicode/ustring.h>
 #include <map>
 #include <string>
 #include <vector>

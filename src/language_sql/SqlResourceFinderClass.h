@@ -25,11 +25,11 @@
 #ifndef SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_
 #define SRC_LANGUAGE_SQL_SQLRESOURCEFINDERCLASS_H_
 
-#include <language_sql/DatabaseTagClass.h>
 #include <unicode/unistr.h>
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
+#include "language_sql/DatabaseTagClass.h"
 
 namespace t4p {
 /**

@@ -22,19 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/DetectorFeatureClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <actions/TagDetectorActionClass.h>
-#include <actions/CallStackActionClass.h>
-#include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <actions/DatabaseTagDetectorActionClass.h>
-#include <actions/ConfigTagDetectorActionClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <Triumph.h>
+#include "features/DetectorFeatureClass.h"
 #include <wx/artprov.h>
 #include <wx/file.h>
 #include <vector>
+#include "actions/CallStackActionClass.h"
+#include "actions/ConfigTagDetectorActionClass.h"
+#include "actions/DatabaseTagDetectorActionClass.h"
+#include "actions/TagDetectorActionClass.h"
+#include "actions/TemplateFileTagsDetectorActionClass.h"
+#include "actions/UrlTagDetectorActionClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "Triumph.h"
 
 t4p::DetectorClass::DetectorClass() {
 }

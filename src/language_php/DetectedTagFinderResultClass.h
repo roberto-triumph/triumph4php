@@ -26,11 +26,11 @@
 #ifndef SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_
 #define SRC_LANGUAGE_PHP_DETECTEDTAGFINDERRESULTCLASS_H_
 
-#include <globals/Sqlite.h>
-#include <globals/SqliteResultClass.h>
-#include <language_php/PhpTagClass.h>
 #include <string>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/SqliteResultClass.h"
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 class DetectedTagTotalCountResultClass : public t4p::SqliteResultClass {

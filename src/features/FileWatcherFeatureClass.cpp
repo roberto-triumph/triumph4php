@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FileWatcherFeatureClass.h>
-#include <Triumph.h>
-#include <globals/Errors.h>
-#include <globals/Events.h>
-#include <wx/volume.h>
+#include "features/FileWatcherFeatureClass.h"
 #include <wx/platinfo.h>
+#include <wx/volume.h>
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "Triumph.h"
 
 static int ID_FILE_MODIFIED_CHECK = wxNewId();
 

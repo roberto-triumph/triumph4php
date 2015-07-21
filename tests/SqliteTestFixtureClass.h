@@ -26,8 +26,8 @@
 #define TESTS_SQLITETESTFIXTURECLASS_H_
 
 #include <soci.h>
-#include <string>
 #include <wx/filename.h>
+#include <string>
 
 /**
  * This is a test fixture that will initialize an SQLITE in-memory database. This

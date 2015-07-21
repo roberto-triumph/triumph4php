@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <search/FinderClass.h>
-#include <globals/String.h>
 #include <unicode/unistr.h>
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
+#include "globals/String.h"
+#include "search/FinderClass.h"
 
 UnicodeString CODE = t4p::CharToIcu(
 	"<?php\n"

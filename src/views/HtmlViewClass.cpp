@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/HtmlViewClass.h>
-#include <code_control/CodeControlClass.h>
+#include "views/HtmlViewClass.h"
 #include <vector>
+#include "code_control/CodeControlClass.h"
 
 static bool InCssCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);

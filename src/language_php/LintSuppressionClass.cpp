@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/LintSuppressionClass.h>
-#include <globals/String.h>
+#include "language_php/LintSuppressionClass.h"
+#include <wx/tokenzr.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
-#include <wx/tokenzr.h>
 #include <vector>
+#include "globals/String.h"
 
 /**
  * serialize a SuppressionRuleClass::Types to a string

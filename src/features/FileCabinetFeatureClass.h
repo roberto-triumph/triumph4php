@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_FILECABINETFEATURECLASS_H_
 #define SRC_FEATURES_FILECABINETFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <globals/FileCabinetItemClass.h>
-#include <globals/Sqlite.h>
+#include "features/FeatureClass.h"
+#include "globals/FileCabinetItemClass.h"
+#include "globals/Sqlite.h"
 
 namespace t4p {
 /**

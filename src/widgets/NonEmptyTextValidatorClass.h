@@ -25,9 +25,9 @@
 #ifndef SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_
 #define SRC_WIDGETS_NONEMPTYTEXTVALIDATORCLASS_H_
 
-#include <wx/validate.h>
-#include <wx/textctrl.h>
 #include <wx/stattext.h>
+#include <wx/textctrl.h>
+#include <wx/validate.h>
 
 /**
  * Class that can be used to transfer wxString data from wxTextCtrl

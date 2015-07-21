@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/FileTags.h>
-#include <globals/Sqlite.h>
-#include <globals/String.h>
+#include "language_php/FileTags.h"
 #include <algorithm>
 #include <string>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/String.h"
 
 std::vector<int> t4p::FileTagIdsForDirs(soci::session& session, const std::vector<wxFileName>& dirs, bool& error, wxString& errorMsg) {
 	std::vector<int> fileTagIds;

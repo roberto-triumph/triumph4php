@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <TriumphChecks.h>
-#include <ActionTestFixtureClass.h>
-#include <FileTestFixtureClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <language_php/TagCacheClass.h>
-#include <globals/Assets.h>
-#include <wx/event.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <wx/event.h>
+#include "actions/ProjectTagActionClass.h"
+#include "ActionTestFixtureClass.h"
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "language_php/TagCacheClass.h"
+#include "TriumphChecks.h"
 
 static int ID_EVENT = wxNewId();
 

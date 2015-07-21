@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_JAVASCRIPTVIEWCLASS_H_
 #define SRC_VIEWS_JAVASCRIPTVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <code_control/CodeControlClass.h>
-#include <globals/Events.h>
-#include <language_js/JsTagResultClass.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "globals/Events.h"
+#include "language_js/JsTagResultClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 // forward declaration, defined in other files

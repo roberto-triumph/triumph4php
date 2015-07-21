@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <unicode/ustdio.h>
 #include <unicode/ucsdet.h>
-#include <unicode/ustring.h>
 #include <unicode/unistr.h>
+#include <unicode/ustdio.h>
+#include <unicode/ustring.h>
 
 /**
  * This tutorial uses ICU to open a file, detect the encoding, grab the contents of the file,

@@ -22,23 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/DetectorViewClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <globals/Number.h>
-#include <widgets/Buttons.h>
-#include <widgets/TreeItemDataStringClass.h>
-#include <widgets/ChooseUrlDialogClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <actions/TagDetectorActionClass.h>
-#include <actions/CallStackActionClass.h>
-#include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <actions/DatabaseTagDetectorActionClass.h>
-#include <actions/ConfigTagDetectorActionClass.h>
-#include <Triumph.h>
+#include "views/DetectorViewClass.h"
 #include <wx/ffile.h>
 #include <string>
 #include <vector>
+#include "actions/CallStackActionClass.h"
+#include "actions/ConfigTagDetectorActionClass.h"
+#include "actions/DatabaseTagDetectorActionClass.h"
+#include "actions/TagDetectorActionClass.h"
+#include "actions/TemplateFileTagsDetectorActionClass.h"
+#include "actions/UrlTagDetectorActionClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/ChooseUrlDialogClass.h"
+#include "widgets/TreeItemDataStringClass.h"
 
 static const int ID_URL_DETECTOR_PANEL = wxNewId();
 static const int ID_TEMPLATE_FILES_DETECTOR_PANEL = wxNewId();

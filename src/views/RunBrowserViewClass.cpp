@@ -22,17 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/RunBrowserViewClass.h>
-#include <features/RunBrowserFeatureClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <widgets/ChooseUrlDialogClass.h>
-#include <Triumph.h>
+#include "views/RunBrowserViewClass.h"
 #include <wx/artprov.h>
 #include <algorithm>
 #include <vector>
+#include "actions/UrlTagDetectorActionClass.h"
+#include "features/RunBrowserFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/ChooseUrlDialogClass.h"
 
 static const size_t MAX_BROWSERS = 10;
 static const size_t MAX_URLS = 40;

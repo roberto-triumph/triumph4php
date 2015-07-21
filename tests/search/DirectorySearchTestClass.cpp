@@ -23,12 +23,12 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <search/DirectorySearchClass.h>
-#include <FileTestFixtureClass.h>
-#include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "search/DirectorySearchClass.h"
+#include "TriumphChecks.h"
 
 class DirectorySearchTestClass : public FileTestFixtureClass {
 	public:

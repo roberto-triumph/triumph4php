@@ -23,16 +23,16 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_php/UrlTagClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/stdpaths.h>
-#include <TriumphChecks.h>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/String.h"
+#include "language_php/UrlTagClass.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class UrlTagFixtureClass : public SqliteTestFixtureClass {
 	public:

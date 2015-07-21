@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_FILEMODIFIEDCHECKFEATURECLASS_H_
 #define SRC_FEATURES_FILEMODIFIEDCHECKFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <actions/FileModifiedCheckActionClass.h>
 #include <vector>
+#include "actions/FileModifiedCheckActionClass.h"
+#include "features/FeatureClass.h"
 
 namespace t4p {
 extern const int ID_FILE_MODIFIED_ACTION;

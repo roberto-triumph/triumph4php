@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_PROJECTVIEWCLASS_H_
 #define SRC_VIEWS_PROJECTVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/ProjectFeatureClass.h>
-#include <views/wxformbuilder/ProjectFeatureForms.h>
 #include <wx/filepicker.h>
 #include <vector>
+#include "features/ProjectFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/ProjectFeatureForms.h"
 
 namespace t4p {
 class ProjectViewClass : public FeatureViewClass {

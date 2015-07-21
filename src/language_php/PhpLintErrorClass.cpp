@@ -22,8 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/PhpLintErrorClass.h>
-
+#include "language_php/PhpLintErrorClass.h"
 
 t4p::PhpLintErrorClass::PhpLintErrorClass() {
 }

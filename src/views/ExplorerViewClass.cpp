@@ -22,20 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/ExplorerViewClass.h>
-#include <features/ExplorerFeatureClass.h>
-#include <globals/Number.h>
-#include <globals/Assets.h>
-#include <widgets/FilePickerValidatorClass.h>
-#include <widgets/Buttons.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
-#include <wx/wupdlock.h>
-#include <wx/stdpaths.h>
+#include "views/ExplorerViewClass.h"
 #include <wx/artprov.h>
+#include <wx/stdpaths.h>
+#include <wx/wupdlock.h>
 #include <map>
 #include <string>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/ExplorerFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/FilePickerValidatorClass.h"
 
 static int ID_EXPLORER_PANEL = wxNewId();
 static int ID_EXPLORER_OUTLINE = wxNewId();

@@ -22,19 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/TemplateFilesViewClass.h>
-#include <widgets/TreeItemDataStringClass.h>
-#include <widgets/Buttons.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <language_php/TemplateFileTagClass.h>
-#include <actions/CallStackActionClass.h>
-#include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <actions/SequenceClass.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "views/TemplateFilesViewClass.h"
 #include <wx/artprov.h>
 #include <vector>
+#include "actions/CallStackActionClass.h"
+#include "actions/SequenceClass.h"
+#include "actions/TemplateFileTagsDetectorActionClass.h"
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "language_php/TemplateFileTagClass.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/TreeItemDataStringClass.h"
 
 static const int ID_TEMPLATE_FILES_PANEL = wxNewId();
 

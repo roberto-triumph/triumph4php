@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/RecentFilesViewClass.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "views/RecentFilesViewClass.h"
+#include "code_control/CodeControlClass.h"
+#include "Triumph.h"
 
 t4p::RecentFilesViewClass::RecentFilesViewClass(t4p::RecentFilesFeatureClass& feature)
 	: FeatureViewClass()

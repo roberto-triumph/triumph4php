@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 
-#include <globals/SqliteResultClass.h>
-#include <globals/String.h>
+#include "globals/SqliteResultClass.h"
+#include "globals/String.h"
 
 t4p::SqliteResultClass::SqliteResultClass()
 : IsEmpty(true)

@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_
 #define SRC_VIEWS_TOTALSEARCHVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/TotalSearchFeatureClass.h>
-#include <views/wxformbuilder/TotalSearchFeatureForms.h>
 #include <wx/timer.h>
 #include <vector>
+#include "features/TotalSearchFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/TotalSearchFeatureForms.h"
 
 namespace t4p {
 /**

@@ -25,11 +25,11 @@
 #ifndef SRC_WIDGETS_NOTEBOOKCLASS_H_
 #define SRC_WIDGETS_NOTEBOOKCLASS_H_
 
-#include <code_control/CodeControlClass.h>
-#include <wx/wx.h>
 #include <wx/aui/aui.h>
 #include <wx/dnd.h>
+#include <wx/wx.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
 
 namespace t4p {
 // forward declarations; defined in other files

@@ -25,8 +25,8 @@
 #ifndef SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_
 #define SRC_CODE_CONTROL_RESOURCECACHEBUILDERCLASS_H_
 
-#include <actions/ActionClass.h>
-#include <language_php/TagCacheClass.h>
+#include "actions/ActionClass.h"
+#include "language_php/TagCacheClass.h"
 
 namespace t4p {
 // forward declaration

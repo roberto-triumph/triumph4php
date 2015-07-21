@@ -22,23 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <main_frame/MainFrameClass.h>
-#include <views/FeatureViewClass.h>
-#include <features/FeatureClass.h>
-#include <Triumph.h>
-#include <main_frame/PreferencesDialogClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <widgets/NotebookClass.h>
-#include <widgets/AuiManager.h>
-#include <globals/Assets.h>
+#include "main_frame/MainFrameClass.h"
+#include <wx/aboutdlg.h>
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <wx/filename.h>
-#include <wx/wfstream.h>
-#include <wx/aboutdlg.h>
 #include <wx/stc/stc.h>
-#include <vector>
+#include <wx/wfstream.h>
 #include <map>
+#include <vector>
+#include "features/FeatureClass.h"
+#include "globals/Assets.h"
+#include "main_frame/PreferencesDialogClass.h"
+#include "Triumph.h"
+#include "views/FeatureViewClass.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
+#include "widgets/StatusBarWithGaugeClass.h"
 
 static int ID_TOOLBAR = wxNewId();
 static int ID_SEQUENCE_GAUGE = wxNewId();

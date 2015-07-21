@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <TriumphChecks.h>
-#include <SqliteTestFixtureClass.h>
-#include <globals/Assets.h>
-#include <globals/FileCabinetItemClass.h>
-#include <globals/SqliteFinderClass.h>
-#include <globals/String.h>
 #include <wx/platinfo.h>
 #include <iostream>
 #include <string>
+#include "globals/Assets.h"
+#include "globals/FileCabinetItemClass.h"
+#include "globals/SqliteFinderClass.h"
+#include "globals/String.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class FileCabinetFixtureClass : public SqliteTestFixtureClass {
 	public:

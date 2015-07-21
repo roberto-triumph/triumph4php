@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/GlobalActionClass.h>
-#include <search/DirectorySearchClass.h>
-#include <language_php/TagFinderList.h>
 #include <pelet/TokenClass.h>
 #include <vector>
+#include "actions/GlobalActionClass.h"
+#include "language_php/TagFinderList.h"
+#include "search/DirectorySearchClass.h"
 
 #ifndef SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_
 #define SRC_ACTIONS_PROJECTTAGACTIONCLASS_H_

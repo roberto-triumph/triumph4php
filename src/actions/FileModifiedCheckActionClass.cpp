@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/FileModifiedCheckActionClass.h>
-#include <globals/FileName.h>
+#include "actions/FileModifiedCheckActionClass.h"
 #include <vector>
+#include "globals/FileName.h"
 
 t4p::FileModifiedTimeClass::FileModifiedTimeClass()
 : FileName()

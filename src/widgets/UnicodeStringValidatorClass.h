@@ -25,8 +25,8 @@
 #ifndef SRC_WIDGETS_UNICODESTRINGVALIDATORCLASS_H_
 #define SRC_WIDGETS_UNICODESTRINGVALIDATORCLASS_H_
 
-#include <wx/validate.h>
 #include <unicode/unistr.h>
+#include <wx/validate.h>
 
 namespace t4p {
 /**

@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/TagCacheSearchActionClass.h>
-#include <globals/FileName.h>
-#include <globals/Assets.h>
-#include <language_php/TagFinderList.h>
-#include <globals/TagList.h>
+#include "actions/TagCacheSearchActionClass.h"
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/FileName.h"
+#include "globals/TagList.h"
+#include "language_php/TagFinderList.h"
 
 t4p::TagCacheSearchCompleteEventClass::TagCacheSearchCompleteEventClass(int eventId,
 																	const UnicodeString& searchString,

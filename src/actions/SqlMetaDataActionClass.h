@@ -27,7 +27,7 @@
 
 #include <wx/event.h>
 #include <vector>
-#include <actions/GlobalActionClass.h>
+#include "actions/GlobalActionClass.h"
 
 namespace t4p {
 /**

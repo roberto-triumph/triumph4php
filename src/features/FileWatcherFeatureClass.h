@@ -25,11 +25,11 @@
 #ifndef SRC_FEATURES_FILEWATCHERFEATURECLASS_H_
 #define SRC_FEATURES_FILEWATCHERFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <actions/ActionClass.h>
 #include <wx/fswatcher.h>
 #include <map>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
 
 namespace t4p {
 // forward declaration, defined below

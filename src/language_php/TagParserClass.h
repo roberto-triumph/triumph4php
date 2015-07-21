@@ -25,17 +25,17 @@
 #ifndef SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_
 #define SRC_LANGUAGE_PHP_TAGPARSERCLASS_H_
 
-#include <search/DirectorySearchClass.h>
-#include <language_php/PhpTagClass.h>
 #include <pelet/ParserClass.h>
-#include <wx/datetime.h>
-#include <wx/string.h>
-#include <wx/filename.h>
 #include <soci/soci.h>
 #include <unicode/unistr.h>
-#include <vector>
+#include <wx/datetime.h>
+#include <wx/filename.h>
+#include <wx/string.h>
 #include <map>
 #include <string>
+#include <vector>
+#include "language_php/PhpTagClass.h"
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 /**

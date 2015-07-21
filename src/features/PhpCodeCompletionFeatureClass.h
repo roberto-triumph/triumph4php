@@ -25,10 +25,10 @@
 #ifndef SRC_FEATURES_PHPCODECOMPLETIONFEATURECLASS_H_
 #define SRC_FEATURES_PHPCODECOMPLETIONFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
+#include <pelet/LanguageDiscoveryClass.h>
 #include <pelet/LexicalAnalyzerClass.h>
 #include <pelet/ParserClass.h>
-#include <pelet/LanguageDiscoveryClass.h>
+#include "features/FeatureClass.h"
 
 namespace t4p {
 /**

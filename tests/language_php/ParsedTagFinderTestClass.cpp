@@ -23,22 +23,22 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <TriumphChecks.h>
-#include <language_php/TagParserClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <wx/filefn.h>
+#include <wx/stdpaths.h>
 #include <wx/timer.h>
 #include <wx/tokenzr.h>
-#include <wx/stdpaths.h>
 #include <algorithm>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/ParsedTagFinderClass.h"
+#include "language_php/TagParserClass.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 /**
  * This is a fixture to test that the tag finder works with-

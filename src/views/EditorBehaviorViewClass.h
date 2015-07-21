@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_
 #define SRC_VIEWS_EDITORBEHAVIORVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/EditorBehaviorFeatureForms.h>
-#include <features/EditorBehaviorFeatureClass.h>
-#include <globals/Events.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include "features/EditorBehaviorFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/EditorBehaviorFeatureForms.h"
 
 namespace t4p {
 class EditorBehaviorViewClass : public t4p::FeatureViewClass {

@@ -23,18 +23,18 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <language_php/TagCacheClass.h>
-#include <language_php/TagFinderList.h>
-#include <globals/String.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
-#include <TriumphChecks.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/TagCacheClass.h"
+#include "language_php/TagFinderList.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 /**
  * fixture that holds the object under test for

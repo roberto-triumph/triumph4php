@@ -25,12 +25,15 @@
 #ifndef SRC_VIEWS_OUTLINEVIEWCLASS_H_
 #define SRC_VIEWS_OUTLINEVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/OutlineViewFeatureForms.h>
 #include <wx/imaglist.h>
+#include <unicode/unistr.h>
 #include <vector>
+#include "features/OutlineFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/OutlineViewFeatureForms.h"
 
 namespace t4p {
+
 /**
  * This is a feature that is designed to let the user see the classes / methods of
  * the opened files and of related files.  The related files / classes / methods that are mentioned

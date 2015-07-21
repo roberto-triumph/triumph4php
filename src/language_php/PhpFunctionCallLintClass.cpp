@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/PhpFunctionCallLintClass.h>
-#include <language_php/TagCacheClass.h>
+#include "language_php/PhpFunctionCallLintClass.h"
 #include <wx/ffile.h>
 #include <vector>
+#include "language_php/TagCacheClass.h"
 
 /**
  * we will stop tracking errors after we have reached this

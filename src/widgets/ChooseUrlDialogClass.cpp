@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/ChooseUrlDialogClass.h>
-#include <globals/Number.h>
+#include "widgets/ChooseUrlDialogClass.h"
 #include <vector>
+#include "globals/Number.h"
 
 t4p::ChooseUrlDialogClass::ChooseUrlDialogClass(wxWindow* parent,
 													  t4p::UrlTagFinderClass& urls,

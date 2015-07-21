@@ -25,9 +25,9 @@
 #ifndef SRC_GLOBALS_FILECABINETITEMCLASS_H_
 #define SRC_GLOBALS_FILECABINETITEMCLASS_H_
 
-#include <globals/Sqlite.h>
-#include <globals/SqliteResultClass.h>
 #include <string>
+#include "globals/Sqlite.h"
+#include "globals/SqliteResultClass.h"
 
 namespace t4p {
 /**

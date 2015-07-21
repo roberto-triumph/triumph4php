@@ -22,26 +22,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/LintFeatureClass.h>
-#include <views/LintViewClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/Buttons.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
-#include <globals/Events.h>
-#include <globals/Number.h>
+#include "views/LintViewClass.h"
 #include <unicode/unistr.h>
-#include <widgets/DataViewGrid.h>
 #include <wx/artprov.h>
-#include <wx/valgen.h>
-#include <wx/tokenzr.h>
-#include <wx/ffile.h>
 #include <wx/clipbrd.h>
+#include <wx/ffile.h>
+#include <wx/tokenzr.h>
+#include <wx/valgen.h>
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/LintFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/DataViewGrid.h"
+#include "widgets/UnicodeStringValidatorClass.h"
 
 const int ID_LINT_RESULTS_PANEL = wxNewId();
 const int ID_LINT_SUPPRESSIONS_PANEL = wxNewId();

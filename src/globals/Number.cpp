@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/Number.h>
+#include "globals/Number.h"
 
 bool t4p::NumberLessThan(int a, unsigned int b) {
 	// if a is not negative then we can safely cast

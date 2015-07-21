@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/ConfigFilesFeatureClass.h>
-#include <actions/ConfigTagDetectorActionClass.h>
-#include <globals/Number.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "features/ConfigFilesFeatureClass.h"
 #include <vector>
+#include "actions/ConfigTagDetectorActionClass.h"
+#include "code_control/CodeControlClass.h"
+#include "globals/Number.h"
+#include "Triumph.h"
 
 t4p::ConfigFilesFeaturePairClass::ConfigFilesFeaturePairClass()
 : ProjectLabel()

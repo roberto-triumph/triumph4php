@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_FEATUREVIEWCLASS_H_
 #define SRC_VIEWS_FEATUREVIEWCLASS_H_
 
-#include <main_frame/PreferencesClass.h>
-#include <globals/FileTypeClass.h>
-#include <wx/event.h>
 #include <wx/aui/aui.h>
+#include <wx/event.h>
 #include <map>
 #include <vector>
+#include "globals/FileTypeClass.h"
+#include "main_frame/PreferencesClass.h"
 
 namespace t4p {
 // forward declaration, defined in another file

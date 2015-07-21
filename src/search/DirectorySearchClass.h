@@ -25,10 +25,10 @@
 #ifndef SRC_SEARCH_DIRECTORYSEARCHCLASS_H_
 #define SRC_SEARCH_DIRECTORYSEARCHCLASS_H_
 
-#include <wx/string.h>
-#include <wx/regex.h>
-#include <wx/filename.h>
 #include <wx/dir.h>
+#include <wx/filename.h>
+#include <wx/regex.h>
+#include <wx/string.h>
 #include <stack>
 #include <vector>
 

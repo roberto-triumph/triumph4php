@@ -22,17 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FindInFilesViewClass.h>
-#include <features/FindInFilesFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/RegularExpressionValidatorClass.h>
-#include <widgets/DataViewGrid.h>
-#include <globals/Errors.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "views/FindInFilesViewClass.h"
 #include <wx/artprov.h>
 #include <wx/clipbrd.h>
 #include <wx/ffile.h>
@@ -41,6 +31,16 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/FindInFilesFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
+#include "widgets/DataViewGrid.h"
+#include "widgets/RegularExpressionValidatorClass.h"
+#include "widgets/UnicodeStringValidatorClass.h"
 
 // these IDs are needed so that the IDs of the Regular expression help menu
 // do not collide with the menu IDs of the FinderFeature

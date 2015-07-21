@@ -23,16 +23,16 @@
  * THE SOFTWARE.
  */
 
-#include <features/ExplorerFeatureClass.h>
-#include <globals/Assets.h>
-#include <globals/Events.h>
-#include <globals/FileName.h>
-#include <globals/Number.h>
-#include <search/Directory.h>
-#include <Triumph.h>
+#include "features/ExplorerFeatureClass.h"
 #include <wx/file.h>
 #include <algorithm>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Events.h"
+#include "globals/FileName.h"
+#include "globals/Number.h"
+#include "search/Directory.h"
+#include "Triumph.h"
 
 /**
  * comparator function that compares 2 filenames by using the full name

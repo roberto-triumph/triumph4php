@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_NAVIGATIONVIEWCLASS_H_
 #define SRC_VIEWS_NAVIGATIONVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/NavigationViewForms.h>
 #include <wx/aui/auibook.h>
 #include <vector>
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/NavigationViewForms.h"
 
 namespace t4p {
 // forward declaration, defined in another file

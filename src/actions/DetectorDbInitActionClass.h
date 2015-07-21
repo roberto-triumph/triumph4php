@@ -26,7 +26,7 @@
 #ifndef SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_
 #define SRC_ACTIONS_DETECTORDBINITACTIONCLASS_H_
 
-#include <actions/GlobalActionClass.h>
+#include "actions/GlobalActionClass.h"
 
 namespace t4p {
 

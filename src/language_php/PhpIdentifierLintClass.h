@@ -27,12 +27,12 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <globals/String.h>
-#include <globals/Sqlite.h>
 #include <wx/filename.h>
 #include <map>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/ParsedTagFinderClass.h"
 
 namespace t4p {
 // forward declaration

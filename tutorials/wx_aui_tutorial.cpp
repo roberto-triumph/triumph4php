@@ -22,22 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/wx.h>
 #include <wx/aui/aui.h>
-#include <wx/stc/stc.h>
-
-#include <wx/string.h>
-#include <wx/stattext.h>
-#include <wx/gdicmn.h>
-#include <wx/font.h>
-#include <wx/colour.h>
-#include <wx/settings.h>
-#include <wx/choice.h>
-#include <wx/spinctrl.h>
-#include <wx/sizer.h>
 #include <wx/button.h>
+#include <wx/choice.h>
+#include <wx/colour.h>
 #include <wx/dialog.h>
+#include <wx/font.h>
+#include <wx/gdicmn.h>
+#include <wx/settings.h>
+#include <wx/sizer.h>
+#include <wx/spinctrl.h>
+#include <wx/stattext.h>
+#include <wx/stc/stc.h>
+#include <wx/string.h>
 #include <wx/valgen.h>
+#include <wx/wx.h>
 
 /*
  * This sample will show a bit about how the AUI layout

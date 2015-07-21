@@ -25,14 +25,14 @@
 #ifndef SRC_VIEWS_RUNBROWSERVIEWCLASS_H_
 #define SRC_VIEWS_RUNBROWSERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/RunBrowserFeatureClass.h>
-#include <widgets/GaugeDialogClass.h>
-#include <code_control/CodeControlClass.h>
-#include <globals/Events.h>
 #include <wx/string.h>
-#include <vector>
 #include <memory>
+#include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/RunBrowserFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
+#include "widgets/GaugeDialogClass.h"
 
 namespace t4p {
 class RunBrowserViewClass : public FeatureViewClass {

@@ -25,7 +25,7 @@
 #ifndef SRC_VIEWS_CHANGELOGVIEWCLASS_H_
 #define SRC_VIEWS_CHANGELOGVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 // forward declaration, defined in another file

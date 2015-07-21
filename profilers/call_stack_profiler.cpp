@@ -23,18 +23,18 @@
  * THE SOFTWARE.
  */
 
-#include <language_php/TagCacheClass.h>
-#include <language_php/TagFinderList.h>
-#include <language_php/CallStackClass.h>
-#include <actions/TagDetectorActionClass.h>
-#include <actions/CallStackActionClass.h>
-#include <globals/Assets.h>
-#include <wx/app.h>
-#include <wx/string.h>
-#include <wx/stdpaths.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <wx/app.h>
+#include <wx/stdpaths.h>
+#include <wx/string.h>
 #include <string>
 #include <vector>
+#include "actions/CallStackActionClass.h"
+#include "actions/TagDetectorActionClass.h"
+#include "globals/Assets.h"
+#include "language_php/CallStackClass.h"
+#include "language_php/TagCacheClass.h"
+#include "language_php/TagFinderList.h"
 
 /**
  * Caches the given directory, putting all resources in the resource cache.

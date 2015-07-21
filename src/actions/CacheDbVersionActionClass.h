@@ -25,9 +25,9 @@
 #ifndef SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_
 #define SRC_ACTIONS_CACHEDBVERSIONACTIONCLASS_H_
 
-#include <actions/GlobalActionClass.h>
 #include <soci/soci.h>
 #include <vector>
+#include "actions/GlobalActionClass.h"
 
 namespace t4p {
 /**

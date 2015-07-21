@@ -23,18 +23,18 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <DatabaseTestFixtureClass.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_sql/SqlResourceFinderClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <TriumphChecks.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/ustdio.h>
 #include <wx/platinfo.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
+#include "DatabaseTestFixtureClass.h"
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/String.h"
+#include "language_sql/SqlResourceFinderClass.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class MysqlResourceFinderFixtureClass : public DatabaseTestFixtureClass,
 	public SqliteTestFixtureClass {

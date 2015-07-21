@@ -22,16 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FindInFilesFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <globals/Errors.h>
-#include <Triumph.h>
+#include "features/FindInFilesFeatureClass.h"
 #include <wx/ffile.h>
 #include <wx/textfile.h>
 #include <algorithm>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
 
 t4p::FindInFilesHitClass::FindInFilesHitClass()
 	: wxObject()

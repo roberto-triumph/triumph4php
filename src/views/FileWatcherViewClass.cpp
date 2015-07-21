@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FileWatcherViewClass.h>
-#include <code_control/CodeControlClass.h>
+#include "views/FileWatcherViewClass.h"
 #include <wx/valgen.h>
+#include "code_control/CodeControlClass.h"
 
 t4p::FileWatcherViewClass::FileWatcherViewClass(t4p::FileWatcherFeatureClass& feature)
 : FeatureViewClass()

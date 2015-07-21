@@ -25,10 +25,10 @@
 #ifndef SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_
 #define SRC_FEATURES_TOTALSEARCHFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <actions/TotalTagSearchActionClass.h>
-#include <actions/ActionClass.h>
 #include <wx/timer.h>
+#include "actions/ActionClass.h"
+#include "actions/TotalTagSearchActionClass.h"
+#include "features/FeatureClass.h"
 
 namespace t4p {
 /**

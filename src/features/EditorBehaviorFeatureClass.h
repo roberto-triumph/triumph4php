@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_
 #define SRC_FEATURES_EDITORBEHAVIORFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <globals/CodeControlOptionsClass.h>
 #include <vector>
+#include "features/FeatureClass.h"
+#include "globals/CodeControlOptionsClass.h"
 
 namespace t4p {
 /**

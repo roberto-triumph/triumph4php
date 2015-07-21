@@ -25,12 +25,12 @@
 #ifndef SRC_LANGUAGE_PHP_PHPTAGCLASS_H_
 #define SRC_LANGUAGE_PHP_PHPTAGCLASS_H_
 
-#include <globals/String.h>
 #include <unicode/unistr.h>
-#include <wx/string.h>
 #include <wx/datetime.h>
 #include <wx/filename.h>
+#include <wx/string.h>
 #include <vector>
+#include "globals/String.h"
 
 namespace t4p {
 /**

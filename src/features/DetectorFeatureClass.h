@@ -25,7 +25,7 @@
 #ifndef SRC_FEATURES_DETECTORFEATURECLASS_H_
 #define SRC_FEATURES_DETECTORFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
+#include "features/FeatureClass.h"
 
 namespace t4p {
 class DetectorClass {

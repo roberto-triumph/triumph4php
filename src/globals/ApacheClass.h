@@ -25,10 +25,10 @@
 #ifndef SRC_GLOBALS_APACHECLASS_H_
 #define SRC_GLOBALS_APACHECLASS_H_
 
-#include <search/DirectorySearchClass.h>
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <map>
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 /**

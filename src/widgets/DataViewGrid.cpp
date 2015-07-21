@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/DataViewGrid.h>
+#include "widgets/DataViewGrid.h"
 #include <wx/wupdlock.h>
 
 void t4p::DataViewGridAutoSizeAllColumns(wxDataViewCtrl* ctrl) {

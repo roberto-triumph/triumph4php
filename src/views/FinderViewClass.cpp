@@ -22,23 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FinderViewClass.h>
-#include <features/FinderFeatureClass.h>
-#include <globals/String.h>
-#include <code_control/CodeControlClass.h>
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/RegularExpressionValidatorClass.h>
-#include <widgets/Buttons.h>
-#include <widgets/AuiManager.h>
-#include <globals/Assets.h>
+#include "views/FinderViewClass.h"
 #include <wx/artprov.h>
 #include <wx/numdlg.h>
+#include <wx/stc/stc.h>
 #include <wx/valgen.h>
 #include <wx/valtext.h>
-#include <wx/stc/stc.h>
-#include <Triumph.h>
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/FinderFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/String.h"
+#include "Triumph.h"
+#include "widgets/AuiManager.h"
+#include "widgets/Buttons.h"
+#include "widgets/RegularExpressionValidatorClass.h"
+#include "widgets/UnicodeStringValidatorClass.h"
 
 static const int ID_FIND_PANEL = wxNewId();
 static const int ID_REPLACE_PANEL = wxNewId();

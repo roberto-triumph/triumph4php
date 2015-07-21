@@ -22,19 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <main_frame/PreferencesClass.h>
-#include <code_control/CodeControlStyles.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
+#include "main_frame/PreferencesClass.h"
 #include <wx/fileconf.h>
 #include <wx/filename.h>
+#include <wx/frame.h>
 #include <wx/menuutils.h>
 #include <wx/stdpaths.h>
-#include <wx/wfstream.h>
-#include <wx/frame.h>
 #include <wx/tokenzr.h>
+#include <wx/wfstream.h>
 #include <wx/wx.h>
 #include <vector>
+#include "code_control/CodeControlStyles.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
 
 // use our own function to convert string to key codes
 // because the wxKeyBinder function does not handle

@@ -37,4 +37,5 @@ class PhpLintErrorClass {
 };
 }  // namespace t4p
 
+#include "language_php/PhpLintErrorClass.h"
 #endif  // SRC_LANGUAGE_PHP_PHPLINTERRORCLASS_H_

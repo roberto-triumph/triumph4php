@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/PhpVariableLintClass.h>
-#include <language_php/TagCacheClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <globals/String.h>
+#include "language_php/PhpVariableLintClass.h"
 #include <wx/ffile.h>
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "globals/String.h"
+#include "language_php/ParsedTagFinderClass.h"
+#include "language_php/TagCacheClass.h"
 
 /**
  * we will stop tracking errors after we have reached this

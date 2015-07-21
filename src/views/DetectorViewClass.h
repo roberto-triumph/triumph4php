@@ -25,13 +25,13 @@
 #ifndef SRC_VIEWS_DETECTORVIEWCLASS_H_
 #define SRC_VIEWS_DETECTORVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <actions/ActionClass.h>
-#include <views/wxformbuilder/DetectorFeatureForms.h>
-#include <features/DetectorFeatureClass.h>
-#include <language_php/UrlTagClass.h>
-#include <globals/Events.h>
 #include <wx/imaglist.h>
+#include "actions/ActionClass.h"
+#include "features/DetectorFeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/UrlTagClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/DetectorFeatureForms.h"
 
 namespace t4p {
 class DetectorViewClass : public t4p::FeatureViewClass {

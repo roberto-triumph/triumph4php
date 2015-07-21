@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_NEWUSERVIEWCLASS_H_
 #define SRC_VIEWS_NEWUSERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/NewUserFeatureClass.h>
-#include <views/wxformbuilder/NewUserFeatureForms.h>
 #include <wx/wizard.h>
+#include "features/NewUserFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/NewUserFeatureForms.h"
 
 namespace t4p {
 /**

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/ListWidget.h>
+#include "widgets/ListWidget.h"
 
 void t4p::ListCtrlAdd(wxListCtrl* list, const wxString& column1Value, const wxString& column2Value) {
 	int newRowNumber = list->GetItemCount();

@@ -25,14 +25,14 @@
 #ifndef SRC_SEARCH_FINDINFILESCLASS_H_
 #define SRC_SEARCH_FINDINFILESCLASS_H_
 
-#include <search/DirectorySearchClass.h>
-#include <search/FinderClass.h>
+#include <unicode/unistr.h>
+#include <unicode/ustdio.h>
 #include <wx/ffile.h>
 #include <wx/regex.h>
 #include <wx/txtstrm.h>
 #include <wx/wfstream.h>
-#include <unicode/unistr.h>
-#include <unicode/ustdio.h>
+#include "search/DirectorySearchClass.h"
+#include "search/FinderClass.h"
 
 namespace t4p {
 /**

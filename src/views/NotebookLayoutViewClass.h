@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_NOTEBOOKLAYOUTVIEWCLASS_H_
 #define SRC_VIEWS_NOTEBOOKLAYOUTVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/FeatureClass.h>
-#include <features/NotebookLayoutFeatureClass.h>
 #include <wx/menu.h>
+#include "features/FeatureClass.h"
+#include "features/NotebookLayoutFeatureClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 /**

@@ -25,8 +25,8 @@
 #ifndef SRC_GLOBALS_ASSETS_H_
 #define SRC_GLOBALS_ASSETS_H_
 
-#include <wx/filename.h>
 #include <wx/bitmap.h>
+#include <wx/filename.h>
 
 namespace t4p {
 /**

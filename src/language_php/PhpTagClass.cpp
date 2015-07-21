@@ -22,8 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/PhpTagClass.h>
-
+#include "language_php/PhpTagClass.h"
 
 t4p::PhpTagClass::PhpTagClass()
 	: Identifier()

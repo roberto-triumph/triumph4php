@@ -25,14 +25,14 @@
 #ifndef SRC_FEATURES_DEBUGGERFEATURECLASS_H_
 #define SRC_FEATURES_DEBUGGERFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <actions/ActionClass.h>
-#include <language_php/DbgpEventClass.h>
-#include <globals/Events.h>
 #include <wx/stc/stc.h>
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/DbgpEventClass.h"
 
 namespace t4p {
 /**

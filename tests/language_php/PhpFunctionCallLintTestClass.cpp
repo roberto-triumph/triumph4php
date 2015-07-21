@@ -23,16 +23,16 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_php/PhpFunctionCallLintClass.h>
-#include <language_php/TagCacheClass.h>
-#include <language_php/TagFinderList.h>
-#include <globals/Assets.h>
-#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "language_php/PhpFunctionCallLintClass.h"
+#include "language_php/TagCacheClass.h"
+#include "language_php/TagFinderList.h"
+#include "SqliteTestFixtureClass.h"
 
 class PhpFunctionCallLintTestFixtureClass :
 	public FileTestFixtureClass, public SqliteTestFixtureClass {

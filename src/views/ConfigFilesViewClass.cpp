@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/ConfigFilesViewClass.h>
-#include <features/ConfigFilesFeatureClass.h>
+#include "views/ConfigFilesViewClass.h"
 #include <vector>
+#include "features/ConfigFilesFeatureClass.h"
 
 t4p::ConfigFilesViewClass::ConfigFilesViewClass(t4p::ConfigFilesFeatureClass& feature)
 : Feature(feature)

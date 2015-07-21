@@ -26,14 +26,14 @@
 #define SRC_LANGUAGE_PHP_CALLSTACKCLASS_H_
 
 #include <pelet/ParserClass.h>
-#include <language_php/TagCacheClass.h>
-#include <language_php/SymbolTableClass.h>
 #include <unicode/unistr.h>
 #include <wx/filename.h>
-#include <vector>
-#include <queue>
 #include <map>
+#include <queue>
 #include <string>
+#include <vector>
+#include "language_php/SymbolTableClass.h"
+#include "language_php/TagCacheClass.h"
 
 namespace t4p {
 /**

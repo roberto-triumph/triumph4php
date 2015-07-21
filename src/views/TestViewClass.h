@@ -25,8 +25,8 @@
 #ifndef SRC_VIEWS_TESTVIEWCLASS_H_
 #define SRC_VIEWS_TESTVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/TestFeatureClass.h>
+#include "features/TestFeatureClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 /**

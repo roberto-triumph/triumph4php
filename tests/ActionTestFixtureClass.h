@@ -28,8 +28,8 @@
 
 #include <wx/event.h>
 #include <wx/filename.h>
-#include <globals/GlobalsClass.h>
-#include <actions/ActionClass.h>
+#include "actions/ActionClass.h"
+#include "globals/GlobalsClass.h"
 
 /**
  * Note: because this class also derives from wxEvtHandler, this class

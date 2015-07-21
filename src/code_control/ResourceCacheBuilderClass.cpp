@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <code_control/ResourceCacheBuilderClass.h>
-#include <language_php/TagFinderList.h>
-#include <globals/Assets.h>
-#include <globals/GlobalsClass.h>
+#include "code_control/ResourceCacheBuilderClass.h"
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/GlobalsClass.h"
+#include "language_php/TagFinderList.h"
 
 t4p::WorkingCacheBuilderClass::WorkingCacheBuilderClass(
 	t4p::RunningThreadsClass& runningThreads, int eventId)

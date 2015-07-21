@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <search/RecursiveDirTraverserClass.h>
+#include "search/RecursiveDirTraverserClass.h"
 #include <vector>
 
 t4p::RecursiveDirTraverserClass::RecursiveDirTraverserClass(std::vector<wxString>& fullPaths)

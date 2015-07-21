@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/TestViewClass.h>
-#include <search/FindInFilesClass.h>
-#include <globals/String.h>
+#include "views/TestViewClass.h"
 #include <wx/artprov.h>
+#include "globals/String.h"
+#include "search/FindInFilesClass.h"
 
 int ID_GO_BUTTON = wxNewId();
 

@@ -22,8 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/ComboBoxHistoryClass.h>
-
+#include "widgets/ComboBoxHistoryClass.h"
 
 t4p::ComboBoxHistoryClass::ComboBoxHistoryClass(wxComboBox* combo)
 	: wxEvtHandler()

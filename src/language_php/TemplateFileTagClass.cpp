@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/TemplateFileTagClass.h>
+#include "language_php/TemplateFileTagClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
 #include <wx/tokenzr.h>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
 
 t4p::TemplateFileTagClass::TemplateFileTagClass()
 	:  FullPath()

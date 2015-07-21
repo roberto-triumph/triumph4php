@@ -25,11 +25,11 @@
 #ifndef SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_
 #define SRC_LANGUAGE_PHP_CONFIGTAGCLASS_H_
 
-#include <wx/string.h>
 #include <wx/filename.h>
-#include <globals/Sqlite.h>
-#include <globals/SqliteFinderClass.h>
+#include <wx/string.h>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/SqliteFinderClass.h"
 
 namespace t4p {
 /**

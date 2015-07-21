@@ -26,18 +26,18 @@
 #ifndef SRC_VIEWS_SQLBROWSERVIEWCLASS_H_
 #define SRC_VIEWS_SQLBROWSERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/SqlBrowserFeatureClass.h>
-#include <views/wxformbuilder/SqlBrowserFeatureForms.h>
-#include <globals/ProjectClass.h>
-#include <language_sql/DatabaseTagClass.h>
-#include <language_sql/SqlLexicalAnalyzerClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <globals/Events.h>
-#include <code_control/CodeControlClass.h>
+#include <unicode/unistr.h>
 #include <wx/txtstrm.h>
 #include <vector>
-#include <unicode/unistr.h>
+#include "actions/SqlMetaDataActionClass.h"
+#include "code_control/CodeControlClass.h"
+#include "features/SqlBrowserFeatureClass.h"
+#include "globals/Events.h"
+#include "globals/ProjectClass.h"
+#include "language_sql/DatabaseTagClass.h"
+#include "language_sql/SqlLexicalAnalyzerClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/SqlBrowserFeatureForms.h"
 
 namespace t4p {
 // forward declaration, defined below

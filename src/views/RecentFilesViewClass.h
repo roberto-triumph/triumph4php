@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_RECENTFILESVIEWCLASS_H_
 #define SRC_VIEWS_RECENTFILESVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/RecentFilesFeatureClass.h>
-#include <globals/Events.h>
 #include <wx/docview.h>
+#include "features/RecentFilesFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 class RecentFilesViewClass : public FeatureViewClass {

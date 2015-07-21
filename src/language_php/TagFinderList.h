@@ -25,12 +25,11 @@
 #ifndef SRC_LANGUAGE_PHP_TAGFINDERLIST_H_
 #define SRC_LANGUAGE_PHP_TAGFINDERLIST_H_
 
-#include <language_php/TagParserClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <wx/filename.h>
 #include <unicode/unistr.h>
+#include <wx/filename.h>
 #include <vector>
-
+#include "language_php/ParsedTagFinderClass.h"
+#include "language_php/TagParserClass.h"
 
 namespace t4p {
 /**

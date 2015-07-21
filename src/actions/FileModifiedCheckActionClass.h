@@ -25,11 +25,11 @@
 #ifndef SRC_ACTIONS_FILEMODIFIEDCHECKACTIONCLASS_H_
 #define SRC_ACTIONS_FILEMODIFIEDCHECKACTIONCLASS_H_
 
-#include <actions/ActionClass.h>
-#include <wx/filename.h>
 #include <wx/datetime.h>
 #include <wx/event.h>
+#include <wx/filename.h>
 #include <vector>
+#include "actions/ActionClass.h"
 
 namespace t4p {
 /**

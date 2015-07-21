@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/TotalSearchViewClass.h>
-#include <search/FindInFilesClass.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <Triumph.h>
+#include "views/TotalSearchViewClass.h"
 #include <wx/imaglist.h>
 #include <wx/wupdlock.h>
 #include <map>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Number.h"
+#include "search/FindInFilesClass.h"
+#include "Triumph.h"
 
 static int ID_DIALOG_TIMER = wxNewId();
 static int ID_TAG_SEARCH = wxNewId();

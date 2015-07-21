@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_js/JsTagClass.h>
+#include "language_js/JsTagClass.h"
 
 t4p::JsTagClass::JsTagClass()
 : Id(0)

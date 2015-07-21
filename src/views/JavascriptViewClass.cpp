@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/JavascriptViewClass.h>
-#include <globals/GlobalsClass.h>
-#include <Triumph.h>
+#include "views/JavascriptViewClass.h"
 #include <vector>
+#include "globals/GlobalsClass.h"
+#include "Triumph.h"
 
 static bool InCommentOrStringStyle(wxStyledTextCtrl* ctrl, int posToCheck) {
 	int style = ctrl->GetStyleAt(posToCheck);

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/RecentFilesFeatureClass.h>
-#include <Triumph.h>
+#include "features/RecentFilesFeatureClass.h"
+#include "Triumph.h"
 
 const int t4p::MAX_RECENT_FILES = 10;
 

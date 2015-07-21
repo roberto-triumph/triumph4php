@@ -25,10 +25,10 @@
 #ifndef SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_
 #define SRC_LANGUAGE_PHP_DBGPEVENTCLASS_H_
 
-#include <wx/string.h>
 #include <wx/event.h>
-#include <vector>
+#include <wx/string.h>
 #include <string>
+#include <vector>
 
 namespace t4p {
 /**

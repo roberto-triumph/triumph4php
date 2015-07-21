@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_EXPLORERVIEWCLASS_H_
 #define SRC_VIEWS_EXPLORERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/ExplorerFeatureClass.h>
-#include <views/wxformbuilder/ExplorerFeatureForms.h>
-#include <widgets/FileTypeImageList.h>
 #include <vector>
+#include "features/ExplorerFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/ExplorerFeatureForms.h"
+#include "widgets/FileTypeImageList.h"
 
 namespace t4p {
 class ExplorerViewClass : public t4p::FeatureViewClass {

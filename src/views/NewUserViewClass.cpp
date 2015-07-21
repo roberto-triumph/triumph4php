@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/NewUserViewClass.h>
-#include <globals/Assets.h>
-#include <widgets/NonEmptyTextValidatorClass.h>
-#include <Triumph.h>
-#include <wx/valgen.h>
-#include <wx/stdpaths.h>
+#include "views/NewUserViewClass.h"
 #include <wx/fileconf.h>
+#include <wx/stdpaths.h>
+#include <wx/valgen.h>
 #include <wx/wizard.h>
+#include "globals/Assets.h"
+#include "Triumph.h"
+#include "widgets/NonEmptyTextValidatorClass.h"
 
 static int ID_NEW_USER_DIALOG = wxNewId();
 static int ID_NEW_USER_PHP_SETTINGS = wxNewId();

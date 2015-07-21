@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/string.h>
 #include <wx/colour.h>
-#include <wx/font.h>
 #include <wx/config.h>
+#include <wx/font.h>
+#include <wx/string.h>
 #include <vector>
 
 #ifndef SRC_GLOBALS_CODECONTROLOPTIONSCLASS_H_

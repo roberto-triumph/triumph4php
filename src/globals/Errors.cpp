@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/Errors.h>
-#include <wx/string.h>
-#include <wx/log.h>
+#include "globals/Errors.h"
 #include <wx/intl.h>
+#include <wx/log.h>
+#include <wx/string.h>
 
 static wxString FIX_SEPARATOR = wxT("\n\nPossible Fixes\n\n");
 

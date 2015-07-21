@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/DbgpEventClass.h>
-#include <globals/String.h>
-#include <wx/xml/xml.h>
-#include <wx/sstream.h>
+#include "language_php/DbgpEventClass.h"
 #include <wx/base64.h>
+#include <wx/sstream.h>
+#include <wx/xml/xml.h>
 #include <string>
+#include "globals/String.h"
 
 /**
  * @param document the parsed xml

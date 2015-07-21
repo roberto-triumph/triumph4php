@@ -22,24 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/TagParserClass.h>
-#include <language_php/FileTags.h>
-#include <search/FinderClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
-#include <wx/filename.h>
-#include <wx/ffile.h>
-#include <algorithm>
-#include <fstream>
-#include <unicode/uchar.h>
-#include <unicode/ustring.h>
+#include "language_php/TagParserClass.h"
+#include <soci/soci.h>
 #include <unicode/fmtable.h>
 #include <unicode/numfmt.h>
-#include <soci/soci.h>
-#include <string>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <wx/ffile.h>
+#include <wx/filename.h>
+#include <algorithm>
+#include <fstream>
 #include <map>
+#include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/FileTags.h"
+#include "search/FinderClass.h"
 
 /**
  * appends name to namespace

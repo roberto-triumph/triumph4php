@@ -22,13 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <search/DirectorySearchClass.h>
+#include "search/DirectorySearchClass.h"
 #include <wx/dir.h>
-#include <wx/tokenzr.h>
 #include <wx/filename.h>
+#include <wx/tokenzr.h>
 #include <algorithm>
 #include <vector>
-
 
 /**
  * @param sources the source directories to check

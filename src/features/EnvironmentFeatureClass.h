@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_ENVIRONMENTFEATURECLASS_H_
 #define SRC_FEATURES_ENVIRONMENTFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <features/BackgroundFileReaderClass.h>
-#include <globals/EnvironmentClass.h>
+#include "features/BackgroundFileReaderClass.h"
+#include "features/FeatureClass.h"
+#include "globals/EnvironmentClass.h"
 
 namespace t4p {
 /**

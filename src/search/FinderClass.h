@@ -25,8 +25,8 @@
 #ifndef SRC_SEARCH_FINDERCLASS_H_
 #define SRC_SEARCH_FINDERCLASS_H_
 
-#include <unicode/unistr.h>
 #include <unicode/regex.h>
+#include <unicode/unistr.h>
 
 namespace t4p {
 /**

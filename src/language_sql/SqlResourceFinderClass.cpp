@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_sql/SqlResourceFinderClass.h>
-#include <globals/String.h>
-#include <globals/Sqlite.h>
+#include "language_sql/SqlResourceFinderClass.h"
 #include <soci.h>
 #include <algorithm>
 #include <string>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/String.h"
 
 t4p::SqlResourceFetchClass::SqlResourceFetchClass(soci::session& session)
 : Session(session) {

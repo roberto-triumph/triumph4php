@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_BOOKMARKVIEWCLASS_H_
 #define SRC_VIEWS_BOOKMARKVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/BookmarkFeatureClass.h>
-#include <globals/Events.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include "features/BookmarkFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 /**

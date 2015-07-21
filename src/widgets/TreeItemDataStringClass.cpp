@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/TreeItemDataStringClass.h>
+#include "widgets/TreeItemDataStringClass.h"
 
 t4p::TreeItemDataStringClass::TreeItemDataStringClass(const wxString& str)
 	: wxTreeItemData()

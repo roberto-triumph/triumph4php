@@ -25,13 +25,13 @@
 #ifndef SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_
 #define SRC_ACTIONS_DEBUGGERSERVERACTIONCLASS_H_
 
-#include <actions/ActionClass.h>
-#include <language_php/DbgpEventClass.h>
-#include <globals/Events.h>
-#include <wx/thread.h>
 #include <boost/asio.hpp>
+#include <wx/thread.h>
 #include <queue>
 #include <string>
+#include "actions/ActionClass.h"
+#include "globals/Events.h"
+#include "language_php/DbgpEventClass.h"
 
 namespace t4p {
 /**

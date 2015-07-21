@@ -26,14 +26,14 @@
 #ifndef SRC_GLOBALS_GLOBALSCLASS_H_
 #define SRC_GLOBALS_GLOBALSCLASS_H_
 
-#include <globals/EnvironmentClass.h>
-#include <language_php/UrlTagClass.h>
-#include <globals/ProjectClass.h>
-#include <language_sql/SqlResourceFinderClass.h>
-#include <language_php/TemplateFileTagClass.h>
-#include <language_php/TagCacheClass.h>
-#include <globals/FileTypeClass.h>
 #include <vector>
+#include "globals/EnvironmentClass.h"
+#include "globals/FileTypeClass.h"
+#include "globals/ProjectClass.h"
+#include "language_php/TagCacheClass.h"
+#include "language_php/TemplateFileTagClass.h"
+#include "language_php/UrlTagClass.h"
+#include "language_sql/SqlResourceFinderClass.h"
 
 namespace t4p {
 /**

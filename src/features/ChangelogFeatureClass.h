@@ -25,7 +25,7 @@
 #ifndef SRC_FEATURES_CHANGELOGFEATURECLASS_H_
 #define SRC_FEATURES_CHANGELOGFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
+#include "features/FeatureClass.h"
 
 namespace t4p {
 /**

@@ -25,11 +25,11 @@
 #ifndef SRC_ACTIONS_SEQUENCECLASS_H_
 #define SRC_ACTIONS_SEQUENCECLASS_H_
 
-#include <globals/GlobalsClass.h>
-#include <actions/GlobalActionClass.h>
 #include <wx/event.h>
 #include <queue>
 #include <vector>
+#include "actions/GlobalActionClass.h"
+#include "globals/GlobalsClass.h"
 
 namespace t4p {
 /**

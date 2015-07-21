@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/wx.h>
-#include <actions/SequenceClass.h>
-#include <actions/CacheDbVersionActionClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <unicode/uclean.h>
+#include <wx/wx.h>
 #include <vector>
+#include "actions/CacheDbVersionActionClass.h"
+#include "actions/ProjectTagActionClass.h"
+#include "actions/SequenceClass.h"
+#include "actions/UrlTagDetectorActionClass.h"
 
 /**
  * This is a program that tests a single sequence or action in isolation.  This was

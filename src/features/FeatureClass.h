@@ -25,14 +25,14 @@
 #ifndef SRC_FEATURES_FEATURECLASS_H_
 #define SRC_FEATURES_FEATURECLASS_H_
 
-#include <globals/EnvironmentClass.h>
-#include <globals/ProjectClass.h>
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <globals/GlobalsClass.h>
-#include <main_frame/PreferencesClass.h>
 #include <wx/event.h>
 #include <wx/propdlg.h>
 #include <vector>
+#include "globals/EnvironmentClass.h"
+#include "globals/GlobalsClass.h"
+#include "globals/ProjectClass.h"
+#include "main_frame/PreferencesClass.h"
+#include "widgets/StatusBarWithGaugeClass.h"
 
 namespace t4p {
 // forward declaration to prevent #include of the AppClass

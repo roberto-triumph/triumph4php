@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/SyntaxHighlightViewClass.h>
-#include <features/SyntaxHighlightFeatureClass.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
-#include <globals/CodeControlOptionsClass.h>
-#include <code_control/CodeControlStyles.h>
-#include <globals/Assets.h>
-#include <language_php/Keywords.h>
+#include "views/SyntaxHighlightViewClass.h"
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "code_control/CodeControlStyles.h"
+#include "features/SyntaxHighlightFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/CodeControlOptionsClass.h"
+#include "language_php/Keywords.h"
+#include "Triumph.h"
 
 //------------------------------------------------------------------------
 // setting the various wxStyledTextCtrl options

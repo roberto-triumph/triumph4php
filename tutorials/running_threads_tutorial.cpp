@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/wx.h>
 #include <wx/menu.h>
 #include <wx/sizer.h>
-#include <actions/ActionClass.h>
+#include <wx/wx.h>
+#include "actions/ActionClass.h"
 
 /**
  * This is an app that exercises the RunningThreads class and shows the

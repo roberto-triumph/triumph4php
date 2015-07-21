@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/EnvironmentClass.h>
-#include <wx/platinfo.h>
+#include "globals/EnvironmentClass.h"
 #include <wx/confbase.h>
+#include <wx/platinfo.h>
 #include <wx/utils.h>
 #include <map>
 #include <vector>

@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/VersionUpdateFeatureClass.h>
-#include <globals/Assets.h>
-#include <Triumph.h>
+#include "features/VersionUpdateFeatureClass.h"
 #include <curl/curl.h>
 #include <wx/ffile.h>
-#include <wx/valgen.h>
-#include <wx/tokenzr.h>
 #include <wx/sstream.h>
+#include <wx/tokenzr.h>
+#include <wx/valgen.h>
 #include <string>
+#include "globals/Assets.h"
+#include "Triumph.h"
 
 // these macros will expand a pre-processor define into the code
 // these are needed to expand the update host which

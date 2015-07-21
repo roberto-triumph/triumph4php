@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_FINDERVIEWCLASS_H_
 #define SRC_VIEWS_FINDERVIEWCLASS_H_
 
-#include <views/wxformbuilder/FinderFeatureForms.h>
-#include <views/FeatureViewClass.h>
-#include <features/FinderFeatureClass.h>
-#include <widgets/ComboBoxHistoryClass.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include "features/FinderFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/FinderFeatureForms.h"
+#include "widgets/ComboBoxHistoryClass.h"
 
 namespace t4p {
 class FinderViewClass : public t4p::FeatureViewClass {

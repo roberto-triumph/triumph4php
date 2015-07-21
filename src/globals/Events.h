@@ -25,10 +25,10 @@
 #ifndef SRC_GLOBALS_EVENTS_H_
 #define SRC_GLOBALS_EVENTS_H_
 
-#include <globals/ProjectClass.h>
 #include <wx/event.h>
 #include <wx/filename.h>
 #include <vector>
+#include "globals/ProjectClass.h"
 
 namespace t4p {
 /**

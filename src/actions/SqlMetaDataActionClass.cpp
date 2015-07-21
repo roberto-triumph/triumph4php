@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/SqlMetaDataActionClass.h>
-#include <globals/Errors.h>
+#include "actions/SqlMetaDataActionClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "globals/Errors.h"
 
 const wxEventType t4p::EVENT_SQL_META_DATA_COMPLETE = wxNewEventType();
 

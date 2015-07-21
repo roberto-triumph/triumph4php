@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_FILEOPERATIONSVIEWCLASS_H_
 #define SRC_VIEWS_FILEOPERATIONSVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/FileOperationsFeatureClass.h>
-#include <globals/Events.h>
 #include <wx/stc/stc.h>
 #include <vector>
+#include "features/FileOperationsFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 /**

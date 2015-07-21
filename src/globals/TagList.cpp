@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/TagList.h>
-#include <globals/ProjectClass.h>
+#include "globals/TagList.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "globals/ProjectClass.h"
 
 void t4p::TagListRemoveNativeMatches(std::vector<t4p::PhpTagClass>& matches) {
 	std::vector<t4p::PhpTagClass>::iterator it = matches.begin();

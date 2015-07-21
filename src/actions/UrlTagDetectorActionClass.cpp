@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/UrlTagDetectorActionClass.h>
-#include <search/RecursiveDirTraverserClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
+#include "actions/UrlTagDetectorActionClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "search/RecursiveDirTraverserClass.h"
 
 static int ID_URL_TAG_DETECTOR_PROCESS = wxNewId();
 

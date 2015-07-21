@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <TriumphChecks.h>
-#include <globals/ProjectClass.h>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/ProjectClass.h"
+#include "TriumphChecks.h"
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
 	public:

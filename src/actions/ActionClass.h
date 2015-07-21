@@ -25,8 +25,8 @@
 #ifndef SRC_ACTIONS_ACTIONCLASS_H_
 #define SRC_ACTIONS_ACTIONCLASS_H_
 
-#include <wx/thread.h>
 #include <wx/event.h>
+#include <wx/thread.h>
 #include <wx/timer.h>
 #include <queue>
 #include <vector>

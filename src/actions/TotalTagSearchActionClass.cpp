@@ -23,15 +23,15 @@
  * THE SOFTWARE.
  */
 
-#include <actions/TotalTagSearchActionClass.h>
-#include <globals/FileName.h>
-#include <globals/Assets.h>
-#include <language_php/TagFinderList.h>
-#include <globals/TagList.h>
-#include <globals/FileCabinetItemClass.h>
+#include "actions/TotalTagSearchActionClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/FileCabinetItemClass.h"
+#include "globals/FileName.h"
+#include "globals/TagList.h"
+#include "language_php/TagFinderList.h"
 
 t4p::TotalTagSearchCompleteEventClass::TotalTagSearchCompleteEventClass(int eventId,
 	const UnicodeString& searchString, int lineNumber,

@@ -26,12 +26,12 @@
 #define SRC_LANGUAGE_SQL_DATABASETAGCLASS_H_
 
 #include <unicode/unistr.h>
-#include <globals/Sqlite.h>
-#include <globals/SqliteFinderClass.h>
-#include <vector>
+#include <wx/filename.h>
 #include <wx/longlong.h>
 #include <wx/thread.h>
-#include <wx/filename.h>
+#include <vector>
+#include "globals/Sqlite.h"
+#include "globals/SqliteFinderClass.h"
 
 namespace t4p {
 // defined below

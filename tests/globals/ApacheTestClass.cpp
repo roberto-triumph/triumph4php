@@ -23,13 +23,13 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <globals/ApacheClass.h>
-#include <FileTestFixtureClass.h>
-#include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <wx/platinfo.h>
 #include <wx/utils.h>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/ApacheClass.h"
+#include "TriumphChecks.h"
 
 class ApacheTestClass : public FileTestFixtureClass {
 	public:

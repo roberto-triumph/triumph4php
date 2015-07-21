@@ -22,20 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/SymbolTableClass.h>
-#include <language_php/TagFinderList.h>
-#include <language_php/TagParserClass.h>
-#include <globals/String.h>
-#include <globals/Sqlite.h>
-#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <TriumphChecks.h>
+#include <UnitTest++.h>
 #include <string>
 #include <vector>
-#include <UnitTest++.h>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/SymbolTableClass.h"
+#include "language_php/TagFinderList.h"
+#include "language_php/TagParserClass.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 UnicodeString CURSOR = UNICODE_STRING_SIMPLE("{CURSOR}");
 

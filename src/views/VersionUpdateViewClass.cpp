@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/VersionUpdateViewClass.h>
-#include <globals/Assets.h>
-#include <Triumph.h>
-#include <wx/valgen.h>
-#include <wx/tokenzr.h>
+#include "views/VersionUpdateViewClass.h"
 #include <wx/sstream.h>
+#include <wx/tokenzr.h>
+#include <wx/valgen.h>
+#include "globals/Assets.h"
+#include "Triumph.h"
 
 // these macros will expand a pre-processor define into code
 // these are needed to expand the update host which

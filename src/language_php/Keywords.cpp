@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/Keywords.h>
+#include "language_php/Keywords.h"
 #include <wx/tokenzr.h>
 #include <vector>
 

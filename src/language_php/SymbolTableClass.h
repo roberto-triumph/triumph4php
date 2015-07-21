@@ -27,11 +27,11 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <language_php/PhpTagClass.h>
-#include <globals/String.h>
 #include <unicode/unistr.h>
 #include <map>
 #include <vector>
+#include "globals/String.h"
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 // forward declaration

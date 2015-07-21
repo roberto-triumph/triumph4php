@@ -23,18 +23,18 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <TriumphChecks.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_php/CallStackClass.h>
-#include <language_php/TagFinderList.h>
-#include <globals/String.h>
-#include <globals/Sqlite.h>
-#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "language_php/CallStackClass.h"
+#include "language_php/TagFinderList.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class CallStackFixtureTestClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 	public:

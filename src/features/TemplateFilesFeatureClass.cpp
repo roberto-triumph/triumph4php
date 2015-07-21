@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/TemplateFilesFeatureClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <language_php/TemplateFileTagClass.h>
-#include <actions/CallStackActionClass.h>
-#include <actions/TemplateFileTagsDetectorActionClass.h>
-#include <actions/SequenceClass.h>
-#include <Triumph.h>
+#include "features/TemplateFilesFeatureClass.h"
 #include <vector>
+#include "actions/CallStackActionClass.h"
+#include "actions/SequenceClass.h"
+#include "actions/TemplateFileTagsDetectorActionClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "language_php/TemplateFileTagClass.h"
+#include "Triumph.h"
 
 t4p::TemplateFilesFeatureClass::TemplateFilesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

@@ -25,19 +25,19 @@
 #ifndef SRC_TRIUMPH_H_
 #define SRC_TRIUMPH_H_
 
-#include <globals/GlobalsClass.h>
-#include <main_frame/PreferencesClass.h>
-#include <globals/Events.h>
-#include <actions/GlobalsChangeHandlerClass.h>
-#include <actions/SequenceClass.h>
-#include <actions/FileModifiedCheckActionClass.h>
-#include <FeatureFactoryClass.h>
 #include <wx/app.h>
+#include <wx/bookctrl.h>
 #include <wx/event.h>
 #include <wx/string.h>
 #include <wx/timer.h>
 #include <vector>
-#include <wx/bookctrl.h>
+#include "actions/FileModifiedCheckActionClass.h"
+#include "actions/GlobalsChangeHandlerClass.h"
+#include "actions/SequenceClass.h"
+#include "FeatureFactoryClass.h"
+#include "globals/Events.h"
+#include "globals/GlobalsClass.h"
+#include "main_frame/PreferencesClass.h"
 
 namespace t4p {
 // forward declaration

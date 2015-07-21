@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/PhpCodeCompletionViewClass.h>
-#include <features/PhpCodeCompletionFeatureClass.h>
-#include <Triumph.h>
+#include "views/PhpCodeCompletionViewClass.h"
 #include <wx/tokenzr.h>
 #include <algorithm>
-#include <language_php/Keywords.h>
-#include <globals/Assets.h>
 #include <map>
 #include <vector>
+#include "features/PhpCodeCompletionFeatureClass.h"
+#include "globals/Assets.h"
+#include "language_php/Keywords.h"
+#include "Triumph.h"
 
 enum AutoCompletionImages {
 	AUTOCOMP_IMAGE_VARIABLE = 1,

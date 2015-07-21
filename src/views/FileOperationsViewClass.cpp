@@ -22,15 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FileOperationsViewClass.h>
-#include <widgets/NotebookClass.h>
-#include <Triumph.h>
-#include <widgets/AuiManager.h>
+#include "views/FileOperationsViewClass.h"
 #include <wx/artprov.h>
 #include <wx/choicdlg.h>
 #include <map>
 #include <vector>
-
+#include "Triumph.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
 
 static const int ID_STATUS_BAR_TIMER = wxNewId();
 

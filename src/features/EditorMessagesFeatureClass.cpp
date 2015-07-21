@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/EditorMessagesFeatureClass.h>
-#include <Triumph.h>
+#include "features/EditorMessagesFeatureClass.h"
+#include "Triumph.h"
 
 t4p::EditorMessagesFeatureClass::EditorMessagesFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

@@ -22,17 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_sql/DatabaseTagClass.h>
+#include "language_sql/DatabaseTagClass.h"
 #include <soci/mysql/soci-mysql.h>
-#include <soci/sqlite3/soci-sqlite3.h>
 #include <soci/soci.h>
-#include <wx/datetime.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
+#include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/ustdio.h>
-#include <string>
+#include <wx/datetime.h>
 #include <algorithm>
+#include <string>
 #include <vector>
+#include "globals/Errors.h"
+#include "globals/String.h"
 
 t4p::DatabaseTagClass::DatabaseTagClass()
 	: Label()

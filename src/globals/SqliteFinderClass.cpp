@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <globals/SqliteFinderClass.h>
+#include "globals/SqliteFinderClass.h"
 
 t4p::SqliteFinderClass::SqliteFinderClass(soci::session& session)
 : Session(session) {

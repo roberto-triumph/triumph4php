@@ -22,24 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/NotebookClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <search/FindInFilesClass.h>
-#include <Triumph.h>
-#include <main_frame/PreferencesClass.h>
-#include <globals/GlobalsClass.h>
-#include <globals/Events.h>
-#include <globals/Errors.h>
-#include <globals/Number.h>
-#include <widgets/FileTypeImageList.h>
-#include <code_control/CodeControlClass.h>
-#include <widgets/AuiManager.h>
+#include "widgets/NotebookClass.h"
 #include <wx/artprov.h>
-#include <wx/filename.h>
 #include <wx/file.h>
+#include <wx/filename.h>
 #include <wx/wupdlock.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "globals/GlobalsClass.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "main_frame/PreferencesClass.h"
+#include "search/FindInFilesClass.h"
+#include "Triumph.h"
+#include "widgets/AuiManager.h"
+#include "widgets/FileTypeImageList.h"
 
 static const int ID_CLOSE_ALL_TABS = wxNewId();
 static const int ID_CLOSE_TAB = wxNewId();

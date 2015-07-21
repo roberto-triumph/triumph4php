@@ -25,14 +25,14 @@
 #ifndef SRC_VIEWS_TAGVIEWCLASS_H_
 #define SRC_VIEWS_TAGVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/TagFeatureClass.h>
-#include <views/wxformbuilder/TagFeatureForms.h>
-#include <code_control/ResourceCacheBuilderClass.h>
-#include <widgets/GaugeDialogClass.h>
-#include <code_control/CodeControlClass.h>
 #include <wx/string.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "code_control/ResourceCacheBuilderClass.h"
+#include "features/TagFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/TagFeatureForms.h"
+#include "widgets/GaugeDialogClass.h"
 
 namespace t4p {
 

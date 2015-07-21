@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FinderFeatureClass.h>
-#include <globals/String.h>
-#include <widgets/UnicodeStringValidatorClass.h>
-#include <widgets/RegularExpressionValidatorClass.h>
-#include <Triumph.h>
+#include "features/FinderFeatureClass.h"
+#include "globals/String.h"
+#include "Triumph.h"
+#include "widgets/RegularExpressionValidatorClass.h"
+#include "widgets/UnicodeStringValidatorClass.h"
 
 static const int ID_FIND_PANEL = wxNewId();
 static const int ID_REPLACE_PANEL = wxNewId();

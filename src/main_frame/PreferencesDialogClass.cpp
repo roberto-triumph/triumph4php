@@ -22,9 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <main_frame/PreferencesDialogClass.h>
-#include <main_frame/SettingsDirectoryPanelClass.h>
-#include <globals/GlobalsClass.h>
+#include "main_frame/PreferencesDialogClass.h"
 #include <wx/bookctrl.h>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
@@ -32,6 +30,8 @@
 #include <wx/wfstream.h>
 #include <map>
 #include <vector>
+#include "globals/GlobalsClass.h"
+#include "main_frame/SettingsDirectoryPanelClass.h"
 
 t4p::PreferencesDialogClass::PreferencesDialogClass(wxWindow* parent,
 														  t4p::GlobalsClass& globals,

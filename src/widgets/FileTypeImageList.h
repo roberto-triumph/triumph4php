@@ -26,9 +26,9 @@
 #ifndef SRC_WIDGETS_FILETYPEIMAGELIST_H_
 #define SRC_WIDGETS_FILETYPEIMAGELIST_H_
 
-#include <wx/imaglist.h>
 #include <wx/filename.h>
-#include <globals/FileTypeClass.h>
+#include <wx/imaglist.h>
+#include "globals/FileTypeClass.h"
 
 namespace t4p {
 /**

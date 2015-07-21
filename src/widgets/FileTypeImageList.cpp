@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/FileTypeImageList.h>
-#include <globals/Assets.h>
-#include <globals/FileTypeClass.h>
+#include "widgets/FileTypeImageList.h"
+#include "globals/Assets.h"
+#include "globals/FileTypeClass.h"
 
 void t4p::FileTypeImageList(wxImageList& imgList) {
 	imgList.Add(t4p::BitmapImageAsset(wxT("document-php")));

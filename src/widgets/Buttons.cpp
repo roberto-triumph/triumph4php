@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/Buttons.h>
+#include "widgets/Buttons.h"
 #include <wx/artprov.h>
 #include <wx/platinfo.h>
 

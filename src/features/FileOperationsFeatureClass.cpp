@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FileOperationsFeatureClass.h>
+#include "features/FileOperationsFeatureClass.h"
 
 t4p::FileOperationsFeatureClass::FileOperationsFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

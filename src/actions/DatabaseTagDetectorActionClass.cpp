@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/DatabaseTagDetectorActionClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <search/RecursiveDirTraverserClass.h>
+#include "actions/DatabaseTagDetectorActionClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "search/RecursiveDirTraverserClass.h"
 
 static const int ID_DATABASE_TAG_DETECTOR_PROCESS = wxNewId();
 

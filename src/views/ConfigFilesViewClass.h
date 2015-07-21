@@ -25,8 +25,8 @@
 #ifndef SRC_VIEWS_CONFIGFILESVIEWCLASS_H_
 #define SRC_VIEWS_CONFIGFILESVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <actions/ActionClass.h>
+#include "actions/ActionClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 // forward declaration, defined in another file

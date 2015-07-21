@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/EnvironmentFeatureClass.h>
-#include <Triumph.h>
+#include "features/EnvironmentFeatureClass.h"
 #include <wx/filename.h>
 #include <wx/string.h>
 #include <vector>
+#include "Triumph.h"
 
 const wxEventType t4p::EVENT_APACHE_FILE_READ_COMPLETE = wxNewEventType();
 

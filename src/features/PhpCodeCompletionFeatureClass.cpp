@@ -22,13 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/PhpCodeCompletionFeatureClass.h>
-#include <globals/Assets.h>
-#include <language_php/Keywords.h>
-#include <Triumph.h>
+#include "features/PhpCodeCompletionFeatureClass.h"
 #include <wx/tokenzr.h>
 #include <algorithm>
-
+#include "globals/Assets.h"
+#include "language_php/Keywords.h"
+#include "Triumph.h"
 
 t4p::PhpCodeCompletionFeatureClass::PhpCodeCompletionFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

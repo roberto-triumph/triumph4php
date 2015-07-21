@@ -25,8 +25,8 @@
 #ifndef SRC_ACTIONS_CALLSTACKACTIONCLASS_H_
 #define SRC_ACTIONS_CALLSTACKACTIONCLASS_H_
 
-#include <actions/GlobalActionClass.h>
-#include <language_php/CallStackClass.h>
+#include "actions/GlobalActionClass.h"
+#include "language_php/CallStackClass.h"
 
 namespace t4p {
 /**

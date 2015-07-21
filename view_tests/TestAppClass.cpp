@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 
+#include "TestAppClass.h"
 #include <TestAppClass.h>
 #include <UnitTest++.h>
 

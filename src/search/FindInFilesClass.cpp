@@ -22,16 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/Errors.h>
-#include <globals/String.h>
-#include <search/FindInFilesClass.h>
-#include <unicode/ustring.h>
+#include "search/FindInFilesClass.h"
 #include <unicode/ucnv.h>
 #include <unicode/ucsdet.h>
-
-#include <wx/string.h>
-#include <wx/regex.h>
+#include <unicode/ustring.h>
 #include <wx/filename.h>
+#include <wx/regex.h>
+#include <wx/string.h>
+#include "globals/Errors.h"
+#include "globals/String.h"
 
 static const char* CharsetFromSignature(const char* buffer, int bufferLength) {
 	int signatureLength = 0;

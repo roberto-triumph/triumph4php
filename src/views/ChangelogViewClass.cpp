@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/ChangelogViewClass.h>
-#include <features/ChangelogFeatureClass.h>
+#include "views/ChangelogViewClass.h"
+#include "features/ChangelogFeatureClass.h"
 
 t4p::ChangelogViewClass::ChangelogViewClass(t4p::ChangelogFeatureClass& feature)
 : FeatureViewClass()

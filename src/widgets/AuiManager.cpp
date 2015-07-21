@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/AuiManager.h>
-#include <widgets/NotebookClass.h>
+#include "widgets/AuiManager.h"
 #include <vector>
+#include "widgets/NotebookClass.h"
 
 const int t4p::AUI_MAX_CODE_NOTEBOOKS = 5;
 

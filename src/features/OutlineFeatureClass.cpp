@@ -22,22 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/OutlineFeatureClass.h>
-#include <language_php/SymbolTableClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <globals/TagList.h>
-#include <language_php/TagParserClass.h>
-#include <globals/Sqlite.h>
-#include <globals/Number.h>
-#include <Triumph.h>
+#include "features/OutlineFeatureClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/regex.h>
 #include <wx/tokenzr.h>
-#include <vector>
 #include <algorithm>
+#include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "globals/TagList.h"
+#include "language_php/SymbolTableClass.h"
+#include "language_php/TagParserClass.h"
+#include "Triumph.h"
 
 const wxEventType t4p::EVENT_OUTLINE_SEARCH_COMPLETE = wxNewEventType();
 

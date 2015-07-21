@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/GlobalsChangeHandlerClass.h>
-#include <language_sql/DatabaseTagClass.h>
-#include <actions/GlobalActionClass.h>
-#include <globals/Errors.h>
+#include "actions/GlobalsChangeHandlerClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "actions/GlobalActionClass.h"
+#include "globals/Errors.h"
+#include "language_sql/DatabaseTagClass.h"
 
 t4p::GlobalsChangeHandlerClass::GlobalsChangeHandlerClass(t4p::GlobalsClass& globals)
 	: wxEvtHandler()

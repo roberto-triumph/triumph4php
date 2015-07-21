@@ -22,22 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/RunConsoleViewClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <search/FinderClass.h>
-#include <code_control/CodeControlClass.h>
-#include <widgets/DirPickerValidatorClass.h>
-#include <Triumph.h>
+#include "views/RunConsoleViewClass.h"
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/sstream.h>
 #include <wx/valgen.h>
 #include <map>
 #include <vector>
-
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "search/FinderClass.h"
+#include "Triumph.h"
+#include "widgets/DirPickerValidatorClass.h"
 
 static const int ID_PROCESS = wxNewId();
 static const int ID_WINDOW_CONSOLE = wxNewId();

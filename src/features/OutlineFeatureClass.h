@@ -25,13 +25,13 @@
 #ifndef SRC_FEATURES_OUTLINEFEATURECLASS_H_
 #define SRC_FEATURES_OUTLINEFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <globals/Events.h>
 #include <pelet/TokenClass.h>
-#include <actions/ActionClass.h>
-#include <language_php/TagCacheClass.h>
-#include <vector>
 #include <map>
+#include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/TagCacheClass.h"
 
 namespace t4p {
 /**

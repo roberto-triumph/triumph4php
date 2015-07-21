@@ -22,20 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <cstdarg>
 #include <UnitTest++.h>
-#include <TestReporterStdout.h>
-#include <TestRunner.h>
-#include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string.h>
+#include <TestReporterStdout.h>
+#include <TestRunner.h>
+#include <unicode/uclean.h>
 #include <wx/wx.h>
-
-#include <vector>
-#include <string>
 #include <algorithm>
+#include <cstdarg>
 #include <iostream>
+#include <string>
+#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

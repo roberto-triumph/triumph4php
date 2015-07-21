@@ -25,10 +25,10 @@
 #ifndef SRC_ACTIONS_TEMPLATEFILETAGSDETECTORACTIONCLASS_H_
 #define SRC_ACTIONS_TEMPLATEFILETAGSDETECTORACTIONCLASS_H_
 
-#include <actions/GlobalActionClass.h>
-#include <widgets/ProcessWithHeartbeatClass.h>
 #include <queue>
 #include <vector>
+#include "actions/GlobalActionClass.h"
+#include "widgets/ProcessWithHeartbeatClass.h"
 
 namespace t4p {
 /**

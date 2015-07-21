@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/ConfigTagDetectorActionClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <search/RecursiveDirTraverserClass.h>
+#include "actions/ConfigTagDetectorActionClass.h"
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "search/RecursiveDirTraverserClass.h"
 
 static const int ID_CONFIG_TAG_DETECTOR_PROCESS = wxNewId();
 

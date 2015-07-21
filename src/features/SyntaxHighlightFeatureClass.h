@@ -26,8 +26,8 @@
 #ifndef SRC_FEATURES_SYNTAXHIGHLIGHTFEATURECLASS_H_
 #define SRC_FEATURES_SYNTAXHIGHLIGHTFEATURECLASS_H_
 
-#include <globals/Events.h>
-#include <features/FeatureClass.h>
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
 
 namespace t4p {
 /**

@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/Assets.h>
-#include <wx/stdpaths.h>
-#include <wx/image.h>
-#include <wx/icon.h>
+#include "globals/Assets.h"
 #include <wx/fileconf.h>
+#include <wx/icon.h>
+#include <wx/image.h>
+#include <wx/stdpaths.h>
 #include <string>
 
 // these macros will expand a pre-processor define into code

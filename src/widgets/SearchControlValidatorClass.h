@@ -25,8 +25,8 @@
 #ifndef SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_
 #define SRC_WIDGETS_SEARCHCONTROLVALIDATORCLASS_H_
 
-#include <wx/validate.h>
 #include <wx/srchctrl.h>
+#include <wx/validate.h>
 
 /**
  * Class that can be used to transfer wxString data from wxSearchCtrl

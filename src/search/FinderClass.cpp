@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <search/FinderClass.h>
+#include "search/FinderClass.h"
+#include <assert.h>
 #include <unicode/uchar.h>
 #include <unicode/ustdio.h>
-#include <globals/String.h>
-#include <assert.h>
+#include "globals/String.h"
 
 t4p::FinderClass::FinderClass(UnicodeString expression, t4p::FinderClass::Modes mode)
 	: Expression(expression)

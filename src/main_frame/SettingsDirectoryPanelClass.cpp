@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <main_frame/SettingsDirectoryPanelClass.h>
-#include <widgets/DirPickerValidatorClass.h>
-#include <wx/stdpaths.h>
+#include "main_frame/SettingsDirectoryPanelClass.h"
 #include <wx/msgdlg.h>
+#include <wx/stdpaths.h>
+#include "widgets/DirPickerValidatorClass.h"
 
 /**
  * @return wxFileName the location of the settings directory when it is in the

@@ -26,11 +26,11 @@
 #ifndef SRC_VIEWS_SYNTAXHIGHLIGHTVIEWCLASS_H_
 #define SRC_VIEWS_SYNTAXHIGHLIGHTVIEWCLASS_H_
 
-#include <globals/Events.h>
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/SyntaxHighlightFeatureForms.h>
-#include <globals/CodeControlOptionsClass.h>
-#include <globals/GlobalsClass.h>
+#include "globals/CodeControlOptionsClass.h"
+#include "globals/Events.h"
+#include "globals/GlobalsClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/SyntaxHighlightFeatureForms.h"
 
 namespace t4p {
 // forward declaration - defined below

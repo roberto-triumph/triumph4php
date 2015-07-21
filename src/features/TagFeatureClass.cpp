@@ -22,19 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/TagFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Events.h>
-#include <globals/Number.h>
-#include <actions/TagWipeActionClass.h>
-#include <globals/TagList.h>
-#include <Triumph.h>
+#include "features/TagFeatureClass.h"
 #include <wx/artprov.h>
 #include <wx/filename.h>
 #include <wx/valgen.h>
 #include <vector>
+#include "actions/TagWipeActionClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "globals/TagList.h"
+#include "Triumph.h"
 
 t4p::TagFeatureClass::TagFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)

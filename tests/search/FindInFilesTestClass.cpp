@@ -23,9 +23,9 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <search/FindInFilesClass.h>
-#include <globals/String.h>
+#include "FileTestFixtureClass.h"
+#include "globals/String.h"
+#include "search/FindInFilesClass.h"
 
 wxString FILE_1 = wxString::FromAscii(
 	"<?php\n"

@@ -25,15 +25,15 @@
 #ifndef SRC_FEATURES_TAGFEATURECLASS_H_
 #define SRC_FEATURES_TAGFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <features/BackgroundFileReaderClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <actions/TagCacheSearchActionClass.h>
-#include <code_control/ResourceCacheBuilderClass.h>
-#include <globals/Events.h>
 #include <wx/string.h>
 #include <queue>
+#include "actions/ProjectTagActionClass.h"
+#include "actions/TagCacheSearchActionClass.h"
+#include "code_control/ResourceCacheBuilderClass.h"
+#include "features/BackgroundFileReaderClass.h"
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/ParsedTagFinderClass.h"
 
 namespace t4p {
 /**

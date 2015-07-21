@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <TriumphChecks.h>
-#include <language_php/DbgpEventClass.h>
-#include <wx/string.h>
 #include <wx/log.h>
+#include <wx/string.h>
 #include <string>
+#include "language_php/DbgpEventClass.h"
+#include "TriumphChecks.h"
 
 SUITE(DbgpEventClassTest) {
 TEST(BreakpointResponse) {

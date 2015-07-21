@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/SymbolTableClass.h>
-#include <language_php/TagFinderList.h>
-#include <globals/String.h>
+#include "language_php/SymbolTableClass.h"
 #include <pelet/TokenClass.h>
 #include <wx/ffile.h>
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "globals/String.h"
+#include "language_php/TagFinderList.h"
 
 static UnicodeString VariableName(const pelet::VariableClass& var) {
 	UnicodeString varName;

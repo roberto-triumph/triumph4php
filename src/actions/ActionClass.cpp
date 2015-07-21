@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/ActionClass.h>
+#include "actions/ActionClass.h"
 #include <wx/intl.h>
 #include <algorithm>
 #include <queue>

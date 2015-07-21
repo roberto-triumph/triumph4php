@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/DocCommentViewClass.h>
-#include <features/DocCommentFeatureClass.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "views/DocCommentViewClass.h"
 #include <unicode/unistr.h>
 #include <wx/tokenzr.h>
 #include <wx/wupdlock.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/DocCommentFeatureClass.h"
+#include "Triumph.h"
 
 /**
  * Turns a tag PHPDoc comment into a nicer format that is more suitable

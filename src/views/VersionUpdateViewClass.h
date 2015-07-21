@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_
 #define SRC_VIEWS_VERSIONUPDATEVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/VersionUpdateFeatureClass.h>
-#include <views/wxformbuilder/VersionUpdateFeatureForms.h>
-#include <actions/ActionClass.h>
+#include "actions/ActionClass.h"
+#include "features/VersionUpdateFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/VersionUpdateFeatureForms.h"
 
 namespace t4p {
 /**

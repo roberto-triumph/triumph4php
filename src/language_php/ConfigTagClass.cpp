@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/ConfigTagClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
+#include "language_php/ConfigTagClass.h"
 #include <string>
 #include <vector>
+#include "globals/Errors.h"
+#include "globals/String.h"
 
 t4p::ConfigTagClass::ConfigTagClass()
 	: Label()

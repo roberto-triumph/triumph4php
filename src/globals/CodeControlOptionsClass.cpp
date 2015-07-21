@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/CodeControlOptionsClass.h>
+#include "globals/CodeControlOptionsClass.h"
 #include <wx/platinfo.h>
 #include <wx/utils.h>
 #include <vector>

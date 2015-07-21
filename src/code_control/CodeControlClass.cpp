@@ -22,23 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <code_control/CodeControlClass.h>
-#include <globals/String.h>
-#include <globals/GlobalsClass.h>
-#include <globals/Errors.h>
-#include <globals/Events.h>
-#include <globals/Assets.h>
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <search/FindInFilesClass.h>
-#include <wx/filename.h>
-#include <wx/ffile.h>
-#include <wx/stc/stc.h>
-#include <wx/utils.h>
-#include <wx/tokenzr.h>
-#include <wx/process.h>
-#include <unicode/ustring.h>
+#include "code_control/CodeControlClass.h"
 #include <sys/stat.h>
+#include <unicode/ustring.h>
+#include <wx/ffile.h>
+#include <wx/filename.h>
+#include <wx/process.h>
+#include <wx/stc/stc.h>
+#include <wx/tokenzr.h>
+#include <wx/utils.h>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "globals/GlobalsClass.h"
+#include "globals/String.h"
+#include "search/FindInFilesClass.h"
+#include "widgets/StatusBarWithGaugeClass.h"
 
 #if defined(__WXMSW__)
 	#include <Shellapi.h>

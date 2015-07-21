@@ -25,10 +25,10 @@
 #ifndef SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_
 #define SRC_FEATURES_TEMPLATEFILESFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <language_php/TemplateFileTagClass.h>
-#include <actions/ActionClass.h>
-#include <language_php/UrlTagClass.h>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "language_php/TemplateFileTagClass.h"
+#include "language_php/UrlTagClass.h"
 
 namespace t4p {
 /**

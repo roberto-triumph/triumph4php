@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/TagWipeActionClass.h>
-#include <language_php/TagParserClass.h>
-#include <language_php/DetectorDbClass.h>
+#include "actions/TagWipeActionClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <globals/FileName.h>
 #include <vector>
+#include "globals/FileName.h"
+#include "language_php/DetectorDbClass.h"
+#include "language_php/TagParserClass.h"
 
 t4p::TagWipeActionClass::TagWipeActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)

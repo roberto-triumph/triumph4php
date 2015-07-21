@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/ProcessWithHeartbeatClass.h>
+#include "widgets/ProcessWithHeartbeatClass.h"
 #include <wx/txtstrm.h>
 #include <map>
 

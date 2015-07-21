@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/DetectorDbClass.h>
-#include <globals/Errors.h>
-#include <globals/String.h>
+#include "language_php/DetectorDbClass.h"
 #include <string>
+#include "globals/Errors.h"
+#include "globals/String.h"
 
 t4p::DetectorDbClass::DetectorDbClass()
 : Session(NULL) {

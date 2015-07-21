@@ -23,10 +23,10 @@
  * THE SOFTWARE.
  */
 
-#include <globals/FileTypeClass.h>
-#include <wx/tokenzr.h>
+#include "globals/FileTypeClass.h"
 #include <wx/filefn.h>
 #include <wx/filename.h>
+#include <wx/tokenzr.h>
 #include <vector>
 
 /**

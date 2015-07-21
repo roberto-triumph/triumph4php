@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <language_php/DetectedTagFinderResultClass.h>
+#include "language_php/DetectedTagFinderResultClass.h"
 #include <string>
 #include <vector>
 

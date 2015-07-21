@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <SqliteTestFixtureClass.h>
-#include <globals/Assets.h>
-#include <globals/String.h>
+#include "SqliteTestFixtureClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <wx/ffile.h>
 #include <stdio.h>
+#include <wx/ffile.h>
 #include <string>
+#include "globals/Assets.h"
+#include "globals/String.h"
 
 static std::string ResourceSchemaSql = "";
 static std::string DetectorSchemaSql = "";

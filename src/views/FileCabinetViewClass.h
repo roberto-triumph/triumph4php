@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_FILECABINETVIEWCLASS_H_
 #define SRC_VIEWS_FILECABINETVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/FileCabinetFeatureClass.h>
-#include <views/wxformbuilder/FileCabinetFeatureForms.h>
-#include <widgets/FileTypeImageList.h>
-#include <globals/FileCabinetItemClass.h>
-#include <globals/Sqlite.h>
+#include "features/FileCabinetFeatureClass.h"
+#include "globals/FileCabinetItemClass.h"
+#include "globals/Sqlite.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/FileCabinetFeatureForms.h"
+#include "widgets/FileTypeImageList.h"
 
 namespace t4p {
 class FileCabinetViewClass : public t4p::FeatureViewClass {

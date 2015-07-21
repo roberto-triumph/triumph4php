@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/DebuggerServerActionClass.h>
-#include <globals/String.h>
-#include <string>
+#include "actions/DebuggerServerActionClass.h"
 #include <algorithm>
+#include <string>
+#include "globals/String.h"
 
 /**
  * reads a response from the debug engine. engine responses are

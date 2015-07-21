@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/TestFeatureClass.h>
+#include "features/TestFeatureClass.h"
 
 t4p::TestFeatureClass::TestFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

@@ -26,8 +26,8 @@
 #ifndef TESTS_TRIUMPHCHECKS_H_
 #define TESTS_TRIUMPHCHECKS_H_
 
-#include <wx/string.h>  // so that UnitTest++ can compare wxStrings by their content
 #include <unicode/ustream.h>  // get the << overloaded operator, needed by UnitTest++
+#include <wx/string.h>  // so that UnitTest++ can compare wxStrings by their content
 
 /**
  * This is a "hard" check for vector size. Will check that the vetor is of the given

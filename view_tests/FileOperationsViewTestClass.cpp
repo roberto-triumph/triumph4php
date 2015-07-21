@@ -23,10 +23,9 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <TestAppClass.h>
-
-#include <features/FileOperationsFeatureClass.h>
-#include <views/FileOperationsViewClass.h>
+#include "features/FileOperationsFeatureClass.h"
+#include "TestAppClass.h"
+#include "views/FileOperationsViewClass.h"
 
 class FileOperationsViewTestClass : public ViewTestClass {
 	public:

@@ -25,11 +25,11 @@
 #ifndef SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_
 #define SRC_LANGUAGE_JS_JSTAGRESULTCLASS_H_
 
-#include <globals/SqliteResultClass.h>
-#include <language_js/JsTagClass.h>
 #include <wx/filename.h>
-#include <vector>
 #include <string>
+#include <vector>
+#include "globals/SqliteResultClass.h"
+#include "language_js/JsTagClass.h"
 
 namespace t4p {
 /**

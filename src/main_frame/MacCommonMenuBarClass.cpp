@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <main_frame/MacCommonMenuBarClass.h>
+#include "main_frame/MacCommonMenuBarClass.h"
 
 t4p::MacCommonMenuBarClass::MacCommonMenuBarClass(wxApp& app)
 : App(app)

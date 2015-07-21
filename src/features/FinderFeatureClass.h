@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_FINDERFEATURECLASS_H_
 #define SRC_FEATURES_FINDERFEATURECLASS_H_
 
-#include <search/FinderClass.h>
-#include <features/FeatureClass.h>
-#include <actions/ActionClass.h>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "search/FinderClass.h"
 
 namespace t4p {
 /**

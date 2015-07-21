@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/TotalSearchFeatureClass.h>
-#include <search/FindInFilesClass.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <Triumph.h>
+#include "features/TotalSearchFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Number.h"
+#include "search/FindInFilesClass.h"
+#include "Triumph.h"
 
 t4p::TotalSearchFeatureClass::TotalSearchFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

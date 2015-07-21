@@ -26,15 +26,15 @@
 #ifndef SRC_FEATURES_SQLBROWSERFEATURECLASS_H_
 #define SRC_FEATURES_SQLBROWSERFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <globals/ProjectClass.h>
-#include <language_sql/DatabaseTagClass.h>
-#include <language_sql/SqlLexicalAnalyzerClass.h>
-#include <actions/SqlMetaDataActionClass.h>
+#include <unicode/unistr.h>
 #include <wx/thread.h>
 #include <wx/txtstrm.h>
 #include <vector>
-#include <unicode/unistr.h>
+#include "actions/SqlMetaDataActionClass.h"
+#include "features/FeatureClass.h"
+#include "globals/ProjectClass.h"
+#include "language_sql/DatabaseTagClass.h"
+#include "language_sql/SqlLexicalAnalyzerClass.h"
 
 namespace t4p {
 /**

@@ -25,13 +25,13 @@
 #ifndef SRC_FEATURES_RUNBROWSERFEATURECLASS_H_
 #define SRC_FEATURES_RUNBROWSERFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <language_php/UrlTagClass.h>
-#include <actions/ActionClass.h>
-#include <widgets/GaugeDialogClass.h>
 #include <wx/string.h>
-#include <vector>
 #include <memory>
+#include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "language_php/UrlTagClass.h"
+#include "widgets/GaugeDialogClass.h"
 
 namespace t4p {
 class RunBrowserFeatureClass : public FeatureClass {

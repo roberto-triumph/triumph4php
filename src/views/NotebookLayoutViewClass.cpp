@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/NotebookLayoutViewClass.h>
-#include <widgets/NotebookClass.h>
-#include <Triumph.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <widgets/AuiManager.h>
+#include "views/NotebookLayoutViewClass.h"
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
 
 /**
  * Moves all of the code notebooks from the hidden notebooks into the

@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <soci/soci.h>
 #include <soci/mysql/soci-mysql.h>
+#include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <stdio.h>
 #include <string>

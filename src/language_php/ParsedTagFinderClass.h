@@ -25,15 +25,15 @@
 #ifndef SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_
 #define SRC_LANGUAGE_PHP_PARSEDTAGFINDERCLASS_H_
 
-#include <language_php/PhpTagClass.h>
-#include <globals/Sqlite.h>
-#include <globals/SqliteResultClass.h>
-#include <globals/SqliteFinderClass.h>
-#include <wx/string.h>
 #include <soci/soci.h>
 #include <unicode/unistr.h>
-#include <vector>
+#include <wx/string.h>
 #include <string>
+#include <vector>
+#include "globals/Sqlite.h"
+#include "globals/SqliteFinderClass.h"
+#include "globals/SqliteResultClass.h"
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 // forward declaration, defined below

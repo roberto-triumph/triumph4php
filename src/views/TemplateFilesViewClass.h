@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_
 #define SRC_VIEWS_TEMPLATEFILESVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <features/TemplateFilesFeatureClass.h>
-#include <views/wxformbuilder/TemplateFilesFeatureForms.h>
-#include <language_php/TemplateFileTagClass.h>
-#include <actions/ActionClass.h>
 #include <wx/imaglist.h>
+#include "actions/ActionClass.h"
+#include "features/TemplateFilesFeatureClass.h"
+#include "language_php/TemplateFileTagClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/TemplateFilesFeatureForms.h"
 
 namespace t4p {
 /**

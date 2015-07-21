@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <DatabaseTestFixtureClass.h>
-#include <language_sql/DatabaseTagClass.h>
-#include <globals/String.h>
-#include <TriumphChecks.h>
 #include <soci.h>
+#include "DatabaseTestFixtureClass.h"
+#include "globals/String.h"
+#include "language_sql/DatabaseTagClass.h"
+#include "TriumphChecks.h"
 
 class DatabaseTagTestFixtureClass : public DatabaseTestFixtureClass {
 	public:

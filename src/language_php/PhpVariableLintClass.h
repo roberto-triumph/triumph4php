@@ -27,11 +27,11 @@
 
 #include <pelet/ParserClass.h>
 #include <pelet/ParserTypeClass.h>
-#include <language_php/ParsedTagFinderClass.h>
 #include <wx/filename.h>
-#include <globals/String.h>
 #include <map>
 #include <vector>
+#include "globals/String.h"
+#include "language_php/ParsedTagFinderClass.h"
 
 namespace t4p {
 

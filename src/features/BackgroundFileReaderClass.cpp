@@ -22,9 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/BackgroundFileReaderClass.h>
+#include "features/BackgroundFileReaderClass.h"
 #include <vector>
-
 
 t4p::BackgroundFileReaderClass::BackgroundFileReaderClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId)

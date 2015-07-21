@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <search/FindInFilesClass.h>
-#include <search/DirectorySearchClass.h>
+#include <unicode/uclean.h>
 #include <wx/filefn.h>
 #include <wx/timer.h>
-#include <unicode/uclean.h>
 #include <vector>
+#include "search/DirectorySearchClass.h"
+#include "search/FindInFilesClass.h"
 
 /**
  * Find in files over an entire directory, using an exact search

@@ -23,14 +23,14 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_php/TagParserClass.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "language_php/TagParserClass.h"
+#include "SqliteTestFixtureClass.h"
 
 class TagParserTestFixtureClass : public SqliteTestFixtureClass {
 	public:

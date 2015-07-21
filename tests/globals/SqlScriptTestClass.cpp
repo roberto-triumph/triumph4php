@@ -23,16 +23,16 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <globals/Sqlite.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <TriumphChecks.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class SqliteFixtureClass : public FileTestFixtureClass, public SqliteTestFixtureClass {
 	public:

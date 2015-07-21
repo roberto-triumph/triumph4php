@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_DEBUGGERVIEWCLASS_H_
 #define SRC_VIEWS_DEBUGGERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/DebuggerFeatureForms.h>
-#include <features/DebuggerFeatureClass.h>
-#include <language_php/DbgpEventClass.h>
 #include <vector>
+#include "features/DebuggerFeatureClass.h"
+#include "language_php/DbgpEventClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/DebuggerFeatureForms.h"
 
 namespace t4p {
 class DebuggerViewClass : public t4p::FeatureViewClass {

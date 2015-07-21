@@ -25,16 +25,16 @@
 #ifndef SRC_LANGUAGE_PHP_TAGCACHECLASS_H_
 #define SRC_LANGUAGE_PHP_TAGCACHECLASS_H_
 
-#include <search/DirectorySearchClass.h>
-#include <language_php/TagParserClass.h>
-#include <language_php/SymbolTableClass.h>
-#include <globals/Sqlite.h>
-#include <globals/SqliteResultClass.h>
 #include <unicode/unistr.h>
-#include <map>
-#include <wx/thread.h>
 #include <wx/event.h>
+#include <wx/thread.h>
+#include <map>
 #include <vector>
+#include "globals/Sqlite.h"
+#include "globals/SqliteResultClass.h"
+#include "language_php/SymbolTableClass.h"
+#include "language_php/TagParserClass.h"
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 // forward declarations

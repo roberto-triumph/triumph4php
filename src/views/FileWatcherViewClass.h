@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_FILEWATCHERVIEWCLASS_H_
 #define SRC_VIEWS_FILEWATCHERVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/FileWatcherFeatureForms.h>
-#include <features/FileWatcherFeatureClass.h>
-#include <globals/Events.h>
+#include "features/FileWatcherFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/FileWatcherFeatureForms.h"
 
 namespace t4p {
 class FileWatcherViewClass : public t4p::FeatureViewClass {

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/GaugeDialogClass.h>
+#include "widgets/GaugeDialogClass.h"
 
 static const int ID_GAUGE_DIALOG_TIMER = wxNewId();
 

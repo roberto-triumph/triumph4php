@@ -25,8 +25,8 @@
 #ifndef SRC_ACTIONS_GLOBALACTIONCLASS_H_
 #define SRC_ACTIONS_GLOBALACTIONCLASS_H_
 
-#include <actions/ActionClass.h>
-#include <globals/GlobalsClass.h>
+#include "actions/ActionClass.h"
+#include "globals/GlobalsClass.h"
 
 namespace t4p {
 /**

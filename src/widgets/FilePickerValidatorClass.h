@@ -25,8 +25,8 @@
 #ifndef SRC_WIDGETS_FILEPICKERVALIDATORCLASS_H_
 #define SRC_WIDGETS_FILEPICKERVALIDATORCLASS_H_
 
-#include <wx/validate.h>
 #include <wx/filename.h>
+#include <wx/validate.h>
 
 namespace t4p {
 /**

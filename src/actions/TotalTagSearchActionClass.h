@@ -26,13 +26,13 @@
 #ifndef SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_
 #define SRC_ACTIONS_TOTALTAGSEARCHACTIONCLASS_H_
 
-#include <wx/event.h>
-#include <actions/ActionClass.h>
-#include <language_php/DatabaseTableTagClass.h>
-#include <language_php/PhpTagClass.h>
-#include <globals/GlobalsClass.h>
 #include <unicode/unistr.h>
+#include <wx/event.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "globals/GlobalsClass.h"
+#include "language_php/DatabaseTableTagClass.h"
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 class TotalTagResultClass {

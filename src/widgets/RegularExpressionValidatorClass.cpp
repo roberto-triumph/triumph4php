@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/RegularExpressionValidatorClass.h>
-#include <globals/String.h>
-#include <search/FinderClass.h>
-#include <unicode/unistr.h>
+#include "widgets/RegularExpressionValidatorClass.h"
 #include <unicode/regex.h>
-#include <wx/textctrl.h>
+#include <unicode/unistr.h>
+#include <wx/clipbrd.h>
 #include <wx/combobox.h>
 #include <wx/msgdlg.h>
-#include <wx/clipbrd.h>
+#include <wx/textctrl.h>
+#include "globals/String.h"
+#include "search/FinderClass.h"
 
 /**
  * Add a flag to the given regular expression string, taking care not to clobber existing flags

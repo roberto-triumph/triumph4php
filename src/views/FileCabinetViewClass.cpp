@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FileCabinetViewClass.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
-#include <globals/Assets.h>
-#include <widgets/Buttons.h>
+#include "views/FileCabinetViewClass.h"
 #include <wx/artprov.h>
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
 
 static int ID_FILE_CABINET_PANEL = wxNewId();
 static int ID_FILE_CABINET_MENU_DELETE = wxNewId();

@@ -22,9 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/NewUserFeatureClass.h>
-#include <Triumph.h>
-
+#include "features/NewUserFeatureClass.h"
+#include "Triumph.h"
 
 t4p::NewUserFeatureClass::NewUserFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

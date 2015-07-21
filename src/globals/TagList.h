@@ -25,10 +25,10 @@
 #ifndef SRC_GLOBALS_TAGLIST_H_
 #define SRC_GLOBALS_TAGLIST_H_
 
-#include <language_php/PhpTagClass.h>
-#include <language_php/ParsedTagFinderClass.h>
-#include <globals/FileTypeClass.h>
 #include <vector>
+#include "globals/FileTypeClass.h"
+#include "language_php/ParsedTagFinderClass.h"
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 // forward declaration

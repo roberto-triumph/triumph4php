@@ -25,8 +25,8 @@
 #ifndef SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_
 #define SRC_FEATURES_EDITORMESSAGESFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
 #include <wx/log.h>
+#include "features/FeatureClass.h"
 
 namespace t4p {
 /**

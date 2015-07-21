@@ -25,12 +25,12 @@
 #ifndef SRC_ACTIONS_TAGCACHESEARCHACTIONCLASS_H_
 #define SRC_ACTIONS_TAGCACHESEARCHACTIONCLASS_H_
 
-#include <actions/ActionClass.h>
-#include <globals/GlobalsClass.h>
-#include <language_php/TagCacheClass.h>
 #include <unicode/unistr.h>
 #include <wx/string.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "globals/GlobalsClass.h"
+#include "language_php/TagCacheClass.h"
 
 namespace t4p {
 /**

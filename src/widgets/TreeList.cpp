@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/TreeList.h>
+#include "widgets/TreeList.h"
 #include <wx/wupdlock.h>
 
 void t4p::TreeListAutoSizeAllColumns(wxTreeListCtrl* ctrl) {

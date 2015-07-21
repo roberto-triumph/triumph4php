@@ -25,11 +25,11 @@
 #ifndef SRC_MAIN_FRAME_PREFERENCESCLASS_H_
 #define SRC_MAIN_FRAME_PREFERENCESCLASS_H_
 
+#include <wx/filename.h>
 #include <wx/keybinder.h>
 #include <wx/menuutils.h>
-#include <wx/filename.h>
-#include <globals/CodeControlOptionsClass.h>
 #include <vector>
+#include "globals/CodeControlOptionsClass.h"
 
 namespace t4p {
 /**

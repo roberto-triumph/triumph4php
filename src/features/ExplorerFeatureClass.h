@@ -25,11 +25,11 @@
 #ifndef SRC_FEATURES_EXPLORERFEATURECLASS_H_
 #define SRC_FEATURES_EXPLORERFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <actions/ActionClass.h>
-#include <wx/imaglist.h>
 #include <wx/fswatcher.h>
+#include <wx/imaglist.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
 
 namespace t4p {
 // forward declaration, defined below

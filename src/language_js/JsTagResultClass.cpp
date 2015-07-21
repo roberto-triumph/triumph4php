@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_js/JsTagResultClass.h>
-#include <globals/String.h>
+#include "language_js/JsTagResultClass.h"
 #include <string>
 #include <vector>
+#include "globals/String.h"
 
 t4p::JsTagResultClass::JsTagResultClass()
 : t4p::SqliteResultClass()

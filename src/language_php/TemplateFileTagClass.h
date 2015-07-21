@@ -25,9 +25,9 @@
 #ifndef SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_
 #define SRC_LANGUAGE_PHP_TEMPLATEFILETAGCLASS_H_
 
-#include <wx/string.h>
-#include <wx/filename.h>
 #include <soci/soci.h>
+#include <wx/filename.h>
+#include <wx/string.h>
 #include <vector>
 
 namespace t4p {

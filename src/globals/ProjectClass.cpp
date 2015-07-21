@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/ProjectClass.h>
+#include "globals/ProjectClass.h"
 #include <wx/tokenzr.h>
-#include <globals/Assets.h>
 #include <vector>
+#include "globals/Assets.h"
 
 t4p::ProjectClass::ProjectClass()
 	: Label()

@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/GlobalsClass.h>
-#include <globals/Assets.h>
+#include "globals/GlobalsClass.h"
 #include <algorithm>
 #include <vector>
+#include "globals/Assets.h"
 
 t4p::GlobalsClass::GlobalsClass()
 	: Environment()

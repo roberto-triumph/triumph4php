@@ -25,11 +25,11 @@
 #ifndef SRC_VIEWS_FINDINFILESVIEWCLASS_H_
 #define SRC_VIEWS_FINDINFILESVIEWCLASS_H_
 
-#include <views/wxformbuilder/FindInFilesFeatureForms.h>
-#include <features/FindInFilesFeatureClass.h>
-#include <widgets/ComboBoxHistoryClass.h>
-#include <views/FeatureViewClass.h>
 #include <vector>
+#include "features/FindInFilesFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/FindInFilesFeatureForms.h"
+#include "widgets/ComboBoxHistoryClass.h"
 
 namespace t4p {
 // forward declaration, defined below

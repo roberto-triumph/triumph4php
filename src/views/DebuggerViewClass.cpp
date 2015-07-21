@@ -22,21 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/DebuggerViewClass.h>
-#include <Triumph.h>
-#include <globals/GlobalsClass.h>
-#include <globals/Number.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <widgets/TreeList.h>
-#include <widgets/DirPickerValidatorClass.h>
-#include <widgets/ListWidget.h>
-#include <language_php/DbgpEventClass.h>
-#include <actions/DebuggerServerActionClass.h>
-#include <code_control/CodeControlClass.h>
+#include "views/DebuggerViewClass.h"
 #include <wx/valgen.h>
 #include <map>
 #include <vector>
+#include "actions/DebuggerServerActionClass.h"
+#include "code_control/CodeControlClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/GlobalsClass.h"
+#include "globals/Number.h"
+#include "language_php/DbgpEventClass.h"
+#include "Triumph.h"
+#include "widgets/DirPickerValidatorClass.h"
+#include "widgets/ListWidget.h"
+#include "widgets/TreeList.h"
 
 static const int ID_PANEL_DEBUGGER = wxNewId();
 static const int ID_PANEL_DEBUGGER_STACK = wxNewId();

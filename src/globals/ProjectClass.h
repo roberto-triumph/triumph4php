@@ -25,10 +25,10 @@
 #ifndef SRC_GLOBALS_PROJECTCLASS_H_
 #define SRC_GLOBALS_PROJECTCLASS_H_
 
-#include <search/DirectorySearchClass.h>
-#include <globals/FileTypeClass.h>
 #include <wx/string.h>
 #include <vector>
+#include "globals/FileTypeClass.h"
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 /**

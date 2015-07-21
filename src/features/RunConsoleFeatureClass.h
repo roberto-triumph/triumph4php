@@ -25,10 +25,9 @@
 #ifndef SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_
 #define SRC_FEATURES_RUNCONSOLEFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <widgets/ProcessWithHeartbeatClass.h>
 #include <vector>
-
+#include "features/FeatureClass.h"
+#include "widgets/ProcessWithHeartbeatClass.h"
 
 namespace t4p {
 // defined below

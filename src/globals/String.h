@@ -27,9 +27,9 @@
 
 #include <unicode/unistr.h>
 #include <wx/string.h>
-#include <vector>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace t4p {
 /**

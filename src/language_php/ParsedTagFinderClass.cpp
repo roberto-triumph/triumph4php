@@ -22,21 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/ParsedTagFinderClass.h>
-#include <search/FinderClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <language_php/FileTags.h>
+#include "language_php/ParsedTagFinderClass.h"
+#include <soci/soci.h>
+#include <unicode/fmtable.h>
+#include <unicode/numfmt.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include <wx/filename.h>
 #include <algorithm>
 #include <fstream>
-#include <unicode/uchar.h>
-#include <unicode/ustring.h>
-#include <unicode/fmtable.h>
-#include <unicode/numfmt.h>
-#include <soci/soci.h>
 #include <string>
 #include <vector>
+#include "globals/Errors.h"
+#include "globals/String.h"
+#include "language_php/FileTags.h"
+#include "search/FinderClass.h"
 
 namespace t4p {
 class AllMembersTagResultClass : public t4p::ExactMemberTagResultClass {

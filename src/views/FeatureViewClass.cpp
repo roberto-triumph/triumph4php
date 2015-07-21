@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/FeatureViewClass.h>
-#include <widgets/NotebookClass.h>
-#include <widgets/AuiManager.h>
-#include <globals/Events.h>
+#include "views/FeatureViewClass.h"
 #include <wx/wupdlock.h>
 #include <map>
 #include <vector>
+#include "globals/Events.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
 
 /**
  * Checks that the given possible code control is in fact part of

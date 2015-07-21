@@ -25,9 +25,9 @@
 #ifndef SRC_MAIN_FRAME_MACCOMMONMENUBARCLASS_H_
 #define SRC_MAIN_FRAME_MACCOMMONMENUBARCLASS_H_
 
+#include <wx/app.h>
 #include <wx/event.h>
 #include <wx/menu.h>
-#include <wx/app.h>
 #include <memory>
 
 namespace t4p {

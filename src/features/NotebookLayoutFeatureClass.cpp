@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/NotebookLayoutFeatureClass.h>
+#include "features/NotebookLayoutFeatureClass.h"
 
 t4p::NotebookLayoutFeatureClass::NotebookLayoutFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

@@ -25,7 +25,7 @@
 #ifndef SRC_CODE_CONTROL_CODECONTROLSTYLES_H_
 #define SRC_CODE_CONTROL_CODECONTROLSTYLES_H_
 
-#include <globals/CodeControlOptionsClass.h>
+#include "globals/CodeControlOptionsClass.h"
 
 namespace t4p {
 /**

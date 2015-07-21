@@ -22,17 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/DebuggerFeatureClass.h>
-#include <actions/DebuggerServerActionClass.h>
-#include <globals/Errors.h>
-#include <globals/Number.h>
-#include <code_control/CodeControlClass.h>
-#include <Triumph.h>
+#include "features/DebuggerFeatureClass.h"
 #include <istream>
-#include <string>
 #include <algorithm>
 #include <map>
+#include <string>
 #include <vector>
+#include "actions/DebuggerServerActionClass.h"
+#include "code_control/CodeControlClass.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
 
 // TODO(roberto): not sure how breakpoints react when
 // file is edited (and breakpoints moves lines)

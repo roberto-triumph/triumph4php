@@ -23,17 +23,17 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <globals/String.h>
-#include <TriumphChecks.h>
-#include <ActionTestFixtureClass.h>
-#include <DatabaseTestFixtureClass.h>
-#include <SqliteTestFixtureClass.h>
-#include <FileTestFixtureClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <globals/Assets.h>
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <vector>
+#include "actions/SqlMetaDataActionClass.h"
+#include "ActionTestFixtureClass.h"
+#include "DatabaseTestFixtureClass.h"
+#include "FileTestFixtureClass.h"
+#include "globals/Assets.h"
+#include "globals/String.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 static int ID_SQL_METADATA_FETCH = wxNewId();
 

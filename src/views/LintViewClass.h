@@ -26,10 +26,12 @@
 #ifndef SRC_VIEWS_LINTVIEWCLASS_H_
 #define SRC_VIEWS_LINTVIEWCLASS_H_
 
+#include <pelet/Api.h>
 #include <vector>
-#include <views/FeatureViewClass.h>
-#include <globals/Events.h>
-#include <views/wxformbuilder/LintFeatureForms.h>
+#include "features/LintFeatureClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/LintFeatureForms.h"
 
 namespace t4p {
 // forward declaration, defined below

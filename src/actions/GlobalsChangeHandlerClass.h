@@ -25,10 +25,10 @@
 #ifndef SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_
 #define SRC_ACTIONS_GLOBALSCHANGEHANDLERCLASS_H_
 
-#include <globals/GlobalsClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <actions/ProjectTagActionClass.h>
 #include <wx/event.h>
+#include "actions/ProjectTagActionClass.h"
+#include "actions/SqlMetaDataActionClass.h"
+#include "globals/GlobalsClass.h"
 
 namespace t4p {
 /**

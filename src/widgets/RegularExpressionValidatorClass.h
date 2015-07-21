@@ -25,11 +25,11 @@
 #ifndef SRC_WIDGETS_REGULAREXPRESSIONVALIDATORCLASS_H_
 #define SRC_WIDGETS_REGULAREXPRESSIONVALIDATORCLASS_H_
 
-#include <wx/validate.h>
-#include <wx/radiobox.h>
+#include <unicode/unistr.h>
 #include <wx/combobox.h>
 #include <wx/menu.h>
-#include <unicode/unistr.h>
+#include <wx/radiobox.h>
+#include <wx/validate.h>
 
 namespace t4p {
 /**

@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/EditorMessagesViewClass.h>
-#include <features/EditorMessagesFeatureClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
+#include "views/EditorMessagesViewClass.h"
 #include <map>
 #include <vector>
+#include "features/EditorMessagesFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
 
 static const int ID_DEBUG_WINDOW = wxNewId();
 

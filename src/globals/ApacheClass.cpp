@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/ApacheClass.h>
+#include "globals/ApacheClass.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/textfile.h>

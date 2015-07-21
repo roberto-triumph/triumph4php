@@ -27,13 +27,13 @@
 
 #include <wx/aui/aui.h>
 #include <wx/frame.h>
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <widgets/NotebookClass.h>
-#include <widgets/AuiManager.h>
-#include <globals/GlobalsClass.h>
-#include <features/FeatureClass.h>
-#include <views/FeatureViewClass.h>
-#include <Triumph.h>
+#include "features/FeatureClass.h"
+#include "globals/GlobalsClass.h"
+#include "Triumph.h"
+#include "views/FeatureViewClass.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
+#include "widgets/StatusBarWithGaugeClass.h"
 
 /**
  * The TestApp class takes care of initializing a

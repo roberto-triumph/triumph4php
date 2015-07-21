@@ -23,8 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <language_php/DatabaseTableTagClass.h>
-
+#include "language_php/DatabaseTableTagClass.h"
 
 t4p::DatabaseTableTagClass::DatabaseTableTagClass()
 : TableName()

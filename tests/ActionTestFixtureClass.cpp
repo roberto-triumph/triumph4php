@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <ActionTestFixtureClass.h>
+#include "ActionTestFixtureClass.h"
 
 ActionTestFixtureClass::ActionTestFixtureClass()
 	: wxEvtHandler()

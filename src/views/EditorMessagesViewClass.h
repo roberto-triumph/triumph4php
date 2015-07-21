@@ -25,9 +25,9 @@
 #ifndef SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_
 #define SRC_VIEWS_EDITORMESSAGESVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/EditorMessagesFeatureForms.h>
 #include <vector>
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/EditorMessagesFeatureForms.h"
 
 namespace t4p {
 // forward declaration, defined in another file

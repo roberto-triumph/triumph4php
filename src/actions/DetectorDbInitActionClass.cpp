@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 
-#include <actions/DetectorDbInitActionClass.h>
+#include "actions/DetectorDbInitActionClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>

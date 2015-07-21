@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/BookmarkViewClass.h>
-#include <features/BookmarkFeatureClass.h>
-#include <code_control/CodeControlClass.h>
+#include "views/BookmarkViewClass.h"
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/BookmarkFeatureClass.h"
 
 t4p::BookmarkViewClass::BookmarkViewClass(t4p::BookmarkFeatureClass& feature)
 : FeatureViewClass()

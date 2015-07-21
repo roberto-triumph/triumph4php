@@ -26,8 +26,8 @@
 #define SRC_LANGUAGE_PHP_DETECTORDBCLASS_H_
 
 #include <soci/soci.h>
-#include <globals/Sqlite.h>
 #include <wx/filename.h>
+#include "globals/Sqlite.h"
 
 namespace t4p {
 /**

@@ -25,10 +25,10 @@
 #ifndef SRC_LANGUAGE_PHP_FILETAGS_H_
 #define SRC_LANGUAGE_PHP_FILETAGS_H_
 
-#include <language_php/PhpTagClass.h>
-#include <wx/filename.h>
 #include <soci/soci.h>
+#include <wx/filename.h>
 #include <vector>
+#include "language_php/PhpTagClass.h"
 
 namespace t4p {
 	/**

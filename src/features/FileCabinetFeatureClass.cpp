@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FileCabinetFeatureClass.h>
-#include <Triumph.h>
-#include <globals/Assets.h>
+#include "features/FileCabinetFeatureClass.h"
+#include "globals/Assets.h"
+#include "Triumph.h"
 
 t4p::FileCabinetFeatureClass::FileCabinetFeatureClass(t4p::AppClass& app)
 : FeatureClass(app)

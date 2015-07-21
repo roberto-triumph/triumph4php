@@ -25,11 +25,11 @@
 #ifndef SRC_FEATURES_CONFIGFILESFEATURECLASS_H_
 #define SRC_FEATURES_CONFIGFILESFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <language_php/ConfigTagClass.h>
-#include <globals/Events.h>
-#include <actions/ActionClass.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/ConfigTagClass.h"
 
 namespace t4p {
 /**

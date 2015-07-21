@@ -25,8 +25,8 @@
 #ifndef SRC_FEATURES_RECENTFILESFEATURECLASS_H_
 #define SRC_FEATURES_RECENTFILESFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
 #include <wx/docview.h>
+#include "features/FeatureClass.h"
 
 namespace t4p {
 extern const int MAX_RECENT_FILES;

@@ -25,9 +25,9 @@
 #ifndef SRC_LANGUAGE_PHP_KEYWORDS_H_
 #define SRC_LANGUAGE_PHP_KEYWORDS_H_
 
+#include <pelet/TokenClass.h>
 #include <wx/string.h>
 #include <vector>
-#include <pelet/TokenClass.h>
 
 namespace t4p {
 /**

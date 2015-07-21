@@ -22,28 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/OutlineFeatureClass.h>
-#include <views/OutlineViewClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
-#include <globals/TagList.h>
-#include <code_control/CodeControlClass.h>
-#include <language_php/TagParserClass.h>
-#include <globals/Sqlite.h>
-#include <globals/Number.h>
-#include <widgets/TreeItemDataStringClass.h>
-#include <widgets/Buttons.h>
-#include <Triumph.h>
+#include "views/OutlineViewClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <unicode/regex.h>
 #include <wx/artprov.h>
 #include <wx/tokenzr.h>
-#include <vector>
 #include <algorithm>
 #include <map>
-
+#include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/OutlineFeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
+#include "globals/TagList.h"
+#include "language_php/TagParserClass.h"
+#include "Triumph.h"
+#include "widgets/Buttons.h"
+#include "widgets/TreeItemDataStringClass.h"
 
 static int ID_WINDOW_OUTLINE = wxNewId();
 static int ID_OUTLINE_MENU_DELETE = wxNewId();

@@ -22,18 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/LintFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
+#include "features/LintFeatureClass.h"
+#include <unicode/unistr.h>
+#include <wx/ffile.h>
+#include <wx/tokenzr.h>
 #include <map>
 #include <vector>
-#include <Triumph.h>
-#include <globals/Events.h>
-#include <globals/Number.h>
-#include <unicode/unistr.h>
-#include <wx/tokenzr.h>
-#include <wx/ffile.h>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Events.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
 
 /**
  * any files bigger than this size will NOT be

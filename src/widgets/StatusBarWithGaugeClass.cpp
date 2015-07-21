@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/StatusBarWithGaugeClass.h>
+#include "widgets/StatusBarWithGaugeClass.h"
 #include <map>
 
 t4p::StatusBarWithGaugeClass::StatusBarWithGaugeClass(wxWindow *parent, int id)

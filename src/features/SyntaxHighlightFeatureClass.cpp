@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/SyntaxHighlightFeatureClass.h>
-#include <Triumph.h>
+#include "features/SyntaxHighlightFeatureClass.h"
+#include "Triumph.h"
 
 t4p::SyntaxHighlightFeatureClass::SyntaxHighlightFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

@@ -22,22 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/ProjectViewClass.h>
-#include <widgets/NonEmptyTextValidatorClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <Triumph.h>
+#include "views/ProjectViewClass.h"
 #include <wx/artprov.h>
-#include <wx/platinfo.h>
-#include <wx/filename.h>
-#include <wx/fileconf.h>
-#include <wx/valgen.h>
+#include <wx/choicdlg.h>
 #include <wx/dir.h>
 #include <wx/dirdlg.h>
-#include <wx/choicdlg.h>
+#include <wx/fileconf.h>
+#include <wx/filename.h>
+#include <wx/platinfo.h>
+#include <wx/valgen.h>
 #include <algorithm>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/NonEmptyTextValidatorClass.h"
 
 t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 	: FeatureViewClass()

@@ -26,8 +26,8 @@
 #ifndef SRC_GLOBALS_SQLITEFINDERCLASS_H_
 #define SRC_GLOBALS_SQLITEFINDERCLASS_H_
 
-#include <globals/SqliteResultClass.h>
 #include <soci/soci.h>
+#include "globals/SqliteResultClass.h"
 
 namespace t4p {
 /**

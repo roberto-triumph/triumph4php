@@ -25,7 +25,7 @@
 #ifndef SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_
 #define SRC_MAIN_FRAME_SETTINGSDIRECTORYPANELCLASS_H_
 
-#include <main_frame/wxformbuilder/MainFrameForms.h>
+#include "main_frame/wxformbuilder/MainFrameForms.h"
 
 namespace t4p {
 class SettingsDirectoryPanelClass : public SettingsDirectoryGeneratedPanelClass {

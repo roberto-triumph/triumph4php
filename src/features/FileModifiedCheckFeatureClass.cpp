@@ -22,10 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/FileModifiedCheckFeatureClass.h>
-#include <actions/FileModifiedCheckActionClass.h>
-#include <Triumph.h>
+#include "features/FileModifiedCheckFeatureClass.h"
 #include <vector>
+#include "actions/FileModifiedCheckActionClass.h"
+#include "Triumph.h"
 
 const int t4p::ID_FILE_MODIFIED_ACTION = wxNewId();
 

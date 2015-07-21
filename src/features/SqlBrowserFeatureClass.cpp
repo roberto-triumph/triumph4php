@@ -22,18 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/SqlBrowserFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Number.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <Triumph.h>
+#include "features/SqlBrowserFeatureClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
 #include <wx/sstream.h>
 #include <algorithm>
 #include <vector>
-
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
 
 t4p::QueryCompleteEventClass::QueryCompleteEventClass(t4p::SqlResultClass* results, int eventId)
 : wxEvent(eventId, t4p::QUERY_COMPLETE_EVENT)

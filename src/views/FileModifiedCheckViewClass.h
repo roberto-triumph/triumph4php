@@ -25,9 +25,9 @@
 #ifndef SRC_VIEWS_FILEMODIFIEDCHECKVIEWCLASS_H_
 #define SRC_VIEWS_FILEMODIFIEDCHECKVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <actions/FileModifiedCheckActionClass.h>
 #include <map>
+#include "actions/FileModifiedCheckActionClass.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 // forward declaration, defined in another file

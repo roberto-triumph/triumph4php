@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/GlobalActionClass.h>
+#include "actions/GlobalActionClass.h"
 
 t4p::GlobalActionClass::GlobalActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: ActionClass(runningThreads, eventId) {

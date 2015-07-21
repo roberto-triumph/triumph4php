@@ -23,11 +23,11 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <FileTestFixtureClass.h>
-#include <TriumphChecks.h>
-#include <language_php/LintSuppressionClass.h>
 #include <unicode/unistr.h>
 #include <vector>
+#include "FileTestFixtureClass.h"
+#include "language_php/LintSuppressionClass.h"
+#include "TriumphChecks.h"
 
 class LintSuppressionFixtureClass : public FileTestFixtureClass {
 	public:

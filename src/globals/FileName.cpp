@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/FileName.h>
+#include "globals/FileName.h"
 #include <vector>
 
 wxFileName t4p::FileNameCopy(const wxFileName& fileName) {

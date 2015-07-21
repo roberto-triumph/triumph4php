@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/CacheDbVersionActionClass.h>
-#include <globals/Assets.h>
-#include <globals/Errors.h>
+#include "actions/CacheDbVersionActionClass.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
 
 /**
  * This number must match the number on the schema_version table

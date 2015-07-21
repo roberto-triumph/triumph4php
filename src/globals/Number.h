@@ -55,4 +55,5 @@ bool NumberLessThan(int a, unsigned int b);
 bool NumberEqualTo(int a, unsigned int b);
 }  // namespace t4p
 
+#include "globals/Number.h"
 #endif  // SRC_GLOBALS_NUMBER_H_

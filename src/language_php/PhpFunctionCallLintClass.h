@@ -25,10 +25,10 @@
 #ifndef SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_
 #define SRC_LANGUAGE_PHP_PHPFUNCTIONCALLLINTCLASS_H_
 
-#include <language_php/ParsedTagFinderClass.h>
 #include <pelet/ParserClass.h>
 #include <unicode/unistr.h>
 #include <vector>
+#include "language_php/ParsedTagFinderClass.h"
 
 namespace t4p {
 // forward declaration, defined in another file

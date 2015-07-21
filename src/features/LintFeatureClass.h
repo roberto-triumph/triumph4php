@@ -27,16 +27,16 @@
 #define SRC_FEATURES_LINTFEATURECLASS_H_
 
 #include <vector>
-#include <features/FeatureClass.h>
-#include <globals/Events.h>
-#include <actions/ActionClass.h>
-#include <search/DirectorySearchClass.h>
-#include <features/BackgroundFileReaderClass.h>
-#include <language_php/PhpVariableLintClass.h>
-#include <language_php/PhpIdentifierLintClass.h>
-#include <language_php/LintSuppressionClass.h>
-#include <language_php/PhpFunctionCallLintClass.h>
-#include <language_php/TagCacheClass.h>
+#include "actions/ActionClass.h"
+#include "features/BackgroundFileReaderClass.h"
+#include "features/FeatureClass.h"
+#include "globals/Events.h"
+#include "language_php/LintSuppressionClass.h"
+#include "language_php/PhpFunctionCallLintClass.h"
+#include "language_php/PhpIdentifierLintClass.h"
+#include "language_php/PhpVariableLintClass.h"
+#include "language_php/TagCacheClass.h"
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 // forward declaration, defined below

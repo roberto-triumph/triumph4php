@@ -26,9 +26,9 @@
 #define SRC_WIDGETS_PROCESSWITHHEARTBEATCLASS_H_
 
 #include <wx/event.h>
-#include <wx/timer.h>
-#include <wx/process.h>
 #include <wx/filename.h>
+#include <wx/process.h>
+#include <wx/timer.h>
 #include <map>
 
 namespace t4p {

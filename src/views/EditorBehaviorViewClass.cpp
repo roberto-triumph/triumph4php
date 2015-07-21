@@ -22,18 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/EditorBehaviorViewClass.h>
-#include <features/EditorBehaviorFeatureClass.h>
-#include <globals/Assets.h>
-#include <code_control/CodeControlClass.h>
-#include <widgets/NotebookClass.h>
-#include <main_frame/PreferencesClass.h>
-#include <widgets/AuiManager.h>
-#include <Triumph.h>
-#include <wx/valgen.h>
+#include "views/EditorBehaviorViewClass.h"
 #include <wx/stc/stc.h>
+#include <wx/valgen.h>
 #include <map>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "features/EditorBehaviorFeatureClass.h"
+#include "globals/Assets.h"
+#include "main_frame/PreferencesClass.h"
+#include "Triumph.h"
+#include "widgets/AuiManager.h"
+#include "widgets/NotebookClass.h"
 
 static int ID_SUBMENU_TRANSFORM = wxNewId();
 static int ID_SUBMENU_SELECTION = wxNewId();

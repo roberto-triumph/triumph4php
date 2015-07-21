@@ -25,8 +25,8 @@
 #ifndef SRC_WIDGETS_GAUGEDIALOGCLASS_H_
 #define SRC_WIDGETS_GAUGEDIALOGCLASS_H_
 
-#include <widgets/wxformbuilder/GaugeDialogWidget.h>
 #include <wx/timer.h>
+#include "widgets/wxformbuilder/GaugeDialogWidget.h"
 
 namespace t4p {
 /**

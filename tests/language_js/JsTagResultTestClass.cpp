@@ -23,14 +23,14 @@
  * THE SOFTWARE.
  */
 #include <UnitTest++.h>
-#include <SqliteTestFixtureClass.h>
-#include <language_js/JsTagResultClass.h>
-#include <globals/Assets.h>
-#include <language_php/PhpTagClass.h>
-#include <language_php/FileTags.h>
-#include <TriumphChecks.h>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "language_js/JsTagResultClass.h"
+#include "language_php/FileTags.h"
+#include "language_php/PhpTagClass.h"
+#include "SqliteTestFixtureClass.h"
+#include "TriumphChecks.h"
 
 class JsTagResultFixtureClass : SqliteTestFixtureClass {
 	public:

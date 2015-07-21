@@ -22,18 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/SequenceClass.h>
-#include <actions/ProjectTagActionClass.h>
-#include <actions/SqlMetaDataActionClass.h>
-#include <actions/TagWipeActionClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <actions/TagDetectorActionClass.h>
-#include <actions/DatabaseTagDetectorActionClass.h>
-#include <actions/CacheDbVersionActionClass.h>
-#include <actions/ConfigTagDetectorActionClass.h>
-#include <actions/DetectorDbInitActionClass.h>
-#include <globals/Errors.h>
+#include "actions/SequenceClass.h"
 #include <vector>
+#include "actions/CacheDbVersionActionClass.h"
+#include "actions/ConfigTagDetectorActionClass.h"
+#include "actions/DatabaseTagDetectorActionClass.h"
+#include "actions/DetectorDbInitActionClass.h"
+#include "actions/ProjectTagActionClass.h"
+#include "actions/SqlMetaDataActionClass.h"
+#include "actions/TagDetectorActionClass.h"
+#include "actions/TagWipeActionClass.h"
+#include "actions/UrlTagDetectorActionClass.h"
+#include "globals/Errors.h"
 
 t4p::SequenceClass::SequenceClass(t4p::GlobalsClass& globals, t4p::RunningThreadsClass& runningThreads)
 	: wxEvtHandler()

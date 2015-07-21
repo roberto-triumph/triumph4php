@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_
 #define SRC_VIEWS_RUNCONSOLEVIEWCLASS_H_
 
-#include <views/wxformbuilder/RunConsoleFeatureForms.h>
-#include <views/FeatureViewClass.h>
-#include <features/RunConsoleFeatureClass.h>
 #include <vector>
+#include "features/RunConsoleFeatureClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/RunConsoleFeatureForms.h"
 
 namespace t4p {
 // forward declaration, defined below

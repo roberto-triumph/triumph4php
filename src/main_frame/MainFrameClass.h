@@ -25,17 +25,17 @@
 #ifndef SRC_MAIN_FRAME_MAINFRAMECLASS_H_
 #define SRC_MAIN_FRAME_MAINFRAMECLASS_H_
 
-#include <globals/ProjectClass.h>
-#include <main_frame/wxformbuilder/MainFrameForms.h>
-#include <widgets/StatusBarWithGaugeClass.h>
-#include <main_frame/PreferencesClass.h>
-#include <globals/Events.h>
-#include <actions/ActionClass.h>
-#include <actions/SequenceClass.h>
 #include <wx/aui/aui.h>
-#include <wx/wizard.h>
 #include <wx/stc/stc.h>
+#include <wx/wizard.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "actions/SequenceClass.h"
+#include "globals/Events.h"
+#include "globals/ProjectClass.h"
+#include "main_frame/PreferencesClass.h"
+#include "main_frame/wxformbuilder/MainFrameForms.h"
+#include "widgets/StatusBarWithGaugeClass.h"
 
 namespace t4p {
 // forward declaration to prevent recursive dependencies

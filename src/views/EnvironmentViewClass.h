@@ -25,12 +25,12 @@
 #ifndef SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_
 #define SRC_VIEWS_ENVIRONMENTVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <views/wxformbuilder/EnvironmentFeatureForms.h>
-#include <globals/EnvironmentClass.h>
-#include <actions/ActionClass.h>
 #include <map>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "globals/EnvironmentClass.h"
+#include "views/FeatureViewClass.h"
+#include "views/wxformbuilder/EnvironmentFeatureForms.h"
 
 namespace t4p {
 // forward declaration, declared in another file

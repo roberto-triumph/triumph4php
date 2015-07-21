@@ -22,16 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/CallStackClass.h>
-#include <globals/String.h>
-#include <globals/Assets.h>
-#include <algorithm>
+#include "language_php/CallStackClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <globals/Sqlite.h>
 #include <wx/ffile.h>
+#include <algorithm>
 #include <string>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Sqlite.h"
+#include "globals/String.h"
 
 t4p::VariableSymbolClass::VariableSymbolClass()
 	: Type(t4p::VariableSymbolClass::SCALAR)

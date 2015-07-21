@@ -22,17 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/ProjectFeatureClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <Triumph.h>
-#include <wx/platinfo.h>
-#include <wx/filename.h>
-#include <wx/fileconf.h>
+#include "features/ProjectFeatureClass.h"
 #include <wx/dir.h>
+#include <wx/fileconf.h>
+#include <wx/filename.h>
+#include <wx/platinfo.h>
 #include <algorithm>
 #include <vector>
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
 
 t4p::ProjectFeatureClass::ProjectFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app) {

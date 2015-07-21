@@ -22,15 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/RunConsoleFeatureClass.h>
-#include <globals/String.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <Triumph.h>
+#include "features/RunConsoleFeatureClass.h"
 #include <wx/filename.h>
 #include <wx/sstream.h>
-
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "globals/String.h"
+#include "Triumph.h"
 
 static const int ID_PROCESS = wxNewId();
 

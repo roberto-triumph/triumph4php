@@ -25,11 +25,11 @@
 #ifndef SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_
 #define SRC_WIDGETS_CHOOSEURLDIALOGCLASS_H_
 
-#include <widgets/wxformbuilder/ChooseUrlDialogWidget.h>
-#include <language_php/UrlTagClass.h>
-#include <globals/ProjectClass.h>
 #include <wx/wx.h>
 #include <vector>
+#include "globals/ProjectClass.h"
+#include "language_php/UrlTagClass.h"
+#include "widgets/wxformbuilder/ChooseUrlDialogWidget.h"
 
 namespace t4p {
 /**

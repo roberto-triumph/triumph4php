@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/EditorBehaviorFeatureClass.h>
-#include <globals/Assets.h>
-#include <main_frame/PreferencesClass.h>
-#include <Triumph.h>
-#include <wx/valgen.h>
+#include "features/EditorBehaviorFeatureClass.h"
 #include <wx/stc/stc.h>
+#include <wx/valgen.h>
 #include <vector>
+#include "globals/Assets.h"
+#include "main_frame/PreferencesClass.h"
+#include "Triumph.h"
 
 static int SciCommands[][2] = {
 { t4p::MENU_BEHAVIOR + 20, wxSTC_CMD_LINECUT },

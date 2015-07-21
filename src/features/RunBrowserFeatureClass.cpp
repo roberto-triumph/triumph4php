@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/RunBrowserFeatureClass.h>
-#include <actions/UrlTagDetectorActionClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
-#include <globals/Number.h>
-#include <widgets/ChooseUrlDialogClass.h>
-#include <Triumph.h>
+#include "features/RunBrowserFeatureClass.h"
 #include <wx/artprov.h>
 #include <algorithm>
+#include "actions/UrlTagDetectorActionClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "globals/Number.h"
+#include "Triumph.h"
+#include "widgets/ChooseUrlDialogClass.h"
 
 t4p::RunBrowserFeatureClass::RunBrowserFeatureClass(t4p::AppClass& app)
 	: FeatureClass(app)

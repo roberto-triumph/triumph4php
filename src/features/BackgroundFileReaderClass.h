@@ -25,11 +25,11 @@
 #ifndef SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_
 #define SRC_FEATURES_BACKGROUNDFILEREADERCLASS_H_
 
-#include <wx/string.h>
 #include <wx/event.h>
-#include <actions/ActionClass.h>
-#include <search/DirectorySearchClass.h>
+#include <wx/string.h>
 #include <vector>
+#include "actions/ActionClass.h"
+#include "search/DirectorySearchClass.h"
 
 namespace t4p {
 /**

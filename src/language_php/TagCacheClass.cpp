@@ -22,17 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <language_php/TagCacheClass.h>
-#include <language_php/TagFinderList.h>
-#include <language_php/DetectedTagFinderResultClass.h>
-#include <globals/Assets.h>
-#include <globals/Sqlite.h>
-#include <globals/GlobalsClass.h>
+#include "language_php/TagCacheClass.h"
 #include <soci/soci.h>
 #include <soci/sqlite3/soci-sqlite3.h>
+#include <algorithm>
 #include <map>
 #include <vector>
-#include <algorithm>
+#include "globals/Assets.h"
+#include "globals/GlobalsClass.h"
+#include "globals/Sqlite.h"
+#include "language_php/DetectedTagFinderResultClass.h"
+#include "language_php/TagFinderList.h"
 
 /**
  * Fills completeStatus with a human-friendly version of the symbol table error

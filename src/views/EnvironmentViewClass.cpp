@@ -22,15 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <views/EnvironmentViewClass.h>
-#include <features/EnvironmentFeatureClass.h>
-#include <widgets/NonEmptyTextValidatorClass.h>
-#include <widgets/ListWidget.h>
-#include <Triumph.h>
-#include <wx/valgen.h>
+#include "views/EnvironmentViewClass.h"
 #include <wx/msgdlg.h>
+#include <wx/valgen.h>
 #include <map>
 #include <vector>
+#include "features/EnvironmentFeatureClass.h"
+#include "Triumph.h"
+#include "widgets/ListWidget.h"
+#include "widgets/NonEmptyTextValidatorClass.h"
 
 static int ID_APACHE_FILE_READER = wxNewId();
 

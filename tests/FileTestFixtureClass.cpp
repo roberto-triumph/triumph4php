@@ -22,12 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <FileTestFixtureClass.h>
+#include "FileTestFixtureClass.h"
 #include <wx/dir.h>
 #include <wx/filename.h>
 #include <wx/utils.h>
 #include <fstream>
-
 
 FileTestFixtureClass::FileTestFixtureClass(const wxString& tempTestDirectory) {
 	wxFileName tempDir;

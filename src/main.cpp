@@ -29,19 +29,19 @@
 //
 // in MSW
 #include <boost/asio.hpp>
-#include <vector>
-#include <Triumph.h>
-#include <wx/cmdline.h>
-#include <wx/fileconf.h>
-#include <unicode/uclean.h>
 #include <soci/mysql/soci-mysql.h>
 #include <soci/sqlite3/soci-sqlite3.h>
-#include <main_frame/MainFrameClass.h>
-#include <main_frame/MacCommonMenuBarClass.h>
-#include <features/FeatureClass.h>
-#include <views/FeatureViewClass.h>
-#include <globals/Errors.h>
-#include <globals/Assets.h>
+#include <unicode/uclean.h>
+#include <wx/cmdline.h>
+#include <wx/fileconf.h>
+#include <vector>
+#include "features/FeatureClass.h"
+#include "globals/Assets.h"
+#include "globals/Errors.h"
+#include "main_frame/MacCommonMenuBarClass.h"
+#include "main_frame/MainFrameClass.h"
+#include "Triumph.h"
+#include "views/FeatureViewClass.h"
 
 static int ID_EVENT_CONFIG_FILE_CHECK = wxNewId();
 

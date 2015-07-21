@@ -25,9 +25,9 @@
 #ifndef TESTS_FILETESTFIXTURECLASS_H_
 #define TESTS_FILETESTFIXTURECLASS_H_
 
-#include <TriumphChecks.h>
 #include <wx/filename.h>
 #include <iostream>
+#include "TriumphChecks.h"
 
 /**
  * This test fixture is useful for testing classes that read from files.

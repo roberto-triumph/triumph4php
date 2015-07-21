@@ -22,18 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <wx/wx.h>
+#include <unicode/uclean.h>
 #include <wx/dnd.h>
 #include <wx/filename.h>
-#include <unicode/uclean.h>
-#include <globals/CodeControlOptionsClass.h>
-#include <globals/Assets.h>
-#include <globals/Events.h>
-#include <globals/GlobalsClass.h>
-#include <language_php/TagFinderList.h>
-#include <code_control/CodeControlStyles.h>
-#include <code_control/CodeControlClass.h>
-#include <search/FindInFilesClass.h>
+#include <wx/wx.h>
+#include "code_control/CodeControlClass.h"
+#include "code_control/CodeControlStyles.h"
+#include "globals/Assets.h"
+#include "globals/CodeControlOptionsClass.h"
+#include "globals/Events.h"
+#include "globals/GlobalsClass.h"
+#include "language_php/TagFinderList.h"
+#include "search/FindInFilesClass.h"
 
 /**
  * This profiler can be used to test the speediness of the code editing control.

@@ -22,15 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <globals/Sqlite.h>
-#include <globals/String.h>
-#include <wx/ffile.h>
+#include "globals/Sqlite.h"
 #include <soci/sqlite3/soci-sqlite3.h>
 #include <sqlite3.h>
+#include <wx/ffile.h>
 #include <algorithm>
 #include <string>
 #include <vector>
-
+#include "globals/String.h"
 
 std::string t4p::SqliteSqlLikeEscape(const std::string& value, char e) {
 	std::string escaped;

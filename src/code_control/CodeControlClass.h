@@ -25,17 +25,16 @@
 #ifndef SRC_CODE_CONTROL_CODECONTROLCLASS_H_
 #define SRC_CODE_CONTROL_CODECONTROLCLASS_H_
 
-#include <globals/CodeControlOptionsClass.h>
-#include <search/FinderClass.h>
-#include <language_php/PhpTagClass.h>
-#include <language_sql/DatabaseTagClass.h>
-#include <globals/FileTypeClass.h>
 #include <pelet/ParserClass.h>
+#include <unicode/unistr.h>
 #include <wx/stc/stc.h>
 #include <wx/timer.h>
-#include <unicode/unistr.h>
-
 #include <vector>
+#include "globals/CodeControlOptionsClass.h"
+#include "globals/FileTypeClass.h"
+#include "language_php/PhpTagClass.h"
+#include "language_sql/DatabaseTagClass.h"
+#include "search/FinderClass.h"
 
 namespace t4p {
 // some forward declarations to prevent re-compilation as much as possible

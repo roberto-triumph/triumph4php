@@ -25,10 +25,10 @@
 #ifndef SRC_GLOBALS_ENVIRONMENTCLASS_H_
 #define SRC_GLOBALS_ENVIRONMENTCLASS_H_
 
-#include <globals/ApacheClass.h>
 #include <pelet/TokenClass.h>
-#include <vector>
 #include <wx/config.h>
+#include <vector>
+#include "globals/ApacheClass.h"
 
 namespace t4p {
 /**

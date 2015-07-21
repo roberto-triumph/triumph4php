@@ -22,8 +22,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <features/DocCommentFeatureClass.h>
-#include <Triumph.h>
+#include "features/DocCommentFeatureClass.h"
+#include "Triumph.h"
 
 t4p::DocCommentFeatureClass::DocCommentFeatureClass(t4p::AppClass& app)
 : FeatureClass(app) {

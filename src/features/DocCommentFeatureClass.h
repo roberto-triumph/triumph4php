@@ -25,9 +25,9 @@
 #ifndef SRC_FEATURES_DOCCOMMENTFEATURECLASS_H_
 #define SRC_FEATURES_DOCCOMMENTFEATURECLASS_H_
 
-#include <features/FeatureClass.h>
-#include <views/wxformbuilder/DocCommentFeatureForms.h>
 #include <wx/hyperlink.h>
+#include "features/FeatureClass.h"
+#include "views/wxformbuilder/DocCommentFeatureForms.h"
 
 namespace t4p {
 // forward declaration, defined in another file

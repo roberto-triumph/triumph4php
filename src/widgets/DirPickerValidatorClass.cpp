@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <widgets/DirPickerValidatorClass.h>
+#include "widgets/DirPickerValidatorClass.h"
 #include <wx/filepicker.h>
 #include <wx/msgdlg.h>
 

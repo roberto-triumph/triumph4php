@@ -25,10 +25,10 @@
 #ifndef SRC_VIEWS_HTMLVIEWCLASS_H_
 #define SRC_VIEWS_HTMLVIEWCLASS_H_
 
-#include <views/FeatureViewClass.h>
-#include <code_control/CodeControlClass.h>
-#include <globals/Events.h>
 #include <vector>
+#include "code_control/CodeControlClass.h"
+#include "globals/Events.h"
+#include "views/FeatureViewClass.h"
 
 namespace t4p {
 /**

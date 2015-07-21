@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include <actions/ProjectTagActionClass.h>
-#include <code_control/ResourceCacheBuilderClass.h>
-#include <search/RecursiveDirTraverserClass.h>
-#include <globals/Assets.h>
+#include "actions/ProjectTagActionClass.h"
 #include <vector>
+#include "code_control/ResourceCacheBuilderClass.h"
+#include "globals/Assets.h"
+#include "search/RecursiveDirTraverserClass.h"
 
 t4p::ProjectTagActionClass::ProjectTagActionClass(t4p::RunningThreadsClass& runningThreads, int eventId)
 	: GlobalActionClass(runningThreads, eventId)
