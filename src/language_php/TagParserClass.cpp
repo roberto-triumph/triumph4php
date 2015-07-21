@@ -748,7 +748,8 @@ void t4p::TagParserClass::Print() {
 				break;
 		}
 	}
-	for (std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it = TraitCache.begin(); it != TraitCache.end(); ++it) {
+	std::map<UnicodeString, std::vector<t4p::TraitTagClass>, UnicodeStringComparatorClass>::const_iterator it;
+	for (it = TraitCache.begin(); it != TraitCache.end(); ++it) {
 		u_fprintf(out, "TRAITS USED BY: %.*S\n",
 			it->first.length(), it->first.getBuffer());
 		std::vector<t4p::TraitTagClass> traits =  it->second;

@@ -69,11 +69,15 @@ class ChangeDialogGeneratedClass : public wxDialog {
 		wxButton* m_sdbSizer1Cancel;
 
 	public:
-	ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
+	ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id = wxID_ANY,
+		const wxString& title = wxT("Change"), const wxPoint& pos = wxDefaultPosition,
+		const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE);
 	~ChangeDialogGeneratedClass();
 };
 
-ChangeDialogGeneratedClass::ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxDialog(parent, id, title, pos, size, style) {
+ChangeDialogGeneratedClass::ChangeDialogGeneratedClass(wxWindow* parent, wxWindowID id,
+	const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+: wxDialog(parent, id, title, pos, size, style) {
 	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
 
 	wxFlexGridSizer* BodySizer;

@@ -293,7 +293,8 @@ t4p::FileListingWidgetClass::~FileListingWidgetClass() {
 	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_CSS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
 	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_JS, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
 	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_TEXT, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateNew), NULL, this);
-	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_DIRECTORY, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateDirectory), NULL, this);
+	ParentPanel->Disconnect(ID_EXPLORER_LIST_CREATE_DIRECTORY, wxEVT_MENU,
+		wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuCreateDirectory), NULL, this);
 	ParentPanel->Disconnect(ID_EXPLORER_LIST_SHELL, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuShell), NULL, this);
 	ParentPanel->Disconnect(ID_EXPLORER_LIST_FILE_MANAGER, wxEVT_MENU, wxCommandEventHandler(t4p::FileListingWidgetClass::OnListMenuFileManager), NULL, this);
 }

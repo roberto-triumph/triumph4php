@@ -78,11 +78,13 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 			break;
 		case t4p::ERR_MISSING_KEYBOARD_SHORTCUT:
 			msg = t4p::MessageWithFix(_("Could not find menu item for shortcut. ") + extra,
-				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
+				_("All other menu shortcuts were loaded successfully and are functional. ") +
+				_("If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
 			break;
 		case t4p::ERR_CORRUPT_KEYBOARD_SHORTCUT:
 			msg = t4p::MessageWithFix(_("Could not load menu shortcuts from config file. ") + extra,
-				_("All other menu shortcuts were loaded successfully and are functional. If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
+				_("All other menu shortcuts were loaded successfully and are functional. ") +
+				_("If you want to get rid of this message; Go to Edit ... Preferences, then Click OK to re-write the config file."));
 			break;
 		case t4p::ERR_INVALID_FILE:
 			msg = t4p::MessageWithFix(_("Could not load file: ") + extra,
@@ -98,11 +100,13 @@ wxString MessageFromError(t4p::Errors error, const wxString& extra) {
 			break;
 		case t4p::ERR_INVALID_SETTINGS_DIRECTORY:
 			msg = t4p::MessageWithFix(_("Settings directory does not exist:") + extra,
-				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \nOR go to Edit ... Preferences and choose a different settings directory."));
+				_("Does the directory exist?\nDo you have access rights?\nRestore the directory \n") +
+				_("OR go to Edit ... Preferences and choose a different settings directory."));
 			break;
 		case t4p::ERR_TAG_READ:
 			msg = t4p::MessageWithFix(_("Could not read tag sqlite file:") + extra,
-				_("Does the file exist?\nDo you have access rights?\nRestore the settings directory \nOR go to Edit ... Preferences and choose a different settings directory."));
+				_("Does the file exist?\nDo you have access rights?\nRestore the settings directory \n") +
+				_("OR go to Edit ... Preferences and choose a different settings directory."));
 			break;
 		default:
 			break;

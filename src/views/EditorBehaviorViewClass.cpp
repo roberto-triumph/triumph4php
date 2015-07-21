@@ -278,7 +278,8 @@ void t4p::EditorBehaviorViewClass::AddKeyboardCommands(wxMenu* menu, bool isText
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDLEFTENDEXTEND), _("Expand selection to the end of previous word"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDRIGHTENDEXTEND), _("Expand selection to the end of next word"));
 	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTLEFTEXTEND), _("Expand selection to the previous word segment"));  // \tCTRL+SHIFT+/
-	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND), _("Expand selection to the end of next word segment"));  // \tCTRL+SHIFT+backslash
+	selectionMenu->Append(Feature.SciCommandToMenuId(wxSTC_CMD_WORDPARTRIGHTEXTEND),
+		_("Expand selection to the end of next word segment"));  // \tCTRL+SHIFT+backslash
 
 	//?? not sure what these do
 	// SCI_WORDLEFTEND

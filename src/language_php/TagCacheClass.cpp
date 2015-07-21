@@ -547,7 +547,8 @@ void t4p::TagCacheClass::Clear() {
 	WorkingCaches.clear();
 }
 
-std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName, int fileTagId, std::vector<wxFileName>& sourceDirs) {
+std::vector<t4p::PhpTagClass> t4p::TagCacheClass::AllMemberTags(const UnicodeString& fullyQualifiedClassName,
+	int fileTagId, std::vector<wxFileName>& sourceDirs) {
 	std::vector<t4p::PhpTagClass> allMatches;
 
 	// add the double colon so that we search for all members

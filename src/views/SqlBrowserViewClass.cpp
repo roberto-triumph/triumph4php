@@ -1552,7 +1552,8 @@ std::vector<wxString> t4p::SqlCodeCompletionProviderClass::HandleAutoCompletionM
 	return autoCompleteList;
 }
 
-void t4p::SqlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+void t4p::SqlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl,
+	std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 	int currentPos = ctrl->GetCurrentPos();
 	int startPos = ctrl->WordStartPosition(currentPos, true);
 	int endPos = ctrl->WordEndPosition(currentPos, true);

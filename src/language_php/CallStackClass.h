@@ -224,7 +224,8 @@ class VariableSymbolClass {
 
 	void ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName);
 
-	void ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments);
+	void ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName,
+		const UnicodeString& methodName, const std::vector<UnicodeString> arguments);
 
 	void ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments);
 

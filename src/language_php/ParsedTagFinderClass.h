@@ -522,7 +522,8 @@ class NearMatchMemberTagResultClass : public t4p::ExactMemberTagResultClass {
 	public:
 	NearMatchMemberTagResultClass();
 
-	void SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, int fileItemId, const std::vector<wxFileName>& sourceDirs);
+	void SetNearMatchArgs(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName,
+		int fileItemId, const std::vector<wxFileName>& sourceDirs);
 
 	protected:
 	bool DoPrepare(soci::statement& stmt, bool doLimit);

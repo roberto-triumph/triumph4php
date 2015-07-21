@@ -56,7 +56,8 @@ bool t4p::JavascriptCodeCompletionProviderClass::DoesSupport(t4p::FileType type)
 	return t4p::FILE_TYPE_JS == type;
 }
 
-void t4p::JavascriptCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+void t4p::JavascriptCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl,
+	std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 	if (!HasInit) {
 		return;
 	}

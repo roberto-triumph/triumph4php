@@ -288,7 +288,8 @@ static bool LoadKeyProfile(std::vector<t4p::DynamicCmdClass>& dynamicCmds, wxKey
 	return ret;
 }
 
-static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts,
+	wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
     config->SetPath(configKey);
 	int profileSelected = 0;
 
@@ -345,7 +346,8 @@ static bool LoadKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortc
  * @param config the shortcuts will be stored to the given config
  * @param configKey the shortcuts will be stored to the given config group
  */
-static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts, wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
+static bool SaveKeyProfileArray(std::vector<t4p::DynamicCmdClass>& defaultShortcuts,
+	wxKeyProfileArray& profiles, wxConfigBase* config, const wxString& configKey) {
 	// Example config file will look like this
 	//
 	//  ... other top-level confg items ...

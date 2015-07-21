@@ -75,14 +75,17 @@ void t4p::VariableSymbolClass::ToAssignment(const UnicodeString& variableName, c
 	SourceVariable = sourceVariableName;
 }
 
-void t4p::VariableSymbolClass::ToProperty(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& propertyName) {
+void t4p::VariableSymbolClass::ToProperty(const UnicodeString& variableName, const UnicodeString& objectName,
+	const UnicodeString& propertyName) {
 	Type = t4p::VariableSymbolClass::PROPERTY;
 	DestinationVariable = variableName;
 	ObjectName = objectName;
 	PropertyName = propertyName;
 }
 
-void t4p::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName, const UnicodeString& methodName, const std::vector<UnicodeString> arguments) {
+void t4p::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, const UnicodeString& objectName,
+	const UnicodeString& methodName,
+	const std::vector<UnicodeString> arguments) {
 	Type = t4p::VariableSymbolClass::METHOD_CALL;
 	DestinationVariable = variableName;
 	ObjectName = objectName;
@@ -90,14 +93,16 @@ void t4p::VariableSymbolClass::ToMethodCall(const UnicodeString& variableName, c
 	FunctionArguments = arguments;
 }
 
-void t4p::VariableSymbolClass::ToFunctionCall(const UnicodeString& variableName, const UnicodeString& functionName, const std::vector<UnicodeString> arguments) {
+void t4p::VariableSymbolClass::ToFunctionCall(const UnicodeString& variableName,
+	const UnicodeString& functionName, const std::vector<UnicodeString> arguments) {
 	Type = t4p::VariableSymbolClass::FUNCTION_CALL;
 	DestinationVariable = variableName;
 	FunctionName = functionName;
 	FunctionArguments = arguments;
 }
 
-void t4p::VariableSymbolClass::ToBeginMethod(const UnicodeString& className, const UnicodeString& methodName) {
+void t4p::VariableSymbolClass::ToBeginMethod(const UnicodeString& className,
+	const UnicodeString& methodName) {
 	Type = t4p::VariableSymbolClass::BEGIN_METHOD;
 	ClassName = className;
 	MethodName = methodName;
@@ -547,7 +552,9 @@ void t4p::CallStackClass::SymbolsFromVariable(const pelet::VariableClass& variab
 	}
 }
 
-void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName, const pelet::VariablePropertyClass& property, std::vector<t4p::VariableSymbolClass>& symbols) {
+void t4p::CallStackClass::SymbolFromVariableProperty(const UnicodeString& objectName,
+	const pelet::VariablePropertyClass& property,
+	std::vector<t4p::VariableSymbolClass>& symbols) {
 	// recurse down the arguments first
 	std::vector<UnicodeString> argumentVariables;
 	if (property.IsFunction && !property.CallArguments.empty()) {
@@ -696,8 +703,10 @@ UnicodeString t4p::CallStackClass::NewTempVariable() {
 	return newName;
 }
 
-void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className, const UnicodeString& methodName, const UnicodeString& signature,
-        const UnicodeString& returnType, const UnicodeString& comment, pelet::TokenClass::TokenIds visibility,
+void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const UnicodeString& className,
+        const UnicodeString& methodName, const UnicodeString& signature,
+        const UnicodeString& returnType, const UnicodeString& comment,
+        pelet::TokenClass::TokenIds visibility,
         bool isStatic, const int lineNumber, bool hasVariableArguments) {
 	CurrentClass = className;
 	CurrentMethod = methodName;
@@ -721,7 +730,8 @@ void t4p::CallStackClass::MethodFound(const UnicodeString& namespaceName, const 
 	}
 }
 
-void t4p::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName, const UnicodeString& signature, const UnicodeString& returnType,
+void t4p::CallStackClass::FunctionFound(const UnicodeString& namespaceName, const UnicodeString& functionName,
+        const UnicodeString& signature, const UnicodeString& returnType,
         const UnicodeString& comment, const int lineNumber, bool hasVariableArguments) {
 	CurrentClass.remove();
 	CurrentMethod.remove();

@@ -42,7 +42,8 @@ bool t4p::HtmlCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
 	return false;
 }
 
-void t4p::HtmlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+void t4p::HtmlCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl,
+	std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 }
 
 

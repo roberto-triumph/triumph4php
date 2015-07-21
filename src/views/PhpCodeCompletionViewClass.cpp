@@ -124,7 +124,8 @@ bool t4p::PhpCodeCompletionProviderClass::DoesSupport(t4p::FileType type) {
 }
 
 
-void t4p::PhpCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl, std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
+void t4p::PhpCodeCompletionProviderClass::Provide(t4p::CodeControlClass* ctrl,
+	std::vector<t4p::CodeCompletionItemClass>& suggestions, wxString& completeStatus) {
 	AutoCompletionResourceMatches.clear();
 	int currentPos = ctrl->GetCurrentPos();
 	int startPos = ctrl->WordStartPosition(currentPos, true);

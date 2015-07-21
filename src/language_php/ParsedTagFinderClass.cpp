@@ -881,7 +881,8 @@ t4p::TraitTagResultClass::TraitTagResultClass()
 , InsteadOfs() {
 }
 
-void t4p::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames, const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
+void t4p::TraitTagResultClass::Set(const std::vector<UnicodeString>& classNames,
+	const UnicodeString& memberName, bool exactMatch, const std::vector<wxFileName>& sourceDirs) {
 	for (size_t i = 0; i < classNames.size(); ++i) {
 		Keys.push_back(t4p::IcuToChar(classNames[i]));
 	}

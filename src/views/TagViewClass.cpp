@@ -221,7 +221,8 @@ void t4p::TagViewClass::OnAppFileClosed(t4p::CodeControlEventClass& event) {
 	}
 	if (!codeCtrl->IsNew()) {
 		wxString fileName = codeCtrl->GetFileName();
-		t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(Feature.App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
+		t4p::ProjectTagSingleFileActionClass* tagAction = new t4p::ProjectTagSingleFileActionClass(
+			Feature.App.SqliteRunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST);
 		tagAction->SetFileToParse(fileName);
 		if (tagAction->Init(Feature.App.Globals)) {
 			Feature.App.SqliteRunningThreads.Queue(tagAction);

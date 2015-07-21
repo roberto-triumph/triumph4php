@@ -125,7 +125,9 @@ bool t4p::UrlTagFinderClass::FindByUrl(const wxURI& url, const std::vector<wxFil
 	return ret;
 }
 
-bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className, const wxString& methodName, const std::vector<wxFileName>& sourceDirs, t4p::UrlTagClass& urlTag) {
+bool t4p::UrlTagFinderClass::FindByClassMethod(const wxString& className,
+	const wxString& methodName, const std::vector<wxFileName>& sourceDirs,
+	t4p::UrlTagClass& urlTag) {
 	bool ret = false;
 	if (sourceDirs.empty()) {
 		return ret;

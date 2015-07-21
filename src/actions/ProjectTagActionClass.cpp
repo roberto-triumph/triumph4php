@@ -49,7 +49,11 @@ bool t4p::ProjectTagActionClass::Init(t4p::GlobalsClass& globals) {
 	SetProgressMode(t4p::ActionClass::DETERMINATE);
 
 	// ATTN: assumes that all projects have the same extension
-	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+	TagFinderList.InitGlobalTag(globals.TagCacheDbFileName,
+		globals.FileTypes.GetPhpFileExtensions(),
+		globals.FileTypes.GetNonPhpFileExtensions(),
+		globals.Environment.Php.Version
+	);
 
 	// if we were not given projects, scan all of them
 	if (!DoTouchedProjects) {
@@ -189,7 +193,10 @@ bool t4p::ProjectTagDirectoryActionClass::Init(t4p::GlobalsClass& globals) {
 		}
 	}
 	if (isDirFromProject) {
-		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName, globals.FileTypes.GetPhpFileExtensions(), globals.FileTypes.GetNonPhpFileExtensions(), globals.Environment.Php.Version);
+		TagFinderList.InitGlobalTag(globals.TagCacheDbFileName,
+			globals.FileTypes.GetPhpFileExtensions(),
+			globals.FileTypes.GetNonPhpFileExtensions(),
+			globals.Environment.Php.Version);
 	}
 	return isDirFromProject;
 }

@@ -46,7 +46,9 @@ t4p::ProjectViewClass::ProjectViewClass(t4p::ProjectFeatureClass& feature)
 
 void t4p::ProjectViewClass::AddFileMenuItems(wxMenu* fileMenu) {
 	fileMenu->Append(t4p::MENU_PROJECT + 1, _("New Project"), _("Create a new project from a source directory"), wxITEM_NORMAL);
-	fileMenu->Append(t4p::MENU_PROJECT + 0, _("Show Projects"), _("See the created projects, and add additional source directories to the current project"), wxITEM_NORMAL);
+	fileMenu->Append(t4p::MENU_PROJECT + 0, _("Show Projects"),
+		_("See the created projects, and add additional source directories to the current project"),
+		wxITEM_NORMAL);
 }
 
 void t4p::ProjectViewClass::AddPreferenceWindow(wxBookCtrlBase* parent) {

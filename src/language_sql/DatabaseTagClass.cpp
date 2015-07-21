@@ -359,7 +359,8 @@ bool t4p::SqlQueryClass::TableNames(soci::session& session, soci::statement& stm
 	return data;
 }
 
-bool t4p::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& columnValues, std::vector<soci::indicator>& columnIndicators, UnicodeString& error) {
+bool t4p::SqlQueryClass::NextRow(soci::row& row, std::vector<UnicodeString>& columnValues,
+	std::vector<soci::indicator>& columnIndicators, UnicodeString& error) {
 	bool data = false;
 	try {
 		for (size_t i = 0; i < row.size(); i++) {

@@ -53,7 +53,8 @@ static int ID_FILE_MODIFIED_CHECK = wxNewId();
  * @param collapsedDis the directories in paths
  * @param collapsedFiles the files in paths (except files in any of collapsedDirs)
  */
-static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, int>& paths, std::map<wxString, int>& collapsedDirs, std::map<wxString, int>& collapsedFiles) {
+static void CollapseDirsFiles(t4p::TagCacheClass& tagCache, std::map<wxString, int>& paths,
+	std::map<wxString, int>& collapsedDirs, std::map<wxString, int>& collapsedFiles) {
 	std::map<wxString, int>::iterator mapIt;
 	std::vector<wxString> sortedPaths;
 	for (mapIt = paths.begin(); mapIt != paths.end(); ++mapIt) {

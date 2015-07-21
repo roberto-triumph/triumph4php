@@ -37,7 +37,8 @@
  *         xmlString is well-formed xml AND it's root tag
  *         has the given name.
  */
-static bool EnsureXmlRoot(wxXmlDocument& document, const wxString& xmlString, const wxString& rootName, t4p::DbgpXmlErrors& error) {
+static bool EnsureXmlRoot(wxXmlDocument& document, const wxString& xmlString,
+	const wxString& rootName, t4p::DbgpXmlErrors& error) {
 	error = t4p::DBGP_XML_ERROR_NONE;
 
 	// not sure if the encoding that we get from xdebug feature get command
@@ -64,7 +65,8 @@ static bool EnsureXmlRoot(wxXmlDocument& document, const wxString& xmlString, co
  * @param error reason for failure will be written to this variable
  * @return bool TRUE if the attribute exists
  */
-static bool GetNodeAttributeString(wxXmlNode* node, const wxString& attributeName, wxString& value, t4p::DbgpXmlErrors& error) {
+static bool GetNodeAttributeString(wxXmlNode* node, const wxString& attributeName,
+	wxString& value, t4p::DbgpXmlErrors& error) {
 	if (!node->GetAttribute(attributeName, &value)) {
 		error = t4p::DBGP_XML_ERROR_ATTRIBUTE;
 		return false;
@@ -202,7 +204,8 @@ static t4p::DbgpFeatures FeatureFromString(const wxString& str) {
 	return t4p::DBGP_FEATURE_UNKNOWN;
 }
 
-static bool BreakpointFromXmlNode(wxXmlNode* breakpointNode, t4p::DbgpBreakpointClass& breakpoint, t4p::DbgpXmlErrors& error) {
+static bool BreakpointFromXmlNode(wxXmlNode* breakpointNode,
+	t4p::DbgpBreakpointClass& breakpoint, t4p::DbgpXmlErrors& error) {
 	if (!GetNodeAttributeString(breakpointNode, "id", breakpoint.BreakpointId, error)) {
 		return false;
 	}
@@ -236,7 +239,8 @@ static bool BreakpointFromXmlNode(wxXmlNode* breakpointNode, t4p::DbgpBreakpoint
 	return true;
 }
 
-static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t4p::DbgpXmlErrors& error) {
+static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack,
+	t4p::DbgpXmlErrors& error) {
 	GetNodeAttributeInt(stackNode, "level", stack.Level);
 
 	if (!GetNodeAttributeString(stackNode, "type", stack.Type, error)) {
@@ -257,7 +261,8 @@ static bool StackFromXmlNode(wxXmlNode* stackNode, t4p::DbgpStackClass& stack, t
 	return true;
 }
 
-static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop, t4p::DbgpXmlErrors& error) {
+static bool PropertyFromXmlNode(wxXmlNode* node, t4p::DbgpPropertyClass& prop,
+	t4p::DbgpXmlErrors& error) {
 	// name is optional when we parse properties from an eval response
 	// class name, full name are optional
 	t4p::DbgpXmlErrors ignored;
@@ -1306,7 +1311,8 @@ std::string t4p::DbgpCommandClass::Stop() {
 	);
 }
 
-std::string t4p::DbgpCommandClass::BreakpointFile(const wxString& filename, int lineNumber, bool enabled, int hitValue, const wxString& hitCondition) {
+std::string t4p::DbgpCommandClass::BreakpointFile(const wxString& filename,
+	int lineNumber, bool enabled, int hitValue, const wxString& hitCondition) {
 	wxString args;
 	args += wxT("-t line");
 	args += wxT(" -f ") + EscapeArg(filename);
@@ -1328,7 +1334,8 @@ std::string t4p::DbgpCommandClass::BreakpointFile(const wxString& filename, int 
 	);
 }
 
-std::string t4p::DbgpCommandClass::BreakpointCall(const wxString& function, bool enabled, int hitValue, const wxString& hitCondition) {
+std::string t4p::DbgpCommandClass::BreakpointCall(const wxString& function,
+	bool enabled, int hitValue, const wxString& hitCondition) {
 	wxString args;
 	args += wxT("-t call");
 	args += wxT(" -m ") + EscapeArg(function);
@@ -1350,7 +1357,8 @@ std::string t4p::DbgpCommandClass::BreakpointCall(const wxString& function, bool
 	);
 }
 
-std::string t4p::DbgpCommandClass::BreakpointReturn(const wxString& function, bool enabled, int hitValue, const wxString& hitCondition) {
+std::string t4p::DbgpCommandClass::BreakpointReturn(const wxString& function,
+	bool enabled, int hitValue, const wxString& hitCondition) {
 	wxString args;
 	args += wxT("-t return");
 	args += wxT(" -m ") + EscapeArg(function);
@@ -1388,7 +1396,8 @@ std::string t4p::DbgpCommandClass::BreakpointException(const wxString& exception
 	);
 }
 
-std::string t4p::DbgpCommandClass::BreakpointConditional(const wxString& filename, int lineNumber, const wxString& expression, bool enabled) {
+std::string t4p::DbgpCommandClass::BreakpointConditional(const wxString& filename,
+	int lineNumber, const wxString& expression, bool enabled) {
 	wxString args;
 	args += wxT("-t conditional");
 	args += wxT(" -f ") + EscapeArg(filename);
@@ -1506,7 +1515,8 @@ std::string t4p::DbgpCommandClass::ContextGet(int stackDepth, int contextId) {
 	);
 }
 
-std::string t4p::DbgpCommandClass::PropertyGet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey) {
+std::string t4p::DbgpCommandClass::PropertyGet(int stackDepth, int contextId,
+	const wxString& propertyFullName, const wxString& propertyKey) {
 	wxString args;
 	args += wxT("-n ") + EscapeArg(propertyFullName);
 	args += wxString::Format(" -d %d", stackDepth);
@@ -1521,7 +1531,8 @@ std::string t4p::DbgpCommandClass::PropertyGet(int stackDepth, int contextId, co
 	);
 }
 
-std::string t4p::DbgpCommandClass::PropertySet(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& dataType, const wxString& value) {
+std::string t4p::DbgpCommandClass::PropertySet(int stackDepth, int contextId,
+	const wxString& propertyFullName, const wxString& dataType, const wxString& value) {
 	wxString args;
 	args += wxT("-n ") + EscapeArg(propertyFullName);
 	args += wxString::Format(" -d %d", stackDepth);
@@ -1535,7 +1546,8 @@ std::string t4p::DbgpCommandClass::PropertySet(int stackDepth, int contextId, co
 	);
 }
 
-std::string t4p::DbgpCommandClass::PropertyValue(int stackDepth, int contextId, const wxString& propertyFullName, const wxString& propertyKey) {
+std::string t4p::DbgpCommandClass::PropertyValue(int stackDepth, int contextId,
+	const wxString& propertyFullName, const wxString& propertyKey) {
 	wxString args;
 	args += wxT("-n ") + EscapeArg(propertyFullName);
 	args += wxString::Format(" -d %d", stackDepth);
