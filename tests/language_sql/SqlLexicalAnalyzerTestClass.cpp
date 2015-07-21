@@ -27,57 +27,57 @@
 #include "language_sql/SqlLexicalAnalyzerClass.h"
 
 SUITE(SqlLexicalAnalyzerTestClass) {
-TEST(SingleQuery) {
-	t4p::SqlLexicalAnalyzerClass lexer;
-	UnicodeString query = UNICODE_STRING_SIMPLE("SELECT * FROM users;");
-	CHECK(lexer.OpenString(query));
-	UnicodeString extracted;
-	bool ret = lexer.NextQuery(extracted);
-	CHECK(ret);
-	CHECK_EQUAL(query, extracted);
-	ret = lexer.NextQuery(extracted);
-	CHECK_EQUAL(false, ret);
-}
+    TEST(SingleQuery) {
+        t4p::SqlLexicalAnalyzerClass lexer;
+        UnicodeString query = UNICODE_STRING_SIMPLE("SELECT * FROM users;");
+        CHECK(lexer.OpenString(query));
+        UnicodeString extracted;
+        bool ret = lexer.NextQuery(extracted);
+        CHECK(ret);
+        CHECK_EQUAL(query, extracted);
+        ret = lexer.NextQuery(extracted);
+        CHECK_EQUAL(false, ret);
+    }
 
-TEST(MultipleQueries) {
-	t4p::SqlLexicalAnalyzerClass lexer;
-	UnicodeString expectedQuery1 =
-		UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='my user';\n\nDELETE FROM users WHERE name='another'");
-	UnicodeString queries = expectedQuery1;
-	CHECK(lexer.OpenString(queries));
-	UnicodeString extracted;
-	bool ret = lexer.NextQuery(extracted);
-	CHECK(ret);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='my user';"), extracted);
-	extracted.remove();
-	ret = lexer.NextQuery(extracted);
-	CHECK(ret);
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='another'"), extracted);
-	ret = lexer.NextQuery(extracted);
-	CHECK_EQUAL(false, ret);
-}
+    TEST(MultipleQueries) {
+        t4p::SqlLexicalAnalyzerClass lexer;
+        UnicodeString expectedQuery1 =
+            UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='my user';\n\nDELETE FROM users WHERE name='another'");
+        UnicodeString queries = expectedQuery1;
+        CHECK(lexer.OpenString(queries));
+        UnicodeString extracted;
+        bool ret = lexer.NextQuery(extracted);
+        CHECK(ret);
+        CHECK_EQUAL(UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='my user';"), extracted);
+        extracted.remove();
+        ret = lexer.NextQuery(extracted);
+        CHECK(ret);
+        CHECK_EQUAL(UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name='another'"), extracted);
+        ret = lexer.NextQuery(extracted);
+        CHECK_EQUAL(false, ret);
+    }
 
-TEST(Comments) {
-	t4p::SqlLexicalAnalyzerClass lexer;
-	UnicodeString expectedQuery1 =
-		UNICODE_STRING_SIMPLE("/* a ; comment */ -- another; \n #yet another; \n DELETE FROM users WHERE name='my user'");
-	UnicodeString queries = expectedQuery1;
-	CHECK(lexer.OpenString(queries));
-	UnicodeString extracted;
-	bool ret = lexer.NextQuery(extracted);
-	CHECK(ret);
-	CHECK_EQUAL(expectedQuery1, extracted);
-}
+    TEST(Comments) {
+        t4p::SqlLexicalAnalyzerClass lexer;
+        UnicodeString expectedQuery1 =
+            UNICODE_STRING_SIMPLE("/* a ; comment */ -- another; \n #yet another; \n DELETE FROM users WHERE name='my user'");
+        UnicodeString queries = expectedQuery1;
+        CHECK(lexer.OpenString(queries));
+        UnicodeString extracted;
+        bool ret = lexer.NextQuery(extracted);
+        CHECK(ret);
+        CHECK_EQUAL(expectedQuery1, extracted);
+    }
 
-TEST(StringWithSemicolons) {
-	t4p::SqlLexicalAnalyzerClass lexer;
-	UnicodeString expectedQuery1 =
-		UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name=\"my;user\" or name = 'my;user'");
-	UnicodeString queries = expectedQuery1;
-	CHECK(lexer.OpenString(queries));
-	UnicodeString extracted;
-	bool ret = lexer.NextQuery(extracted);
-	CHECK(ret);
-	CHECK_EQUAL(expectedQuery1, extracted);
-}
+    TEST(StringWithSemicolons) {
+        t4p::SqlLexicalAnalyzerClass lexer;
+        UnicodeString expectedQuery1 =
+            UNICODE_STRING_SIMPLE("DELETE FROM users WHERE name=\"my;user\" or name = 'my;user'");
+        UnicodeString queries = expectedQuery1;
+        CHECK(lexer.OpenString(queries));
+        UnicodeString extracted;
+        bool ret = lexer.NextQuery(extracted);
+        CHECK(ret);
+        CHECK_EQUAL(expectedQuery1, extracted);
+    }
 }

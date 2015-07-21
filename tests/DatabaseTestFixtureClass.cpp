@@ -33,59 +33,59 @@
 
 
 DatabaseTestFixtureClass::DatabaseTestFixtureClass(const std::string& testDatabaseName)
-	: Session()
-	, ConnectionString("host=127.0.0.1 port=3306 user=") {
-	ConnectionString += UserName();
-	std::string pwd = Password();
-	if (!pwd.empty()) {
-		ConnectionString += " password=";
-		ConnectionString += pwd;
-	}
-	Session.open(*soci::factory_mysql(), (ConnectionString + " db=mysql").c_str());
-	DropDatabase(testDatabaseName);
-	CreateDatabase(testDatabaseName);
-	Exec("USE " + testDatabaseName);
+    : Session()
+    , ConnectionString("host=127.0.0.1 port=3306 user=") {
+    ConnectionString += UserName();
+    std::string pwd = Password();
+    if (!pwd.empty()) {
+        ConnectionString += " password=";
+        ConnectionString += pwd;
+    }
+    Session.open(*soci::factory_mysql(), (ConnectionString + " db=mysql").c_str());
+    DropDatabase(testDatabaseName);
+    CreateDatabase(testDatabaseName);
+    Exec("USE " + testDatabaseName);
 }
 
 DatabaseTestFixtureClass::~DatabaseTestFixtureClass() {
-	Session.close();
+    Session.close();
 }
 
 std::string DatabaseTestFixtureClass::UserName() const {
-	std::string user = T4P_STR(T4P_DB_USER);
-	return user;
+    std::string user = T4P_STR(T4P_DB_USER);
+    return user;
 }
 
 std::string DatabaseTestFixtureClass::Password() const {
-	std::string pwd;
-	#ifdef T4P_DB_PASSWORD
-		pwd	= T4P_STR(T4P_DB_PASSWORD);
-	#endif
-	return pwd;
+    std::string pwd;
+#ifdef T4P_DB_PASSWORD
+    pwd = T4P_STR(T4P_DB_PASSWORD);
+#endif
+    return pwd;
 }
 
 
 void DatabaseTestFixtureClass::DropDatabase(const std::string& databaseName) {
-	std::string query("DROP DATABASE IF EXISTS ");
-	query += databaseName;
-	Exec(query);
+    std::string query("DROP DATABASE IF EXISTS ");
+    query += databaseName;
+    Exec(query);
 }
 
 bool DatabaseTestFixtureClass::CreateDatabase(const std::string& name) {
-	std::string query("CREATE DATABASE ");
-	query += name;
-	return Exec(query);
+    std::string query("CREATE DATABASE ");
+    query += name;
+    return Exec(query);
 }
 
 bool DatabaseTestFixtureClass::Exec(const std::string& query) {
-	soci::statement stmt = (Session.prepare << query);
-	try {
-		// execute returns true only when there are results; we want to return
-		// true on success
-		stmt.execute(false);
-		return true;
-	} catch (std::exception& e) {
-		printf("exception=%s\n", e.what());
-	}
-	return false;
+    soci::statement stmt = (Session.prepare << query);
+    try {
+        // execute returns true only when there are results; we want to return
+        // true on success
+        stmt.execute(false);
+        return true;
+    } catch (std::exception& e) {
+        printf("exception=%s\n", e.what());
+    }
+    return false;
 }

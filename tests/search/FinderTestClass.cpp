@@ -29,241 +29,241 @@
 #include "search/FinderClass.h"
 
 UnicodeString CODE = t4p::CharToIcu(
-	"<?php\n"
-	"/**\n"
-	" * function for computing area of circle\n"
-	" * @copyright 2009\n"
-	" */\n"
-	"function computeAreaOfCircle($radius) {\n"
-    "  $PI = 3.14;  // constant \n"
-    "  $MESSAGE = 'area of circle is: %2f';\n"
-	"  if (0 === $radius || 0 >= $radius) {\n"
-	"    return \"Invalid radius. \" . sprintf($MESSAGE, $PI*$radius*2);\n"
-	"  }\n"
-    "  return sprintf($MESSAGE, $PI * $radius * 2);\n"
-    "}\n"
-	"?>");
+                         "<?php\n"
+                         "/**\n"
+                         " * function for computing area of circle\n"
+                         " * @copyright 2009\n"
+                         " */\n"
+                         "function computeAreaOfCircle($radius) {\n"
+                         "  $PI = 3.14;  // constant \n"
+                         "  $MESSAGE = 'area of circle is: %2f';\n"
+                         "  if (0 === $radius || 0 >= $radius) {\n"
+                         "    return \"Invalid radius. \" . sprintf($MESSAGE, $PI*$radius*2);\n"
+                         "  }\n"
+                         "  return sprintf($MESSAGE, $PI * $radius * 2);\n"
+                         "}\n"
+                         "?>");
 
 SUITE(FinderTestClass) {
-TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	CHECK(finder.Prepare());
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
-	CHECK(finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(tofind.length(), length);
-}
+    TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearching) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        CHECK(finder.Prepare());
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
+        CHECK(finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        CHECK_EQUAL(tofind.length(), length);
+    }
 
-TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::CASE_INSENSITIVE);
-	CHECK(finder.Prepare());
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
-	CHECK(finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(tofind.length(), length);
-}
+    TEST(FindNextUsingExactModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::CASE_INSENSITIVE);
+        CHECK(finder.Prepare());
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
+        CHECK(finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        CHECK_EQUAL(tofind.length(), length);
+    }
 
-TEST(FindNextUsingExactModeShouldReturnInvalidIndexWhenNotFound) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	CHECK(finder.Prepare());
-	CHECK_EQUAL(false, finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK_EQUAL(false, finder.GetLastMatch(position, length));
-}
+    TEST(FindNextUsingExactModeShouldReturnInvalidIndexWhenNotFound) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$pi"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        CHECK(finder.Prepare());
+        CHECK_EQUAL(false, finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK_EQUAL(false, finder.GetLastMatch(position, length));
+    }
 
-TEST(FindNextUsingExactModeShouldReturnValidIndexWhenUsingWrap) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	finder.Wrap = true;
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
-	int32_t start = CODE.length() - 2;
-	CHECK(finder.Prepare());
-	CHECK(finder.FindNext(CODE, start));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(tofind.length(), length);
-}
+    TEST(FindNextUsingExactModeShouldReturnValidIndexWhenUsingWrap) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        finder.Wrap = true;
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
+        int32_t start = CODE.length() - 2;
+        CHECK(finder.Prepare());
+        CHECK(finder.FindNext(CODE, start));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        CHECK_EQUAL(tofind.length(), length);
+    }
 
-TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearching) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI\\s*=\\s*\\d+\\.\\d+"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK(finder.Prepare());
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
-	CHECK(finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	UnicodeString expected = UNICODE_STRING_SIMPLE("$PI = 3.14");
-	UnicodeString actual(CODE, position, length);
-	CHECK(expected == actual);
-}
+    TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearching) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI\\s*=\\s*\\d+\\.\\d+"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK(finder.Prepare());
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
+        CHECK(finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        UnicodeString expected = UNICODE_STRING_SIMPLE("$PI = 3.14");
+        UnicodeString actual(CODE, position, length);
+        CHECK(expected == actual);
+    }
 
-TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?i)\\$pi\\s*=\\s*\\d+\\.\\d+"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK(finder.Prepare());
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
-	CHECK(finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$PI = 3.14")));
-}
+    TEST(FindNextUsingRegularExpressionModeShouldReturnValidIndexWhenSearchingCaseInsensitive) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("(?i)\\$pi\\s*=\\s*\\d+\\.\\d+"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK(finder.Prepare());
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$PI"));
+        CHECK(finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$PI = 3.14")));
+    }
 
-TEST(FindNextUsingRegularExpressionModeShouldReturnFalseWhenRegularExpressionIsInvalid) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d+("));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK_EQUAL(false, finder.Prepare());
-	CHECK_EQUAL(false, finder.FindNext(CODE));
-}
+    TEST(FindNextUsingRegularExpressionModeShouldReturnFalseWhenRegularExpressionIsInvalid) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d+("));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK_EQUAL(false, finder.Prepare());
+        CHECK_EQUAL(false, finder.FindNext(CODE));
+    }
 
-TEST(FindNextUsingRegularExpressionModeShouldReturnInvalidIndexWhenNotFound) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d{18}"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK(finder.Prepare());
-	CHECK_EQUAL(false, finder.FindNext(CODE));
-}
+    TEST(FindNextUsingRegularExpressionModeShouldReturnInvalidIndexWhenNotFound) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$PI=\\d{18}"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK(finder.Prepare());
+        CHECK_EQUAL(false, finder.FindNext(CODE));
+    }
 
-TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^  \\$PI = 3\\.14;  // constant $"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK(finder.Prepare());
-	int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("  $PI"));
-	CHECK(finder.FindNext(CODE));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(expectedIndex, position);
-	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("  $PI = 3.14;  // constant ")));
-}
+    TEST(FindNextUsingRegularExpressionModeShouldHandleBeforeAndEndOfLine) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^  \\$PI = 3\\.14;  // constant $"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK(finder.Prepare());
+        int32_t expectedIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("  $PI"));
+        CHECK(finder.FindNext(CODE));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(expectedIndex, position);
+        CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("  $PI = 3.14;  // constant ")));
+    }
 
-TEST(FindPreviousShouldSkipToFirstInstance) {
-	UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));
-	t4p::FinderClass finder(toFind, t4p::FinderClass::EXACT);
-	CHECK(finder.Prepare());
+    TEST(FindPreviousShouldSkipToFirstInstance) {
+        UnicodeString toFind(UNICODE_STRING_SIMPLE("$MESSAGE"));
+        t4p::FinderClass finder(toFind, t4p::FinderClass::EXACT);
+        CHECK(finder.Prepare());
 
-	// find the 2nd instance of $MESSAGE
-	// the test here will be that if the Find starts from one position before the previous match
-	// that the next call will find the previous match
-	// we are testing off-by-one errors
-	//
-	// example
-	/// ...... $MESSAGE ...... $MESSAGE......
-	// we are testing that if we use FindPrevious starting from the next to last character of the second instance of
-	// $MESSAGE that the method will match the first instance of $MESSAGE
-	int32_t firstIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"));
-	int32_t secondIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"), firstIndex + 1);
+        // find the 2nd instance of $MESSAGE
+        // the test here will be that if the Find starts from one position before the previous match
+        // that the next call will find the previous match
+        // we are testing off-by-one errors
+        //
+        // example
+        /// ...... $MESSAGE ...... $MESSAGE......
+        // we are testing that if we use FindPrevious starting from the next to last character of the second instance of
+        // $MESSAGE that the method will match the first instance of $MESSAGE
+        int32_t firstIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"));
+        int32_t secondIndex = CODE.indexOf(UNICODE_STRING_SIMPLE("$MESSAGE"), firstIndex + 1);
 
-	// -2 = start from "$MESSAG"
-	CHECK(finder.FindPrevious(CODE, secondIndex + toFind.length() - 2));
-	int32_t position, length;
-	CHECK(finder.GetLastMatch(position, length));
-	CHECK_EQUAL(firstIndex, position);
-	CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$MESSAGE")));
-}
+        // -2 = start from "$MESSAG"
+        CHECK(finder.FindPrevious(CODE, secondIndex + toFind.length() - 2));
+        int32_t position, length;
+        CHECK(finder.GetLastMatch(position, length));
+        CHECK_EQUAL(firstIndex, position);
+        CHECK_EQUAL(0, CODE.compare(position, length, UNICODE_STRING_SIMPLE("$MESSAGE")));
+    }
 
-TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
-	CHECK(finder.Prepare());
-	CHECK(finder.FindNext(CODE));
-	UnicodeString match;
-	CHECK(finder.GetLastReplacementText(CODE, match));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE("$PI = 3.1415;"), match);
-}
-
-
-TEST(GetLastReplacementTextShouldReturnMatchedTextInRegularExpressionMode) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^\\s*\\$PI\\s*=\\s*3\\.14;\\s*//(.+)$"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /* $1 */");
-	CHECK(finder.Prepare());
-	CHECK(finder.FindNext(CODE));
-	UnicodeString match;
-	CHECK(finder.GetLastReplacementText(CODE, match));
-	UnicodeString expected = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /*  constant  */");
-	CHECK_EQUAL(expected, match);
-}
-
-TEST(GetLastReplacementTextShouldReturnFalseWhenTextDoesNotHaveAMatch) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
-	t4p::FinderClass finder(tofind);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
-	CHECK(finder.Prepare());
-	CHECK(finder.FindNext(CODE));
-	UnicodeString match;
-	UnicodeString changedCode = CODE;
-	changedCode.findAndReplace(UNICODE_STRING_SIMPLE("3.14"), UNICODE_STRING_SIMPLE("3.33"));
-	CHECK_EQUAL(false, finder.GetLastReplacementText(changedCode, match));
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match);
-}
-
-TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$_PI");
-	CHECK(finder.Prepare());
-	UnicodeString newCode(CODE);
-	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
-	UnicodeString expectedCode(CODE);
-	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE("$_PI"));
-	CHECK_EQUAL(expectedCode, newCode);
-}
+    TEST(GetLastReplacementTextShouldReturnMatchedTextInExactMode) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
+        CHECK(finder.Prepare());
+        CHECK(finder.FindNext(CODE));
+        UnicodeString match;
+        CHECK(finder.GetLastReplacementText(CODE, match));
+        CHECK_EQUAL(UNICODE_STRING_SIMPLE("$PI = 3.1415;"), match);
+    }
 
 
-TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
-	CHECK(finder.Prepare());
-	UnicodeString newCode(CODE);
-	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
-	UnicodeString expectedCode(CODE);
-	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
-	CHECK_EQUAL(expectedCode, newCode);
-}
+    TEST(GetLastReplacementTextShouldReturnMatchedTextInRegularExpressionMode) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("(?m)^\\s*\\$PI\\s*=\\s*3\\.14;\\s*//(.+)$"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /* $1 */");
+        CHECK(finder.Prepare());
+        CHECK(finder.FindNext(CODE));
+        UnicodeString match;
+        CHECK(finder.GetLastReplacementText(CODE, match));
+        UnicodeString expected = UNICODE_STRING_SIMPLE("  $PI = 3.1415; /*  constant  */");
+        CHECK_EQUAL(expected, match);
+    }
 
-TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$(PI)"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("\\$_$1");
-	CHECK(finder.Prepare());
-	UnicodeString newCode(CODE);
-	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
-	UnicodeString expectedCode(CODE);
-	expectedCode.findAndReplace(UNICODE_STRING_SIMPLE("$PI"), UNICODE_STRING_SIMPLE("$_PI"));
-	CHECK_EQUAL(expectedCode, newCode);
-}
+    TEST(GetLastReplacementTextShouldReturnFalseWhenTextDoesNotHaveAMatch) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI = 3.14;"));
+        t4p::FinderClass finder(tofind);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$PI = 3.1415;");
+        CHECK(finder.Prepare());
+        CHECK(finder.FindNext(CODE));
+        UnicodeString match;
+        UnicodeString changedCode = CODE;
+        changedCode.findAndReplace(UNICODE_STRING_SIMPLE("3.14"), UNICODE_STRING_SIMPLE("3.33"));
+        CHECK_EQUAL(false, finder.GetLastReplacementText(changedCode, match));
+        CHECK_EQUAL(UNICODE_STRING_SIMPLE(""), match);
+    }
+
+    TEST(ReplaceAllShouldReplaceAllMatchesUsingExactMode) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$_PI");
+        CHECK(finder.Prepare());
+        UnicodeString newCode(CODE);
+        CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+        UnicodeString expectedCode(CODE);
+        expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE("$_PI"));
+        CHECK_EQUAL(expectedCode, newCode);
+    }
 
 
-TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmptyReplacement) {
-	UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
-	t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
-	CHECK(finder.Prepare());
-	UnicodeString newCode(CODE);
-	CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
-	UnicodeString expectedCode(CODE);
-	expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
-	CHECK_EQUAL(expectedCode, newCode);
-}
+    TEST(ReplaceAllShouldReplaceAllMatchesUsingExactModeShouldAllowEmptyReplacement) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::EXACT);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
+        CHECK(finder.Prepare());
+        UnicodeString newCode(CODE);
+        CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+        UnicodeString expectedCode(CODE);
+        expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
+        CHECK_EQUAL(expectedCode, newCode);
+    }
 
-TEST(PrepareShouldReturnFalseWhenExpressionIsEmpty) {
-	t4p::FinderClass finder(UNICODE_STRING_SIMPLE(""),  t4p::FinderClass::REGULAR_EXPRESSION);
-	CHECK_EQUAL(false, finder.Prepare());
-}
+    TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionMode) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("\\$(PI)"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("\\$_$1");
+        CHECK(finder.Prepare());
+        UnicodeString newCode(CODE);
+        CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+        UnicodeString expectedCode(CODE);
+        expectedCode.findAndReplace(UNICODE_STRING_SIMPLE("$PI"), UNICODE_STRING_SIMPLE("$_PI"));
+        CHECK_EQUAL(expectedCode, newCode);
+    }
 
-TEST(PrepareShouldReturnTrueWhenExpressionAndReplaceExpressionAreValid) {
-	t4p::FinderClass finder(UNICODE_STRING_SIMPLE("(a)bc"),  t4p::FinderClass::REGULAR_EXPRESSION);
-	finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$1bc");
-	CHECK(finder.Prepare());
-}
+
+    TEST(ReplaceAllShouldReplaceAllMatchesUsingRegularExpressionModeShouldAllowEmptyReplacement) {
+        UnicodeString tofind(UNICODE_STRING_SIMPLE("$PI"));
+        t4p::FinderClass finder(tofind, t4p::FinderClass::REGULAR_EXPRESSION);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("");
+        CHECK(finder.Prepare());
+        UnicodeString newCode(CODE);
+        CHECK_EQUAL(3, finder.ReplaceAllMatches(newCode));
+        UnicodeString expectedCode(CODE);
+        expectedCode.findAndReplace(tofind, UNICODE_STRING_SIMPLE(""));
+        CHECK_EQUAL(expectedCode, newCode);
+    }
+
+    TEST(PrepareShouldReturnFalseWhenExpressionIsEmpty) {
+        t4p::FinderClass finder(UNICODE_STRING_SIMPLE(""),  t4p::FinderClass::REGULAR_EXPRESSION);
+        CHECK_EQUAL(false, finder.Prepare());
+    }
+
+    TEST(PrepareShouldReturnTrueWhenExpressionAndReplaceExpressionAreValid) {
+        t4p::FinderClass finder(UNICODE_STRING_SIMPLE("(a)bc"),  t4p::FinderClass::REGULAR_EXPRESSION);
+        finder.ReplaceExpression = UNICODE_STRING_SIMPLE("$1bc");
+        CHECK(finder.Prepare());
+    }
 }

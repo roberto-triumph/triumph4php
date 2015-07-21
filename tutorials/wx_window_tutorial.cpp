@@ -30,25 +30,25 @@
  * tutorials.
  */
 class MyApp : public wxApp {
-	public:
-	virtual bool OnInit();
+ public:
+    virtual bool OnInit();
 };
 
 class MyFrame: public wxFrame {
-	public:
-	MyFrame();
+ public:
+    MyFrame();
 };
 
 IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit() {
-	MyFrame* frame = new MyFrame();
-	SetTopWindow(frame);
-	frame->Show(true);
-	return true;
+    MyFrame* frame = new MyFrame();
+    SetTopWindow(frame);
+    frame->Show(true);
+    return true;
 }
 
 MyFrame::MyFrame() :
-	wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition,
-			wxSize(640, 480)) {
+    wxFrame(NULL, wxID_ANY, wxT("test"), wxDefaultPosition,
+            wxSize(640, 480)) {
 }

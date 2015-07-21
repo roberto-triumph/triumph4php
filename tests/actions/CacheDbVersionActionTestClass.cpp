@@ -33,124 +33,124 @@
 #include <soci/sqlite3/soci-sqlite3.h>
 
 class CacheDbVersionActionFixtureClass : public ActionTestFixtureClass, public FileTestFixtureClass {
-	public:
-	t4p::TagCacheDbVersionActionClass Action;
-	t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;
+ public:
+    t4p::TagCacheDbVersionActionClass Action;
+    t4p::DetectorCacheDbVersionActionClass DetectorCacheAction;
 
-	CacheDbVersionActionFixtureClass()
-		: ActionTestFixtureClass()
-		, FileTestFixtureClass(wxT("cache_db_version"))
-		, Action(RunningThreads, wxID_ANY)
-		, DetectorCacheAction(RunningThreads, wxID_ANY) {
-		// need to make sure the directory exists
-		TouchTestDir();
-		InitTagCache(TestProjectDir);
-	}
+    CacheDbVersionActionFixtureClass()
+        : ActionTestFixtureClass()
+        , FileTestFixtureClass(wxT("cache_db_version"))
+        , Action(RunningThreads, wxID_ANY)
+        , DetectorCacheAction(RunningThreads, wxID_ANY) {
+        // need to make sure the directory exists
+        TouchTestDir();
+        InitTagCache(TestProjectDir);
+    }
 };
 
 SUITE(CacheDbVersionActionTestClass) {
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, EmptyCacheDbFiles) {
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	CHECK(Action.Init(Globals));
-	Action.BackgroundWork();
-	CHECK(Globals.TagCacheDbFileName.FileExists());
+        CHECK(Action.Init(Globals));
+        Action.BackgroundWork();
+        CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
-	wxString error;
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, ExistingCacheDbFiles) {
+        wxString error;
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	// create the db files
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
+        // create the db files
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+        t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
 
-	CHECK(Action.Init(Globals));
-	Action.BackgroundWork();
-	CHECK(Globals.TagCacheDbFileName.FileExists());
+        CHECK(Action.Init(Globals));
+        Action.BackgroundWork();
+        CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
-	wxString error;
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, OldCacheDbFiles) {
+        wxString error;
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	// create the db files
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
+        // create the db files
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+        t4p::SqliteSqlScript(t4p::ResourceSqlSchemaAsset(), session, error);
 
-	// set the version to be an old one
-	session.once << "DELETE FROM schema_version;";
-	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
+        // set the version to be an old one
+        session.once << "DELETE FROM schema_version;";
+        session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
+        CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
 
-	CHECK(Action.Init(Globals));
-	Action.BackgroundWork();
-	CHECK(Globals.TagCacheDbFileName.FileExists());
+        CHECK(Action.Init(Globals));
+        Action.BackgroundWork();
+        CHECK(Globals.TagCacheDbFileName.FileExists());
 
-	// not sure why I have to close the connection in order for the test to work
-	session.close();
-	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        // not sure why I have to close the connection in order for the test to work
+        session.close();
+        session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.TagCacheDbFileName.GetFullPath()));
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorEmptyCacheDbFiles) {
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	CHECK(DetectorCacheAction.Init(Globals));
-	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.DetectorCacheDbFileName.FileExists());
+        CHECK(DetectorCacheAction.Init(Globals));
+        DetectorCacheAction.BackgroundWork();
+        CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
-	wxString error;
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorExistingCacheDbFiles) {
+        wxString error;
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	// create the db files
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
+        // create the db files
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+        t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
 
-	CHECK(DetectorCacheAction.Init(Globals));
-	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.DetectorCacheDbFileName.FileExists());
+        CHECK(DetectorCacheAction.Init(Globals));
+        DetectorCacheAction.BackgroundWork();
+        CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 
-TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
-	wxString error;
-	CreateProject(AbsoluteDir(wxT("project_1")));
+    TEST_FIXTURE(CacheDbVersionActionFixtureClass, DetectorOldCacheDbFiles) {
+        wxString error;
+        CreateProject(AbsoluteDir(wxT("project_1")));
 
-	// create the db files
-	soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
+        // create the db files
+        soci::session session(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+        t4p::SqliteSqlScript(t4p::DetectorSqlSchemaAsset(), session, error);
 
-	// set the version to be an old one
-	session.once << "DELETE FROM schema_version;";
-	session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
-	CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
+        // set the version to be an old one
+        session.once << "DELETE FROM schema_version;";
+        session.once << "INSERT INTO schema_version (version_number) VALUES (0);";
+        CHECK_EQUAL(0, t4p::SqliteSchemaVersion(session));
 
-	CHECK(DetectorCacheAction.Init(Globals));
-	DetectorCacheAction.BackgroundWork();
-	CHECK(Globals.DetectorCacheDbFileName.FileExists());
+        CHECK(DetectorCacheAction.Init(Globals));
+        DetectorCacheAction.BackgroundWork();
+        CHECK(Globals.DetectorCacheDbFileName.FileExists());
 
-	// not sure why I have to close the connection in order for the test to work
-	session.close();
-	session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
-	bool greater = t4p::SqliteSchemaVersion(session) > 0;
-	CHECK(greater);
-}
+        // not sure why I have to close the connection in order for the test to work
+        session.close();
+        session.open(*soci::factory_sqlite3(), t4p::WxToChar(Globals.DetectorCacheDbFileName.GetFullPath()));
+        bool greater = t4p::SqliteSchemaVersion(session) > 0;
+        CHECK(greater);
+    }
 }
 

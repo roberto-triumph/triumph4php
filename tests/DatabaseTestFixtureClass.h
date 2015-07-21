@@ -37,61 +37,61 @@
  * and T4P_DB_USER.
  */
 class DatabaseTestFixtureClass {
-	public:
-	/**
-	 * Connects to the database and creates a test database
-	 * This method may throw an exception if it could not connect
-	 * to the database or create the test database
-	 */
-	DatabaseTestFixtureClass(const std::string& testDatabaseName);
+ public:
+    /**
+     * Connects to the database and creates a test database
+     * This method may throw an exception if it could not connect
+     * to the database or create the test database
+     */
+    DatabaseTestFixtureClass(const std::string& testDatabaseName);
 
-	/**
-	 * disconnects from the database
-	 */
-	~DatabaseTestFixtureClass();
+    /**
+     * disconnects from the database
+     */
+    ~DatabaseTestFixtureClass();
 
-	/**
-	 * drops the given database if it exists. will not
-	 * throw an exception if database does not exist. WILL
-	 * throw an exception if could it not connect to database.
-	 */
-	void DropDatabase(const std::string& database);
+    /**
+     * drops the given database if it exists. will not
+     * throw an exception if database does not exist. WILL
+     * throw an exception if could it not connect to database.
+     */
+    void DropDatabase(const std::string& database);
 
-	/**
-	 * creates the given database. WILL
-	 * throw an exception if could it not connect to database or create
-	 * the database.
-	 * @return bool TRUE if query was successful
-	 */
-	bool CreateDatabase(const std::string& name);
+    /**
+     * creates the given database. WILL
+     * throw an exception if could it not connect to database or create
+     * the database.
+     * @return bool TRUE if query was successful
+     */
+    bool CreateDatabase(const std::string& name);
 
-	/**
-	 * executes the given query. WILL
-	 * throw an exception if could it not connect to database or execute the query.
-	 * @return bool TRUE if query was successful
-	 */
-	bool Exec(const std::string& query);
+    /**
+     * executes the given query. WILL
+     * throw an exception if could it not connect to database or execute the query.
+     * @return bool TRUE if query was successful
+     */
+    bool Exec(const std::string& query);
 
-	/**
-	 * Returns the user name, as configured by the T4P_DB_USER macro
-	 */
-	std::string UserName() const;
+    /**
+     * Returns the user name, as configured by the T4P_DB_USER macro
+     */
+    std::string UserName() const;
 
-	/**
-	 * Returns the user name, as configured by the T4P_DB_PASSWORD macro
-	 */
-	std::string Password() const;
+    /**
+     * Returns the user name, as configured by the T4P_DB_PASSWORD macro
+     */
+    std::string Password() const;
 
-	private:
-	/**
-	 * The active connection
-	 */
-	soci::session Session;
+ private:
+    /**
+     * The active connection
+     */
+    soci::session Session;
 
-	/**
-	 * The connection info
-	 */
-	std::string ConnectionString;
+    /**
+     * The connection info
+     */
+    std::string ConnectionString;
 };
 
 #endif  // TESTS_DATABASETESTFIXTURECLASS_H_

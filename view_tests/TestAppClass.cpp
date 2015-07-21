@@ -28,99 +28,99 @@
 #include <UnitTest++.h>
 
 TestAppClass::TestAppClass()
-: wxApp() {
+    : wxApp() {
 }
 
 TestAppClass::~TestAppClass() {
 }
 
 void TestAppClass::InitEnvironment() {
-	InitWxWidgets();
+    InitWxWidgets();
 
-	// don't call wxTheApp->CallOnInit()
-	// as that function will run the event loop
-	// on Mac OS X, and we don't want to run an
-	// event loop in the tests
-	// OnInit creates the app windows
-	wxTheApp->OnInit();
+    // don't call wxTheApp->CallOnInit()
+    // as that function will run the event loop
+    // on Mac OS X, and we don't want to run an
+    // event loop in the tests
+    // OnInit creates the app windows
+    wxTheApp->OnInit();
 }
 
 void TestAppClass::CleanupEnvironment() {
-	CleanupApp();
-	CleanupWxWidgets();
+    CleanupApp();
+    CleanupWxWidgets();
 }
 
 void TestAppClass::TriumphBootstrapView(t4p::FeatureViewClass* view) {
-	App->EventSink.PushHandler(view);
-	view->InitWindow(
-		StatusBarWithGauge,
-		ToolsNotebook,
-		OutlineNotebook,
-		AuiManager,
-		MenuBar,
-		ToolBar);
+    App->EventSink.PushHandler(view);
+    view->InitWindow(
+        StatusBarWithGauge,
+        ToolsNotebook,
+        OutlineNotebook,
+        AuiManager,
+        MenuBar,
+        ToolBar);
 }
 
 void TestAppClass::TriumphBootstrapFeature(t4p::FeatureClass* feature) {
-	App->EventSink.PushHandler(feature);
+    App->EventSink.PushHandler(feature);
 }
 
 bool TestAppClass::OnInit() {
-	if (!wxApp::OnInit()) {
-		return false;
-	}
-	InitApp();
-	return true;
+    if (!wxApp::OnInit()) {
+        return false;
+    }
+    InitApp();
+    return true;
 }
 
 void TestAppClass::InitWxWidgets() {
-	int argc = 0;
-	char** argv = 0;
-	wxApp::SetInstance(this);
-	bool good = wxEntryStart(argc, argv);
-	CHECK(good);
+    int argc = 0;
+    char** argv = 0;
+    wxApp::SetInstance(this);
+    bool good = wxEntryStart(argc, argv);
+    CHECK(good);
 }
 
 void TestAppClass::CleanupWxWidgets() {
-	wxEntryCleanup();
+    wxEntryCleanup();
 }
 
 void TestAppClass::InitApp() {
-	Timer = new wxTimer();
-	App = new t4p::AppClass(*Timer);
+    Timer = new wxTimer();
+    App = new t4p::AppClass(*Timer);
 
-	Frame = new wxFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE);
-	StatusBarWithGauge = new t4p::StatusBarWithGaugeClass(Frame);
-	ToolsNotebook = new wxAuiNotebook(Frame);
-	OutlineNotebook = new wxAuiNotebook(Frame);
-	MenuBar = new wxMenuBar();
-	ToolBar = new wxAuiToolBar(Frame, wxID_ANY);
+    Frame = new wxFrame(NULL, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE);
+    StatusBarWithGauge = new t4p::StatusBarWithGaugeClass(Frame);
+    ToolsNotebook = new wxAuiNotebook(Frame);
+    OutlineNotebook = new wxAuiNotebook(Frame);
+    MenuBar = new wxMenuBar();
+    ToolBar = new wxAuiToolBar(Frame, wxID_ANY);
 
-	Frame->SetStatusBar(StatusBarWithGauge);
-	Frame->SetMenuBar(MenuBar);
-	SetTopWindow(Frame);
-	AuiManager = new wxAuiManager();
+    Frame->SetStatusBar(StatusBarWithGauge);
+    Frame->SetMenuBar(MenuBar);
+    SetTopWindow(Frame);
+    AuiManager = new wxAuiManager();
 }
 
 void TestAppClass::CleanupApp() {
-	Frame->Close();
-	wxTheApp->OnRun();
-	wxTheApp->OnExit();
+    Frame->Close();
+    wxTheApp->OnRun();
+    wxTheApp->OnExit();
 
-	delete AuiManager;
-	delete App;
-	delete Timer;
+    delete AuiManager;
+    delete App;
+    delete Timer;
 }
 
 ViewTestClass::ViewTestClass() {
-	TestApp = new TestAppClass();
-	TestApp->InitEnvironment();
+    TestApp = new TestAppClass();
+    TestApp->InitEnvironment();
 }
 
 ViewTestClass::~ViewTestClass() {
-	// CleanupEnvironment also deletes
-	// the TestApp pointer
-	TestApp->CleanupEnvironment();
+    // CleanupEnvironment also deletes
+    // the TestApp pointer
+    TestApp->CleanupEnvironment();
 }
 
 IMPLEMENT_APP_NO_MAIN(TestAppClass)

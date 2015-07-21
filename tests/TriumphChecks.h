@@ -34,8 +34,8 @@
  * size, if false, then the macro will exit from the current function
  */
 #define CHECK_VECTOR_SIZE(expectedSize, list) \
-	CHECK_EQUAL((size_t)expectedSize, list.size());\
-	if ((size_t)expectedSize != list.size()) return;
+    CHECK_EQUAL((size_t)expectedSize, list.size());\
+    if ((size_t)expectedSize != list.size()) return;
 
 
 /**
@@ -43,7 +43,7 @@
  * in a  case sensitive manner. expected is assumed to be an ASCII string.
  */
 #define CHECK_UNISTR_EQUALS(expected, actual) \
-	CHECK_EQUAL(UNICODE_STRING_SIMPLE(expected), actual);
+    CHECK_EQUAL(UNICODE_STRING_SIMPLE(expected), actual);
 
 
 /**
@@ -52,5 +52,5 @@
  * expected is assumed to be an ASCII string.
  */
 #define CHECK_UNISTR_EQUALS_NO_CASE(expected, actual) \
-	CHECK_EQUAL((int8_t)0, actual.caseCompare(UNICODE_STRING_SIMPLE(expected), 0));
+    CHECK_EQUAL((int8_t)0, actual.caseCompare(UNICODE_STRING_SIMPLE(expected), 0));
 #endif  // TESTS_TRIUMPHCHECKS_H_

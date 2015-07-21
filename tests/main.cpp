@@ -96,168 +96,168 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 
 class SingleTestsPredicateClass {
-	public:
-	std::vector<std::string> TestCases;
+ public:
+    std::vector<std::string> TestCases;
 
-	SingleTestsPredicateClass(const std::vector<std::string>& testCases)
-		: TestCases(testCases) {
-	}
+    SingleTestsPredicateClass(const std::vector<std::string>& testCases)
+        : TestCases(testCases) {
+    }
 
-	bool operator()(const UnitTest::Test* test) const {
-		// if no specific test cases need to be run, then run all tests in
-		// a suite
-		if (TestCases.empty()) {
-			return true;
-		}
-		bool ret = false;
-		for (std::vector<std::string>::const_iterator it =  TestCases.begin(); it != TestCases.end(); ++it) {
-			if (it->compare(test->m_details.testName) == 0) {
-				ret = true;
-				break;
-			}
-		}
-		return ret;
-	}
+    bool operator()(const UnitTest::Test* test) const {
+        // if no specific test cases need to be run, then run all tests in
+        // a suite
+        if (TestCases.empty()) {
+            return true;
+        }
+        bool ret = false;
+        for (std::vector<std::string>::const_iterator it =  TestCases.begin(); it != TestCases.end(); ++it) {
+            if (it->compare(test->m_details.testName) == 0) {
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
 };
 
 std::vector<std::string> listSuites() {
-	UnitTest::TestList& list = UnitTest::Test::GetTestList();
-	UnitTest::Test* test = list.GetHead();
-	std::vector<std::string> suites;
-	while (test) {
-		suites.push_back(test->m_details.suiteName);
-		test = test->next;
-	}
-	std::sort(suites.begin(), suites.end());
-	std::vector<std::string>::iterator end = std::unique(suites.begin(), suites.end());
-	suites.erase(end, suites.end());
-	return suites;
+    UnitTest::TestList& list = UnitTest::Test::GetTestList();
+    UnitTest::Test* test = list.GetHead();
+    std::vector<std::string> suites;
+    while (test) {
+        suites.push_back(test->m_details.suiteName);
+        test = test->next;
+    }
+    std::sort(suites.begin(), suites.end());
+    std::vector<std::string>::iterator end = std::unique(suites.begin(), suites.end());
+    suites.erase(end, suites.end());
+    return suites;
 }
 
 void printSuites(const std::vector<std::string>& suites) {
-	std::cout << "All available test suites\n\n";
-	for (size_t i = 0; i < suites.size(); i++) {
-		std::cout << suites[i] << std::endl;
-	}
-	std::cout << std::endl;
+    std::cout << "All available test suites\n\n";
+    for (size_t i = 0; i < suites.size(); i++) {
+        std::cout << suites[i] << std::endl;
+    }
+    std::cout << std::endl;
 }
 
 bool matchesSuite(const std::vector<std::string>& suites, const std::string& search) {
-	for (size_t i = 0; i < suites.size(); i++) {
-		// lower case suite names so that searches are case insensitive
-		std::string suite(suites[i]);
-		std::transform(suite.begin(), suite.end(), suite.begin(), ::tolower);
-		if (suite.find(search) != std::string::npos) {
-			return true;
-		}
-	}
-	return false;
+    for (size_t i = 0; i < suites.size(); i++) {
+        // lower case suite names so that searches are case insensitive
+        std::string suite(suites[i]);
+        std::transform(suite.begin(), suite.end(), suite.begin(), ::tolower);
+        if (suite.find(search) != std::string::npos) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int runMatchingSuites(const std::string& search) {
-	std::cout << "Running all tests matching \"" << search << "\"\n\n";
+    std::cout << "Running all tests matching \"" << search << "\"\n\n";
 
-	UnitTest::TestReporterStdout reporter;
-	UnitTest::TestResults results(&reporter);
-	UnitTest::CurrentTest::Results() = &results;
-	UnitTest::Timer timer;
+    UnitTest::TestReporterStdout reporter;
+    UnitTest::TestResults results(&reporter);
+    UnitTest::CurrentTest::Results() = &results;
+    UnitTest::Timer timer;
 
-	timer.Start();
-	UnitTest::TestList& list = UnitTest::Test::GetTestList();
-	UnitTest::Test* test = list.GetHead();
-	while (test) {
-		std::string suiteName(test->m_details.suiteName);
+    timer.Start();
+    UnitTest::TestList& list = UnitTest::Test::GetTestList();
+    UnitTest::Test* test = list.GetHead();
+    while (test) {
+        std::string suiteName(test->m_details.suiteName);
 
-		// lower case suite names so that searches are case insensitive
-		std::transform(suiteName.begin(), suiteName.end(), suiteName.begin(), ::tolower);
-		if (suiteName.find(search) != std::string::npos) {
-			results.OnTestStart(test->m_details);
-			test->Run();
-			int const testTimeInMs = timer.GetTimeInMs();
-			results.OnTestFinish(test->m_details, testTimeInMs / 1000.0f);
-		}
-		test = test->next;
-	}
+        // lower case suite names so that searches are case insensitive
+        std::transform(suiteName.begin(), suiteName.end(), suiteName.begin(), ::tolower);
+        if (suiteName.find(search) != std::string::npos) {
+            results.OnTestStart(test->m_details);
+            test->Run();
+            int const testTimeInMs = timer.GetTimeInMs();
+            results.OnTestFinish(test->m_details, testTimeInMs / 1000.0f);
+        }
+        test = test->next;
+    }
 
-	float const secondsElapsed = timer.GetTimeInMs() / 1000.0f;
-	if (results.GetFailureCount() > 0) {
-		std::cout << "FAILURE: " << results.GetFailedTestCount()
-			<< " out of " << results.GetTotalTestCount()
-			<< " failed (" << results.GetFailureCount() << ")." << std::endl;
-	} else {
-		std::cout << "Success: " << results.GetTotalTestCount()
-			<< " tests passed." << std::endl;
-	}
-	std::cout << "Test time: " << secondsElapsed << " seconds.\n";
-	return results.GetFailureCount();
+    float const secondsElapsed = timer.GetTimeInMs() / 1000.0f;
+    if (results.GetFailureCount() > 0) {
+        std::cout << "FAILURE: " << results.GetFailedTestCount()
+                  << " out of " << results.GetTotalTestCount()
+                  << " failed (" << results.GetFailureCount() << ")." << std::endl;
+    } else {
+        std::cout << "Success: " << results.GetTotalTestCount()
+                  << " tests passed." << std::endl;
+    }
+    std::cout << "Test time: " << secondsElapsed << " seconds.\n";
+    return results.GetFailureCount();
 }
 
 int chooseTests() {
-	int ret = 0;
-	std::string suiteToRun;
-	std::vector<std::string> testCasesToRun;
-	std::vector<std::string> suites = listSuites();
-	std::string prompt = "Choose:\n";
-	prompt += "1. Run all tests\n";
-	prompt += "2. Run suites matching a string\n";
-	prompt += "3. List all suites\n";
-	prompt += "4. Exit the program\n";
-	std::string choice = "";
+    int ret = 0;
+    std::string suiteToRun;
+    std::vector<std::string> testCasesToRun;
+    std::vector<std::string> suites = listSuites();
+    std::string prompt = "Choose:\n";
+    prompt += "1. Run all tests\n";
+    prompt += "2. Run suites matching a string\n";
+    prompt += "3. List all suites\n";
+    prompt += "4. Exit the program\n";
+    std::string choice = "";
 
-	std::cout << "Triumph4PHP test runner." << std::endl;
-	std::cout << prompt;
-	std::cin >> choice;
-	while (choice != "4") {
-		if (choice == "1") {
-			std::cout << "Running all tests\n\n";
-			ret = UnitTest::RunAllTests();
-		} else if (choice == "2") {
-			std::cout << "Enter suite string:" << std::endl;
-			std::cin >> suiteToRun;
+    std::cout << "Triumph4PHP test runner." << std::endl;
+    std::cout << prompt;
+    std::cin >> choice;
+    while (choice != "4") {
+        if (choice == "1") {
+            std::cout << "Running all tests\n\n";
+            ret = UnitTest::RunAllTests();
+        } else if (choice == "2") {
+            std::cout << "Enter suite string:" << std::endl;
+            std::cin >> suiteToRun;
 
-			// lowe case the given name
-			std::transform(suiteToRun.begin(), suiteToRun.end(), suiteToRun.begin(), ::tolower);
-			if (matchesSuite(suites, suiteToRun)) {
-				ret = runMatchingSuites(suiteToRun);
-			} else {
-				std::cout << "No suites matched" << std::endl;
-			}
-		} else if (choice == "3") {
-			printSuites(suites);
-		} else {
-			std::cout << "invalid choice." << std::endl;
-		}
-		std::cout << prompt;
-		std::cin >> choice;
-	}
-	return ret;
+            // lowe case the given name
+            std::transform(suiteToRun.begin(), suiteToRun.end(), suiteToRun.begin(), ::tolower);
+            if (matchesSuite(suites, suiteToRun)) {
+                ret = runMatchingSuites(suiteToRun);
+            } else {
+                std::cout << "No suites matched" << std::endl;
+            }
+        } else if (choice == "3") {
+            printSuites(suites);
+        } else {
+            std::cout << "invalid choice." << std::endl;
+        }
+        std::cout << prompt;
+        std::cin >> choice;
+    }
+    return ret;
 }
 
 // run all tests
 int main(int argc, char **argv) {
-	// our classes use wxWidgets we must initialize the
-	// library
-	wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
-	wxInitializer initializer;
-	if (!initializer) {
-		puts("Could not initialize wxWidgets\n");
-		return -1;
-	}
+    // our classes use wxWidgets we must initialize the
+    // library
+    wxApp::CheckBuildOptions(WX_BUILD_OPTIONS_SIGNATURE, "program");
+    wxInitializer initializer;
+    if (!initializer) {
+        puts("Could not initialize wxWidgets\n");
+        return -1;
+    }
 
-	int ret = 0;
-	if (argc > 1 && strcmp("--all", argv[1]) == 0) {
-		ret = UnitTest::RunAllTests();
-	} else {
-		ret = chooseTests();
-	}
+    int ret = 0;
+    if (argc > 1 && strcmp("--all", argv[1]) == 0) {
+        ret = UnitTest::RunAllTests();
+    } else {
+        ret = chooseTests();
+    }
 
-	// calling cleanup here so that we can run this binary through a memory leak detector
-	// ICU will cache many things and that will cause the detector to output "possible leaks"
-	u_cleanup();
+    // calling cleanup here so that we can run this binary through a memory leak detector
+    // ICU will cache many things and that will cause the detector to output "possible leaks"
+    u_cleanup();
 
-	// clean up the MySQL library. Same reason as the ICU cleanup.
-	mysql_library_end();
-	sqlite_api::sqlite3_shutdown();
-	wxUninitialize();
-	return ret;
+    // clean up the MySQL library. Same reason as the ICU cleanup.
+    mysql_library_end();
+    sqlite_api::sqlite3_shutdown();
+    wxUninitialize();
+    return ret;
 }

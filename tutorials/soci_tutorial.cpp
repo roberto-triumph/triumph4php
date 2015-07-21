@@ -35,32 +35,32 @@
  * known at compile time; as in a "SELECT * FROM users type query).
  */
 void queryMysql() {
-	 try {
-		soci::session session(*soci::factory_mysql(), "db=mysql user=root password='' host=127.0.0.1 ");
-		std::string query = "SHOW DATABASES;";
-		printf("querying MySQL: %s\n", query.c_str());
+    try {
+        soci::session session(*soci::factory_mysql(), "db=mysql user=root password='' host=127.0.0.1 ");
+        std::string query = "SHOW DATABASES;";
+        printf("querying MySQL: %s\n", query.c_str());
 
-		soci::statement stmt(session);
-		stmt.alloc();
-		stmt.prepare(query);
-		stmt.define_and_bind();
-		soci::row row;
-		stmt.exchange_for_rowset(soci::into(row));
-		bool good = stmt.execute(true);
-		if (good) {
-			const soci::column_properties& props = row.get_properties(0);
-			printf("%s\n", props.get_name().c_str());
-		}
-		while (good) {
-			printf("%s\n", row.get<std::string>(0).c_str());
-			good = stmt.fetch();
-		}
-		stmt.clean_up();
-		session.close();
-	}
-	catch (std::exception const& e) {
-		printf("Error: %s\n", e.what());
-	}
+        soci::statement stmt(session);
+        stmt.alloc();
+        stmt.prepare(query);
+        stmt.define_and_bind();
+        soci::row row;
+        stmt.exchange_for_rowset(soci::into(row));
+        bool good = stmt.execute(true);
+        if (good) {
+            const soci::column_properties& props = row.get_properties(0);
+            printf("%s\n", props.get_name().c_str());
+        }
+        while (good) {
+            printf("%s\n", row.get<std::string>(0).c_str());
+            good = stmt.fetch();
+        }
+        stmt.clean_up();
+        session.close();
+    }
+    catch (std::exception const& e) {
+        printf("Error: %s\n", e.what());
+    }
 }
 
 /**
@@ -71,41 +71,41 @@ void queryMysql() {
  * known at compile time; as in "SELECT * FROM" type query).
  */
 void querySqlite() {
-	try {
-		std::string sqliteFile = ":memory:";
-		soci::session session(*soci::factory_sqlite3(), sqliteFile);
-		session.once << "CREATE TABLE users(id int, name varchar(255));";
-		session.once << "INSERT INTO users(id, name) VALUES(1, 'John');";
-		session.once << "INSERT INTO users(id, name) VALUES(2, 'Ron');";
+    try {
+        std::string sqliteFile = ":memory:";
+        soci::session session(*soci::factory_sqlite3(), sqliteFile);
+        session.once << "CREATE TABLE users(id int, name varchar(255));";
+        session.once << "INSERT INTO users(id, name) VALUES(1, 'John');";
+        session.once << "INSERT INTO users(id, name) VALUES(2, 'Ron');";
 
-		std::string query = "SELECT id, name FROM users;";
-		printf("querying SQLite3: %s\n", query.c_str());
-		soci::statement stmt(session);
-		stmt.alloc();
-		stmt.prepare(query);
-		stmt.define_and_bind();
-		soci::row row;
-		stmt.exchange_for_rowset(soci::into(row));
-		bool good = stmt.execute(true);
-		if (good) {
-			soci::column_properties props = row.get_properties(0);
-			printf("%s\t", props.get_name().c_str());
-			props = row.get_properties(1);
-			printf("%s\n", props.get_name().c_str());
-		}
-		while (good) {
-			printf("%d\t%s\n", row.get<int>(0), row.get<std::string>(1).c_str());
-			good = stmt.fetch();
-		}
-		stmt.clean_up();
-		session.close();
-	}
-	catch (std::exception const& e) {
-		printf("Error: %s\n", e.what());
-	}
+        std::string query = "SELECT id, name FROM users;";
+        printf("querying SQLite3: %s\n", query.c_str());
+        soci::statement stmt(session);
+        stmt.alloc();
+        stmt.prepare(query);
+        stmt.define_and_bind();
+        soci::row row;
+        stmt.exchange_for_rowset(soci::into(row));
+        bool good = stmt.execute(true);
+        if (good) {
+            soci::column_properties props = row.get_properties(0);
+            printf("%s\t", props.get_name().c_str());
+            props = row.get_properties(1);
+            printf("%s\n", props.get_name().c_str());
+        }
+        while (good) {
+            printf("%d\t%s\n", row.get<int>(0), row.get<std::string>(1).c_str());
+            good = stmt.fetch();
+        }
+        stmt.clean_up();
+        session.close();
+    }
+    catch (std::exception const& e) {
+        printf("Error: %s\n", e.what());
+    }
 }
 
 int main() {
-	queryMysql();
-	querySqlite();
+    queryMysql();
+    querySqlite();
 }

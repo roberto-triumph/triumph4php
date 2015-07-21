@@ -33,65 +33,65 @@
  * This test fixture is useful for testing classes that read from files.
  */
 class FileTestFixtureClass {
-	public:
-	/**
-	 * Construct a new test fixture that will use subdirectory tempDirectory within the OS temp
-	 * @param wxString tempDirectory directory where files will be created.
-	 */
-	FileTestFixtureClass(const wxString& tempDirectory);
+ public:
+    /**
+     * Construct a new test fixture that will use subdirectory tempDirectory within the OS temp
+     * @param wxString tempDirectory directory where files will be created.
+     */
+    FileTestFixtureClass(const wxString& tempDirectory);
 
-	virtual ~FileTestFixtureClass();
+    virtual ~FileTestFixtureClass();
 
-	void RecursiveRmDir(wxString path);
+    void RecursiveRmDir(wxString path);
 
-	/**
-	 * Creates a file in the temp directory. The file will have the given contents.
-	 *
-	 * @param wxString fileName the name of the file.  The  name should be a relative path,
-	 *			with tempDirectory (as given in the constructor) as root.
-	 * @param wxString contents the file contents.
-	 */
-	void CreateFixtureFile(const wxString& fileName, const wxString& contents);
+    /**
+     * Creates a file in the temp directory. The file will have the given contents.
+     *
+     * @param wxString fileName the name of the file.  The  name should be a relative path,
+     *			with tempDirectory (as given in the constructor) as root.
+     * @param wxString contents the file contents.
+     */
+    void CreateFixtureFile(const wxString& fileName, const wxString& contents);
 
-	/**
-	 * "Hides" the given file by executing the appropriate OS command to set the file
-	 * to be a hidden file.
-	 * @param fileName full path of file to hide. Note: does NOT handle non-ascii file names
-	 * @return wxString the name of the hidden file (ie. in case of linux the file is renamed to start
-	 *        with a '.' )
-	 */
-	wxString HideFile(const wxString& fileName);
+    /**
+     * "Hides" the given file by executing the appropriate OS command to set the file
+     * to be a hidden file.
+     * @param fileName full path of file to hide. Note: does NOT handle non-ascii file names
+     * @return wxString the name of the hidden file (ie. in case of linux the file is renamed to start
+     *        with a '.' )
+     */
+    wxString HideFile(const wxString& fileName);
 
-	/**
-	 * Create a sub-directory within tempDirectory
-	 *
-	 * @param wxString subDirectory valid directory name
-	 */
-	void CreateSubDirectory(const wxString& subDirectory);
+    /**
+     * Create a sub-directory within tempDirectory
+     *
+     * @param wxString subDirectory valid directory name
+     */
+    void CreateSubDirectory(const wxString& subDirectory);
 
-	/**
-	 * Reads the file into a string and returns the string.
-	 */
-	wxString GetFileContents(const wxString& fileName);
+    /**
+     * Reads the file into a string and returns the string.
+     */
+    wxString GetFileContents(const wxString& fileName);
 
-	/**
-	 * Creates the test dir if it does not already exist.
-	 */
-	void TouchTestDir();
+    /**
+     * Creates the test dir if it does not already exist.
+     */
+    void TouchTestDir();
 
-	/**
-	 * Use this to make wxFileNames for subdirectories of
-	 * the test dir
-	 *
-	 * @return a wxFileName with TestProjectDir + dirName
-	 */
-	wxFileName AbsoluteDir(const wxString& dirName);
+    /**
+     * Use this to make wxFileNames for subdirectories of
+     * the test dir
+     *
+     * @return a wxFileName with TestProjectDir + dirName
+     */
+    wxFileName AbsoluteDir(const wxString& dirName);
 
-	/**
-	 *
-	 * @var wxString full path to the temp directory for this test
-	 */
-	wxString TestProjectDir;
+    /**
+     *
+     * @var wxString full path to the temp directory for this test
+     */
+    wxString TestProjectDir;
 };
 
 #endif  // TESTS_FILETESTFIXTURECLASS_H_

@@ -43,178 +43,174 @@
  */
 
 class MyApp : public wxApp {
-	public:
-	MyApp();
-	bool OnInit();
-	int OnExit();
+ public:
+    MyApp();
+    bool OnInit();
+    int OnExit();
 
-	/**
-	 * build the sequence to be tested.
-	 */
-	void BuildSequence();
+    /**
+     * build the sequence to be tested.
+     */
+    void BuildSequence();
 
-	/**
-	 * initialize the global data structures.  Note that these are not
-	 * retrieved from the Triumph .ini file; they are hardcoded into
-	 * this program.
-	 */
-	void BuildGlobals();
+    /**
+     * initialize the global data structures.  Note that these are not
+     * retrieved from the Triumph .ini file; they are hardcoded into
+     * this program.
+     */
+    void BuildGlobals();
 
-	/**
-	 * build an instance of a project from a directory
-	 */
-	void CreateProject(wxString label, wxString rootDir);
+    /**
+     * build an instance of a project from a directory
+     */
+    void CreateProject(wxString label, wxString rootDir);
 
-	void Stop();
+    void Stop();
 
-	/**
-	 * used to keep track of running threads
-	 */
-	t4p::RunningThreadsClass RunningThreads;
+    /**
+     * used to keep track of running threads
+     */
+    t4p::RunningThreadsClass RunningThreads;
 
-	/**
-	 * used to keep track of running threads
-	 */
-	t4p::GlobalsClass Globals;
+    /**
+     * used to keep track of running threads
+     */
+    t4p::GlobalsClass Globals;
 
-	/**
-	 * the sequence being tested
-	 */
-	t4p::SequenceClass Sequence;
+    /**
+     * the sequence being tested
+     */
+    t4p::SequenceClass Sequence;
 };
 
 class MyFrame: public wxFrame {
-	public:
-	MyFrame(MyApp& app);
+ public:
+    MyFrame(MyApp& app);
 
-	void Log(wxString msg);
+    void Log(wxString msg);
 
-	private:
-	wxTextCtrl* TextCtrl;
-	MyApp& App;
-	int Lines;
+ private:
+    wxTextCtrl* TextCtrl;
+    MyApp& App;
+    int Lines;
 
-	void OnActionComplete(wxCommandEvent& event);
-	void OnActionInProgress(wxCommandEvent& event);
-	void OnClose(wxCloseEvent& event);
-	void OnSequenceComplete(wxCommandEvent& event);
-	void OnTagFinderListComplete(t4p::TagFinderListCompleteEventClass& event);
+    void OnActionComplete(wxCommandEvent& event);
+    void OnActionInProgress(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+    void OnSequenceComplete(wxCommandEvent& event);
+    void OnTagFinderListComplete(t4p::TagFinderListCompleteEventClass& event);
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 IMPLEMENT_APP(MyApp)
 
 MyApp::MyApp()
-: wxApp()
-, RunningThreads()
-, Globals()
-, Sequence(Globals, RunningThreads) {
+    : wxApp()
+    , RunningThreads()
+    , Globals()
+    , Sequence(Globals, RunningThreads) {
 }
 
 bool MyApp::OnInit() {
-	MyFrame* frame = new MyFrame(*this);
-	SetTopWindow(frame);
-	frame->Show(true);
+    MyFrame* frame = new MyFrame(*this);
+    SetTopWindow(frame);
+    frame->Show(true);
 
-	BuildGlobals();
-	BuildSequence();
-	frame->Log(_("Starting sequence"));
-	return true;
+    BuildGlobals();
+    BuildSequence();
+    frame->Log(_("Starting sequence"));
+    return true;
 }
 
 void MyApp::Stop() {
-	RunningThreads.StopAll();
-	Sequence.Stop();
+    RunningThreads.StopAll();
+    Sequence.Stop();
 }
 
 void MyApp::BuildSequence() {
-	std::vector<t4p::GlobalActionClass*> actions;
-	actions.push_back(
-		new t4p::TagCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK)
-	);
-	actions.push_back(
-		new t4p::DetectorCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK)
-	);
-	actions.push_back(
-		new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST)
-	);
-	actions.push_back(
-		new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR)
-	);
-	Sequence.Build(actions);
+    std::vector<t4p::GlobalActionClass*> actions;
+    actions.push_back(
+        new t4p::TagCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_CACHE_VERSION_CHECK));
+    actions.push_back(
+        new t4p::DetectorCacheDbVersionActionClass(RunningThreads, t4p::ID_EVENT_ACTION_DETECTOR_CACHE_VERSION_CHECK));
+    actions.push_back(
+        new t4p::ProjectTagActionClass(RunningThreads, t4p::ID_EVENT_ACTION_TAG_FINDER_LIST));
+    actions.push_back(
+        new t4p::UrlTagDetectorActionClass(RunningThreads, t4p::ID_EVENT_ACTION_URL_TAG_DETECTOR));
+    Sequence.Build(actions);
 }
 
 void MyApp::BuildGlobals() {
-	Globals.Environment.Init();
-	Globals.Projects.clear();
-	Globals.TagCache.Clear();
+    Globals.Environment.Init();
+    Globals.Projects.clear();
+    Globals.TagCache.Clear();
 
-	wxFileName tagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
-	wxFileName detectorTagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
+    wxFileName tagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\tags.sqlite"));
+    wxFileName detectorTagDbFileName(wxT("C:\\Users\\roberto\\Desktop\\caches\\detectors.sqlite"));
 
-	if (tagDbFileName.FileExists()) {
-		wxRemoveFile(tagDbFileName.GetFullPath());
-	}
-	if (detectorTagDbFileName.FileExists()) {
-		wxRemoveFile(detectorTagDbFileName.GetFullPath());
-	}
+    if (tagDbFileName.FileExists()) {
+        wxRemoveFile(tagDbFileName.GetFullPath());
+    }
+    if (detectorTagDbFileName.FileExists()) {
+        wxRemoveFile(detectorTagDbFileName.GetFullPath());
+    }
 
-	// needed so that we can know what files need to be parsed
-	Globals.FileTypes.PhpFileExtensionsString = wxT("*.php");
-	Globals.FileTypes.CssFileExtensionsString = wxT("*.css");
-	Globals.FileTypes.SqlFileExtensionsString = wxT("*.php");
-	Globals.FileTypes.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
+    // needed so that we can know what files need to be parsed
+    Globals.FileTypes.PhpFileExtensionsString = wxT("*.php");
+    Globals.FileTypes.CssFileExtensionsString = wxT("*.css");
+    Globals.FileTypes.SqlFileExtensionsString = wxT("*.php");
+    Globals.FileTypes.MiscFileExtensionsString = wxT("*.txt;*.xml;*.yml");
 
-	Globals.Environment.Apache.ManualConfiguration = true;
-	Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
+    Globals.Environment.Apache.ManualConfiguration = true;
+    Globals.Environment.Apache.SetVirtualHostMapping(wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"), wxT("http://localhost/"));
 
-	Globals.TagCacheDbFileName = tagDbFileName;
-	Globals.DetectorCacheDbFileName = detectorTagDbFileName;
+    Globals.TagCacheDbFileName = tagDbFileName;
+    Globals.DetectorCacheDbFileName = detectorTagDbFileName;
 
-	// create a project
-	CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
-	CreateProject(wxT("symfony"), wxT("C:\\Users\\roberto\\Documents\\php_projects\\symfony"));
+    // create a project
+    CreateProject(wxT("ember"), wxT("C:\\Users\\roberto\\software\\wamp\\www\\ember"));
+    CreateProject(wxT("symfony"), wxT("C:\\Users\\roberto\\Documents\\php_projects\\symfony"));
 }
 
 void MyApp::CreateProject(wxString projectName, wxString rootDir) {
-        t4p::ProjectClass project1;
-        project1.Label = projectName;
-        project1.IsEnabled = true;
-        t4p::SourceClass src1;
-        src1.RootDirectory.AssignDir(rootDir);
-        src1.SetIncludeWildcards(wxT("*.php"));
-        project1.AddSource(src1);
-        Globals.Projects.push_back(project1);
+    t4p::ProjectClass project1;
+    project1.Label = projectName;
+    project1.IsEnabled = true;
+    t4p::SourceClass src1;
+    src1.RootDirectory.AssignDir(rootDir);
+    src1.SetIncludeWildcards(wxT("*.php"));
+    project1.AddSource(src1);
+    Globals.Projects.push_back(project1);
 }
 
 int MyApp::OnExit() {
-	// external libs use memory pools; close these
-	// down so that we can run this program thtough memory checkers
-	// and the memcheckers will not complain.
-	u_cleanup();
+    // external libs use memory pools; close these
+    // down so that we can run this program thtough memory checkers
+    // and the memcheckers will not complain.
+    u_cleanup();
     mysql_library_end();
     sqlite_api::sqlite3_shutdown();
     return 0;
 }
 
 MyFrame::MyFrame(MyApp& app)
-	: wxFrame(NULL, wxID_ANY, _("action profiler"), wxDefaultPosition,
-			wxSize(640, 480))
-	, App(app) {
-	TextCtrl = new  wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(640, 480), wxTE_MULTILINE | wxTE_READONLY);
-	Lines = 0;
-	App.RunningThreads.AddEventHandler(this);
+    : wxFrame(NULL, wxID_ANY, _("action profiler"), wxDefaultPosition,
+              wxSize(640, 480))
+    , App(app) {
+    TextCtrl = new  wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(640, 480), wxTE_MULTILINE | wxTE_READONLY);
+    Lines = 0;
+    App.RunningThreads.AddEventHandler(this);
 }
 
 void MyFrame::Log(wxString msg) {
-	Lines++;
-	if (Lines > 1000) {
-		Lines = 0;
-		TextCtrl->Clear();
-	}
-	TextCtrl->AppendText(msg);
-	TextCtrl->AppendText(wxT("\n"));
+    Lines++;
+    if (Lines > 1000) {
+        Lines = 0;
+        TextCtrl->Clear();
+    }
+    TextCtrl->AppendText(msg);
+    TextCtrl->AppendText(wxT("\n"));
 }
 
 void MyFrame::OnActionComplete(wxCommandEvent& event) {
@@ -224,25 +220,25 @@ void MyFrame::OnActionInProgress(wxCommandEvent& event) {
 }
 
 void MyFrame::OnClose(wxCloseEvent& event) {
-	App.RunningThreads.RemoveEventHandler(this);
-	App.Stop();
-	event.Skip();
+    App.RunningThreads.RemoveEventHandler(this);
+    App.Stop();
+    event.Skip();
 }
 
 void MyFrame::OnTagFinderListComplete(t4p::TagFinderListCompleteEventClass& event) {
-	Log(_("global cache completed."));
+    Log(_("global cache completed."));
 }
 
 void MyFrame::OnSequenceComplete(wxCommandEvent& event) {
-	Log(_("Sequence completed."));
+    Log(_("Sequence completed."));
 
-	App.BuildGlobals();
-	Log(_("Restarting Sequence."));
-	App.BuildSequence();
+    App.BuildGlobals();
+    Log(_("Restarting Sequence."));
+    App.BuildSequence();
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-	EVT_CLOSE(MyFrame::OnClose)
-	EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
-	EVT_TAG_FINDER_LIST_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)
+    EVT_CLOSE(MyFrame::OnClose)
+    EVT_COMMAND(wxID_ANY, t4p::EVENT_SEQUENCE_COMPLETE, MyFrame::OnSequenceComplete)
+    EVT_TAG_FINDER_LIST_COMPLETE(t4p::ID_EVENT_ACTION_TAG_FINDER_LIST, MyFrame::OnTagFinderListComplete)
 END_EVENT_TABLE()

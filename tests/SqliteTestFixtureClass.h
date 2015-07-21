@@ -34,44 +34,44 @@
  * fixture is useful for the tests that deal with tag searching and tag parsing.
  */
 class SqliteTestFixtureClass {
-	public:
-	/**
-	 * @param sqlScriptFile the file that contains the CREATE table statements
-	 *        to seed the database.
-	 */
-	SqliteTestFixtureClass(const wxFileName& sqlScriptFile);
+ public:
+    /**
+     * @param sqlScriptFile the file that contains the CREATE table statements
+     *        to seed the database.
+     */
+    SqliteTestFixtureClass(const wxFileName& sqlScriptFile);
 
-	/**
-	 * cleans up the database
-	 */
-	virtual ~SqliteTestFixtureClass();
+    /**
+     * cleans up the database
+     */
+    virtual ~SqliteTestFixtureClass();
 
-	/**
-	 * creates the given database. WILL
-	 * throw an exception if could it not connect to database or create
-	 * the database.
-	 * @param seesion must be an opened connection to a sqlite db
-	 * @param sqlScriptFile file that contains sql to execute on the session
-	 */
-	void CreateDatabase(soci::session& session, const wxFileName& sqlScriptFile);
+    /**
+     * creates the given database. WILL
+     * throw an exception if could it not connect to database or create
+     * the database.
+     * @param seesion must be an opened connection to a sqlite db
+     * @param sqlScriptFile file that contains sql to execute on the session
+     */
+    void CreateDatabase(soci::session& session, const wxFileName& sqlScriptFile);
 
-	/**
-	 * executes the given query. WILL
-	 * throw an exception if could it not connect to database or execute the query.
-	 * @return bool TRUE if query was successful
-	 */
-	bool Exec(const std::string& query);
+    /**
+     * executes the given query. WILL
+     * throw an exception if could it not connect to database or execute the query.
+     * @return bool TRUE if query was successful
+     */
+    bool Exec(const std::string& query);
 
-	protected:
-	/**
-	 * The active connection
-	 */
-	soci::session Session;
+ protected:
+    /**
+     * The active connection
+     */
+    soci::session Session;
 
-	/**
-	 * The connection info
-	 */
-	std::string ConnectionString;
+    /**
+     * The connection info
+     */
+    std::string ConnectionString;
 };
 
 #endif  // TESTS_SQLITETESTFIXTURECLASS_H_

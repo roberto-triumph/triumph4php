@@ -50,80 +50,80 @@
  * program.
  */
 class TestAppClass : public wxApp {
-	public:
-	// the App contains the application data structures
-	wxTimer* Timer;
-	t4p::AppClass* App;
+ public:
+    // the App contains the application data structures
+    wxTimer* Timer;
+    t4p::AppClass* App;
 
-	// the various widgets that the application
-	// creates
-	wxFrame* Frame;
-	t4p::StatusBarWithGaugeClass* StatusBarWithGauge;
-	wxAuiNotebook* ToolsNotebook;
-	wxAuiNotebook* OutlineNotebook;
-	wxMenuBar* MenuBar;
-	wxAuiToolBar* ToolBar;
-	wxAuiManager* AuiManager;
+    // the various widgets that the application
+    // creates
+    wxFrame* Frame;
+    t4p::StatusBarWithGaugeClass* StatusBarWithGauge;
+    wxAuiNotebook* ToolsNotebook;
+    wxAuiNotebook* OutlineNotebook;
+    wxMenuBar* MenuBar;
+    wxAuiToolBar* ToolBar;
+    wxAuiManager* AuiManager;
 
-	TestAppClass();
+    TestAppClass();
 
-	~TestAppClass();
+    ~TestAppClass();
 
-	/**
-	 * initializes the wxWidgets library but does
-	 * NOT start the run loop.
-	 * Also, creates the application windows and
-	 * data structures,.
-	 */
-	void InitEnvironment();
+    /**
+     * initializes the wxWidgets library but does
+     * NOT start the run loop.
+     * Also, creates the application windows and
+     * data structures,.
+     */
+    void InitEnvironment();
 
-	/**
-	 * Delete all data structures, windows, and
-	 * un-initialize wxWidgets.
-	 */
-	void CleanupEnvironment();
+    /**
+     * Delete all data structures, windows, and
+     * un-initialize wxWidgets.
+     */
+    void CleanupEnvironment();
 
-	/**
-	 * Initializes the given feature just like the "real app" does. After
-	 * a call to this method, the feature will process all events from the
-	 * event sink, and can access windows, menus, and toolbars.
-	 *
-	 * @param view the view to bootstrap. This class will NOT own the pointer.
-	 */
-	void TriumphBootstrapView(t4p::FeatureViewClass* view);
+    /**
+     * Initializes the given feature just like the "real app" does. After
+     * a call to this method, the feature will process all events from the
+     * event sink, and can access windows, menus, and toolbars.
+     *
+     * @param view the view to bootstrap. This class will NOT own the pointer.
+     */
+    void TriumphBootstrapView(t4p::FeatureViewClass* view);
 
-	/**
-	 * Initializes the given feature just like the "real app" does. After
-	 * a call to this method, the feature will process all events from the
-	 * event sink.
-	 *
-	 * @param feature the feature to bootstrap. This class will NOT own
-	 *        the pointer.
-	 */
-	void TriumphBootstrapFeature(t4p::FeatureClass* feature);
+    /**
+     * Initializes the given feature just like the "real app" does. After
+     * a call to this method, the feature will process all events from the
+     * event sink.
+     *
+     * @param feature the feature to bootstrap. This class will NOT own
+     *        the pointer.
+     */
+    void TriumphBootstrapFeature(t4p::FeatureClass* feature);
 
-	/**
-	 * Create the application data structures and windows
-	 * Should only be called after wxWidgets has been
-	 * initialized.
-	 */
-	virtual bool OnInit();
+    /**
+     * Create the application data structures and windows
+     * Should only be called after wxWidgets has been
+     * initialized.
+     */
+    virtual bool OnInit();
 
-	private:
-	/**
-	 * initialized the wxWidgets library but does
-	 * NOT start the run loop.
-	 */
-	void InitWxWidgets();
+ private:
+    /**
+     * initialized the wxWidgets library but does
+     * NOT start the run loop.
+     */
+    void InitWxWidgets();
 
-	/**
-	 * Deletes the app, windows, and wxWidgets
-	 */
-	void CleanupWxWidgets();
+    /**
+     * Deletes the app, windows, and wxWidgets
+     */
+    void CleanupWxWidgets();
 
-	void InitApp();
+    void InitApp();
 
-	void CleanupApp();
+    void CleanupApp();
 };
 
 /**
@@ -131,20 +131,20 @@ class TestAppClass : public wxApp {
  * of the application environment.
  */
 class ViewTestClass {
-	public:
-	TestAppClass* TestApp;
+ public:
+    TestAppClass* TestApp;
 
-	/**
-	 * Initializes the wxWidgets and the app environment.
-	 */
-	ViewTestClass();
+    /**
+     * Initializes the wxWidgets and the app environment.
+     */
+    ViewTestClass();
 
-	/**
-	 * Uninitialized the wxWidgets and the app environment.
-	 */
-	~ViewTestClass();
+    /**
+     * Uninitialized the wxWidgets and the app environment.
+     */
+    ~ViewTestClass();
 
-	private:
+ private:
 };
 
 #endif  // VIEW_TESTS_TESTAPPCLASS_H_

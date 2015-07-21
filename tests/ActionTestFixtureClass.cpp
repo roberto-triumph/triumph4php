@@ -26,32 +26,32 @@
 #include "ActionTestFixtureClass.h"
 
 ActionTestFixtureClass::ActionTestFixtureClass()
-	: wxEvtHandler()
-	, RunningThreads(false)
-	, Globals() {
-	RunningThreads.AddEventHandler(this);
+    : wxEvtHandler()
+    , RunningThreads(false)
+    , Globals() {
+    RunningThreads.AddEventHandler(this);
 }
 
 ActionTestFixtureClass::~ActionTestFixtureClass() {
-	RunningThreads.RemoveEventHandler(this);
+    RunningThreads.RemoveEventHandler(this);
 }
 
 void ActionTestFixtureClass::InitTagCache(const wxString& cacheDir) {
-	Globals.TagCacheDbFileName.Assign(cacheDir, wxT("tag_cache.db"));
-	Globals.DetectorCacheDbFileName.Assign(cacheDir, wxT("detector_cache.db"));
+    Globals.TagCacheDbFileName.Assign(cacheDir, wxT("tag_cache.db"));
+    Globals.DetectorCacheDbFileName.Assign(cacheDir, wxT("detector_cache.db"));
 }
 
 void ActionTestFixtureClass::CreateProject(const wxFileName& sourceDir) {
-	t4p::ProjectClass project;
+    t4p::ProjectClass project;
 
-	int projectNum = Globals.Projects.size() + 1;
-	project.Label = wxString::Format(wxT("project %d"), projectNum);
-	project.IsEnabled = true;
+    int projectNum = Globals.Projects.size() + 1;
+    project.Label = wxString::Format(wxT("project %d"), projectNum);
+    project.IsEnabled = true;
 
 
-	t4p::SourceClass srcProject;
-	srcProject.RootDirectory.Assign(sourceDir);
-	project.AddSource(srcProject);
+    t4p::SourceClass srcProject;
+    srcProject.RootDirectory.Assign(sourceDir);
+    project.AddSource(srcProject);
 
-	Globals.Projects.push_back(project);
+    Globals.Projects.push_back(project);
 }

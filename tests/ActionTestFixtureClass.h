@@ -36,32 +36,32 @@
  * must be the first class in the inheritance chain.
  */
 class ActionTestFixtureClass : public wxEvtHandler {
-	public:
-	t4p::RunningThreadsClass RunningThreads;
+ public:
+    t4p::RunningThreadsClass RunningThreads;
 
-	/**
-	 * Since ActionClass::Init() needs a GlobalsClass parameter
-	 */
-	t4p::GlobalsClass Globals;
+    /**
+     * Since ActionClass::Init() needs a GlobalsClass parameter
+     */
+    t4p::GlobalsClass Globals;
 
-	ActionTestFixtureClass();
+    ActionTestFixtureClass();
 
-	virtual ~ActionTestFixtureClass();
+    virtual ~ActionTestFixtureClass();
 
-	/**
-	 * Set the directory location for the tag db files
-	 * @param cacheDir the directory to place the cache db files
-	 */
-	void InitTagCache(const wxString& cacheDir);
+    /**
+     * Set the directory location for the tag db files
+     * @param cacheDir the directory to place the cache db files
+     */
+    void InitTagCache(const wxString& cacheDir);
 
-	/**
-	 * Creates a project and adds it to the end of Globals.Projects
-	 * Only the data structure is created. File system is not touched
-	 * at all. Any source dir or db cache files are NOT created.
-	 *
-	 * @param sourceDir the directory that contains source files (php)
-	 */
-	void CreateProject(const wxFileName& sourceDir);
+    /**
+     * Creates a project and adds it to the end of Globals.Projects
+     * Only the data structure is created. File system is not touched
+     * at all. Any source dir or db cache files are NOT created.
+     *
+     * @param sourceDir the directory that contains source files (php)
+     */
+    void CreateProject(const wxFileName& sourceDir);
 };
 
 #endif  // TESTS_ACTIONTESTFIXTURECLASS_H_

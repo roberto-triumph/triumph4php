@@ -41,16 +41,16 @@
  * There will be a menu created where the user can test the code completions and call tips.
  */
 class CodeControlProfilerAppClass : public wxApp {
-	public:
-	CodeControlProfilerAppClass();
+ public:
+    CodeControlProfilerAppClass();
 
-	virtual bool OnInit();
+    virtual bool OnInit();
 
-	virtual int OnExit();
+    virtual int OnExit();
 
-	t4p::CodeControlOptionsClass Options;
-	t4p::GlobalsClass Globals;
-	t4p::EventSinkClass EventSink;
+    t4p::CodeControlOptionsClass Options;
+    t4p::GlobalsClass Globals;
+    t4p::EventSinkClass EventSink;
 };
 
 /**
@@ -58,185 +58,183 @@ class CodeControlProfilerAppClass : public wxApp {
  * When a file is dropped into the control it will be opened.
  */
 class FileDropTargetClass : public wxFileDropTarget {
-	public:
-	/**
-	 * This class will NOT own the codeControl or the globals pointer
-	 */
-	FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals);
+ public:
+    /**
+     * This class will NOT own the codeControl or the globals pointer
+     */
+    FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals);
 
-	/**
-	 * Called by wxWidgets when user drags a file to this application frame. All files dragged in will be opened
-	 * into the notebook.
-	 */
-	virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
+    /**
+     * Called by wxWidgets when user drags a file to this application frame. All files dragged in will be opened
+     * into the notebook.
+     */
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files);
 
-	private:
-	t4p::CodeControlClass* CodeControl;
-	t4p::GlobalsClass* Globals;
+ private:
+    t4p::CodeControlClass* CodeControl;
+    t4p::GlobalsClass* Globals;
 };
 
 FileDropTargetClass::FileDropTargetClass(t4p::CodeControlClass* codeControl, t4p::GlobalsClass* globals)
-: CodeControl(codeControl)
-, Globals(globals) {
+    : CodeControl(codeControl)
+    , Globals(globals) {
 }
 
 bool FileDropTargetClass::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& files) {
-	if (files.Count() != 1) {
-		wxMessageBox(_("You can only drop one file at a time into this control"));
-		return false;
-	}
-	wxString fileNameString = files[0];
-	wxFileName name(fileNameString);
-	if (name.IsDir()) {
-		wxMessageBox(_("You can only drop files (not directories) into this control"));
-		return false;
-	} else if (!name.IsOk()) {
-		wxMessageBox(_("Invalid file:") + fileNameString);
-		return false;
-	}
-	UnicodeString contents;
-	wxString charset;
-	bool hasSignature = false;
-	t4p::FindInFilesClass::FileContents(fileNameString, contents, charset, hasSignature);
-	CodeControl->TrackFile(fileNameString, contents, charset, hasSignature);
+    if (files.Count() != 1) {
+        wxMessageBox(_("You can only drop one file at a time into this control"));
+        return false;
+    }
+    wxString fileNameString = files[0];
+    wxFileName name(fileNameString);
+    if (name.IsDir()) {
+        wxMessageBox(_("You can only drop files (not directories) into this control"));
+        return false;
+    } else if (!name.IsOk()) {
+        wxMessageBox(_("Invalid file:") + fileNameString);
+        return false;
+    }
+    UnicodeString contents;
+    wxString charset;
+    bool hasSignature = false;
+    t4p::FindInFilesClass::FileContents(fileNameString, contents, charset, hasSignature);
+    CodeControl->TrackFile(fileNameString, contents, charset, hasSignature);
 
-	// add the new file to the  tag cache
-	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();
-	tagFinderlist->InitGlobalTag(
-		Globals->TagCacheDbFileName, Globals->FileTypes.GetPhpFileExtensions(),
-		Globals->FileTypes.GetMiscFileExtensions(),
-		Globals->Environment.Php.Version
-	);
+    // add the new file to the  tag cache
+    t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass();
+    tagFinderlist->InitGlobalTag(
+        Globals->TagCacheDbFileName, Globals->FileTypes.GetPhpFileExtensions(),
+        Globals->FileTypes.GetMiscFileExtensions(),
+        Globals->Environment.Php.Version);
 
-	t4p::SymbolTableClass emptyTable;
-	t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
-	workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true, emptyTable);
-	bool good = workingCache->Update(contents, emptyTable);
-	if (good) {
-		tagFinderlist->TagParser.BuildResourceCacheForFile(wxT(""), fileNameString, contents, false);
-		Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
-	} else {
-		delete workingCache;
-	}
+    t4p::SymbolTableClass emptyTable;
+    t4p::WorkingCacheClass* workingCache = new t4p::WorkingCacheClass();
+    workingCache->Init(fileNameString, CodeControl->GetIdString(), false, Globals->Environment.Php.Version, true, emptyTable);
+    bool good = workingCache->Update(contents, emptyTable);
+    if (good) {
+        tagFinderlist->TagParser.BuildResourceCacheForFile(wxT(""), fileNameString, contents, false);
+        Globals->TagCache.RegisterWorking(CodeControl->GetIdString(), workingCache);
+    } else {
+        delete workingCache;
+    }
 
-	delete tagFinderlist;
-	return true;
+    delete tagFinderlist;
+    return true;
 }
 
 /**
  * The application frame will contain the code control only
  */
 class CodeControlFrameClass: public wxFrame {
-	public:
-	CodeControlFrameClass(CodeControlProfilerAppClass& app);
+ public:
+    CodeControlFrameClass(CodeControlProfilerAppClass& app);
 
-	private:
-	/*
-	 * Build the menu and add the event handlers
-	 */
+ private:
+    /*
+     * Build the menu and add the event handlers
+     */
 
-	void CreateMenu();
+    void CreateMenu();
 
-	void OnContentAssist(wxCommandEvent& event);
+    void OnContentAssist(wxCommandEvent& event);
 
-	void OnCallTip(wxCommandEvent& event);
+    void OnCallTip(wxCommandEvent& event);
 
-	void OnHelp(wxCommandEvent& event);
+    void OnHelp(wxCommandEvent& event);
 
-	void OnClose(wxCloseEvent& event);
+    void OnClose(wxCloseEvent& event);
 
-	enum {
-		ID_CONTENT_ASSIST,
-		ID_CALL_TIP,
-		ID_HELP
-	};
+    enum {
+        ID_CONTENT_ASSIST,
+        ID_CALL_TIP,
+        ID_HELP
+    };
 
-	t4p::CodeControlClass* Ctrl;
+    t4p::CodeControlClass* Ctrl;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 IMPLEMENT_APP(CodeControlProfilerAppClass)
 
 CodeControlProfilerAppClass::CodeControlProfilerAppClass()
-	: wxApp()
-	, Options()
-	, Globals()
-	, EventSink() {
+    : wxApp()
+    , Options()
+    , Globals()
+    , EventSink() {
 }
 
 bool CodeControlProfilerAppClass::OnInit() {
-	t4p::CodeControlStylesInit(Options);
-	Globals.TagCacheDbFileName = t4p::TagCacheAsset();
-	Globals.DetectorCacheDbFileName = t4p::DetectorCacheAsset();
-	Globals.Environment.Php.Version = pelet::PHP_54;
-	Options.EnableAutomaticLineIndentation = true;
-	Options.EnableAutoCompletion = true;
+    t4p::CodeControlStylesInit(Options);
+    Globals.TagCacheDbFileName = t4p::TagCacheAsset();
+    Globals.DetectorCacheDbFileName = t4p::DetectorCacheAsset();
+    Globals.Environment.Php.Version = pelet::PHP_54;
+    Options.EnableAutomaticLineIndentation = true;
+    Options.EnableAutoCompletion = true;
 
 
-	t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass;
-	tagFinderlist->InitGlobalTag(
-		Globals.TagCacheDbFileName,
-		Globals.FileTypes.GetPhpFileExtensions(),
-		Globals.FileTypes.GetMiscFileExtensions(),
-		Globals.Environment.Php.Version
-	);
-	tagFinderlist->InitDetectorTag(Globals.DetectorCacheDbFileName);
-	tagFinderlist->InitNativeTag(t4p::NativeFunctionsAsset());
-	Globals.TagCache.RegisterGlobal(tagFinderlist);
+    t4p::TagFinderListClass* tagFinderlist = new t4p::TagFinderListClass;
+    tagFinderlist->InitGlobalTag(
+        Globals.TagCacheDbFileName,
+        Globals.FileTypes.GetPhpFileExtensions(),
+        Globals.FileTypes.GetMiscFileExtensions(),
+        Globals.Environment.Php.Version);
+    tagFinderlist->InitDetectorTag(Globals.DetectorCacheDbFileName);
+    tagFinderlist->InitNativeTag(t4p::NativeFunctionsAsset());
+    Globals.TagCache.RegisterGlobal(tagFinderlist);
 
-	CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
-	SetTopWindow(frame);
-	frame->Show(true);
-	return true;
+    CodeControlFrameClass* frame = new CodeControlFrameClass(*this);
+    SetTopWindow(frame);
+    frame->Show(true);
+    return true;
 }
 
 int CodeControlProfilerAppClass::OnExit() {
-	u_cleanup();
-	return 0;
+    u_cleanup();
+    return 0;
 }
 
 CodeControlFrameClass::CodeControlFrameClass(CodeControlProfilerAppClass& app)
-	: wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition,
-			wxSize(1024, 768)) {
-	Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
-	Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
-	Ctrl->SetFileType(t4p::FILE_TYPE_PHP);
-	CreateMenu();
+    : wxFrame(NULL, wxID_ANY, wxT("CodeControlClass profiler"), wxDefaultPosition,
+              wxSize(1024, 768)) {
+    Ctrl = new t4p::CodeControlClass(this, app.Options, &app.Globals, app.EventSink, wxID_ANY);
+    Ctrl->SetDropTarget(new FileDropTargetClass(Ctrl, &app.Globals));
+    Ctrl->SetFileType(t4p::FILE_TYPE_PHP);
+    CreateMenu();
 }
 
 void CodeControlFrameClass::OnCallTip(wxCommandEvent& event) {
-	Ctrl->HandleCallTip(0, true);
+    Ctrl->HandleCallTip(0, true);
 }
 
 void CodeControlFrameClass::OnContentAssist(wxCommandEvent& event) {
-	Ctrl->HandleAutoCompletion();
+    Ctrl->HandleAutoCompletion();
 }
 
 void CodeControlFrameClass::OnHelp(wxCommandEvent& event) {
-	wxString msg = wxT("This is a program that can be used to profile the source code control. ");
-	msg += wxT("Unfortunately auto completion & call tips won't work because that code is is separate.\n\n");
-	msg += wxT("Dragging a file into the window will open its contents.");
-	wxMessageBox(msg);
+    wxString msg = wxT("This is a program that can be used to profile the source code control. ");
+    msg += wxT("Unfortunately auto completion & call tips won't work because that code is is separate.\n\n");
+    msg += wxT("Dragging a file into the window will open its contents.");
+    wxMessageBox(msg);
 }
 
 void CodeControlFrameClass::OnClose(wxCloseEvent& event) {
-	event.Skip();
+    event.Skip();
 }
 
 void CodeControlFrameClass::CreateMenu() {
-	wxMenuBar* menuBar = new wxMenuBar(0);
-	wxMenu* edit = new wxMenu();
-	edit->Append(ID_CONTENT_ASSIST, wxT("Content Assist\tCTRL+SPACE"), wxT("Content Assist"), false);
-	edit->Append(ID_CALL_TIP, wxT("Show Call Tip\tCTRL+SHIFT+SPACE"), wxT("Show Call Tip"), false);
-	edit->Append(ID_HELP, wxT("Help"), wxT("Help"), false);
-	menuBar->Append(edit, wxT("Edit"));
-	SetMenuBar(menuBar);
+    wxMenuBar* menuBar = new wxMenuBar(0);
+    wxMenu* edit = new wxMenu();
+    edit->Append(ID_CONTENT_ASSIST, wxT("Content Assist\tCTRL+SPACE"), wxT("Content Assist"), false);
+    edit->Append(ID_CALL_TIP, wxT("Show Call Tip\tCTRL+SHIFT+SPACE"), wxT("Show Call Tip"), false);
+    edit->Append(ID_HELP, wxT("Help"), wxT("Help"), false);
+    menuBar->Append(edit, wxT("Edit"));
+    SetMenuBar(menuBar);
 }
 
 BEGIN_EVENT_TABLE(CodeControlFrameClass, wxFrame)
-	EVT_MENU(CodeControlFrameClass::ID_CONTENT_ASSIST, CodeControlFrameClass::OnContentAssist)
-	EVT_MENU(CodeControlFrameClass::ID_CALL_TIP, CodeControlFrameClass::OnCallTip)
-	EVT_MENU(CodeControlFrameClass::ID_HELP, CodeControlFrameClass::OnHelp)
-	EVT_CLOSE(CodeControlFrameClass::OnClose)
+    EVT_MENU(CodeControlFrameClass::ID_CONTENT_ASSIST, CodeControlFrameClass::OnContentAssist)
+    EVT_MENU(CodeControlFrameClass::ID_CALL_TIP, CodeControlFrameClass::OnCallTip)
+    EVT_MENU(CodeControlFrameClass::ID_HELP, CodeControlFrameClass::OnHelp)
+    EVT_CLOSE(CodeControlFrameClass::OnClose)
 END_EVENT_TABLE()

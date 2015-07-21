@@ -28,65 +28,64 @@
 #include "views/FileOperationsViewClass.h"
 
 class FileOperationsViewTestClass : public ViewTestClass {
-	public:
-	t4p::FileOperationsFeatureClass* Feature;
-	t4p::FileOperationsViewClass* View;
+ public:
+    t4p::FileOperationsFeatureClass* Feature;
+    t4p::FileOperationsViewClass* View;
 
-	FileOperationsViewTestClass()
-	: ViewTestClass() {
-		DoSetup();
-	}
+    FileOperationsViewTestClass()
+        : ViewTestClass() {
+        DoSetup();
+    }
 
-	~FileOperationsViewTestClass() {
-		DoCleanup();
-	}
+    ~FileOperationsViewTestClass() {
+        DoCleanup();
+    }
 
-	void DoSetup() {
-		Feature = new t4p::FileOperationsFeatureClass(*TestApp->App);
-		View = new t4p::FileOperationsViewClass(*Feature);
-		TestApp->TriumphBootstrapFeature(Feature);
-		TestApp->TriumphBootstrapView(View);
-	}
+    void DoSetup() {
+        Feature = new t4p::FileOperationsFeatureClass(*TestApp->App);
+        View = new t4p::FileOperationsViewClass(*Feature);
+        TestApp->TriumphBootstrapFeature(Feature);
+        TestApp->TriumphBootstrapView(View);
+    }
 
-	void DoCleanup() {
-		delete View;
-		delete Feature;
-	}
+    void DoCleanup() {
+        delete View;
+        delete Feature;
+    }
 };
 
 TEST_FIXTURE(FileOperationsViewTestClass, SaveMenuShouldBeDisabledByDefault) {
-	wxMenu* fileMenu = new wxMenu;
-	View->AddFileMenuItems(fileMenu);
-	TestApp->MenuBar->Append(fileMenu, _("File"));
+    wxMenu* fileMenu = new wxMenu;
+    View->AddFileMenuItems(fileMenu);
+    TestApp->MenuBar->Append(fileMenu, _("File"));
 
-	CHECK(fileMenu->FindChildItem(wxID_SAVE) != NULL);
-	CHECK(!fileMenu->IsEnabled(wxID_SAVE));
+    CHECK(fileMenu->FindChildItem(wxID_SAVE) != NULL);
+    CHECK(!fileMenu->IsEnabled(wxID_SAVE));
 }
 
 TEST_FIXTURE(FileOperationsViewTestClass, SaveMenuShouldBeEnabledWhenSavepoint) {
-	wxMenu* fileMenu = new wxMenu;
-	View->AddFileMenuItems(fileMenu);
-	TestApp->MenuBar->Append(fileMenu, _("File"));
+    wxMenu* fileMenu = new wxMenu;
+    View->AddFileMenuItems(fileMenu);
+    TestApp->MenuBar->Append(fileMenu, _("File"));
 
-	// open a new code control
-	t4p::NotebookClass* newNotebook = new t4p::NotebookClass(TestApp->Frame);
-	newNotebook->InitApp(
+    // open a new code control
+    t4p::NotebookClass* newNotebook = new t4p::NotebookClass(TestApp->Frame);
+    newNotebook->InitApp(
 
-		&TestApp->App->Preferences.CodeControlOptions,
-		&TestApp->App->Preferences,
-		&TestApp->App->Globals,
-		&TestApp->App->EventSink,
-		TestApp->AuiManager
-	);
-	t4p::AuiAddCodeNotebook(*TestApp->AuiManager, newNotebook, 1);
-	newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
-	wxFocusEvent focus;
-	newNotebook->GetCodeControl(0)->ProcessWindowEvent(focus);
-	newNotebook->GetCodeControl(0)->AppendText("// file.php\n");
+        &TestApp->App->Preferences.CodeControlOptions,
+        &TestApp->App->Preferences,
+        &TestApp->App->Globals,
+        &TestApp->App->EventSink,
+        TestApp->AuiManager);
+    t4p::AuiAddCodeNotebook(*TestApp->AuiManager, newNotebook, 1);
+    newNotebook->AddTriumphPage(t4p::FILE_TYPE_PHP);
+    wxFocusEvent focus;
+    newNotebook->GetCodeControl(0)->ProcessWindowEvent(focus);
+    newNotebook->GetCodeControl(0)->AppendText("// file.php\n");
 
-	wxStyledTextEvent evt(wxEVT_STC_SAVEPOINTLEFT);
-	View->ProcessEvent(evt);
+    wxStyledTextEvent evt(wxEVT_STC_SAVEPOINTLEFT);
+    View->ProcessEvent(evt);
 
-	CHECK(fileMenu->FindChildItem(wxID_SAVE) != NULL);
-	CHECK(fileMenu->IsEnabled(wxID_SAVE));
+    CHECK(fileMenu->FindChildItem(wxID_SAVE) != NULL);
+    CHECK(fileMenu->IsEnabled(wxID_SAVE));
 }

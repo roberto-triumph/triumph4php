@@ -29,95 +29,95 @@
 #include "TriumphChecks.h"
 
 class ProjectFixtureClass :  public FileTestFixtureClass {
-	public:
-	t4p::ProjectClass Project;
-	t4p::FileTypeClass FileType;
+ public:
+    t4p::ProjectClass Project;
+    t4p::FileTypeClass FileType;
 
-	ProjectFixtureClass()
-	: FileTestFixtureClass(wxT("project_test"))
-	, Project()
-	, FileType() {
-		Project.Label = wxT("unit test project");
-		Project.IsEnabled = true;
-		FileType.CssFileExtensionsString = wxT("*.css");
-		FileType.MiscFileExtensionsString = wxT("*.txt");
-		FileType.PhpFileExtensionsString = wxT("*.php");
-		FileType.SqlFileExtensionsString = wxT("*.sql");
-		FileType.ConfigFileExtensionsString = wxT("*.ini");
-	}
+    ProjectFixtureClass()
+        : FileTestFixtureClass(wxT("project_test"))
+        , Project()
+        , FileType() {
+        Project.Label = wxT("unit test project");
+        Project.IsEnabled = true;
+        FileType.CssFileExtensionsString = wxT("*.css");
+        FileType.MiscFileExtensionsString = wxT("*.txt");
+        FileType.PhpFileExtensionsString = wxT("*.php");
+        FileType.SqlFileExtensionsString = wxT("*.sql");
+        FileType.ConfigFileExtensionsString = wxT("*.ini");
+    }
 
-	void AddSrc(const wxString& srcDir, wxString includeWildcards = wxT("*.*"), wxString excludeWildcards = wxEmptyString) {
-		t4p::SourceClass src;
-		src.RootDirectory.AssignDir(TestProjectDir + srcDir);
-		src.SetIncludeWildcards(includeWildcards);
-		src.SetExcludeWildcards(excludeWildcards);
-		Project.AddSource(src);
-	}
+    void AddSrc(const wxString& srcDir, wxString includeWildcards = wxT("*.*"), wxString excludeWildcards = wxEmptyString) {
+        t4p::SourceClass src;
+        src.RootDirectory.AssignDir(TestProjectDir + srcDir);
+        src.SetIncludeWildcards(includeWildcards);
+        src.SetExcludeWildcards(excludeWildcards);
+        Project.AddSource(src);
+    }
 };
 
 SUITE(ProjectTestClass) {
-TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
-	AddSrc(wxT("controllers"));
-	AddSrc(wxT("models"));
+    TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnMultiple) {
+        AddSrc(wxT("controllers"));
+        AddSrc(wxT("models"));
 
-	std::vector<t4p::SourceClass> sources = Project.Sources;
-	CHECK_VECTOR_SIZE(2, sources);
+        std::vector<t4p::SourceClass> sources = Project.Sources;
+        CHECK_VECTOR_SIZE(2, sources);
 
-	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), sources[0].RootDirectory.GetFullPath());
-	CHECK_EQUAL(TestProjectDir + wxT("models") + wxFileName::GetPathSeparator(), sources[1].RootDirectory.GetFullPath());
-}
+        CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), sources[0].RootDirectory.GetFullPath());
+        CHECK_EQUAL(TestProjectDir + wxT("models") + wxFileName::GetPathSeparator(), sources[1].RootDirectory.GetFullPath());
+    }
 
-TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
-	AddSrc(wxT("controllers"), wxT("*.php"), wxT("cache.php"));
-	std::vector<t4p::SourceClass> sources = Project.AllPhpSources(FileType);
-	CHECK_VECTOR_SIZE(1, sources);
+    TEST_FIXTURE(ProjectFixtureClass, AllPhpSourcesShouldReturnExcludedWildcards) {
+        AddSrc(wxT("controllers"), wxT("*.php"), wxT("cache.php"));
+        std::vector<t4p::SourceClass> sources = Project.AllPhpSources(FileType);
+        CHECK_VECTOR_SIZE(1, sources);
 
-	t4p::SourceClass actual = sources[0];
-	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
-	CHECK_EQUAL(wxT("cache.php"), actual.ExcludeWildcardsString());
-}
+        t4p::SourceClass actual = sources[0];
+        CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
+        CHECK_EQUAL(wxT("cache.php"), actual.ExcludeWildcardsString());
+    }
 
 
-TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnExcludedWildcards) {
-	AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
+    TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnExcludedWildcards) {
+        AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
 
-	std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
-	CHECK_VECTOR_SIZE(1, sources);
+        std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
+        CHECK_VECTOR_SIZE(1, sources);
 
-	t4p::SourceClass actual = sources[0];
-	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
-	CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
-	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
-}
+        t4p::SourceClass actual = sources[0];
+        CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
+        CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
+        CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
+    }
 
-TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnIniWildcards) {
-	AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
+    TEST_FIXTURE(ProjectFixtureClass, AllSourcesShouldReturnIniWildcards) {
+        AddSrc(wxT("controllers"), wxT("*.php"), wxT("*\\cache\\*"));
 
-	std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
-	CHECK_VECTOR_SIZE(1, sources);
+        std::vector<t4p::SourceClass> sources = Project.AllSources(FileType);
+        CHECK_VECTOR_SIZE(1, sources);
 
-	t4p::SourceClass actual = sources[0];
-	CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
-	CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
-	CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
-}
+        t4p::SourceClass actual = sources[0];
+        CHECK_EQUAL(TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator(), actual.RootDirectory.GetFullPath());
+        CHECK_EQUAL(FileType.GetAllSourceFileExtensionsString(), actual.IncludeWildcardsString());
+        CHECK_EQUAL(wxT("*\\cache\\*"), actual.ExcludeWildcardsString());
+    }
 
-TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnFalseWhenAnUnknownWildcard) {
-	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
-	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.tmp");
-	CHECK_EQUAL(false, Project.IsASourceFile(fileToCheck, FileType));
-}
+    TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnFalseWhenAnUnknownWildcard) {
+        AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
+        wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.tmp");
+        CHECK_EQUAL(false, Project.IsASourceFile(fileToCheck, FileType));
+    }
 
-TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnTrueWhenKnownWildcard) {
-	AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
-	wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.css");
-	CHECK(Project.IsASourceFile(fileToCheck, FileType));
-}
+    TEST_FIXTURE(ProjectFixtureClass, IsASourceFileShouldReturnTrueWhenKnownWildcard) {
+        AddSrc(wxT("controllers"), wxT("*"), wxT("*\\cache\\*"));
+        wxString fileToCheck = TestProjectDir + wxT("controllers") + wxFileName::GetPathSeparator() + wxT("hello.css");
+        CHECK(Project.IsASourceFile(fileToCheck, FileType));
+    }
 
-TEST_FIXTURE(ProjectFixtureClass, GetNonPhpExtesions) {
-	std::vector<wxString> exts = Project.GetNonPhpExtensions(FileType);
-	std::vector<wxString> expected = FileType.GetNonPhpFileExtensions();
+    TEST_FIXTURE(ProjectFixtureClass, GetNonPhpExtesions) {
+        std::vector<wxString> exts = Project.GetNonPhpExtensions(FileType);
+        std::vector<wxString> expected = FileType.GetNonPhpFileExtensions();
 
-	CHECK_VECTOR_SIZE(expected.size(), exts);
-}
+        CHECK_VECTOR_SIZE(expected.size(), exts);
+    }
 }

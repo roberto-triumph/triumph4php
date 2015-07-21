@@ -35,73 +35,73 @@ static std::string DetectorSchemaSql = "";
 static std::string JsTagsSchemaSql = "";
 
 SqliteTestFixtureClass::SqliteTestFixtureClass(const wxFileName& sqlScriptFile)
-	: Session()
-	, ConnectionString(":memory:") {
-	Session.open(*soci::factory_sqlite3(), ConnectionString);
-	CreateDatabase(Session, sqlScriptFile);
+    : Session()
+    , ConnectionString(":memory:") {
+    Session.open(*soci::factory_sqlite3(), ConnectionString);
+    CreateDatabase(Session, sqlScriptFile);
 }
 
 void SqliteTestFixtureClass::CreateDatabase(soci::session& session, const wxFileName& sqlScriptFile) {
-	std::string schemaSql;
-	wxASSERT_MSG(sqlScriptFile == t4p::ResourceSqlSchemaAsset() ||
-		sqlScriptFile == t4p::DetectorSqlSchemaAsset() ||
-		sqlScriptFile == t4p::JsTagsSqlSchemaAsset(),
-		wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() t4p::JsTagsSqlSchemaAsset() from Assets.h"));
-	if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
-		schemaSql = ResourceSchemaSql;
-	} else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
-		schemaSql = DetectorSchemaSql;
-	} else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
-		schemaSql = JsTagsSchemaSql;
-	}
+    std::string schemaSql;
+    wxASSERT_MSG(sqlScriptFile == t4p::ResourceSqlSchemaAsset() ||
+                 sqlScriptFile == t4p::DetectorSqlSchemaAsset() ||
+                 sqlScriptFile == t4p::JsTagsSqlSchemaAsset(),
+                 wxT("sqlScript must be either ResourceSqlSchemaAsset() or DetectorSqlSchemaAsset() t4p::JsTagsSqlSchemaAsset() from Assets.h"));
+    if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
+        schemaSql = ResourceSchemaSql;
+    } else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
+        schemaSql = DetectorSchemaSql;
+    } else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+        schemaSql = JsTagsSchemaSql;
+    }
 
-	if (schemaSql.empty()) {
-		// now get the contents of the script to be executed
-		// keep the contents in memory so that we dont have to read the file
-		// for each test
-		wxFFile ffile(sqlScriptFile.GetFullPath(), wxT("rb"));
-		wxString sql;
-		ffile.ReadAll(&sql);
-		if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
-			ResourceSchemaSql = t4p::WxToChar(sql);
-			schemaSql = ResourceSchemaSql;
-		} else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
-			DetectorSchemaSql = t4p::WxToChar(sql);
-			schemaSql = DetectorSchemaSql;
-		} else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
-			JsTagsSchemaSql = t4p::WxToChar(sql);
-			schemaSql = JsTagsSchemaSql;
-		}
-	}
-	try {
-		// get the 'raw' connection because it can handle multiple statements at once
-		char *errorMessage = NULL;
-		soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
-		wxASSERT(backend != 0);
-		wxASSERT(backend->conn_ != 0);
-		wxASSERT(schemaSql.c_str() != 0);
+    if (schemaSql.empty()) {
+        // now get the contents of the script to be executed
+        // keep the contents in memory so that we dont have to read the file
+        // for each test
+        wxFFile ffile(sqlScriptFile.GetFullPath(), wxT("rb"));
+        wxString sql;
+        ffile.ReadAll(&sql);
+        if (sqlScriptFile == t4p::ResourceSqlSchemaAsset()) {
+            ResourceSchemaSql = t4p::WxToChar(sql);
+            schemaSql = ResourceSchemaSql;
+        } else if (sqlScriptFile == t4p::DetectorSqlSchemaAsset()) {
+            DetectorSchemaSql = t4p::WxToChar(sql);
+            schemaSql = DetectorSchemaSql;
+        } else if (sqlScriptFile == t4p::JsTagsSqlSchemaAsset()) {
+            JsTagsSchemaSql = t4p::WxToChar(sql);
+            schemaSql = JsTagsSchemaSql;
+        }
+    }
+    try {
+        // get the 'raw' connection because it can handle multiple statements at once
+        char *errorMessage = NULL;
+        soci::sqlite3_session_backend* backend = static_cast<soci::sqlite3_session_backend*>(session.get_backend());
+        wxASSERT(backend != 0);
+        wxASSERT(backend->conn_ != 0);
+        wxASSERT(schemaSql.c_str() != 0);
 
-		sqlite_api::sqlite3_exec(backend->conn_, schemaSql.c_str(), NULL, NULL, &errorMessage);
-		if (errorMessage) {
-			wxASSERT_MSG(strlen(errorMessage) == 0, t4p::CharToWx(errorMessage));
-			sqlite_api::sqlite3_free(errorMessage);
-		}
-	} catch (const std::exception& e) {
-		wxUnusedVar(e);
-		wxASSERT_MSG(false, t4p::CharToWx(e.what()));
-	}
+        sqlite_api::sqlite3_exec(backend->conn_, schemaSql.c_str(), NULL, NULL, &errorMessage);
+        if (errorMessage) {
+            wxASSERT_MSG(strlen(errorMessage) == 0, t4p::CharToWx(errorMessage));
+            sqlite_api::sqlite3_free(errorMessage);
+        }
+    } catch (const std::exception& e) {
+        wxUnusedVar(e);
+        wxASSERT_MSG(false, t4p::CharToWx(e.what()));
+    }
 }
 
 SqliteTestFixtureClass::~SqliteTestFixtureClass() {
-	Session.close();
+    Session.close();
 }
 
 bool SqliteTestFixtureClass::Exec(const std::string& query) {
-	try {
-		Session.once << query;
-		return true;
-	} catch (std::exception& e) {
-		printf("exception=%s\n", e.what());
-	}
-	return false;
+    try {
+        Session.once << query;
+        return true;
+    } catch (std::exception& e) {
+        printf("exception=%s\n", e.what());
+    }
+    return false;
 }

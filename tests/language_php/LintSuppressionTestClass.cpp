@@ -30,279 +30,278 @@
 #include "TriumphChecks.h"
 
 class LintSuppressionFixtureClass : public FileTestFixtureClass {
-	public:
-	/**
-	 * the object under test
-	 */
-	t4p::LintSuppressionClass Suppressions;
+ public:
+    /**
+     * the object under test
+     */
+    t4p::LintSuppressionClass Suppressions;
 
-	/**
-	 * location of the suppression file (where the rules
-	 * are stored)
-	 */
-	wxFileName SuppressionFile;
+    /**
+     * location of the suppression file (where the rules
+     * are stored)
+     */
+    wxFileName SuppressionFile;
 
-	/**
-	 * the name of a file being suppressed
-	 */
-	wxFileName CodeFile;
+    /**
+     * the name of a file being suppressed
+     */
+    wxFileName CodeFile;
 
-	/**
-	 * the name of a directory being suppressed
-	 */
-	wxFileName CodeDir;
+    /**
+     * the name of a directory being suppressed
+     */
+    wxFileName CodeDir;
 
-	/**
-	 * errors when suppression file contains invalid rules
-	 */
-	std::vector<UnicodeString> Errors;
+    /**
+     * errors when suppression file contains invalid rules
+     */
+    std::vector<UnicodeString> Errors;
 
-	LintSuppressionFixtureClass()
-	: FileTestFixtureClass("lint_suppression")
-	, Suppressions()
-	, SuppressionFile(TestProjectDir, wxT("suppressions.csv"))
-	, CodeFile(TestProjectDir, wxT("code.php"))
-	, CodeDir()
-	, Errors() {
-		CreateSubDirectory(wxT("code_dir"));
-		CodeDir.AssignDir(TestProjectDir);
-		CodeDir.AppendDir(wxT("code_dir"));
-	}
+    LintSuppressionFixtureClass()
+        : FileTestFixtureClass("lint_suppression")
+        , Suppressions()
+        , SuppressionFile(TestProjectDir, wxT("suppressions.csv"))
+        , CodeFile(TestProjectDir, wxT("code.php"))
+        , CodeDir()
+        , Errors() {
+        CreateSubDirectory(wxT("code_dir"));
+        CodeDir.AssignDir(TestProjectDir);
+        CodeDir.AppendDir(wxT("code_dir"));
+    }
 
-	/**
-	 * creates one of each kind of suppression
-	 * suppress all for an entire directory
-	 * suppress unknown classes for code.php
-	 * suppress unknown methods for code.php
-	 * suppress unknown functions for code.php
-	 * suppress uninitialized variables for code.php
-	 */
-	void DefaultSuppressions() {
-		// create a file of suppressions
-		// 1 of each kind of suppression
-		wxString contents = wxString::FromAscii(
-			"# this is a comment, one, two, it should be skipped\n"
-			"skip_unknown_class, Couchbase, %locationFile%\n"
-			"skip_all,,%locationDir%\n"
-			"skip_unknown_method, serializeToCouchbase, %locationFile%\n"
-			"skip_unknown_function, couchbase_init, %locationFile%\n"
-			"skip_uninitialized_var, $connection, %locationFile%\n");
+    /**
+     * creates one of each kind of suppression
+     * suppress all for an entire directory
+     * suppress unknown classes for code.php
+     * suppress unknown methods for code.php
+     * suppress unknown functions for code.php
+     * suppress uninitialized variables for code.php
+     */
+    void DefaultSuppressions() {
+        // create a file of suppressions
+        // 1 of each kind of suppression
+        wxString contents = wxString::FromAscii(
+                                "# this is a comment, one, two, it should be skipped\n"
+                                "skip_unknown_class, Couchbase, %locationFile%\n"
+                                "skip_all,,%locationDir%\n"
+                                "skip_unknown_method, serializeToCouchbase, %locationFile%\n"
+                                "skip_unknown_function, couchbase_init, %locationFile%\n"
+                                "skip_uninitialized_var, $connection, %locationFile%\n");
 
-		// create 1 code file that will be used as the file
-		// to be suppressed. file can be empty (no contents)
-		// because its not needed for suppressions.
-		CreateFixtureFile(CodeFile.GetFullName(), wxT(""));
+        // create 1 code file that will be used as the file
+        // to be suppressed. file can be empty (no contents)
+        // because its not needed for suppressions.
+        CreateFixtureFile(CodeFile.GetFullName(), wxT(""));
 
-		// replace %location% tokens with an actual paths
-		contents.Replace(wxT("%locationFile%"), CodeFile.GetFullPath());
-		contents.Replace(wxT("%locationDir%"), CodeDir.GetPathWithSep());
+        // replace %location% tokens with an actual paths
+        contents.Replace(wxT("%locationFile%"), CodeFile.GetFullPath());
+        contents.Replace(wxT("%locationDir%"), CodeDir.GetPathWithSep());
 
-		CreateFixtureFile(SuppressionFile.GetFullName(), contents);
-	}
+        CreateFixtureFile(SuppressionFile.GetFullName(), contents);
+    }
 };
 
 SUITE(LintSuppressionTestClass) {
-TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFile) {
-	// test that the suppressions can be loaded from
-	// a CSV file
-	DefaultSuppressions();
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
-}
+    TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFile) {
+        // test that the suppressions can be loaded from
+        // a CSV file
+        DefaultSuppressions();
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFileWithErrors) {
-	// test that when a suppression file has some invalid rules
-	// the good rules are still loaded from the CSV file
+    TEST_FIXTURE(LintSuppressionFixtureClass, LoadFromFileWithErrors) {
+        // test that when a suppression file has some invalid rules
+        // the good rules are still loaded from the CSV file
 
-	wxString contents = wxString::FromAscii(
-		"# this is a comment, one, two, it should be skipped\n"
-		"skip_unknown_class, Couchbase, %locationFile%\n"
-		"skip_, Couchbase, %locationDir%\n"
-		"skip_all, Couchbase\n"
-		"skip_all, Couchbase, %locationDir%\n"
-		"skip_unknown_method, serializeToCouchbase, %locationFile%\n"
-		"skip_unknown_function, couchbase_init, %locationFile%\n"
-		"skip_uninitialized_var, $connection, %locationFile%\n"
-	);
+        wxString contents = wxString::FromAscii(
+                                "# this is a comment, one, two, it should be skipped\n"
+                                "skip_unknown_class, Couchbase, %locationFile%\n"
+                                "skip_, Couchbase, %locationDir%\n"
+                                "skip_all, Couchbase\n"
+                                "skip_all, Couchbase, %locationDir%\n"
+                                "skip_unknown_method, serializeToCouchbase, %locationFile%\n"
+                                "skip_unknown_function, couchbase_init, %locationFile%\n"
+                                "skip_uninitialized_var, $connection, %locationFile%\n");
 
-	// create 1 code file that will be used as the file
-	// to be suppressed. file can be empty (no contents)
-	// because its not needed for suppressions.
-	CreateFixtureFile(CodeFile.GetFullName(), wxT(""));
+        // create 1 code file that will be used as the file
+        // to be suppressed. file can be empty (no contents)
+        // because its not needed for suppressions.
+        CreateFixtureFile(CodeFile.GetFullName(), wxT(""));
 
-	// replace %location% tokens with an actual paths
-	contents.Replace(wxT("%locationFile%"), CodeFile.GetFullPath());
-	contents.Replace(wxT("%locationDir%"), CodeDir.GetPathWithSep());
+        // replace %location% tokens with an actual paths
+        contents.Replace(wxT("%locationFile%"), CodeFile.GetFullPath());
+        contents.Replace(wxT("%locationDir%"), CodeDir.GetPathWithSep());
 
-	CreateFixtureFile(SuppressionFile.GetFullName(), contents);
+        CreateFixtureFile(SuppressionFile.GetFullName(), contents);
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
-	CHECK_VECTOR_SIZE(2, Errors);
-}
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
+        CHECK_VECTOR_SIZE(2, Errors);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, TypeAllDirectory) {
-	// test that the "all" suppressions properly ignores
-	// all types when using directory suppressions
-	DefaultSuppressions();
+    TEST_FIXTURE(LintSuppressionFixtureClass, TypeAllDirectory) {
+        // test that the "all" suppressions properly ignores
+        // all types when using directory suppressions
+        DefaultSuppressions();
 
-	// create a file inside of the suppressed dir
-	wxFileName passFile;
-	passFile.AssignDir(CodeDir.GetPath());
-	passFile.AppendDir(wxT("code_dir"));
-	passFile.SetFullName(wxT("pass.php"));
+        // create a file inside of the suppressed dir
+        wxFileName passFile;
+        passFile.AssignDir(CodeDir.GetPath());
+        passFile.AppendDir(wxT("code_dir"));
+        passFile.SetFullName(wxT("pass.php"));
 
-	CreateFixtureFile(CodeDir.GetDirs().Last() + wxFileName::GetPathSeparators() + wxT("pass.php"), wxT(""));
+        CreateFixtureFile(CodeDir.GetDirs().Last() + wxFileName::GetPathSeparators() + wxT("pass.php"), wxT(""));
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
 
-	UnicodeString target = UNICODE_STRING_SIMPLE("Couchbase");
-	t4p::SuppressionRuleClass::Types type;
+        UnicodeString target = UNICODE_STRING_SIMPLE("Couchbase");
+        t4p::SuppressionRuleClass::Types type;
 
-	type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
-	bool ignore = Suppressions.ShouldIgnore(passFile, target, type);
-	CHECK(ignore);
+        type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
+        bool ignore = Suppressions.ShouldIgnore(passFile, target, type);
+        CHECK(ignore);
 
-	target = UNICODE_STRING_SIMPLE("connect");
-	type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
-	ignore = Suppressions.ShouldIgnore(passFile, target, type);
-	CHECK(ignore);
+        target = UNICODE_STRING_SIMPLE("connect");
+        type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
+        ignore = Suppressions.ShouldIgnore(passFile, target, type);
+        CHECK(ignore);
 
-	target = UNICODE_STRING_SIMPLE("couchbase_close");
-	type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
-	ignore = Suppressions.ShouldIgnore(passFile, target, type);
-	CHECK(ignore);
+        target = UNICODE_STRING_SIMPLE("couchbase_close");
+        type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
+        ignore = Suppressions.ShouldIgnore(passFile, target, type);
+        CHECK(ignore);
 
-	target = UNICODE_STRING_SIMPLE("$connect");
-	type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
-	ignore = Suppressions.ShouldIgnore(passFile, target, type);
-	CHECK(ignore);
+        target = UNICODE_STRING_SIMPLE("$connect");
+        type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
+        ignore = Suppressions.ShouldIgnore(passFile, target, type);
+        CHECK(ignore);
 
-	// make sure that we don't suppress items outside of the
-	// suppressed dir
-	type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
-	wxFileName outsideFile(TestProjectDir, wxT("good.php"));
-	ignore = Suppressions.ShouldIgnore(outsideFile.GetFullPath(), target, type);
-	CHECK_EQUAL(false, ignore);
-}
+        // make sure that we don't suppress items outside of the
+        // suppressed dir
+        type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
+        wxFileName outsideFile(TestProjectDir, wxT("good.php"));
+        ignore = Suppressions.ShouldIgnore(outsideFile.GetFullPath(), target, type);
+        CHECK_EQUAL(false, ignore);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownClass) {
-	// test that the class suppressions are properly ignored
-	DefaultSuppressions();
+    TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownClass) {
+        // test that the class suppressions are properly ignored
+        DefaultSuppressions();
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
 
-	UnicodeString target = UNICODE_STRING_SIMPLE("Couchbase");
-	t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
+        UnicodeString target = UNICODE_STRING_SIMPLE("Couchbase");
+        t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_CLASS;
 
-	bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK(ignore);
+        bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK(ignore);
 
-	// class not in suppression file
-	target = UNICODE_STRING_SIMPLE("CouchbaseConn");
-	ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK_EQUAL(false, ignore);
-}
+        // class not in suppression file
+        target = UNICODE_STRING_SIMPLE("CouchbaseConn");
+        ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK_EQUAL(false, ignore);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownMethod) {
-	// test that the method suppressions are properly ignored
-	DefaultSuppressions();
+    TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownMethod) {
+        // test that the method suppressions are properly ignored
+        DefaultSuppressions();
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
 
-	UnicodeString target = UNICODE_STRING_SIMPLE("serializeToCouchbase");
-	t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
+        UnicodeString target = UNICODE_STRING_SIMPLE("serializeToCouchbase");
+        t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_METHOD;
 
-	bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK(ignore);
+        bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK(ignore);
 
-	// method not in suppression file
-	target = UNICODE_STRING_SIMPLE("unserializeToCouchbase");
-	ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK_EQUAL(false, ignore);
-}
+        // method not in suppression file
+        target = UNICODE_STRING_SIMPLE("unserializeToCouchbase");
+        ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK_EQUAL(false, ignore);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownFunction) {
-	// test that the function suppressions are properly ignored
-	DefaultSuppressions();
+    TEST_FIXTURE(LintSuppressionFixtureClass, TypeUnknownFunction) {
+        // test that the function suppressions are properly ignored
+        DefaultSuppressions();
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
 
-	UnicodeString target = UNICODE_STRING_SIMPLE("couchbase_init");
-	t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
+        UnicodeString target = UNICODE_STRING_SIMPLE("couchbase_init");
+        t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNKNOWN_FUNCTION;
 
-	bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK(ignore);
+        bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK(ignore);
 
 
-	// function not in suppression file
-	target = UNICODE_STRING_SIMPLE("couchbase_open");
-	ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK_EQUAL(false, ignore);
-}
+        // function not in suppression file
+        target = UNICODE_STRING_SIMPLE("couchbase_open");
+        ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK_EQUAL(false, ignore);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, TypeUninitializedVariable) {
-	// test that the variable suppressions are properly ignored
-	DefaultSuppressions();
+    TEST_FIXTURE(LintSuppressionFixtureClass, TypeUninitializedVariable) {
+        // test that the variable suppressions are properly ignored
+        DefaultSuppressions();
 
-	bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
-	CHECK(loaded);
+        bool loaded = Suppressions.Init(SuppressionFile.GetFullPath(), Errors);
+        CHECK(loaded);
 
-	UnicodeString target = UNICODE_STRING_SIMPLE("$connection");
-	t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
+        UnicodeString target = UNICODE_STRING_SIMPLE("$connection");
+        t4p::SuppressionRuleClass::Types type = t4p::SuppressionRuleClass::SKIP_UNINITIALIZED_VAR;
 
-	bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK(ignore);
+        bool ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK(ignore);
 
-	// variable not in suppression file
-	target = UNICODE_STRING_SIMPLE("$conn");
-	ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
-	CHECK_EQUAL(false, ignore);
-}
+        // variable not in suppression file
+        target = UNICODE_STRING_SIMPLE("$conn");
+        ignore = Suppressions.ShouldIgnore(CodeFile, target, type);
+        CHECK_EQUAL(false, ignore);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRule) {
-	// make sure that adding a directory rule will add a rule
-	t4p::SuppressionRuleClass rule;
-	rule.SkipAllRule(CodeDir);
-	Suppressions.Add(rule);
+    TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRule) {
+        // make sure that adding a directory rule will add a rule
+        t4p::SuppressionRuleClass rule;
+        rule.SkipAllRule(CodeDir);
+        Suppressions.Add(rule);
 
-	// now call the method being tested
-	wxFileName skipDir;
-	skipDir.AssignDir(CodeDir.GetPath());
-	skipDir.AppendDir(wxT("vendor"));
-	CHECK(Suppressions.AddSkipAllRuleForDirectory(skipDir));
-	CHECK_VECTOR_SIZE(2, Suppressions.Rules);
-}
+        // now call the method being tested
+        wxFileName skipDir;
+        skipDir.AssignDir(CodeDir.GetPath());
+        skipDir.AppendDir(wxT("vendor"));
+        CHECK(Suppressions.AddSkipAllRuleForDirectory(skipDir));
+        CHECK_VECTOR_SIZE(2, Suppressions.Rules);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRuleWithDuplicates) {
-	// make sure that adding a directory rule
-	// will not add a rule if another rule for the dir
-	// already exists
-	t4p::SuppressionRuleClass rule;
-	rule.SkipAllRule(CodeDir);
-	Suppressions.Add(rule);
+    TEST_FIXTURE(LintSuppressionFixtureClass, AddDirectoryRuleWithDuplicates) {
+        // make sure that adding a directory rule
+        // will not add a rule if another rule for the dir
+        // already exists
+        t4p::SuppressionRuleClass rule;
+        rule.SkipAllRule(CodeDir);
+        Suppressions.Add(rule);
 
-	// now call the method being tested
-	CHECK_EQUAL(false, Suppressions.AddSkipAllRuleForDirectory(CodeDir));
-	CHECK_VECTOR_SIZE(1, Suppressions.Rules);
-}
+        // now call the method being tested
+        CHECK_EQUAL(false, Suppressions.AddSkipAllRuleForDirectory(CodeDir));
+        CHECK_VECTOR_SIZE(1, Suppressions.Rules);
+    }
 
-TEST_FIXTURE(LintSuppressionFixtureClass, RemoveDirectoryRuleWithExistingRules) {
-	// add 2 rules, then attempt to remove 1
-	t4p::SuppressionRuleClass ruleDir;
-	ruleDir.SkipAllRule(CodeDir);
-	Suppressions.Add(ruleDir);
+    TEST_FIXTURE(LintSuppressionFixtureClass, RemoveDirectoryRuleWithExistingRules) {
+        // add 2 rules, then attempt to remove 1
+        t4p::SuppressionRuleClass ruleDir;
+        ruleDir.SkipAllRule(CodeDir);
+        Suppressions.Add(ruleDir);
 
-	t4p::SuppressionRuleClass ruleFile;
-	ruleFile.SkipAllRule(CodeFile);
-	Suppressions.Add(ruleFile);
+        t4p::SuppressionRuleClass ruleFile;
+        ruleFile.SkipAllRule(CodeFile);
+        Suppressions.Add(ruleFile);
 
-	// now call the method being tested
-	CHECK_EQUAL(true, Suppressions.RemoveRulesForDirectory(CodeDir));
-	CHECK_VECTOR_SIZE(1, Suppressions.Rules);
-}
+        // now call the method being tested
+        CHECK_EQUAL(true, Suppressions.RemoveRulesForDirectory(CodeDir));
+        CHECK_VECTOR_SIZE(1, Suppressions.Rules);
+    }
 }

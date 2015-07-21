@@ -28,69 +28,69 @@
 #include "globals/String.h"
 
 SUITE(StringHelperTestClass) {
-TEST(FindPreviousShouldReturnLastIndex) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("test");
-	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, -1));
-}
+    TEST(FindPreviousShouldReturnLastIndex) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("test");
+        int32_t expected = text.indexOf(expression);
+        CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, -1));
+    }
 
-TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtBeginning) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("this");
-	CHECK_EQUAL(0, t4p::FindPrevious(text, expression, -1));
-}
+    TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtBeginning) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("this");
+        CHECK_EQUAL(0, t4p::FindPrevious(text, expression, -1));
+    }
 
-TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtEnd) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("find");
-	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, -1));
-}
+    TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtEnd) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("find");
+        int32_t expected = text.indexOf(expression);
+        CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, -1));
+    }
 
-TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtStart) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
-	int32_t expected = text.indexOf(expression);
-	CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, expected + expression.length() - 1));
-}
+    TEST(FindPreviousShouldReturnLastIndexWhenMatchIsAtStart) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
+        int32_t expected = text.indexOf(expression);
+        CHECK_EQUAL(expected, t4p::FindPrevious(text, expression, expected + expression.length() - 1));
+    }
 
-TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotFound) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("dackwards");  // 1 char off d vs. b
-	CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, -1));
-}
+    TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotFound) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("dackwards");  // 1 char off d vs. b
+        CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, -1));
+    }
 
 
-TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotBeforeStart) {
-	UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
-	UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
-	CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, 29));  // 29 = index of 'd' of "backward"
-}
+    TEST(FindPreviousShouldReturnNotFoundWhenMatchIsNotBeforeStart) {
+        UnicodeString text = UNICODE_STRING_SIMPLE("this is a test of the backwards find");
+        UnicodeString expression = UNICODE_STRING_SIMPLE("backwards");
+        CHECK_EQUAL(-1, t4p::FindPrevious(text, expression, 29));  // 29 = index of 'd' of "backward"
+    }
 
-TEST(WxToIcuConversions) {
-	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
-	wxString wxStr = wxT("this is a test of the conversions");
+    TEST(WxToIcuConversions) {
+        UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
+        wxString wxStr = wxT("this is a test of the conversions");
 
-	CHECK_EQUAL(wxStr, t4p::IcuToWx(uniStr));
-	CHECK_EQUAL(uniStr, t4p::WxToIcu(wxStr));
+        CHECK_EQUAL(wxStr, t4p::IcuToWx(uniStr));
+        CHECK_EQUAL(uniStr, t4p::WxToIcu(wxStr));
 
-	// convert twice
-	UnicodeString test = t4p::WxToIcu(
-			t4p::IcuToWx(uniStr));
-	CHECK_EQUAL(uniStr, test);
-}
+        // convert twice
+        UnicodeString test = t4p::WxToIcu(
+                                 t4p::IcuToWx(uniStr));
+        CHECK_EQUAL(uniStr, test);
+    }
 
-TEST(IcuToCharConversions) {
-	UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
-	std::string str = "this is a test of the conversions";
+    TEST(IcuToCharConversions) {
+        UnicodeString uniStr = UNICODE_STRING_SIMPLE("this is a test of the conversions");
+        std::string str = "this is a test of the conversions";
 
-	CHECK_EQUAL(str, t4p::IcuToChar(uniStr));
-	CHECK_EQUAL(uniStr, t4p::CharToIcu(str.c_str()));
+        CHECK_EQUAL(str, t4p::IcuToChar(uniStr));
+        CHECK_EQUAL(uniStr, t4p::CharToIcu(str.c_str()));
 
-	// convert twice
-	UnicodeString test = t4p::CharToIcu(
-		t4p::IcuToChar(uniStr).c_str());
-	CHECK_EQUAL(uniStr, test);
-}
+        // convert twice
+        UnicodeString test = t4p::CharToIcu(
+                                 t4p::IcuToChar(uniStr).c_str());
+        CHECK_EQUAL(uniStr, test);
+    }
 }
