@@ -433,6 +433,12 @@ void t4p::CodeControlStylesInit(t4p::CodeControlOptionsClass& options) {
 
 
 
+
+
+
+
+
+
 // *** ALL CODE BELOW IS GENERATED AUTOMATICALLY BY resources/color_themes/color-theme-parser.cpp *** //
 
 
@@ -564,7 +570,6 @@ static void SetToOblivionTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToOblivionThemePhp(options);
     SetToOblivionThemeSql(options);
@@ -1091,7 +1096,6 @@ static void SetToRettaTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToRettaThemePhp(options);
     SetToRettaThemeSql(options);
     SetToRettaThemeCss(options);
@@ -1616,7 +1620,6 @@ static void SetToSolarized_lightTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToSolarized_lightThemePhp(options);
     SetToSolarized_lightThemeSql(options);
@@ -2143,7 +2146,6 @@ static void SetToSolarized_darkTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToSolarized_darkThemePhp(options);
     SetToSolarized_darkThemeSql(options);
     SetToSolarized_darkThemeCss(options);
@@ -2668,7 +2670,6 @@ static void SetToGedit_original_oblivionTheme(t4p::CodeControlOptionsClass& opti
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToGedit_original_oblivionThemePhp(options);
     SetToGedit_original_oblivionThemeSql(options);
@@ -3195,7 +3196,6 @@ static void SetToWombatTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToWombatThemePhp(options);
     SetToWombatThemeSql(options);
     SetToWombatThemeCss(options);
@@ -3720,7 +3720,6 @@ static void SetToBlack_pastelTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToBlack_pastelThemePhp(options);
     SetToBlack_pastelThemeSql(options);
@@ -4247,7 +4246,6 @@ static void SetToVisual_studioTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToVisual_studioThemePhp(options);
     SetToVisual_studioThemeSql(options);
     SetToVisual_studioThemeCss(options);
@@ -4772,7 +4770,6 @@ static void SetToObsidianTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToObsidianThemePhp(options);
     SetToObsidianThemeSql(options);
@@ -5299,7 +5296,6 @@ static void SetToAs_visual_studio_2010Theme(t4p::CodeControlOptionsClass& option
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToAs_visual_studio_2010ThemePhp(options);
     SetToAs_visual_studio_2010ThemeSql(options);
     SetToAs_visual_studio_2010ThemeCss(options);
@@ -5824,7 +5820,6 @@ static void SetToHavenjarkTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToHavenjarkThemePhp(options);
     SetToHavenjarkThemeSql(options);
@@ -6351,7 +6346,6 @@ static void SetToTangoTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToTangoThemePhp(options);
     SetToTangoThemeSql(options);
     SetToTangoThemeCss(options);
@@ -6876,7 +6870,6 @@ static void SetToSchussTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToSchussThemePhp(options);
     SetToSchussThemeSql(options);
@@ -7403,7 +7396,6 @@ static void SetToNotepad_defaultTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToNotepad_defaultThemePhp(options);
     SetToNotepad_defaultThemeSql(options);
     SetToNotepad_defaultThemeCss(options);
@@ -7928,7 +7920,6 @@ static void SetToVibrant_inkTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToVibrant_inkThemePhp(options);
     SetToVibrant_inkThemeSql(options);
@@ -8455,7 +8446,6 @@ static void SetToRecogneyesTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToRecogneyesThemePhp(options);
     SetToRecogneyesThemeSql(options);
     SetToRecogneyesThemeCss(options);
@@ -8980,7 +8970,6 @@ static void SetToMrTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToMrThemePhp(options);
     SetToMrThemeSql(options);
@@ -9507,7 +9496,6 @@ static void SetToSunburstTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToSunburstThemePhp(options);
     SetToSunburstThemeSql(options);
     SetToSunburstThemeCss(options);
@@ -10032,7 +10020,6 @@ static void SetToInkpotTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToInkpotThemePhp(options);
     SetToInkpotThemeSql(options);
@@ -10559,7 +10546,6 @@ static void SetToMinimalTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToMinimalThemePhp(options);
     SetToMinimalThemeSql(options);
     SetToMinimalThemeCss(options);
@@ -11084,7 +11070,6 @@ static void SetToNightlion_aptana_themeTheme(t4p::CodeControlOptionsClass& optio
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToNightlion_aptana_themeThemePhp(options);
     SetToNightlion_aptana_themeThemeSql(options);
@@ -11611,7 +11596,6 @@ static void SetToMonokaiTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToMonokaiThemePhp(options);
     SetToMonokaiThemeSql(options);
     SetToMonokaiThemeCss(options);
@@ -12136,7 +12120,6 @@ static void SetToSublime_text_2Theme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToSublime_text_2ThemePhp(options);
     SetToSublime_text_2ThemeSql(options);
@@ -12663,7 +12646,6 @@ static void SetToPastelTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToPastelThemePhp(options);
     SetToPastelThemeSql(options);
     SetToPastelThemeCss(options);
@@ -13188,7 +13170,6 @@ static void SetToZenburn_highcontrastTheme(t4p::CodeControlOptionsClass& options
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToZenburn_highcontrastThemePhp(options);
     SetToZenburn_highcontrastThemeSql(options);
@@ -13715,7 +13696,6 @@ static void SetToFrontenddevTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsItalic = false;
     }
 
-
     SetToFrontenddevThemePhp(options);
     SetToFrontenddevThemeSql(options);
     SetToFrontenddevThemeCss(options);
@@ -14240,7 +14220,6 @@ static void SetToRoboticketTheme(t4p::CodeControlOptionsClass& options) {
         options.DiffStyles[i].IsBold = false;
         options.DiffStyles[i].IsItalic = false;
     }
-
 
     SetToRoboticketThemePhp(options);
     SetToRoboticketThemeSql(options);
